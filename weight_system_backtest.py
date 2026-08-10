@@ -78,7 +78,7 @@ BUY_STRONG = 75   # >=75 标准加仓（仓位升至 100%）
 BUY_WEAK = 60     # 60-74 轻仓加仓（仓位 50%）
 HOLD_UPPER = 60
 HOLD_LOWER = 45   # 45-59 观望
-SELL_WEAK = 40    # 40-44 减仓（仓位降至 50%）
+SELL_WEAK = 40    # 30-44 减至半仓（仓位降至 50%，<30 清仓）
 SELL_STRONG = 30  # <30 清仓
 
 # ---- v1.3 可配置开关（默认关闭，行为与 v1.2 完全一致）----
@@ -595,7 +595,7 @@ def run_backtest(df, news_level, is_fund=False, strategy="weight"):
                     else:
                         pending_action = None
                 else:
-                    # 模型B/target：目标仓位制（≥75→100% / 60-74→50% / 40-44→50% / <30→0）
+                    # 模型B/target：目标仓位制（≥75→100% / 60-74→50% / 30-44→50% / <30→0）
                     if total >= BUY_STRONG:
                         pending_action = ("buy", 1.0)  # 满仓
                     elif total >= BUY_WEAK:

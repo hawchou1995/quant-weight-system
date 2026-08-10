@@ -27,7 +27,7 @@ def action_tier(total):
     if total >= BUY_STRONG: return "加仓", f"满仓加仓（≥75 分，{share}）"
     if total >= BUY_WEAK: return "加仓", f"轻仓加仓（60-74 分，{share}）"
     if total < SELL_STRONG: return "减仓", f"清仓（<30 分，{share}）"
-    if total < SELL_WEAK: return "减仓", f"减至半仓（40-44 分，{share}）"
+    if total < SELL_WEAK: return "减仓", f"减至半仓（30-44 分，{share}）"
     return "观望", "维持现状（45-59 分）"
 
 def snapshot_at(df_full, target_date):
