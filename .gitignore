@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# 检查用临时文件
+dash_check*.png
+dom_dump.html
+
+# 本地环境（若有）
+.env
+*.local
+
+# 系统
+Thumbs.db
+.DS_Store

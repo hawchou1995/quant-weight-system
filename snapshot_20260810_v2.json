@@ -1,0 +1,1050 @@
+{
+  "generated_at": "2026-08-10T18:50:00+08:00",
+  "snapshot_dates": [
+    "2026-08-07",
+    "2026-08-10"
+  ],
+  "weights": {
+    "trend": 0.3,
+    "momentum": 0.25,
+    "volume": 0.15,
+    "osc": 0.15,
+    "risk": 0.1,
+    "news": 0.05
+  },
+  "thresholds": {
+    "BUY_STRONG": 75,
+    "BUY_WEAK": 60,
+    "SELL_WEAK": 40,
+    "SELL_STRONG": 30
+  },
+  "signals": [
+    {
+      "code": "300502",
+      "name": "新易盛",
+      "type": "股票",
+      "news_level": "L3",
+      "date": "2026-08-10",
+      "close": 399.6,
+      "pct_chg": -5.07,
+      "ma20": 464.46,
+      "ma20_dev": -13.96,
+      "rsi": 40.3,
+      "macd_hist": -7.3565,
+      "k": 49.2,
+      "d": 42.9,
+      "adx": 22.2,
+      "atr_pct": 11.35,
+      "total_score": 38.5,
+      "components": {
+        "trend": 26.0,
+        "momentum": 25.0,
+        "volume": 73.0,
+        "osc": 64.0,
+        "risk": 24.0,
+        "news": 30.0
+      },
+      "confidence": {
+        "level": "高",
+        "coverage": 1.0,
+        "directional_cats": 6,
+        "agree_ratio": 1.0
+      },
+      "provenance": {
+        "as_of": "2026-08-10",
+        "kline": {
+          "source": "腾讯自选股接口(westock)",
+          "level": "A",
+          "note": "日线前复权"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "L3"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "减仓",
+      "action_desc": "减至半仓（40-44 分）",
+      "prev_action": "减仓",
+      "change": "-"
+    },
+    {
+      "code": "300308",
+      "name": "中际旭创",
+      "type": "股票",
+      "news_level": "L1",
+      "date": "2026-08-10",
+      "close": 864.58,
+      "pct_chg": -6.01,
+      "ma20": 1003.991,
+      "ma20_dev": -13.89,
+      "rsi": 39.1,
+      "macd_hist": -12.6242,
+      "k": 43.8,
+      "d": 44.6,
+      "adx": 25.0,
+      "atr_pct": 11.37,
+      "total_score": 42.9,
+      "components": {
+        "trend": 34.0,
+        "momentum": 25.0,
+        "volume": 73.0,
+        "osc": 64.0,
+        "risk": 24.0,
+        "news": 70.0
+      },
+      "confidence": {
+        "level": "高",
+        "coverage": 1.0,
+        "directional_cats": 6,
+        "agree_ratio": 1.0
+      },
+      "provenance": {
+        "as_of": "2026-08-10",
+        "kline": {
+          "source": "腾讯自选股接口(westock)",
+          "level": "A",
+          "note": "日线前复权"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "L1"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "观望",
+      "action_desc": "维持现状（45-59 分）",
+      "prev_action": "减仓",
+      "change": "减仓➡️观望"
+    },
+    {
+      "code": "159516",
+      "name": "半导体设备ETF",
+      "type": "ETF",
+      "news_level": "-",
+      "date": "2026-08-10",
+      "close": 0.762,
+      "pct_chg": 2.97,
+      "ma20": 0.72,
+      "ma20_dev": 5.89,
+      "rsi": 53.0,
+      "macd_hist": 0.0082,
+      "k": 69.4,
+      "d": 50.6,
+      "adx": 22.3,
+      "atr_pct": 7.65,
+      "total_score": 65.2,
+      "components": {
+        "trend": 66.0,
+        "momentum": 80.0,
+        "volume": 55.0,
+        "osc": 82.0,
+        "risk": 24.0,
+        "news": 50.0
+      },
+      "confidence": {
+        "level": "高",
+        "coverage": 0.83,
+        "directional_cats": 5,
+        "agree_ratio": 0.8
+      },
+      "provenance": {
+        "as_of": "2026-08-10",
+        "kline": {
+          "source": "腾讯自选股接口(westock)",
+          "level": "A",
+          "note": "日线前复权"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "无情报（中性50）"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "加仓",
+      "action_desc": "轻仓加仓（60-74 分）",
+      "prev_action": "观望",
+      "change": "观望➡️加仓"
+    },
+    {
+      "code": "600498",
+      "name": "烽火通信",
+      "type": "股票",
+      "news_level": "-",
+      "date": "2026-08-10",
+      "close": 38.3,
+      "pct_chg": -2.32,
+      "ma20": 38.135,
+      "ma20_dev": 0.43,
+      "rsi": 40.6,
+      "macd_hist": 2.3346,
+      "k": 74.9,
+      "d": 57.0,
+      "adx": 36.4,
+      "atr_pct": 8.92,
+      "total_score": 63.9,
+      "components": {
+        "trend": 74.0,
+        "momentum": 65.0,
+        "volume": 73.0,
+        "osc": 64.0,
+        "risk": 24.0,
+        "news": 50.0
+      },
+      "confidence": {
+        "level": "高",
+        "coverage": 0.83,
+        "directional_cats": 5,
+        "agree_ratio": 1.0
+      },
+      "provenance": {
+        "as_of": "2026-08-10",
+        "kline": {
+          "source": "腾讯自选股接口(westock)",
+          "level": "A",
+          "note": "日线前复权"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "无情报（中性50）"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "加仓",
+      "action_desc": "轻仓加仓（60-74 分）",
+      "prev_action": "加仓",
+      "change": "-"
+    },
+    {
+      "code": "601138",
+      "name": "工业富联",
+      "type": "股票",
+      "news_level": "-",
+      "date": "2026-08-10",
+      "close": 69.18,
+      "pct_chg": 1.47,
+      "ma20": 60.865,
+      "ma20_dev": 13.66,
+      "rsi": 59.8,
+      "macd_hist": 3.3537,
+      "k": 81.9,
+      "d": 68.2,
+      "adx": 21.4,
+      "atr_pct": 5.67,
+      "total_score": 76.6,
+      "components": {
+        "trend": 92.0,
+        "momentum": 82.0,
+        "volume": 55.0,
+        "osc": 82.0,
+        "risk": 55.0,
+        "news": 50.0
+      },
+      "confidence": {
+        "level": "中",
+        "coverage": 0.83,
+        "directional_cats": 5,
+        "agree_ratio": 0.6
+      },
+      "provenance": {
+        "as_of": "2026-08-10",
+        "kline": {
+          "source": "腾讯自选股接口(westock)",
+          "level": "A",
+          "note": "日线前复权"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "无情报（中性50）"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "加仓",
+      "action_desc": "满仓加仓（≥75 分，信号强）",
+      "prev_action": "加仓",
+      "change": "-"
+    },
+    {
+      "code": "002463",
+      "name": "沪电股份",
+      "type": "股票",
+      "news_level": "-",
+      "date": "2026-08-10",
+      "close": 122.7,
+      "pct_chg": -2.52,
+      "ma20": 117.112,
+      "ma20_dev": 4.77,
+      "rsi": 52.2,
+      "macd_hist": 3.9209,
+      "k": 77.2,
+      "d": 61.9,
+      "adx": 22.2,
+      "atr_pct": 8.05,
+      "total_score": 64.7,
+      "components": {
+        "trend": 74.0,
+        "momentum": 65.0,
+        "volume": 60.0,
+        "osc": 82.0,
+        "risk": 24.0,
+        "news": 50.0
+      },
+      "confidence": {
+        "level": "高",
+        "coverage": 0.83,
+        "directional_cats": 5,
+        "agree_ratio": 1.0
+      },
+      "provenance": {
+        "as_of": "2026-08-10",
+        "kline": {
+          "source": "腾讯自选股接口(westock)",
+          "level": "A",
+          "note": "日线前复权"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "无情报（中性50）"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "加仓",
+      "action_desc": "轻仓加仓（60-74 分）",
+      "prev_action": "加仓",
+      "change": "-"
+    },
+    {
+      "code": "002384",
+      "name": "东山精密",
+      "type": "股票",
+      "news_level": "-",
+      "date": "2026-08-10",
+      "close": 185.94,
+      "pct_chg": -4.78,
+      "ma20": 206.047,
+      "ma20_dev": -9.76,
+      "rsi": 43.5,
+      "macd_hist": -0.5231,
+      "k": 54.1,
+      "d": 39.9,
+      "adx": 26.8,
+      "atr_pct": 11.13,
+      "total_score": 39.6,
+      "components": {
+        "trend": 34.0,
+        "momentum": 25.0,
+        "volume": 58.0,
+        "osc": 64.0,
+        "risk": 24.0,
+        "news": 50.0
+      },
+      "confidence": {
+        "level": "高",
+        "coverage": 0.83,
+        "directional_cats": 5,
+        "agree_ratio": 0.8
+      },
+      "provenance": {
+        "as_of": "2026-08-10",
+        "kline": {
+          "source": "腾讯自选股接口(westock)",
+          "level": "A",
+          "note": "日线前复权"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "无情报（中性50）"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "减仓",
+      "action_desc": "减至半仓（40-44 分）",
+      "prev_action": "观望",
+      "change": "观望➡️减仓"
+    },
+    {
+      "code": "600183",
+      "name": "生益科技",
+      "type": "股票",
+      "news_level": "-",
+      "date": "2026-08-10",
+      "close": 138.57,
+      "pct_chg": -1.01,
+      "ma20": 125.228,
+      "ma20_dev": 10.65,
+      "rsi": 54.5,
+      "macd_hist": 6.3264,
+      "k": 78.2,
+      "d": 58.5,
+      "adx": 25.3,
+      "atr_pct": 8.56,
+      "total_score": 69.8,
+      "components": {
+        "trend": 92.0,
+        "momentum": 65.0,
+        "volume": 58.0,
+        "osc": 82.0,
+        "risk": 24.0,
+        "news": 50.0
+      },
+      "confidence": {
+        "level": "高",
+        "coverage": 0.83,
+        "directional_cats": 5,
+        "agree_ratio": 0.8
+      },
+      "provenance": {
+        "as_of": "2026-08-10",
+        "kline": {
+          "source": "腾讯自选股接口(westock)",
+          "level": "A",
+          "note": "日线前复权"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "无情报（中性50）"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "加仓",
+      "action_desc": "轻仓加仓（60-74 分）",
+      "prev_action": "加仓",
+      "change": "-"
+    },
+    {
+      "code": "300476",
+      "name": "胜宏科技",
+      "type": "股票",
+      "news_level": "L1",
+      "date": "2026-08-10",
+      "close": 286.0,
+      "pct_chg": 2.07,
+      "ma20": 235.911,
+      "ma20_dev": 21.23,
+      "rsi": 58.7,
+      "macd_hist": 22.4029,
+      "k": 80.4,
+      "d": 59.2,
+      "adx": 25.6,
+      "atr_pct": 8.25,
+      "total_score": 73.0,
+      "components": {
+        "trend": 82.0,
+        "momentum": 80.0,
+        "volume": 68.0,
+        "osc": 82.0,
+        "risk": 24.0,
+        "news": 70.0
+      },
+      "confidence": {
+        "level": "高",
+        "coverage": 1.0,
+        "directional_cats": 6,
+        "agree_ratio": 1.0
+      },
+      "provenance": {
+        "as_of": "2026-08-10",
+        "kline": {
+          "source": "腾讯自选股接口(westock)",
+          "level": "A",
+          "note": "日线前复权"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "L1"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "加仓",
+      "action_desc": "轻仓加仓（60-74 分）",
+      "prev_action": "加仓",
+      "change": "-"
+    },
+    {
+      "code": "603986",
+      "name": "兆易创新",
+      "type": "股票",
+      "news_level": "-",
+      "date": "2026-08-10",
+      "close": 403.03,
+      "pct_chg": -3.36,
+      "ma20": 432.3,
+      "ma20_dev": -6.77,
+      "rsi": 41.8,
+      "macd_hist": 4.7656,
+      "k": 59.2,
+      "d": 39.7,
+      "adx": 28.6,
+      "atr_pct": 10.97,
+      "total_score": 54.9,
+      "components": {
+        "trend": 44.0,
+        "momentum": 65.0,
+        "volume": 73.0,
+        "osc": 64.0,
+        "risk": 24.0,
+        "news": 50.0
+      },
+      "confidence": {
+        "level": "高",
+        "coverage": 0.83,
+        "directional_cats": 5,
+        "agree_ratio": 0.8
+      },
+      "provenance": {
+        "as_of": "2026-08-10",
+        "kline": {
+          "source": "腾讯自选股接口(westock)",
+          "level": "A",
+          "note": "日线前复权"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "无情报（中性50）"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "观望",
+      "action_desc": "维持现状（45-59 分）",
+      "prev_action": "观望",
+      "change": "-"
+    },
+    {
+      "code": "515880",
+      "name": "通信ETF",
+      "type": "ETF",
+      "news_level": "-",
+      "date": "2026-08-10",
+      "close": 0.644,
+      "pct_chg": -2.42,
+      "ma20": 0.655,
+      "ma20_dev": -1.63,
+      "rsi": 44.1,
+      "macd_hist": 0.0159,
+      "k": 70.8,
+      "d": 57.6,
+      "adx": 35.4,
+      "atr_pct": 7.29,
+      "total_score": 53.0,
+      "components": {
+        "trend": 44.0,
+        "momentum": 65.0,
+        "volume": 60.0,
+        "osc": 64.0,
+        "risk": 24.0,
+        "news": 50.0
+      },
+      "confidence": {
+        "level": "高",
+        "coverage": 0.83,
+        "directional_cats": 5,
+        "agree_ratio": 0.8
+      },
+      "provenance": {
+        "as_of": "2026-08-10",
+        "kline": {
+          "source": "腾讯自选股接口(westock)",
+          "level": "A",
+          "note": "日线前复权"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "无情报（中性50）"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "观望",
+      "action_desc": "维持现状（45-59 分）",
+      "prev_action": "加仓",
+      "change": "加仓➡️观望"
+    },
+    {
+      "code": "516150",
+      "name": "稀土ETF嘉实",
+      "type": "ETF",
+      "news_level": "-",
+      "date": "2026-08-10",
+      "close": 1.832,
+      "pct_chg": 0.66,
+      "ma20": 1.67,
+      "ma20_dev": 9.69,
+      "rsi": 57.6,
+      "macd_hist": 0.0727,
+      "k": 88.6,
+      "d": 83.7,
+      "adx": 32.8,
+      "atr_pct": 3.69,
+      "total_score": 74.1,
+      "components": {
+        "trend": 92.0,
+        "momentum": 72.0,
+        "volume": 55.0,
+        "osc": 72.0,
+        "risk": 70.0,
+        "news": 50.0
+      },
+      "confidence": {
+        "level": "高",
+        "coverage": 0.83,
+        "directional_cats": 5,
+        "agree_ratio": 0.8
+      },
+      "provenance": {
+        "as_of": "2026-08-10",
+        "kline": {
+          "source": "腾讯自选股接口(westock)",
+          "level": "A",
+          "note": "日线前复权"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "无情报（中性50）"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "加仓",
+      "action_desc": "轻仓加仓（60-74 分）",
+      "prev_action": "加仓",
+      "change": "-"
+    },
+    {
+      "code": "560390",
+      "name": "电网设备ETF易方达",
+      "type": "ETF",
+      "news_level": "-",
+      "date": "2026-08-10",
+      "close": 0.892,
+      "pct_chg": 0.22,
+      "ma20": 0.854,
+      "ma20_dev": 4.44,
+      "rsi": 49.5,
+      "macd_hist": 0.0271,
+      "k": 89.1,
+      "d": 80.5,
+      "adx": 30.5,
+      "atr_pct": 3.47,
+      "total_score": 70.0,
+      "components": {
+        "trend": 92.0,
+        "momentum": 72.0,
+        "volume": 55.0,
+        "osc": 54.0,
+        "risk": 56.0,
+        "news": 50.0
+      },
+      "confidence": {
+        "level": "中",
+        "coverage": 0.83,
+        "directional_cats": 5,
+        "agree_ratio": 0.4
+      },
+      "provenance": {
+        "as_of": "2026-08-10",
+        "kline": {
+          "source": "腾讯自选股接口(westock)",
+          "level": "A",
+          "note": "日线前复权"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "无情报（中性50）"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "加仓",
+      "action_desc": "轻仓加仓（60-74 分）",
+      "prev_action": "加仓",
+      "change": "-"
+    },
+    {
+      "code": "008254",
+      "name": "华宝致远混合C",
+      "type": "基金",
+      "news_level": "-",
+      "date": "2026-08-07",
+      "close": 1.721,
+      "pct_chg": 1.2,
+      "ma20": 1.73,
+      "ma20_dev": -0.54,
+      "rsi": 45.2,
+      "macd_hist": 0.0211,
+      "k": 75.7,
+      "d": 56.5,
+      "adx": 18.4,
+      "atr_pct": 2.49,
+      "total_score": 51.0,
+      "components": {
+        "trend": 26.0,
+        "momentum": 72.0,
+        "volume": 50.0,
+        "osc": 64.0,
+        "risk": 56.0,
+        "news": 50.0
+      },
+      "confidence": {
+        "level": "中",
+        "coverage": 0.67,
+        "directional_cats": 4,
+        "agree_ratio": 0.75
+      },
+      "provenance": {
+        "as_of": "2026-08-07",
+        "kline": {
+          "source": "通达信基金净值(setcode=33)",
+          "level": "A",
+          "note": "净值T-1"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "无情报（中性50）"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "观望",
+      "action_desc": "维持现状（45-59 分）",
+      "prev_action": "观望",
+      "change": "-"
+    },
+    {
+      "code": "018036",
+      "name": "长城新能源车股C",
+      "type": "基金",
+      "news_level": "-",
+      "date": "2026-08-06",
+      "close": 2.576,
+      "pct_chg": -1.27,
+      "ma20": 2.592,
+      "ma20_dev": -0.63,
+      "rsi": 47.0,
+      "macd_hist": 0.0229,
+      "k": 74.0,
+      "d": 56.8,
+      "adx": 14.7,
+      "atr_pct": 2.39,
+      "total_score": 50.6,
+      "components": {
+        "trend": 26.0,
+        "momentum": 65.0,
+        "volume": 50.0,
+        "osc": 64.0,
+        "risk": 70.0,
+        "news": 50.0
+      },
+      "confidence": {
+        "level": "中",
+        "coverage": 0.67,
+        "directional_cats": 4,
+        "agree_ratio": 1.0
+      },
+      "provenance": {
+        "as_of": "2026-08-06",
+        "kline": {
+          "source": "通达信基金净值(setcode=33)",
+          "level": "A",
+          "note": "净值T-1"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "无情报（中性50）"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "观望",
+      "action_desc": "维持现状（45-59 分）",
+      "prev_action": "观望",
+      "change": "-"
+    },
+    {
+      "code": "002891",
+      "name": "华夏移动互联CNY",
+      "type": "基金",
+      "news_level": "-",
+      "date": "2026-08-06",
+      "close": 2.6,
+      "pct_chg": -1.29,
+      "ma20": 2.614,
+      "ma20_dev": -0.53,
+      "rsi": 46.9,
+      "macd_hist": 0.0435,
+      "k": 72.7,
+      "d": 56.1,
+      "adx": 16.2,
+      "atr_pct": 3.98,
+      "total_score": 49.2,
+      "components": {
+        "trend": 26.0,
+        "momentum": 65.0,
+        "volume": 50.0,
+        "osc": 64.0,
+        "risk": 56.0,
+        "news": 50.0
+      },
+      "confidence": {
+        "level": "中",
+        "coverage": 0.67,
+        "directional_cats": 4,
+        "agree_ratio": 0.75
+      },
+      "provenance": {
+        "as_of": "2026-08-06",
+        "kline": {
+          "source": "通达信基金净值(setcode=33)",
+          "level": "A",
+          "note": "净值T-1"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "无情报（中性50）"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "观望",
+      "action_desc": "维持现状（45-59 分）",
+      "prev_action": "观望",
+      "change": "-"
+    },
+    {
+      "code": "024239",
+      "name": "华夏全球QDII C",
+      "type": "基金",
+      "news_level": "-",
+      "date": "2026-08-06",
+      "close": 2.614,
+      "pct_chg": 0.54,
+      "ma20": 2.788,
+      "ma20_dev": -6.21,
+      "rsi": 36.3,
+      "macd_hist": 0.0141,
+      "k": 37.7,
+      "d": 21.8,
+      "adx": 31.6,
+      "atr_pct": 3.13,
+      "total_score": 59.1,
+      "components": {
+        "trend": 44.0,
+        "momentum": 72.0,
+        "volume": 50.0,
+        "osc": 82.0,
+        "risk": 56.0,
+        "news": 50.0
+      },
+      "confidence": {
+        "level": "中",
+        "coverage": 0.67,
+        "directional_cats": 4,
+        "agree_ratio": 0.5
+      },
+      "provenance": {
+        "as_of": "2026-08-06",
+        "kline": {
+          "source": "通达信基金净值(setcode=33)",
+          "level": "A",
+          "note": "净值T-1"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "无情报（中性50）"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "观望",
+      "action_desc": "维持现状（45-59 分）",
+      "prev_action": "观望",
+      "change": "-"
+    },
+    {
+      "code": "014002",
+      "name": "浦银智能科技C",
+      "type": "基金",
+      "news_level": "-",
+      "date": "2026-08-06",
+      "close": 3.254,
+      "pct_chg": -3.32,
+      "ma20": 3.362,
+      "ma20_dev": -3.21,
+      "rsi": 44.6,
+      "macd_hist": 0.0363,
+      "k": 67.6,
+      "d": 53.7,
+      "adx": 16.2,
+      "atr_pct": 4.14,
+      "total_score": 49.2,
+      "components": {
+        "trend": 26.0,
+        "momentum": 65.0,
+        "volume": 50.0,
+        "osc": 64.0,
+        "risk": 56.0,
+        "news": 50.0
+      },
+      "confidence": {
+        "level": "中",
+        "coverage": 0.67,
+        "directional_cats": 4,
+        "agree_ratio": 0.75
+      },
+      "provenance": {
+        "as_of": "2026-08-06",
+        "kline": {
+          "source": "通达信基金净值(setcode=33)",
+          "level": "A",
+          "note": "净值T-1"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "无情报（中性50）"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "观望",
+      "action_desc": "维持现状（45-59 分）",
+      "prev_action": "观望",
+      "change": "-"
+    },
+    {
+      "code": "020900",
+      "name": "天弘通信设备C",
+      "type": "基金",
+      "news_level": "-",
+      "date": "2026-08-07",
+      "close": 3.426,
+      "pct_chg": 1.07,
+      "ma20": 3.378,
+      "ma20_dev": 1.43,
+      "rsi": 47.8,
+      "macd_hist": 0.0792,
+      "k": 79.3,
+      "d": 56.1,
+      "adx": 20.5,
+      "atr_pct": 3.64,
+      "total_score": 63.0,
+      "components": {
+        "trend": 66.0,
+        "momentum": 72.0,
+        "volume": 50.0,
+        "osc": 64.0,
+        "risk": 56.0,
+        "news": 50.0
+      },
+      "confidence": {
+        "level": "中",
+        "coverage": 0.67,
+        "directional_cats": 4,
+        "agree_ratio": 0.75
+      },
+      "provenance": {
+        "as_of": "2026-08-07",
+        "kline": {
+          "source": "通达信基金净值(setcode=33)",
+          "level": "A",
+          "note": "净值T-1"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "无情报（中性50）"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "加仓",
+      "action_desc": "轻仓加仓（60-74 分）",
+      "prev_action": "加仓",
+      "change": "-"
+    }
+  ],
+  "note": "变动记录 = 8-07 建议 ➡️ 8-10 建议；「-」表示建议未变"
+}

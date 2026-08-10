@@ -1,0 +1,21 @@
+{
+  "meta": {
+    "strategy_name": "综合指标权重系统 v1.0（19标的等权组合）",
+    "symbol": "19标的等权组合",
+    "start": "2025-01-01",
+    "end": "2026-08-07",
+    "initial_cash": 100.0,
+    "window_start_value": 100.0,
+    "final_value": 320.3178,
+    "market": "china_a",
+    "generated_at": "2026-08-10T21:24:05+08:00"
+  },
+  "summary": {
+    "total_return_pct": 220.32,
+    "annual_return_pct": 113.41,
+    "max_drawdown_pct": 18.76,
+    "sharpe": 2.273,
+    "win_rate_pct": 83.5,
+    "total_trades": 109
+  }
+}
