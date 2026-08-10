@@ -41,13 +41,36 @@ def snapshot_at(df_full, target_date):
         return None
     return row
 
+def classify_market(code, typ):
+    """按代码前缀细分板块（类型列展示用）：
+    创业板 300/301 | 科创板 688 | 沪主板 600/601/603/605 | 深主板 000/001/002
+    美股(05/06/09前缀)/港股(00700等5位)预留；ETF/基金保持原分类"""
+    if typ == "ETF":
+        return "ETF"
+    if typ == "基金":
+        return "基金"
+    if code.startswith(("300", "301")):
+        return "创业板"
+    if code.startswith("688"):
+        return "科创板"
+    if code.startswith(("600", "601", "603", "605")):
+        return "沪主板"
+    if code.startswith(("000", "001", "002")):
+        return "深主板"
+    if len(code) == 6 and code.isdigit():
+        if code[0] in ("0", "1", "2", "3") and typ == "美股":
+            return "美股"
+        if code[0] in ("0", "1", "2", "3", "4", "5") and typ == "港股":
+            return "港股"
+    return typ
+
 def build_rows(target_date):
     rows = []
     for code, name, typ, market, news_level in UNIVERSE:
         df = load_data(code)
         row = snapshot_at(df, target_date)
         if row is None:
-            rows.append({"code": code, "name": name, "type": typ, "available": False})
+            rows.append({"code": code, "name": name, "type": classify_market(code, typ), "available": False})
             continue
         total, comp, conf = compute_total_score(row, news_level, is_fund=(typ == "基金"))
         act, desc = action_tier(total)
@@ -62,7 +85,7 @@ def build_rows(target_date):
                            "note": "MA/MACD/KDJ/RSI/ADX/ATR"},
         }
         rows.append({
-            "code": code, "name": name, "type": typ, "news_level": news_level or "-",
+            "code": code, "name": name, "type": classify_market(code, typ), "news_level": news_level or "-",
             "date": str(row["date"].date()),
             "close": round(float(row["close"]), 3),
             "pct_chg": round(float(row["pct_chg"]), 2) if not pd.isna(row["pct_chg"]) else None,

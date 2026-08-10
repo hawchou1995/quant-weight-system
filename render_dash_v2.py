@@ -24,7 +24,7 @@ sig_rows = []
 for s in snap["signals"]:
     comp = s["components"]
     conf = s.get("confidence", {})
-    conf_txt = f"{conf.get('level', '-')}（覆盖率{conf.get('coverage', 0)*100:.0f}%）" if conf else "-"
+    conf_txt = conf.get("level", "-") if conf else "-"
     sig_rows.append({
         "metric": f"{s['name']} ({s['code']})",
         "values": [
@@ -72,7 +72,7 @@ extra_modules = [
     {
         "type": "metric_table", "tab": "overview",
         "title": "今日信号快照（2026-08-10）· 含变动记录",
-        "subtitle": "变动 = 8-07 建议 ➡️ 8-10 建议；操作按总分判断：≥75 满仓加仓 / 60-74 轻仓加仓 / 45-59 观望 / 30-44 减至半仓 / <30 清仓",
+        "subtitle": "变动 = 8-07 建议 ➡️ 8-10 建议；操作按总分判断：≥75 满仓加仓 / 60-74 轻仓加仓 / 45-59 观望 / 30-44 减至半仓 / <30 清仓；置信度：高=覆盖率≥80%且方向一致率≥75%，低=覆盖率<60%，其余为中",
         "columns": ["标的", "类型", "总分", "本次建议", "置信度", "上次建议", "变动", "RSI", "KDJ K/D", "ADX", "MA20偏离%", "打分明细"],
         "rows": sig_rows,
     },
