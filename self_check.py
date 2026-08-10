@@ -72,8 +72,8 @@ if sum_path.exists():
         s = d["summary"]
         ret = s.get("total_return_pct")
         dd = s.get("max_drawdown_pct")
-        check("组合总收益 ≈ 220.32%", ret is not None and abs(ret - 220.32) < 1.0, f"实际 {ret}%")
-        check("最大回撤 ≈ 18.76%", dd is not None and abs(dd - 18.76) < 1.0, f"实际 {dd}%")
+        check("组合总收益 ≈ 225.15%", ret is not None and abs(ret - 225.15) < 1.0, f"实际 {ret}%")
+        check("最大回撤 ≈ 20.04%", dd is not None and abs(dd - 20.04) < 1.0, f"实际 {dd}%")
     except Exception as e:
         check("summary 可解析", False, str(e))
 else:

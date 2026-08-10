@@ -69,7 +69,7 @@
         }
       },
       "action": "减仓",
-      "action_desc": "减至半仓（40-44 分）",
+      "action_desc": "减至半仓（40-44 分，单次最多调整 50% 仓位）",
       "prev_action": "减仓",
       "change": "-"
     },
@@ -177,7 +177,7 @@
         }
       },
       "action": "加仓",
-      "action_desc": "轻仓加仓（60-74 分）",
+      "action_desc": "轻仓加仓（60-74 分，单次最多调整 50% 仓位）",
       "prev_action": "观望",
       "change": "观望➡️加仓"
     },
@@ -231,7 +231,7 @@
         }
       },
       "action": "加仓",
-      "action_desc": "轻仓加仓（60-74 分）",
+      "action_desc": "轻仓加仓（60-74 分，单次最多调整 50% 仓位）",
       "prev_action": "加仓",
       "change": "-"
     },
@@ -285,7 +285,7 @@
         }
       },
       "action": "加仓",
-      "action_desc": "满仓加仓（≥75 分，信号强）",
+      "action_desc": "满仓加仓（≥75 分，单次最多调整 50% 仓位）",
       "prev_action": "加仓",
       "change": "-"
     },
@@ -339,7 +339,7 @@
         }
       },
       "action": "加仓",
-      "action_desc": "轻仓加仓（60-74 分）",
+      "action_desc": "轻仓加仓（60-74 分，单次最多调整 50% 仓位）",
       "prev_action": "加仓",
       "change": "-"
     },
@@ -393,7 +393,7 @@
         }
       },
       "action": "减仓",
-      "action_desc": "减至半仓（40-44 分）",
+      "action_desc": "减至半仓（40-44 分，单次最多调整 50% 仓位）",
       "prev_action": "观望",
       "change": "观望➡️减仓"
     },
@@ -447,7 +447,7 @@
         }
       },
       "action": "加仓",
-      "action_desc": "轻仓加仓（60-74 分）",
+      "action_desc": "轻仓加仓（60-74 分，单次最多调整 50% 仓位）",
       "prev_action": "加仓",
       "change": "-"
     },
@@ -501,7 +501,7 @@
         }
       },
       "action": "加仓",
-      "action_desc": "轻仓加仓（60-74 分）",
+      "action_desc": "轻仓加仓（60-74 分，单次最多调整 50% 仓位）",
       "prev_action": "加仓",
       "change": "-"
     },
@@ -663,7 +663,7 @@
         }
       },
       "action": "加仓",
-      "action_desc": "轻仓加仓（60-74 分）",
+      "action_desc": "轻仓加仓（60-74 分，单次最多调整 50% 仓位）",
       "prev_action": "加仓",
       "change": "-"
     },
@@ -717,7 +717,7 @@
         }
       },
       "action": "加仓",
-      "action_desc": "轻仓加仓（60-74 分）",
+      "action_desc": "轻仓加仓（60-74 分，单次最多调整 50% 仓位）",
       "prev_action": "加仓",
       "change": "-"
     },
@@ -1041,7 +1041,7 @@
         }
       },
       "action": "加仓",
-      "action_desc": "轻仓加仓（60-74 分）",
+      "action_desc": "轻仓加仓（60-74 分，单次最多调整 50% 仓位）",
       "prev_action": "加仓",
       "change": "-"
     }

@@ -85,10 +85,10 @@ DEADBAND_HI = 65  # 死区上限
 USE_DEADBAND = False      # True = 55-65 分区间一律观望（不触发轻仓加/减半仓）
 USE_REVERSAL_ONLY = False  # True = 仅加减反转才生成信号；同向档位变化（半仓↔满仓）不动作
 
-# ---- v1.4 仓位模型（默认 target = v1.2 基线，零回归）----
-POSITION_MODEL = "target"      # "target"=目标仓位制(v1.2) | "incremental"=增量步进 | "target_cap"=目标制+上限
+# ---- v1.4 仓位模型（默认 target_cap = 稳健增强：目标制+单次上限 50%，2026-08-10 用户拍板）----
+POSITION_MODEL = "target_cap"  # "target"=目标仓位制(v1.2基线) | "incremental"=增量步进 | "target_cap"=目标制+上限(默认)
 STEP_PCT = 0.20                # 模型A增量步长：加仓=总资产×STEP_PCT，减仓=持有市值×STEP_PCT
-CAP_PCT = 0.30                 # 模型B单次调整上限：每次执行最多调整 CAP_PCT 仓位
+CAP_PCT = 0.50                 # 模型B单次调整上限：每次执行最多调整 CAP_PCT 仓位（稳健增强）
 
 BACKTEST_START = "2025-01-01"
 BACKTEST_END = "2026-08-07"

@@ -16,11 +16,18 @@ def action_label(total):
     return "观望"
 
 def action_tier(total):
-    """返回带档位的建议 + 说明"""
-    if total >= BUY_STRONG: return "加仓", "满仓加仓（≥75 分，信号强）"
-    if total >= BUY_WEAK: return "加仓", "轻仓加仓（60-74 分）"
-    if total < SELL_STRONG: return "减仓", "清仓（<30 分）"
-    if total < SELL_WEAK: return "减仓", "减至半仓（40-44 分）"
+    """返回带档位的建议 + 说明（含 v1.4 仓位模型份额口径）"""
+    from weight_system_backtest import POSITION_MODEL, CAP_PCT, STEP_PCT
+    if POSITION_MODEL == "target_cap":
+        share = f"单次最多调整 {CAP_PCT*100:.0f}% 仓位"
+    elif POSITION_MODEL == "incremental":
+        share = f"每次加仓={STEP_PCT*100:.0f}%总资产 / 减仓={STEP_PCT*100:.0f}%持有"
+    else:
+        share = "调整至目标仓位"
+    if total >= BUY_STRONG: return "加仓", f"满仓加仓（≥75 分，{share}）"
+    if total >= BUY_WEAK: return "加仓", f"轻仓加仓（60-74 分，{share}）"
+    if total < SELL_STRONG: return "减仓", f"清仓（<30 分，{share}）"
+    if total < SELL_WEAK: return "减仓", f"减至半仓（40-44 分，{share}）"
     return "观望", "维持现状（45-59 分）"
 
 def snapshot_at(df_full, target_date):
