@@ -1,0 +1,189 @@
+{
+ "v1.2基线(target)": {
+  "model": "target",
+  "step_pct": 0.0,
+  "cap_pct": 0.0,
+  "pool19": {
+   "total": 220.32,
+   "dd": 18.76,
+   "sharpe": 2.273,
+   "trades": 109
+  },
+  "pool39": {
+   "total": 13.13,
+   "dd": 10.63,
+   "sharpe": 0.701,
+   "trades": 107
+  }
+ },
+ "增量STEP10%": {
+  "model": "incremental",
+  "step_pct": 0.1,
+  "cap_pct": 0.0,
+  "pool19": {
+   "total": 292.39,
+   "dd": 32.45,
+   "sharpe": 2.178,
+   "trades": 435
+  },
+  "pool39": {
+   "total": 16.15,
+   "dd": 10.95,
+   "sharpe": 0.73,
+   "trades": 318
+  }
+ },
+ "增量STEP15%": {
+  "model": "incremental",
+  "step_pct": 0.15,
+  "cap_pct": 0.0,
+  "pool19": {
+   "total": 286.06,
+   "dd": 30.36,
+   "sharpe": 2.193,
+   "trades": 435
+  },
+  "pool39": {
+   "total": 16.61,
+   "dd": 10.91,
+   "sharpe": 0.74,
+   "trades": 319
+  }
+ },
+ "增量STEP20%": {
+  "model": "incremental",
+  "step_pct": 0.2,
+  "cap_pct": 0.0,
+  "pool19": {
+   "total": 280.69,
+   "dd": 28.73,
+   "sharpe": 2.199,
+   "trades": 435
+  },
+  "pool39": {
+   "total": 16.65,
+   "dd": 10.93,
+   "sharpe": 0.744,
+   "trades": 319
+  }
+ },
+ "增量STEP25%": {
+  "model": "incremental",
+  "step_pct": 0.25,
+  "cap_pct": 0.0,
+  "pool19": {
+   "total": 280.65,
+   "dd": 27.49,
+   "sharpe": 2.214,
+   "trades": 435
+  },
+  "pool39": {
+   "total": 16.51,
+   "dd": 11.01,
+   "sharpe": 0.742,
+   "trades": 319
+  }
+ },
+ "增量STEP30%": {
+  "model": "incremental",
+  "step_pct": 0.3,
+  "cap_pct": 0.0,
+  "pool19": {
+   "total": 281.59,
+   "dd": 26.55,
+   "sharpe": 2.228,
+   "trades": 432
+  },
+  "pool39": {
+   "total": 16.47,
+   "dd": 11.05,
+   "sharpe": 0.741,
+   "trades": 316
+  }
+ },
+ "目标制CAP10%": {
+  "model": "target_cap",
+  "step_pct": 0.0,
+  "cap_pct": 0.1,
+  "pool19": {
+   "total": 247.58,
+   "dd": 30.43,
+   "sharpe": 2.1,
+   "trades": 333
+  },
+  "pool39": {
+   "total": 13.48,
+   "dd": 10.89,
+   "sharpe": 0.687,
+   "trades": 249
+  }
+ },
+ "目标制CAP20%": {
+  "model": "target_cap",
+  "step_pct": 0.0,
+  "cap_pct": 0.2,
+  "pool19": {
+   "total": 227.87,
+   "dd": 23.86,
+   "sharpe": 2.139,
+   "trades": 274
+  },
+  "pool39": {
+   "total": 12.67,
+   "dd": 12.07,
+   "sharpe": 0.652,
+   "trades": 206
+  }
+ },
+ "目标制CAP30%": {
+  "model": "target_cap",
+  "step_pct": 0.0,
+  "cap_pct": 0.3,
+  "pool19": {
+   "total": 227.42,
+   "dd": 21.29,
+   "sharpe": 2.185,
+   "trades": 223
+  },
+  "pool39": {
+   "total": 12.76,
+   "dd": 11.99,
+   "sharpe": 0.657,
+   "trades": 176
+  }
+ },
+ "目标制CAP40%": {
+  "model": "target_cap",
+  "step_pct": 0.0,
+  "cap_pct": 0.4,
+  "pool19": {
+   "total": 224.9,
+   "dd": 20.45,
+   "sharpe": 2.194,
+   "trades": 192
+  },
+  "pool39": {
+   "total": 12.96,
+   "dd": 11.96,
+   "sharpe": 0.666,
+   "trades": 158
+  }
+ },
+ "目标制CAP50%": {
+  "model": "target_cap",
+  "step_pct": 0.0,
+  "cap_pct": 0.5,
+  "pool19": {
+   "total": 225.15,
+   "dd": 20.04,
+   "sharpe": 2.205,
+   "trades": 172
+  },
+  "pool39": {
+   "total": 13.15,
+   "dd": 12.01,
+   "sharpe": 0.673,
+   "trades": 151
+  }
+ }
+}

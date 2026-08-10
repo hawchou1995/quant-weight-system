@@ -85,6 +85,11 @@ DEADBAND_HI = 65  # 死区上限
 USE_DEADBAND = False      # True = 55-65 分区间一律观望（不触发轻仓加/减半仓）
 USE_REVERSAL_ONLY = False  # True = 仅加减反转才生成信号；同向档位变化（半仓↔满仓）不动作
 
+# ---- v1.4 仓位模型（默认 target = v1.2 基线，零回归）----
+POSITION_MODEL = "target"      # "target"=目标仓位制(v1.2) | "incremental"=增量步进 | "target_cap"=目标制+上限
+STEP_PCT = 0.20                # 模型A增量步长：加仓=总资产×STEP_PCT，减仓=持有市值×STEP_PCT
+CAP_PCT = 0.30                 # 模型B单次调整上限：每次执行最多调整 CAP_PCT 仓位
+
 BACKTEST_START = "2025-01-01"
 BACKTEST_END = "2026-08-07"
 INITIAL_CASH = 1_000_000.0
@@ -490,28 +495,66 @@ def run_backtest(df, news_level, is_fund=False, strategy="weight"):
 
         # ---- 1. 执行昨日待执行动作（T+1 开盘）----
         if pending_action is not None and in_eval:
-            action, target_pct = pending_action
+            action, amount = pending_action
             pending_action = None
             # A股 T+1：当日买入不可当日卖（执行日即信号日+1，天然满足，但保险检查）
             if action == "buy":
-                target_value = target_pct * INITIAL_CASH
-                target_shares = int(target_value / (open_p * (1 + COMMISSION)))
-                target_shares = (target_shares // LOT) * LOT
-                add_size = target_shares - position  # 只补差额，避免覆盖已有仓位
-                if add_size > 0:
-                    cost = add_size * open_p * (1 + COMMISSION)
-                    if cost <= cash:
-                        cash -= cost
-                        if position == 0:
-                            entry_price = open_p
-                            entry_date = date
-                            entry_bar = i
-                        position += add_size
+                if POSITION_MODEL == "target":
+                    # v1.2 基线（逐字原版）：目标股数 - 当前股数，现金不足整笔跳过
+                    target_value = amount * INITIAL_CASH
+                    target_shares = int(target_value / (open_p * (1 + COMMISSION)))
+                    target_shares = (target_shares // LOT) * LOT
+                    add_size = target_shares - position  # 只补差额，避免覆盖已有仓位
+                    if add_size > 0:
+                        cost = add_size * open_p * (1 + COMMISSION)
+                        if cost <= cash:
+                            cash -= cost
+                            if position == 0:
+                                entry_price = open_p
+                                entry_date = date
+                                entry_bar = i
+                            position += add_size
+                else:
+                    # 模型A incremental / 模型B target_cap：市值差驱动
+                    if POSITION_MODEL == "incremental":
+                        total_assets = cash + position * open_p
+                        add_value = total_assets * amount          # 加仓额 = 总资产 × STEP_PCT
+                    else:  # target_cap
+                        target_value = amount * INITIAL_CASH
+                        cur_value = position * open_p
+                        cap_value = max(0.0, target_value - cur_value)
+                        add_value = min(cap_value, CAP_PCT * INITIAL_CASH)  # 单次上限
+                    add_shares = int(add_value / (open_p * (1 + COMMISSION)))
+                    add_shares = (add_shares // LOT) * LOT
+                    add_size = min(add_shares, int(cash / (open_p * (1 + COMMISSION))) // LOT * LOT)
+                    if add_size > 0:
+                        cost = add_size * open_p * (1 + COMMISSION)
+                        if cost <= cash:
+                            cash -= cost
+                            if position == 0:
+                                entry_price = open_p
+                                entry_date = date
+                                entry_bar = i
+                            position += add_size
             elif action == "sell":
-                target_value = target_pct * INITIAL_CASH
-                target_shares = int(target_value / open_p)
-                target_shares = (target_shares // LOT) * LOT
-                sell_size = position - target_shares
+                if POSITION_MODEL == "target":
+                    # v1.2 基线（逐字原版）：目标股数差值
+                    target_value = amount * INITIAL_CASH
+                    target_shares = int(target_value / open_p)
+                    target_shares = (target_shares // LOT) * LOT
+                    sell_size = position - target_shares
+                else:
+                    # 模型A incremental / 模型B target_cap：市值差驱动
+                    if POSITION_MODEL == "incremental":
+                        sell_value = position * open_p * amount      # 减仓额 = 持有市值 × STEP_PCT
+                    else:  # target_cap
+                        target_value = amount * INITIAL_CASH
+                        cur_value = position * open_p
+                        cap_value = max(0.0, cur_value - target_value)
+                        sell_value = min(cap_value, CAP_PCT * INITIAL_CASH)  # 单次上限
+                    sell_shares = int(sell_value / open_p)
+                    sell_shares = (sell_shares // LOT) * LOT
+                    sell_size = min(sell_shares, position)
                 if sell_size > 0:
                     tax = sell_size * open_p * SELL_TAX if not is_fund else 0.0
                     proceeds = sell_size * open_p * (1 - COMMISSION) - tax
@@ -541,19 +584,29 @@ def run_backtest(df, news_level, is_fund=False, strategy="weight"):
             if strategy == "weight":
                 _, comp, _conf = compute_total_score(row, news_level, is_fund=is_fund)
                 total = comp["total"]
-                # v1.3 死区：55-65 区间一律观望（默认关）
+                if POSITION_MODEL == "incremental":
+                    # 模型A：增量步进——方向驱动，幅度由 STEP_PCT 控制
+                    if total >= BUY_WEAK:
+                        pending_action = ("buy", STEP_PCT)   # 加仓方向：加总资产 STEP_PCT
+                    elif total < SELL_WEAK:
+                        pending_action = ("sell", STEP_PCT)  # 减仓方向：减持有份额 STEP_PCT
+                    else:
+                        pending_action = None
+                else:
+                    # 模型B/target：目标仓位制（≥75→100% / 60-74→50% / 40-44→50% / <30→0）
+                    if total >= BUY_STRONG:
+                        pending_action = ("buy", 1.0)  # 满仓
+                    elif total >= BUY_WEAK:
+                        pending_action = ("buy", 0.5)  # 半仓
+                    elif total < SELL_STRONG:
+                        pending_action = ("sell", 0.0)  # 清仓
+                    elif total < SELL_WEAK:
+                        pending_action = ("sell", 0.5)  # 减至半仓
+                    else:
+                        pending_action = None  # 观望
+                # v1.3 死区：55-65 区间一律观望（默认关，优先级高于模型分支）
                 if USE_DEADBAND and DEADBAND_LO <= total < DEADBAND_HI:
                     pending_action = None
-                elif total >= BUY_STRONG:
-                    pending_action = ("buy", 1.0)  # 满仓
-                elif total >= BUY_WEAK:
-                    pending_action = ("buy", 0.5)  # 半仓
-                elif total < SELL_STRONG:
-                    pending_action = ("sell", 0.0)  # 清仓
-                elif total < SELL_WEAK:
-                    pending_action = ("sell", 0.5)  # 减至半仓
-                else:
-                    pending_action = None  # 观望
                 # v1.3 反转才动：同向档位变化不动作（默认关）
                 if USE_REVERSAL_ONLY and pending_action is not None:
                     cur_dir = "buy" if pending_action[0] == "buy" else "sell"
