@@ -15,6 +15,16 @@ with open("weight_system_summary.json", encoding="utf-8") as f:
 
 ws = summary_payload["summary"]
 
+def share_of(s):
+    """从 action_desc 提取建议份额（加多少/减多少），无则返回空"""
+    desc = s.get("action_desc", "")
+    # 提取括号内份额口径（如「单次最多调整 50% 仓位」）
+    import re
+    m = re.search(r"（(.+?)）", desc)
+    if m:
+        return m.group(1)
+    return ""
+
 # 今日信号表（含变动记录 + 置信度 + 数据溯源）
 sig_rows = []
 for s in snap["signals"]:
@@ -26,7 +36,7 @@ for s in snap["signals"]:
         "values": [
             {"main": s["type"]},
             {"main": f"{s['total_score']:.1f}"},
-            {"main": s["action"]},
+            {"main": f"{s['action']} {share_of(s)}"},
             {"main": conf_txt},
             {"main": s["prev_action"]},
             {"main": s["change"]},
@@ -69,7 +79,7 @@ extra_modules = [
         "type": "metric_table", "tab": "overview",
         "title": "今日信号快照（2026-08-10）· 含变动记录",
         "subtitle": "变动 = 8-07 建议 ➡️ 8-10 建议；≥75 满仓加仓 / 60-74 轻仓加仓 / 45-59 观望 / 40-44 减半仓 / <30 清仓",
-        "columns": ["标的", "类型", "总分", "本次建议", "置信度", "上次建议", "变动", "RSI", "KDJ K/D", "ADX", "MA20偏离%", "打分明细"],
+        "columns": ["标的", "类型", "总分", "本次建议(份额)", "置信度", "上次建议", "变动", "RSI", "KDJ K/D", "ADX", "MA20偏离%", "打分明细"],
         "rows": sig_rows,
     },
     {
