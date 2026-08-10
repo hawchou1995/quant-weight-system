@@ -68,9 +68,9 @@
           "note": "MA/MACD/KDJ/RSI/ADX/ATR"
         }
       },
-      "action": "减仓",
+      "action": "减至半仓",
       "action_desc": "减至半仓（30-44 分，单次最多调整 50% 仓位）",
-      "prev_action": "减仓",
+      "prev_action": "减至半仓",
       "change": "-"
     },
     {
@@ -124,8 +124,8 @@
       },
       "action": "观望",
       "action_desc": "维持现状（45-59 分）",
-      "prev_action": "减仓",
-      "change": "减仓➡️观望"
+      "prev_action": "减至半仓",
+      "change": "减至半仓➡️观望"
     },
     {
       "code": "159516",
@@ -176,10 +176,10 @@
           "note": "MA/MACD/KDJ/RSI/ADX/ATR"
         }
       },
-      "action": "加仓",
+      "action": "轻仓加仓",
       "action_desc": "轻仓加仓（60-74 分，单次最多调整 50% 仓位）",
       "prev_action": "观望",
-      "change": "观望➡️加仓"
+      "change": "观望➡️轻仓加仓"
     },
     {
       "code": "600498",
@@ -230,9 +230,9 @@
           "note": "MA/MACD/KDJ/RSI/ADX/ATR"
         }
       },
-      "action": "加仓",
+      "action": "轻仓加仓",
       "action_desc": "轻仓加仓（60-74 分，单次最多调整 50% 仓位）",
-      "prev_action": "加仓",
+      "prev_action": "轻仓加仓",
       "change": "-"
     },
     {
@@ -284,10 +284,10 @@
           "note": "MA/MACD/KDJ/RSI/ADX/ATR"
         }
       },
-      "action": "加仓",
+      "action": "满仓加仓",
       "action_desc": "满仓加仓（≥75 分，单次最多调整 50% 仓位）",
-      "prev_action": "加仓",
-      "change": "-"
+      "prev_action": "轻仓加仓",
+      "change": "轻仓加仓➡️满仓加仓"
     },
     {
       "code": "002463",
@@ -338,10 +338,10 @@
           "note": "MA/MACD/KDJ/RSI/ADX/ATR"
         }
       },
-      "action": "加仓",
+      "action": "轻仓加仓",
       "action_desc": "轻仓加仓（60-74 分，单次最多调整 50% 仓位）",
-      "prev_action": "加仓",
-      "change": "-"
+      "prev_action": "满仓加仓",
+      "change": "满仓加仓➡️轻仓加仓"
     },
     {
       "code": "002384",
@@ -392,10 +392,10 @@
           "note": "MA/MACD/KDJ/RSI/ADX/ATR"
         }
       },
-      "action": "减仓",
+      "action": "减至半仓",
       "action_desc": "减至半仓（30-44 分，单次最多调整 50% 仓位）",
       "prev_action": "观望",
-      "change": "观望➡️减仓"
+      "change": "观望➡️减至半仓"
     },
     {
       "code": "600183",
@@ -446,10 +446,10 @@
           "note": "MA/MACD/KDJ/RSI/ADX/ATR"
         }
       },
-      "action": "加仓",
+      "action": "轻仓加仓",
       "action_desc": "轻仓加仓（60-74 分，单次最多调整 50% 仓位）",
-      "prev_action": "加仓",
-      "change": "-"
+      "prev_action": "满仓加仓",
+      "change": "满仓加仓➡️轻仓加仓"
     },
     {
       "code": "300476",
@@ -500,10 +500,10 @@
           "note": "MA/MACD/KDJ/RSI/ADX/ATR"
         }
       },
-      "action": "加仓",
+      "action": "轻仓加仓",
       "action_desc": "轻仓加仓（60-74 分，单次最多调整 50% 仓位）",
-      "prev_action": "加仓",
-      "change": "-"
+      "prev_action": "满仓加仓",
+      "change": "满仓加仓➡️轻仓加仓"
     },
     {
       "code": "603986",
@@ -662,10 +662,172 @@
           "note": "MA/MACD/KDJ/RSI/ADX/ATR"
         }
       },
-      "action": "加仓",
+      "action": "轻仓加仓",
       "action_desc": "轻仓加仓（60-74 分，单次最多调整 50% 仓位）",
-      "prev_action": "加仓",
+      "prev_action": "轻仓加仓",
       "change": "-"
+    },
+    {
+      "code": "603228",
+      "name": "景旺电子",
+      "type": "沪主板",
+      "news_level": "-",
+      "date": "2026-08-10",
+      "close": 96.0,
+      "pct_chg": 1.11,
+      "ma20": 76.482,
+      "ma20_dev": 25.52,
+      "rsi": 68.0,
+      "macd_hist": 4.8847,
+      "k": 86.3,
+      "d": 77.6,
+      "adx": 13.8,
+      "atr_pct": 7.65,
+      "total_score": 74.8,
+      "components": {
+        "trend": 64.0,
+        "momentum": 82.0,
+        "volume": 100.0,
+        "osc": 72.0,
+        "risk": 68.0,
+        "news": 50.0
+      },
+      "confidence": {
+        "level": "高",
+        "coverage": 0.83,
+        "directional_cats": 5,
+        "agree_ratio": 1.0
+      },
+      "provenance": {
+        "as_of": "2026-08-10",
+        "kline": {
+          "source": "腾讯自选股接口(westock)",
+          "level": "A",
+          "note": "日线前复权"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "无情报（中性50）"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "轻仓加仓",
+      "action_desc": "轻仓加仓（60-74 分，单次最多调整 50% 仓位）",
+      "prev_action": "轻仓加仓",
+      "change": "-"
+    },
+    {
+      "code": "603339",
+      "name": "四方科技",
+      "type": "沪主板",
+      "news_level": "-",
+      "date": "2026-08-10",
+      "close": 14.01,
+      "pct_chg": -1.96,
+      "ma20": 12.447,
+      "ma20_dev": 12.55,
+      "rsi": 58.6,
+      "macd_hist": 0.5926,
+      "k": 93.2,
+      "d": 90.5,
+      "adx": 22.8,
+      "atr_pct": 4.43,
+      "total_score": 67.5,
+      "components": {
+        "trend": 66.0,
+        "momentum": 75.0,
+        "volume": 58.0,
+        "osc": 72.0,
+        "risk": 70.0,
+        "news": 50.0
+      },
+      "confidence": {
+        "level": "高",
+        "coverage": 0.83,
+        "directional_cats": 5,
+        "agree_ratio": 0.8
+      },
+      "provenance": {
+        "as_of": "2026-08-10",
+        "kline": {
+          "source": "腾讯自选股接口(westock)",
+          "level": "A",
+          "note": "日线前复权"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "无情报（中性50）"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "轻仓加仓",
+      "action_desc": "轻仓加仓（60-74 分，单次最多调整 50% 仓位）",
+      "prev_action": "满仓加仓",
+      "change": "满仓加仓➡️轻仓加仓"
+    },
+    {
+      "code": "000636",
+      "name": "风华高科",
+      "type": "深主板",
+      "news_level": "-",
+      "date": "2026-08-10",
+      "close": 61.7,
+      "pct_chg": 5.85,
+      "ma20": 50.011,
+      "ma20_dev": 23.37,
+      "rsi": 60.5,
+      "macd_hist": 4.106,
+      "k": 84.9,
+      "d": 78.3,
+      "adx": 25.7,
+      "atr_pct": 9.78,
+      "total_score": 78.4,
+      "components": {
+        "trend": 90.0,
+        "momentum": 90.0,
+        "volume": 88.0,
+        "osc": 72.0,
+        "risk": 24.0,
+        "news": 50.0
+      },
+      "confidence": {
+        "level": "高",
+        "coverage": 0.83,
+        "directional_cats": 5,
+        "agree_ratio": 1.0
+      },
+      "provenance": {
+        "as_of": "2026-08-10",
+        "kline": {
+          "source": "腾讯自选股接口(westock)",
+          "level": "A",
+          "note": "日线前复权"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "无情报（中性50）"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "满仓加仓",
+      "action_desc": "满仓加仓（≥75 分，单次最多调整 50% 仓位）",
+      "prev_action": "轻仓加仓",
+      "change": "轻仓加仓➡️满仓加仓"
     },
     {
       "code": "515880",
@@ -718,8 +880,8 @@
       },
       "action": "观望",
       "action_desc": "维持现状（45-59 分）",
-      "prev_action": "加仓",
-      "change": "加仓➡️观望"
+      "prev_action": "轻仓加仓",
+      "change": "轻仓加仓➡️观望"
     },
     {
       "code": "516150",
@@ -770,10 +932,10 @@
           "note": "MA/MACD/KDJ/RSI/ADX/ATR"
         }
       },
-      "action": "加仓",
+      "action": "轻仓加仓",
       "action_desc": "轻仓加仓（60-74 分，单次最多调整 50% 仓位）",
-      "prev_action": "加仓",
-      "change": "-"
+      "prev_action": "满仓加仓",
+      "change": "满仓加仓➡️轻仓加仓"
     },
     {
       "code": "560390",
@@ -824,9 +986,9 @@
           "note": "MA/MACD/KDJ/RSI/ADX/ATR"
         }
       },
-      "action": "加仓",
+      "action": "轻仓加仓",
       "action_desc": "轻仓加仓（60-74 分，单次最多调整 50% 仓位）",
-      "prev_action": "加仓",
+      "prev_action": "轻仓加仓",
       "change": "-"
     },
     {
@@ -1148,9 +1310,9 @@
           "note": "MA/MACD/KDJ/RSI/ADX/ATR"
         }
       },
-      "action": "加仓",
+      "action": "轻仓加仓",
       "action_desc": "轻仓加仓（60-74 分，单次最多调整 50% 仓位）",
-      "prev_action": "加仓",
+      "prev_action": "轻仓加仓",
       "change": "-"
     }
   ],
