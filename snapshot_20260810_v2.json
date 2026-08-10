@@ -560,6 +560,114 @@
       "change": "-"
     },
     {
+      "code": "002185",
+      "name": "华天科技",
+      "type": "股票",
+      "news_level": "-",
+      "date": "2026-08-10",
+      "close": 18.06,
+      "pct_chg": 0.44,
+      "ma20": 18.071,
+      "ma20_dev": -0.06,
+      "rsi": 49.5,
+      "macd_hist": 0.1225,
+      "k": 65.5,
+      "d": 44.3,
+      "adx": 26.5,
+      "atr_pct": 8.76,
+      "total_score": 54.0,
+      "components": {
+        "trend": 44.0,
+        "momentum": 72.0,
+        "volume": 55.0,
+        "osc": 64.0,
+        "risk": 24.0,
+        "news": 50.0
+      },
+      "confidence": {
+        "level": "中",
+        "coverage": 0.83,
+        "directional_cats": 5,
+        "agree_ratio": 0.6
+      },
+      "provenance": {
+        "as_of": "2026-08-10",
+        "kline": {
+          "source": "腾讯自选股接口(westock)",
+          "level": "A",
+          "note": "日线前复权"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "无情报（中性50）"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "观望",
+      "action_desc": "维持现状（45-59 分）",
+      "prev_action": "观望",
+      "change": "-"
+    },
+    {
+      "code": "605358",
+      "name": "立昂微",
+      "type": "股票",
+      "news_level": "-",
+      "date": "2026-08-10",
+      "close": 44.24,
+      "pct_chg": -1.43,
+      "ma20": 43.135,
+      "ma20_dev": 2.56,
+      "rsi": 45.2,
+      "macd_hist": 2.2134,
+      "k": 76.1,
+      "d": 55.9,
+      "adx": 31.9,
+      "atr_pct": 9.01,
+      "total_score": 62.0,
+      "components": {
+        "trend": 74.0,
+        "momentum": 65.0,
+        "volume": 60.0,
+        "osc": 64.0,
+        "risk": 24.0,
+        "news": 50.0
+      },
+      "confidence": {
+        "level": "高",
+        "coverage": 0.83,
+        "directional_cats": 5,
+        "agree_ratio": 1.0
+      },
+      "provenance": {
+        "as_of": "2026-08-10",
+        "kline": {
+          "source": "腾讯自选股接口(westock)",
+          "level": "A",
+          "note": "日线前复权"
+        },
+        "news": {
+          "source": "vault研报情报L1-L3",
+          "level": "B",
+          "note": "无情报（中性50）"
+        },
+        "indicators": {
+          "source": "本地计算(向量化)",
+          "level": "A",
+          "note": "MA/MACD/KDJ/RSI/ADX/ATR"
+        }
+      },
+      "action": "加仓",
+      "action_desc": "轻仓加仓（60-74 分，单次最多调整 50% 仓位）",
+      "prev_action": "加仓",
+      "change": "-"
+    },
+    {
       "code": "515880",
       "name": "通信ETF",
       "type": "ETF",

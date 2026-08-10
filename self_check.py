@@ -39,7 +39,7 @@ for f in required:
 print("\n[2] 数据完整性")
 data_files = list((BASE / "data").glob("*.csv")) if (BASE / "data").exists() else []
 tmp_files = list((BASE / "data_tmp").glob("*.csv")) if (BASE / "data_tmp").exists() else []
-check(f"关注标的 {len(data_files)} 只（期望 19）", len(data_files) == 19, f"实际 {len(data_files)}")
+check(f"关注标的 {len(data_files)} 只（期望 21）", len(data_files) == 21, f"实际 {len(data_files)}")
 check(f"验证标的 {len(tmp_files)} 只（期望 39）", len(tmp_files) == 39, f"实际 {len(tmp_files)}")
 
 # 3. 依赖检查
@@ -72,7 +72,7 @@ if sum_path.exists():
         s = d["summary"]
         ret = s.get("total_return_pct")
         dd = s.get("max_drawdown_pct")
-        check("组合总收益 ≈ 225.15%", ret is not None and abs(ret - 225.15) < 1.0, f"实际 {ret}%")
+        check("组合总收益 ≈ 202.84%", ret is not None and abs(ret - 202.84) < 1.0, f"实际 {ret}%")
         check("最大回撤 ≈ 20.04%", dd is not None and abs(dd - 20.04) < 1.0, f"实际 {dd}%")
     except Exception as e:
         check("summary 可解析", False, str(e))
@@ -86,7 +86,7 @@ if snap_path.exists():
     try:
         d = json.loads(snap_path.read_text(encoding="utf-8"))
         sigs = d.get("signals", [])
-        check(f"快照 19 标的", len(sigs) == 19, f"实际 {len(sigs)}")
+        check(f"快照 21 标的", len(sigs) == 21, f"实际 {len(sigs)}")
         has_conf = all("confidence" in s for s in sigs)
         has_prov = all("provenance" in s for s in sigs)
         check("全部含置信度字段", has_conf)
