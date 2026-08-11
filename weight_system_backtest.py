@@ -95,6 +95,13 @@ POSITION_MODEL = "target_cap"  # "target"=目标仓位制(v1.2基线) | "increme
 STEP_PCT = 0.20                # 模型A增量步长：加仓=总资产×STEP_PCT，减仓=持有市值×STEP_PCT
 CAP_PCT = 0.50                 # 模型B单次调整上限：每次执行最多调整 CAP_PCT 仓位（稳健增强）
 
+# 市场状态调节（2026-08-11 看板系统落地，素材「市场测温」启示；回测默认 normal 行为不变）
+MARKET_ADJUST = {
+    "strong": {"BUY_WEAK": 58, "SELL_STRONG": 28},  # 大盘强（沪深300>MA20 且偏离>+2%）
+    "normal": {"BUY_WEAK": 62, "SELL_STRONG": 30},  # 中性
+    "weak": {"BUY_WEAK": 65, "SELL_STRONG": 35},    # 大盘弱势（沪深300<MA20）：加仓门槛上调、清仓提前
+}
+
 BACKTEST_START = "2025-01-01"
 BACKTEST_END = "2026-08-07"
 INITIAL_CASH = 1_000_000.0
@@ -291,16 +298,18 @@ def score_volume(row, is_fund=False):
         s += 25
     else:
         s += 12
-    # 量价配合（0-50）：涨+量增 高分；跌+放量 低分（S3 逻辑）
+    # 量价配合（0-50）：涨+量增 高分；跌+放量 低分；A3 位置区分（2026-08-11）：高位放量跌 8 分，低位放量跌 20 分
     if not np.isnan(row["pct_chg"]):
+        dd = row["dd60"] if not np.isnan(row["dd60"]) else -50.0
+        high_zone = dd > -12   # 距 60 日高点 12% 以内视为高位区
         if row["pct_chg"] > 0 and vr >= 1.0:
             s += 50
         elif row["pct_chg"] > 0 and vr < 1.0:
             s += 30
         elif row["pct_chg"] <= 0 and vr >= 1.5:
-            s += 8  # 放量下跌
+            s += 8 if high_zone else 20   # 高位放量跌=派发；低位放量跌=最后一跌/吸筹，不额外惩罚
         elif row["pct_chg"] <= 0 and vr >= 1.0:
-            s += 20
+            s += 20 if high_zone else 30
         else:
             s += 35  # 缩量回调
     else:
