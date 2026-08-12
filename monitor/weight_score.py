@@ -39,6 +39,20 @@ SCORE_MODE = "patch"   # "patch"=补丁式±10（v4 选型）/ "evidence"=分支
 PDV_BONUS = 10.0
 RSIDIV_BONUS = 10.0
 
+# ---- v5（2026-08-12 回测选型）：恐贪指数 FG 动态门槛——采纳「恐惧机会」方向（27池 +142.40% vs v4 +141.54%，夏普 1.672 最高、胜率 92.1% 最高、换手 0.778% 最低）----
+# 推文「积极信号在积累，指标持续向好+期权策略」（东胜小猢狲 2026-08-07）恐贪指数吸收：
+# 沪深300 日K衍生 5 维（动量/趋势/波动率/回撤/量能）滚动分位归一化 W=250 → FG ∈ [0,100]
+# FG_MODE="opportunistic"（恐惧机会）：恐惧区（FG<50）加仓门槛下移、清仓阈值上移 = 逆向抄底；
+# "defensive"（恐惧防御）回测否决（胜率 85.0%）。FG 第 7 维权重回测收益最高但回撤恶化 5.1pct，暂缓。
+USE_FG_DYNAMIC = True  # v5-1 FG 动态门槛（替代三档离散门禁的市场情绪层）
+FG_MODE = "opportunistic"
+FG_W = 250             # 滚动分位窗口
+FG_WINDOW = 20         # 分维子窗口
+FG_K_BUY = 6.0         # 加仓门槛斜率
+FG_K_SELL = 5.0        # 清仓阈值斜率
+FG_BUY_CLAMP = (50.0, 78.0)
+FG_SELL_CLAMP = (22.0, 42.0)
+
 # ---- 操作阈值（总分 0-100；市场状态调节：weak 时加仓门槛上移、清仓阈值上移）----
 BUY_STRONG = 75
 BUY_WEAK = 60
@@ -516,13 +530,17 @@ def compute_confidence(comp, is_fund=False):
             "directional_cats": directional, "agree_ratio": round(agree_ratio, 2)}
 
 
-def action_tier(total, market_state="normal"):
+def action_tier(total, market_state="normal", bw_override=None, ss_override=None):
     """精细档位 + 稳健加减仓份额口径（v1.4 target_cap：目标制 + 单次上限 50%）
-    market_state: strong/normal/weak——weak 时轻仓加仓门槛 62→65、清仓阈值 30→35；strong 时 62→58、28。"""
+    market_state: strong/normal/weak——weak 时轻仓加仓门槛 62→65、清仓阈值 30→35；strong 时 62→58、28。
+    bw_override/ss_override: v5 FG 动态门槛覆盖（恐惧机会方向）。"""
     adj = MARKET_ADJUST.get(market_state, MARKET_ADJUST["normal"])
-    bw, ss = adj["BUY_WEAK"], adj["SELL_STRONG"]
+    bw = bw_override if bw_override is not None else adj["BUY_WEAK"]
+    ss = ss_override if ss_override is not None else adj["SELL_STRONG"]
     share = f"单次最多调整 {CAP_PCT * 100:.0f}% 仓位"
-    if market_state == "weak":
+    if bw_override is not None:
+        share += f"（FG 恐惧机会动态门槛：加仓≥{bw:.0f}/清仓&lt;{ss:.0f}）"
+    elif market_state == "weak":
         share += "（市场弱势防御态）"
     elif market_state == "strong":
         share += "（市场强势态）"
@@ -537,12 +555,89 @@ def action_tier(total, market_state="normal"):
     return "观望", "维持现状（45-59 分）"
 
 
-def evaluate(closes, highs, lows, vols, news_level=None, is_fund=False, market_state="normal"):
-    """对外接口：返回 {total, comp, conf, action, action_desc, provenance, market_state}"""
+def compute_fg(closes, highs=None, lows=None, vols=None):
+    """恐贪指数 FG：沪深300 日K衍生 5 维（动量/趋势/波动率/回撤/量能）滚动分位归一化 W=250。
+    与回测引擎 _quant_weight_ref/weight_system_backtest_v5_fg.py 的 build_fg_index 完全一致。
+    返回 {fg: 0-100, dims: {d1..d5}}；数据不足时 fg=None。
+    """
+    n = len(closes)
+    if n < 60:
+        return {"fg": None, "dims": None}
+    import math as _m
+    def sma(vals, w, i):
+        if i + 1 < w:
+            return float("nan")
+        return statistics.mean(vals[i + 1 - w:i + 1])
+    def pctrank_win(vals, i, w, lo=None, hi=None):
+        """当前值在过去 w 窗口内的百分位 0-100。"""
+        lo = lo if lo is not None else max(0, i + 1 - w)
+        window = vals[lo:i + 1]
+        if len(window) < max(30, w // 4):
+            return float("nan")
+        return (sum(1 for x in window if x <= vals[i]) / len(window)) * 100
+    mom20 = [closes[i] / closes[max(0, i - FG_WINDOW)] - 1 if i >= FG_WINDOW else float("nan") for i in range(n)]
+    ma20s = [sma(closes, FG_WINDOW, i) for i in range(n)]
+    ma20_dev = [(closes[i] / ma20s[i] - 1) if not _m.isnan(ma20s[i]) else float("nan") for i in range(n)]
+    rets = [closes[i] / closes[i - 1] - 1 if i > 0 else 0.0 for i in range(n)]
+    def stddev(vals, w, i):
+        if i + 1 < w:
+            return float("nan")
+        return statistics.pstdev(vals[i + 1 - w:i + 1])
+    vol20 = []
+    for i in range(n):
+        sd = stddev(rets, FG_WINDOW, i)
+        vol20.append(sd * _m.sqrt(252) * 100 if not _m.isnan(sd) else float("nan"))
+    hi_win = [max(closes[max(0, i + 1 - FG_W):i + 1]) for i in range(n)]
+    dd = [closes[i] / hi_win[i] - 1 for i in range(n)]
+    vrs = []
+    for i in range(n):
+        v = vols[i] if vols else None
+        if v is None or v <= 0 or i < FG_WINDOW:
+            vrs.append(float("nan"))
+        else:
+            v5 = statistics.mean(vols[i - FG_WINDOW:i])
+            vrs.append(v / v5 if v5 > 0 else float("nan"))
+    p1 = [pctrank_win(mom20, i, FG_W) for i in range(n)]
+    p2 = [pctrank_win(ma20_dev, i, FG_W) for i in range(n)]
+    p3 = [100 - pctrank_win(vol20, i, FG_W) if not _m.isnan(vol20[i]) else float("nan") for i in range(n)]
+    p4 = [pctrank_win(dd, i, FG_W) for i in range(n)]
+    p5 = [pctrank_win(vrs, i, FG_W) if not _m.isnan(vrs[i]) else float("nan") for i in range(n)]
+    last = n - 1
+    if any(_m.isnan(x) for x in (p1[last], p2[last], p3[last], p4[last], p5[last])):
+        return {"fg": None, "dims": None}
+    fg = (p1[last] + p2[last] + p3[last] + p4[last] + p5[last]) / 5.0
+    return {"fg": round(fg, 1),
+            "dims": {"d1_mom": round(p1[last], 1), "d2_trend": round(p2[last], 1),
+                     "d3_vol": round(p3[last], 1), "d4_dd": round(p4[last], 1),
+                     "d5_volratio": round(p5[last], 1)}}
+
+
+def fg_dynamic_thresholds(fg, market_state="normal"):
+    """FG 动态门槛：恐惧机会方向（opportunistic）——恐惧区门槛下移（更易加仓）、清仓阈值上移。
+    返回 (bw_eff, ss_eff)。"""
+    adj = MARKET_ADJUST.get(market_state, MARKET_ADJUST["normal"])
+    bw, ss = adj["BUY_WEAK"], adj["SELL_STRONG"]
+    if not USE_FG_DYNAMIC or fg is None:
+        return bw, ss
+    dev = (50.0 - fg) / 50.0   # 恐惧(FG<50)→dev>0
+    sign = 1.0 if FG_MODE == "defensive" else -1.0
+    bw = bw + sign * FG_K_BUY * dev
+    ss = ss + sign * FG_K_SELL * dev
+    bw = max(FG_BUY_CLAMP[0], min(FG_BUY_CLAMP[1], bw))
+    ss = max(FG_SELL_CLAMP[0], min(FG_SELL_CLAMP[1], ss))
+    return bw, ss
+
+
+def evaluate(closes, highs, lows, vols, news_level=None, is_fund=False, market_state="normal", fg=None):
+    """对外接口：返回 {total, comp, conf, action, action_desc, provenance, market_state, fg_info}"""
     inds = compute_indicators(closes, highs, lows, vols)
     row = inds[-1]
     total, comp, conf = compute_total_score(row, news_level, is_fund=is_fund)
-    act, desc = action_tier(total, market_state)
+    # v5 FG 动态门槛：恐惧机会方向——恐惧区加仓门槛下移、清仓阈值上移
+    bw_eff, ss_eff = fg_dynamic_thresholds(fg, market_state)
+    act, desc = action_tier(total, market_state, bw_override=bw_eff, ss_override=ss_eff)
+    fg_info = {"fg": fg, "bw_eff": round(bw_eff, 1), "ss_eff": round(ss_eff, 1),
+               "mode": FG_MODE if (USE_FG_DYNAMIC and fg is not None) else None}
     osc_detail = None
     vol_detail = None
     if USE_BOLL_POS:
@@ -575,6 +670,7 @@ def evaluate(closes, highs, lows, vols, news_level=None, is_fund=False, market_s
         "osc_detail": osc_detail,
         "vol_detail": vol_detail,
         "conf": conf, "action": act, "action_desc": desc, "market_state": market_state,
+        "fg_info": fg_info,
         "provenance": {
             "kline": {"name": PROVENANCE["kline"]["name"], "level": PROVENANCE["kline"]["level"]},
             "news": None if news_level is None else {"name": PROVENANCE["news"]["name"], "level": PROVENANCE["news"]["level"], "level_tag": news_level},

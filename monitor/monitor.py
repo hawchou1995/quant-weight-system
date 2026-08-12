@@ -32,23 +32,36 @@ def load_events():
         return {}
 
 def market_state():
-    """大盘状态三档：沪深300 收盘 vs MA20——偏离 >+2% → strong；<0 → weak；否则 normal。"""
+    """大盘状态三档 + 恐贪指数 FG（v5 投产：恐惧机会动态门槛）。
+    沪深300 收盘 vs MA20——偏离 >+2% → strong；<0 → weak；否则 normal。
+    FG：沪深300 日K 5 维滚动分位归一化（W=250），由 weight_score.compute_fg 计算。
+    返回 (market_state, fg)。"""
     try:
         with open(INDICES_FILE, encoding="utf-8") as f:
             idx = json.load(f)["indexes"]
         rows = idx["000300"]["rows"]
         closes = [r["c"] for r in rows]
         if len(closes) < 20:
-            return "normal"
+            return "normal", None
         ma20 = statistics.mean(closes[-20:])
         dev = (closes[-1] / ma20 - 1) * 100
         if dev > 2.0:
-            return "strong"
-        if dev < 0:
-            return "weak"
-        return "normal"
+            ms = "strong"
+        elif dev < 0:
+            ms = "weak"
+        else:
+            ms = "normal"
+        # FG：需要 OHLCV（indices.json 已合并 h/l/v）
+        highs = [r.get("h") for r in rows]
+        lows = [r.get("l") for r in rows]
+        vols = [r.get("v") for r in rows]
+        has_ohlcv = all(h is not None and l is not None and v is not None for h, l, v in zip(highs, lows, vols))
+        if not has_ohlcv:
+            return ms, None
+        fg_res = weight_score.compute_fg(closes, highs, lows, vols)
+        return ms, fg_res.get("fg")
     except Exception:
-        return "normal"
+        return "normal", None
 
 def load_info():
     try:
@@ -78,7 +91,7 @@ def main():
     info = load_info()
     ref = load_ref()
     events = load_events()
-    mkt = market_state()
+    mkt, fg = market_state()
     date = raw["snapshot_date"]
 
     rows_out = []
@@ -109,7 +122,7 @@ def main():
         iv = info.get(code)
         news_level = VIEW_TO_LEVEL.get(iv["view"]) if iv and iv.get("view") else None
         wscore = weight_score.evaluate(closes, highs, lows, vols, news_level=news_level,
-                                       is_fund=(itype == "基金"), market_state=mkt)
+                                       is_fund=(itype == "基金"), market_state=mkt, fg=fg)
         # 参考指标（回测/近一年/板块）
         rm = ref.get("items", {}).get(code, {})
         rows_out.append({
@@ -146,6 +159,7 @@ def main():
         "date": date, "note": raw.get("snapshot_note", ""),
         "intraday": any(r["today_intraday"] for r in rows_out),
         "market_state": mkt,
+        "fg": fg,
         "combined": ref.get("combined", {}),
         "weights": weight_score.WEIGHTS,
         "items": [{
@@ -160,6 +174,7 @@ def main():
             "comp": r["weight"]["comp"],
             "osc_detail": r["weight"].get("osc_detail"),
             "vol_detail": r["weight"].get("vol_detail"),
+            "fg_info": r["weight"].get("fg_info"),
             "bt": r["bt"], "buyhold_return": r["buyhold_return"],
             "news": r["info_view"], "risk_note": r["risk_note"],
         } for r in rows_out],
