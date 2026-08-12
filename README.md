@@ -1,78 +1,66 @@
-# 量化权重系统（Quant Weight System）
+# 量化权重系统（Quant Weight System）v4
 
-A 股多指标加权打分系统：六类指标连续打分（趋势/动能/量能/超买超卖/风控/研报）→ 加权合成总分 0-100 → 映射加仓/观望/减仓操作。内置回测引擎、每日信号快照、HTML 仪表盘、39 只跨行业验证池、公司设备可移植部署。
+A 股个人研究工具：**六类加权打分 + 回测引擎 + 每日信号快照 + HTML 仪表盘**。个人参考，不构成投资建议。
+
+## 版本历程
+
+| 版本 | 内容 | 组合回测（27 池 × 9 领域，2024-01 起） |
+|---|---|---|
+| v2 | 六类基础打分 + 市场状态门禁 + A3 量价位置区分 | +130.75% / 回撤 14.64% |
+| v3 | **布林带 %B 位置分**（采纳）；均线三线/共振补丁/牛熊系数（回测否决） | +138.63% / 回撤 13.91% / 胜率 89.4% / 换手 0.845% |
+| **v4** | **量价三件套补丁式**：地量见底/天量见顶 + 纯量价背离 + RSI背离（量能验证） | **+141.54% / 回撤 13.84% / 胜率 91.6% / 换手 0.787%（四项全优）** |
+
+v4 关键发现：量价背离是 20 日极值低频事件，信号稀疏高价值——换手率不升反降，与 v3 共振补丁（高频抖动、换手翻倍判负）本质不同。
+
+## 目录结构
+
+```
+monitor/          生产监控系统（每日信号 + 看板）
+  monitor.py         主流程：指标 → 六类打分 → 档位 → 信号变化 → 报告/看板数据
+  weight_score.py    v4 权重打分核心（开关可回退）
+  render_dashboard.py  看板 HTML（含超买/量能分解列 + 导出 PNG/PDF）
+  render_report_html.py 每日报告 HTML
+  build_web.py      历史归档 + history.html
+  信号规则.md        档位/阈值/市场状态规则
+backtest/         回测引擎（v3/v4 候选矩阵）
+  weight_system_backtest_v3.py
+  weight_system_backtest_v4.py   9 实验矩阵（量价三件套选型）
+  update_ref_metrics_v4.py       更新 ref_metrics.json（27 池重跑）
+  weight_system_v4_results.json  9 实验明细
+  权重系统v4改造报告_20260812.md
+docs/             文档
+index.html        看板快照（最新构建产物）
+legacy/           v2 时代历史代码（可回溯）
+watchlist.example.json  标的池模板（脱敏；个人 watchlist.json 不入库）
+```
 
 ## 快速开始
 
 ```bash
-# 1. 环境：Python 3.10+，安装依赖
-pip install pandas numpy matplotlib
+# 1. 准备标的池（复制模板并编辑）
+cp watchlist.example.json monitor/watchlist.json
 
-# 2. 配置数据源（config.py 自动探测；也可用环境变量覆盖）
-export WSTOCK_CLI=/path/to/westock-data/index.js   # 行情 CLI（可选）
+# 2. 拉取行情（tdx-connector，每标的日K线 ≥60 根带 h/l）写入 raw_kline/YYYY-MM-DD.json
 
-# 3. 运行回测（19 标的等权组合，2025-01 起）
-python weight_system_backtest.py
+# 3. 生成信号 + 报告 + 看板
+python monitor/monitor.py
+python monitor/render_report_html.py
+python monitor/render_dashboard.py   # 产出 dist/index.html
 
-# 4. 每日信号快照（操作建议 + 变动记录 + 置信度 + 数据溯源）
-python make_snapshot_v2.py
-
-# 5. HTML 仪表盘
-python render_dash_v2.py
-
-# 6. 移植自检（17 项，公司设备部署后必跑）
-python self_check.py
+# 4. 回测（可选，验证候选）
+python backtest/weight_system_backtest_v4.py
+python backtest/update_ref_metrics_v4.py
 ```
 
-## 核心文件
+数据依赖：通达信 K 线（tdx-connector）拉取、研报情报.json（个人维护，L1-L4 分级，不入库）。
 
-| 文件 | 用途 |
-|------|------|
-| `weight_system_backtest.py` | 回测引擎（六类打分/置信度/数据溯源/v1.3 开关） |
-| `config.py` | 统一配置（路径/数据源/取数预算/置信度规则）——移植唯一需改文件 |
-| `make_snapshot_v2.py` | 每日快照（含操作建议+前后变动记录） |
-| `render_dash_v2.py` | HTML 仪表盘渲染 |
-| `validate_industry_v2.py` | 39 只 × 19 领域跨行业验证（权重调整试金石） |
-| `fetch_stocks.py` / `fetch_tmp_balanced.py` | 行情取数（19 关注 + 39 验证） |
-| `compare_v13.py` | v1.3 死区/反转才动开关对比 |
-| `self_check.py` | 移植自检 17 项 |
+## 六类权重与档位
 
-## 配置开关（v1.3）
+- 权重：趋势 30% / 动能 25% / 量能 15% / 超买超卖 15% / 风控 10% / 研报 5%
+- 档位：满仓加仓 ≥75 / 轻仓加仓 60-74 / 观望 45-59 / 减至半仓 30-44 / 清仓 <30（市场状态三档调节门槛）
+- v3 增量：超买超卖类 = RSI(45) + KDJ过滤(30) + 布林位置(25)
+- v4 增量：量能类 = 量比 + A3量价配合 + 地量天量(±15) + 纯量价背离(±10)；超买超卖类 += RSI背离(±10，缩量/放量加权)
 
-`weight_system_backtest.py` 顶部：
+## 免责声明
 
-```python
-USE_DEADBAND = False        # 55-65 分死区观望（防临界抖动，收益 -1.9pct）
-USE_REVERSAL_ONLY = False   # 仅加减反转才动（实测 -68pct，证伪，勿开）
-```
-
-默认全关 = v1.2 基线（组合 +220.3% / 回撤 18.8% / 夏普 2.27）。
-
-## 数据
-
-- `data/`：19 只关注标的日线（qfq，westock）
-- `data_tmp/`：39 只 × 19 领域验证标的日线
-- 基金净值（`data/008254.csv` 等）为 T-1 口径（通达信 setcode=33）
-
-## 公司设备部署
-
-1. `git clone` 本仓库（或 git pull 更新）
-2. 装 Python + `pip install pandas numpy matplotlib`
-3. 改 `config.py` 或设环境变量接入公司数据源
-4. `python self_check.py` → 17/17 PASS 即部署成功
-
-详细手册见知识库 `research-量化权重系统部署手册-20260810.md`。
-
-## 说明
-
-> 本项目为个人量化研究工具，输出仅供参考，不构成投资建议。
-
-## v1.5（2026-08-11）——看板系统落地 + 补丁
-
-- **A3 量价位置区分**（素材吸收落地）：score_volume 放量下跌按位置计分——高位（dd60>-12%）放量跌 8 分（派发），低位放量跌 20 分（最后一跌/吸筹）。新基线 24 池：**+184.62% / 回撤 21.52% / 夏普 2.116 / 胜率 89%**（A3 补丁成本：收益 -2pct、回撤 +0.8pct）。
-- **市场状态三档化**（MARKET_ADJUST）：strong（沪深300>MA20 且偏离>+2%）加仓门槛 58/清仓 28；normal 62/30；weak（<MA20）65/35。回测默认 normal 行为不变；快照/看板可传 market_state。
-- **「半数加仓」科学性质疑三实验**（详见 exp_risk_weight.py 同目录实验记录）：osc 收紧 / 加仓需当日上涨 / 深跌过滤均被数据否决（收益净损 7-21pct）——系统在 AI 牛市的最优行为是现阈值，防御诉求可通过 market_state=weak 或深跌过滤开关满足。
-- **SPI 口径**：「SPI」为 RSI 的错误叫法（知识库 2026-08-10 澄清），超买超卖类主项为 RSI(14)；代码中无 SPI。
-- **监控应用**：`股票基金/行情监控/`（monitor.py v4 + weight_score.py + render_dashboard.py）为 agentos 网站应用，单页看板含 KPI/组合净值/汇总表（搜索筛选/分数构成列）/逐标的卡片；知识库文档 `research-量化权重看板系统-20260811.md`。
-
-> ⚠️ 本项目为个人量化研究工具，输出仅供参考，不构成投资建议。
+本仓库为个人研究工具，基于历史数据回测选型，不代表未来表现。仅供个人参考，不构成任何投资建议；最终投资决策由使用者自行判断并承担全部盈亏责任。

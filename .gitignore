@@ -1,17 +1,14 @@
+# 运行时数据 / 本地敏感数据（不入库）
+raw_kline/
+reports/
+dashboard_data.json
+信号状态.json
+研报情报.json
+ref_metrics.json
+watchlist.json
+# 看板快照（index.html 已入库，历史归档不入）
+dist/
 # Python
 __pycache__/
 *.pyc
 .venv/
-venv/
-
-# 检查用临时文件
-dash_check*.png
-dom_dump.html
-
-# 本地环境（若有）
-.env
-*.local
-
-# 系统
-Thumbs.db
-.DS_Store
