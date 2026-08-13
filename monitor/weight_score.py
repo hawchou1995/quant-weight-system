@@ -83,6 +83,14 @@ PROVENANCE = {
 
 NEWS_SCORE = {"L1": 70.0, "L2": 50.0, "L3": 30.0, "L4": 20.0}
 
+# ---- v6（2026-08-13 用户质疑 + 回测修正）：研报情报对称打分 ----
+# 原缺陷：score_news 无研报=50（加权后 +2.5 分"无信息白拿分"），且看空 L4=20 分仍贡献 +1 分（方向错误）。
+# 对称修正：以 50 为中性锚点，看多正偏移、看空负偏移、无研报=0 偏移。
+# 回测（27 池）：对称 +138.78% vs 原 +141.54%（-2.76pct），回撤 14.08%，语义正确优先。
+USE_NEWS_SYMMETRIC = True
+NEWS_OFFSET = {"L1": +20.0, "L2": 0.0, "L3": -20.0, "L4": -30.0}  # 相对中性 50 的偏移
+NEWS_NONE = 0.0
+
 
 def _clip(x):
     return max(0.0, min(100.0, float(x)))
@@ -485,7 +493,10 @@ def score_risk(row):
 
 
 def score_news(news_level):
-    """研报情报类：L1 看多 70 / L2 观望 50 / L3 谨慎 30 / L4 看空 20 / 无 50"""
+    """研报情报类（v6 对称）：L1 看多 70 / L2 观望 50 / L3 谨慎 30 / L4 看空 20 / 无 50。
+    对称模式（USE_NEWS_SYMMETRIC=True）：返回相对中性 50 的偏移（看多+20/看空-30/无0），由 compute_total_score 直接加减。"""
+    if USE_NEWS_SYMMETRIC:
+        return NEWS_OFFSET.get(news_level, NEWS_NONE)
     return NEWS_SCORE.get(news_level, 50.0)
 
 
@@ -496,9 +507,20 @@ def compute_total_score(row, news_level, is_fund=False):
     so = score_osc(row)
     sr = score_risk(row)
     sn = score_news(news_level)
-    total = (st * WEIGHTS["trend"] + sm * WEIGHTS["momentum"] + sv * WEIGHTS["volume"]
-             + so * WEIGHTS["osc"] + sr * WEIGHTS["risk"] + sn * WEIGHTS["news"])
-    comp = {"trend": st, "momentum": sm, "volume": sv, "osc": so, "risk": sr, "news": sn, "total": _clip(total)}
+    if USE_NEWS_SYMMETRIC:
+        # v6 对称：五类归一化 + news 偏移直接加减（无研报=0 贡献，看多正/看空负）
+        base_w = {k: WEIGHTS[k] for k in ["trend", "momentum", "volume", "osc", "risk"]}
+        s = sum(base_w.values())
+        total = (st * base_w["trend"] + sm * base_w["momentum"] + sv * base_w["volume"]
+                 + so * base_w["osc"] + sr * base_w["risk"]) / s
+        # news 偏移幅度：L1 +20 → +1.0 分；L4 -30 → -1.5 分（news 权重 5% 同量级）
+        total += sn * WEIGHTS["news"]
+        comp = {"trend": st, "momentum": sm, "volume": sv, "osc": so, "risk": sr,
+                "news": 50.0 + sn, "total": _clip(total)}
+    else:
+        total = (st * WEIGHTS["trend"] + sm * WEIGHTS["momentum"] + sv * WEIGHTS["volume"]
+                 + so * WEIGHTS["osc"] + sr * WEIGHTS["risk"] + sn * WEIGHTS["news"])
+        comp = {"trend": st, "momentum": sm, "volume": sv, "osc": so, "risk": sr, "news": sn, "total": _clip(total)}
     conf = compute_confidence(comp, is_fund=is_fund)
     return comp["total"], comp, conf
 
