@@ -16,6 +16,52 @@ combo = d.get("combined", {})
 W = d.get("weights", {})
 CW = d.get("combined_window", "2016-01起·100池")
 
+# ---- 收益概述 21 项指标（参考量化看板参数结构）----
+METRICS_DEF = [
+    ("strategy_return_pct", "策略收益", "pct"),
+    ("strategy_annual_pct", "策略年化收益", "pct"),
+    ("excess_return_pct", "超额收益", "pct"),
+    ("benchmark_return_pct", "基准收益", "pct"),
+    ("alpha", "阿尔法 α", "dec3"),
+    ("beta", "贝塔 β", "dec3"),
+    ("sharpe", "夏普比率", "dec3"),
+    ("win_rate", "胜率", "dec3"),
+    ("profit_loss_ratio", "盈亏比", "dec3"),
+    ("max_drawdown_pct", "最大回撤", "pct_neg"),
+    ("sortino", "索提诺比率", "dec3"),
+    ("daily_excess_pct", "日均超额收益", "pct4"),
+    ("excess_max_drawdown_pct", "超额收益最大回撤", "pct_neg"),
+    ("excess_sharpe", "超额收益夏普比率", "dec3"),
+    ("daily_win_rate", "日胜率", "dec3"),
+    ("win_count", "盈利次数", "int"),
+    ("loss_count", "亏损次数", "int"),
+    ("information_ratio", "信息比率", "dec3"),
+    ("strategy_volatility", "策略波动率", "dec3"),
+    ("benchmark_volatility", "基准波动率", "dec3"),
+    ("max_drawdown_range", "最大回撤区间", "range"),
+]
+
+def _fmt_metric(key, fmt):
+    v = combo.get(key)
+    if v is None:
+        return "—"
+    if fmt == "pct":
+        return f"{v:+.2f}%"
+    if fmt == "pct_neg":
+        return f"{v:.2f}%"
+    if fmt == "pct4":
+        return f"{v:.4f}%"
+    if fmt == "dec3":
+        return f"{v:.3f}"
+    if fmt == "int":
+        return f"{int(v)}"
+    return str(v)
+
+METRICS_HTML = "\n".join(
+    f'<div class="kpi"><div class="l">{label}</div><div class="v">{_fmt_metric(k, fmt)}</div></div>'
+    for k, label, fmt in METRICS_DEF
+)
+
 def b64(p):
     with open(p, "rb") as f:
         return "data:image/png;base64," + base64.b64encode(f.read()).decode()
@@ -91,18 +137,9 @@ th:hover {{ background: #e2e8f0; }}
 </div>
 <p class="note">{d['note']}｜权重系统 v6（2026-08-13 样本池重建）：六类打分（趋势30/动能25/量能15/超买超卖15/风控10/研报5；超买超卖类含布林带位置分，量能类含量价三件套）→ 满仓加仓≥75（按资产配置加到目标仓位，非全部资金投入）/ 轻仓加仓60-74 / 观望45-59 / 减至半仓30-44 / 清仓&lt;30；稳健加减仓 = 目标制 + 单次上限50%；研报对称打分（无研报0/看多+1/看空-1.5）；<b>恐贪指数 FG（沪深300 5维滚动分位 W=250）：{'🎯 FG ' + ('%.1f' % d.get('fg')) + '（恐惧区·逆向机会，动态门槛 ' + ('%.1f' % (d['items'][0].get('fg_info',{}).get('bw_eff',62))) + '/' + ('%.1f' % (d['items'][0].get('fg_info',{}).get('ss_eff',30))) + '）' if d.get('fg') is not None and d.get('fg') < 45 else ('⚖️ FG ' + ('%.1f' % d.get('fg')) + '（中性）' if d.get('fg') is not None and d.get('fg') <= 55 else ('🚀 FG ' + ('%.1f' % d.get('fg')) + '（贪婪区）' if d.get('fg') is not None else 'FG 不可用'))}</b>；组合回测口径 {CW}（v6 重建：27 池口径已作废，100 池基线 +303.37%/回撤 26.52%/夏普 0.85/年化 14.1%，2016-01 起 10.5 年全窗口，含 10 退市标的）</p>
 
+<h2>收益概述（v6 100 池 · 2016-01 ~ 2026-08）</h2>
 <div class="kpis">
-  <div class="kpi"><div class="v up">+{combo.get('total_return_pct', 0):.1f}%</div><div class="l">组合总收益（{CW}）</div></div>
-  <div class="kpi"><div class="v up">{combo.get('annual_return_pct', 0):.1f}%</div><div class="l">年化收益</div></div>
-  <div class="kpi"><div class="v">{combo.get('benchmark_return_pct', 0):+.1f}%</div><div class="l">基准收益（沪深300）</div></div>
-  <div class="kpi"><div class="v up">+{combo.get('excess_return_pct', 0):.1f}pct</div><div class="l">超额收益（vs 基准）</div></div>
-  <div class="kpi"><div class="v up">{combo.get('alpha_annual_pct', 0):+.1f}%</div><div class="l">阿尔法 α（年化）</div></div>
-  <div class="kpi"><div class="v">{combo.get('beta', 0):.2f}</div><div class="l">贝塔 β</div></div>
-  <div class="kpi"><div class="v up">{combo.get('win_rate_pct', 0):.1f}%</div><div class="l">交易胜率</div></div>
-  <div class="kpi"><div class="v down">{combo.get('max_drawdown_pct', 0):.1f}%</div><div class="l">最大回撤</div></div>
-  <div class="kpi"><div class="v">{combo.get('sharpe', 0):.2f}</div><div class="l">夏普比率</div></div>
-  <div class="kpi"><div class="v">{combo.get('total_trades', 0)}</div><div class="l">总交易次数</div></div>
-  <div class="kpi"><div class="v">{len(items)}</div><div class="l">监控标的数</div></div>
+{METRICS_HTML}
 </div>
 
 <h2>组合净值走势（拖动下方滑块自由选择时间段）</h2>
