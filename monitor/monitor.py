@@ -161,6 +161,7 @@ def main():
         "market_state": mkt,
         "fg": fg,
         "combined": ref.get("combined", {}),
+        "combined_window": ref.get("combined", {}).get("window", "2021-08起·100池") + "·" + ref.get("combined", {}).get("pool", "100池"),
         "weights": weight_score.WEIGHTS,
         "items": [{
             "code": r["code"], "name": r["name"], "type": r["type"],

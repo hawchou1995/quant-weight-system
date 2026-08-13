@@ -14,7 +14,7 @@ d = json.load(open(DASH, encoding="utf-8"))
 items = d["items"]
 combo = d.get("combined", {})
 W = d.get("weights", {})
-CW = d.get("combined_window", "2024-01起·27池")
+CW = d.get("combined_window", "2016-01起·100池")
 
 def b64(p):
     with open(p, "rb") as f:
@@ -89,10 +89,15 @@ th:hover {{ background: #e2e8f0; }}
   <a class="community" href="https://qingju.me/" target="_blank" rel="noopener" title="青橘社区 · 西理工人的论坛">💬 青橘社区 · 加标的 / 自由讨论 →</a>
 </div>
 </div>
-<p class="note">{d['note']}｜权重系统 v4（2026-08-12 回测选型）：六类打分（趋势30/动能25/量能15/超买超卖15/风控10/研报5；超买超卖类含布林带位置分，量能类含量价三件套）→ 满仓加仓≥75（按资产配置加到目标仓位，非全部资金投入）/ 轻仓加仓60-74 / 观望45-59 / 减至半仓30-44 / 清仓&lt;30；稳健加减仓 = 目标制 + 单次上限50%；市场状态门禁（沪深300 MA20 三档）：<b>{'🛡 防御态（加仓门槛65/清仓35）' if d.get('market_state')=='weak' else ('🔥 强势态（门槛58/清仓28）' if d.get('market_state')=='strong' else '✅ 正常态（门槛62/清仓30）')}</b>；组合回测口径 {CW}（9 领域 × 3 标的）</p>
+<p class="note">{d['note']}｜权重系统 v6（2026-08-13 样本池重建）：六类打分（趋势30/动能25/量能15/超买超卖15/风控10/研报5；超买超卖类含布林带位置分，量能类含量价三件套）→ 满仓加仓≥75（按资产配置加到目标仓位，非全部资金投入）/ 轻仓加仓60-74 / 观望45-59 / 减至半仓30-44 / 清仓&lt;30；稳健加减仓 = 目标制 + 单次上限50%；研报对称打分（无研报0/看多+1/看空-1.5）；<b>恐贪指数 FG（沪深300 5维滚动分位 W=250）：{'🎯 FG ' + ('%.1f' % d.get('fg')) + '（恐惧区·逆向机会，动态门槛 ' + ('%.1f' % (d['items'][0].get('fg_info',{}).get('bw_eff',62))) + '/' + ('%.1f' % (d['items'][0].get('fg_info',{}).get('ss_eff',30))) + '）' if d.get('fg') is not None and d.get('fg') < 45 else ('⚖️ FG ' + ('%.1f' % d.get('fg')) + '（中性）' if d.get('fg') is not None and d.get('fg') <= 55 else ('🚀 FG ' + ('%.1f' % d.get('fg')) + '（贪婪区）' if d.get('fg') is not None else 'FG 不可用'))}</b>；组合回测口径 {CW}（v6 重建：27 池口径已作废，100 池基线 +303.37%/回撤 26.52%/夏普 0.85/年化 14.1%，2016-01 起 10.5 年全窗口，含 10 退市标的）</p>
 
 <div class="kpis">
   <div class="kpi"><div class="v up">+{combo.get('total_return_pct', 0):.1f}%</div><div class="l">组合总收益（{CW}）</div></div>
+  <div class="kpi"><div class="v up">{combo.get('annual_return_pct', 0):.1f}%</div><div class="l">年化收益</div></div>
+  <div class="kpi"><div class="v">{combo.get('benchmark_return_pct', 0):+.1f}%</div><div class="l">基准收益（沪深300）</div></div>
+  <div class="kpi"><div class="v up">+{combo.get('excess_return_pct', 0):.1f}pct</div><div class="l">超额收益（vs 基准）</div></div>
+  <div class="kpi"><div class="v up">{combo.get('alpha_annual_pct', 0):+.1f}%</div><div class="l">阿尔法 α（年化）</div></div>
+  <div class="kpi"><div class="v">{combo.get('beta', 0):.2f}</div><div class="l">贝塔 β</div></div>
   <div class="kpi"><div class="v up">{combo.get('win_rate_pct', 0):.1f}%</div><div class="l">交易胜率</div></div>
   <div class="kpi"><div class="v down">{combo.get('max_drawdown_pct', 0):.1f}%</div><div class="l">最大回撤</div></div>
   <div class="kpi"><div class="v">{combo.get('sharpe', 0):.2f}</div><div class="l">夏普比率</div></div>
@@ -100,7 +105,7 @@ th:hover {{ background: #e2e8f0; }}
   <div class="kpi"><div class="v">{len(items)}</div><div class="l">监控标的数</div></div>
 </div>
 
-<h2>组合净值走势（鼠标悬浮/缩放交互）</h2>
+<h2>组合净值走势（拖动下方滑块自由选择时间段）</h2>
 <div class="charts">
   <div id="trendChart" style="width:100%;height:360px;background:#fff;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin:8px 0;"></div>
 </div>
@@ -110,7 +115,7 @@ th:hover {{ background: #e2e8f0; }}
   <div class="kpi" style="box-shadow:0 1px 3px rgba(0,0,0,.08)">
     <div class="l" style="font-weight:700;color:#2b6cb0;margin-bottom:6px">六类打分权重</div>
     <div class="l">总分 = 趋势<b>30%</b> + 动能<b>25%</b> + 量能<b>15%</b> + 超买超卖<b>15%</b> + 风控<b>10%</b> + 研报<b>5%</b></div>
-    <div class="l" style="margin-top:6px">趋势=MA20位置/ADX(14)/20日动量 ｜ 动能=MACD(12,26,9)/当日涨跌(ATR自适应)/MACD柱<br>量能=量比(5日)/量价配合(A3位置区分)/量价三件套(v4:地量天量+量价背离+RSI背离) ｜ 超买超卖=RSI(14)/KDJ三重过滤/布林带位置分(v3)<br>风控=ATR%适中/60日回撤 ｜ 研报=L1看多70/L3谨慎30</div>
+    <div class="l" style="margin-top:6px">趋势=MA20位置/ADX(14)/20日动量 ｜ 动能=MACD(12,26,9)/当日涨跌(ATR自适应)/MACD柱<br>量能=量比(5日)/量价配合(A3位置区分)/量价三件套(v4:地量天量+量价背离+RSI背离) ｜ 超买超卖=RSI(14)/KDJ三重过滤/布林带位置分(v3)<br>风控=ATR%适中/60日回撤 ｜ 研报=对称贡献分（看多+1.0/谨慎-1.0/看空-1.5/无0，v6）</div>
   </div>
   <div class="kpi" style="box-shadow:0 1px 3px rgba(0,0,0,.08)">
     <div class="l" style="font-weight:700;color:#2b6cb0;margin-bottom:6px">操作档位与市场门禁</div>
@@ -124,7 +129,7 @@ th:hover {{ background: #e2e8f0; }}
     <div class="l" style="margin-top:6px">方向性类别 = 剔除退化项（基金无量能/无研报）后的六类；方向一致 = 该类别≥60 或 ≤40 分</div>
   </div>
 </div>
-<p style="font-size:12px;color:#8892a0;margin:0 0 8px">指标全解（每个档位可手算复核）见知识库《权重系统指标全解_20260811》｜ 素材纪律：权重经 ±5% 敏感性扫描 + 37 只验证池维持 v1.0；v3（2026-08-12）新增布林带位置分（+138.63%/回撤 13.91%，牛熊系数/共振补丁/均线三线经回测否决）；v4（2026-08-12）量价三件套补丁式（地量见底/天量见顶+纯量价背离+RSI背离，27 池 +141.54%/回撤 13.84%/胜率 91.6%/换手 0.787% 四项全优）</p>
+<p style="font-size:12px;color:#8892a0;margin:0 0 8px">指标全解（每个档位可手算复核）见知识库《权重系统指标全解_20260811》｜ 素材纪律：权重经 ±5% 敏感性扫描 + 37 只验证池维持 v1.0；v3（2026-08-12）布林带位置分；v4（2026-08-12）量价三件套补丁式；v5（2026-08-12）恐贪指数 FG 动态门槛（恐惧机会）；<b style="color:#c53030">v6（2026-08-13）样本池重建为 100 池（9 领域 × 10 + 10 退市）消除幸存者偏差——27 池口径（+141.54%）已作废；2016-01 起全量回测：100 池基线 +303.37%/回撤 26.52%/夏普 0.85/胜率 82.0%/年化 14.1%（退市 10 只均值 -88.4% 已计入）；FG 恐惧机会 +304.92% 微优（胜率 84.2%/换手 0.489% 占优）；FG 第7维收益最高但回撤恶化 6.1pct 否决</b></p>
 
 <h2>标的汇总（{len(items)} 只）</h2>
 <div class="tools">
@@ -133,7 +138,7 @@ th:hover {{ background: #e2e8f0; }}
   <select id="fInd" onchange="render()"><option value="">全部行业</option></select>
   <select id="fAct" onchange="render()"><option value="">全部档位</option></select>
   <button onclick="exportPNG()" style="margin-left:8px;padding:4px 12px;border:1px solid #2b6cb0;background:#fff;color:#2b6cb0;border-radius:4px;cursor:pointer;font-size:12px">📷 导出PNG</button>
-  <button onclick="exportPDF()" style="margin-left:6px;padding:4px 12px;border:1px solid #2b6cb0;background:#2b6cb0;color:#fff;border-radius:4px;cursor:pointer;font-size:12px">📄 导出PDF</button>
+  <button onclick="exportXLSX()" style="margin-left:6px;padding:4px 12px;border:1px solid #2b6cb0;background:#2b6cb0;color:#fff;border-radius:4px;cursor:pointer;font-size:12px">📊 导出XLSX</button>
 </div>
 <table id="tbl"><thead><tr>
 <th data-k="name">标的</th><th data-k="market">板块</th><th data-k="industry">行业</th>
@@ -149,6 +154,8 @@ th:hover {{ background: #e2e8f0; }}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 const D = {DATA_JSON};
 const TREND = {TREND_JSON};
@@ -195,7 +202,7 @@ function render() {{
       <td class="${{pcCls}}">${{fmt(pc)}}</td>
       <td class="${{i.year_return >= 0 ? "up" : "down"}}">${{fmt(i.year_return)}}</td>
       <td><b>${{i.score.toFixed(0)}}</b></td>
-      <td style="font-size:11px;color:#555" title="趋势/动能/量能/超买超卖(含布林v3)/风控/研报">${{i.comp.trend.toFixed(0)}}/${{i.comp.momentum.toFixed(0)}}/${{i.comp.volume.toFixed(0)}}/${{i.comp.osc.toFixed(0)}}/${{i.comp.risk.toFixed(0)}}/${{i.comp.news.toFixed(0)}}</td>
+      <td style="font-size:11px;color:#555" title="趋势/动能/量能/超买超卖(含布林v3)/风控/研报(对称贡献分)">${{i.comp.trend.toFixed(0)}}/${{i.comp.momentum.toFixed(0)}}/${{i.comp.volume.toFixed(0)}}/${{i.comp.osc.toFixed(0)}}/${{i.comp.risk.toFixed(0)}}/<span class="${{i.comp.news<0?"down":"up"}}">${{i.comp.news>0?"+":""}}${{i.comp.news.toFixed(1)}}</span></td>
       <td style="font-size:11px;color:#555" title="${{i.osc_detail ? '超买超卖子分：RSI ' + i.osc_detail.rsi + ' 分 / KDJ ' + i.osc_detail.kdj + ' 分 / 布林位置 ' + i.osc_detail.boll + ' 分（%B=' + (i.osc_detail.boll_pct != null ? i.osc_detail.boll_pct : '—') + '，v3 新增）' + (i.osc_detail.rsi_div ? '；⚠ ' + i.osc_detail.rsi_div : '') : 'v2 模式无布林分'}}">${{i.osc_detail ? '<div>' + i.osc_detail.rsi.toFixed(0) + '/' + i.osc_detail.kdj.toFixed(0) + '/' + i.osc_detail.boll.toFixed(0) + '</div><div style="margin-top:2px">' + (i.osc_detail.boll_pct != null ? '<span class="bdg boll">B'+ (i.osc_detail.boll_pct*100).toFixed(0) + '%</span>' : '') + (i.osc_detail.rsi_div ? '<span class="bdg rdiv">' + i.osc_detail.rsi_div + '</span>' : '') + '</div>' : '—'}}</td>
       <td style="font-size:11px;color:#555" title="${{i.vol_detail ? '量能子分：量比 ' + i.vol_detail.vr + ' → ' + i.vol_detail.vr_score + ' 分 / 量价配合 ' + i.vol_detail.pv_score + ' 分' + (i.vol_detail.extreme ? '；' + i.vol_detail.extreme : '') + (i.vol_detail.pdv ? '；' + i.vol_detail.pdv : '') + '（v4 量价三件套）' : '—'}}">${{i.vol_detail ? '<div>' + (i.vol_detail.vr != null ? '量比' + i.vol_detail.vr.toFixed(1) : '—') + '</div><div style="margin-top:2px">' + (i.vol_detail.extreme ? '<span class="bdg evol">' + i.vol_detail.extreme + '</span>' : '') + (i.vol_detail.pdv ? '<span class="bdg pdiv">' + i.vol_detail.pdv + '</span>' : '') + '</div>' : '—'}}</td>
       <td><span class="bdg ${{confCls[i.conf.level]}}">${{i.conf.level}}置信</span></td>
@@ -208,7 +215,7 @@ function render() {{
     return `<div class="card"><h3>${{i.name}} <span class="sub">${{i.code}}</span></h3>
       <p class="meta">板块：${{i.market}} ｜ 行业：${{i.industry||"—"}} ｜ 现价 ${{i.close.toFixed(2)}}（<span class="${{i.pct_chg>0?"up":"down"}}">${{fmt(i.pct_chg)}}</span>）｜ 近一年 <span class="${{i.year_return>=0?"up":"down"}}">${{fmt(i.year_return)}}</span></p>
       <p class="meta">权重 <b>${{i.score.toFixed(1)}} 分</b> → <span class="sig ${{actCls[i.action]}}">${{i.action}}</span> <span class="bdg ${{confCls[i.conf.level]}}">${{i.conf.level}}置信</span></p>
-      <p class="meta">六类：趋势 ${{i.comp.trend.toFixed(0)}}｜动能 ${{i.comp.momentum.toFixed(0)}}｜量能 ${{i.comp.volume.toFixed(0)}}<span class="sub" style="margin-left:4px">${{i.vol_detail ? '= 量比 ' + i.vol_detail.vr_score.toFixed(0) + ' + 量价配合 ' + i.vol_detail.pv_score.toFixed(0) + '（量比' + (i.vol_detail.vr != null ? i.vol_detail.vr : '—') + '）' + (i.vol_detail.extreme ? ' ⚠' + i.vol_detail.extreme : '') + (i.vol_detail.pdv ? ' ⚠' + i.vol_detail.pdv : '') + ' v4' : ''}}</span>｜超买超卖 ${{i.comp.osc.toFixed(0)}}<span class="sub" style="margin-left:4px">${{i.osc_detail ? '= RSI ' + i.osc_detail.rsi.toFixed(0) + ' + KDJ ' + i.osc_detail.kdj.toFixed(0) + ' + 布林 ' + i.osc_detail.boll.toFixed(0) + '（%B=' + (i.osc_detail.boll_pct != null ? i.osc_detail.boll_pct : '—') + '）' + (i.osc_detail.rsi_div ? ' ⚠' + i.osc_detail.rsi_div : '') + ' v3/v4' : '（v2 无布林分）'}}</span>｜风控 ${{i.comp.risk.toFixed(0)}}｜研报 ${{i.comp.news.toFixed(0)}}</p>
+      <p class="meta">六类：趋势 ${{i.comp.trend.toFixed(0)}}｜动能 ${{i.comp.momentum.toFixed(0)}}｜量能 ${{i.comp.volume.toFixed(0)}}<span class="sub" style="margin-left:4px">${{i.vol_detail ? '= 量比 ' + i.vol_detail.vr_score.toFixed(0) + ' + 量价配合 ' + i.vol_detail.pv_score.toFixed(0) + '（量比' + (i.vol_detail.vr != null ? i.vol_detail.vr : '—') + '）' + (i.vol_detail.extreme ? ' ⚠' + i.vol_detail.extreme : '') + (i.vol_detail.pdv ? ' ⚠' + i.vol_detail.pdv : '') + ' v4' : ''}}</span>｜超买超卖 ${{i.comp.osc.toFixed(0)}}<span class="sub" style="margin-left:4px">${{i.osc_detail ? '= RSI ' + i.osc_detail.rsi.toFixed(0) + ' + KDJ ' + i.osc_detail.kdj.toFixed(0) + ' + 布林 ' + i.osc_detail.boll.toFixed(0) + '（%B=' + (i.osc_detail.boll_pct != null ? i.osc_detail.boll_pct : '—') + '）' + (i.osc_detail.rsi_div ? ' ⚠' + i.osc_detail.rsi_div : '') + ' v3/v4' : '（v2 无布林分）'}}</span>｜风控 ${{i.comp.risk.toFixed(0)}}｜研报 <span class="${{i.comp.news<0?"down":"up"}}">${{i.comp.news>0?"+":""}}${{i.comp.news.toFixed(1)}}</span>（对称：看多+1/谨慎-1/看空-1.5/无0）</p>
       <p class="meta">回测(${{i.bt_window||"2024-01起"}})：收益 <b>${{bt.total_return_pct != null ? bt.total_return_pct.toFixed(1)+"%" : "—"}}</b>（持有 ${{i.buyhold_return != null ? i.buyhold_return.toFixed(1)+"%" : "—"}}）｜胜率 ${{bt.win_rate_pct != null ? bt.win_rate_pct.toFixed(0)+"%" : "—"}}｜回撤 ${{bt.max_drawdown_pct != null ? bt.max_drawdown_pct.toFixed(1)+"%" : "—"}}｜${{bt.total_trades||0}} 笔</p>
       ${{i.news ? `<p class="meta">研报：${{i.news}}</p>` : ""}}
       ${{i.risk_note ? `<p class="meta" style="color:#b45309">⚠ 事件：${{i.risk_note}}</p>` : ""}}</div>`;
@@ -216,30 +223,31 @@ function render() {{
   document.getElementById("cards").innerHTML = rows.map(c).join("");
 }}
 render();
-// ---- 组合净值交互式走势图（ECharts）----
+// ---- 组合净值交互式走势图（ECharts · v6 2016 起全量 + 时间段筛选）----
 if (TREND && TREND.combo && window.echarts) {{
   const chart = echarts.init(document.getElementById("trendChart"));
-  const mk = (arr, color) => ({{
-    name: arr === TREND.combo ? "权重系统 27池" : arr === TREND.buyhold ? "买入持有（基准）" : "沪深300",
-    type: "line", showSymbol: false, smooth: true, color,
+  const mk = (arr, color, nm) => ({{
+    name: nm, type: "line", showSymbol: false, smooth: true, color,
     data: (arr || []).map(p => [p.date, p.value]),
   }});
   chart.setOption({{
     tooltip: {{ trigger: "axis", confine: true }},
-    legend: {{ data: ["权重系统 27池", "买入持有（基准）", "沪深300"], top: 4 }},
-    grid: {{ left: 46, right: 14, top: 34, bottom: 26 }},
+    legend: {{ data: ["权重系统 100池", "沪深300"], top: 4 }},
+    grid: {{ left: 46, right: 14, top: 34, bottom: 40 }},
     xAxis: {{ type: "time" }},
     yAxis: {{ type: "value", scale: true, axisLabel: {{ formatter: v => v.toFixed(0) }} }},
-    dataZoom: [{{ type: "inside" }}, {{ type: "slider", height: 16, bottom: 2 }}],
+    dataZoom: [
+      {{ type: "inside" }},
+      {{ type: "slider", height: 20, bottom: 8, startValue: TREND.combo[0].date, endValue: TREND.combo[TREND.combo.length-1].date }},
+    ],
     series: [
-      mk(TREND.combo, "#d92d20"),
-      mk(TREND.buyhold, "#8a94a6"),
-      mk(TREND.hs300, "#f5a623"),
+      mk(TREND.combo, "#d92d20", "权重系统 100池"),
+      mk(TREND.hs300, "#f5a623", "沪深300"),
     ],
   }});
   window.addEventListener("resize", () => chart.resize());
 }}
-// ---- 导出 PNG / PDF（html2canvas + jsPDF，分享用）----
+// ---- 导出 PNG / XLSX（分享用）----
 const EXPORT_DATE = "{d['date']}";
 function exportPNG() {{
   const el = document.getElementById("tbl");
@@ -250,27 +258,28 @@ function exportPNG() {{
     a.click();
   }});
 }}
-function exportPDF() {{
-  const el = document.getElementById("tbl");
-  html2canvas(el, {{ backgroundColor: "#fff", scale: 2, useCORS: true }}).then(canvas => {{
-    const img = canvas.toDataURL("image/png");
-    const {{ jsPDF }} = window.jspdf;
-    const pdf = new jsPDF("l", "mm", "a4");
-    const pw = pdf.internal.pageSize.getWidth();
-    const ph = pdf.internal.pageSize.getHeight();
-    const ratio = pw / canvas.width;
-    const h = canvas.height * ratio;
-    let heightLeft = h, position = 0;
-    pdf.addImage(img, "PNG", 0, position, pw, h);
-    heightLeft -= ph;
-    while (heightLeft > 0) {{
-      position -= ph;
-      pdf.addPage();
-      pdf.addImage(img, "PNG", 0, position, pw, h);
-      heightLeft -= ph;
-    }}
-    pdf.save(`权重看板_${{EXPORT_DATE}}.pdf`);
+function exportXLSX() {{
+  const rows = filtered();  // 导出当前筛选结果
+  const fmtPct = v => (v === null || v === undefined) ? "—" : (v > 0 ? "+" : "") + v.toFixed(2) + "%";
+  const data = rows.map(i => {{
+    const od = i.osc_detail || {{}}, vd = i.vol_detail || {{}};
+    return {{
+      "名称": i.name, "代码": i.code, "板块": i.market, "行业": i.industry || "—",
+      "现价": i.close, "涨跌幅": fmtPct(i.pct_chg), "近一年": fmtPct(i.year_return),
+      "权重分": i.score, "趋势": i.comp.trend, "动能": i.comp.momentum, "量能": i.comp.volume,
+      "超买超卖": i.comp.osc, "风控": i.comp.risk, "研报": i.comp.news,
+      "RSI/KDJ/布林": od.rsi + "/" + od.kdj + "/" + od.boll,
+      "布林%B": od.boll_pct != null ? (od.boll_pct * 100).toFixed(1) + "%" : "—",
+      "RSI背离": od.rsi_div || "—",
+      "量比": vd.vr != null ? vd.vr : "—", "量价信号": [vd.extreme, vd.pdv].filter(Boolean).join(" / ") || "—",
+      "置信度": i.conf.level, "操作档位": i.action,
+    }};
   }});
+  const ws = XLSX.utils.json_to_sheet(data);
+  ws["!cols"] = Object.keys(data[0] || {{}}).map(() => ({{ wch: 12 }}));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "权重看板");
+  XLSX.writeFile(wb, `权重看板_${{EXPORT_DATE}}.xlsx`);
 }}
 </script>
 </body></html>"""

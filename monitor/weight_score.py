@@ -516,7 +516,7 @@ def compute_total_score(row, news_level, is_fund=False):
         # news 偏移幅度：L1 +20 → +1.0 分；L4 -30 → -1.5 分（news 权重 5% 同量级）
         total += sn * WEIGHTS["news"]
         comp = {"trend": st, "momentum": sm, "volume": sv, "osc": so, "risk": sr,
-                "news": 50.0 + sn, "total": _clip(total)}
+                "news": round(sn * WEIGHTS["news"], 2), "total": _clip(total)}  # news 输出实际贡献分：看多+1.0/谨慎-1.0/看空-1.5/无0
     else:
         total = (st * WEIGHTS["trend"] + sm * WEIGHTS["momentum"] + sv * WEIGHTS["volume"]
                  + so * WEIGHTS["osc"] + sr * WEIGHTS["risk"] + sn * WEIGHTS["news"])
