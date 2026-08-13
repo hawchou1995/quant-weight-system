@@ -3,7 +3,7 @@
 看板渲染：dashboard_data.json + charts/*.png → dist/index.html（单页自包含）
 功能：KPI 卡片（组合胜率/收益/回撤）+ 走势图 + 汇总表（搜索/板块筛选/行业筛选/排序）+ 逐标的卡片
 """
-import json, os, base64
+import json, os, base64, math
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 DIST = r"D:/Documents/Workbuddy/股票基金/dist"
@@ -58,9 +58,57 @@ def _fmt_metric(key, fmt):
     return str(v)
 
 METRICS_HTML = "\n".join(
-    f'<div class="kpi"><div class="l">{label}</div><div class="v">{_fmt_metric(k, fmt)}</div></div>'
+    f'<div class="m"><span class="ml">{label}</span><span class="mv">{_fmt_metric(k, fmt)}</span></div>'
     for k, label, fmt in METRICS_DEF
 )
+
+
+# ---- 浅色主题六角雷达图（逐标的卡片内嵌）----
+def svg_radar_light(item, size=104):
+    cx = cy = size / 2
+    R = size * 0.36
+    cats = ["trend", "momentum", "volume", "osc", "risk", "news"]
+    labels = ["趋势", "动能", "量能", "超买", "风控", "研报"]
+    comp = item.get("comp", {})
+    score = item.get("score", 50)
+    angles = [math.radians(i * 60 - 90) for i in range(6)]  # 顶部起点
+
+    def pt(r, ang):
+        return (cx + r * math.cos(ang), cy + r * math.sin(ang))
+
+    parts = []
+    for ring in [0.25, 0.5, 0.75, 1.0]:
+        pts = " ".join(f"{pt(R*ring, a)[0]:.1f},{pt(R*ring, a)[1]:.1f}" for a in angles)
+        stroke = "#e2e8f0" if ring < 1.0 else "#cbd5e0"
+        parts.append(f'<polygon points="{pts}" fill="none" stroke="{stroke}" stroke-width="1"/>')
+    for a in angles:
+        x0, y0 = pt(0, a); x1, y1 = pt(R, a)
+        parts.append(f'<line x1="{x0:.1f}" y1="{y0:.1f}" x2="{x1:.1f}" y2="{y1:.1f}" stroke="#e5e9f0" stroke-width="1"/>')
+    vals = [comp.get(c, 50) for c in cats]
+    if abs(comp.get("news", 0) or 0) <= 5:
+        vals[5] = 50 + comp["news"] * 20
+    spts = " ".join(f"{pt(R*max(3,min(100,vals[i]))/100, angles[i])[0]:.1f},{pt(R*max(3,min(100,vals[i]))/100, angles[i])[1]:.1f}" for i in range(6))
+    if score >= 75: fill, stroke = "rgba(220,38,38,0.18)", "#dc2626"
+    elif score >= 60: fill, stroke = "rgba(234,88,12,0.16)", "#ea580c"
+    elif score >= 45: fill, stroke = "rgba(202,138,4,0.16)", "#ca8a04"
+    elif score >= 30: fill, stroke = "rgba(22,163,74,0.16)", "#16a34a"
+    else: fill, stroke = "rgba(2,132,199,0.16)", "#0284c7"
+    parts.append(f'<polygon points="{spts}" fill="{fill}" stroke="{stroke}" stroke-width="2" stroke-linejoin="round"/>')
+    for i in range(6):
+        xr, yr = pt(R * max(3, min(100, vals[i])) / 100, angles[i])
+        parts.append(f'<circle cx="{xr:.1f}" cy="{yr:.1f}" r="2.5" fill="{stroke}"/>')
+        lx, ly = pt(R * 1.22, angles[i])
+        anchor = "middle"
+        if abs(math.cos(angles[i])) > 0.7:
+            anchor = "start" if lx > cx else "end"
+        parts.append(f'<text x="{lx:.1f}" y="{ly:.1f}" fill="#4a5568" font-size="8" text-anchor="{anchor}" font-weight="600">{labels[i]}</text>')
+    parts.append(f'<text x="{cx:.1f}" y="{cy+1:.1f}" fill="#1a202c" font-size="20" font-weight="800" text-anchor="middle">{score:.1f}</text>')
+    parts.append(f'<text x="{cx:.1f}" y="{cy+13:.1f}" fill="#9ca3af" font-size="7" text-anchor="middle">总分</text>')
+    return f'<svg viewBox="0 0 {size} {size}" style="width:{size}px;height:{size}px;flex:0 0 auto">{chr(10).join(parts)}</svg>'
+
+# 给每个 item 预生成雷达图 SVG
+for _it in items:
+    _it["radar_svg"] = svg_radar_light(_it)
 
 def b64(p):
     with open(p, "rb") as f:
@@ -84,10 +132,11 @@ body {{ font-family: "Microsoft YaHei", sans-serif; margin: 0; background: #f7f8
 .wrap {{ max-width: 1180px; margin: 0 auto; padding: 20px 16px 40px; }}
 h1 {{ font-size: 22px; margin: 4px 0 2px; }}
 .note {{ color: #666; font-size: 13px; background: #eef2f7; padding: 8px 12px; border-radius: 6px; margin: 8px 0 16px; }}
-.kpis {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 14px 0; }}
-.kpi {{ background: #fff; border-radius: 10px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }}
-.kpi .v {{ font-size: 22px; font-weight: 700; }}
-.kpi .l {{ font-size: 12px; color: #8892a0; margin-top: 2px; }}
+.kpis {{ display: grid; grid-template-columns: repeat(11, minmax(0, 1fr)); gap: 6px 18px; margin: 10px 0 14px; padding: 10px 14px; background: #fff; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }}
+@media (max-width: 900px) {{ .kpis {{ grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }} }}
+.m {{ display: flex; flex-direction: column; gap: 1px; padding: 2px 0; }}
+.m .ml {{ font-size: 11px; color: #8892a0; white-space: nowrap; }}
+.m .mv {{ font-size: 15px; font-weight: 700; color: #1a202c; font-variant-numeric: tabular-nums; }}
 .up {{ color: #d92d20; }} .down {{ color: #0f9d58; }} .flat {{ color: #666; }}
 .charts img {{ width: 100%; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,.08); margin: 8px 0; background:#fff; }}
 h2 {{ font-size: 17px; margin: 26px 0 10px; border-left: 4px solid #2b6cb0; padding-left: 8px; }}
@@ -112,8 +161,9 @@ th:hover {{ background: #e2e8f0; }}
 .bdg.pdiv {{ background: #fdeaea; color: #c0392b; border: 1px solid #c0392b; }}
 .bdg.rdiv {{ background: #f3e8fd; color: #7c3aed; border: 1px solid #7c3aed; }}
 .sub {{ color: #8892a0; font-size: 11px; font-weight: normal; }}
-.cards {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; margin-top: 12px; }}
-.card {{ background: #fff; border-radius: 10px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }}
+.cards {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 12px; margin-top: 12px; }}
+.card {{ background: #fff; border-radius: 10px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.08); display: flex; gap: 12px; align-items: flex-start; }}
+.card .body {{ flex: 1 1 auto; min-width: 0; }}
 .card h3 {{ margin: 0 0 6px; font-size: 15px; }}
 .card .meta {{ margin: 3px 0; font-size: 12px; color: #555; }}
 .risk {{ background: #fef6e7; border: 1px solid #f0d9a8; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #6b4f1d; margin-top: 26px; }}
@@ -137,7 +187,7 @@ th:hover {{ background: #e2e8f0; }}
 </div>
 <p class="note">{d['note']}｜权重系统 v6（2026-08-13 样本池重建）：六类打分（趋势30/动能25/量能15/超买超卖15/风控10/研报5；超买超卖类含布林带位置分，量能类含量价三件套）→ 满仓加仓≥75（按资产配置加到目标仓位，非全部资金投入）/ 轻仓加仓60-74 / 观望45-59 / 减至半仓30-44 / 清仓&lt;30；稳健加减仓 = 目标制 + 单次上限50%；研报对称打分（无研报0/看多+1/看空-1.5）；<b>恐贪指数 FG（沪深300 5维滚动分位 W=250）：{'🎯 FG ' + ('%.1f' % d.get('fg')) + '（恐惧区·逆向机会，动态门槛 ' + ('%.1f' % (d['items'][0].get('fg_info',{}).get('bw_eff',62))) + '/' + ('%.1f' % (d['items'][0].get('fg_info',{}).get('ss_eff',30))) + '）' if d.get('fg') is not None and d.get('fg') < 45 else ('⚖️ FG ' + ('%.1f' % d.get('fg')) + '（中性）' if d.get('fg') is not None and d.get('fg') <= 55 else ('🚀 FG ' + ('%.1f' % d.get('fg')) + '（贪婪区）' if d.get('fg') is not None else 'FG 不可用'))}</b>；组合回测口径 {CW}（v6 重建：27 池口径已作废，100 池基线 +303.37%/回撤 26.52%/夏普 0.85/年化 14.1%，2016-01 起 10.5 年全窗口，含 10 退市标的）</p>
 
-<h2>收益概述（v6 100 池 · 2016-01 ~ 2026-08）</h2>
+<h2>收益概述 <span class="sub" style="font-size:12px;font-weight:normal">v6 100 池 · 2016-01 ~ 2026-08 · 含 10 退市</span></h2>
 <div class="kpis">
 {METRICS_HTML}
 </div>
@@ -238,7 +288,7 @@ function render() {{
       <td>${{i.close.toFixed(2)}}</td>
       <td class="${{pcCls}}">${{fmt(pc)}}</td>
       <td class="${{i.year_return >= 0 ? "up" : "down"}}">${{fmt(i.year_return)}}</td>
-      <td><b>${{i.score.toFixed(0)}}</b></td>
+      <td><b>${{i.score.toFixed(1)}}</b></td>
       <td style="font-size:11px;color:#555" title="趋势/动能/量能/超买超卖(含布林v3)/风控/研报(对称贡献分)">${{i.comp.trend.toFixed(0)}}/${{i.comp.momentum.toFixed(0)}}/${{i.comp.volume.toFixed(0)}}/${{i.comp.osc.toFixed(0)}}/${{i.comp.risk.toFixed(0)}}/<span class="${{i.comp.news<0?"down":"up"}}">${{i.comp.news>0?"+":""}}${{i.comp.news.toFixed(1)}}</span></td>
       <td style="font-size:11px;color:#555" title="${{i.osc_detail ? '超买超卖子分：RSI ' + i.osc_detail.rsi + ' 分 / KDJ ' + i.osc_detail.kdj + ' 分 / 布林位置 ' + i.osc_detail.boll + ' 分（%B=' + (i.osc_detail.boll_pct != null ? i.osc_detail.boll_pct : '—') + '，v3 新增）' + (i.osc_detail.rsi_div ? '；⚠ ' + i.osc_detail.rsi_div : '') : 'v2 模式无布林分'}}">${{i.osc_detail ? '<div>' + i.osc_detail.rsi.toFixed(0) + '/' + i.osc_detail.kdj.toFixed(0) + '/' + i.osc_detail.boll.toFixed(0) + '</div><div style="margin-top:2px">' + (i.osc_detail.boll_pct != null ? '<span class="bdg boll">B'+ (i.osc_detail.boll_pct*100).toFixed(0) + '%</span>' : '') + (i.osc_detail.rsi_div ? '<span class="bdg rdiv">' + i.osc_detail.rsi_div + '</span>' : '') + '</div>' : '—'}}</td>
       <td style="font-size:11px;color:#555" title="${{i.vol_detail ? '量能子分：量比 ' + i.vol_detail.vr + ' → ' + i.vol_detail.vr_score + ' 分 / 量价配合 ' + i.vol_detail.pv_score + ' 分' + (i.vol_detail.extreme ? '；' + i.vol_detail.extreme : '') + (i.vol_detail.pdv ? '；' + i.vol_detail.pdv : '') + '（v4 量价三件套）' : '—'}}">${{i.vol_detail ? '<div>' + (i.vol_detail.vr != null ? '量比' + i.vol_detail.vr.toFixed(1) : '—') + '</div><div style="margin-top:2px">' + (i.vol_detail.extreme ? '<span class="bdg evol">' + i.vol_detail.extreme + '</span>' : '') + (i.vol_detail.pdv ? '<span class="bdg pdiv">' + i.vol_detail.pdv + '</span>' : '') + '</div>' : '—'}}</td>
@@ -249,13 +299,12 @@ function render() {{
   document.getElementById("cnt").textContent = `显示 ${{rows.length}} / ${{ITEMS.length}} 只`;
   const c = i => {{
     const bt = i.bt || {{}};
-    return `<div class="card"><h3>${{i.name}} <span class="sub">${{i.code}}</span></h3>
+    return `<div class="card">${{i.radar_svg || ""}}<div class="body"><h3>${{i.name}} <span class="sub">${{i.code}}</span></h3>
       <p class="meta">板块：${{i.market}} ｜ 行业：${{i.industry||"—"}} ｜ 现价 ${{i.close.toFixed(2)}}（<span class="${{i.pct_chg>0?"up":"down"}}">${{fmt(i.pct_chg)}}</span>）｜ 近一年 <span class="${{i.year_return>=0?"up":"down"}}">${{fmt(i.year_return)}}</span></p>
-      <p class="meta">权重 <b>${{i.score.toFixed(1)}} 分</b> → <span class="sig ${{actCls[i.action]}}">${{i.action}}</span> <span class="bdg ${{confCls[i.conf.level]}}">${{i.conf.level}}置信</span></p>
-      <p class="meta">六类：趋势 ${{i.comp.trend.toFixed(0)}}｜动能 ${{i.comp.momentum.toFixed(0)}}｜量能 ${{i.comp.volume.toFixed(0)}}<span class="sub" style="margin-left:4px">${{i.vol_detail ? '= 量比 ' + i.vol_detail.vr_score.toFixed(0) + ' + 量价配合 ' + i.vol_detail.pv_score.toFixed(0) + '（量比' + (i.vol_detail.vr != null ? i.vol_detail.vr : '—') + '）' + (i.vol_detail.extreme ? ' ⚠' + i.vol_detail.extreme : '') + (i.vol_detail.pdv ? ' ⚠' + i.vol_detail.pdv : '') + ' v4' : ''}}</span>｜超买超卖 ${{i.comp.osc.toFixed(0)}}<span class="sub" style="margin-left:4px">${{i.osc_detail ? '= RSI ' + i.osc_detail.rsi.toFixed(0) + ' + KDJ ' + i.osc_detail.kdj.toFixed(0) + ' + 布林 ' + i.osc_detail.boll.toFixed(0) + '（%B=' + (i.osc_detail.boll_pct != null ? i.osc_detail.boll_pct : '—') + '）' + (i.osc_detail.rsi_div ? ' ⚠' + i.osc_detail.rsi_div : '') + ' v3/v4' : '（v2 无布林分）'}}</span>｜风控 ${{i.comp.risk.toFixed(0)}}｜研报 <span class="${{i.comp.news<0?"down":"up"}}">${{i.comp.news>0?"+":""}}${{i.comp.news.toFixed(1)}}</span>（对称：看多+1/谨慎-1/看空-1.5/无0）</p>
-      <p class="meta">回测(${{i.bt_window||"2024-01起"}})：收益 <b>${{bt.total_return_pct != null ? bt.total_return_pct.toFixed(1)+"%" : "—"}}</b>（持有 ${{i.buyhold_return != null ? i.buyhold_return.toFixed(1)+"%" : "—"}}）｜胜率 ${{bt.win_rate_pct != null ? bt.win_rate_pct.toFixed(0)+"%" : "—"}}｜回撤 ${{bt.max_drawdown_pct != null ? bt.max_drawdown_pct.toFixed(1)+"%" : "—"}}｜${{bt.total_trades||0}} 笔</p>
-      ${{i.news ? `<p class="meta">研报：${{i.news}}</p>` : ""}}
-      ${{i.risk_note ? `<p class="meta" style="color:#b45309">⚠ 事件：${{i.risk_note}}</p>` : ""}}</div>`;
+      <p class="meta">权重 <b>${{i.score.toFixed(1)}} 分</b> → <span class="sig ${{actCls[i.action]}}">${{i.action}}</span> <span class="bdg ${{confCls[i.conf.level]}}">${{i.conf.level}}置信</span>${{i.news ? ` ｜ 研报：${{i.news}}` : ""}}</p>
+      <p class="meta">六类：趋势 ${{i.comp.trend.toFixed(0)}}｜动能 ${{i.comp.momentum.toFixed(0)}}｜量能 ${{i.comp.volume.toFixed(0)}}${{i.vol_detail && (i.vol_detail.extreme || i.vol_detail.pdv) ? `⚠${{i.vol_detail.extreme || i.vol_detail.pdv}}` : ""}}｜超买超卖 ${{i.comp.osc.toFixed(0)}}${{i.osc_detail && i.osc_detail.rsi_div ? `⚠${{i.osc_detail.rsi_div}}` : ""}}｜风控 ${{i.comp.risk.toFixed(0)}}｜研报 <span class="${{i.comp.news<0?"down":"up"}}">${{i.comp.news>0?"+":""}}${{i.comp.news.toFixed(1)}}</span></p>
+      <p class="meta">回测(${{i.bt_window||"2016-01起"}})：收益 <b>${{bt.total_return_pct != null ? bt.total_return_pct.toFixed(1)+"%" : "—"}}</b>（持有 ${{i.buyhold_return != null ? i.buyhold_return.toFixed(1)+"%" : "—"}}）｜回撤 ${{bt.max_drawdown_pct != null ? bt.max_drawdown_pct.toFixed(1)+"%" : "—"}}</p>
+      ${{i.risk_note ? `<p class="meta" style="color:#b45309">⚠ 事件：${{i.risk_note}}</p>` : ""}}</div></div>`;
   }};
   document.getElementById("cards").innerHTML = rows.map(c).join("");
 }}

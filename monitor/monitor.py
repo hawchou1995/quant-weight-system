@@ -132,7 +132,7 @@ def main():
             "weight": wscore,
             "market": rm.get("market", itype), "industry": w.get("industry") or rm.get("industry") or w.get("note", ""),
             "year_return": rm.get("year_return_pct"),
-            "bt": rm.get("bt", {}), "buyhold_return": rm.get("buyhold_return_pct"),
+            "bt": rm.get("bt", {}), "bt_window": rm.get("bt_window"), "buyhold_return": rm.get("buyhold_return_pct"),
             "info_view": iv["view"] if iv else None,
             "info_source": iv["source"] if iv else None,
             "info_date": iv["date"] if iv else None,
@@ -176,7 +176,7 @@ def main():
             "osc_detail": r["weight"].get("osc_detail"),
             "vol_detail": r["weight"].get("vol_detail"),
             "fg_info": r["weight"].get("fg_info"),
-            "bt": r["bt"], "buyhold_return": r["buyhold_return"],
+            "bt": r["bt"], "bt_window": r["bt_window"], "buyhold_return": r["buyhold_return"],
             "news": r["info_view"], "risk_note": r["risk_note"],
         } for r in rows_out],
     }
@@ -236,7 +236,7 @@ def main():
                 lines.append(f"- 置信度：{conf_label(w['conf'])}｜方向一致 {w['conf']['agree_ratio']:.0%}")
                 if r["bt"]:
                     bt = r["bt"]
-                    lines.append(f"- 回测（2025-01~2026-08，target_cap）：收益 {fmt_pct(bt.get('total_return_pct'), 1)}｜胜率 {bt.get('win_rate_pct', 0):.0f}%｜最大回撤 {fmt_pct(bt.get('max_drawdown_pct'), 1)}｜{bt.get('total_trades', 0)} 笔交易（买入持有 {fmt_pct(r['buyhold_return'], 1)}）")
+                    lines.append(f"- 回测（2016-01~2026-08，100池）：收益 {fmt_pct(bt.get('total_return_pct'), 1)}｜最大回撤 {fmt_pct(bt.get('max_drawdown_pct'), 1)}（买入持有 {fmt_pct(r['buyhold_return'], 1)}）")
                 prov = w["provenance"]
                 src = f"K线[{prov['kline']['level']}级]"
                 if prov.get("news"):
