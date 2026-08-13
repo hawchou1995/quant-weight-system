@@ -17,28 +17,29 @@ W = d.get("weights", {})
 CW = d.get("combined_window", "2016-01起·100池")
 
 # ---- 收益概述 21 项指标（参考量化看板参数结构）----
+# 元组: (key, label, fmt, hot) — hot=True 核心指标标红前置
 METRICS_DEF = [
-    ("strategy_return_pct", "策略收益", "pct"),
-    ("strategy_annual_pct", "策略年化收益", "pct"),
-    ("excess_return_pct", "超额收益", "pct"),
-    ("benchmark_return_pct", "基准收益", "pct"),
-    ("alpha", "阿尔法 α", "dec3"),
-    ("beta", "贝塔 β", "dec3"),
-    ("sharpe", "夏普比率", "dec3"),
-    ("win_rate", "胜率", "dec3"),
-    ("profit_loss_ratio", "盈亏比", "dec3"),
-    ("max_drawdown_pct", "最大回撤", "pct_neg"),
-    ("sortino", "索提诺比率", "dec3"),
-    ("daily_excess_pct", "日均超额收益", "pct4"),
-    ("excess_max_drawdown_pct", "超额收益最大回撤", "pct_neg"),
-    ("excess_sharpe", "超额收益夏普比率", "dec3"),
-    ("daily_win_rate", "日胜率", "dec3"),
-    ("win_count", "盈利次数", "int"),
-    ("loss_count", "亏损次数", "int"),
-    ("information_ratio", "信息比率", "dec3"),
-    ("strategy_volatility", "策略波动率", "dec3"),
-    ("benchmark_volatility", "基准波动率", "dec3"),
-    ("max_drawdown_range", "最大回撤区间", "range"),
+    ("strategy_return_pct", "策略收益", "pct", True),
+    ("strategy_annual_pct", "策略年化收益", "pct", True),
+    ("excess_return_pct", "超额收益", "pct", True),
+    ("benchmark_return_pct", "基准收益", "pct", True),
+    ("alpha", "阿尔法 α", "dec3", True),
+    ("beta", "贝塔 β", "dec3", True),
+    ("sharpe", "夏普比率", "dec3", True),
+    ("win_rate", "胜率", "dec3", False),
+    ("profit_loss_ratio", "盈亏比", "dec3", False),
+    ("max_drawdown_pct", "最大回撤", "pct_neg", False),
+    ("sortino", "索提诺比率", "dec3", False),
+    ("daily_excess_pct", "日均超额收益", "pct4", False),
+    ("excess_max_drawdown_pct", "超额收益最大回撤", "pct_neg", False),
+    ("excess_sharpe", "超额收益夏普比率", "dec3", False),
+    ("daily_win_rate", "日胜率", "dec3", False),
+    ("win_count", "盈利次数", "int", False),
+    ("loss_count", "亏损次数", "int", False),
+    ("information_ratio", "信息比率", "dec3", False),
+    ("strategy_volatility", "策略波动率", "dec3", False),
+    ("benchmark_volatility", "基准波动率", "dec3", False),
+    ("max_drawdown_range", "最大回撤区间", "range", False),
 ]
 
 def _fmt_metric(key, fmt):
@@ -55,11 +56,18 @@ def _fmt_metric(key, fmt):
         return f"{v:.3f}"
     if fmt == "int":
         return f"{int(v)}"
+    if fmt == "range":
+        # 2018/01/23 - 2019/01/03 → 2018/01~2019/01（防三行换行）
+        s = str(v)
+        if " - " in s:
+            a, b = s.split(" - ")
+            return f"{a[:7]}~{b[:7]}"
+        return s
     return str(v)
 
 METRICS_HTML = "\n".join(
-    f'<div class="m"><span class="ml">{label}</span><span class="mv">{_fmt_metric(k, fmt)}</span></div>'
-    for k, label, fmt in METRICS_DEF
+    f'<div class="m{" hot" if hot else ""}"><span class="ml">{label}</span><span class="mv">{_fmt_metric(k, fmt)}</span></div>'
+    for k, label, fmt, hot in METRICS_DEF
 )
 
 
@@ -79,11 +87,10 @@ def svg_radar_light(item, size=104):
     parts = []
     for ring in [0.25, 0.5, 0.75, 1.0]:
         pts = " ".join(f"{pt(R*ring, a)[0]:.1f},{pt(R*ring, a)[1]:.1f}" for a in angles)
-        stroke = "#e2e8f0" if ring < 1.0 else "#cbd5e0"
-        parts.append(f'<polygon points="{pts}" fill="none" stroke="{stroke}" stroke-width="1"/>')
+        parts.append(f'<polygon points="{pts}" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>')
     for a in angles:
         x0, y0 = pt(0, a); x1, y1 = pt(R, a)
-        parts.append(f'<line x1="{x0:.1f}" y1="{y0:.1f}" x2="{x1:.1f}" y2="{y1:.1f}" stroke="#e5e9f0" stroke-width="1"/>')
+        parts.append(f'<line x1="{x0:.1f}" y1="{y0:.1f}" x2="{x1:.1f}" y2="{y1:.1f}" style="stroke:var(--radar-axis)" stroke-width="1"/>')
     vals = [comp.get(c, 50) for c in cats]
     if abs(comp.get("news", 0) or 0) <= 5:
         vals[5] = 50 + comp["news"] * 20
@@ -101,9 +108,9 @@ def svg_radar_light(item, size=104):
         anchor = "middle"
         if abs(math.cos(angles[i])) > 0.7:
             anchor = "start" if lx > cx else "end"
-        parts.append(f'<text x="{lx:.1f}" y="{ly:.1f}" fill="#4a5568" font-size="8" text-anchor="{anchor}" font-weight="600">{labels[i]}</text>')
-    parts.append(f'<text x="{cx:.1f}" y="{cy+1:.1f}" fill="#1a202c" font-size="20" font-weight="800" text-anchor="middle">{score:.1f}</text>')
-    parts.append(f'<text x="{cx:.1f}" y="{cy+13:.1f}" fill="#9ca3af" font-size="7" text-anchor="middle">总分</text>')
+        parts.append(f'<text x="{lx:.1f}" y="{ly:.1f}" style="fill:var(--radar-label)" font-size="8" text-anchor="{anchor}" font-weight="600">{labels[i]}</text>')
+    parts.append(f'<text x="{cx:.1f}" y="{cy+1:.1f}" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">{score:.1f}</text>')
+    parts.append(f'<text x="{cx:.1f}" y="{cy+13:.1f}" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text>')
     return f'<svg viewBox="0 0 {size} {size}" style="width:{size}px;height:{size}px;flex:0 0 auto">{chr(10).join(parts)}</svg>'
 
 # 给每个 item 预生成雷达图 SVG
@@ -128,27 +135,38 @@ DATA_JSON = json.dumps(d, ensure_ascii=False).replace("</", "<\\/")
 html = f"""<!DOCTYPE html>
 <html lang="zh"><head><meta charset="utf-8"><title>关注标的权重看板 {d['date']}</title>
 <style>
-body {{ font-family: "Microsoft YaHei", sans-serif; margin: 0; background: #f7f8fa; color: #222; }}
+:root {{ --bg:#f7f8fa; --panel:#fff; --text:#222; --strong:#1a202c; --muted:#8892a0; --border:#e2e8f0;
+  --head-bg:#f1f5f9; --note-bg:#eef2f7; --note-text:#666; --meta:#555; --shadow:0 1px 3px rgba(0,0,0,.08);
+  --input-border:#d5dbe3; --hist-bg:#fff; --hist-text:#4a5568; --up:#d92d20; --down:#0f9d58; --hot:#dc2626;
+  --risk-bg:#fef6e7; --risk-border:#f0d9a8; --risk-text:#6b4f1d; --empty:#8892a0;
+  --radar-ring:#e2e8f0; --radar-axis:#e5e9f0; --radar-label:#4a5568; --radar-score:#1a202c; --radar-sub:#9ca3af; }}
+[data-theme="dark"] {{ --bg:#0f1419; --panel:#1a212b; --text:#e2e8f0; --strong:#f1f5f9; --muted:#8fa0b5; --border:#2d3748;
+  --head-bg:#232d3a; --note-bg:#1e2833; --note-text:#b0bec5; --meta:#a8b6c6; --shadow:0 1px 4px rgba(0,0,0,.45);
+  --input-border:#3a4552; --hist-bg:#232d3a; --hist-text:#cbd5e1; --up:#ff5a4d; --down:#2ecc8f; --hot:#ff5a4d;
+  --risk-bg:#33291a; --risk-border:#5c4a26; --risk-text:#e0b15c; --empty:#8fa0b5;
+  --radar-ring:#2d3748; --radar-axis:#2a3440; --radar-label:#cbd5e1; --radar-score:#f1f5f9; --radar-sub:#64748b; }}
+body {{ font-family: "Microsoft YaHei", sans-serif; margin: 0; background: var(--bg); color: var(--text); transition: background .2s, color .2s; }}
 .wrap {{ max-width: 1180px; margin: 0 auto; padding: 20px 16px 40px; }}
 h1 {{ font-size: 22px; margin: 4px 0 2px; }}
-.note {{ color: #666; font-size: 13px; background: #eef2f7; padding: 8px 12px; border-radius: 6px; margin: 8px 0 16px; }}
-.kpis {{ display: grid; grid-template-columns: repeat(11, minmax(0, 1fr)); gap: 6px 18px; margin: 10px 0 14px; padding: 10px 14px; background: #fff; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }}
+.note {{ color: var(--note-text); font-size: 13px; background: var(--note-bg); padding: 8px 12px; border-radius: 6px; margin: 8px 0 16px; }}
+.kpis {{ display: grid; grid-template-columns: repeat(11, minmax(0, 1fr)); gap: 6px 18px; margin: 10px 0 14px; padding: 10px 14px; background: var(--panel); border-radius: 10px; box-shadow: var(--shadow); }}
 @media (max-width: 900px) {{ .kpis {{ grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }} }}
 .m {{ display: flex; flex-direction: column; gap: 1px; padding: 2px 0; }}
-.m .ml {{ font-size: 11px; color: #8892a0; white-space: nowrap; }}
-.m .mv {{ font-size: 15px; font-weight: 700; color: #1a202c; font-variant-numeric: tabular-nums; }}
-.up {{ color: #d92d20; }} .down {{ color: #0f9d58; }} .flat {{ color: #666; }}
-.charts img {{ width: 100%; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,.08); margin: 8px 0; background:#fff; }}
+.m .ml {{ font-size: 11px; color: var(--muted); white-space: nowrap; }}
+.m .mv {{ font-size: 15px; font-weight: 700; color: var(--strong); font-variant-numeric: tabular-nums; white-space: nowrap; }}
+.m.hot .mv {{ color: var(--hot); }}
+.up {{ color: var(--up); }} .down {{ color: var(--down); }} .flat {{ color: var(--muted); }}
+.charts img {{ width: 100%; border-radius: 10px; box-shadow: var(--shadow); margin: 8px 0; background: var(--panel); }}
 h2 {{ font-size: 17px; margin: 26px 0 10px; border-left: 4px solid #2b6cb0; padding-left: 8px; }}
 .tools {{ display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0; }}
-.tools input, .tools select {{ padding: 7px 10px; border: 1px solid #d5dbe3; border-radius: 6px; font-size: 13px; }}
+.tools input, .tools select {{ padding: 7px 10px; border: 1px solid var(--input-border); border-radius: 6px; font-size: 13px; background: var(--panel); color: var(--text); }}
 .tools input {{ flex: 1; min-width: 200px; }}
-table {{ border-collapse: collapse; width: 100%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.08); font-size: 13px; }}
-th, td {{ border: 1px solid #e2e8f0; padding: 7px 8px; text-align: center; }}
-th {{ background: #f1f5f9; cursor: pointer; user-select: none; white-space: nowrap; }}
-th:hover {{ background: #e2e8f0; }}
+table {{ border-collapse: collapse; width: 100%; background: var(--panel); box-shadow: var(--shadow); font-size: 13px; }}
+th, td {{ border: 1px solid var(--border); padding: 7px 8px; text-align: center; }}
+th {{ background: var(--head-bg); cursor: pointer; user-select: none; white-space: nowrap; }}
+th:hover {{ background: var(--border); }}
 .sig {{ display: inline-block; padding: 2px 9px; border-radius: 12px; color: #fff; font-size: 12px; white-space: nowrap; }}
-.sig.buy {{ background: #d92d20; }} .sig.sell {{ background: #0f9d58; }} .sig.hold {{ background: #8a94a6; }}
+.sig.buy {{ background: var(--up); }} .sig.sell {{ background: var(--down); }} .sig.hold {{ background: #8a94a6; }}
 .bdg {{ display: inline-block; padding: 1px 7px; border-radius: 4px; font-size: 11px; margin: 1px; white-space: nowrap; }}
 .bdg.res-ok {{ background: #e8f5ec; color: #0f9d58; border: 1px solid #0f9d58; }}
 .bdg.flat {{ background: #eef1f4; color: #6b7280; }}
@@ -160,27 +178,31 @@ th:hover {{ background: #e2e8f0; }}
 .bdg.evol {{ background: #fff3e0; color: #b45309; border: 1px solid #b45309; }}
 .bdg.pdiv {{ background: #fdeaea; color: #c0392b; border: 1px solid #c0392b; }}
 .bdg.rdiv {{ background: #f3e8fd; color: #7c3aed; border: 1px solid #7c3aed; }}
-.sub {{ color: #8892a0; font-size: 11px; font-weight: normal; }}
+[data-theme="dark"] .bdg {{ background: rgba(255,255,255,.08); }}
+.sub {{ color: var(--muted); font-size: 11px; font-weight: normal; }}
 .cards {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 12px; margin-top: 12px; }}
-.card {{ background: #fff; border-radius: 10px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.08); display: flex; gap: 12px; align-items: flex-start; }}
+.card {{ background: var(--panel); border-radius: 10px; padding: 12px 14px; box-shadow: var(--shadow); display: flex; gap: 12px; align-items: flex-start; }}
 .card .body {{ flex: 1 1 auto; min-width: 0; }}
 .card h3 {{ margin: 0 0 6px; font-size: 15px; }}
-.card .meta {{ margin: 3px 0; font-size: 12px; color: #555; }}
-.risk {{ background: #fef6e7; border: 1px solid #f0d9a8; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #6b4f1d; margin-top: 26px; }}
-.empty {{ padding: 30px; text-align: center; color: #8892a0; }}
+.card .meta {{ margin: 3px 0; font-size: 12px; color: var(--meta); }}
+.risk {{ background: var(--risk-bg); border: 1px solid var(--risk-border); border-radius: 8px; padding: 12px 16px; font-size: 13px; color: var(--risk-text); margin-top: 26px; }}
+.empty {{ padding: 30px; text-align: center; color: var(--empty); }}
 .header-row {{ display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 4px 0 2px; }}
 .header-row h1 {{ margin: 0; }}
 .topbar {{ display: flex; gap: 8px; align-items: center; }}
-.topbar a.hist {{ display: inline-block; padding: 6px 12px; border-radius: 20px; background: #fff; color: #4a5568; font-size: 12.5px; text-decoration: none; box-shadow: 0 1px 4px rgba(0,0,0,.10); border: 1px solid #e2e8f0; transition: all .15s; }}
-.topbar a.hist:hover {{ background: #fff; color: #2b6cb0; border-color: #2b6cb0; }}
+.topbar a.hist, .topbar button.theme {{ display: inline-block; padding: 6px 12px; border-radius: 20px; background: var(--hist-bg); color: var(--hist-text); font-size: 12.5px; text-decoration: none; box-shadow: var(--shadow); border: 1px solid var(--border); transition: all .15s; cursor: pointer; }}
+.topbar a.hist:hover, .topbar button.theme:hover {{ background: var(--hist-bg); color: #2b6cb0; border-color: #2b6cb0; }}
 .topbar a.community {{ display: inline-block; padding: 7px 14px; border-radius: 20px; background: linear-gradient(135deg, #FF9A3D 0%, #F2701D 100%); color: #fff; font-size: 13px; font-weight: 600; text-decoration: none; box-shadow: 0 2px 8px rgba(242,112,29,.35); transition: all .15s; }}
 .topbar a.community:hover {{ transform: translateY(-1px); box-shadow: 0 4px 14px rgba(242,112,29,.45); }}
+.rangebar {{ display: flex; gap: 8px; align-items: center; justify-content: flex-end; margin: 6px 0 4px; font-size: 12px; color: var(--muted); }}
+.rangebar select {{ padding: 5px 8px; border: 1px solid var(--input-border); border-radius: 6px; font-size: 12.5px; background: var(--panel); color: var(--text); }}
 @media (max-width: 720px) {{ .topbar a.community {{ font-size: 12px; padding: 6px 10px; }} .topbar a.hist {{ display: none; }} }}
 </style></head><body>
 <div class="wrap">
 <div class="header-row">
 <h1>📊 关注标的权重看板（{d['date']}）</h1>
 <div class="topbar">
+  <button class="theme" id="themeBtn" onclick="toggleTheme()" title="切换明暗主题">🌙</button>
   <a class="hist" href="history.html" title="历史监控报告归档">📚 历史报告</a>
   <a class="community" href="https://qingju.me/" target="_blank" rel="noopener" title="青橘社区 · 西理工人的论坛">💬 青橘社区 · 加标的 / 自由讨论 →</a>
 </div>
@@ -192,9 +214,14 @@ th:hover {{ background: #e2e8f0; }}
 {METRICS_HTML}
 </div>
 
-<h2>组合净值走势（拖动下方滑块自由选择时间段）</h2>
+<h2>组合净值走势</h2>
 <div class="charts">
-  <div id="trendChart" style="width:100%;height:360px;background:#fff;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin:8px 0;"></div>
+  <div class="rangebar">
+    <span>起始</span><select id="yStart" onchange="applyRange()"></select>
+    <span>结束</span><select id="yEnd" onchange="applyRange()"></select>
+    <span style="opacity:.7">（也可拖动图下方滑块）</span>
+  </div>
+  <div id="trendChart" style="width:100%;height:360px;background:var(--panel);border-radius:10px;box-shadow:var(--shadow);margin:8px 0;"></div>
 </div>
 
 <h2>权重系统指标公示</h2>
@@ -309,6 +336,20 @@ function render() {{
   document.getElementById("cards").innerHTML = rows.map(c).join("");
 }}
 render();
+// ---- 明暗主题切换 ----
+(function() {{
+  const saved = localStorage.getItem("wbTheme");
+  if (saved) document.documentElement.setAttribute("data-theme", saved);
+  const btn = document.getElementById("themeBtn");
+  if (btn) btn.textContent = (saved === "dark") ? "☀️" : "🌙";
+}})();
+function toggleTheme() {{
+  const el = document.documentElement;
+  const cur = el.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  el.setAttribute("data-theme", cur);
+  localStorage.setItem("wbTheme", cur);
+  document.getElementById("themeBtn").textContent = (cur === "dark") ? "☀️" : "🌙";
+}}
 // ---- 组合净值交互式走势图（ECharts · v6 2016 起全量 + 时间段筛选）----
 if (TREND && TREND.combo && window.echarts) {{
   const chart = echarts.init(document.getElementById("trendChart"));
@@ -331,6 +372,19 @@ if (TREND && TREND.combo && window.echarts) {{
       mk(TREND.hs300, "#f5a623", "沪深300"),
     ],
   }});
+  // 右上角起止年份下拉框（时间上下限筛选）
+  const ys = new Set();
+  TREND.combo.forEach(p => ys.add(p.date.slice(0, 4)));
+  const YEARS = [...ys].sort();
+  const yS = document.getElementById("yStart"), yE = document.getElementById("yEnd");
+  if (yS && yE && YEARS.length) {{
+    YEARS.forEach(y => {{ yS.add(new Option(y, y)); yE.add(new Option(y, y)); }});
+    yS.value = YEARS[0]; yE.value = YEARS[YEARS.length - 1];
+    window.applyRange = () => {{
+      const s = yS.value + "-01-01", e = yE.value + "-12-31";
+      chart.dispatchAction({{ type: "dataZoom", startValue: s, endValue: e }});
+    }};
+  }}
   window.addEventListener("resize", () => chart.resize());
 }}
 // ---- 导出 PNG / XLSX（分享用）----
