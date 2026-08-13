@@ -54,18 +54,18 @@ def svg_radar(item, size=300):
     parts = []
     for ring in [0.2, 0.4, 0.6, 0.8, 1.0]:
         pts = " ".join(f"{pt(R*ring, a)[0]:.1f},{pt(R*ring, a)[1]:.1f}" for a in angles)
-        stroke = "#2a3a52" if ring < 1.0 else "#3d5575"
+        stroke = "var(--grid)" if ring < 1.0 else "var(--grid-s)"
         parts.append(f'<polygon points="{pts}" fill="none" stroke="{stroke}" stroke-width="{1.5 if ring==1.0 else 1}"/>')
     for a in angles:
         x0, y0 = pt(0, a); x1, y1 = pt(R, a)
-        parts.append(f'<line x1="{x0:.1f}" y1="{y0:.1f}" x2="{x1:.1f}" y2="{y1:.1f}" stroke="#22324a" stroke-width="1"/>')
+        parts.append(f'<line x1="{x0:.1f}" y1="{y0:.1f}" x2="{x1:.1f}" y2="{y1:.1f}" stroke="var(--axis)" stroke-width="1"/>')
     xs, ys = cx, cy
     xe, ye = cx + R, cy
-    parts.append(f'<line x1="{xs:.1f}" y1="{ys:.1f}" x2="{xe:.1f}" y2="{ye:.1f}" stroke="#ffd500" stroke-width="2"/>')
+    parts.append(f'<line x1="{xs:.1f}" y1="{ys:.1f}" x2="{xe:.1f}" y2="{ye:.1f}" stroke="var(--accent)" stroke-width="2"/>')
     for v in [20, 40, 60, 80, 100]:
         rv = R * v / 100
         tx, ty = cx + rv, cy + 4
-        parts.append(f'<text x="{tx:.1f}" y="{ty:.1f}" fill="#ffd500" font-size="7" text-anchor="middle">{v}</text>')
+        parts.append(f'<text x="{tx:.1f}" y="{ty:.1f}" fill="var(--accent)" font-size="7" text-anchor="middle">{v}</text>')
     vals = [comp.get(c, 50) for c in cats]
     # 研报维度：对称贡献分（±1.0/±1.5/0）→ 0-100 显示标尺映射（0→50 中性，+1.0→70，-1.0→30，-1.5→20）
     if abs(comp.get("news", 0) or 0) <= 5:
@@ -86,13 +86,13 @@ def svg_radar(item, size=300):
         anchor = "middle"
         if abs(angles[i]) < 0.3: anchor = "start"
         elif abs(angles[i] - math.pi) < 0.3: anchor = "end"
-        parts.append(f'<text x="{lx:.1f}" y="{ly:.1f}" fill="#c8d6ea" font-size="9" text-anchor="{anchor}" font-weight="600">{labels[i]}</text>')
+        parts.append(f'<text x="{lx:.1f}" y="{ly:.1f}" fill="var(--text)" font-size="9" text-anchor="{anchor}" font-weight="600">{labels[i]}</text>')
         vx, vy = pt(R * 1.16, angles[i])
         vy2 = vy + 10
-        parts.append(f'<text x="{vx:.1f}" y="{vy2:.1f}" fill="#8fa3c0" font-size="8" text-anchor="{anchor}">{v:.1f}</text>')
+        parts.append(f'<text x="{vx:.1f}" y="{vy2:.1f}" fill="var(--muted)" font-size="8" text-anchor="{anchor}">{v:.1f}</text>')
     # 中心总分（保留 1 位小数）
-    parts.append(f'<text x="{cx:.1f}" y="{cy-2:.1f}" fill="#ffffff" font-size="24" font-weight="800" text-anchor="middle">{score:.1f}</text>')
-    parts.append(f'<text x="{cx:.1f}" y="{cy+14:.1f}" fill="#8fa3c0" font-size="8" text-anchor="middle">总分(0-100)</text>')
+    parts.append(f'<text x="{cx:.1f}" y="{cy-2:.1f}" fill="var(--strong)" font-size="24" font-weight="800" text-anchor="middle">{score:.1f}</text>')
+    parts.append(f'<text x="{cx:.1f}" y="{cy+14:.1f}" fill="var(--muted)" font-size="8" text-anchor="middle">总分(0-100)</text>')
     return f'<svg viewBox="0 0 {size} {size}" width="100%" style="max-width:{size}px">{chr(10).join(parts)}</svg>'
 
 # ---------- 卡片 ----------
@@ -208,47 +208,63 @@ html_page = f'''<!DOCTYPE html>
 <title>逐标的详情 · 多边形仪表盘（{DASH.get("date","")}）</title>
 <style>
   * {{ margin:0; padding:0; box-sizing:border-box; }}
-  body {{ background:#0d1526; color:#c8d6ea; font-family:"Microsoft YaHei","PingFang SC",sans-serif; padding:24px; }}
+  :root {{ --bg:#0d1526; --text:#c8d6ea; --strong:#fff; --panel:#111c33; --panel2:#16233d; --border:#1e3050;
+    --grid:#2a3a52; --grid-s:#3d5575; --axis:#22324a; --row-border:#1a2842; --muted:#8fa3c0; --footer:#6b7d99;
+    --accent:#ffd500; --up:#ff4d4d; --down:#50be78; --warn:#ff8c3c; --warn2:#ffc850; --risk-text:#ffb3a0; --body-text:#a9b8d0; }}
+  [data-theme="light"] {{ --bg:#f5f6f8; --text:#33415c; --strong:#1a202c; --panel:#fff; --panel2:#f8fafc; --border:#e2e8f0;
+    --grid:#dbe3ec; --grid-s:#cbd5e0; --axis:#e5e9f0; --row-border:#edf0f4; --muted:#64748b; --footer:#94a3b8;
+    --accent:#002FA7; --up:#dc2626; --down:#16a34a; --warn:#ea580c; --warn2:#ca8a04; --risk-text:#b45309; --body-text:#4a5568; }}
+  body {{ background:var(--bg); color:var(--text); font-family:"Microsoft YaHei","PingFang SC",sans-serif; padding:24px; transition:background .2s,color .2s; }}
+  .header {{ display:flex; align-items:baseline; gap:16px; flex-wrap:wrap; margin-bottom:6px; position:sticky; top:0; z-index:100; background:var(--bg); padding:10px 0 10px; border-bottom:1px solid var(--border); }}
+  .topbar {{ margin-left:auto; display:flex; gap:8px; align-items:center; }}
+  .topbar .tb {{ display:inline-block; padding:5px 12px; border-radius:16px; background:var(--panel); color:var(--text); font-size:12px; text-decoration:none; border:1px solid var(--border); cursor:pointer; transition:all .15s; }}
+  .topbar .tb:hover {{ color:var(--accent); border-color:var(--accent); }}
   .header {{ display:flex; align-items:baseline; gap:16px; flex-wrap:wrap; margin-bottom:6px; }}
-  .header h1 {{ font-size:22px; color:#fff; font-weight:800; }}
-  .header .sub {{ color:#8fa3c0; font-size:13px; }}
-  .header .date {{ color:#ffd500; font-size:14px; font-weight:600; }}
-  .market {{ display:flex; gap:20px; flex-wrap:wrap; margin:10px 0 18px; padding:12px 16px; background:#111c33; border-radius:10px; border:1px solid #1e3050; }}
-  .market .ms {{ color:#ffd500; font-size:15px; font-weight:700; }}
-  .market .stat {{ color:#8fa3c0; font-size:12px; }}
+  .header h1 {{ font-size:22px; color:var(--strong); font-weight:800; }}
+  .header .sub {{ color:var(--muted); font-size:13px; }}
+  .header .date {{ color:var(--accent); font-size:14px; font-weight:600; }}
+  .market {{ display:flex; gap:20px; flex-wrap:wrap; margin:10px 0 18px; padding:12px 16px; background:var(--panel); border-radius:10px; border:1px solid var(--border); }}
+  .market .ms {{ color:var(--accent); font-size:15px; font-weight:700; }}
+  .market .stat {{ color:var(--muted); font-size:12px; }}
   .market .stat b {{ color:#c8d6ea; }}
   .grid {{ display:grid; grid-template-columns:repeat(auto-fill,minmax(500px,1fr)); gap:16px; }}
-  .card {{ background:#111c33; border:1px solid #1e3050; border-radius:12px; padding:14px; transition:border .2s; }}
-  .card:hover {{ border-color:#ffd50066; }}
+  .card {{ background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:14px; transition:border .2s; }}
+  .card:hover {{ border-color:var(--accent)66; }}
   .card-head {{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; }}
-  .card-title .name {{ font-size:16px; font-weight:700; color:#fff; }}
-  .card-title .code {{ font-size:11px; color:#8fa3c0; margin-left:6px; }}
+  .card-title .name {{ font-size:16px; font-weight:700; color:var(--strong); }}
+  .card-title .code {{ font-size:11px; color:var(--muted); margin-left:6px; }}
   .card-quote {{ text-align:right; }}
   .card-quote .price {{ font-size:17px; font-weight:800; }}
   .card-quote .chg {{ font-size:13px; font-weight:700; margin-left:6px; }}
-  .card-quote .yr {{ display:block; font-size:11px; color:#8fa3c0; margin-top:2px; }}
-  .advice {{ background:#16233d; border-left:3px solid #ffc850; border-radius:6px; padding:6px 10px; margin-bottom:8px; font-size:12px; }}
+  .card-quote .yr {{ display:block; font-size:11px; color:var(--muted); margin-top:2px; }}
+  .advice {{ background:var(--panel2); border-left:3px solid var(--warn2); border-radius:6px; padding:6px 10px; margin-bottom:8px; font-size:12px; }}
   .adv-head {{ font-weight:800; margin-right:8px; }}
-  .adv-body {{ color:#a9b8d0; }}
+  .adv-body {{ color:var(--body-text); }}
   .card-body {{ display:flex; gap:14px; }}
   .radar-wrap {{ flex:0 0 220px; }}
   .info {{ flex:1; min-width:0; font-size:12px; }}
-  .row {{ display:flex; gap:8px; padding:4px 0; border-bottom:1px dashed #1a2842; }}
+  .row {{ display:flex; gap:8px; padding:4px 0; border-bottom:1px dashed var(--row-border); }}
   .row:last-child {{ border-bottom:none; }}
   .k {{ flex:0 0 64px; color:#8fa3c0; }}
   .v {{ color:#c8d6ea; line-height:1.5; }}
   .row.risk .v {{ color:#ffb3a0; }}
   .badge {{ display:inline-block; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:700; }}
-  .fgchip {{ display:inline-block; padding:1px 8px; border-radius:10px; font-size:10px; background:#0d1526; border:1px solid #2a3a52; color:#ff8c3c; margin-left:4px; }}
+  .fgchip {{ display:inline-block; padding:1px 8px; border-radius:10px; font-size:10px; background:var(--bg); border:1px solid var(--grid); color:var(--warn); margin-left:4px; }}
   .fgchip.dim {{ color:#8fa3c0; }}
-  .footer {{ margin-top:20px; color:#6b7d99; font-size:11px; text-align:center; padding:12px; border-top:1px solid #1e3050; }}
+  .footer {{ margin-top:20px; color:var(--footer); font-size:11px; text-align:center; padding:12px; border-top:1px solid var(--border); }}
   .footnote {{ color:#8fa3c0; font-size:11px; margin:6px 0 14px; }}
 </style>
 </head>
 <body>
   <div class="header">
     <h1>逐标的详情 · 多边形仪表盘</h1>
-    <span class="date">{DASH.get("date","")} 尾盘快照</span>
+    <span class="date">{DASH.get("date","")} 快照</span>
+    <div class="topbar">
+      <button class="tb" id="themeBtn" onclick="toggleTheme()" title="切换明暗主题">🌙</button>
+      <a class="tb" href="index.html">📊 主看板</a>
+      <a class="tb" href="history.html">📚 历史</a>
+      <a class="tb" href="https://qingju.me/" target="_blank" rel="noopener">💬 社区</a>
+    </div>
     <span class="sub">六角指标：趋势/动能/量能/超买超卖/风控/研报 · 分数连线成圈 · X 轴正方向 0-100 刻度</span>
   </div>
   <div class="market">
@@ -260,7 +276,22 @@ html_page = f'''<!DOCTYPE html>
   </div>
   <div class="footnote">参考：公众号「东胜小猢狲」2026-08-07《积极信号在积累，指标持续向好+期权策略》恐贪看板风格——各指标滚动分位归一化（W=250日），多边形外框角点=指标，分数连线成圈。增强：操作建议 / 数据质量 / 买卖参考位（MA20·布林·ATR·2×ATR 止损）。</div>
   <div class="grid">{cards}</div>
-  <div class="footer">⚠️ 本看板仅供个人研究参考，不构成投资建议。数据源：通达信 K 线 + 权重系统 v5（含 FG 恐贪动态门槛）；最终投资决策由用户自行判断并承担全部盈亏责任。</div>
+  <div class="footer">⚠️ 本看板仅供个人研究参考，不构成投资建议。数据源：通达信 K 线 + 权重系统 v6（含 FG 恐贪动态门槛）；最终投资决策由用户自行判断并承担全部盈亏责任。</div>
+<script>
+(function(){{
+  const saved = localStorage.getItem("wbTheme");
+  if (saved === "light") document.documentElement.setAttribute("data-theme", "light");
+  const btn = document.getElementById("themeBtn");
+  if (btn) btn.textContent = (saved === "light") ? "🌙" : "☀️";
+}})();
+function toggleTheme(){{
+  const el = document.documentElement;
+  const cur = el.getAttribute("data-theme") === "light" ? "" : "light";
+  if (cur === "light") el.setAttribute("data-theme", "light"); else el.removeAttribute("data-theme");
+  localStorage.setItem("wbTheme", cur === "light" ? "light" : "dark");
+  document.getElementById("themeBtn").textContent = (cur === "light") ? "🌙" : "☀️";
+}}
+</script>
 </body>
 </html>'''
 

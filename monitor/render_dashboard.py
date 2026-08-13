@@ -187,7 +187,7 @@ th:hover {{ background: var(--border); }}
 .card .meta {{ margin: 3px 0; font-size: 12px; color: var(--meta); }}
 .risk {{ background: var(--risk-bg); border: 1px solid var(--risk-border); border-radius: 8px; padding: 12px 16px; font-size: 13px; color: var(--risk-text); margin-top: 26px; }}
 .empty {{ padding: 30px; text-align: center; color: var(--empty); }}
-.header-row {{ display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 4px 0 2px; }}
+.header-row {{ display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 4px 0 2px; position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 10px 0 8px; border-bottom: 1px solid var(--border); }}
 .header-row h1 {{ margin: 0; }}
 .topbar {{ display: flex; gap: 8px; align-items: center; }}
 .topbar a.hist, .topbar button.theme {{ display: inline-block; padding: 6px 12px; border-radius: 20px; background: var(--hist-bg); color: var(--hist-text); font-size: 12.5px; text-decoration: none; box-shadow: var(--shadow); border: 1px solid var(--border); transition: all .15s; cursor: pointer; }}
@@ -219,7 +219,7 @@ th:hover {{ background: var(--border); }}
   <div class="rangebar">
     <span>起始</span><select id="yStart" onchange="applyRange()"></select>
     <span>结束</span><select id="yEnd" onchange="applyRange()"></select>
-    <span style="opacity:.7">（也可拖动图下方滑块）</span>
+    <span style="opacity:.7">（精确到月，也可拖动图下方滑块）</span>
   </div>
   <div id="trendChart" style="width:100%;height:360px;background:var(--panel);border-radius:10px;box-shadow:var(--shadow);margin:8px 0;"></div>
 </div>
@@ -372,16 +372,16 @@ if (TREND && TREND.combo && window.echarts) {{
       mk(TREND.hs300, "#f5a623", "沪深300"),
     ],
   }});
-  // 右上角起止年份下拉框（时间上下限筛选）
-  const ys = new Set();
-  TREND.combo.forEach(p => ys.add(p.date.slice(0, 4)));
-  const YEARS = [...ys].sort();
+  // 右上角起止月份下拉框（精确到月，时间上下限筛选）
+  const months = new Set();
+  TREND.combo.forEach(p => months.add(p.date.slice(0, 7)));
+  const MONTHS = [...months].sort();
   const yS = document.getElementById("yStart"), yE = document.getElementById("yEnd");
-  if (yS && yE && YEARS.length) {{
-    YEARS.forEach(y => {{ yS.add(new Option(y, y)); yE.add(new Option(y, y)); }});
-    yS.value = YEARS[0]; yE.value = YEARS[YEARS.length - 1];
+  if (yS && yE && MONTHS.length) {{
+    MONTHS.forEach(m => {{ yS.add(new Option(m, m)); yE.add(new Option(m, m)); }});
+    yS.value = MONTHS[0]; yE.value = MONTHS[MONTHS.length - 1];
     window.applyRange = () => {{
-      const s = yS.value + "-01-01", e = yE.value + "-12-31";
+      const s = yS.value + "-01", e = yE.value + "-31";
       chart.dispatchAction({{ type: "dataZoom", startValue: s, endValue: e }});
     }};
   }}
