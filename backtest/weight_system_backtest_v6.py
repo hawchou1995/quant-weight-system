@@ -140,7 +140,7 @@ BB_YR_BULL, BB_YR_BEAR = 1.08, 0.92   # 年线牛/熊系数
 BB_DEV_CAP = 5.0            # 沪深300 偏离截断（±5%）
 
 # ---- 回测区间与费用（与 v2 一致）----
-BACKTEST_START = "2021-08-01"
+BACKTEST_START = "2016-01-04"
 BACKTEST_END = "2026-08-07"
 INITIAL_CASH = 1_000_000.0
 COMMISSION = 0.00025
@@ -929,7 +929,7 @@ def run_experiment(name, weights, switches, market_state, bb_coef, fg_state=None
 
 
 def main():
-    print(f"v6 样本池重建回测：{BACKTEST_START} ~ {BACKTEST_END}，27 标的 × 9 领域")
+    print(f"v6 样本池重建回测：{BACKTEST_START} ~ {BACKTEST_END}，100 标的（9 领域 × 10 + 10 退市）")
     idx = load_index("000300")
     market_state = build_market_state(idx) if USE_MARKET_GATE else {}
     bb_coef = build_bull_bear_coef(idx)
