@@ -1,0 +1,563 @@
+{
+  "pool": "100池(9领域×10+10退市)",
+  "window": "2016-01-04~2026-08-07",
+  "results": [
+    {
+      "name": "基线(v4生产)",
+      "weights": {
+        "trend": 0.3,
+        "momentum": 0.25,
+        "volume": 0.15,
+        "osc": 0.15,
+        "risk": 0.1,
+        "news": 0.05
+      },
+      "switches": {
+        "ma_triple": false,
+        "boll_pos": true,
+        "reso_patch": false,
+        "bull_bear": false,
+        "extreme_vol": true,
+        "pdv": true,
+        "rsi_div": true,
+        "score_mode": "patch"
+      },
+      "return_pct": 303.37,
+      "annual_pct": 14.64,
+      "mdd_pct": 26.52,
+      "sharpe": 0.85,
+      "win_rate_pct": 82.0,
+      "trades": 1938
+    },
+    {
+      "name": "权重[趋势+5%]",
+      "weights": {
+        "trend": 0.35,
+        "momentum": 0.2321,
+        "volume": 0.1393,
+        "osc": 0.1393,
+        "risk": 0.0929,
+        "news": 0.0464
+      },
+      "switches": {
+        "ma_triple": false,
+        "boll_pos": true,
+        "reso_patch": false,
+        "bull_bear": false,
+        "extreme_vol": true,
+        "pdv": true,
+        "rsi_div": true,
+        "score_mode": "patch"
+      },
+      "return_pct": 278.56,
+      "annual_pct": 13.93,
+      "mdd_pct": 25.49,
+      "sharpe": 0.812,
+      "win_rate_pct": 75.9,
+      "trades": 2774
+    },
+    {
+      "name": "权重[动能+5%]",
+      "weights": {
+        "trend": 0.28,
+        "momentum": 0.3,
+        "volume": 0.14,
+        "osc": 0.14,
+        "risk": 0.0933,
+        "news": 0.0467
+      },
+      "switches": {
+        "ma_triple": false,
+        "boll_pos": true,
+        "reso_patch": false,
+        "bull_bear": false,
+        "extreme_vol": true,
+        "pdv": true,
+        "rsi_div": true,
+        "score_mode": "patch"
+      },
+      "return_pct": 278.24,
+      "annual_pct": 13.92,
+      "mdd_pct": 25.21,
+      "sharpe": 0.821,
+      "win_rate_pct": 79.9,
+      "trades": 2724
+    },
+    {
+      "name": "权重[量能+5%]",
+      "weights": {
+        "trend": 0.2824,
+        "momentum": 0.2353,
+        "volume": 0.2,
+        "osc": 0.1412,
+        "risk": 0.0941,
+        "news": 0.0471
+      },
+      "switches": {
+        "ma_triple": false,
+        "boll_pos": true,
+        "reso_patch": false,
+        "bull_bear": false,
+        "extreme_vol": true,
+        "pdv": true,
+        "rsi_div": true,
+        "score_mode": "patch"
+      },
+      "return_pct": 324.39,
+      "annual_pct": 15.21,
+      "mdd_pct": 29.99,
+      "sharpe": 0.759,
+      "win_rate_pct": 84.8,
+      "trades": 1332
+    },
+    {
+      "name": "权重[超买超卖+5%]",
+      "weights": {
+        "trend": 0.2824,
+        "momentum": 0.2353,
+        "volume": 0.1412,
+        "osc": 0.2,
+        "risk": 0.0941,
+        "news": 0.0471
+      },
+      "switches": {
+        "ma_triple": false,
+        "boll_pos": true,
+        "reso_patch": false,
+        "bull_bear": false,
+        "extreme_vol": true,
+        "pdv": true,
+        "rsi_div": true,
+        "score_mode": "patch"
+      },
+      "return_pct": 365.03,
+      "annual_pct": 16.24,
+      "mdd_pct": 33.01,
+      "sharpe": 0.759,
+      "win_rate_pct": 86.7,
+      "trades": 1162
+    },
+    {
+      "name": "权重[风控+5%]",
+      "weights": {
+        "trend": 0.2833,
+        "momentum": 0.2361,
+        "volume": 0.1417,
+        "osc": 0.1417,
+        "risk": 0.15,
+        "news": 0.0472
+      },
+      "switches": {
+        "ma_triple": false,
+        "boll_pos": true,
+        "reso_patch": false,
+        "bull_bear": false,
+        "extreme_vol": true,
+        "pdv": true,
+        "rsi_div": true,
+        "score_mode": "patch"
+      },
+      "return_pct": 294.04,
+      "annual_pct": 14.37,
+      "mdd_pct": 27.32,
+      "sharpe": 0.831,
+      "win_rate_pct": 81.7,
+      "trades": 1747
+    },
+    {
+      "name": "权重[研报+5%]",
+      "weights": {
+        "trend": 0.2842,
+        "momentum": 0.2368,
+        "volume": 0.1421,
+        "osc": 0.1421,
+        "risk": 0.0947,
+        "news": 0.1
+      },
+      "switches": {
+        "ma_triple": false,
+        "boll_pos": true,
+        "reso_patch": false,
+        "bull_bear": false,
+        "extreme_vol": true,
+        "pdv": true,
+        "rsi_div": true,
+        "score_mode": "patch"
+      },
+      "return_pct": 308.02,
+      "annual_pct": 14.77,
+      "mdd_pct": 27.76,
+      "sharpe": 0.79,
+      "win_rate_pct": 84.3,
+      "trades": 1619
+    },
+    {
+      "name": "BUY_WEAK=58",
+      "weights": {
+        "trend": 0.3,
+        "momentum": 0.25,
+        "volume": 0.15,
+        "osc": 0.15,
+        "risk": 0.1,
+        "news": 0.05
+      },
+      "switches": {
+        "ma_triple": false,
+        "boll_pos": true,
+        "reso_patch": false,
+        "bull_bear": false,
+        "extreme_vol": true,
+        "pdv": true,
+        "rsi_div": true,
+        "score_mode": "patch"
+      },
+      "return_pct": 303.37,
+      "annual_pct": 14.64,
+      "mdd_pct": 26.52,
+      "sharpe": 0.85,
+      "win_rate_pct": 82.0,
+      "trades": 1938
+    },
+    {
+      "name": "BUY_WEAK=60",
+      "weights": {
+        "trend": 0.3,
+        "momentum": 0.25,
+        "volume": 0.15,
+        "osc": 0.15,
+        "risk": 0.1,
+        "news": 0.05
+      },
+      "switches": {
+        "ma_triple": false,
+        "boll_pos": true,
+        "reso_patch": false,
+        "bull_bear": false,
+        "extreme_vol": true,
+        "pdv": true,
+        "rsi_div": true,
+        "score_mode": "patch"
+      },
+      "return_pct": 303.37,
+      "annual_pct": 14.64,
+      "mdd_pct": 26.52,
+      "sharpe": 0.85,
+      "win_rate_pct": 82.0,
+      "trades": 1938
+    },
+    {
+      "name": "BUY_WEAK=64",
+      "weights": {
+        "trend": 0.3,
+        "momentum": 0.25,
+        "volume": 0.15,
+        "osc": 0.15,
+        "risk": 0.1,
+        "news": 0.05
+      },
+      "switches": {
+        "ma_triple": false,
+        "boll_pos": true,
+        "reso_patch": false,
+        "bull_bear": false,
+        "extreme_vol": true,
+        "pdv": true,
+        "rsi_div": true,
+        "score_mode": "patch"
+      },
+      "return_pct": 303.37,
+      "annual_pct": 14.64,
+      "mdd_pct": 26.52,
+      "sharpe": 0.85,
+      "win_rate_pct": 82.0,
+      "trades": 1938
+    },
+    {
+      "name": "BUY_WEAK=66",
+      "weights": {
+        "trend": 0.3,
+        "momentum": 0.25,
+        "volume": 0.15,
+        "osc": 0.15,
+        "risk": 0.1,
+        "news": 0.05
+      },
+      "switches": {
+        "ma_triple": false,
+        "boll_pos": true,
+        "reso_patch": false,
+        "bull_bear": false,
+        "extreme_vol": true,
+        "pdv": true,
+        "rsi_div": true,
+        "score_mode": "patch"
+      },
+      "return_pct": 303.37,
+      "annual_pct": 14.64,
+      "mdd_pct": 26.52,
+      "sharpe": 0.85,
+      "win_rate_pct": 82.0,
+      "trades": 1938
+    },
+    {
+      "name": "SELL_STRONG=25",
+      "weights": {
+        "trend": 0.3,
+        "momentum": 0.25,
+        "volume": 0.15,
+        "osc": 0.15,
+        "risk": 0.1,
+        "news": 0.05
+      },
+      "switches": {
+        "ma_triple": false,
+        "boll_pos": true,
+        "reso_patch": false,
+        "bull_bear": false,
+        "extreme_vol": true,
+        "pdv": true,
+        "rsi_div": true,
+        "score_mode": "patch"
+      },
+      "return_pct": 303.37,
+      "annual_pct": 14.64,
+      "mdd_pct": 26.52,
+      "sharpe": 0.85,
+      "win_rate_pct": 82.0,
+      "trades": 1938
+    },
+    {
+      "name": "SELL_STRONG=28",
+      "weights": {
+        "trend": 0.3,
+        "momentum": 0.25,
+        "volume": 0.15,
+        "osc": 0.15,
+        "risk": 0.1,
+        "news": 0.05
+      },
+      "switches": {
+        "ma_triple": false,
+        "boll_pos": true,
+        "reso_patch": false,
+        "bull_bear": false,
+        "extreme_vol": true,
+        "pdv": true,
+        "rsi_div": true,
+        "score_mode": "patch"
+      },
+      "return_pct": 303.37,
+      "annual_pct": 14.64,
+      "mdd_pct": 26.52,
+      "sharpe": 0.85,
+      "win_rate_pct": 82.0,
+      "trades": 1938
+    },
+    {
+      "name": "SELL_STRONG=32",
+      "weights": {
+        "trend": 0.3,
+        "momentum": 0.25,
+        "volume": 0.15,
+        "osc": 0.15,
+        "risk": 0.1,
+        "news": 0.05
+      },
+      "switches": {
+        "ma_triple": false,
+        "boll_pos": true,
+        "reso_patch": false,
+        "bull_bear": false,
+        "extreme_vol": true,
+        "pdv": true,
+        "rsi_div": true,
+        "score_mode": "patch"
+      },
+      "return_pct": 303.37,
+      "annual_pct": 14.64,
+      "mdd_pct": 26.52,
+      "sharpe": 0.85,
+      "win_rate_pct": 82.0,
+      "trades": 1938
+    },
+    {
+      "name": "SELL_STRONG=35",
+      "weights": {
+        "trend": 0.3,
+        "momentum": 0.25,
+        "volume": 0.15,
+        "osc": 0.15,
+        "risk": 0.1,
+        "news": 0.05
+      },
+      "switches": {
+        "ma_triple": false,
+        "boll_pos": true,
+        "reso_patch": false,
+        "bull_bear": false,
+        "extreme_vol": true,
+        "pdv": true,
+        "rsi_div": true,
+        "score_mode": "patch"
+      },
+      "return_pct": 303.37,
+      "annual_pct": 14.64,
+      "mdd_pct": 26.52,
+      "sharpe": 0.85,
+      "win_rate_pct": 82.0,
+      "trades": 1938
+    },
+    {
+      "name": "FG机会 K_BUY=4.0",
+      "weights": {
+        "trend": 0.3,
+        "momentum": 0.25,
+        "volume": 0.15,
+        "osc": 0.15,
+        "risk": 0.1,
+        "news": 0.05
+      },
+      "switches": {
+        "ma_triple": false,
+        "boll_pos": true,
+        "reso_patch": false,
+        "bull_bear": false,
+        "extreme_vol": true,
+        "pdv": true,
+        "rsi_div": true,
+        "score_mode": "patch",
+        "fg_dynamic": true,
+        "fg_mode": "opportunistic"
+      },
+      "return_pct": 304.74,
+      "annual_pct": 14.67,
+      "mdd_pct": 26.67,
+      "sharpe": 0.844,
+      "win_rate_pct": 84.4,
+      "trades": 1909
+    },
+    {
+      "name": "FG机会 K_BUY=8.0",
+      "weights": {
+        "trend": 0.3,
+        "momentum": 0.25,
+        "volume": 0.15,
+        "osc": 0.15,
+        "risk": 0.1,
+        "news": 0.05
+      },
+      "switches": {
+        "ma_triple": false,
+        "boll_pos": true,
+        "reso_patch": false,
+        "bull_bear": false,
+        "extreme_vol": true,
+        "pdv": true,
+        "rsi_div": true,
+        "score_mode": "patch",
+        "fg_dynamic": true,
+        "fg_mode": "opportunistic"
+      },
+      "return_pct": 304.99,
+      "annual_pct": 14.68,
+      "mdd_pct": 26.67,
+      "sharpe": 0.842,
+      "win_rate_pct": 84.2,
+      "trades": 1910
+    },
+    {
+      "name": "CAP_PCT=0.3",
+      "weights": {
+        "trend": 0.3,
+        "momentum": 0.25,
+        "volume": 0.15,
+        "osc": 0.15,
+        "risk": 0.1,
+        "news": 0.05
+      },
+      "switches": {
+        "ma_triple": false,
+        "boll_pos": true,
+        "reso_patch": false,
+        "bull_bear": false,
+        "extreme_vol": true,
+        "pdv": true,
+        "rsi_div": true,
+        "score_mode": "patch"
+      },
+      "return_pct": 305.93,
+      "annual_pct": 14.71,
+      "mdd_pct": 28.48,
+      "sharpe": 0.776,
+      "win_rate_pct": 85.9,
+      "trades": 2347
+    },
+    {
+      "name": "CAP_PCT=0.7",
+      "weights": {
+        "trend": 0.3,
+        "momentum": 0.25,
+        "volume": 0.15,
+        "osc": 0.15,
+        "risk": 0.1,
+        "news": 0.05
+      },
+      "switches": {
+        "ma_triple": false,
+        "boll_pos": true,
+        "reso_patch": false,
+        "bull_bear": false,
+        "extreme_vol": true,
+        "pdv": true,
+        "rsi_div": true,
+        "score_mode": "patch"
+      },
+      "return_pct": 302.82,
+      "annual_pct": 14.62,
+      "mdd_pct": 26.17,
+      "sharpe": 0.89,
+      "win_rate_pct": 78.1,
+      "trades": 1737
+    },
+    {
+      "name": "门槛全域-4",
+      "return_pct": 305.45,
+      "mdd_pct": 26.73,
+      "sharpe": 0.835,
+      "win_rate_pct": 86.6,
+      "trades": 1905
+    },
+    {
+      "name": "门槛全域+4",
+      "return_pct": 292.98,
+      "mdd_pct": 26.8,
+      "sharpe": 0.853,
+      "win_rate_pct": 72.0,
+      "trades": 2076
+    },
+    {
+      "name": "CAP_PCT=0.6",
+      "return_pct": 292.07,
+      "mdd_pct": 26.65,
+      "sharpe": 0.881,
+      "win_rate_pct": 68.0,
+      "trades": 1936
+    },
+    {
+      "name": "CAP_PCT=0.8",
+      "return_pct": 290.33,
+      "mdd_pct": 26.25,
+      "sharpe": 0.911,
+      "win_rate_pct": 64.3,
+      "trades": 1791
+    },
+    {
+      "name": "CAP_PCT=1.0",
+      "return_pct": 287.67,
+      "mdd_pct": 25.97,
+      "sharpe": 0.927,
+      "win_rate_pct": 63.8,
+      "trades": 1646
+    }
+  ]
+}
