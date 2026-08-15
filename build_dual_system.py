@@ -124,6 +124,9 @@ def cards_html_for(items):
 # ---------------- 视图区 ----------------
 s_auto = DATA["systems"]["v9_auto"]["summary"]
 s_lite = DATA["systems"]["v8_lite"]["summary"]
+# ETF/基金独立回测（普适版视图展示）
+s_etf = json.load(open(BASE / "v8_etf_summary.json", encoding="utf-8"))["summary"]
+s_fund = json.load(open(BASE / "v8_fund_summary.json", encoding="utf-8"))["summary"]
 perm_stat = f'股票 {len(v8_main)} ｜ ETF {len(v8_etf)} ｜ 基金 {len(v8_fund)}'
 
 def system_block(vid, sid, title, badge, sub, kpis, rule, items, tbl_id, card_id, note):
@@ -147,9 +150,9 @@ def system_block(vid, sid, title, badge, sub, kpis, rule, items, tbl_id, card_id
 </div>
 <table class="tbl" id="{tbl_id}">
 <thead><tr>
-<th data-key="rank">#</th><th data-key="name">标的</th><th data-key="board">板块</th><th data-key="industry">行业</th><th data-key="px">现价</th>
-<th data-key="chg">涨跌幅</th><th data-key="ret1y">近一年</th><th data-key="score">权重分/构成</th><th data-key="rsi">RSI</th><th data-key="vp">量能</th>
-<th data-key="conf">置信度</th><th data-key="tier">档位</th><th data-key="tierchg">档位变化</th><th data-key="action">建议动作</th>
+<th data-key="rank" style="text-align:center">#</th><th data-key="name">标的</th><th data-key="board">板块</th><th data-key="industry">行业</th><th data-key="px" style="text-align:right">现价</th>
+<th data-key="chg" style="text-align:right">涨跌幅</th><th data-key="ret1y" style="text-align:right">近一年</th><th data-key="score" style="text-align:center">权重分<div class="th-sub">趋势/动量/量能/超买/风控</div></th><th data-key="rsi" style="text-align:center">RSI</th><th data-key="vp" style="text-align:center">量能</th>
+<th data-key="conf" style="text-align:center">置信度</th><th data-key="tier" style="text-align:center">档位</th><th data-key="tierchg" style="text-align:center">档位变化</th><th data-key="action" style="text-align:center">建议动作</th>
 </tr></thead>
 <tbody>{rows_html_for(items)}</tbody>
 </table>
@@ -181,6 +184,12 @@ html = f"""<!doctype html>
 /* 筛选条 */
 .toolbar .flt{{background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:7px 10px;font-size:13px;font-family:inherit}}
 .toolbar input[type=text]{{background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:7px 12px;font-size:13px;width:200px;font-family:inherit}}
+/* 表头两行（权重分/构成第二行指标名） */
+.th-sub{{font-size:10px;color:var(--faint);font-weight:400;margin-top:2px}}
+/* 到顶/到底浮动按钮 */
+.scroll-fab{{position:fixed;right:22px;bottom:22px;display:flex;flex-direction:column;gap:8px;z-index:950}}
+.scroll-fab button{{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);font-family:inherit}}
+.scroll-fab button:hover{{border-color:var(--accent);color:var(--accent)}}
 /* 逐标的详情卡片（模板风格 · 等高适配） */
 .stock-cards{{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px}}
 .stock-card{{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:stretch}}
@@ -229,6 +238,19 @@ html = f"""<!doctype html>
   v9_items, "tbl-v9", "card-tbl-v9",
   "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测净值曲线见下方（历史参考）")}
 
+<div class="card" id="sub-bt">
+<h2>📊 ETF 池 / 基金池 回测参考 <span class="badge badge-auto">独立策略</span></h2>
+<div class="sub">ETF 全市场动量 Top10 · 半年轮动 ｜ 基金全市场动量 Top10 · 半年轮动 —— 与普适版股票池为独立回测，监控表 ETF/基金档即对应此池</div>
+<div class="kpis">
+<div class="kpi"><div class="l">ETF 回测收益</div><div class="v" style="color:#f59e0b">+{s_etf["total_return_pct"]:.1f}%</div><div class="s">2016-01~2026-08 · 103 笔</div></div>
+<div class="kpi"><div class="l">ETF 年化</div><div class="v">{s_etf["annual_return_pct"]:.1f}%</div><div class="s">胜率 {s_etf.get("win_rate_pct",0):.0f}%</div></div>
+<div class="kpi"><div class="l">ETF 最大回撤</div><div class="v" style="color:#ef4444">{s_etf["max_drawdown_pct"]:.1f}%</div><div class="s">夏普 {s_etf["sharpe"]:.2f}</div></div>
+<div class="kpi"><div class="l">基金回测收益</div><div class="v" style="color:#3b82f6">+{s_fund["total_return_pct"]:.1f}%</div><div class="s">2016-01~2026-08 · 90 笔</div></div>
+<div class="kpi"><div class="l">基金年化</div><div class="v">{s_fund["annual_return_pct"]:.1f}%</div><div class="s">胜率 {s_fund.get("win_rate_pct",0):.0f}%</div></div>
+<div class="kpi"><div class="l">基金最大回撤</div><div class="v" style="color:#ef4444">{s_fund["max_drawdown_pct"]:.1f}%</div><div class="s">夏普 {s_fund["sharpe"]:.2f}</div></div>
+</div>
+</div>
+
 <!-- ============ 视图 B：个人版 ============ -->
 {system_block(
   "view-lite", "sys-lite",
@@ -251,6 +273,11 @@ html = f"""<!doctype html>
 </div>
 
 </div>
+<!-- 到顶/到底浮动按钮 -->
+<div class="scroll-fab">
+<button title="回到顶部" onclick="window.scrollTo({{top:0,behavior:'smooth'}})">↑</button>
+<button title="滚到底部" onclick="window.scrollTo({{top:document.body.scrollHeight,behavior:'smooth'}})">↓</button>
+</div>
 <script src="enhanced_data.js"></script>
 <script src="monitor/snapshots_index.js"></script>
 <script>
@@ -271,6 +298,7 @@ function renderReportMenu(){{
   var m=document.getElementById('report-menu');if(!m)return;
   if(!window.SNAPSHOTS){{m.innerHTML='<div class="head">暂无历史快照</div>';return;}}
   var h='<div class="head">历史收盘监控快照（'+window.SNAPSHOTS.snapshots.length+' 份）</div>';
+  h+='<a class="snap-item" style="font-weight:600;color:var(--accent)" href="history_reports.html">📚 历史报告总览（独立页）</a>';
   window.SNAPSHOTS.months.forEach(function(g){{
     h+='<div class="snap-group">📅 '+g.month+'</div>';
     g.items.forEach(function(s){{

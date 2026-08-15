@@ -36,6 +36,8 @@ quant-weight-system/
 |---|---|---|---|---|
 | **普适版** | 全市场 5307 只自动筛池（股票按权限各10 + ETF10 + 基金10） | Top3 | 月轮动 | **无人工选池**（夏普 1.715，止损4.5%/MA150/动态门槛/RSI<85） |
 | 个人版 | 用户固定池 30 只（20股+ETF4+基金6，不扩充） | Top4 | 月轮动 20 笔/年 | 自选池执行（50 万中性资金，参数化） |
+| ETF 池 | 全市场 1014 只 ETF 动量 Top10 | Top10 | 半年 | 独立策略（+165%，夏普 0.74） |
+| 基金池 | 全市场 14668 只净值动量 Top10 | Top10 | 半年 | 独立策略（+184%，夏普 0.69） |
 | 股票主体系 | 全市场 5307 只 | Top15 + 卫星 | 季度 | 策略研究基准 |
 | ETF | 全市场 888 只 | Top10 | 半年 | 低波动配置 |
 | 基金 | 全市场 16171 只 | Top10 + 卫星 | 半年 | 场外配置 |
@@ -91,7 +93,7 @@ print(A.V.summary(eq, tr))             # +839.6% / 夏普 1.715
 3. 自选池：修改 `v8_lite.py` 中 `STOCKS / ETFS` 清单（25 只默认）；普适版自动池按权限分层（main/gem/star 各 10 只）由 `build_enhanced_data.py` 的 `V9_TIERS` 自动计算
 4. 验证回测：`python -c "import v8_lite as L; pool=L.build_pool(); print(L.V.summary(*L.run_lite(pool, top_n=4, hold_days=21)))"`
 5. 调度：`schtasks /create /tn v8_dashboard_update /sc monthly /d 1 /st 18:00 /tr "<路径>\v8_update.bat"`
-6. 看板：浏览器打开 `index.html`（个人版默认），`advice_v8lite.html` 为当月加减仓建议
+6. 看板：浏览器打开 `dual_system.html`（监控看板），`history_reports.html`（历史报告总览），`index.html`（回测主看板）
 
 ## 已知限制
 
