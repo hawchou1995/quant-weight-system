@@ -20,9 +20,29 @@ def get_ddf(auto_pool, code):
     return ddf
 
 
+def board_filter(code, perm="all"):
+    """交易权限过滤（A 股板块权限）：
+    perm='main' 沪深主板(sh60/sz00)      —— 新开户即可
+    perm='gem'  主板+创业板(sz30)        —— 2年经验+10万资产
+    perm='star' 主板+创业板+科创板(sh688)—— 2年经验+50万资产
+    perm='all'  全部 A 股                 —— 含 B 股剔除
+    """
+    if code.startswith("sh900") or code.startswith("sz200"):
+        return False  # B 股：普通 A 股账户不可买
+    if perm == "all":
+        return True
+    if code.startswith(("sh60", "sz00")):
+        return True
+    if perm == "gem" and code.startswith("sz30"):
+        return True
+    if perm == "star" and (code.startswith("sz30") or code.startswith("sh688") or code.startswith("sh689")):
+        return True
+    return False
+
+
 def run_auto(top_n=4, hold_days=21, pool_size=25, stop_loss=0.10, cash0=500000,
              mom_min=0.15, score_min=60, use_timing=True, sell_score=0,
-             dynamic=False, rsi_max=None, ma_window=200, vol_target=None):
+             dynamic=False, rsi_max=None, ma_window=200, vol_target=None, perm="all"):
     idx = V.load_index(200).set_index('date')
     idx['idx_vol'] = idx['close'].pct_change().rolling(20).std() * math.sqrt(252)
     idx_vol = idx['idx_vol'].to_dict()
@@ -107,6 +127,7 @@ def run_auto(top_n=4, hold_days=21, pool_size=25, stop_loss=0.10, cash0=500000,
                         thresh_now = max(55.0, min(75.0, score_min + (v_now - 0.20) * 200))
                 cand = []
                 for code, ddf in pool_all.items():
+                    if not board_filter(code, perm): continue
                     if day not in ddf.index: continue
                     r = ddf.loc[day]
                     if pd.isna(r['close']) or r['close'] <= 0 or pd.isna(r['mom_12_1']): continue
