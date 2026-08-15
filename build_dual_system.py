@@ -70,8 +70,11 @@ def updown(items):
     return up, down
 
 # ---------------- 工具 ----------------
+TIER_W = {"满仓加仓": 5, "强买入": 5, "轻仓加仓": 4, "买入": 4, "观望": 3, "减至半仓": 2, "清仓": 1, "不买": 0}
+
 def tier_pill(t):
-    cls = {"满仓加仓": "pill-full", "轻仓加仓": "pill-add", "观望": "pill-watch", "减至半仓": "pill-cut", "清仓": "pill-clear"}.get(t, "pill-watch")
+    cls = {"满仓加仓": "pill-full", "强买入": "pill-full", "轻仓加仓": "pill-add", "买入": "pill-add",
+           "观望": "pill-watch", "减至半仓": "pill-cut", "清仓": "pill-clear", "不买": "pill-watch"}.get(t, "pill-watch")
     return f'<span class="pill {cls}">{t}</span>'
 
 def action_for(d):
@@ -79,6 +82,9 @@ def action_for(d):
     if d["tier"] == "轻仓加仓": return "可加至目标仓位"
     if d["tier"] == "观望": return "持有不加 / 观望"
     if d["tier"] == "减至半仓": return "减至半仓"
+    if d["tier"] == "强买入": return "买入（强信号）"
+    if d["tier"] == "买入": return "买入"
+    if d["tier"] == "不买": return "不买入"
     return "清仓离场"
 
 def conf_level(d):
@@ -113,9 +119,9 @@ def rows_html_for(items):
 <td style="text-align:center"><b>{d["score"]:.1f}</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">{comp_txt}</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">{rsi_txt}</td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">{vp_txt}</td>
-<td style="text-align:center"><span class="board-tag">{conf_level(d)}置信</span></td>
-<td style="text-align:center">{tier_pill(d["tier"])}</td>
-<td style="text-align:center">{chg_tier or '<span style="color:var(--faint)">—</span>'}</td>
+<td style="text-align:center" data-v="100"><span class="board-tag">{conf_level(d)}置信</span></td>
+<td style="text-align:center" data-v="{TIER_W.get(d["tier"], 0)}">{tier_pill(d["tier"])}</td>
+<td style="text-align:center" data-v="{1 if chg_tier else 0}">{chg_tier or '<span style="color:var(--faint)">—</span>'}</td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">{action_for(d)}</td></tr>'''
     return rows
 

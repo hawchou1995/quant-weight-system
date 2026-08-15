@@ -271,9 +271,13 @@ function initTable(tblId, opts){
       var idx=colIdx[k];
       var rs=rows().filter(function(tr){return tr.style.display!=='none'});
       rs.sort(function(a,b){
-        var va=parseFloat(a.children[idx].getAttribute('data-v')||a.children[idx].textContent.replace(/[+,%—]/g,'')||'0');
-        var vb=parseFloat(b.children[idx].getAttribute('data-v')||b.children[idx].textContent.replace(/[+,%—]/g,'')||'0');
-        return (va-vb)*state.sortDir;});
+        // 数值优先（data-v 或文本数字），文本列按中文 localeCompare 兜底（v5.10.6）
+        var ta=a.children[idx].getAttribute('data-v')||a.children[idx].textContent;
+        var tb=b.children[idx].getAttribute('data-v')||b.children[idx].textContent;
+        var va=parseFloat(String(ta).replace(/[+,%—→↓↑]/g,''));
+        var vb=parseFloat(String(tb).replace(/[+,%—→↓↑]/g,''));
+        if(!isNaN(va)&&!isNaN(vb))return (va-vb)*state.sortDir;
+        return String(ta).localeCompare(String(tb),'zh')*state.sortDir;});
       var tb=table.querySelector('tbody');
       rs.forEach(function(tr){tb.appendChild(tr);});});});
   apply();
