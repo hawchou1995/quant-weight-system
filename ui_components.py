@@ -201,16 +201,21 @@ function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)retu
     a.addEventListener('click',function(e){
       e.preventDefault();
       var t=a.getAttribute('data-anchor');
-      var el=document.getElementById(t);
-      if(el){el.scrollIntoView({behavior:'auto',block:'start'});
-        window.scrollBy(0,-70);}
+      // 视图切换模式：交给 switchView；否则滚动定位
+      if(window.switchView){window.switchView(t);}
+      else{
+        var el=document.getElementById(t);
+        if(el){el.scrollIntoView({behavior:'auto',block:'start'});
+          window.scrollBy(0,-70);}}
       nav.querySelectorAll('a[data-anchor]').forEach(function(x){x.classList.toggle('active',x===a);});});});
+  // 滚动高亮：仅对可见元素生效（display:none 的视图跳过，避免视图切换模式下 active 乱跳）
   window.addEventListener('scroll',function(){
+    if(window.ENH&&window.ENH.NAV_SWITCH)return;   // 视图切换模式：滚动不更新 active
     var anchors=window.ENH.nav.map(function(it){return it[0];});
     var cur=anchors[0];
     anchors.forEach(function(a){
       var el=document.getElementById(a);
-      if(el&&el.getBoundingClientRect().top<=150)cur=a;});
+      if(el&&el.offsetParent!==null&&el.getBoundingClientRect().top<=150)cur=a;});
     nav.querySelectorAll('a[data-anchor]').forEach(function(a){
       a.classList.toggle('active',a.getAttribute('data-anchor')===cur);});});}
 
@@ -255,8 +260,9 @@ function initTable(tblId, opts){
   // 档位筛选
   var tierSel=document.getElementById(tblId+'-tier');
   if(tierSel)tierSel.addEventListener('change',function(){state.tier=tierSel.value;apply();});
-  // 排序
+  // 排序（判空：表头无 .arr 时自动创建，避免 null.textContent 报错中断排序）
   table.querySelectorAll('th[data-key]').forEach(function(th){
+    if(!th.querySelector('.arr')){var sp=document.createElement('span');sp.className='arr';th.appendChild(sp);}
     th.addEventListener('click',function(){
       var k=th.getAttribute('data-key');
       if(state.sortKey===k){state.sortDir*=-1}else{state.sortKey=k;state.sortDir=1;}

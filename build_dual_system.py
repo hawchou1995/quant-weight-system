@@ -256,6 +256,8 @@ html = f"""<!doctype html>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
 window.ENH.nav = [["overview","📊","监控总览"],["sys-auto","🅰️","普适版"],["sys-lite","🅱️","个人版"]];
+/* 视图切换模式：滚动不更新导航高亮（COMMON_JS renderSidenav 检测此标志） */
+window.ENH.NAV_SWITCH = true;
 /* 视图切换 */
 function switchView(key){{
   var map={{'overview':'view-overview','sys-auto':'view-auto','sys-lite':'view-lite','snapshot':'view-snapshot'}};
