@@ -278,6 +278,7 @@ def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extr
 <select id="{tbl_id}-ind" class="flt" title="行业筛选"><option value="">全部行业</option>{filter_options(items, "industry")}</select>
 <select id="{tbl_id}-tier" class="flt" title="档位筛选"><option value="">全部档位</option><option>满仓加仓</option><option>轻仓加仓</option><option>观望</option><option>减至半仓</option><option>清仓</option></select>
 <span class="count" id="{tbl_id}-count"></span>
+<button id="{tbl_id}-buyonly" class="flt" title="只看买入候选（剔除减半/清仓）" style="cursor:pointer;padding:7px 12px">🔍 只看可买信号</button>
 </div>
 <table class="tbl" id="{tbl_id}">
 <thead><tr>
@@ -419,7 +420,7 @@ html = f"""<!doctype html>
   "view-short", "sys-short",
   "⚡ 全量池短线", "auto", f"全市场短线信号 Top 池（数据截至 {SHORT_POOL_ASOF}）：股票=反转信号 Top10（剔ST）｜ ETF=动量 Top10 ｜ 基金=动量 Top10 · 短线分 = 动量30/量价25/通道25/波动20 · 回测参考见「监控总览」",
   v9_short_items, "tbl-short", "card-tbl-short",
-  "短线分 = 动量30 + 量价25 + 通道25 + 波动20（A 股个股反转版）· 档位与中长线同口径 · 回测参考在监控总览视图",
+  "信号池 = 回测买入清单：分数≥50 的 TopN 在轮动日全部买入（观望档 = 建议轻仓参与，仍属买入候选）· 减半/清仓 = 仅当已持仓时的卖出信号 · 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览",
   extra_card=WATCH_CARD)}
 
 <!-- ============ 历史快照视图（右上角标的报告切换） ============ -->
@@ -601,15 +602,19 @@ document.addEventListener('DOMContentLoaded',function(){{
   ['tbl-v9','tbl-v8','tbl-short'].forEach(function(id){{
     var q=document.getElementById(id+'-q'), mk=document.getElementById(id+'-mk');
     var ind=document.getElementById(id+'-ind'), tier=document.getElementById(id+'-tier');
+    var buyonly=document.getElementById(id+'-buyonly');
     var cardsBox=document.getElementById(id+'-cards');
+    var buyOnlyOn=false;
     function match(el){{
       var txt=(el.getAttribute('data-search')||'').toLowerCase();
       var qv=(q?q.value:'').toLowerCase();
       var mv=mk?mk.value:'', iv=ind?ind.value:'', tv=tier?tier.value:'';
+      var t2=el.getAttribute('data-tier');
       return (!qv||txt.indexOf(qv)>=0)
         &&(!mv||el.getAttribute('data-market')===mv)
         &&(!iv||el.getAttribute('data-industry')===iv)
-        &&(!tv||el.getAttribute('data-tier')===tv);
+        &&(!tv||t2===tv)
+        &&(!buyOnlyOn||(t2!=='减至半仓'&&t2!=='清仓'));
     }}
     function applyAll(){{
       var rows=document.querySelectorAll('#'+id+' tbody tr');
@@ -626,6 +631,12 @@ document.addEventListener('DOMContentLoaded',function(){{
     if(mk)mk.addEventListener('change',applyAll);
     if(ind)ind.addEventListener('change',applyAll);
     if(tier)tier.addEventListener('change',applyAll);
+    if(buyonly)buyonly.addEventListener('click',function(){{
+      buyOnlyOn=!buyOnlyOn;
+      buyonly.style.borderColor=buyOnlyOn?'var(--accent)':'';
+      buyonly.style.color=buyOnlyOn?'var(--accent)':'';
+      applyAll();
+    }});
     /* 排序联动：表头排序后，卡片按同样顺序重排（按 data-code 匹配） */
     var table=document.getElementById(id);
     if(table&&cardsBox){{

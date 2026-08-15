@@ -355,6 +355,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <select id="tbl-v9-ind" class="flt" title="行业筛选"><option value="">全部行业</option><option>医药生物</option><option>国防军工</option><option>基础化工</option><option>机械设备</option><option>汽车</option><option>环保</option><option>电力设备</option><option>电子</option><option>综合</option><option>计算机</option><option>通信</option></select>
 <select id="tbl-v9-tier" class="flt" title="档位筛选"><option value="">全部档位</option><option>满仓加仓</option><option>轻仓加仓</option><option>观望</option><option>减至半仓</option><option>清仓</option></select>
 <span class="count" id="tbl-v9-count"></span>
+<button id="tbl-v9-buyonly" class="flt" title="只看买入候选（剔除减半/清仓）" style="cursor:pointer;padding:7px 12px">🔍 只看可买信号</button>
 </div>
 <table class="tbl" id="tbl-v9">
 <thead><tr>
@@ -2693,6 +2694,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <select id="tbl-v8-ind" class="flt" title="行业筛选"><option value="">全部行业</option><option>传媒</option><option>商贸零售</option><option>房地产</option><option>有色金属</option><option>机械设备</option><option>煤炭</option><option>电力设备</option><option>电子</option><option>纺织服饰</option><option>综合</option><option>计算机</option><option>通信</option><option>非银金融</option></select>
 <select id="tbl-v8-tier" class="flt" title="档位筛选"><option value="">全部档位</option><option>满仓加仓</option><option>轻仓加仓</option><option>观望</option><option>减至半仓</option><option>清仓</option></select>
 <span class="count" id="tbl-v8-count"></span>
+<button id="tbl-v8-buyonly" class="flt" title="只看买入候选（剔除减半/清仓）" style="cursor:pointer;padding:7px 12px">🔍 只看可买信号</button>
 </div>
 <table class="tbl" id="tbl-v8">
 <thead><tr>
@@ -4111,6 +4113,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <select id="tbl-short-ind" class="flt" title="行业筛选"><option value="">全部行业</option><option>农林牧渔</option><option>医药生物</option><option>国防军工</option><option>家用电器</option><option>有色金属</option><option>环保</option><option>电子</option><option>社会服务</option><option>纺织服饰</option><option>综合</option></select>
 <select id="tbl-short-tier" class="flt" title="档位筛选"><option value="">全部档位</option><option>满仓加仓</option><option>轻仓加仓</option><option>观望</option><option>减至半仓</option><option>清仓</option></select>
 <span class="count" id="tbl-short-count"></span>
+<button id="tbl-short-buyonly" class="flt" title="只看买入候选（剔除减半/清仓）" style="cursor:pointer;padding:7px 12px">🔍 只看可买信号</button>
 </div>
 <table class="tbl" id="tbl-short">
 <thead><tr>
@@ -4540,7 +4543,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><span style="color:var(--faint)">—</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">可加至目标仓位</td></tr></tbody>
 </table>
-<div class="note">短线分 = 动量30 + 量价25 + 通道25 + 波动20（A 股个股反转版）· 档位与中长线同口径 · 回测参考在监控总览视图</div>
+<div class="note">信号池 = 回测买入清单：分数≥50 的 TopN 在轮动日全部买入（观望档 = 建议轻仓参与，仍属买入候选）· 减半/清仓 = 仅当已持仓时的卖出信号 · 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览</div>
 </div>
 <div class="card">
 <h2>🔍 逐标的详情（雷达图） <span class="count" id="tbl-short-cardcount" style="font-size:12px"></span></h2>
@@ -5248,15 +5251,19 @@ document.addEventListener('DOMContentLoaded',function(){
   ['tbl-v9','tbl-v8','tbl-short'].forEach(function(id){
     var q=document.getElementById(id+'-q'), mk=document.getElementById(id+'-mk');
     var ind=document.getElementById(id+'-ind'), tier=document.getElementById(id+'-tier');
+    var buyonly=document.getElementById(id+'-buyonly');
     var cardsBox=document.getElementById(id+'-cards');
+    var buyOnlyOn=false;
     function match(el){
       var txt=(el.getAttribute('data-search')||'').toLowerCase();
       var qv=(q?q.value:'').toLowerCase();
       var mv=mk?mk.value:'', iv=ind?ind.value:'', tv=tier?tier.value:'';
+      var t2=el.getAttribute('data-tier');
       return (!qv||txt.indexOf(qv)>=0)
         &&(!mv||el.getAttribute('data-market')===mv)
         &&(!iv||el.getAttribute('data-industry')===iv)
-        &&(!tv||el.getAttribute('data-tier')===tv);
+        &&(!tv||t2===tv)
+        &&(!buyOnlyOn||(t2!=='减至半仓'&&t2!=='清仓'));
     }
     function applyAll(){
       var rows=document.querySelectorAll('#'+id+' tbody tr');
@@ -5273,6 +5280,12 @@ document.addEventListener('DOMContentLoaded',function(){
     if(mk)mk.addEventListener('change',applyAll);
     if(ind)ind.addEventListener('change',applyAll);
     if(tier)tier.addEventListener('change',applyAll);
+    if(buyonly)buyonly.addEventListener('click',function(){
+      buyOnlyOn=!buyOnlyOn;
+      buyonly.style.borderColor=buyOnlyOn?'var(--accent)':'';
+      buyonly.style.color=buyOnlyOn?'var(--accent)':'';
+      applyAll();
+    });
     /* 排序联动：表头排序后，卡片按同样顺序重排（按 data-code 匹配） */
     var table=document.getElementById(id);
     if(table&&cardsBox){
