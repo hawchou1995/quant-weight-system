@@ -1,0 +1,12 @@
+{
+  "strategy": "short_v3_stock",
+  "params": "T10/H10/S50 · 反转+MA5",
+  "summary": {
+    "total_return_pct": 632.7,
+    "annual_return_pct": 20.65,
+    "max_drawdown_pct": -7.97,
+    "sharpe": 2.291,
+    "win_rate_pct": 53.7,
+    "total_trades": 1319
+  }
+}

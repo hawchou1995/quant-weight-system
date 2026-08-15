@@ -1,0 +1,12 @@
+{
+  "strategy": "short_v3_etf",
+  "params": "T10/H10/S50 · 动量+MA5+止盈12%",
+  "summary": {
+    "total_return_pct": 239.21,
+    "annual_return_pct": 12.2,
+    "max_drawdown_pct": -9.25,
+    "sharpe": 1.737,
+    "win_rate_pct": 54.3,
+    "total_trades": 1261
+  }
+}

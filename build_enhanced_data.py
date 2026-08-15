@@ -13,6 +13,7 @@ sys.path.insert(0, str(BASE))
 import v8_selector as V
 import v9_auto as A
 import v8_lite as L
+import short_engine as SH   # v5.8：details 加 short_score/short_tier（短线视角）
 
 names = json.load(open(BASE / "data_full_names.json", encoding="utf-8"))
 
@@ -384,6 +385,11 @@ for c in ALL_CODES:
     _industry = ETF_INDUSTRY.get(c) or INDUSTRY.get(c)
     if not _industry:
         _industry = "综合"   # 统一体系兜底：一律归「综合」，不分板块各玩各的
+    # 短线分（v5.8）：同一标的池的短线视角——股票用反转版、ETF/基金用动量版（v2/v3 回测验证）
+    _sf = SH.short_factors(ddf)
+    _sr = _sf.iloc[-1]
+    short_sc = float(SH.short_score(_sr, reversal=(_board in ("主板", "创业板", "科创板"))))
+    short_tier = tier(short_sc)
     details[c] = {
         "code": c, "key": k, "name": FUND_NAMES.get(c, names.get(k, c)),
         "pool": POOL_TAG.get(c, "v8"),   # v8=个人版自选池 / v9=普适版自动池
@@ -394,6 +400,7 @@ for c in ALL_CODES:
         "ret_1y": round(ret_1y, 1) if ret_1y is not None else None,
         "score": round(sc_now, 1), "score_prev": round(sc_prev, 1) if sc_prev is not None else None,
         "tier": tier(sc_now), "tier_prev": tier(sc_prev) if sc_prev is not None else None,
+        "short_score": round(short_sc, 1), "short_tier": short_tier,
         "factors": fs, "comp": comp, "radar_svg": radar_svg, "rsi": round(rsi, 1),
         "kline": kline, "factor_hist": fh,
         "trades": {"v9_auto": tlist(th_auto), "v8_lite": tlist(th_lite)},

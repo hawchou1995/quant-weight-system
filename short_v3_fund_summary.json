@@ -1,0 +1,12 @@
+{
+  "strategy": "short_v3_fund",
+  "params": "T5/H5/S40 · 动量（净值型不设MA5，实测MA5腰斩收益）",
+  "summary": {
+    "total_return_pct": 273.35,
+    "annual_return_pct": 13.22,
+    "max_drawdown_pct": -16.71,
+    "sharpe": 0.953,
+    "win_rate_pct": 54.1,
+    "total_trades": 1019
+  }
+}
