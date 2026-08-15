@@ -138,7 +138,7 @@ NAV_HTML = """
   <div class="logo" onclick="location.hash='#overview'"><span class="dot"></span>量化权重看板</div>
   <div class="spacer"></div>
   <div class="dropdown" id="report-dd">
-    <button class="tb-btn" onclick="toggleDrop('report-dd')">📄 历史报告 ▾</button>
+    <button class="tb-btn" onclick="toggleDrop('report-dd')">📄 标的报告 ▾</button>
     <div class="dropdown-menu" id="report-menu"></div>
   </div>
   <button class="tb-btn" id="theme-btn" onclick="toggleTheme()">🌙 夜间</button>
@@ -163,30 +163,38 @@ function applyTheme(t){document.documentElement.setAttribute('data-theme',t);
 function toggleTheme(){var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';applyTheme(t)}
 try{applyTheme(localStorage.getItem('qw-theme')||'light')}catch(e){applyTheme('light')}
 
-/* ---------- 历史报告下拉 ---------- */
+/* ---------- 历史报告下拉（标的监控报告） ---------- */
 function toggleDrop(id){var el=document.getElementById(id);el.classList.toggle('open');
   if(id==='report-dd'&&!document.getElementById('report-menu').innerHTML){
     var m=document.getElementById('report-menu');
-    var h='<div class="head">Obsidian 知识库 · 02-投资研究-Investment（'+window.ENH.reports.length+' 篇）</div>';
-    window.ENH.reports.forEach(function(f){
-      h+='<a href="file:///D:/Documents/Obsidian/WorkBuddy/wiki/02-投资研究-Investment/'+encodeURIComponent(f)+'" target="_blank">📄 '+f.replace('.md','').replace(/^research-/,'')+'</a>';});
+    var h='<div class="head">标的监控报告（'+window.ENH.monitor_reports.length+' 只）</div>';
+    window.ENH.monitor_reports.forEach(function(r){
+      h+='<a href="monitor_reports.html#'+r.code+'" target="_blank">📈 '+r.name+'（'+r.code+'）· '+r.tier+'</a>';});
     m.innerHTML=h;}}
 document.addEventListener('click',function(e){
   document.querySelectorAll('.dropdown.open').forEach(function(d){
     if(!d.contains(e.target))d.classList.remove('open');});});
 
-/* ---------- 左侧导航 ---------- */
+/* ---------- 左侧导航（JS 点击滚动，不依赖 hash） ---------- */
 function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)return;
   var html='';window.ENH.nav.forEach(function(it){
-    html+='<a href="#'+it[0]+'" data-anchor="'+it[0]+'"><span class="ic">'+it[1]+'</span>'+it[2]+'</a>';});
+    html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"><span class="ic">'+it[1]+'</span>'+it[2]+'</a>';});
   nav.innerHTML=html;
   document.body.classList.add('sidenav-open');
+  nav.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click',function(e){
+      e.preventDefault();
+      var t=a.getAttribute('data-anchor');
+      var el=document.getElementById(t);
+      if(el){el.scrollIntoView({behavior:'auto',block:'start'});
+        window.scrollBy(0,-70);}
+      nav.querySelectorAll('a').forEach(function(x){x.classList.toggle('active',x===a);});});});
   window.addEventListener('scroll',function(){
     var anchors=window.ENH.nav.map(function(it){return it[0];});
     var cur=anchors[0];
     anchors.forEach(function(a){
       var el=document.getElementById(a);
-      if(el&&el.getBoundingClientRect().top<=140)cur=a;});
+      if(el&&el.getBoundingClientRect().top<=150)cur=a;});
     nav.querySelectorAll('a').forEach(function(a){
       a.classList.toggle('active',a.getAttribute('data-anchor')===cur);});});}
 

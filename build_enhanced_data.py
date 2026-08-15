@@ -170,7 +170,11 @@ reports = sorted([f.name for f in REPORTS_DIR.glob("research-*.md")], reverse=Tr
 
 out = {
     "meta": {"as_of": "2026-08-14", "generated": "2026-08-15 21:00"},
-    "nav": [["overview", "📊", "总览"], ["sys-auto", "🅰️", "普适版"], ["sys-lite", "🅱️", "个人版"], ["table", "📋", "标的表"]],
+    "nav": [["overview", "📊", "监控总览"], ["sys-auto", "🅰️", "普适版"], ["sys-lite", "🅱️", "个人版"], ["table", "📋", "标的监控表"]],
+    "monitor_reports": [
+        {"code": c, "name": d["name"], "tier": d["tier"]}
+        for c, d in sorted(details.items(), key=lambda kv: -kv[1]["score"])
+    ],
     "systems": {
         "v9_auto": {"label": "v9-auto 普适版", "badge": "全市场自动池 · 无人工选池",
                      "summary": s_auto, "equity": [round(float(x), 2) for x in v_auto]},
