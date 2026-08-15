@@ -254,9 +254,9 @@ def bt_short_html():
             '<div class="bt-grid">' + cards + '</div>\n</div>')
 perm_stat = f'股票 {len(v8_main)} ｜ ETF {len(v8_etf)} ｜ 基金 {len(v8_fund)}'
 
-def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extra_stat=None):
+def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extra_stat=None, extra_card=""):
     """每个系统的完整区块：系统头（标题+说明）+ 操作统计条 + 汇总表 + 详情卡片
-    回测参考统一放总览视图，这里只保留监控主体。"""
+    回测参考统一放总览视图，这里只保留监控主体。extra_card=视图末尾追加卡片（如持仓跟踪）"""
     up, down = updown(items)
     t8 = tier_counts(items)
     stat_bar = (extra_stat if extra_stat else "") + f'''<div class="op-stats">
@@ -294,8 +294,20 @@ def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extr
 <div class="sub">六角雷达 = 趋势/动能/量能/超买/风控/研报 六类打分 · 与上方表格搜索/筛选/排序联动</div>
 <div class="stock-cards" id="{tbl_id}-cards">{cards_html_for(items)}</div>
 </div>
+{extra_card}
 </div>'''
 
+
+WATCH_CARD = f'''<div class="card" id="watch-card">
+<h2>🔎 我的持仓跟踪 <span class="badge badge-auto">与回测同口径</span></h2>
+<div class="sub">卖出规则（与回测一致）：<b>收盘跌破 MA5 → 次日开盘卖出</b> ｜ 掉出信号池 → 下次轮动换出（约 10 个交易日）｜ 档位减半/清仓 → 按档位操作 · 数据截至 {SHORT_POOL_ASOF} · 每天收盘后跑 refresh_daily.py 刷新</div>
+<div class="watch-bar">
+<input type="text" id="watch-input" placeholder="持仓代码，逗号分隔，如：600641, 159502, 000742">
+<button id="watch-save">💾 保存持仓</button>
+<span class="count" id="watch-count"></span>
+</div>
+<div id="watch-table"></div>
+</div>'''
 html = f"""<!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -327,6 +339,12 @@ html = f"""<!doctype html>
 .bt-card .bt-head{{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:15px}}
 .bt-card .bt-tag{{font-size:11px;color:var(--faint);background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2px 10px}}
 .bt-card .bt-curve{{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:6px;margin-top:10px}}
+/* 持仓跟踪 */
+.watch-bar{{display:flex;gap:10px;align-items:center;margin-bottom:12px}}
+.watch-bar input{{flex:1;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:8px 12px;font-size:13px;font-family:inherit}}
+.watch-bar button{{background:var(--accent);border:none;color:#fff;border-radius:10px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:inherit}}
+.watch-bar .count{{color:var(--faint);font-size:12px}}
+#watch-table .up{{color:#22c55e}} #watch-table .down{{color:#ef4444}} #watch-table .warn{{color:#f59e0b}}
 .bt-short{{background:var(--card2);border:1px dashed var(--border);border-radius:14px;padding:22px;text-align:center;margin-top:16px}}
 .bt-short h3{{margin:0 0 8px;color:var(--sub);font-size:15px}}
 .bt-short .sub{{color:var(--faint);font-size:12px;line-height:1.8}}
@@ -401,7 +419,8 @@ html = f"""<!doctype html>
   "view-short", "sys-short",
   "⚡ 全量池短线", "auto", f"全市场短线信号 Top 池（数据截至 {SHORT_POOL_ASOF}）：股票=反转信号 Top10（剔ST）｜ ETF=动量 Top10 ｜ 基金=动量 Top10 · 短线分 = 动量30/量价25/通道25/波动20 · 回测参考见「监控总览」",
   v9_short_items, "tbl-short", "card-tbl-short",
-  "短线分 = 动量30 + 量价25 + 通道25 + 波动20（A 股个股反转版）· 档位与中长线同口径 · 回测参考在监控总览视图")}
+  "短线分 = 动量30 + 量价25 + 通道25 + 波动20（A 股个股反转版）· 档位与中长线同口径 · 回测参考在监控总览视图",
+  extra_card=WATCH_CARD)}
 
 <!-- ============ 历史快照视图（右上角标的报告切换） ============ -->
 <div class="view" id="view-snapshot">
@@ -419,6 +438,7 @@ html = f"""<!doctype html>
 <button title="滚到底部" onclick="window.scrollTo({{top:document.body.scrollHeight,behavior:'smooth'}})">↓</button>
 </div>
 <script src="enhanced_data.js"></script>
+<script src="short_signals.js"></script>
 <script src="monitor/snapshots_index.js"></script>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
@@ -519,6 +539,39 @@ document.addEventListener('DOMContentLoaded',function(){{
   applyHash();   // 按 URL hash 定位视图（历史页跳转 dual_system.html#sys-auto 直接显示普适版）
   renderSubCurve();   // ETF/基金回测净值曲线
   renderReportMenu();
+  /* 持仓跟踪：localStorage 存代码 → 查 SHORT_SIGNALS 渲染状态（卖出规则与回测一致） */
+  function renderWatch(){{
+    var box=document.getElementById('watch-table');if(!box)return;
+    var codes=(localStorage.getItem('short_watchlist')||'').split(',').map(function(s){{return s.trim();}}).filter(Boolean);
+    var S=window.SHORT_SIGNALS;if(!S){{box.innerHTML='<div class="sub">信号数据未加载（缺 short_signals.js）</div>';return;}}
+    var topSet={{}};
+    if(window.SHORT_POOL){{Object.keys(window.SHORT_POOL.tiers||{{}}).forEach(function(g){{(window.SHORT_POOL.tiers[g]||[]).forEach(function(c){{topSet[c]=1;}});}});}}
+    var cnt=document.getElementById('watch-count');
+    if(cnt)cnt.textContent='跟踪 '+codes.length+' 只';
+    if(!codes.length){{box.innerHTML='<div class="sub" style="color:var(--faint)">未设置持仓 —— 在上方输入代码并保存，每天刷新后这里显示每只持仓的减仓/清仓信号</div>';return;}}
+    var h='<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>类型</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">短线分</th><th style="text-align:center">档位</th><th style="text-align:center">MA5</th><th style="text-align:center">建议动作</th></tr></thead><tbody>';
+    codes.forEach(function(code){{
+      var rec=null,grp='';
+      ['stock','etf','fund'].forEach(function(g){{if(S[g]&&S[g][code]){{rec=S[g][code];grp=g;}}}});
+      if(!rec){{h+='<tr><td>'+code+'</td><td colspan="8" style="color:var(--faint)">未找到该代码（检查输入 / 代码不在监控范围）</td></tr>';return;}}
+      var act,actCls;
+      if(rec.ma5_above===false){{act='⚠️ 次日卖出（破MA5）';actCls='down';}}
+      else if(rec.tier==='清仓'){{act='🔴 清仓';actCls='down';}}
+      else if(rec.tier==='减至半仓'){{act='🔴 减至半仓';actCls='down';}}
+      else if(!topSet[code]){{act='🔄 下次轮动换出';actCls='warn';}}
+      else if(rec.tier==='轻仓加仓'||rec.tier==='满仓加仓'){{act='✅ 继续持有';actCls='up';}}
+      else {{act='🟡 观望（不补不加）';actCls='warn';}}
+      var gName=grp==='stock'?'股票':(grp==='etf'?'ETF':'基金');
+      h+='<tr><td>'+code+'</td><td>'+rec.name+'</td><td>'+gName+'</td><td style="text-align:right">'+rec.px+'</td><td style="text-align:right" class="'+(rec.chg>0?'up':'down')+'">'+(rec.chg>0?'+':'')+rec.chg+'%</td><td style="text-align:center">'+rec.score+'</td><td style="text-align:center">'+rec.tier+'</td><td style="text-align:center">'+(rec.ma5_above?'✅ 上方':'⚠️ 下方')+'</td><td style="text-align:center" class="'+actCls+'">'+act+'</td></tr>';
+    }});
+    h+='</tbody></table>';
+    box.innerHTML=h;
+  }}
+  var ws=document.getElementById('watch-save');
+  if(ws){{ws.addEventListener('click',function(){{localStorage.setItem('short_watchlist',document.getElementById('watch-input').value);renderWatch();}});}}
+  var wi=document.getElementById('watch-input');
+  if(wi)wi.addEventListener('keydown',function(e){{if(e.key==='Enter'&&ws)ws.click();}});
+  renderWatch();
   /* 大卡片折叠：所有 .card 的标题可点击折叠/展开（.stock-card 小卡不受影响） */
   document.querySelectorAll('.card').forEach(function(card){{
     var h2=null;

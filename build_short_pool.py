@@ -146,6 +146,8 @@ def build():
     t0 = __import__("time").time()
     fnames = fund_names()
     print(f"基金名 {len(fnames)} 只 ({time.time()-t0:.0f}s)", flush=True)
+    global sig_stock, sig_etf, sig_fund
+    sig_stock, sig_etf, sig_fund = {}, {}, {}
 
     # 1) 股票反转 Top10（剔除 ST/*ST/S 股——反转信号选到 ST = 接飞刀）
     stock_pool = S.load_stock_pool()
@@ -163,8 +165,12 @@ def build():
         if pd.isna(sc):
             continue
         rows.append((code, float(sc), r, ddf))
+        sig_stock[code[-6:]] = {"name": nm, "px": round(float(r["close"]), 2),
+                                "chg": round(float(r["close"] / ddf["close"].iloc[-2] - 1) * 100, 2),
+                                "score": round(float(sc), 1), "tier": tier_of(float(sc)),
+                                "ma5_above": bool(not pd.isna(r.get("ma5", np.nan)) and r["close"] > r["ma5"])}
     rows.sort(key=lambda kv: -kv[1])
-    print(f"股票池 {len(stock_pool)} 只 → 反转分 Top10（剔 ST {len(stock_pool)-len(rows)} 只）({time.time()-t0:.0f}s)", flush=True)
+    print(f"股票池 {len(stock_pool)} 只 → 反转分 Top10（剔 ST/退市 {len(stock_pool)-len(rows)} 只）({time.time()-t0:.0f}s)", flush=True)
     stock_top = rows[:10]
 
     # 2) ETF 动量 Top10
@@ -178,6 +184,10 @@ def build():
         if pd.isna(sc):
             continue
         erows.append((code, float(sc), r, ddf))
+        sig_etf[code[-6:]] = {"name": NAMES.get(code, code[-6:]), "px": round(float(r["close"]), 2),
+                              "chg": round(float(r["close"] / ddf["close"].iloc[-2] - 1) * 100, 2),
+                              "score": round(float(sc), 1), "tier": tier_of(float(sc)),
+                              "ma5_above": bool(not pd.isna(r.get("ma5", np.nan)) and r["close"] > r["ma5"])}
     erows.sort(key=lambda kv: -kv[1])
     print(f"ETF 池 {len(etf_pool)} 只 → 动量分 Top10 ({time.time()-t0:.0f}s)", flush=True)
     etf_top = erows[:10]
@@ -193,6 +203,10 @@ def build():
         if pd.isna(sc):
             continue
         frows.append((code, float(sc), r, ddf))
+        sig_fund[code[-6:]] = {"name": fnames.get(code[-6:], code[-6:]), "px": round(float(r["close"]), 4),
+                               "chg": round(float(r["close"] / ddf["close"].iloc[-2] - 1) * 100, 2),
+                               "score": round(float(sc), 1), "tier": tier_of(float(sc)),
+                               "ma5_above": bool(not pd.isna(r.get("ma5", np.nan)) and r["close"] > r["ma5"])}
     frows.sort(key=lambda kv: -kv[1])
     print(f"基金池 {len(fund_pool)} 只 → 动量分 Top10 ({time.time()-t0:.0f}s)", flush=True)
     fund_top = frows[:10]
@@ -246,6 +260,11 @@ def build():
     json.dump(out, open(BASE / "short_pool.json", "w", encoding="utf-8"), ensure_ascii=False, indent=2)
     with open(BASE / "short_pool.js", "w", encoding="utf-8") as f:
         f.write("window.SHORT_POOL = " + json.dumps(out, ensure_ascii=False) + ";")
+    # 全市场精简信号（持仓跟踪：股票/ETF/基金全部标的的短线状态）
+    sigs = {"as_of": out["as_of"], "stock": sig_stock, "etf": sig_etf, "fund": sig_fund}
+    with open(BASE / "short_signals.js", "w", encoding="utf-8") as f:
+        f.write("window.SHORT_SIGNALS = " + json.dumps(sigs, ensure_ascii=False) + ";")
+    print(f"全市场信号 {len(sig_stock)}+{len(sig_etf)}+{len(sig_fund)} 只 → short_signals.js", flush=True)
     print(f"\n短线信号池完成 ({time.time()-t0:.0f}s): 股票10 + ETF10 + 基金10, 数据截至 {out['as_of']}")
     for grp, codes in order.items():
         for c in codes:
