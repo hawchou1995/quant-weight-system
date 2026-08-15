@@ -1,45 +1,24 @@
 # -*- coding: utf-8 -*-
-"""
-v8 ETF 回测独立脚本（自包含，生产版）
-======================================
-ETF 池：data_full sh5/sz1 开头，清洗除权跳变（单日 >25%）
-参数：Top20 / H42 / 择时 / 止损15% / 波动<60% / 最低价 0.5 / 成交额 100 万
-输出：v8_etf_equity.csv / v8_etf_trades.csv / v8_etf_summary.json
-"""
-import sys, json, time, csv
+"""ETF/基金池优化实验：对齐股票池风控强度，扫描参数找更优组合。
+ETF：TopN × 轮动周期 × 止损 × 择时窗口
+基金：TopN × 轮动周期 × 净值止损 × 择时窗口"""
+import sys, json, time
 from pathlib import Path
-import numpy as np
 import pandas as pd
+import numpy as np
 
-BASE = Path(__file__).parent
+BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
 sys.path.insert(0, str(BASE))
 import v8_selector as V
 
+# ---------- ETF 优化 ----------
+def build_etf_pool_fast():
+    """复用 v8_etf_run 的池（避免重复构建）"""
+    import v8_etf_run as E
+    return E.build_etf_pool()
 
-def build_etf_pool():
-    pool = {}
-    for f in sorted((BASE / "data_full").glob("*.csv")):
-        code = f.stem
-        if not (code.startswith("sh5") or code.startswith("sz1")):
-            continue
-        try:
-            df = pd.read_csv(f, dtype={"date": str})
-            df["date"] = pd.to_datetime(df["date"])
-            df = df.sort_values("date").reset_index(drop=True)
-            if len(df) < 400:
-                continue
-            if df["close"].pct_change().abs().max() > 0.25:
-                continue
-            df = V.compute_factors_full(df).set_index("date")
-            pool[code] = df
-        except Exception:
-            continue
-    return pool
-
-
-def run_etf(pool, top_n=8, hold_days=126, use_timing=True, stop_loss=0.10,
-            min_price=0.5, max_vol=0.60, min_amt=1e6, ma_win=150):
-    """ETF 版主循环（自包含，mark-to-market 末日兜底）"""
+def run_etf_params(pool, top_n, hold_days, stop_loss, ma_win, min_price=0.5, max_vol=0.60, min_amt=1e6):
+    """ETF 参数化回测（复制原版 v8_etf_run 逻辑，仅 ma_win 可调）"""
     idx = V.load_index(ma_win).set_index("date")
     in_market_map = idx["in_market"].to_dict()
     all_days = [d for d in idx.index if V.START <= str(d.date()) <= V.END]
@@ -49,10 +28,9 @@ def run_etf(pool, top_n=8, hold_days=126, use_timing=True, stop_loss=0.10,
     equity_curve, trades = [], []
     pending_sell, pending_buy = set(), []
     last_close = {}
-
     for di, day in enumerate(all_days):
         dstr = str(day.date())
-        in_market = in_market_map.get(day, False) if use_timing else True
+        in_market = in_market_map.get(day, False)
         if stop_loss and holdings:
             for code in list(holdings.keys()):
                 ddf = pool.get(code)
@@ -147,7 +125,7 @@ def run_etf(pool, top_n=8, hold_days=126, use_timing=True, stop_loss=0.10,
             if px:
                 port_value += sh * px
         equity_curve.append({"date": dstr, "value": round(port_value, 2)})
-
+    # 期末强制平仓（末日兜底，与 summary 口径一致）
     if holdings:
         last_day = all_days[-1]
         for code, sh in holdings.items():
@@ -170,33 +148,70 @@ def run_etf(pool, top_n=8, hold_days=126, use_timing=True, stop_loss=0.10,
                            "pnl_pct": round((px / entry_price[code] - 1) * 100, 2),
                            "holding_bars": (last_day - entry_date[code]).days,
                            "symbol": code, "symbol_name": code, "display_symbol": code})
-            cash += proceeds
-        holdings = {}
-    return pd.DataFrame(equity_curve), trades
+    eq = pd.DataFrame(equity_curve)
+    return eq, trades
 
+def etf_opt():
+    pool = build_etf_pool_fast()
+    print(f"ETF 池 {len(pool)} 只", flush=True)
+    cases = [
+        ("baseline_T20_H42_SL15_MA200", dict(top_n=20, hold_days=42, stop_loss=0.15, ma_win=200)),
+        ("T10_H126_SL10_MA150",         dict(top_n=10, hold_days=126, stop_loss=0.10, ma_win=150)),
+        ("T10_H126_SL08_MA150",         dict(top_n=10, hold_days=126, stop_loss=0.08, ma_win=150)),
+        ("T10_H126_SL10_MA120",         dict(top_n=10, hold_days=126, stop_loss=0.10, ma_win=120)),
+        ("T12_H126_SL10_MA150",         dict(top_n=12, hold_days=126, stop_loss=0.10, ma_win=150)),
+        ("T10_H168_SL10_MA150",         dict(top_n=10, hold_days=168, stop_loss=0.10, ma_win=150)),
+        ("T10_H126_SL12_MA150",         dict(top_n=10, hold_days=126, stop_loss=0.12, ma_win=150)),
+        ("T8_H126_SL10_MA150",          dict(top_n=8, hold_days=126, stop_loss=0.10, ma_win=150)),
+        ("T10_H126_SL10_MA180",         dict(top_n=10, hold_days=126, stop_loss=0.10, ma_win=180)),
+        ("T15_H126_SL12_MA150",         dict(top_n=15, hold_days=126, stop_loss=0.12, ma_win=150)),
+    ]
+    res = {}
+    for label, kw in cases:
+        t0 = time.time()
+        eq, tr = run_etf_params(pool, **kw)
+        s = V.summary(eq, tr)
+        res[label] = s
+        print(f"{label}: 收益 {s['total_return_pct']}% | 年化 {s['annual_return_pct']}% | 回撤 {s['max_drawdown_pct']}% | 夏普 {s['sharpe']} | 交易 {s['total_trades']} ({time.time()-t0:.0f}s)", flush=True)
+    json.dump(res, open(BASE / "etf_opt_results.json", "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    return res
 
 if __name__ == "__main__":
-    t0 = time.time()
-    pool = build_etf_pool()
-    print(f"ETF 池: {len(pool)} 只（清洗后）", flush=True)
-    eq, trades = run_etf(pool)
-    s = V.summary(eq, trades)
-    print(f"ETF v8 T8/H126/MA150/SL10: 收益 {s['total_return_pct']}% | 年化 {s['annual_return_pct']}% "
-          f"| 回撤 {s['max_drawdown_pct']}% | 夏普 {s['sharpe']} | 胜率 {s['win_rate_pct']}% | 交易 {s['total_trades']} "
-          f"({time.time()-t0:.0f}s)", flush=True)
-    eq.to_csv(BASE / "v8_etf_equity.csv", index=False)
-    with open(BASE / "v8_etf_trades.csv", "w", encoding="utf-8", newline="") as f:
-        w = csv.writer(f)
-        keys = ["entry_date", "exit_date", "side", "size", "entry_price", "exit_price",
-                "pnl", "pnl_pct", "holding_bars", "symbol", "symbol_name", "display_symbol"]
-        w.writerow(keys)
-        for t in trades:
-            w.writerow([t.get(k, "") for k in keys])
-    with open(BASE / "v8_etf_summary.json", "w", encoding="utf-8") as f:
-        json.dump({"meta": {"strategy_name": "v8 ETF 中长线看板（T8/H126/MA150/SL10）",
-                            "symbol": "全量 ETF 截面选股 Top8", "start": V.START, "end": V.END,
-                            "initial_cash": 1000000.0,
-                            "window_start_value": float(eq["value"].iloc[0]),
-                            "final_value": float(eq["value"].iloc[-1]), "market": "china_a"},
-                   "summary": s}, f, ensure_ascii=False, indent=2)
-    print("已输出 v8_etf_equity.csv / v8_etf_trades.csv / v8_etf_summary.json")
+    r = etf_opt()
+    best = max(r.items(), key=lambda kv: kv[1]["sharpe"])
+    print("BEST:", best[0], best[1])
+
+# ---------- 基金优化 ----------
+def fund_opt():
+    """基金参数扫描（复用 v8_fund_v5 逻辑：净值动量 TopN + MA 择时 + 净值止损）"""
+    import v8_fund_v5 as F
+    # v8_fund_v5 已有 run_case；直接扫描关键参数
+    cases = [
+        ("F_base_ma100", dict(top_n=10, hold_days=126, ma_window=100)),
+        ("F_ma100_ns15", dict(top_n=10, hold_days=126, ma_window=100, nav_stop=0.15)),
+        ("F_ma100_ns20", dict(top_n=10, hold_days=126, ma_window=100, nav_stop=0.20)),
+        ("F_ma120_ns15", dict(top_n=10, hold_days=126, ma_window=120, nav_stop=0.15)),
+        ("F_ma100_t8",   dict(top_n=8, hold_days=126, ma_window=100, nav_stop=0.15)),
+        ("F_ma100_t15",  dict(top_n=15, hold_days=126, ma_window=100, nav_stop=0.15)),
+        ("F_ma80_ns15",  dict(top_n=10, hold_days=126, ma_window=80, nav_stop=0.15)),
+        ("F_ma100_ns15_h84", dict(top_n=10, hold_days=84, ma_window=100, nav_stop=0.15)),
+    ]
+    import json as _j
+    res = {}
+    for label, kw in cases:
+        try:
+            eq, tr = F.run_fund_v5(**kw)
+            s = V.summary(eq, tr)
+            res[label] = s
+            print(f"{label}: 收益 {s['total_return_pct']}% | 年化 {s['annual_return_pct']}% | 回撤 {s['max_drawdown_pct']}% | 夏普 {s['sharpe']} | 交易 {s['total_trades']}", flush=True)
+        except Exception as e:
+            print(label, "ERR", str(e)[:80], flush=True)
+    _j.dump(res, open(BASE / "fund_opt_results.json", "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    return res
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == "fund":
+        r = fund_opt()
+        best = max(r.items(), key=lambda kv: kv[1]["sharpe"])
+        print("BEST:", best[0], best[1])

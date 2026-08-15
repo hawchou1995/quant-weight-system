@@ -1,20 +1,20 @@
 {
   "meta": {
-    "strategy_name": "v8 ETF 独立看板（Top10/半年轮动/6月动量）",
-    "symbol": "全量 ETF 截面选股 Top10",
+    "strategy_name": "v8 ETF 中长线看板（T8/H126/MA150/SL10）",
+    "symbol": "全量 ETF 截面选股 Top8",
     "start": "2016-01-04",
     "end": "2026-08-14",
     "initial_cash": 1000000.0,
     "window_start_value": 1000000.0,
-    "final_value": 2650697.74,
+    "final_value": 1864811.66,
     "market": "china_a"
   },
   "summary": {
-    "total_return_pct": 165.07,
-    "annual_return_pct": 9.62,
-    "max_drawdown_pct": -20.67,
-    "sharpe": 0.736,
-    "win_rate_pct": 67.0,
-    "total_trades": 103
+    "total_return_pct": 86.48,
+    "annual_return_pct": 6.05,
+    "max_drawdown_pct": -19.14,
+    "sharpe": 0.565,
+    "win_rate_pct": 62.2,
+    "total_trades": 82
   }
 }
