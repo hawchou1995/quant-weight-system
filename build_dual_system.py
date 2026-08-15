@@ -450,7 +450,7 @@ html = f"""<!doctype html>
 <script src="monitor/snapshots_index.js"></script>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
-window.ENH.nav = [["overview","📊","监控总览"],["sys-auto","🅰️","全量池中/长线"],["sys-lite","🅱️","固定池中/长线"],["short","⚡","全量池短线"]];
+window.ENH.nav = [["overview","📊","监控总览"],["sys-auto","🅰️","全量池中/长线"],["sys-lite","🅱️","固定池中/长线"],["short","⚡","全量池短线"],["review","📋","复盘日志"],["changelog","📝","更新日志"]];
 /* 视图切换模式：滚动不更新导航高亮（COMMON_JS renderSidenav 检测此标志） */
 window.ENH.NAV_SWITCH = true;
 /* 三池回测净值（股票/ETF/基金，监控总览展示） */
@@ -507,6 +507,8 @@ function renderSubCurve(){{
 /* 视图切换（hash 驱动：切换时更新 location.hash，加载/前进后退时按 hash 定位） */
 var VIEW_MAP={{'overview':'view-overview','sys-auto':'view-auto','sys-lite':'view-lite','short':'view-short','snapshot':'view-snapshot'}};
 function switchView(key){{
+  if(key==='review'){{window.location.href='review_log.html';return;}}
+  if(key==='changelog'){{window.location.href='changelog.html';return;}}
   var v=VIEW_MAP[key];if(!v)return;
   document.querySelectorAll('.view').forEach(function(x){{x.classList.remove('active');}});
   document.getElementById(v).classList.add('active');

@@ -60,12 +60,16 @@ def main():
     print("== 4/5 监控看板重建 ==", flush=True)
     run([PY, str(BASE / "build_dual_system.py")])
 
-    print("== 5/5 快照归档 + 月度报告 ==", flush=True)
+    print("== 5/6 快照归档 + 月度报告 ==", flush=True)
     run([PY, str(BASE / "build_snapshots.py")])
     run([PY, str(BASE / "build_monitor_reports.py")])
 
+    print("== 6/6 当日复盘（信号 → T+1 结果，缺陷检测）==", flush=True)
+    run([PY, str(BASE / "review_daily.py")])
+    run([PY, str(BASE / "build_log_pages.py")])
+
     print(f"\n✅ 刷新完成，总耗时 {(time.time()-t0)/60:.1f} 分钟", flush=True)
-    print("下一步：浏览器打开 dual_system.html →「⚡ 全量池短线」查看最新信号", flush=True)
+    print("下一步：浏览器打开 dual_system.html →「⚡ 全量池短线」查看最新信号；「📋 复盘日志」查看当日复盘", flush=True)
 
 
 if __name__ == "__main__":

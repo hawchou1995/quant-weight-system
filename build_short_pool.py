@@ -7,7 +7,7 @@
 输出：short_pool.js（window.SHORT_POOL）+ short_pool.json
 详情复用 80 只 details 的行业/名称（命中），未命中用兜底；雷达六类 = 短线因子
 """
-import sys, json, math, re
+import sys, json, math, re, time
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -148,7 +148,8 @@ def rsi14(close):
     rs = up / dn.replace(0, np.nan)
     return 100 - 100 / (1 + rs)
 
-def build():
+def calc_signals(as_of=None):
+    """计算短线信号池（as_of=指定信号日，默认最新交易日）；返回 (out, sigs)，不写文件"""
     t0 = __import__("time").time()
     fnames = fund_names()
     print(f"基金名 {len(fnames)} 只 ({time.time()-t0:.0f}s)", flush=True)
@@ -159,7 +160,12 @@ def build():
     stock_pool = S.load_stock_pool()
     rows = []
     for code, ddf in stock_pool.items():
-        r = ddf.iloc[-1]
+        if as_of is not None:
+            if as_of not in ddf.index:
+                continue
+            r = ddf.loc[as_of]
+        else:
+            r = ddf.iloc[-1]
         if pd.isna(r["close"]) or r["close"] <= 0 or pd.isna(r["mom20"]):
             continue
         nm = NAMES.get(code, code[-6:])
@@ -171,8 +177,9 @@ def build():
         if pd.isna(sc):
             continue
         rows.append((code, float(sc), r, ddf))
+        _tail2 = ddf.loc[:as_of] if as_of is not None else ddf
         sig_stock[code[-6:]] = {"name": nm, "px": round(float(r["close"]), 2),
-                                "chg": round(float(r["close"] / ddf["close"].iloc[-2] - 1) * 100, 2),
+                                "chg": round(float(r["close"] / (_tail2["close"].iloc[-2] if as_of else ddf["close"].iloc[-2]) - 1) * 100, 2),
                                 "score": round(float(sc), 1), "tier": tier_of(float(sc)),
                                 "ma5_above": bool(not pd.isna(r.get("ma5", np.nan)) and r["close"] > r["ma5"])}
     rows.sort(key=lambda kv: -kv[1])
@@ -183,15 +190,21 @@ def build():
     etf_pool = S.load_etf_pool()
     erows = []
     for code, ddf in etf_pool.items():
-        r = ddf.iloc[-1]
+        if as_of is not None:
+            if as_of not in ddf.index:
+                continue
+            r = ddf.loc[as_of]
+        else:
+            r = ddf.iloc[-1]
         if pd.isna(r["close"]) or r["close"] <= 0 or pd.isna(r["mom20"]):
             continue
         sc = S.short_score(r, reversal=False)
         if pd.isna(sc):
             continue
         erows.append((code, float(sc), r, ddf))
+        _tail2 = ddf.loc[:as_of] if as_of is not None else ddf
         sig_etf[code[-6:]] = {"name": NAMES.get(code, code[-6:]), "px": round(float(r["close"]), 2),
-                              "chg": round(float(r["close"] / ddf["close"].iloc[-2] - 1) * 100, 2),
+                              "chg": round(float(r["close"] / (_tail2["close"].iloc[-2] if as_of else ddf["close"].iloc[-2]) - 1) * 100, 2),
                               "score": round(float(sc), 1), "tier": tier_of(float(sc)),
                               "ma5_above": bool(not pd.isna(r.get("ma5", np.nan)) and r["close"] > r["ma5"])}
     erows.sort(key=lambda kv: -kv[1])
@@ -202,15 +215,21 @@ def build():
     fund_pool = S.load_fund_pool(3000)
     frows = []
     for code, ddf in fund_pool.items():
-        r = ddf.iloc[-1]
+        if as_of is not None:
+            if as_of not in ddf.index:
+                continue
+            r = ddf.loc[as_of]
+        else:
+            r = ddf.iloc[-1]
         if pd.isna(r["close"]) or r["close"] <= 0 or pd.isna(r["mom20"]):
             continue
         sc = S.short_score(r, reversal=False)
         if pd.isna(sc):
             continue
         frows.append((code, float(sc), r, ddf))
+        _tail2 = ddf.loc[:as_of] if as_of is not None else ddf
         sig_fund[code[-6:]] = {"name": fnames.get(code[-6:], code[-6:]), "px": round(float(r["close"]), 4),
-                               "chg": round(float(r["close"] / ddf["close"].iloc[-2] - 1) * 100, 2),
+                               "chg": round(float(r["close"] / (_tail2["close"].iloc[-2] if as_of else ddf["close"].iloc[-2]) - 1) * 100, 2),
                                "score": round(float(sc), 1), "tier": tier_of(float(sc)),
                                "ma5_above": bool(not pd.isna(r.get("ma5", np.nan)) and r["close"] > r["ma5"])}
     frows.sort(key=lambda kv: -kv[1])
@@ -238,9 +257,10 @@ def build():
             else:
                 industry = STK_IND.get(bare, "综合")
         px = float(r["close"])
-        chg = float(ddf["close"].iloc[-1] / ddf["close"].iloc[-2] - 1) * 100 if len(ddf) >= 2 else None
-        ret_1y = float(px / ddf["close"].iloc[-252] - 1) * 100 if len(ddf) > 252 else None
-        rsi = float(rsi14(ddf["close"]).iloc[-1]) if len(ddf) > 20 else None
+        _tail = ddf.loc[:as_of] if as_of is not None else ddf
+        chg = float(_tail["close"].iloc[-1] / _tail["close"].iloc[-2] - 1) * 100 if len(_tail) >= 2 else None
+        ret_1y = float(px / _tail["close"].iloc[-252] - 1) * 100 if len(_tail) > 252 else None
+        rsi = float(rsi14(_tail["close"]).iloc[-1]) if len(_tail) > 20 else None
         comp = comp_short(r, "股票" if board in ("主板", "创业板", "科创板") else board)
         radar = svg_radar(comp, sc)
         details[bare] = {
@@ -262,22 +282,27 @@ def build():
     order = {"股票": [c[-6:] for c, _, _, _ in stock_top],
              "ETF": [c[-6:] for c, _, _, _ in etf_top],
              "基金": [c[-6:] for c, _, _, _ in fund_top]}
-    out = {"as_of": str(ddf.index[-1].date()), "details": details, "tiers": order}
+    _eff = as_of if as_of is not None else str(ddf.index[-1].date())
+    out = {"as_of": _eff, "details": details, "tiers": order}
+    sigs = {"as_of": out["as_of"], "stock": sig_stock, "etf": sig_etf, "fund": sig_fund}
+    return out, sigs
+
+
+def build(as_of=None):
+    """计算并写文件（short_pool.js / short_signals.js / short_pool.json）"""
+    out, sigs = calc_signals(as_of)
     json.dump(out, open(BASE / "short_pool.json", "w", encoding="utf-8"), ensure_ascii=False, indent=2)
     with open(BASE / "short_pool.js", "w", encoding="utf-8") as f:
         f.write("window.SHORT_POOL = " + json.dumps(out, ensure_ascii=False) + ";")
-    # 全市场精简信号（持仓跟踪：股票/ETF/基金全部标的的短线状态）
-    sigs = {"as_of": out["as_of"], "stock": sig_stock, "etf": sig_etf, "fund": sig_fund}
     with open(BASE / "short_signals.js", "w", encoding="utf-8") as f:
         f.write("window.SHORT_SIGNALS = " + json.dumps(sigs, ensure_ascii=False) + ";")
     print(f"全市场信号 {len(sig_stock)}+{len(sig_etf)}+{len(sig_fund)} 只 → short_signals.js", flush=True)
-    print(f"\n短线信号池完成 ({time.time()-t0:.0f}s): 股票10 + ETF10 + 基金10, 数据截至 {out['as_of']}")
-    for grp, codes in order.items():
-        for c in codes:
-            d = details[c]
-            print(f"  {grp} {c} {d['name']}: 短线分 {d['short_score']} ({d['short_tier']}) | {d['industry']}")
 
 if __name__ == "__main__":
     import time
     time = __import__("time")
-    build()
+    import argparse
+    _ap = argparse.ArgumentParser()
+    _ap.add_argument("--as-of", default=None, help="信号日 YYYY-MM-DD（默认最新交易日）")
+    _args = _ap.parse_args()
+    build(as_of=_args.as_of)
