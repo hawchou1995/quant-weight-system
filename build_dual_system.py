@@ -32,17 +32,26 @@ for tier, codes in v9_tiers.items():
         row["perm"] = tier          # 行级档位（main/gem/star/etf/fund），覆盖数据默认
         v9_items.append(row)
 v9_items.sort(key=lambda d: -d["score"])
-# 短线视角（v5.8）：同一标的池，分数/档位换短线口径（股票反转版 / ETF·基金动量版）
-v9_short_items = []
-for d in v9_items:
-    row = dict(d)
-    row["score"] = d.get("short_score", d["score"])
-    row["score_prev"] = None
-    row["tier"] = d.get("short_tier", d["tier"])
-    row["tier_prev"] = None
-    row["is_short"] = True
-    v9_short_items.append(row)
-v9_short_items.sort(key=lambda d: -d["score"])
+# 短线信号池（v5.10）：全市场最新交易日短线分 Top 池（股票反转10 + ETF动量10 + 基金动量10）
+try:
+    _sp_js = open(BASE / "short_pool.js", encoding="utf-8").read()
+    SHORT_POOL = json.loads(_sp_js[len("window.SHORT_POOL = "):-1])
+    _sp_items = []
+    for _grp in ("股票", "ETF", "基金"):
+        for _c in SHORT_POOL["tiers"].get(_grp, []):
+            _d = SHORT_POOL["details"].get(_c)
+            if _d:
+                _row = dict(_d)
+                _row["score"] = _d["short_score"]
+                _row["tier"] = _d["short_tier"]
+                _row["is_short"] = True
+                _sp_items.append(_row)
+    v9_short_items = _sp_items
+    SHORT_POOL_ASOF = SHORT_POOL.get("as_of", "—")
+except Exception as _e:
+    print("short_pool 加载失败:", _e)
+    v9_short_items = []
+    SHORT_POOL_ASOF = "—"
 # 个人版按板块分组（用户固定池）
 v8_main = [d for d in v8_items if d["perm"] == "main"]
 v8_etf  = [d for d in v8_items if d["perm"] == "etf"]
@@ -390,7 +399,7 @@ html = f"""<!doctype html>
 <!-- ============ 视图 C：全量池短线（与中长线同结构：统计条+表格+雷达卡） ============ -->
 {system_block(
   "view-short", "sys-short",
-  "⚡ 全量池短线", "auto", "全市场自动池（同全量池中/长线标的）· 短线视角 ｜ 股票=反转信号 / ETF·基金=动量信号 · 布林收窄+MA5生命线 · 回测参考见「监控总览」",
+  "⚡ 全量池短线", "auto", f"全市场短线信号 Top 池（数据截至 {SHORT_POOL_ASOF}）：股票=反转信号 Top10（剔ST）｜ ETF=动量 Top10 ｜ 基金=动量 Top10 · 短线分 = 动量30/量价25/通道25/波动20 · 回测参考见「监控总览」",
   v9_short_items, "tbl-short", "card-tbl-short",
   "短线分 = 动量30 + 量价25 + 通道25 + 波动20（A 股个股反转版）· 档位与中长线同口径 · 回测参考在监控总览视图")}
 
@@ -534,8 +543,9 @@ document.addEventListener('DOMContentLoaded',function(){{
   }});
   initTable('tbl-v9', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});
   initTable('tbl-v8', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});
+  initTable('tbl-short', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});
   /* 统一联动：搜索 + 板块/行业/档位筛选 → 表格行 + 详情卡片同步；排序后卡片重排 */
-  ['tbl-v9','tbl-v8'].forEach(function(id){{
+  ['tbl-v9','tbl-v8','tbl-short'].forEach(function(id){{
     var q=document.getElementById(id+'-q'), mk=document.getElementById(id+'-mk');
     var ind=document.getElementById(id+'-ind'), tier=document.getElementById(id+'-tier');
     var cardsBox=document.getElementById(id+'-cards');
