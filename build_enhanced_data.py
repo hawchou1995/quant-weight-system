@@ -48,12 +48,28 @@ BIZ = {
     # 基金
     '008254': 'QDII混合', '018036': '新能源车主题', '002891': '移动互联主题',
     '024239': '全球QDII', '014002': '智能科技主题', '020900': '通信设备主题',
+    # 普适版新选股票/ETF/基金（补全行业）
+    '600353': '电子元件', '600397': '军工装备', '300814': 'PCB', '300903': 'PCB', '301328': '连接器',
+    '000742': '均衡配置', '001060': '高端装备', '001198': '灵活配置', '001411': '科技成长',
+    '001470': '灵活配置', '001723': '成长混合', '001759': '成长混合', '002051': '科技成长',
+    '002163': '灵活配置', '002289': '改革成长',
 }
 
-# 基金名称（data_hist 净值，data_full_names 无基金名）
+# 基金名称（data_hist/fund_nav_cache 净值，data_full_names 无基金名；普适版基金为全市场 Top10）
 FUND_NAMES = {
     '008254': '华宝致远混合C', '018036': '长城新能源车股C', '002891': '华夏移动互联CNY',
     '024239': '华夏全球QDII C', '014002': '浦银智能科技C', '020900': '天弘通信设备C',
+    '000742': '国泰新经济混合A', '001060': '前海开源高端装备A', '001198': '东方惠新混合A',
+    '001411': '诺安创新驱动A', '001470': '融通通鑫混合', '001723': '华商新动力A',
+    '001759': '嘉实成长增强混合', '002051': '诺安创新驱动C', '002163': '东方惠新混合C',
+    '002289': '华商改革创新股票A',
+}
+
+# 普适版 ETF 行业（按名称推断，从 etf_top_pool 名称映射）
+ETF_INDUSTRY = {
+    '159502': '标普生物科技', '513290': '纳指生物科技', '159513': '纳斯达克100',
+    '512990': 'MSCI中国A股', '159517': '中证800增强', '515160': 'MSCI中国',
+    '159655': '标普500', '159620': '中证500成长', '561950': '中证500增强',
 }
 
 def tier(sc):
@@ -81,10 +97,10 @@ def rsi14(close, n=14):
     return 100 - 100 / (1 + up / dn.replace(0, np.nan))
 
 # ---------------- 六类雷达图（模板风格：趋势/动能/量能/超买/风控/研报） ----------------
-def svg_radar(comp, score, size=104):
-    """六角雷达，与模板 monitor/render_dashboard.py svg_radar_light 一致"""
+def svg_radar(comp, score, size=120):
+    """六角雷达，与模板 monitor/render_dashboard.py svg_radar_light 一致（size 增大防标签截断）"""
     cx = cy = size / 2
-    R = size * 0.36
+    R = size * 0.34
     cats = ["trend", "momentum", "volume", "osc", "risk", "news"]
     labels = ["趋势", "动能", "量能", "超买", "风控", "研报"]
     angles = [math.radians(i * 60 - 90) for i in range(6)]
@@ -112,11 +128,15 @@ def svg_radar(comp, score, size=104):
     for i in range(6):
         xr, yr = pt(R * max(3, min(100, vals[i])) / 100, angles[i])
         parts.append(f'<circle cx="{xr:.1f}" cy="{yr:.1f}" r="2.5" fill="{stroke}"/>')
-        lx, ly = pt(R * 1.22, angles[i])
-        anchor = "middle"
-        if abs(math.cos(angles[i])) > 0.7:
-            anchor = "start" if lx > cx else "end"
-        parts.append(f'<text x="{lx:.1f}" y="{ly:.1f}" style="fill:var(--radar-label)" font-size="8" text-anchor="{anchor}" font-weight="600">{labels[i]}</text>')
+        lx, ly = pt(R * 1.42, angles[i])
+        # 标签防截断：左右标签居中显示（不贴边延伸），上下标签 y 偏移留边距
+        if i in (0, 3):
+            anchor = "middle"
+            dy = 4 if i == 0 else -2
+        else:
+            anchor = "middle"
+            dy = 0
+        parts.append(f'<text x="{lx:.1f}" y="{ly + dy:.1f}" style="fill:var(--radar-label)" font-size="8" text-anchor="{anchor}" font-weight="600">{labels[i]}</text>')
     parts.append(f'<text x="{cx:.1f}" y="{cy+1:.1f}" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">{score:.1f}</text>')
     parts.append(f'<text x="{cx:.1f}" y="{cy+13:.1f}" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text>')
     return f'<svg viewBox="0 0 {size} {size}" style="width:{size}px;height:{size}px;flex:0 0 auto">{chr(10).join(parts)}</svg>'
@@ -182,12 +202,26 @@ MAIN_CODES = ['300502','300308','600498','601138','002463','002384','600183','30
 ETFS = ['159516','515880','516150','560390','159841']
 FUNDS = ['008254','018036','002891','024239','014002','020900']
 
-# 普适版自动池：按权限分层，从全市场 v9 规则各取 Top10（main 主板10 / gem 主板+创业板10 / star 全A 10）
-def v9_rank_by_perm(perm, top_n=10, mom_min=0.25, score_min=65, rsi_max=85):
-    """v9 完整筛池规则（与 run_auto 一致），按权限取 TopN"""
+# 普适版自动池：按板块互补分层（main 主板10 / gem 创业板10 / star 科创板10 / etf 10 / fund 10），
+# 档间不重复，与个人版池也不重复——每档恰好 10 只唯一标的
+def _is_board(code, board):
+    """精确板块判断（股票）"""
+    if board == "main":
+        return code.startswith(("sh60", "sz00", "sz002"))
+    if board == "gem":
+        return code.startswith("sz30")
+    if board == "star":
+        return code.startswith(("sh688", "sh689"))
+    return False
+
+def v9_rank_board(board, top_n=10, exclude=(), mom_min=0.25, score_min=65):
+    """按板块互补取 TopN（v9 规则），exclude=已占用裸代码（去重，支持 sh600xxx 与 600xxx 混用）"""
+    excl = {c[-6:] for c in exclude}
     cand = []
     for code, ddf in A.pool_all.items():
-        if not A.board_filter(code, perm):
+        if code[-6:] in excl:
+            continue
+        if not _is_board(code, board):
             continue
         if last_day not in ddf.index:
             continue
@@ -209,17 +243,21 @@ def v9_rank_by_perm(perm, top_n=10, mom_min=0.25, score_min=65, rsi_max=85):
     cand.sort(key=lambda kv: -kv[1])
     return [c for c, _ in cand[:top_n]]
 
-V9_MAIN = v9_rank_by_perm("main", 10)   # 主板 10 只
-V9_GEM  = v9_rank_by_perm("gem", 10)    # 主板+创业板 10 只
-V9_STAR = v9_rank_by_perm("star", 10)   # 全A 10 只
-# 普适版 ETF Top10（全市场 ETF 四因子打分，无权限限制）
+# 个人版已占用标的（普适版避开，杜绝两表重复）
+_v8_used = set(MAIN_CODES) | set(ETFS) | set(FUNDS)
+
+# 按板块互补取 Top10（档间 + 与个人版均不重复）
+V9_MAIN = v9_rank_board("main", 10, exclude=_v8_used)       # 主板 10
+V9_GEM  = v9_rank_board("gem", 10, exclude=_v8_used | set(V9_MAIN))   # 创业板 10
+V9_STAR = v9_rank_board("star", 10, exclude=_v8_used | set(V9_MAIN) | set(V9_GEM))  # 科创板 10
+# 普适版 ETF Top10（避开个人版 5 只 ETF）
 _etf_pool = json.load(open(BASE / "etf_top_pool.json", encoding="utf-8"))
-V9_ETF = [x["code"] for x in _etf_pool["top"][:10]]
-# 普适版基金 Top10（全市场基金净值打分，无权限限制；从缓存读，若不存在则回退用户 6 只）
+V9_ETF = [x["code"] for x in _etf_pool["top"] if x["code"] not in ETFS][:10]
+# 普适版基金 Top10（避开个人版 6 只基金；从缓存读）
 _fund_pool_f = BASE / "fund_top_pool.json"
 if _fund_pool_f.exists():
     _fund_pool = json.load(open(_fund_pool_f, encoding="utf-8"))
-    V9_FUND = [x["code"] for x in _fund_pool["top"][:10]]
+    V9_FUND = [x["code"] for x in _fund_pool["top"] if x["code"] not in FUNDS][:10]
 else:
     V9_FUND = FUNDS[:]
 # 普适版分层清单（股票按权限 + ETF + 基金，供监控表按类型/权限过滤）
@@ -320,12 +358,16 @@ for c in ALL_CODES:
         return [{"e": str(x["entry_date"]), "x": str(x["exit_date"]),
                  "pct": round(float(x["pnl_pct"]), 1), "days": int(x["holding_bars"])}
                 for _, x in df.iterrows()]
+    _board = ("基金" if (c in FUNDS or c in V9_FUND) else ("ETF" if (k.startswith(("sh5", "sz1")) or c in V9_ETF) else ("创业板" if c.startswith("30") else ("科创板" if k.startswith("sh688") else "主板"))))
+    _industry = ETF_INDUSTRY.get(c) or INDUSTRY.get(c)
+    if not _industry:
+        _industry = {"基金": "场外基金", "ETF": "指数基金"}.get(_board, "股票")
     details[c] = {
         "code": c, "key": k, "name": FUND_NAMES.get(c, names.get(k, c)),
         "pool": POOL_TAG.get(c, "v8"),   # v8=个人版自选池 / v9=普适版自动池
         "perm": PERM_OF.get(c, "main"),  # main/gem/star/etf/fund 权限档
-        "board": ("基金" if (c in FUNDS or c in V9_FUND) else ("ETF" if (k.startswith(("sh5", "sz1")) or c in V9_ETF) else ("创业板" if c.startswith("30") else ("科创板" if k.startswith("sh688") else "主板")))),
-        "industry": INDUSTRY.get(c, "—"), "biz": BIZ.get(c, "—"),
+        "board": _board,
+        "industry": _industry, "biz": BIZ.get(c, "—"),
         "px": round(px, 2), "chg": round(chg, 2) if chg is not None else None,
         "ret_1y": round(ret_1y, 1) if ret_1y is not None else None,
         "score": round(sc_now, 1), "score_prev": round(sc_prev, 1) if sc_prev is not None else None,

@@ -81,7 +81,7 @@ def rows_html_for(items):
         rsi_txt = f'{d["rsi"]:.0f}' if d.get("rsi") is not None else "—"
         vp_txt = f'{comp.get("volume",0):.0f}'
         board = d["board"]
-        rows += f'''<tr data-search="{d["name"]} {d["code"]} {d["industry"]} {board}" data-board="{d["perm"]}" data-market="{board}" data-industry="{d["industry"]}" data-tier="{d["tier"]}">
+        rows += f'''<tr data-code="{d["code"]}" data-search="{d["name"]} {d["code"]} {d["industry"]} {board}" data-board="{d["perm"]}" data-market="{board}" data-industry="{d["industry"]}" data-tier="{d["tier"]}">
 <td style="text-align:center">{rank}</td>
 <td><b>{d["name"]}</b><br><span style="color:var(--faint);font-size:11px">{d["code"]}</span></td>
 <td><span class="board-tag">{board}</span></td>
@@ -104,15 +104,16 @@ def filter_options(items, key):
     return "".join(f'<option>{o}</option>' for o in opts)
 
 def cards_html_for(items):
-    """逐标的详情卡片（模板风格：雷达图 + 六类分数 + 回测），紧跟表格下方"""
+    """逐标的详情卡片（模板风格：雷达图 + 六类分数 + 回测），紧跟表格下方，与表格联动过滤"""
     cards = ""
     for d in items:
         comp = d.get("comp", {})
         radar = d.get("radar_svg", "")
-        cards += f'''<div class="stock-card" id="card-{d["code"]}">
-{radar}
+        board = d["board"]
+        cards += f'''<div class="stock-card" id="card-{d["code"]}" data-code="{d["code"]}" data-search="{d["name"]} {d["code"]} {d["industry"]} {board}" data-market="{board}" data-industry="{d["industry"]}" data-tier="{d["tier"]}">
+<div class="radar-wrap">{radar}</div>
 <div class="body">
-<h3>{d["name"]} <span class="sub">{d["code"]}</span> <span class="board-tag">{d["board"]}</span> <span class="board-tag">{d["industry"]}</span></h3>
+<h3>{d["name"]} <span class="sub">{d["code"]}</span> <span class="board-tag">{board}</span> <span class="board-tag">{d["industry"]}</span></h3>
 <p class="meta">现价 <b>{d["px"]:.2f}</b>（<span class="{"up" if (d["chg"] or 0)>0 else "down"}">{f"{d['chg']:+.2f}%" if d["chg"] is not None else "—"}</span>）｜ 近一年 <span class="{"up" if (d["ret_1y"] or 0)>0 else "down"}">{f"{d['ret_1y']:+.0f}%" if d["ret_1y"] is not None else "—"}</span> ｜ RSI {d["rsi"]:.0f}</p>
 <p class="meta">权重 <b>{d["score"]:.1f} 分</b> → {tier_pill(d["tier"])} ｜ 建议：{action_for(d)} ｜ {conf_level(d)}置信</p>
 <p class="meta">六类：趋势 {comp.get("trend",0):.0f}｜动能 {comp.get("momentum",0):.0f}｜量能 {comp.get("volume",0):.0f}｜超买 {comp.get("osc",0):.0f}｜风控 {comp.get("risk",0):.0f}｜研报 0.0</p>
@@ -136,8 +137,9 @@ def system_block(vid, sid, title, badge, sub, kpis, rule, items, tbl_id, card_id
 </div>
 <div class="card" id="{card_id}">
 <h2>📋 标的汇总表 <span class="badge {badge}">{len(items)} 行</span></h2>
-<div class="sub">今日信号：加仓区 {up} ｜ 减/清仓区 {down} · 表头点击排序 · 左上角筛选 · 同一标的多档出现属正常</div>
+<div class="sub">今日信号：加仓区 {up} ｜ 减/清仓区 {down} · 搜索/筛选/排序联动下方详情卡片 · 表头点击排序</div>
 <div class="toolbar">
+<input type="text" id="{tbl_id}-q" placeholder="🔍 搜索名称 / 代码 / 行业…">
 <select id="{tbl_id}-mk" class="flt" title="板块筛选"><option value="">全部板块</option>{filter_options(items, "board")}</select>
 <select id="{tbl_id}-ind" class="flt" title="行业筛选"><option value="">全部行业</option>{filter_options(items, "industry")}</select>
 <select id="{tbl_id}-tier" class="flt" title="档位筛选"><option value="">全部档位</option><option>满仓加仓</option><option>轻仓加仓</option><option>观望</option><option>减至半仓</option><option>清仓</option></select>
@@ -154,9 +156,9 @@ def system_block(vid, sid, title, badge, sub, kpis, rule, items, tbl_id, card_id
 <div class="note">{note}</div>
 </div>
 <div class="card">
-<h2>🔍 逐标的详情（雷达图）</h2>
-<div class="sub">六角雷达 = 趋势/动能/量能/超买/风控/研报 六类打分 · 每只标的卡片紧跟汇总表</div>
-<div class="stock-cards">{cards_html_for(items)}</div>
+<h2>🔍 逐标的详情（雷达图） <span class="count" id="{tbl_id}-cardcount" style="font-size:12px"></span></h2>
+<div class="sub">六角雷达 = 趋势/动能/量能/超买/风控/研报 六类打分 · 与上方表格搜索/筛选/排序联动</div>
+<div class="stock-cards" id="{tbl_id}-cards">{cards_html_for(items)}</div>
 </div>
 </div>'''
 
@@ -178,10 +180,13 @@ html = f"""<!doctype html>
 [data-theme="dark"]{{--radar-ring:#2d3748;--radar-axis:#2a3440;--radar-label:#cbd5e1;--radar-score:#f1f5f9;--radar-sub:#64748b}}
 /* 筛选条 */
 .toolbar .flt{{background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:7px 10px;font-size:13px;font-family:inherit}}
-/* 逐标的详情卡片（模板风格） */
-.stock-cards{{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}}
-.stock-card{{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:flex-start}}
-.stock-card .body{{flex:1;min-width:0}}
+.toolbar input[type=text]{{background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:7px 12px;font-size:13px;width:200px;font-family:inherit}}
+/* 逐标的详情卡片（模板风格 · 等高适配） */
+.stock-cards{{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px}}
+.stock-card{{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:stretch}}
+.stock-card .radar-wrap{{flex:0 0 120px;display:flex;align-items:center;justify-content:center}}
+.stock-card .radar-wrap svg{{width:120px;height:120px}}
+.stock-card .body{{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}}
 .stock-card h3{{margin:0 0 6px;font-size:15px}}
 .stock-card .sub{{color:var(--faint);font-size:11px;font-weight:400}}
 .stock-card .meta{{color:var(--sub);font-size:12px;margin:3px 0;line-height:1.6}}
@@ -292,26 +297,61 @@ document.addEventListener('DOMContentLoaded',function(){{
   }});
   initTable('tbl-v9', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});
   initTable('tbl-v8', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});
-    /* 板块/行业筛选（模板式左上角 select） */
+  /* 统一联动：搜索 + 板块/行业/档位筛选 → 表格行 + 详情卡片同步；排序后卡片重排 */
   ['tbl-v9','tbl-v8'].forEach(function(id){{
-    var mk=document.getElementById(id+'-mk'), ind=document.getElementById(id+'-ind');
-    var tier=document.getElementById(id+'-tier');
-    function applyFltr(){{
+    var q=document.getElementById(id+'-q'), mk=document.getElementById(id+'-mk');
+    var ind=document.getElementById(id+'-ind'), tier=document.getElementById(id+'-tier');
+    var cardsBox=document.getElementById(id+'-cards');
+    function match(el){{
+      var txt=(el.getAttribute('data-search')||'').toLowerCase();
+      var qv=(q?q.value:'').toLowerCase();
       var mv=mk?mk.value:'', iv=ind?ind.value:'', tv=tier?tier.value:'';
-      var rs=document.querySelectorAll('#'+id+' tbody tr');
-      var n=0;
-      rs.forEach(function(tr){{
-        var show=(!mv||tr.getAttribute('data-market')===mv)
-          &&(!iv||tr.getAttribute('data-industry')===iv)
-          &&(!tv||tr.getAttribute('data-tier')===tv);
-        tr.style.display=show?'':'none';
-        if(show)n++;}});
-      var cnt=document.getElementById(id+'-count');
-      if(cnt)cnt.textContent='显示 '+n+' / '+rs.length+' 只';
+      return (!qv||txt.indexOf(qv)>=0)
+        &&(!mv||el.getAttribute('data-market')===mv)
+        &&(!iv||el.getAttribute('data-industry')===iv)
+        &&(!tv||el.getAttribute('data-tier')===tv);
     }}
-    if(mk)mk.addEventListener('change',applyFltr);
-    if(ind)ind.addEventListener('change',applyFltr);
-    if(tier)tier.addEventListener('change',applyFltr);
+    function applyAll(){{
+      var rows=document.querySelectorAll('#'+id+' tbody tr');
+      var cards=cardsBox?cardsBox.querySelectorAll('.stock-card'):[];
+      var n=0;
+      rows.forEach(function(tr){{var ok=match(tr);tr.style.display=ok?'':'none';if(ok)n++;}});
+      if(cardsBox)cards.forEach(function(cd){{cd.style.display=match(cd)?'':'none';}});
+      var cnt=document.getElementById(id+'-count');
+      if(cnt)cnt.textContent='显示 '+n+' / '+rows.length+' 只';
+      var cc=document.getElementById(id+'-cardcount');
+      if(cc)cc.textContent='（卡片 '+Array.prototype.filter.call(cards,function(cd){{return cd.style.display!=='none';}}).length+' 张）';
+    }}
+    if(q)q.addEventListener('input',applyAll);
+    if(mk)mk.addEventListener('change',applyAll);
+    if(ind)ind.addEventListener('change',applyAll);
+    if(tier)tier.addEventListener('change',applyAll);
+    /* 排序联动：表头排序后，卡片按同样顺序重排（按 data-code 匹配） */
+    var table=document.getElementById(id);
+    if(table&&cardsBox){{
+      table.querySelectorAll('th[data-key]').forEach(function(th){{
+        th.addEventListener('click',function(){{
+          setTimeout(function(){{
+            var order=[];
+            table.querySelectorAll('tbody tr').forEach(function(tr){{
+              if(tr.style.display!=='none')order.push(tr.getAttribute('data-code'));}});
+            var map={{}};
+            cardsBox.querySelectorAll('.stock-card').forEach(function(cd){{map[cd.getAttribute('data-code')]=cd;}});
+            order.forEach(function(code){{if(map[code])cardsBox.appendChild(map[code]);}});
+          }},50);
+        }});}});
+    }}
+    applyAll();
+    /* 行/卡片点击 → 详情弹层（同页处理） */
+    var openDetailFn = (typeof openDetail==='function')?openDetail:null;
+    if(openDetailFn){{
+      table.querySelectorAll('tbody tr').forEach(function(tr){{
+        tr.style.cursor='pointer';
+        tr.addEventListener('click',function(){{openDetailFn(tr.getAttribute('data-code'));}});}});
+      if(cardsBox)cardsBox.querySelectorAll('.stock-card').forEach(function(cd){{
+        cd.style.cursor='pointer';
+        cd.addEventListener('click',function(){{openDetailFn(cd.getAttribute('data-code'));}});}});
+    }}
   }});
 }});
 </script>
