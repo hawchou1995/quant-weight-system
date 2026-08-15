@@ -44,15 +44,19 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 .dropdown-menu a:hover{background:var(--card2);color:var(--accent)}
 .dropdown-menu .head{font-size:12px;color:var(--faint);padding:6px 12px;border-bottom:1px solid var(--line);margin-bottom:4px}
 
-/* ---------- 左侧贴边导航 ---------- */
-.sidenav{position:fixed;left:0;top:64px;bottom:0;width:56px;background:var(--nav-bg);border-right:1px solid var(--border);
-  display:flex;flex-direction:column;align-items:center;padding-top:14px;gap:6px;z-index:800}
-.sidenav a{width:42px;height:42px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  color:var(--sub);text-decoration:none;font-size:10px;gap:2px;transition:all .15s}
-.sidenav a .ic{font-size:17px}
+/* ---------- 左侧宽侧边栏（图标+文字） ---------- */
+.sidenav{position:fixed;left:0;top:0;bottom:0;width:190px;background:var(--nav-bg);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;padding:16px 10px;z-index:850;overflow-y:auto}
+.sidenav .sn-logo{font-size:14px;font-weight:700;padding:2px 10px 14px;display:flex;align-items:center;gap:8px}
+.sidenav .sn-logo .dot{width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,#f59e0b,#ef4444);display:inline-block}
+.sidenav .sn-sep{height:1px;background:var(--line);margin:8px 6px}
+.sidenav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
+  color:var(--sub);text-decoration:none;font-size:13px;margin-bottom:2px;transition:all .15s}
+.sidenav a .ic{font-size:16px;width:20px;text-align:center}
 .sidenav a:hover{background:var(--card2);color:var(--text)}
 .sidenav a.active{background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(239,68,68,.15));color:var(--accent);font-weight:600}
-body.sidenav-open .container{padding-left:80px}
+.sidenav .sn-foot{margin-top:auto;display:flex;flex-direction:column;gap:6px}
+body.sidenav-open .container{margin-left:190px}
 
 /* ---------- 通用卡片 ---------- */
 .card{background:var(--card);border-radius:16px;padding:22px;margin-bottom:22px;border:1px solid var(--border)}
@@ -135,23 +139,23 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 # ---------------- 顶部导航 + 左侧导航 ----------------
 NAV_HTML = """
 <div class="topbar">
-  <div class="logo" onclick="location.hash='#overview'"><span class="dot"></span>量化权重看板</div>
+  <div class="logo" onclick="location.hash='#overview'"><span class="dot"></span>量化权重监控</div>
   <div class="spacer"></div>
   <div class="dropdown" id="report-dd">
     <button class="tb-btn" onclick="toggleDrop('report-dd')">📄 标的报告 ▾</button>
     <div class="dropdown-menu" id="report-menu"></div>
   </div>
   <button class="tb-btn" id="theme-btn" onclick="toggleTheme()">🌙 夜间</button>
-  <a class="community" href="https://qingju.me/" target="_blank" rel="noopener">💬 青橘社区 · 加标的 / 自由讨论 →</a>
+  <a class="community" href="https://qingju.me/" target="_blank" rel="noopener">💬 青橘社区</a>
 </div>
 <div class="sidenav" id="sidenav"></div>
 """
 
 SIDENAV_ITEMS = [
-    ("overview", "📊", "总览"),
+    ("overview", "📊", "监控总览"),
     ("sys-auto", "🅰️", "普适版"),
     ("sys-lite", "🅱️", "个人版"),
-    ("table", "📋", "标的表"),
+    ("table", "📋", "标的监控表"),
 ]
 
 # ---------------- 公共 JS ----------------
@@ -177,25 +181,29 @@ document.addEventListener('click',function(e){
 
 /* ---------- 左侧导航（JS 点击滚动，不依赖 hash） ---------- */
 function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)return;
-  var html='';window.ENH.nav.forEach(function(it){
+  var html='<div class="sn-logo"><span class="dot"></span>量化权重监控</div><div class="sn-sep"></div>';
+  window.ENH.nav.forEach(function(it){
     html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"><span class="ic">'+it[1]+'</span>'+it[2]+'</a>';});
+  html+='<div class="sn-sep"></div><div class="sn-foot">'+
+    '<a href="monitor_reports.html" target="_blank"><span class="ic">📄</span>标的报告</a>'+
+    '<a href="https://qingju.me/" target="_blank" rel="noopener"><span class="ic">💬</span>青橘社区</a></div>';
   nav.innerHTML=html;
   document.body.classList.add('sidenav-open');
-  nav.querySelectorAll('a').forEach(function(a){
+  nav.querySelectorAll('a[data-anchor]').forEach(function(a){
     a.addEventListener('click',function(e){
       e.preventDefault();
       var t=a.getAttribute('data-anchor');
       var el=document.getElementById(t);
       if(el){el.scrollIntoView({behavior:'auto',block:'start'});
         window.scrollBy(0,-70);}
-      nav.querySelectorAll('a').forEach(function(x){x.classList.toggle('active',x===a);});});});
+      nav.querySelectorAll('a[data-anchor]').forEach(function(x){x.classList.toggle('active',x===a);});});});
   window.addEventListener('scroll',function(){
     var anchors=window.ENH.nav.map(function(it){return it[0];});
     var cur=anchors[0];
     anchors.forEach(function(a){
       var el=document.getElementById(a);
       if(el&&el.getBoundingClientRect().top<=150)cur=a;});
-    nav.querySelectorAll('a').forEach(function(a){
+    nav.querySelectorAll('a[data-anchor]').forEach(function(a){
       a.classList.toggle('active',a.getAttribute('data-anchor')===cur);});});}
 
 /* ---------- 工具函数 ---------- */
@@ -359,7 +367,44 @@ function renderFactors(fh){
 
 document.addEventListener('DOMContentLoaded',function(){
   renderSidenav();
+  renderCurve();
+  renderKlineBoxes();
   var m=document.createElement('div');m.id='modal-mask';m.className='modal-mask';
   m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('open');});
   document.body.appendChild(m);});
+
+/* ---------- 双体系净值曲线（JS 运行时渲染，容器 #curve-chart） ---------- */
+function renderCurve(){
+  var el=document.getElementById('curve-chart');if(!el)return;
+  var S=window.ENH.systems;if(!S)return;
+  var va=S.v9_auto.equity, vl=S.v8_lite.equity;
+  var n=Math.max(va.length,vl.length);
+  var W=1400,H=300,PAD_L=70,PAD_R=20,PAD_T=26,PAD_B=34;
+  var x=function(i){return PAD_L+(W-PAD_L-PAD_R)*i/Math.max(1,n-1);};
+  var all=va.concat(vl);
+  var vmax=Math.max(200,Math.ceil(Math.max.apply(null,all)/100)*100), vmin=50;
+  var y=function(v){return PAD_T+(H-PAD_T-PAD_B)*(1-(v-vmin)/(vmax-vmin));};
+  var g='';
+  for(var yy=vmin;yy<=vmax;yy+=50){
+    g+='<line x1="'+PAD_L+'" y1="'+y(yy)+'" x2="'+(W-PAD_R)+'" y2="'+y(yy)+'" stroke="rgba(128,128,128,.15)"/>';
+    g+='<text x="'+(PAD_L-8)+'" y="'+(y(yy)+4)+'" font-size="12" fill="#9ca3af" text-anchor="end">'+yy+'</text>';}
+  var prevYr=null;
+  for(var i=0;i<n;i++){
+    var yr=2016+Math.floor(i/252);
+    if(yr!==prevYr){g+='<text x="'+x(i)+'" y="'+(H-PAD_B+18)+'" font-size="13" fill="#9ca3af" text-anchor="middle">'+yr+'</text>';prevYr=yr;}}
+  var poly=function(vals,color,width){
+    var pts='';
+    for(var i=0;i<vals.length;i+=3){pts+=x(i).toFixed(1)+','+y(vals[i]).toFixed(1)+' ';}
+    return '<polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="'+width+'"/>';};
+  el.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+g+
+    poly(vl,'#3b82f6',2)+poly(va,'#f59e0b',2.5)+
+    '<text x="'+(PAD_L+10)+'" y="'+(PAD_T+18)+'" font-size="13" fill="#3b82f6">v8-lite 个人版 → +'+S.v8_lite.summary.total_return_pct+'%</text>'+
+    '<text x="'+(PAD_L+10)+'" y="'+(PAD_T+36)+'" font-size="13" fill="#f59e0b">v9-auto 普适版 → +'+S.v9_auto.summary.total_return_pct+'%</text></svg>';
+}
+
+/* ---------- 报告页 K线容器（.kline-box[data-code]） ---------- */
+function renderKlineBoxes(){
+  document.querySelectorAll('.kline-box').forEach(function(box){
+    var d=window.ENH.details[box.getAttribute('data-code')];
+    if(d&&d.kline)box.innerHTML=renderKline(d.kline);});}
 """

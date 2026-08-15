@@ -25,27 +25,40 @@ if "<body" in html:
 else:
     html = NAV_HTML + html
 
+# 隐藏模板自带的 topbar（避免双顶栏）
+html = re.sub(r'<div class="topbar"[^>]*id="topbar"[^>]*>.*?</div>', '', html, count=1, flags=re.S)
+
 # 注入增强脚本（</body> 前）：sidenav 变 tab 切换 + 交易表增强 + 详情弹层
 INJECT_JS = r"""
 <script src="enhanced_data.js"></script>
 <script>
 /* ===== 五 tab 左侧导航（点击切换 tab） ===== */
 (function(){
+  /* 隐藏模板运行时渲染的 topbar（避免双顶栏） */
+  var hideTb=function(){
+    var tb=document.getElementById('topbar');
+    if(tb){tb.style.display='none';}
+  };
+  document.addEventListener('DOMContentLoaded',hideTb);
+  new MutationObserver(hideTb).observe(document.body,{subtree:true,childList:true});
   function renderTabNav(){
     var nav=document.getElementById('sidenav');if(!nav)return;
     var items=[['auto','🅰️','普适版'],['lite','🅱️','个人版'],['stock','📈','股票'],['etf','📊','ETF'],['fund','💰','基金']];
-    var html='';
+    var html='<div class="sn-logo"><span class="dot"></span>量化权重监控</div><div class="sn-sep"></div>';
     items.forEach(function(it){
-      html+='<a href="#"+it[0] data-navtab="'+it[0]+'"><span class="ic">'+it[1]+'</span>'+it[2]+'</a>';});
+      html+='<a href="javascript:void(0)" data-navtab="'+it[0]+'"><span class="ic">'+it[1]+'</span>'+it[2]+'</a>';});
+    html+='<div class="sn-sep"></div><div class="sn-foot">'+
+      '<a href="monitor_reports.html" target="_blank"><span class="ic">📄</span>标的报告</a>'+
+      '<a href="https://qingju.me/" target="_blank" rel="noopener"><span class="ic">💬</span>青橘社区</a></div>';
     nav.innerHTML=html;
     document.body.classList.add('sidenav-open');
-    nav.querySelectorAll('a').forEach(function(a){
+    nav.querySelectorAll('a[data-navtab]').forEach(function(a){
       a.addEventListener('click',function(e){
         e.preventDefault();
         var t=a.getAttribute('data-navtab');
         var btn=document.querySelector('.tab[data-tab="'+t+'"]');
         if(btn){btn.click();}
-        nav.querySelectorAll('a').forEach(function(x){x.classList.toggle('active',x===a);});
+        nav.querySelectorAll('a[data-navtab]').forEach(function(x){x.classList.toggle('active',x===a);});
       });});
   }
   /* 观察 tab 渲染后同步高亮 */
@@ -54,7 +67,7 @@ INJECT_JS = r"""
     if(active){
       var t=active.getAttribute('data-tab');
       var nav=document.getElementById('sidenav');
-      if(nav){nav.querySelectorAll('a').forEach(function(a){
+      if(nav){nav.querySelectorAll('a[data-navtab]').forEach(function(a){
         a.classList.toggle('active',a.getAttribute('data-navtab')===t);});}
     }
   });

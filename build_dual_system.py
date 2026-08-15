@@ -71,39 +71,8 @@ perm_btns = ''.join(
     f'<button data-perm="{p}" class="{"active" if p == "all" else ""}">{lbl}</button>'
     for p, lbl in [("all", "全部"), ("main", "主板·新开户"), ("gem", "+创业板"), ("star", "+科创板"), ("etf", "ETF")])
 
-# 净值曲线（参考区，缩小）
-d_auto = DATA["systems"]["v9_auto"]["equity"]
-d_lite = DATA["systems"]["v8_lite"]["equity"]
-n = len(d_auto)
-W, H = 1400, 300
-PAD_L, PAD_R, PAD_T, PAD_B = 70, 20, 26, 34
-x = lambda i: PAD_L + (W - PAD_L - PAD_R) * i / max(1, n - 1)
-all_v = d_auto + d_lite
-vmax = max(200, math.ceil(max(all_v) / 100) * 100)
-vmin = 50
-y = lambda v: PAD_T + (H - PAD_T - PAD_B) * (1 - (v - vmin) / (vmax - vmin))
-grid = ""
-for yy in range(vmin, vmax + 1, 50):
-    grid += f'<line x1="{PAD_L}" y1="{y(yy):.1f}" x2="{W-PAD_R}" y2="{y(yy):.1f}" stroke="rgba(128,128,128,.15)"/>'
-    grid += f'<text x="{PAD_L-8}" y="{y(yy)+4:.1f}" font-size="12" fill="#9ca3af" text-anchor="end">{yy}</text>'
-prev_yr = None
-for i, va in enumerate(d_auto):
-    yr = 2016 + i // 252
-    if yr != prev_yr:
-        grid += f'<text x="{x(i):.1f}" y="{H-PAD_B+18}" font-size="13" fill="#9ca3af" text-anchor="middle">{yr}</text>'
-        prev_yr = yr
-
-def poly(vals, color, width):
-    pts = " ".join(f"{x(i):.1f},{y(vals[i]):.1f}" for i in range(0, n, 3))
-    return f'<polyline points="{pts}" fill="none" stroke="{color}" stroke-width="{width}"/>'
-
-svg_curve = f'''<svg viewBox="0 0 {W} {H}" style="width:100%;height:auto;background:var(--card);border-radius:12px;border:1px solid var(--border)">
-{grid}
-{poly(d_lite, "#3b82f6", 2)}
-{poly(d_auto, "#f59e0b", 2.5)}
-<text x="{PAD_L+10}" y="{PAD_T+18}" font-size="13" fill="#3b82f6">v8-lite 个人版 → +3923.7%</text>
-<text x="{PAD_L+10}" y="{PAD_T+36}" font-size="13" fill="#f59e0b">v9-auto 普适版 → +839.6%</text>
-</svg>'''
+# 净值曲线改为 JS 运行时渲染（数据在 enhanced_data.js，容器占位 → HTML 大幅瘦身）
+svg_curve = '<div id="curve-chart" style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:6px"></div>'
 
 html = f"""<!doctype html>
 <html lang="zh"><head><meta charset="utf-8">

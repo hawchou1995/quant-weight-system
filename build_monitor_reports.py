@@ -16,27 +16,11 @@ def tier_pill(t):
     cls = {"满仓加仓": "pill-full", "轻仓加仓": "pill-add", "观望": "pill-watch", "减至半仓": "pill-cut", "清仓": "pill-clear"}.get(t, "pill-watch")
     return f'<span class="pill {cls}">{t}</span>'
 
-def kline_svg(kl, w=560, h=150):
+def kline_svg(kl, code):
+    """K线改为 JS 容器渲染（数据在 enhanced_data.js，HTML 瘦身）"""
     if not kl:
         return '<div class="note">无K线</div>'
-    n = len(kl)
-    x0, x1 = 30, w - 10
-    lo = min(k["l"] for k in kl); hi = max(k["h"] for k in kl)
-    pad = (hi - lo) * 0.05 or 1
-    y = lambda v: 6 + (h - 12) * (1 - (v - lo + pad) / (hi - lo + 2 * pad))
-    cw = (x1 - x0) / n
-    bw = max(2, cw * 0.55)
-    body = ""
-    for i, k in enumerate(kl):
-        cx = x0 + i * cw + cw / 2
-        col = "#dc2626" if k["c"] >= k["o"] else "#16a34a"
-        yo, yc = y(k["o"]), y(k["c"])
-        bh = max(1, abs(yc - yo))
-        body += f'<line x1="{cx}" y1="{y(k["h"]):.1f}" x2="{cx}" y2="{y(k["l"]):.1f}" stroke="{col}"/>'
-        body += f'<rect x="{cx-bw/2:.1f}" y="{min(yo, yc):.1f}" width="{bw:.1f}" height="{bh:.1f}" fill="{col}" rx="1"/>'
-    last = kl[-1]
-    return (f'<svg viewBox="0 0 {w} {h}" style="width:100%;max-width:{w}px;background:var(--card2);border-radius:10px">{body}'
-            f'<text x="{x1-2}" y="{y(last["c"])-5:.1f}" font-size="11" font-weight="bold" fill="{"#dc2626" if last["c"] >= last["o"] else "#16a34a"}" text-anchor="end">{last["c"]:.2f}</text></svg>')
+    return f'<div class="kline-box" data-code="{code}" style="background:var(--card2);border-radius:10px;min-height:160px"></div>'
 
 def action_for(d):
     return {"满仓加仓": "持有至目标仓位", "轻仓加仓": "可加至目标仓位", "观望": "持有不加 / 观望",
@@ -75,7 +59,7 @@ for c, d in sorted(details.items(), key=lambda kv: -kv[1]["score"]):
 </div>
 <div class="factor-bars">{bars}</div>
 <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-<div><h4>K线（近 250 日 · 红涨绿跌）</h4>{kline_svg(d["kline"])}</div>
+<div><h4>K线（近 250 日 · 红涨绿跌）</h4>{kline_svg(d["kline"], c)}</div>
 <div>
 <h4>v9-auto 交易史</h4>{render_trades(d["trades"]["v9_auto"], "v9-auto")}
 <h4>v8-lite 交易史</h4>{render_trades(d["trades"]["v8_lite"], "v8-lite")}
