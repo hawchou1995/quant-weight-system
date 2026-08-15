@@ -166,6 +166,13 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 .card .card-body{margin-top:12px}
 .card.collapsed .card-body{display:none}
 .card.collapsed .fold-arrow{transform:rotate(-90deg);display:inline-block}
+/* 操作统计条（各系统视图） */
+.op-stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.op{font-size:13px;padding:6px 14px;border-radius:20px;background:var(--card2);border:1px solid var(--border)}
+.op b{font-size:15px}
+.op-add{color:var(--up)}
+.op-watch{color:#d97706}
+.op-cut{color:var(--down)}
 /* 逐标的详情卡片（模板风格 · 等高适配） */
 .stock-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px}
 .stock-card{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:stretch}
@@ -201,28 +208,64 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class="view active" id="view-overview">
 <div class="card" id="overview">
 <h2>📊 标的监控总览 <span class="badge badge-auto">数据截至 2026-08-14 收盘</span></h2>
-<div class="sub">左侧导航切换：🅰️ 普适版监控（全市场自动池·股票分层+ETF+基金） / 🅱️ 个人版监控（用户固定池） · 右上角「标的报告」按月查看历史收盘快照 · 信号仅供参考</div>
+<div class="sub">左侧导航切换：🅰️ 全量池中/长线（全市场自动池·股票分层+ETF+基金） / 🅱️ 固定池中/长线（用户固定池） / ⚡ 短线（占位） · 右上角「标的报告」按月查看历史收盘快照 · 信号仅供参考</div>
 <div class="kpis">
 <div class="kpi"><div class="l">🟢 加仓区</div><div class="v" style="color:#dc2626">68 只</div><div class="s">满仓+轻仓加仓</div></div>
 <div class="kpi"><div class="l">🟡 观望区</div><div class="v" style="color:#d97706">6 只</div><div class="s">持有不加</div></div>
 <div class="kpi"><div class="l">🔴 减/清仓区</div><div class="v" style="color:#16a34a">6 只</div><div class="s">减半或清仓</div></div>
-<div class="kpi"><div class="l">共监控</div><div class="v">80 只</div><div class="s">普适版 50 行 + 个人版 30 只</div></div>
+<div class="kpi"><div class="l">共监控</div><div class="v">80 只</div><div class="s">全量池 50 行 + 固定池 30 只</div></div>
 </div>
 <div class="rule-box" style="margin-bottom:0"><b>监控口径</b>：权重分 = 动量35% + 趋势25% + Aroon20% + 量价20% ｜ 档位 = ≥75 满仓加仓 / ≥60 轻仓加仓 / ≥45 观望 / ≥30 减半 / &lt;30 清仓
-<br><b>卖出闸门（每日）</b>：普适版 移动止损 4.5% + 沪深300破MA150 ｜ 个人版 移动止损 10% + 破MA200 ｜ 任何闸门先触发先生效
+<br><b>卖出闸门（每日）</b>：全量池 移动止损 4.5% + 沪深300破MA150 ｜ 固定池 移动止损 10% + 破MA200 ｜ 任何闸门先触发先生效
 <br><b>历史快照</b>：右上角「标的报告」按月分类，点击当前页切换查看（不新开窗口）</div>
+</div>
+<div class="card" id="bt-all">
+<h2>📊 三池回测参考 <span class="badge badge-auto">股票/ETF/基金 · 独立策略</span></h2>
+<div class="sub">股票池 = 全市场自动筛池 Top3 · 月轮动 ｜ ETF/基金池 = 动量 Top10 · 半年轮动 —— 均为独立回测，监控表对应各档</div>
+<div class="kpis">
+<div class="kpi"><div class="l">股票池 回测收益</div><div class="v" style="color:#f59e0b">+839.6%</div><div class="s">年化 23.5% · 夏普 1.72</div></div>
+<div class="kpi"><div class="l">股票池 最大回撤</div><div class="v" style="color:#ef4444">-10.9%</div><div class="s">月轮动 Top3</div></div>
+<div class="kpi"><div class="l">ETF 池 回测收益</div><div class="v" style="color:#f59e0b">+165.1%</div><div class="s">年化 9.6% · 夏普 0.74</div></div>
+<div class="kpi"><div class="l">ETF 池 最大回撤</div><div class="v" style="color:#ef4444">-20.7%</div><div class="s">半年轮动 Top10</div></div>
+<div class="kpi"><div class="l">基金池 回测收益</div><div class="v" style="color:#3b82f6">+184.3%</div><div class="s">年化 10.3% · 夏普 0.69</div></div>
+<div class="kpi"><div class="l">基金池 最大回撤</div><div class="v" style="color:#ef4444">-22.6%</div><div class="s">半年轮动 Top10</div></div>
+</div>
+<div class="sub-pool">
+<div class="pool-panel" id="pool-etf">
+<div class="pool-head"><b>🟠 ETF 池</b><span class="pool-tag">动量 Top10 · 半年轮动</span></div>
+<div class="kpis">
+<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#f59e0b">+165.1%</div><div class="s">2016-01~2026-08</div></div>
+<div class="kpi"><div class="l">年化</div><div class="v">9.6%</div><div class="s">50万中性资金</div></div>
+<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">-20.7%</div><div class="s">回测参考</div></div>
+<div class="kpi"><div class="l">夏普</div><div class="v" style="color:#22c55e">0.736</div><div class="s">胜率 67%</div></div>
+<div class="kpi"><div class="l">交易次数</div><div class="v">103</div><div class="s">半年轮动</div></div>
+</div>
+<div id="curve-chart-etf" style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:6px;margin-top:10px"></div>
+</div>
+<div class="pool-panel" id="pool-fund">
+<div class="pool-head"><b>🔵 基金池</b><span class="pool-tag">净值动量 Top10 · 半年轮动</span></div>
+<div class="kpis">
+<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#3b82f6">+184.3%</div><div class="s">2016-01~2026-08</div></div>
+<div class="kpi"><div class="l">年化</div><div class="v">10.3%</div><div class="s">50万中性资金</div></div>
+<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">-22.6%</div><div class="s">回测参考</div></div>
+<div class="kpi"><div class="l">夏普</div><div class="v" style="color:#22c55e">0.687</div><div class="s">胜率 67%</div></div>
+<div class="kpi"><div class="l">交易次数</div><div class="v">90</div><div class="s">半年轮动</div></div>
+</div>
+<div id="curve-chart-fund" style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:6px;margin-top:10px"></div>
+</div>
+</div>
 </div>
 </div>
 
-<!-- ============ 视图 A：普适版 ============ -->
+<!-- ============ 视图 A：全量池中/长线 ============ -->
 <div class="view" id="view-auto">
 <div class="card" id="sys-auto">
-<h2>🅰️ 普适版监控 <span class="view-badge auto">全市场自动池 · 股票分层+ETF10+基金10</span></h2>
-<div class="sub">每月全市场绝对规则筛池 → Top3 等权 · 移动止损 4.5% · MA150 择时 · 动态门槛 · RSI&lt;85 · 自动补位 · 今日加仓区 50 只 ｜ 筛池规则：绝对动量≥25% / 四因子分≥65 / 站上MA150 / 价格≥2 / 成交额≥500万 / RSI&lt;85</div>
-<div class="kpis"><div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#f59e0b">+839.6%</div><div class="s">2016-01~2026-08</div></div>
-<div class="kpi"><div class="l">年化</div><div class="v">23.5%</div><div class="s">50万中性资金</div></div>
-<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">-10.9%</div><div class="s">回测参考</div></div>
-<div class="kpi"><div class="l">夏普</div><div class="v" style="color:#22c55e">1.715</div><div class="s">回测参考</div></div></div>
+<h2>🅰️ 全量池中/长线 <span class="view-badge auto">全市场自动池 · 股票分层+ETF+基金 ｜ 全市场绝对规则筛池 Top3 等权 · 月轮动 · 移动止损4.5% · MA150择时 ｜ 回测参考见「监控总览」</span></h2>
+<div class="op-stats">
+<span class="op op-add">🟢 加仓区 <b>50</b> 只</span>
+<span class="op op-watch">🟡 观望 <b>0</b> 只</span>
+<span class="op op-cut">🔴 减/清仓区 <b>0</b> 只</span>
+</div>
 </div>
 <div class="card" id="card-tbl-v9">
 <h2>📋 标的汇总表 <span class="badge auto">50 行</span></h2>
@@ -942,7 +985,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><span class="pill-chg-up">满仓加仓→轻仓加仓</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">可加至目标仓位</td></tr></tbody>
 </table>
-<div class="note">档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测净值曲线见下方（历史参考）</div>
+<div class="note">档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测参考在监控总览视图</div>
 </div>
 <div class="card">
 <h2>🔍 逐标的详情（雷达图） <span class="count" id="tbl-v9-cardcount" style="font-size:12px"></span></h2>
@@ -2551,44 +2594,15 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 </div>
 
-<div class="card" id="sub-bt">
-<h2>📊 ETF 池 / 基金池 回测参考 <span class="badge badge-auto">独立策略 · 半年轮动</span></h2>
-<div class="sub">与普适版股票池（月轮动 Top3）为<b>独立回测</b>：ETF 全市场 1014 只动量 Top10 · 基金全市场 14668 只净值动量 Top10 · 半年轮动 · 监控表 ETF/基金档即对应此池</div>
-<div class="sub-pool">
-<div class="pool-panel" id="pool-etf">
-<div class="pool-head"><b>🟠 ETF 池</b><span class="pool-tag">动量 Top10 · 半年轮动</span></div>
-<div class="kpis">
-<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#f59e0b">+165.1%</div><div class="s">2016-01~2026-08</div></div>
-<div class="kpi"><div class="l">年化</div><div class="v">9.6%</div><div class="s">50万中性资金</div></div>
-<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">-20.7%</div><div class="s">回测参考</div></div>
-<div class="kpi"><div class="l">夏普</div><div class="v" style="color:#22c55e">0.736</div><div class="s">胜率 67%</div></div>
-<div class="kpi"><div class="l">交易次数</div><div class="v">103</div><div class="s">半年轮动</div></div>
-</div>
-<div id="curve-chart-etf" style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:6px;margin-top:10px"></div>
-</div>
-<div class="pool-panel" id="pool-fund">
-<div class="pool-head"><b>🔵 基金池</b><span class="pool-tag">净值动量 Top10 · 半年轮动</span></div>
-<div class="kpis">
-<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#3b82f6">+184.3%</div><div class="s">2016-01~2026-08</div></div>
-<div class="kpi"><div class="l">年化</div><div class="v">10.3%</div><div class="s">50万中性资金</div></div>
-<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">-22.6%</div><div class="s">回测参考</div></div>
-<div class="kpi"><div class="l">夏普</div><div class="v" style="color:#22c55e">0.687</div><div class="s">胜率 67%</div></div>
-<div class="kpi"><div class="l">交易次数</div><div class="v">90</div><div class="s">半年轮动</div></div>
-</div>
-<div id="curve-chart-fund" style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:6px;margin-top:10px"></div>
-</div>
-</div>
-</div>
-
-<!-- ============ 视图 B：个人版 ============ -->
+<!-- ============ 视图 B：固定池中/长线 ============ -->
 <div class="view" id="view-lite">
 <div class="card" id="sys-lite">
-<h2>🅱️ 个人版监控 <span class="view-badge lite">用户固定池 · 股票+ETF+基金</span></h2>
-<div class="sub">固定池四因子打分轮动 Top4 · 月轮动(21日) · 移动止损 10% · MA200 择时 · 动态等权 · 池构成：股票 20 ｜ ETF 4 ｜ 基金 6 ｜ 执行：Top4 等权 ｜ 风控：移动止损10% + 沪深300破MA200全撤（用户固定池，未扩充）</div>
-<div class="kpis"><div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#3b82f6">+3923.7%</div><div class="s">2016-01~2026-08</div></div>
-<div class="kpi"><div class="l">年化</div><div class="v">41.7%</div><div class="s">50万中性资金</div></div>
-<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">-18.0%</div><div class="s">回测参考</div></div>
-<div class="kpi"><div class="l">夏普</div><div class="v" style="color:#22c55e">1.644</div><div class="s">回测参考</div></div></div>
+<h2>🅱️ 固定池中/长线 <span class="view-badge lite">用户固定池 · 股票+ETF+基金 ｜ 四因子打分 Top4 · 月轮动21日 · 移动止损10% · MA200择时 ｜ 池构成：股票 20 ｜ ETF 4 ｜ 基金 6 ｜ 回测参考见「监控总览」</span></h2>
+<div class="op-stats">
+<span class="op op-add">🟢 加仓区 <b>18</b> 只</span>
+<span class="op op-watch">🟡 观望 <b>6</b> 只</span>
+<span class="op op-cut">🔴 减/清仓区 <b>6</b> 只</span>
+</div>
 </div>
 <div class="card" id="card-tbl-v8">
 <h2>📋 标的汇总表 <span class="badge lite">30 行</span></h2>
@@ -3028,7 +3042,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><span class="pill-chg-down">减至半仓→清仓</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">清仓离场</td></tr></tbody>
 </table>
-<div class="note">档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测净值曲线见下方（历史参考）</div>
+<div class="note">档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测参考在监控总览视图</div>
 </div>
 <div class="card">
 <h2>🔍 逐标的详情（雷达图） <span class="count" id="tbl-v8-cardcount" style="font-size:12px"></span></h2>
@@ -3997,6 +4011,15 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 </div>
 
+<!-- ============ 视图 C：短线（占位） ============ -->
+<div class="view" id="view-short">
+<div class="card">
+<h2>⚡ 短线板块 <span class="badge badge-auto">占位</span></h2>
+<div class="sub">短线策略板块预留位置——后续接入短线信号体系后在此展示</div>
+<div class="rule-box" style="margin-bottom:0">🛠️ 建设中：短线信号体系尚未接入。当前可用「全量池中/长线」「固定池中/长线」监控中长线信号，短线板块上线后自动填充。</div>
+</div>
+</div>
+
 <!-- ============ 历史快照视图（右上角标的报告切换） ============ -->
 <div class="view" id="view-snapshot">
 <div class="card" id="snap-holder">
@@ -4016,7 +4039,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <script src="monitor/snapshots_index.js"></script>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
-window.ENH.nav = [["overview","📊","监控总览"],["sys-auto","🅰️","普适版"],["sys-lite","🅱️","个人版"]];
+window.ENH.nav = [["overview","📊","监控总览"],["sys-auto","🅰️","全量池中/长线"],["sys-lite","🅱️","固定池中/长线"],["short","⚡","短线(占位)"]];
 /* 视图切换模式：滚动不更新导航高亮（COMMON_JS renderSidenav 检测此标志） */
 window.ENH.NAV_SWITCH = true;
 /* ETF/基金回测净值（独立策略，普适版视图展示） */
@@ -4053,7 +4076,7 @@ function renderSubCurve(){
   renderOneCurve('curve-chart-fund', C.fund, '#3b82f6', '基金池', '+'+184);
 }
 /* 视图切换（hash 驱动：切换时更新 location.hash，加载/前进后退时按 hash 定位） */
-var VIEW_MAP={'overview':'view-overview','sys-auto':'view-auto','sys-lite':'view-lite','snapshot':'view-snapshot'};
+var VIEW_MAP={'overview':'view-overview','sys-auto':'view-auto','sys-lite':'view-lite','short':'view-short','snapshot':'view-snapshot'};
 function switchView(key){
   var v=VIEW_MAP[key];if(!v)return;
   document.querySelectorAll('.view').forEach(function(x){x.classList.remove('active');});
