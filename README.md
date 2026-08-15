@@ -15,6 +15,8 @@ A 股个人研究工具：**因子打分 + 截面选股 + 月度轮动 + 移动�
 
 ```
 quant-weight-system/
+├── v9_auto.py               # ★普适版：全市场自动筛池→Top3（无人工选池，夏普1.715）
+├── v9_signal.py             # v9 探索版（绝对信号体系，验证"无选择=市场平均"）
 ├── v8_selector.py          # 核心引擎：因子计算 + 打分 + 回测（全量池 5307 只缓存）
 ├── v8_sprint2.py            # 参数化冲刺引擎（run_v8x）
 ├── v8_mixed.py              # 混合引擎：全量池 Top15 主仓 + 固定池卫星
@@ -28,11 +30,12 @@ quant-weight-system/
 └── v8_update.bat            # Windows 计划任务入口
 ```
 
-**四体系定位**：
+**五体系定位**：
 
 | 体系 | 范围 | 持仓 | 频率 | 定位 |
 |---|---|---|---|---|
-| 个人版 v8-lite | 自选池 25 只 | Top4 | 月轮动 20 笔/年 | **实际执行**（50 万中性资金，参数化） |
+| **普适版 v9-auto** | 全市场 5307 只自动筛池 | Top3 | 月轮动 | **无人工选池**（夏普 1.715，止损4.5%/MA150/动态门槛/RSI<85） |
+| 个人版 v8-lite | 自选池 25 只 | Top4 | 月轮动 20 笔/年 | 自选池执行（50 万中性资金，参数化） |
 | 股票主体系 | 全市场 5307 只 | Top15 + 卫星 | 季度 | 策略研究基准 |
 | ETF | 全市场 888 只 | Top10 | 半年 | 低波动配置 |
 | 基金 | 全市场 16171 只 | Top10 + 卫星 | 半年 | 场外配置 |
@@ -64,6 +67,14 @@ python v8_triple_dashboard.py         # → index.html（个人版默认激活�
 
 # 6. 每日/每月更新
 v8_update.bat                          # 或 schtasks 注册
+
+# 7. 普适版（全自动，无人工选池）
+python -c "
+import v9_auto as A
+eq, tr = A.run_auto(top_n=3, mom_min=0.25, score_min=65, stop_loss=0.045,
+                    dynamic=True, rsi_max=85, ma_window=150)
+print(A.V.summary(eq, tr))             # +839.6% / 夏普 1.715
+"
 ```
 
 ## 核心规则（个人版 v8-lite）

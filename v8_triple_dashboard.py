@@ -88,6 +88,32 @@ report_fund = build_dashboard_data(
     extra_modules=fund_extra,
 )
 
+# ============ Tab 0 普适版（v9-auto，无人工选池） ============
+auto_extra = [
+    {"type": "text", "tab": "auto", "title": "核心结论",
+     "text": "- **总收益 +839.6% / 年化 23.5% / 回撤 -10.9% / 夏普 1.715 / 胜率 48.1% / 183 笔（50万中性资金）**\n"
+             "- **达标：夏普≥1 / 回撤≤30% / 年化≥10% 全过；全自动无人工选池**\n"
+             "- 规则：每月从全市场 5307 只按**绝对规则**自动筛池（绝对动量≥25% + 四因子分≥65 + 站上MA150 + 价格≥2 + 成交额≥500万）→ 池内 Top3 持仓\n"
+             "- 动态风控：移动止损 4.5%（峰值回撤，倒U顶点）+ **MA150 择时** + **动态门槛**（波动映射 55-75）+ **RSI<85 过滤**\n"
+             "- 验证：优化阶梯 1.23→1.35→1.46→1.58→1.72（MA150/动态/RSI/止损4.5 逐项叠加）；邻域全高原稳定\n"
+             "- ⚠️ 诚实边界：纯绝对信号全持（不选 Top）实测夏普仅 0.1（市场平均）——A 股无选择无 alpha；本版保留「绝对规则+容量截断」，规则普适但持仓有选择"},
+    {"type": "text", "tab": "auto", "title": "与个人版的区别",
+     "text": "- **v9-auto（本页）**：全市场自动筛池，无需任何人工维护池子——适合「不管什么股票都能用」的通用场景\n"
+             "- **v8-lite 个人版**：固定自选池 25 只内轮动——适合盯自己熟悉的池子\n"
+             "- 共同点：月轮动、移动止损、MA200 择时、动态等权（无固定预算）\n"
+             "- 选型建议：无池子偏好用 v9-auto；有信任池子用 v8-lite；两者可并行参照"},
+]
+
+report_auto = build_dashboard_data(
+    equity_csv=str(BASE / "v9_auto_equity.csv"),
+    trades_csv=str(BASE / "v9_auto_trades.csv"),
+    summary_json=str(BASE / "v9_auto_summary.json"),
+    language="zh", market="china_a",
+    ui_overrides={"tabs": [{"id": "auto", "label": "普适版"}, {"id": "lite", "label": "个人版"}, {"id": "stock", "label": "股票"}, {"id": "etf", "label": "ETF"}, {"id": "fund", "label": "基金"}],
+                  "active_tab": "auto"},
+    extra_modules=auto_extra,
+)
+
 # ============ Tab 0 个人版（v8-lite，用户投产版） ============
 lite_extra = [
     {"type": "text", "tab": "lite", "title": "核心结论",
@@ -118,12 +144,12 @@ report_lite = build_dashboard_data(
     extra_modules=lite_extra,
 )
 
-# ============ 合并为单页四 tab ============
-# 以个人版为主框架，合并其他 tab 的模块
-merged = report_lite
+# ============ 合并为单页五 tab ============
+# 以普适版为主框架，合并其他 tab 的模块
+merged = report_auto
 for m in merged.get("modules", []):
     if m.get("tab") == "overview":
-        m["tab"] = "lite"
+        m["tab"] = "auto"
 # 股票版：所有模块 tab → "stock"
 stock_modules = []
 for m in report_stock.get("modules", []):
@@ -142,16 +168,23 @@ for m in report_fund.get("modules", []):
     m = dict(m)
     m["tab"] = "fund"
     fund_modules.append(m)
-# 去掉 lite 版里残留的其他 tab 模块（本不应有），再合并
-merged["modules"] = [m for m in merged.get("modules", []) if m.get("tab") == "lite"]
+# 个人版：所有模块 tab → "lite"
+lite_modules = []
+for m in report_lite.get("modules", []):
+    m = dict(m)
+    m["tab"] = "lite"
+    lite_modules.append(m)
+# 去掉 auto 版里残留的其他 tab 模块（本不应有），再合并
+merged["modules"] = [m for m in merged.get("modules", []) if m.get("tab") == "auto"]
+merged["modules"].extend(lite_modules)
 merged["modules"].extend(stock_modules)
 merged["modules"].extend(etf_modules)
 merged["modules"].extend(fund_modules)
-# 确保 tabs 配置为四 tab
-merged["ui"]["tabs"] = [{"id": "lite", "label": "个人版"}, {"id": "stock", "label": "股票"}, {"id": "etf", "label": "ETF"}, {"id": "fund", "label": "基金"}]
-merged["ui"]["active_tab"] = "lite"
-merged["meta"]["strategy_name"] = "v8 四体系标的看板（个人版 / 股票 / ETF / 基金）"
-merged["meta"]["symbol"] = "个人版：自选池 25 只→Top4（15万）；股票 5307 只→Top15；ETF 888 只→Top10；基金 16171 只→Top10"
+# 确保 tabs 配置为五 tab
+merged["ui"]["tabs"] = [{"id": "auto", "label": "普适版"}, {"id": "lite", "label": "个人版"}, {"id": "stock", "label": "股票"}, {"id": "etf", "label": "ETF"}, {"id": "fund", "label": "基金"}]
+merged["ui"]["active_tab"] = "auto"
+merged["meta"]["strategy_name"] = "v8 五体系标的看板（普适版 / 个人版 / 股票 / ETF / 基金）"
+merged["meta"]["symbol"] = "普适版：全市场 5307 只自动池→Top3；个人版：自选池 25 只→Top4；股票→Top15；ETF→Top10；基金→Top10"
 
 out = render_dashboard(merged, output_path=str(BASE / "index.html"),
                        template_path=str(QBL / "dashboard_template.html"))
