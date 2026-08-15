@@ -1,0 +1,13 @@
+{
+  "strategy": "shortsplit_all",
+  "label": "股票一体 · 全A",
+  "params": "T10/H10/S50 反转+MA5/MA30门控",
+  "summary": {
+    "total_return_pct": 724.3,
+    "annual_return_pct": 22.0,
+    "max_drawdown_pct": -6.72,
+    "sharpe": 2.415,
+    "win_rate_pct": 53.9,
+    "total_trades": 1316
+  }
+}

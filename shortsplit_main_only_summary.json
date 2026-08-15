@@ -1,0 +1,13 @@
+{
+  "strategy": "shortsplit_main_only",
+  "label": "纯主板",
+  "params": "T10/H10/S50 反转+MA5/MA30门控",
+  "summary": {
+    "total_return_pct": 676.15,
+    "annual_return_pct": 21.31,
+    "max_drawdown_pct": -8.61,
+    "sharpe": 2.347,
+    "win_rate_pct": 53.6,
+    "total_trades": 1313
+  }
+}

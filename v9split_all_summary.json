@@ -1,0 +1,13 @@
+{
+  "strategy": "v9_split_all",
+  "label": "股票一体 · 全A",
+  "params": "T3/m25/s65/SL5.5/MA150 择时",
+  "summary": {
+    "total_return_pct": 825.03,
+    "annual_return_pct": 23.33,
+    "max_drawdown_pct": -13.31,
+    "sharpe": 1.577,
+    "win_rate_pct": 49.2,
+    "total_trades": 183
+  }
+}

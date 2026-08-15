@@ -1,0 +1,13 @@
+{
+  "strategy": "v9_split_star_only",
+  "label": "纯科创板",
+  "params": "T3/m25/s65/SL5.5/MA150 择时",
+  "summary": {
+    "total_return_pct": 139.36,
+    "annual_return_pct": 8.57,
+    "max_drawdown_pct": -13.9,
+    "sharpe": 0.875,
+    "win_rate_pct": 46.8,
+    "total_trades": 94
+  }
+}

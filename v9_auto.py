@@ -26,9 +26,19 @@ def board_filter(code, perm="all"):
     perm='gem'  主板+创业板(sz30)        —— 2年经验+10万资产
     perm='star' 主板+创业板+科创板(sh688)—— 2年经验+50万资产
     perm='all'  全部 A 股                 —— 含 B 股剔除
+    互斥分层（v5.9 分层回测用）：
+    perm='main_only' 纯主板(sh60/sz00/sz002)
+    perm='gem_only'  纯创业板(sz30)
+    perm='star_only' 纯科创板(sh688/sh689)
     """
     if code.startswith("sh900") or code.startswith("sz200"):
         return False  # B 股：普通 A 股账户不可买
+    if perm == "main_only":
+        return code.startswith(("sh60", "sz00", "sz002"))
+    if perm == "gem_only":
+        return code.startswith("sz30")
+    if perm == "star_only":
+        return code.startswith(("sh688", "sh689"))
     if perm == "all":
         return True
     if code.startswith(("sh60", "sz00")):

@@ -135,21 +135,29 @@ def cards_html_for(items):
 # ---------------- 视图区 ----------------
 s_auto = DATA["systems"]["v9_auto"]["summary"]
 s_lite = DATA["systems"]["v8_lite"]["summary"]
-# ETF/基金独立回测（普适版视图展示）
-s_etf = json.load(open(BASE / "v8_etf_summary.json", encoding="utf-8"))["summary"]
+# ETF/基金独立回测（v5.9：ETF 升级 v3 月频+MA5；基金维持混合版）
+s_etf = json.load(open(BASE / "etf_v3_final_summary.json", encoding="utf-8"))["summary"]
+ETF_TAG = json.load(open(BASE / "etf_v3_final_summary.json", encoding="utf-8"))["params"]
 s_fund = json.load(open(BASE / "v8_fund_summary.json", encoding="utf-8"))["summary"]
 
 def load_curve_norm(f):
-    df = __import__("pandas").read_csv(BASE / f)
-    v = df["value"].astype(float).values
-    return [round(float(x), 2) for x in (v / v[0] * 100)]
+    try:
+        df = __import__("pandas").read_csv(BASE / f)
+        v = df["value"].astype(float).values
+        return [round(float(x), 2) for x in (v / v[0] * 100)]
+    except Exception:
+        return []
 
-v_etf = load_curve_norm("v8_etf_equity.csv")
+v_etf = load_curve_norm("etf_v3_final_equity.csv")
 v_fund = load_curve_norm("v8_fund_equity.csv")
 # 短线净值曲线（短线体系 v3 最优）
 v_short_etf = load_curve_norm("short_v3_etf_equity.csv")
 v_short_fund = load_curve_norm("short_v3_fund_equity.csv")
 v_short_stock = load_curve_norm("short_v3_stock_equity.csv")
+# 分层净值曲线（v5.9：中长线 v9split + 短线 shortsplit，按权限互斥）
+_SPLIT_GROUPS = ["all", "main_only", "gem_only", "star_only"]
+v9split_curves = {g: load_curve_norm(f"v9split_{g}_equity.csv") for g in _SPLIT_GROUPS}
+shortsplit_curves = {g: load_curve_norm(f"shortsplit_{g}_equity.csv") for g in _SPLIT_GROUPS}
 # 短线 v3 最优 summary（看板 KPI 卡读这里，不再用穷举中间结果）
 ss_stock = json.load(open(BASE / "short_v3_stock_summary.json", encoding="utf-8"))["summary"]
 ss_etf = json.load(open(BASE / "short_v3_etf_summary.json", encoding="utf-8"))["summary"]
@@ -157,6 +165,84 @@ ss_fund = json.load(open(BASE / "short_v3_fund_summary.json", encoding="utf-8"))
 ss_stock_tag = json.load(open(BASE / "short_v3_stock_summary.json", encoding="utf-8"))["params"]
 ss_etf_tag = json.load(open(BASE / "short_v3_etf_summary.json", encoding="utf-8"))["params"]
 ss_fund_tag = json.load(open(BASE / "short_v3_fund_summary.json", encoding="utf-8"))["params"]
+
+
+# ---- v5.9 分层回测（股票按权限互斥：一体/主板/创业板/科创板）----
+def _load_summary(f):
+    try:
+        d = json.load(open(BASE / f, encoding="utf-8"))
+        return d.get("summary", {}), d.get("label", ""), d.get("params", "")
+    except Exception:
+        return {}, "", ""
+
+
+_STK_GROUPS = [
+    ("all", "股票一体 · 全A", "v9split_all", "shortsplit_all"),
+    ("main", "纯主板", "v9split_main_only", "shortsplit_main_only"),
+    ("gem", "纯创业板", "v9split_gem_only", "shortsplit_gem_only"),
+    ("star", "纯科创板", "v9split_star_only", "shortsplit_star_only"),
+]
+# 中长线分层 summary
+s_stk = {}
+stk_tag = {}
+for g, label, v9f, _sf in _STK_GROUPS:
+    s, lbl, tag = _load_summary(v9f + "_summary.json")
+    s_stk[g] = s
+    stk_tag[g] = tag or label
+# 短线分层 summary
+ss_stk = {}
+ss_stk_tag = {}
+for g, label, _v9f, sf in _STK_GROUPS:
+    s, lbl, tag = _load_summary(sf + "_summary.json")
+    ss_stk[g] = s
+    ss_stk_tag[g] = tag or label
+
+
+def bt_card(cid, title, tag, s, curve_id, color="#f59e0b", sub="2016-01~2026-08"):
+    """回测 KPI 卡（收益/年化/回撤·夏普 + 净值曲线容器）"""
+    if not s:
+        return f'<div class="bt-card" id="{cid}"><div class="bt-head"><b>{title}</b><span class="bt-tag">{tag}</span></div><div class="kpis"><div class="kpi"><div class="l">回测收益</div><div class="v">—</div><div class="s">回测中…</div></div></div><div class="bt-curve" id="{curve_id}"></div></div>'
+    return f'''<div class="bt-card" id="{cid}">
+<div class="bt-head"><b>{title}</b><span class="bt-tag">{tag}</span></div>
+<div class="kpis">
+<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:{color}">+{s["total_return_pct"]:.1f}%</div><div class="s">{sub}</div></div>
+<div class="kpi"><div class="l">年化</div><div class="v">{s["annual_return_pct"]:.1f}%</div><div class="s">胜率 {s.get("win_rate_pct",0):.0f}%</div></div>
+<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">{s["max_drawdown_pct"]:.1f}%</div><div class="s">夏普 {s["sharpe"]:.2f} · {s.get("total_trades",0)} 笔</div></div>
+</div>
+<div class="bt-curve" id="{curve_id}"></div>
+</div>'''
+
+
+def bt_all_html():
+    """中长线回测参考 6 卡（股票分层 4 + ETF + 基金）"""
+    cards = "".join([
+        bt_card("bt-stock-all", "📈 股票 一体（全A）", stk_tag["all"], s_stk["all"], "curve-chart-stock-all"),
+        bt_card("bt-stock-main", "📈 股票 纯主板", stk_tag["main"], s_stk["main"], "curve-chart-stock-main"),
+        bt_card("bt-stock-gem", "📈 股票 纯创业板", stk_tag["gem"], s_stk["gem"], "curve-chart-stock-gem"),
+        bt_card("bt-stock-star", "📈 股票 纯科创板", stk_tag["star"], s_stk["star"], "curve-chart-stock-star"),
+        bt_card("bt-etf", "🟠 ETF 池", ETF_TAG, s_etf, "curve-chart-etf"),
+        bt_card("bt-fund", "🔵 基金池", "净值动量轮动", s_fund, "curve-chart-fund", color="#3b82f6"),
+    ])
+    return ('<div class="card" id="bt-all">\n'
+            '<h2>📊 回测参考 <span class="badge badge-auto">中/长线 · 股票按权限分层</span></h2>\n'
+            '<div class="sub">股票 = 绝对规则筛池 Top3 · 月轮动 · 按权限<b>互斥分层</b>（一体/纯主板/纯创业板/纯科创板，各池独立回测）｜ ETF = 动量轮动 ｜ 基金 = 净值动量轮动 —— 各池严格分开</div>\n'
+            '<div class="bt-grid">' + cards + '</div>\n</div>')
+
+
+def bt_short_html():
+    """短线回测参考 6 卡（股票分层 4 + ETF + 基金）"""
+    cards = "".join([
+        bt_card("bt-short-stock-all", "📈 短线 股票 一体", ss_stk_tag["all"], ss_stk["all"], "curve-short-stock-all"),
+        bt_card("bt-short-stock-main", "📈 短线 纯主板", ss_stk_tag["main"], ss_stk["main"], "curve-short-stock-main"),
+        bt_card("bt-short-stock-gem", "📈 短线 纯创业板", ss_stk_tag["gem"], ss_stk["gem"], "curve-short-stock-gem"),
+        bt_card("bt-short-stock-star", "📈 短线 纯科创板", ss_stk_tag["star"], ss_stk["star"], "curve-short-stock-star"),
+        bt_card("bt-short-etf", "🟠 短线 ETF", ss_etf_tag, ss_etf, "curve-short-etf"),
+        bt_card("bt-short-fund", "🔵 短线 基金", ss_fund_tag, ss_fund, "curve-short-fund", color="#3b82f6"),
+    ])
+    return ('<div class="card" id="bt-short">\n'
+            '<h2>⚡ 短线回测参考 <span class="badge badge-auto">全量池短线 · 股票按权限分层</span></h2>\n'
+            '<div class="sub">短线 = 动量30/量价25/通道25/波动20（A 股个股反转版）+ <b>MA5 生命线每日止损</b> + 强势市门控 · 股票按权限<b>互斥分层</b>（各池独立回测）｜ ETF/基金 = 动量短线 —— 与中长线独立，监控表「⚡ 全量池短线」视图对应此池</div>\n'
+            '<div class="bt-grid">' + cards + '</div>\n</div>')
 perm_stat = f'股票 {len(v8_main)} ｜ ETF {len(v8_etf)} ｜ 基金 {len(v8_fund)}'
 
 def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extra_stat=None):
@@ -284,74 +370,9 @@ html = f"""<!doctype html>
 <br><b>卖出闸门（每日）</b>：全量池 移动止损 4.5% + 沪深300破MA150 ｜ 固定池 移动止损 10% + 破MA200 ｜ 任何闸门先触发先生效
 <br><b>历史快照</b>：右上角「标的报告」按月分类，点击当前页切换查看（不新开窗口）</div>
 </div>
-<div class="card" id="bt-all">
-<h2>📊 回测参考 <span class="badge badge-auto">三池独立 · 中/长线</span></h2>
-<div class="sub">股票池 = 全市场自动筛池 Top3 · 月轮动 ｜ ETF 池 = 动量 Top10 · 半年轮动 ｜ 基金池 = 净值动量 Top10 · 半年轮动 —— 各池独立回测，严格分开</div>
-<div class="bt-grid">
-<div class="bt-card" id="bt-stock">
-<div class="bt-head"><b>📈 股票池 中/长线</b><span class="bt-tag">月轮动 Top3</span></div>
-<div class="kpis">
-<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#f59e0b">+{s_auto["total_return_pct"]:.1f}%</div><div class="s">2016-01~2026-08</div></div>
-<div class="kpi"><div class="l">年化</div><div class="v">{s_auto["annual_return_pct"]:.1f}%</div><div class="s">50万中性资金</div></div>
-<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">{s_auto["max_drawdown_pct"]:.1f}%</div><div class="s">夏普 {s_auto["sharpe"]:.2f}</div></div>
+{bt_all_html()}
+{bt_short_html()}
 </div>
-<div class="bt-curve" id="curve-chart-stock"></div>
-</div>
-<div class="bt-card" id="bt-etf">
-<div class="bt-head"><b>🟠 ETF 池 中/长线</b><span class="bt-tag">半年轮动 Top10</span></div>
-<div class="kpis">
-<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#f59e0b">+{s_etf["total_return_pct"]:.1f}%</div><div class="s">2016-01~2026-08</div></div>
-<div class="kpi"><div class="l">年化</div><div class="v">{s_etf["annual_return_pct"]:.1f}%</div><div class="s">胜率 {s_etf.get("win_rate_pct",0):.0f}%</div></div>
-<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">{s_etf["max_drawdown_pct"]:.1f}%</div><div class="s">夏普 {s_etf["sharpe"]:.2f} · {s_etf.get("total_trades",0)} 笔</div></div>
-</div>
-<div class="bt-curve" id="curve-chart-etf"></div>
-</div>
-<div class="bt-card" id="bt-fund">
-<div class="bt-head"><b>🔵 基金池 中/长线</b><span class="bt-tag">半年轮动 Top10</span></div>
-<div class="kpis">
-<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#3b82f6">+{s_fund["total_return_pct"]:.1f}%</div><div class="s">2016-01~2026-08</div></div>
-<div class="kpi"><div class="l">年化</div><div class="v">{s_fund["annual_return_pct"]:.1f}%</div><div class="s">胜率 {s_fund.get("win_rate_pct",0):.0f}%</div></div>
-<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">{s_fund["max_drawdown_pct"]:.1f}%</div><div class="s">夏普 {s_fund["sharpe"]:.2f} · {s_fund.get("total_trades",0)} 笔</div></div>
-</div>
-<div class="bt-curve" id="curve-chart-fund"></div>
-</div>
-</div>
-<div class="card" id="bt-short">
-<h2>⚡ 短线回测参考 <span class="badge badge-auto">全量池短线 · 独立策略 · v3 混合风控</span></h2>
-<div class="sub">短线信号 = 动量30/量价25/通道25/波动20（A 股个股反转版）+ <b>MA5 生命线每日止损</b> + 止盈/止损 + 强势市门控 —— 与中长线独立回测，监控表「⚡ 全量池短线」视图即对应此池 · 点击左侧导航查看短线标的信号</div>
-<div class="bt-grid">
-<div class="bt-card" id="bt-short-stock">
-<div class="bt-head"><b>📈 股票短线</b><span class="bt-tag">{ss_stock_tag}</span></div>
-<div class="kpis">
-<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#f59e0b">+{ss_stock["total_return_pct"]:.1f}%</div><div class="s">全市场 5307 只 · 反转版</div></div>
-<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">{ss_stock["max_drawdown_pct"]:.1f}%</div><div class="s">年化 {ss_stock["annual_return_pct"]:.1f}%</div></div>
-<div class="kpi"><div class="l">夏普</div><div class="v" style="color:#22c55e">{ss_stock["sharpe"]:.2f}</div><div class="s">胜率 {ss_stock.get("win_rate_pct",0):.0f}% · {ss_stock.get("total_trades",0)} 笔</div></div>
-</div>
-<div class="bt-curve" id="curve-short-stock"></div>
-</div>
-<div class="bt-card" id="bt-short-etf">
-<div class="bt-head"><b>🟠 ETF 短线</b><span class="bt-tag">{ss_etf_tag}</span></div>
-<div class="kpis">
-<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#f59e0b">+{ss_etf["total_return_pct"]:.1f}%</div><div class="s">全量 1014 只 · 动量版</div></div>
-<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">{ss_etf["max_drawdown_pct"]:.1f}%</div><div class="s">年化 {ss_etf["annual_return_pct"]:.1f}%</div></div>
-<div class="kpi"><div class="l">夏普</div><div class="v" style="color:#22c55e">{ss_etf["sharpe"]:.2f}</div><div class="s">胜率 {ss_etf.get("win_rate_pct",0):.0f}% · {ss_etf.get("total_trades",0)} 笔</div></div>
-</div>
-<div class="bt-curve" id="curve-short-etf"></div>
-</div>
-<div class="bt-card" id="bt-short-fund">
-<div class="bt-head"><b>🔵 基金短线</b><span class="bt-tag">{ss_fund_tag}</span></div>
-<div class="kpis">
-<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#3b82f6">+{ss_fund["total_return_pct"]:.1f}%</div><div class="s">全量 14668 只 · 动量版</div></div>
-<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">{ss_fund["max_drawdown_pct"]:.1f}%</div><div class="s">年化 {ss_fund["annual_return_pct"]:.1f}%</div></div>
-<div class="kpi"><div class="l">夏普</div><div class="v" style="color:#22c55e">{ss_fund["sharpe"]:.2f}</div><div class="s">胜率 {ss_fund.get("win_rate_pct",0):.0f}% · {ss_fund.get("total_trades",0)} 笔</div></div>
-</div>
-<div class="bt-curve" id="curve-short-fund"></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-
 <!-- ============ 视图 A：全量池中/长线 ============ -->
 {system_block(
   "view-auto", "sys-auto",
@@ -403,6 +424,10 @@ window.ENH.sub_curves = {{
   short_etf: {json.dumps(v_short_etf)},
   short_fund: {json.dumps(v_short_fund)},
   short_stock: {json.dumps(v_short_stock)},
+  stk_all: {json.dumps(v9split_curves["all"])}, stk_main: {json.dumps(v9split_curves["main_only"])},
+  stk_gem: {json.dumps(v9split_curves["gem_only"])}, stk_star: {json.dumps(v9split_curves["star_only"])},
+  sstk_all: {json.dumps(shortsplit_curves["all"])}, sstk_main: {json.dumps(shortsplit_curves["main_only"])},
+  sstk_gem: {json.dumps(shortsplit_curves["gem_only"])}, sstk_star: {json.dumps(shortsplit_curves["star_only"])},
 }};
 /* 渲染 ETF/基金回测净值曲线（各自容器、各自对数坐标轴） */
 function renderOneCurve(elId, vals, color, label, totalPct){{
@@ -429,12 +454,18 @@ function renderOneCurve(elId, vals, color, label, totalPct){{
 }}
 function renderSubCurve(){{
   var C=window.ENH.sub_curves;if(!C)return;
-  renderOneCurve('curve-chart-stock', C.stock, '#f59e0b', '股票池', '+'+{s_auto["total_return_pct"]:.0f});
+  renderOneCurve('curve-chart-stock-all', C.stk_all, '#f59e0b', '股票 一体', '+'+{round(s_stk["all"].get("total_return_pct") or 0):.0f});
+  renderOneCurve('curve-chart-stock-main', C.stk_main, '#ea580c', '纯主板', '+'+{round(s_stk["main"].get("total_return_pct") or 0):.0f});
+  renderOneCurve('curve-chart-stock-gem', C.stk_gem, '#22c55e', '纯创业板', '+'+{round(s_stk["gem"].get("total_return_pct") or 0):.0f});
+  renderOneCurve('curve-chart-stock-star', C.stk_star, '#8b5cf6', '纯科创板', '+'+{round(s_stk["star"].get("total_return_pct") or 0):.0f});
   renderOneCurve('curve-chart-etf', C.etf, '#ea580c', 'ETF 池', '+'+{s_etf["total_return_pct"]:.0f});
   renderOneCurve('curve-chart-fund', C.fund, '#3b82f6', '基金池', '+'+{s_fund["total_return_pct"]:.0f});
+  renderOneCurve('curve-short-stock-all', C.sstk_all, '#f59e0b', '短线 股票 一体', '+'+{round(ss_stk["all"].get("total_return_pct") or 0):.0f});
+  renderOneCurve('curve-short-stock-main', C.sstk_main, '#ea580c', '短线 纯主板', '+'+{round(ss_stk["main"].get("total_return_pct") or 0):.0f});
+  renderOneCurve('curve-short-stock-gem', C.sstk_gem, '#22c55e', '短线 纯创业板', '+'+{round(ss_stk["gem"].get("total_return_pct") or 0):.0f});
+  renderOneCurve('curve-short-stock-star', C.sstk_star, '#8b5cf6', '短线 纯科创板', '+'+{round(ss_stk["star"].get("total_return_pct") or 0):.0f});
   renderOneCurve('curve-short-etf', C.short_etf, '#ea580c', 'ETF 短线', '+'+{ss_etf["total_return_pct"]:.0f});
   renderOneCurve('curve-short-fund', C.short_fund, '#3b82f6', '基金短线', '+'+{ss_fund["total_return_pct"]:.0f});
-  renderOneCurve('curve-short-stock', C.short_stock, '#f59e0b', '股票短线', '+'+{ss_stock["total_return_pct"]:.0f});
 }}
 /* 视图切换（hash 驱动：切换时更新 location.hash，加载/前进后退时按 hash 定位） */
 var VIEW_MAP={{'overview':'view-overview','sys-auto':'view-auto','sys-lite':'view-lite','short':'view-short','snapshot':'view-snapshot'}};
