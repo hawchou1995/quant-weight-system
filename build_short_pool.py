@@ -135,6 +135,12 @@ def tier_of(sc):
     if sc >= 30: return "减至半仓"
     return "清仓"
 
+def buy_tier(sc):
+    """短线买入口径（信号池专用）：回测 score≥50 即买 → 两态买入档"""
+    if sc >= 60: return "强买入"
+    if sc >= 50: return "买入"
+    return "不买"
+
 def rsi14(close):
     d = close.diff()
     up = d.clip(lower=0).rolling(14).mean()
@@ -243,8 +249,8 @@ def build():
             "px": round(px, 2), "chg": round(chg, 2) if chg is not None else None,
             "ret_1y": round(ret_1y, 1) if ret_1y is not None else None,
             "score": round(sc, 1), "score_prev": None,
-            "tier": tier_of(sc), "tier_prev": None,
-            "short_score": round(sc, 1), "short_tier": tier_of(sc),
+            "tier": buy_tier(sc), "tier_prev": None,
+            "short_score": round(sc, 1), "short_tier": buy_tier(sc),
             "factors": {"mom": round(r.get("mom20", 0) * 100, 1) if not pd.isna(r.get("mom20", np.nan)) else None,
                         "vr": round(float(r.get("vr5", 1)), 2) if not pd.isna(r.get("vr5", np.nan)) else None,
                         "trend": comp["trend"], "volume": comp["volume"],

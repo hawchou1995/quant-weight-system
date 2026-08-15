@@ -254,7 +254,7 @@ def bt_short_html():
             '<div class="bt-grid">' + cards + '</div>\n</div>')
 perm_stat = f'股票 {len(v8_main)} ｜ ETF {len(v8_etf)} ｜ 基金 {len(v8_fund)}'
 
-def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extra_stat=None, extra_card=""):
+def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extra_stat=None, extra_card="", score_sub="趋势/动量/量能/超买/风控"):
     """每个系统的完整区块：系统头（标题+说明）+ 操作统计条 + 汇总表 + 详情卡片
     回测参考统一放总览视图，这里只保留监控主体。extra_card=视图末尾追加卡片（如持仓跟踪）"""
     up, down = updown(items)
@@ -283,7 +283,7 @@ def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extr
 <table class="tbl" id="{tbl_id}">
 <thead><tr>
 <th data-key="rank" style="text-align:center">#</th><th data-key="name">标的</th><th data-key="board">板块</th><th data-key="industry">行业</th><th data-key="px" style="text-align:right">现价</th>
-<th data-key="chg" style="text-align:right">涨跌幅</th><th data-key="ret1y" style="text-align:right">近一年</th><th data-key="score" style="text-align:center">权重分<div class="th-sub">趋势/动量/量能/超买/风控</div></th><th data-key="rsi" style="text-align:center">RSI</th><th data-key="vp" style="text-align:center">量能</th>
+<th data-key="chg" style="text-align:right">涨跌幅</th><th data-key="ret1y" style="text-align:right">近一年</th><th data-key="score" style="text-align:center">权重分<div class="th-sub">{score_sub}</div></th><th data-key="rsi" style="text-align:center">RSI</th><th data-key="vp" style="text-align:center">量能</th>
 <th data-key="conf" style="text-align:center">置信度</th><th data-key="tier" style="text-align:center">档位</th><th data-key="tierchg" style="text-align:center">档位变化</th><th data-key="action" style="text-align:center">建议动作</th>
 </tr></thead>
 <tbody>{rows_html_for(items)}</tbody>
@@ -420,8 +420,8 @@ html = f"""<!doctype html>
   "view-short", "sys-short",
   "⚡ 全量池短线", "auto", f"全市场短线信号 Top 池（数据截至 {SHORT_POOL_ASOF}）：股票=反转信号 Top10（剔ST）｜ ETF=动量 Top10 ｜ 基金=动量 Top10 · 短线分 = 动量30/量价25/通道25/波动20 · 回测参考见「监控总览」",
   v9_short_items, "tbl-short", "card-tbl-short",
-  "信号池 = 回测买入清单：分数≥50 的 TopN 在轮动日全部买入（观望档 = 建议轻仓参与，仍属买入候选）· 减半/清仓 = 仅当已持仓时的卖出信号 · 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览",
-  extra_card=WATCH_CARD)}
+  "信号池 = 回测买入清单：分数≥50 的 TopN 在轮动日全部买入 · 档位 = 短线买入口径（强买入/买入）· 持仓的减仓/清仓信号见下方「我的持仓跟踪」· 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览",
+  extra_card=WATCH_CARD, score_sub="动量/量价/通道/波动")}
 
 <!-- ============ 历史快照视图（右上角标的报告切换） ============ -->
 <div class="view" id="view-snapshot">
