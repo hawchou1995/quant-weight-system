@@ -108,28 +108,64 @@ rebal21 = [d for d in all_days[::21]]
 prev_rebal = [d for d in rebal21 if d < all_days[-1]][-2]   # 上次完整再平衡（档位变化对比）
 last_day = all_days[-1]                                     # 08-14
 
-# 个人版自选池：主板10 + 创业板10 + 科创板10（按权限分层，各档位各 10 只）
-MAIN_CODES = ['600498','601138','002463','002384','600183','603986','002185','605358','603228','000636']
-GEM_CODES  = ['300502','300308','300476','300750','300059','300124','300316','300014','300223','300782']
-STAR_CODES = ['688981','688008','688012','688041','688256','688126','688111','688036','688599','688223']
+# 个人版自选池：用户原始固定池（20 股 + 5 ETF = v8_lite 口径，不动） + 6 只基金
+MAIN_CODES = ['300502','300308','600498','601138','002463','002384','600183','300476','603986',
+              '002185','605358','603228','603339','000636','605189','600403','002879','600162','000759','002474']
 ETFS = ['159516','515880','516150','560390','159841']
 FUNDS = ['008254','018036','002891','024239','014002','020900']
-# v9 自动池 Top10（普适版，保持原样）
-V9_CODES = ['600641','688082','688549','601208','603078','603083','603186','603773','603989','688143']
+
+# 普适版自动池：按权限分层，从全市场 v9 规则各取 Top10（main 主板10 / gem 主板+创业板10 / star 全A 10）
+def v9_rank_by_perm(perm, top_n=10, mom_min=0.25, score_min=65, rsi_max=85):
+    """v9 完整筛池规则（与 run_auto 一致），按权限取 TopN"""
+    cand = []
+    for code, ddf in A.pool_all.items():
+        if not A.board_filter(code, perm):
+            continue
+        if last_day not in ddf.index:
+            continue
+        r = ddf.loc[last_day]
+        if pd.isna(r['close']) or r['close'] <= 0 or pd.isna(r['mom_12_1']):
+            continue
+        if r['close'] < 2.0:
+            continue
+        if pd.isna(r['amt20']) or r['amt20'] < 5e6:
+            continue
+        if r['mom_12_1'] < mom_min:
+            continue
+        if pd.isna(r['ma200_pos']) or r['ma200_pos'] <= 0:
+            continue
+        sc = V.score_row(r)
+        if sc < score_min:
+            continue
+        cand.append((code, sc))
+    cand.sort(key=lambda kv: -kv[1])
+    return [c for c, _ in cand[:top_n]]
+
+V9_MAIN = v9_rank_by_perm("main", 10)   # 主板 10 只
+V9_GEM  = v9_rank_by_perm("gem", 10)    # 主板+创业板 10 只
+V9_STAR = v9_rank_by_perm("star", 10)   # 全A 10 只
+# 普适版分层清单（每档 10 只，供监控表按权限过滤）
+V9_TIERS = {
+    "main": [k[-6:] for k in V9_MAIN],
+    "gem":  [k[-6:] for k in V9_GEM],
+    "star": [k[-6:] for k in V9_STAR],
+}
+# 普适版监控池全集（分层，不去重——同一标的多档出现属正常）
+V9_CODES = V9_TIERS["main"] + V9_TIERS["gem"] + V9_TIERS["star"]
 
 # 权限映射：main=主板 / gem=创业板 / star=科创板 / etf / fund
 PERM_OF = {}
 for c in MAIN_CODES: PERM_OF[c] = "main"
-for c in GEM_CODES:  PERM_OF[c] = "gem"
-for c in STAR_CODES: PERM_OF[c] = "star"
 for c in ETFS:       PERM_OF[c] = "etf"
 for c in FUNDS:      PERM_OF[c] = "fund"
-# v9 自动池按板块映射权限（用于 v9 表权限过滤）
+# 普适版按板块映射权限（用于普适版表权限过滤）
 for c in V9_CODES:
     PERM_OF[c] = ("star" if c.startswith("688") else ("gem" if c.startswith("30") else "main"))
 
-ALL_CODES = MAIN_CODES + GEM_CODES + STAR_CODES + ETFS + FUNDS + V9_CODES
-POOL_TAG = {c: ("v9" if c in V9_CODES else "v8") for c in ALL_CODES}   # v8=个人版自选池 v9=普适版自动池
+ALL_CODES = list(dict.fromkeys(MAIN_CODES + ETFS + FUNDS + V9_CODES))   # 去重，details 每只一份
+# pool 标签：用户固定池优先（600183 等重叠标的归个人版展示，普适版表经 V9_TIERS 引用其数据）
+OVERLAP = sorted(set(MAIN_CODES) & set(V9_CODES))
+POOL_TAG = {c: ("v8" if c in MAIN_CODES + ETFS + FUNDS else "v9") for c in ALL_CODES}
 
 # ---------------- 标的详情 ----------------
 # 交易历史（两体系）
@@ -221,7 +257,8 @@ REPORTS_DIR = Path("D:/Documents/Obsidian/WorkBuddy/wiki/02-投资研究-Investm
 reports = sorted([f.name for f in REPORTS_DIR.glob("research-*.md")], reverse=True)
 
 out = {
-    "meta": {"as_of": "2026-08-14", "generated": "2026-08-15 21:00"},
+    "meta": {"as_of": "2026-08-14", "generated": "2026-08-15 23:20", "overlap": OVERLAP,
+             "v9_tiers": V9_TIERS},
     "nav": [["overview", "📊", "监控总览"], ["sys-auto", "🅰️", "普适版"], ["sys-lite", "🅱️", "个人版"], ["table", "📋", "标的监控表"]],
     "monitor_reports": [
         {"code": c, "name": d["name"], "tier": d["tier"]}
@@ -239,4 +276,6 @@ out = {
 js = "window.ENH = " + json.dumps(out, ensure_ascii=False) + ";"
 (BASE / "enhanced_data.js").write_text(js, encoding="utf-8")
 print(f"enhanced_data.js 生成: {len(details)} 只标的 + 2 体系 + {len(reports)} 篇报告 ({(BASE/'enhanced_data.js').stat().st_size/1024:.0f} KB)")
-print(f"  个人版自选池: {len([c for c in MAIN_CODES+GEM_CODES+STAR_CODES+ETFS+FUNDS if c in details])}/40 | v9 自动池: {len([c for c in V9_CODES if c in details])}/10")
+n_v8 = len([c for c in MAIN_CODES + ETFS + FUNDS if c in details])
+n_v9 = len([c for c in V9_CODES if c in details])
+print(f"  个人版自选池: {n_v8}/{len(MAIN_CODES)+len(ETFS)+len(FUNDS)} | 普适版自动池(分层去重): {n_v9}（main {len(V9_MAIN)} / gem {len(V9_GEM)} / star {len(V9_STAR)}）")

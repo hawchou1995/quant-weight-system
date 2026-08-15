@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """标的监控看板（双体系·三视图）：监控总览 / 普适版监控 / 个人版监控。
 左侧导航点击切换独立视图（不再一页堆叠）；每视图含 KPI + 监控表 + 独立回测曲线；
-个人版自选池按权限分层（主板10/创业板10/科创板10 + ETF4 + 基金6）；
+个人版 = 用户固定池（20股+5ETF+6基金）不动；普适版自动池按权限分层（main主板10/gem+创业板10/star全A10）；
 标题去版本号（普适版/个人版）；曲线独立坐标轴（根治纵坐标挤成皱纹）。"""
 import json
 import math
@@ -19,11 +19,21 @@ details = DATA["details"]
 # ---------------- 分池 ----------------
 all_items = list(details.values())
 v8_items = sorted([d for d in all_items if d.get("pool", "v8") == "v8"], key=lambda d: -d["score"])
-v9_items = sorted([d for d in all_items if d.get("pool", "v8") == "v9"], key=lambda d: -d["score"])
-# 个人版按权限分层
+# 普适版：按权限分层表（main 10 + gem 10 + star 10 = 30 行，同一标的多档出现属正常，
+# 权限过滤时每档恰好 10 只）；details 数据每只一份（600183 等重叠标的取个人版数据）
+v9_tiers = DATA.get("meta", {}).get("v9_tiers", {})
+v9_items = []
+for tier, codes in v9_tiers.items():
+    for c in codes:
+        d = details.get(c)
+        if d is None:
+            continue
+        row = dict(d)
+        row["perm"] = tier          # 行级档位（main/gem/star），覆盖数据默认
+        v9_items.append(row)
+v9_items.sort(key=lambda d: -d["score"])
+# 个人版按板块分组（用户固定池：股票+ETF+基金）
 v8_main = [d for d in v8_items if d["perm"] == "main"]
-v8_gem  = [d for d in v8_items if d["perm"] == "gem"]
-v8_star = [d for d in v8_items if d["perm"] == "star"]
 v8_etf  = [d for d in v8_items if d["perm"] == "etf"]
 v8_fund = [d for d in v8_items if d["perm"] == "fund"]
 
@@ -115,7 +125,7 @@ up9, down9 = updown(v9_items)
 up8, down8 = updown(v8_items)
 
 # 权限分层概览（个人版）
-perm_stat = f'''主板 {len(v8_main)} ｜ 创业板 {len(v8_gem)} ｜ 科创板 {len(v8_star)} ｜ ETF {len(v8_etf)} ｜ 基金 {len(v8_fund)}'''
+perm_stat = f'''股票 {len(v8_main)} ｜ ETF {len(v8_etf)} ｜ 基金 {len(v8_fund)}'''
 
 html = f"""<!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
@@ -138,7 +148,7 @@ html = f"""<!doctype html>
 <div class="view active" id="view-overview">
 <div class="card" id="overview">
 <h2>📊 标的监控总览 <span class="badge badge-auto">数据截至 2026-08-14 收盘</span></h2>
-<div class="sub">左侧导航切换：🅰️ 普适版监控（全市场自动池） / 🅱️ 个人版监控（自选池·权限分层） · 信号仅供参考，执行与否由你决定</div>
+<div class="sub">左侧导航切换：🅰️ 普适版监控（全市场自动池·权限分层各10只） / 🅱️ 个人版监控（用户固定池·股票+ETF+基金） · 信号仅供参考，执行与否由你决定</div>
 <div class="kpis">
 <div class="kpi"><div class="l">🟢 加仓区</div><div class="v" style="color:#dc2626">{sum(1 for d in all_items if d["tier"] in ("满仓加仓","轻仓加仓"))} 只</div><div class="s">满仓+轻仓加仓</div></div>
 <div class="kpi"><div class="l">🟡 观望区</div><div class="v" style="color:#d97706">{sum(1 for d in all_items if d["tier"]=="观望")} 只</div><div class="s">持有不加</div></div>
@@ -153,7 +163,7 @@ html = f"""<!doctype html>
 <!-- ============ 视图 A：普适版监控 ============ -->
 <div class="view" id="view-auto">
 <div class="card" id="sys-auto">
-<h2>🅰️ 普适版监控 <span class="view-badge auto">全市场自动池 · 无人工选池</span></h2>
+<h2>🅰️ 普适版监控 <span class="view-badge auto">全市场自动池 · 权限分层各 10 只</span></h2>
 <div class="sub">每月全市场绝对规则筛池 → Top3 等权 · 移动止损 4.5% · MA150 择时 · 动态门槛 · RSI&lt;85 · 自动补位</div>
 <div class="kpis">
 <div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#f59e0b">+{s_auto["total_return_pct"]:.1f}%</div><div class="s">参考：2016-01~2026-08</div></div>
@@ -165,7 +175,7 @@ html = f"""<!doctype html>
 <br><b>权限档</b>：main=仅主板(新开户) 夏普2.49 ｜ gem=+创业板 2.44 ｜ star=+科创板 2.34 —— 下表按权限切换查看</div>
 </div>
 {table_card("card-tbl-v9", "tbl-v9", "📋 普适版监控表", "badge-auto",
-            "全市场自动筛池 Top10（普适版监控口径）", v9_items,
+            "全市场自动筛池 · 按权限分层（main 主板10 / gem +创业板10 / star 全A10 = 30 行），同一标的多档出现属正常", v9_items,
             "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测净值曲线见下方（历史参考）")}
 <div class="card" id="curve-auto">
 <h2>📈 回测净值参考（普适版 · 2016-2026）</h2>
@@ -177,18 +187,18 @@ html = f"""<!doctype html>
 <!-- ============ 视图 B：个人版监控 ============ -->
 <div class="view" id="view-lite">
 <div class="card" id="sys-lite">
-<h2>🅱️ 个人版监控 <span class="view-badge lite">自选池 40 只 · 权限分层</span></h2>
-<div class="sub">自选池四因子打分轮动 Top4 · 月轮动(21日) · 移动止损 10% · MA200 择时 · 动态等权 · 权限分层：{perm_stat}</div>
+<h2>🅱️ 个人版监控 <span class="view-badge lite">用户固定池 · 股票+ETF+基金</span></h2>
+<div class="sub">固定池四因子打分轮动 Top4 · 月轮动(21日) · 移动止损 10% · MA200 择时 · 动态等权 · 池构成：{perm_stat}</div>
 <div class="kpis">
 <div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#3b82f6">+{s_lite["total_return_pct"]:.1f}%</div><div class="s">参考：2016-01~2026-08</div></div>
 <div class="kpi"><div class="l">年化</div><div class="v">{s_lite["annual_return_pct"]:.1f}%</div><div class="s">50万中性资金</div></div>
 <div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">{s_lite["max_drawdown_pct"]:.1f}%</div><div class="s">回测参考</div></div>
 <div class="kpi"><div class="l">夏普</div><div class="v" style="color:#22c55e">{s_lite["sharpe"]:.3f}</div><div class="s">回测参考</div></div>
 </div>
-<div class="rule-box" style="margin-bottom:0"><b>执行</b>：自选池 {len(v8_items)} 只打分 → 每期 Top4 等权 ｜ <b>风控</b>：移动止损 10% ｜ 沪深300 破 MA200 全撤 ｜ <b>权限</b>：主板10（新开户）/ +创业板10（2年+10万）/ +科创板10（2年+50万）/ ETF4 / 基金6</div>
+<div class="rule-box" style="margin-bottom:0"><b>执行</b>：用户固定池 {len(v8_items)} 只打分 → 每期 Top4 等权 ｜ <b>风控</b>：移动止损 10% ｜ 沪深300 破 MA200 全撤 ｜ <b>池构成</b>：股票 {len(v8_main)} + ETF {len(v8_etf)} + 基金 {len(v8_fund)}（用户固定池，未扩充）</div>
 </div>
 {table_card("card-tbl-v8", "tbl-v8", "📋 个人版监控表", "badge-lite",
-            f"自选池 {len(v8_items)} 只（主板 {len(v8_main)} + 创业板 {len(v8_gem)} + 科创板 {len(v8_star)} + ETF {len(v8_etf)} + 基金 {len(v8_fund)}）", v8_items,
+            f"用户固定池 {len(v8_items)} 只（股票 {len(v8_main)} + ETF {len(v8_etf)} + 基金 {len(v8_fund)}）", v8_items,
             "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测净值曲线见下方（历史参考）")}
 <div class="card" id="curve-lite">
 <h2>📈 回测净值参考（个人版 · 2016-2026）</h2>
@@ -281,4 +291,4 @@ document.addEventListener('DOMContentLoaded',function(){{
 out = BASE / "dual_system.html"
 out.write_text(html, encoding="utf-8")
 print(f"监控看板已生成: {out} ({out.stat().st_size/1024:.0f} KB)")
-print(f"  普适版表: {len(v9_items)} 只 | 个人版表: {len(v8_items)} 只（主板{len(v8_main)}/创业板{len(v8_gem)}/科创板{len(v8_star)}/ETF{len(v8_etf)}/基金{len(v8_fund)}）")
+print(f"  普适版表: {len(v9_items)} 只 | 个人版表: {len(v8_items)} 只（股票{len(v8_main)}/ETF{len(v8_etf)}/基金{len(v8_fund)}）")

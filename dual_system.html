@@ -161,12 +161,12 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class="view active" id="view-overview">
 <div class="card" id="overview">
 <h2>📊 标的监控总览 <span class="badge badge-auto">数据截至 2026-08-14 收盘</span></h2>
-<div class="sub">左侧导航切换：🅰️ 普适版监控（全市场自动池） / 🅱️ 个人版监控（自选池·权限分层） · 信号仅供参考，执行与否由你决定</div>
+<div class="sub">左侧导航切换：🅰️ 普适版监控（全市场自动池·权限分层各10只） / 🅱️ 个人版监控（用户固定池·股票+ETF+基金） · 信号仅供参考，执行与否由你决定</div>
 <div class="kpis">
-<div class="kpi"><div class="l">🟢 加仓区</div><div class="v" style="color:#dc2626">29 只</div><div class="s">满仓+轻仓加仓</div></div>
-<div class="kpi"><div class="l">🟡 观望区</div><div class="v" style="color:#d97706">12 只</div><div class="s">持有不加</div></div>
-<div class="kpi"><div class="l">🔴 减/清仓区</div><div class="v" style="color:#16a34a">9 只</div><div class="s">减半或清仓</div></div>
-<div class="kpi"><div class="l">共监控</div><div class="v">50 只</div><div class="s">普适版 10 + 个人版 40</div></div>
+<div class="kpi"><div class="l">🟢 加仓区</div><div class="v" style="color:#dc2626">33 只</div><div class="s">满仓+轻仓加仓</div></div>
+<div class="kpi"><div class="l">🟡 观望区</div><div class="v" style="color:#d97706">6 只</div><div class="s">持有不加</div></div>
+<div class="kpi"><div class="l">🔴 减/清仓区</div><div class="v" style="color:#16a34a">6 只</div><div class="s">减半或清仓</div></div>
+<div class="kpi"><div class="l">共监控</div><div class="v">45 只</div><div class="s">普适版 30 + 个人版 30</div></div>
 </div>
 <div class="rule-box" style="margin-bottom:0"><b>监控口径</b>：权重分 = 动量35% + 趋势25% + Aroon20% + 量价20% ｜ 档位 = ≥75 满仓加仓 / ≥60 轻仓加仓 / ≥45 观望 / ≥30 减半 / &lt;30 清仓
 <br><b>卖出闸门（每日）</b>：普适版 移动止损 4.5% + 沪深300破MA150 ｜ 个人版 移动止损 10% + 破MA200 ｜ 任何闸门先触发先生效</div>
@@ -176,7 +176,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <!-- ============ 视图 A：普适版监控 ============ -->
 <div class="view" id="view-auto">
 <div class="card" id="sys-auto">
-<h2>🅰️ 普适版监控 <span class="view-badge auto">全市场自动池 · 无人工选池</span></h2>
+<h2>🅰️ 普适版监控 <span class="view-badge auto">全市场自动池 · 权限分层各 10 只</span></h2>
 <div class="sub">每月全市场绝对规则筛池 → Top3 等权 · 移动止损 4.5% · MA150 择时 · 动态门槛 · RSI&lt;85 · 自动补位</div>
 <div class="kpis">
 <div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#f59e0b">+839.6%</div><div class="s">参考：2016-01~2026-08</div></div>
@@ -188,8 +188,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <br><b>权限档</b>：main=仅主板(新开户) 夏普2.49 ｜ gem=+创业板 2.44 ｜ star=+科创板 2.34 —— 下表按权限切换查看</div>
 </div>
 <div class="card" id="card-tbl-v9">
-<h2>📋 普适版监控表 <span class="badge badge-auto">10 只</span></h2>
-<div class="sub">全市场自动筛池 Top10（普适版监控口径） · 今日信号：加仓区 10 ｜ 减/清仓区 0 · 点击行打开监控详情 · 表头点击排序 · 权限切换模拟开户状态</div>
+<h2>📋 普适版监控表 <span class="badge badge-auto">30 只</span></h2>
+<div class="sub">全市场自动筛池 · 按权限分层（main 主板10 / gem +创业板10 / star 全A10 = 30 行），同一标的多档出现属正常 · 今日信号：加仓区 30 ｜ 减/清仓区 0 · 点击行打开监控详情 · 表头点击排序 · 权限切换模拟开户状态</div>
 <div class="toolbar">
 <input type="text" id="tbl-v9-q" placeholder="🔍 搜索名称 / 代码 / 行业…">
 <div class="perm-group" data-perm-group="tbl-v9"><button data-perm="all" class="active">全部</button><button data-perm="main" class="">主板·新开户</button><button data-perm="gem" class="">+创业板</button><button data-perm="star" class="">+科创板</button><button data-perm="etf" class="">ETF</button><button data-perm="fund" class="">基金</button></div>
@@ -211,8 +211,26 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><b>96.8</b></td>
 <td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
 <td style="text-align:center"><span style="color:var(--faint)">—</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="盛美上海 688082 电子" data-board="star" data-tier="满仓加仓" onclick="openDetail('688082')">
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="先导基电 600641 电子" data-board="gem" data-tier="满仓加仓" onclick="openDetail('600641')">
 <td style="text-align:center">2</td>
+<td><b>先导基电</b><br><span style="color:var(--faint);font-size:11px">600641 <span class="board-tag">主板</span> <span class="board-tag">电子</span></span></td>
+<td style="text-align:right" data-v="34.2">34.20</td>
+<td style="text-align:right" class="up" data-v="0.53">+0.53%</td>
+<td style="text-align:right" class="up" data-v="136.8">+137%</td>
+<td style="text-align:center"><b>96.8</b></td>
+<td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
+<td style="text-align:center"><span style="color:var(--faint)">—</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="先导基电 600641 电子" data-board="star" data-tier="满仓加仓" onclick="openDetail('600641')">
+<td style="text-align:center">3</td>
+<td><b>先导基电</b><br><span style="color:var(--faint);font-size:11px">600641 <span class="board-tag">主板</span> <span class="board-tag">电子</span></span></td>
+<td style="text-align:right" data-v="34.2">34.20</td>
+<td style="text-align:right" class="up" data-v="0.53">+0.53%</td>
+<td style="text-align:right" class="up" data-v="136.8">+137%</td>
+<td style="text-align:center"><b>96.8</b></td>
+<td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
+<td style="text-align:center"><span style="color:var(--faint)">—</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="盛美上海 688082 电子" data-board="star" data-tier="满仓加仓" onclick="openDetail('688082')">
+<td style="text-align:center">4</td>
 <td><b>盛美上海</b><br><span style="color:var(--faint);font-size:11px">688082 <span class="board-tag">科创板</span> <span class="board-tag">电子</span></span></td>
 <td style="text-align:right" data-v="305.4">305.40</td>
 <td style="text-align:right" class="down" data-v="-0.07">-0.07%</td>
@@ -221,7 +239,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
 <td style="text-align:center"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="中巨芯 688549 电子" data-board="star" data-tier="满仓加仓" onclick="openDetail('688549')">
-<td style="text-align:center">3</td>
+<td style="text-align:center">5</td>
 <td><b>中巨芯</b><br><span style="color:var(--faint);font-size:11px">688549 <span class="board-tag">科创板</span> <span class="board-tag">电子</span></span></td>
 <td style="text-align:right" data-v="29.5">29.50</td>
 <td style="text-align:right" class="up" data-v="7.66">+7.66%</td>
@@ -230,7 +248,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
 <td style="text-align:center"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="东材科技 601208 基础化工" data-board="main" data-tier="满仓加仓" onclick="openDetail('601208')">
-<td style="text-align:center">4</td>
+<td style="text-align:center">6</td>
 <td><b>东材科技</b><br><span style="color:var(--faint);font-size:11px">601208 <span class="board-tag">主板</span> <span class="board-tag">基础化工</span></span></td>
 <td style="text-align:right" data-v="47.71">47.71</td>
 <td style="text-align:right" class="up" data-v="1.68">+1.68%</td>
@@ -239,7 +257,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
 <td style="text-align:center"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="江化微 603078 电子" data-board="main" data-tier="满仓加仓" onclick="openDetail('603078')">
-<td style="text-align:center">5</td>
+<td style="text-align:center">7</td>
 <td><b>江化微</b><br><span style="color:var(--faint);font-size:11px">603078 <span class="board-tag">主板</span> <span class="board-tag">电子</span></span></td>
 <td style="text-align:right" data-v="36.18">36.18</td>
 <td style="text-align:right" class="down" data-v="-0.71">-0.71%</td>
@@ -248,7 +266,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
 <td style="text-align:center"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="剑桥科技 603083 通信" data-board="main" data-tier="满仓加仓" onclick="openDetail('603083')">
-<td style="text-align:center">6</td>
+<td style="text-align:center">8</td>
 <td><b>剑桥科技</b><br><span style="color:var(--faint);font-size:11px">603083 <span class="board-tag">主板</span> <span class="board-tag">通信</span></span></td>
 <td style="text-align:right" data-v="185.9">185.90</td>
 <td style="text-align:right" class="up" data-v="10.0">+10.00%</td>
@@ -257,7 +275,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
 <td style="text-align:center"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="华正新材 603186 电子" data-board="main" data-tier="满仓加仓" onclick="openDetail('603186')">
-<td style="text-align:center">7</td>
+<td style="text-align:center">9</td>
 <td><b>华正新材</b><br><span style="color:var(--faint);font-size:11px">603186 <span class="board-tag">主板</span> <span class="board-tag">电子</span></span></td>
 <td style="text-align:right" data-v="167.55">167.55</td>
 <td style="text-align:right" class="up" data-v="10.0">+10.00%</td>
@@ -266,7 +284,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
 <td style="text-align:center"><span style="color:var(--faint)">—</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="沃格光电 603773 电子" data-board="main" data-tier="满仓加仓" onclick="openDetail('603773')">
-<td style="text-align:center">8</td>
+<td style="text-align:center">10</td>
 <td><b>沃格光电</b><br><span style="color:var(--faint);font-size:11px">603773 <span class="board-tag">主板</span> <span class="board-tag">电子</span></span></td>
 <td style="text-align:right" data-v="94.99">94.99</td>
 <td style="text-align:right" class="up" data-v="1.27">+1.27%</td>
@@ -275,7 +293,142 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
 <td style="text-align:center"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="艾华集团 603989 电子" data-board="main" data-tier="满仓加仓" onclick="openDetail('603989')">
-<td style="text-align:center">9</td>
+<td style="text-align:center">11</td>
+<td><b>艾华集团</b><br><span style="color:var(--faint);font-size:11px">603989 <span class="board-tag">主板</span> <span class="board-tag">电子</span></span></td>
+<td style="text-align:right" data-v="32.99">32.99</td>
+<td style="text-align:right" class="up" data-v="10.0">+10.00%</td>
+<td style="text-align:right" class="up" data-v="105.9">+106%</td>
+<td style="text-align:center"><b>96.4</b></td>
+<td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
+<td style="text-align:center"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="东材科技 601208 基础化工" data-board="gem" data-tier="满仓加仓" onclick="openDetail('601208')">
+<td style="text-align:center">12</td>
+<td><b>东材科技</b><br><span style="color:var(--faint);font-size:11px">601208 <span class="board-tag">主板</span> <span class="board-tag">基础化工</span></span></td>
+<td style="text-align:right" data-v="47.71">47.71</td>
+<td style="text-align:right" class="up" data-v="1.68">+1.68%</td>
+<td style="text-align:right" class="up" data-v="187.8">+188%</td>
+<td style="text-align:center"><b>96.4</b></td>
+<td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
+<td style="text-align:center"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="江化微 603078 电子" data-board="gem" data-tier="满仓加仓" onclick="openDetail('603078')">
+<td style="text-align:center">13</td>
+<td><b>江化微</b><br><span style="color:var(--faint);font-size:11px">603078 <span class="board-tag">主板</span> <span class="board-tag">电子</span></span></td>
+<td style="text-align:right" data-v="36.18">36.18</td>
+<td style="text-align:right" class="down" data-v="-0.71">-0.71%</td>
+<td style="text-align:right" class="up" data-v="91.1">+91%</td>
+<td style="text-align:center"><b>96.4</b></td>
+<td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
+<td style="text-align:center"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="剑桥科技 603083 通信" data-board="gem" data-tier="满仓加仓" onclick="openDetail('603083')">
+<td style="text-align:center">14</td>
+<td><b>剑桥科技</b><br><span style="color:var(--faint);font-size:11px">603083 <span class="board-tag">主板</span> <span class="board-tag">通信</span></span></td>
+<td style="text-align:right" data-v="185.9">185.90</td>
+<td style="text-align:right" class="up" data-v="10.0">+10.00%</td>
+<td style="text-align:right" class="up" data-v="266.2">+266%</td>
+<td style="text-align:center"><b>96.4</b></td>
+<td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
+<td style="text-align:center"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="华正新材 603186 电子" data-board="gem" data-tier="满仓加仓" onclick="openDetail('603186')">
+<td style="text-align:center">15</td>
+<td><b>华正新材</b><br><span style="color:var(--faint);font-size:11px">603186 <span class="board-tag">主板</span> <span class="board-tag">电子</span></span></td>
+<td style="text-align:right" data-v="167.55">167.55</td>
+<td style="text-align:right" class="up" data-v="10.0">+10.00%</td>
+<td style="text-align:right" class="up" data-v="403.2">+403%</td>
+<td style="text-align:center"><b>96.4</b></td>
+<td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
+<td style="text-align:center"><span style="color:var(--faint)">—</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="沃格光电 603773 电子" data-board="gem" data-tier="满仓加仓" onclick="openDetail('603773')">
+<td style="text-align:center">16</td>
+<td><b>沃格光电</b><br><span style="color:var(--faint);font-size:11px">603773 <span class="board-tag">主板</span> <span class="board-tag">电子</span></span></td>
+<td style="text-align:right" data-v="94.99">94.99</td>
+<td style="text-align:right" class="up" data-v="1.27">+1.27%</td>
+<td style="text-align:right" class="up" data-v="248.6">+249%</td>
+<td style="text-align:center"><b>96.4</b></td>
+<td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
+<td style="text-align:center"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="艾华集团 603989 电子" data-board="gem" data-tier="满仓加仓" onclick="openDetail('603989')">
+<td style="text-align:center">17</td>
+<td><b>艾华集团</b><br><span style="color:var(--faint);font-size:11px">603989 <span class="board-tag">主板</span> <span class="board-tag">电子</span></span></td>
+<td style="text-align:right" data-v="32.99">32.99</td>
+<td style="text-align:right" class="up" data-v="10.0">+10.00%</td>
+<td style="text-align:right" class="up" data-v="105.9">+106%</td>
+<td style="text-align:center"><b>96.4</b></td>
+<td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
+<td style="text-align:center"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="中富电路 300814 —" data-board="gem" data-tier="满仓加仓" onclick="openDetail('300814')">
+<td style="text-align:center">18</td>
+<td><b>中富电路</b><br><span style="color:var(--faint);font-size:11px">300814 <span class="board-tag">创业板</span> <span class="board-tag">—</span></span></td>
+<td style="text-align:right" data-v="155.88">155.88</td>
+<td style="text-align:right" class="up" data-v="11.74">+11.74%</td>
+<td style="text-align:right" class="up" data-v="347.2">+347%</td>
+<td style="text-align:center"><b>96.4</b></td>
+<td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
+<td style="text-align:center"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="科翔股份 300903 —" data-board="gem" data-tier="满仓加仓" onclick="openDetail('300903')">
+<td style="text-align:center">19</td>
+<td><b>科翔股份</b><br><span style="color:var(--faint);font-size:11px">300903 <span class="board-tag">创业板</span> <span class="board-tag">—</span></span></td>
+<td style="text-align:right" data-v="79.9">79.90</td>
+<td style="text-align:right" class="up" data-v="3.23">+3.23%</td>
+<td style="text-align:right" class="up" data-v="587.0">+587%</td>
+<td style="text-align:center"><b>96.4</b></td>
+<td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
+<td style="text-align:center"><span style="color:var(--faint)">—</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="维峰电子 301328 —" data-board="gem" data-tier="满仓加仓" onclick="openDetail('301328')">
+<td style="text-align:center">20</td>
+<td><b>维峰电子</b><br><span style="color:var(--faint);font-size:11px">301328 <span class="board-tag">创业板</span> <span class="board-tag">—</span></span></td>
+<td style="text-align:right" data-v="61.45">61.45</td>
+<td style="text-align:right" class="up" data-v="4.15">+4.15%</td>
+<td style="text-align:right" class="up" data-v="100.3">+100%</td>
+<td style="text-align:center"><b>96.4</b></td>
+<td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
+<td style="text-align:center"><span style="color:var(--faint)">—</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="东材科技 601208 基础化工" data-board="star" data-tier="满仓加仓" onclick="openDetail('601208')">
+<td style="text-align:center">21</td>
+<td><b>东材科技</b><br><span style="color:var(--faint);font-size:11px">601208 <span class="board-tag">主板</span> <span class="board-tag">基础化工</span></span></td>
+<td style="text-align:right" data-v="47.71">47.71</td>
+<td style="text-align:right" class="up" data-v="1.68">+1.68%</td>
+<td style="text-align:right" class="up" data-v="187.8">+188%</td>
+<td style="text-align:center"><b>96.4</b></td>
+<td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
+<td style="text-align:center"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="江化微 603078 电子" data-board="star" data-tier="满仓加仓" onclick="openDetail('603078')">
+<td style="text-align:center">22</td>
+<td><b>江化微</b><br><span style="color:var(--faint);font-size:11px">603078 <span class="board-tag">主板</span> <span class="board-tag">电子</span></span></td>
+<td style="text-align:right" data-v="36.18">36.18</td>
+<td style="text-align:right" class="down" data-v="-0.71">-0.71%</td>
+<td style="text-align:right" class="up" data-v="91.1">+91%</td>
+<td style="text-align:center"><b>96.4</b></td>
+<td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
+<td style="text-align:center"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="剑桥科技 603083 通信" data-board="star" data-tier="满仓加仓" onclick="openDetail('603083')">
+<td style="text-align:center">23</td>
+<td><b>剑桥科技</b><br><span style="color:var(--faint);font-size:11px">603083 <span class="board-tag">主板</span> <span class="board-tag">通信</span></span></td>
+<td style="text-align:right" data-v="185.9">185.90</td>
+<td style="text-align:right" class="up" data-v="10.0">+10.00%</td>
+<td style="text-align:right" class="up" data-v="266.2">+266%</td>
+<td style="text-align:center"><b>96.4</b></td>
+<td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
+<td style="text-align:center"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="华正新材 603186 电子" data-board="star" data-tier="满仓加仓" onclick="openDetail('603186')">
+<td style="text-align:center">24</td>
+<td><b>华正新材</b><br><span style="color:var(--faint);font-size:11px">603186 <span class="board-tag">主板</span> <span class="board-tag">电子</span></span></td>
+<td style="text-align:right" data-v="167.55">167.55</td>
+<td style="text-align:right" class="up" data-v="10.0">+10.00%</td>
+<td style="text-align:right" class="up" data-v="403.2">+403%</td>
+<td style="text-align:center"><b>96.4</b></td>
+<td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
+<td style="text-align:center"><span style="color:var(--faint)">—</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="沃格光电 603773 电子" data-board="star" data-tier="满仓加仓" onclick="openDetail('603773')">
+<td style="text-align:center">25</td>
+<td><b>沃格光电</b><br><span style="color:var(--faint);font-size:11px">603773 <span class="board-tag">主板</span> <span class="board-tag">电子</span></span></td>
+<td style="text-align:right" data-v="94.99">94.99</td>
+<td style="text-align:right" class="up" data-v="1.27">+1.27%</td>
+<td style="text-align:right" class="up" data-v="248.6">+249%</td>
+<td style="text-align:center"><b>96.4</b></td>
+<td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
+<td style="text-align:center"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="艾华集团 603989 电子" data-board="star" data-tier="满仓加仓" onclick="openDetail('603989')">
+<td style="text-align:center">26</td>
 <td><b>艾华集团</b><br><span style="color:var(--faint);font-size:11px">603989 <span class="board-tag">主板</span> <span class="board-tag">电子</span></span></td>
 <td style="text-align:right" data-v="32.99">32.99</td>
 <td style="text-align:right" class="up" data-v="10.0">+10.00%</td>
@@ -284,7 +437,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
 <td style="text-align:center"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="长盈通 688143 通信" data-board="star" data-tier="满仓加仓" onclick="openDetail('688143')">
-<td style="text-align:center">10</td>
+<td style="text-align:center">27</td>
 <td><b>长盈通</b><br><span style="color:var(--faint);font-size:11px">688143 <span class="board-tag">科创板</span> <span class="board-tag">通信</span></span></td>
 <td style="text-align:right" data-v="140.0">140.00</td>
 <td style="text-align:right" class="up" data-v="14.88">+14.88%</td>
@@ -292,6 +445,33 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><b>96.4</b></td>
 <td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
 <td style="text-align:center"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="旭光电子 600353 —" data-board="main" data-tier="满仓加仓" onclick="openDetail('600353')">
+<td style="text-align:center">28</td>
+<td><b>旭光电子</b><br><span style="color:var(--faint);font-size:11px">600353 <span class="board-tag">主板</span> <span class="board-tag">—</span></span></td>
+<td style="text-align:right" data-v="31.03">31.03</td>
+<td style="text-align:right" class="up" data-v="10.0">+10.00%</td>
+<td style="text-align:right" class="up" data-v="145.7">+146%</td>
+<td style="text-align:center"><b>96.0</b></td>
+<td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
+<td style="text-align:center"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="生益科技 600183 覆铜板" data-board="main" data-tier="满仓加仓" onclick="openDetail('600183')">
+<td style="text-align:center">29</td>
+<td><b>生益科技</b><br><span style="color:var(--faint);font-size:11px">600183 <span class="board-tag">主板</span> <span class="board-tag">覆铜板</span></span></td>
+<td style="text-align:right" data-v="143.21">143.21</td>
+<td style="text-align:right" class="up" data-v="1.04">+1.04%</td>
+<td style="text-align:right" class="up" data-v="253.8">+254%</td>
+<td style="text-align:center"><b>95.6</b></td>
+<td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
+<td style="text-align:center"><span style="color:var(--faint)">—</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="江钨装备 600397 —" data-board="main" data-tier="满仓加仓" onclick="openDetail('600397')">
+<td style="text-align:center">30</td>
+<td><b>江钨装备</b><br><span style="color:var(--faint);font-size:11px">600397 <span class="board-tag">主板</span> <span class="board-tag">—</span></span></td>
+<td style="text-align:right" data-v="18.06">18.06</td>
+<td style="text-align:right" class="up" data-v="3.2">+3.20%</td>
+<td style="text-align:right" class="up" data-v="195.1">+195%</td>
+<td style="text-align:center"><b>95.6</b></td>
+<td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
+<td style="text-align:center"><span style="color:var(--faint)">—</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr></tbody>
 </table>
 <div class="note">档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测净值曲线见下方（历史参考）</div>
@@ -306,19 +486,19 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <!-- ============ 视图 B：个人版监控 ============ -->
 <div class="view" id="view-lite">
 <div class="card" id="sys-lite">
-<h2>🅱️ 个人版监控 <span class="view-badge lite">自选池 40 只 · 权限分层</span></h2>
-<div class="sub">自选池四因子打分轮动 Top4 · 月轮动(21日) · 移动止损 10% · MA200 择时 · 动态等权 · 权限分层：主板 10 ｜ 创业板 10 ｜ 科创板 10 ｜ ETF 4 ｜ 基金 6</div>
+<h2>🅱️ 个人版监控 <span class="view-badge lite">用户固定池 · 股票+ETF+基金</span></h2>
+<div class="sub">固定池四因子打分轮动 Top4 · 月轮动(21日) · 移动止损 10% · MA200 择时 · 动态等权 · 池构成：股票 20 ｜ ETF 4 ｜ 基金 6</div>
 <div class="kpis">
 <div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#3b82f6">+3923.7%</div><div class="s">参考：2016-01~2026-08</div></div>
 <div class="kpi"><div class="l">年化</div><div class="v">41.7%</div><div class="s">50万中性资金</div></div>
 <div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">-18.0%</div><div class="s">回测参考</div></div>
 <div class="kpi"><div class="l">夏普</div><div class="v" style="color:#22c55e">1.644</div><div class="s">回测参考</div></div>
 </div>
-<div class="rule-box" style="margin-bottom:0"><b>执行</b>：自选池 40 只打分 → 每期 Top4 等权 ｜ <b>风控</b>：移动止损 10% ｜ 沪深300 破 MA200 全撤 ｜ <b>权限</b>：主板10（新开户）/ +创业板10（2年+10万）/ +科创板10（2年+50万）/ ETF4 / 基金6</div>
+<div class="rule-box" style="margin-bottom:0"><b>执行</b>：用户固定池 30 只打分 → 每期 Top4 等权 ｜ <b>风控</b>：移动止损 10% ｜ 沪深300 破 MA200 全撤 ｜ <b>池构成</b>：股票 20 + ETF 4 + 基金 6（用户固定池，未扩充）</div>
 </div>
 <div class="card" id="card-tbl-v8">
-<h2>📋 个人版监控表 <span class="badge badge-lite">40 只</span></h2>
-<div class="sub">自选池 40 只（主板 10 + 创业板 10 + 科创板 10 + ETF 4 + 基金 6） · 今日信号：加仓区 19 ｜ 减/清仓区 9 · 点击行打开监控详情 · 表头点击排序 · 权限切换模拟开户状态</div>
+<h2>📋 个人版监控表 <span class="badge badge-lite">30 只</span></h2>
+<div class="sub">用户固定池 30 只（股票 20 + ETF 4 + 基金 6） · 今日信号：加仓区 18 ｜ 减/清仓区 6 · 点击行打开监控详情 · 表头点击排序 · 权限切换模拟开户状态</div>
 <div class="toolbar">
 <input type="text" id="tbl-v8-q" placeholder="🔍 搜索名称 / 代码 / 行业…">
 <div class="perm-group" data-perm-group="tbl-v8"><button data-perm="all" class="active">全部</button><button data-perm="main" class="">主板·新开户</button><button data-perm="gem" class="">+创业板</button><button data-perm="star" class="">+科创板</button><button data-perm="etf" class="">ETF</button><button data-perm="fund" class="">基金</button></div>
@@ -358,15 +538,15 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><b>82.0</b></td>
 <td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
 <td style="text-align:center"><span class="pill-chg-up">观望→满仓加仓</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="中微公司 688012 —" data-board="star" data-tier="满仓加仓" onclick="openDetail('688012')">
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="香江控股 600162 地产服务" data-board="main" data-tier="满仓加仓" onclick="openDetail('600162')">
 <td style="text-align:center">4</td>
-<td><b>中微公司</b><br><span style="color:var(--faint);font-size:11px">688012 <span class="board-tag">科创板</span> <span class="board-tag">—</span></span></td>
-<td style="text-align:right" data-v="374.85">374.85</td>
-<td style="text-align:right" class="up" data-v="1.2">+1.20%</td>
-<td style="text-align:right" class="up" data-v="204.3">+204%</td>
-<td style="text-align:center"><b>76.8</b></td>
+<td><b>香江控股</b><br><span style="color:var(--faint);font-size:11px">600162 <span class="board-tag">主板</span> <span class="board-tag">地产服务</span></span></td>
+<td style="text-align:right" data-v="4.7">4.70</td>
+<td style="text-align:right" class="up" data-v="2.84">+2.84%</td>
+<td style="text-align:right" class="up" data-v="181.4">+181%</td>
+<td style="text-align:center"><b>81.2</b></td>
 <td style="text-align:center"><span class="pill pill-full">满仓加仓</span></td>
-<td style="text-align:center"><span style="color:var(--faint)">—</span></td>
+<td style="text-align:center"><span class="pill-chg-up">观望→满仓加仓</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-search="半导体设备ETF国泰 159516 半导体设备" data-board="etf" data-tier="满仓加仓" onclick="openDetail('159516')">
 <td style="text-align:center">5</td>
 <td><b>半导体设备ETF国泰</b><br><span style="color:var(--faint);font-size:11px">159516 <span class="board-tag">ETF</span> <span class="board-tag">半导体设备</span></span></td>
@@ -403,17 +583,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><b>70.6</b></td>
 <td style="text-align:center"><span class="pill pill-add">轻仓加仓</span></td>
 <td style="text-align:center"><span style="color:var(--faint)">—</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">可加至目标仓位</td></tr><tr data-search="华天科技 002185 半导体封测" data-board="main" data-tier="轻仓加仓" onclick="openDetail('002185')">
+<td style="text-align:center;font-size:12px;color:var(--sub)">可加至目标仓位</td></tr><tr data-search="胜宏科技 300476 PCB" data-board="main" data-tier="轻仓加仓" onclick="openDetail('300476')">
 <td style="text-align:center">9</td>
-<td><b>华天科技</b><br><span style="color:var(--faint);font-size:11px">002185 <span class="board-tag">主板</span> <span class="board-tag">半导体封测</span></span></td>
-<td style="text-align:right" data-v="17.98">17.98</td>
-<td style="text-align:right" class="up" data-v="0.56">+0.56%</td>
-<td style="text-align:right" class="up" data-v="80.2">+80%</td>
-<td style="text-align:center"><b>70.6</b></td>
-<td style="text-align:center"><span class="pill pill-add">轻仓加仓</span></td>
-<td style="text-align:center"><span class="pill-chg-up">满仓加仓→轻仓加仓</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">可加至目标仓位</td></tr><tr data-search="胜宏科技 300476 PCB" data-board="gem" data-tier="轻仓加仓" onclick="openDetail('300476')">
-<td style="text-align:center">10</td>
 <td><b>胜宏科技</b><br><span style="color:var(--faint);font-size:11px">300476 <span class="board-tag">创业板</span> <span class="board-tag">PCB</span></span></td>
 <td style="text-align:right" data-v="269.33">269.33</td>
 <td style="text-align:right" class="down" data-v="-0.73">-0.73%</td>
@@ -421,6 +592,15 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><b>70.6</b></td>
 <td style="text-align:center"><span class="pill pill-add">轻仓加仓</span></td>
 <td style="text-align:center"><span style="color:var(--faint)">—</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">可加至目标仓位</td></tr><tr data-search="华天科技 002185 半导体封测" data-board="main" data-tier="轻仓加仓" onclick="openDetail('002185')">
+<td style="text-align:center">10</td>
+<td><b>华天科技</b><br><span style="color:var(--faint);font-size:11px">002185 <span class="board-tag">主板</span> <span class="board-tag">半导体封测</span></span></td>
+<td style="text-align:right" data-v="17.98">17.98</td>
+<td style="text-align:right" class="up" data-v="0.56">+0.56%</td>
+<td style="text-align:right" class="up" data-v="80.2">+80%</td>
+<td style="text-align:center"><b>70.6</b></td>
+<td style="text-align:center"><span class="pill pill-add">轻仓加仓</span></td>
+<td style="text-align:center"><span class="pill-chg-up">满仓加仓→轻仓加仓</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">可加至目标仓位</td></tr><tr data-search="华夏移动互联CNY 002891 移动互联" data-board="fund" data-tier="轻仓加仓" onclick="openDetail('002891')">
 <td style="text-align:center">11</td>
 <td><b>华夏移动互联CNY</b><br><span style="color:var(--faint);font-size:11px">002891 <span class="board-tag">基金</span> <span class="board-tag">移动互联</span></span></td>
@@ -439,7 +619,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><b>69.8</b></td>
 <td style="text-align:center"><span class="pill pill-add">轻仓加仓</span></td>
 <td style="text-align:center"><span class="pill-chg-up">满仓加仓→轻仓加仓</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">可加至目标仓位</td></tr><tr data-search="中际旭创 300308 光模块" data-board="gem" data-tier="轻仓加仓" onclick="openDetail('300308')">
+<td style="text-align:center;font-size:12px;color:var(--sub)">可加至目标仓位</td></tr><tr data-search="中际旭创 300308 光模块" data-board="main" data-tier="轻仓加仓" onclick="openDetail('300308')">
 <td style="text-align:center">13</td>
 <td><b>中际旭创</b><br><span style="color:var(--faint);font-size:11px">300308 <span class="board-tag">创业板</span> <span class="board-tag">光模块</span></span></td>
 <td style="text-align:right" data-v="943.0">943.00</td>
@@ -448,7 +628,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><b>69.1</b></td>
 <td style="text-align:center"><span class="pill pill-add">轻仓加仓</span></td>
 <td style="text-align:center"><span style="color:var(--faint)">—</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">可加至目标仓位</td></tr><tr data-search="新易盛 300502 光模块" data-board="gem" data-tier="轻仓加仓" onclick="openDetail('300502')">
+<td style="text-align:center;font-size:12px;color:var(--sub)">可加至目标仓位</td></tr><tr data-search="新易盛 300502 光模块" data-board="main" data-tier="轻仓加仓" onclick="openDetail('300502')">
 <td style="text-align:center">14</td>
 <td><b>新易盛</b><br><span style="color:var(--faint);font-size:11px">300502 <span class="board-tag">创业板</span> <span class="board-tag">光模块</span></span></td>
 <td style="text-align:right" data-v="448.08">448.08</td>
@@ -475,17 +655,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><b>65.4</b></td>
 <td style="text-align:center"><span class="pill pill-add">轻仓加仓</span></td>
 <td style="text-align:center"><span style="color:var(--faint)">—</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">可加至目标仓位</td></tr><tr data-search="澜起科技 688008 —" data-board="star" data-tier="轻仓加仓" onclick="openDetail('688008')">
-<td style="text-align:center">17</td>
-<td><b>澜起科技</b><br><span style="color:var(--faint);font-size:11px">688008 <span class="board-tag">科创板</span> <span class="board-tag">—</span></span></td>
-<td style="text-align:right" data-v="211.91">211.91</td>
-<td style="text-align:right" class="up" data-v="0.8">+0.80%</td>
-<td style="text-align:right" class="up" data-v="158.7">+159%</td>
-<td style="text-align:center"><b>63.8</b></td>
-<td style="text-align:center"><span class="pill pill-add">轻仓加仓</span></td>
-<td style="text-align:center"><span style="color:var(--faint)">—</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">可加至目标仓位</td></tr><tr data-search="天弘通信设备C 020900 —" data-board="fund" data-tier="轻仓加仓" onclick="openDetail('020900')">
-<td style="text-align:center">18</td>
+<td style="text-align:center">17</td>
 <td><b>天弘通信设备C</b><br><span style="color:var(--faint);font-size:11px">020900 <span class="board-tag">基金</span> <span class="board-tag">—</span></span></td>
 <td style="text-align:right" data-v="3.46">3.46</td>
 <td style="text-align:right" class="up" data-v="0.17">+0.17%</td>
@@ -494,7 +665,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><span class="pill pill-add">轻仓加仓</span></td>
 <td style="text-align:center"><span style="color:var(--faint)">—</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">可加至目标仓位</td></tr><tr data-search="浦银智能科技C 014002 智能科技" data-board="fund" data-tier="轻仓加仓" onclick="openDetail('014002')">
-<td style="text-align:center">19</td>
+<td style="text-align:center">18</td>
 <td><b>浦银智能科技C</b><br><span style="color:var(--faint);font-size:11px">014002 <span class="board-tag">基金</span> <span class="board-tag">智能科技</span></span></td>
 <td style="text-align:right" data-v="3.37">3.37</td>
 <td style="text-align:right" class="up" data-v="3.77">+3.77%</td>
@@ -503,7 +674,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><span class="pill pill-add">轻仓加仓</span></td>
 <td style="text-align:center"><span style="color:var(--faint)">—</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">可加至目标仓位</td></tr><tr data-search="华宝致远混合C 008254 QDII混合" data-board="fund" data-tier="观望" onclick="openDetail('008254')">
-<td style="text-align:center">20</td>
+<td style="text-align:center">19</td>
 <td><b>华宝致远混合C</b><br><span style="color:var(--faint);font-size:11px">008254 <span class="board-tag">基金</span> <span class="board-tag">QDII混合</span></span></td>
 <td style="text-align:right" data-v="1.75">1.75</td>
 <td style="text-align:right" class="up" data-v="0.66">+0.66%</td>
@@ -511,35 +682,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><b>59.8</b></td>
 <td style="text-align:center"><span class="pill pill-watch">观望</span></td>
 <td style="text-align:center"><span class="pill-chg-down">轻仓加仓→观望</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">持有不加 / 观望</td></tr><tr data-search="君正股份 300223 —" data-board="gem" data-tier="观望" onclick="openDetail('300223')">
-<td style="text-align:center">21</td>
-<td><b>君正股份</b><br><span style="color:var(--faint);font-size:11px">300223 <span class="board-tag">创业板</span> <span class="board-tag">—</span></span></td>
-<td style="text-align:right" data-v="143.62">143.62</td>
-<td style="text-align:right" class="up" data-v="4.47">+4.47%</td>
-<td style="text-align:right" class="up" data-v="116.5">+116%</td>
-<td style="text-align:center"><b>59.0</b></td>
-<td style="text-align:center"><span class="pill pill-watch">观望</span></td>
-<td style="text-align:center"><span class="pill-chg-down">满仓加仓→观望</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">持有不加 / 观望</td></tr><tr data-search="中芯国际 688981 —" data-board="star" data-tier="观望" onclick="openDetail('688981')">
-<td style="text-align:center">22</td>
-<td><b>中芯国际</b><br><span style="color:var(--faint);font-size:11px">688981 <span class="board-tag">科创板</span> <span class="board-tag">—</span></span></td>
-<td style="text-align:right" data-v="132.87">132.87</td>
-<td style="text-align:right" class="up" data-v="2.65">+2.65%</td>
-<td style="text-align:right" class="up" data-v="44.8">+45%</td>
-<td style="text-align:center"><b>58.6</b></td>
-<td style="text-align:center"><span class="pill pill-watch">观望</span></td>
-<td style="text-align:center"><span class="pill-chg-down">满仓加仓→观望</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">持有不加 / 观望</td></tr><tr data-search="沪硅产业 688126 —" data-board="star" data-tier="观望" onclick="openDetail('688126')">
-<td style="text-align:center">23</td>
-<td><b>沪硅产业</b><br><span style="color:var(--faint);font-size:11px">688126 <span class="board-tag">科创板</span> <span class="board-tag">—</span></span></td>
-<td style="text-align:right" data-v="25.9">25.90</td>
-<td style="text-align:right" class="up" data-v="2.25">+2.25%</td>
-<td style="text-align:right" class="up" data-v="40.2">+40%</td>
-<td style="text-align:center"><b>58.4</b></td>
-<td style="text-align:center"><span class="pill pill-watch">观望</span></td>
-<td style="text-align:center"><span class="pill-chg-down">轻仓加仓→观望</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">持有不加 / 观望</td></tr><tr data-search="通信ETF国泰 515880 通信" data-board="etf" data-tier="观望" onclick="openDetail('515880')">
-<td style="text-align:center">24</td>
+<td style="text-align:center">20</td>
 <td><b>通信ETF国泰</b><br><span style="color:var(--faint);font-size:11px">515880 <span class="board-tag">ETF</span> <span class="board-tag">通信</span></span></td>
 <td style="text-align:right" data-v="3.88">3.88</td>
 <td style="text-align:right" class="up" data-v="0.15">+0.15%</td>
@@ -547,26 +691,17 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><b>57.7</b></td>
 <td style="text-align:center"><span class="pill pill-watch">观望</span></td>
 <td style="text-align:center"><span class="pill-chg-down">轻仓加仓→观望</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">持有不加 / 观望</td></tr><tr data-search="寒武纪 688256 —" data-board="star" data-tier="观望" onclick="openDetail('688256')">
-<td style="text-align:center">25</td>
-<td><b>寒武纪</b><br><span style="color:var(--faint);font-size:11px">688256 <span class="board-tag">科创板</span> <span class="board-tag">—</span></span></td>
-<td style="text-align:right" data-v="1093.0">1093.00</td>
-<td style="text-align:right" class="down" data-v="-1.13">-1.13%</td>
-<td style="text-align:right" class="up" data-v="136.5">+136%</td>
-<td style="text-align:center"><b>57.4</b></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有不加 / 观望</td></tr><tr data-search="大有能源 600403 煤炭" data-board="main" data-tier="观望" onclick="openDetail('600403')">
+<td style="text-align:center">21</td>
+<td><b>大有能源</b><br><span style="color:var(--faint);font-size:11px">600403 <span class="board-tag">主板</span> <span class="board-tag">煤炭</span></span></td>
+<td style="text-align:right" data-v="6.32">6.32</td>
+<td style="text-align:right" class="down" data-v="-3.22">-3.22%</td>
+<td style="text-align:right" class="up" data-v="64.2">+64%</td>
+<td style="text-align:center"><b>56.2</b></td>
 <td style="text-align:center"><span class="pill pill-watch">观望</span></td>
-<td style="text-align:center"><span class="pill-chg-down">满仓加仓→观望</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">持有不加 / 观望</td></tr><tr data-search="海光信息 688041 —" data-board="star" data-tier="观望" onclick="openDetail('688041')">
-<td style="text-align:center">26</td>
-<td><b>海光信息</b><br><span style="color:var(--faint);font-size:11px">688041 <span class="board-tag">科创板</span> <span class="board-tag">—</span></span></td>
-<td style="text-align:right" data-v="280.99">280.99</td>
-<td style="text-align:right" class="down" data-v="-1.75">-1.75%</td>
-<td style="text-align:right" class="up" data-v="104.1">+104%</td>
-<td style="text-align:center"><b>56.9</b></td>
-<td style="text-align:center"><span class="pill pill-watch">观望</span></td>
-<td style="text-align:center"><span class="pill-chg-down">轻仓加仓→观望</span></td>
+<td style="text-align:center"><span class="pill-chg-down">减至半仓→观望</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">持有不加 / 观望</td></tr><tr data-search="立昂微 605358 半导体硅片" data-board="main" data-tier="观望" onclick="openDetail('605358')">
-<td style="text-align:center">27</td>
+<td style="text-align:center">22</td>
 <td><b>立昂微</b><br><span style="color:var(--faint);font-size:11px">605358 <span class="board-tag">主板</span> <span class="board-tag">半导体硅片</span></span></td>
 <td style="text-align:right" data-v="44.85">44.85</td>
 <td style="text-align:right" class="up" data-v="1.82">+1.82%</td>
@@ -575,7 +710,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><span class="pill pill-watch">观望</span></td>
 <td style="text-align:center"><span class="pill-chg-down">轻仓加仓→观望</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">持有不加 / 观望</td></tr><tr data-search="华夏全球QDII C 024239 QDII科技" data-board="fund" data-tier="观望" onclick="openDetail('024239')">
-<td style="text-align:center">28</td>
+<td style="text-align:center">23</td>
 <td><b>华夏全球QDII C</b><br><span style="color:var(--faint);font-size:11px">024239 <span class="board-tag">基金</span> <span class="board-tag">QDII科技</span></span></td>
 <td style="text-align:right" data-v="2.73">2.73</td>
 <td style="text-align:right" class="up" data-v="3.31">+3.31%</td>
@@ -583,17 +718,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><b>52.8</b></td>
 <td style="text-align:center"><span class="pill pill-watch">观望</span></td>
 <td style="text-align:center"><span class="pill-chg-down">清仓→观望</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">持有不加 / 观望</td></tr><tr data-search="卓胜微 300782 —" data-board="gem" data-tier="观望" onclick="openDetail('300782')">
-<td style="text-align:center">29</td>
-<td><b>卓胜微</b><br><span style="color:var(--faint);font-size:11px">300782 <span class="board-tag">创业板</span> <span class="board-tag">—</span></span></td>
-<td style="text-align:right" data-v="78.87">78.87</td>
-<td style="text-align:right" class="down" data-v="-0.1">-0.10%</td>
-<td style="text-align:right" class="up" data-v="5.9">+6%</td>
-<td style="text-align:center"><b>49.1</b></td>
-<td style="text-align:center"><span class="pill pill-watch">观望</span></td>
-<td style="text-align:center"><span class="pill-chg-down">满仓加仓→观望</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">持有不加 / 观望</td></tr><tr data-search="工业富联 601138 电子制造" data-board="main" data-tier="观望" onclick="openDetail('601138')">
-<td style="text-align:center">30</td>
+<td style="text-align:center">24</td>
 <td><b>工业富联</b><br><span style="color:var(--faint);font-size:11px">601138 <span class="board-tag">主板</span> <span class="board-tag">电子制造</span></span></td>
 <td style="text-align:right" data-v="66.19">66.19</td>
 <td style="text-align:right" class="up" data-v="1.47">+1.47%</td>
@@ -601,53 +727,35 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><b>47.6</b></td>
 <td style="text-align:center"><span class="pill pill-watch">观望</span></td>
 <td style="text-align:center"><span class="pill-chg-down">满仓加仓→观望</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">持有不加 / 观望</td></tr><tr data-search="晶盛机电 300316 —" data-board="gem" data-tier="观望" onclick="openDetail('300316')">
-<td style="text-align:center">31</td>
-<td><b>晶盛机电</b><br><span style="color:var(--faint);font-size:11px">300316 <span class="board-tag">创业板</span> <span class="board-tag">—</span></span></td>
-<td style="text-align:right" data-v="43.49">43.49</td>
-<td style="text-align:right" class="up" data-v="1.75">+1.75%</td>
-<td style="text-align:right" class="up" data-v="53.1">+53%</td>
-<td style="text-align:center"><b>47.4</b></td>
-<td style="text-align:center"><span class="pill pill-watch">观望</span></td>
-<td style="text-align:center"><span class="pill-chg-down">满仓加仓→观望</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">持有不加 / 观望</td></tr><tr data-search="宁德时代 300750 —" data-board="gem" data-tier="减至半仓" onclick="openDetail('300750')">
-<td style="text-align:center">32</td>
-<td><b>宁德时代</b><br><span style="color:var(--faint);font-size:11px">300750 <span class="board-tag">创业板</span> <span class="board-tag">—</span></span></td>
-<td style="text-align:right" data-v="393.93">393.93</td>
-<td style="text-align:right" class="down" data-v="-0.6">-0.60%</td>
-<td style="text-align:right" class="up" data-v="53.2">+53%</td>
-<td style="text-align:center"><b>39.6</b></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有不加 / 观望</td></tr><tr data-search="富春染织 605189 纺织印染" data-board="main" data-tier="减至半仓" onclick="openDetail('605189')">
+<td style="text-align:center">25</td>
+<td><b>富春染织</b><br><span style="color:var(--faint);font-size:11px">605189 <span class="board-tag">主板</span> <span class="board-tag">纺织印染</span></span></td>
+<td style="text-align:right" data-v="16.14">16.14</td>
+<td style="text-align:right" class="up" data-v="1.13">+1.13%</td>
+<td style="text-align:right" class="up" data-v="9.6">+10%</td>
+<td style="text-align:center"><b>39.8</b></td>
 <td style="text-align:center"><span class="pill pill-cut">减至半仓</span></td>
 <td style="text-align:center"><span class="pill-chg-down">观望→减至半仓</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">减至半仓</td></tr><tr data-search="亿纬锂能 300014 —" data-board="gem" data-tier="清仓" onclick="openDetail('300014')">
-<td style="text-align:center">33</td>
-<td><b>亿纬锂能</b><br><span style="color:var(--faint);font-size:11px">300014 <span class="board-tag">创业板</span> <span class="board-tag">—</span></span></td>
-<td style="text-align:right" data-v="56.44">56.44</td>
-<td style="text-align:right" class="up" data-v="1.0">+1.00%</td>
-<td style="text-align:right" class="up" data-v="29.4">+29%</td>
-<td style="text-align:center"><b>29.4</b></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">减至半仓</td></tr><tr data-search="榕基软件 002474 软件服务" data-board="main" data-tier="清仓" onclick="openDetail('002474')">
+<td style="text-align:center">26</td>
+<td><b>榕基软件</b><br><span style="color:var(--faint);font-size:11px">002474 <span class="board-tag">主板</span> <span class="board-tag">软件服务</span></span></td>
+<td style="text-align:right" data-v="6.57">6.57</td>
+<td style="text-align:right" class="down" data-v="-4.23">-4.23%</td>
+<td style="text-align:right" class="down" data-v="-6.3">-6%</td>
+<td style="text-align:center"><b>23.2</b></td>
+<td style="text-align:center"><span class="pill pill-clear">清仓</span></td>
+<td style="text-align:center"><span class="pill-chg-down">减至半仓→清仓</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">清仓离场</td></tr><tr data-search="四方科技 603339 冷链设备" data-board="main" data-tier="清仓" onclick="openDetail('603339')">
+<td style="text-align:center">27</td>
+<td><b>四方科技</b><br><span style="color:var(--faint);font-size:11px">603339 <span class="board-tag">主板</span> <span class="board-tag">冷链设备</span></span></td>
+<td style="text-align:right" data-v="13.74">13.74</td>
+<td style="text-align:right" class="down" data-v="-0.36">-0.36%</td>
+<td style="text-align:right" class="up" data-v="9.0">+9%</td>
+<td style="text-align:center"><b>17.2</b></td>
 <td style="text-align:center"><span class="pill pill-clear">清仓</span></td>
 <td style="text-align:center"><span class="pill-chg-down">轻仓加仓→清仓</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">清仓离场</td></tr><tr data-search="天合光能 688599 —" data-board="star" data-tier="清仓" onclick="openDetail('688599')">
-<td style="text-align:center">34</td>
-<td><b>天合光能</b><br><span style="color:var(--faint);font-size:11px">688599 <span class="board-tag">科创板</span> <span class="board-tag">—</span></span></td>
-<td style="text-align:right" data-v="12.97">12.97</td>
-<td style="text-align:right" class="down" data-v="-0.99">-0.99%</td>
-<td style="text-align:right" class="down" data-v="-17.0">-17%</td>
-<td style="text-align:center"><b>24.0</b></td>
-<td style="text-align:center"><span class="pill pill-clear">清仓</span></td>
-<td style="text-align:center"><span class="pill-chg-down">观望→清仓</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">清仓离场</td></tr><tr data-search="传音控股 688036 —" data-board="star" data-tier="清仓" onclick="openDetail('688036')">
-<td style="text-align:center">35</td>
-<td><b>传音控股</b><br><span style="color:var(--faint);font-size:11px">688036 <span class="board-tag">科创板</span> <span class="board-tag">—</span></span></td>
-<td style="text-align:right" data-v="55.02">55.02</td>
-<td style="text-align:right" class="up" data-v="0.82">+0.82%</td>
-<td style="text-align:right" class="down" data-v="-28.8">-29%</td>
-<td style="text-align:center"><b>20.0</b></td>
-<td style="text-align:center"><span class="pill pill-clear">清仓</span></td>
-<td style="text-align:center"><span style="color:var(--faint)">—</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">清仓离场</td></tr><tr data-search="证券ETF天弘 159841 证券" data-board="etf" data-tier="清仓" onclick="openDetail('159841')">
-<td style="text-align:center">36</td>
+<td style="text-align:center">28</td>
 <td><b>证券ETF天弘</b><br><span style="color:var(--faint);font-size:11px">159841 <span class="board-tag">ETF</span> <span class="board-tag">证券</span></span></td>
 <td style="text-align:right" data-v="0.99">0.99</td>
 <td style="text-align:right" class="down" data-v="-1.1">-1.10%</td>
@@ -655,42 +763,24 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center"><b>13.6</b></td>
 <td style="text-align:center"><span class="pill pill-clear">清仓</span></td>
 <td style="text-align:center"><span style="color:var(--faint)">—</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">清仓离场</td></tr><tr data-search="汇川技术 300124 —" data-board="gem" data-tier="清仓" onclick="openDetail('300124')">
-<td style="text-align:center">37</td>
-<td><b>汇川技术</b><br><span style="color:var(--faint);font-size:11px">300124 <span class="board-tag">创业板</span> <span class="board-tag">—</span></span></td>
-<td style="text-align:right" data-v="61.2">61.20</td>
-<td style="text-align:right" class="up" data-v="0.21">+0.21%</td>
-<td style="text-align:right" class="down" data-v="-2.8">-3%</td>
-<td style="text-align:center"><b>12.4</b></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">清仓离场</td></tr><tr data-search="中百集团 000759 商业零售" data-board="main" data-tier="清仓" onclick="openDetail('000759')">
+<td style="text-align:center">29</td>
+<td><b>中百集团</b><br><span style="color:var(--faint);font-size:11px">000759 <span class="board-tag">主板</span> <span class="board-tag">商业零售</span></span></td>
+<td style="text-align:right" data-v="6.95">6.95</td>
+<td style="text-align:right" class="down" data-v="-5.44">-5.44%</td>
+<td style="text-align:right" class="down" data-v="-6.3">-6%</td>
+<td style="text-align:center"><b>11.2</b></td>
+<td style="text-align:center"><span class="pill pill-clear">清仓</span></td>
+<td style="text-align:center"><span style="color:var(--faint)">—</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">清仓离场</td></tr><tr data-search="长缆科技 002879 电线电缆" data-board="main" data-tier="清仓" onclick="openDetail('002879')">
+<td style="text-align:center">30</td>
+<td><b>长缆科技</b><br><span style="color:var(--faint);font-size:11px">002879 <span class="board-tag">主板</span> <span class="board-tag">电线电缆</span></span></td>
+<td style="text-align:right" data-v="17.28">17.28</td>
+<td style="text-align:right" class="down" data-v="-0.97">-0.97%</td>
+<td style="text-align:right" class="up" data-v="12.0">+12%</td>
+<td style="text-align:center"><b>7.6</b></td>
 <td style="text-align:center"><span class="pill pill-clear">清仓</span></td>
 <td style="text-align:center"><span class="pill-chg-down">减至半仓→清仓</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">清仓离场</td></tr><tr data-search="东方财富 300059 —" data-board="gem" data-tier="清仓" onclick="openDetail('300059')">
-<td style="text-align:center">38</td>
-<td><b>东方财富</b><br><span style="color:var(--faint);font-size:11px">300059 <span class="board-tag">创业板</span> <span class="board-tag">—</span></span></td>
-<td style="text-align:right" data-v="19.47">19.47</td>
-<td style="text-align:right" class="down" data-v="-1.57">-1.57%</td>
-<td style="text-align:right" class="down" data-v="-15.6">-16%</td>
-<td style="text-align:center"><b>4.8</b></td>
-<td style="text-align:center"><span class="pill pill-clear">清仓</span></td>
-<td style="text-align:center"><span style="color:var(--faint)">—</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">清仓离场</td></tr><tr data-search="金山办公 688111 —" data-board="star" data-tier="清仓" onclick="openDetail('688111')">
-<td style="text-align:center">39</td>
-<td><b>金山办公</b><br><span style="color:var(--faint);font-size:11px">688111 <span class="board-tag">科创板</span> <span class="board-tag">—</span></span></td>
-<td style="text-align:right" data-v="256.45">256.45</td>
-<td style="text-align:right" class="up" data-v="0.77">+0.77%</td>
-<td style="text-align:right" class="down" data-v="-16.1">-16%</td>
-<td style="text-align:center"><b>4.8</b></td>
-<td style="text-align:center"><span class="pill pill-clear">清仓</span></td>
-<td style="text-align:center"><span style="color:var(--faint)">—</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">清仓离场</td></tr><tr data-search="晶科能源 688223 —" data-board="star" data-tier="清仓" onclick="openDetail('688223')">
-<td style="text-align:center">40</td>
-<td><b>晶科能源</b><br><span style="color:var(--faint);font-size:11px">688223 <span class="board-tag">科创板</span> <span class="board-tag">—</span></span></td>
-<td style="text-align:right" data-v="4.4">4.40</td>
-<td style="text-align:right" class="down" data-v="-0.23">-0.23%</td>
-<td style="text-align:right" class="down" data-v="-17.3">-17%</td>
-<td style="text-align:center"><b>4.0</b></td>
-<td style="text-align:center"><span class="pill pill-clear">清仓</span></td>
-<td style="text-align:center"><span class="pill-chg-down">观望→清仓</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">清仓离场</td></tr></tbody>
 </table>
 <div class="note">档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测净值曲线见下方（历史参考）</div>

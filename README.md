@@ -35,7 +35,7 @@ quant-weight-system/
 | 体系 | 范围 | 持仓 | 频率 | 定位 |
 |---|---|---|---|---|
 | **普适版 v9-auto** | 全市场 5307 只自动筛池 | Top3 | 月轮动 | **无人工选池**（夏普 1.715，止损4.5%/MA150/动态门槛/RSI<85） |
-| 个人版 | 自选池 40 只（主板10/创业板10/科创板10+ETF4+基金6，权限分层） | Top4 | 月轮动 20 笔/年 | 自选池执行（50 万中性资金，参数化） |
+| 个人版 | 用户固定池 30 只（20股+ETF4+基金6，不扩充） | Top4 | 月轮动 20 笔/年 | 自选池执行（50 万中性资金，参数化） |
 | 股票主体系 | 全市场 5307 只 | Top15 + 卫星 | 季度 | 策略研究基准 |
 | ETF | 全市场 888 只 | Top10 | 半年 | 低波动配置 |
 | 基金 | 全市场 16171 只 | Top10 + 卫星 | 半年 | 场外配置 |
@@ -88,7 +88,7 @@ print(A.V.summary(eq, tr))             # +839.6% / 夏普 1.715
 
 1. `pip install akshare pandas numpy`
 2. 数据：跑 `compile_full_summary.py` 拉全量日线到 `data_full/`（或从公司行情源批量导出同名 CSV：`sh600000.csv` 等，列 `date/open/close/high/low/volume/amount`）
-3. 自选池：修改 `v8_lite.py` 中 `STOCKS / ETFS` 清单（回测 25 只默认）；监控表分层池见 `build_enhanced_data.py` 的 `MAIN_CODES/GEM_CODES/STAR_CODES/ETFS/FUNDS`（40 只）
+3. 自选池：修改 `v8_lite.py` 中 `STOCKS / ETFS` 清单（25 只默认）；普适版自动池按权限分层（main/gem/star 各 10 只）由 `build_enhanced_data.py` 的 `V9_TIERS` 自动计算
 4. 验证回测：`python -c "import v8_lite as L; pool=L.build_pool(); print(L.V.summary(*L.run_lite(pool, top_n=4, hold_days=21)))"`
 5. 调度：`schtasks /create /tn v8_dashboard_update /sc monthly /d 1 /st 18:00 /tr "<路径>\v8_update.bat"`
 6. 看板：浏览器打开 `index.html`（个人版默认），`advice_v8lite.html` 为当月加减仓建议
