@@ -74,8 +74,11 @@ def run_auto(top_n=4, hold_days=21, pool_size=25, stop_loss=0.10, cash0=500000,
                     v = idx_vol.get(day)
                     if v is not None and not pd.isna(v) and v > 0:
                         scale = max(0.3, min(1.0, vol_target / v))
-                budget = port_value * scale / len(pb)
-                for code, _sc in pb:
+                budget = port_value * scale / top_n
+                # 自动补位：按分数降序遍历完整候选，买得起就买，最多 top_n 只
+                for code, _sc in sorted(pb, key=lambda kv: -kv[1]):
+                    if len(holdings) >= top_n:
+                        break
                     if code in holdings: continue
                     px = open_px.get(code)
                     if px is None or pd.isna(px) or px <= 0: continue
@@ -128,7 +131,7 @@ def run_auto(top_n=4, hold_days=21, pool_size=25, stop_loss=0.10, cash0=500000,
                             sc_now = V.score_row(ddf.loc[day])
                             if sc_now < sell_score:
                                 ps.add(code)
-                pb = ranked
+                pb = cand   # 完整达标候选（买入自动补位，TopN 买不起时用下一名补上）
         pv = cash
         for code, sh in holdings.items():
             ddf = get_ddf(auto_pool, code)
