@@ -204,11 +204,15 @@ html = f"""<!doctype html>
 .scroll-fab{{position:fixed;right:22px;bottom:22px;display:flex;flex-direction:column;gap:8px;z-index:950}}
 .scroll-fab button{{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);font-family:inherit}}
 .scroll-fab button:hover{{border-color:var(--accent);color:var(--accent)}}
-/* ETF/基金回测参考 · 双池面板 */
-.sub-pool{{display:grid;grid-template-columns:1fr 1fr;gap:16px}}
-.pool-panel{{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:16px}}
-.pool-head{{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:15px}}
-.pool-tag{{font-size:11px;color:var(--faint);background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2px 10px}}
+/* ETF/基金回测参考 · 三池独立大卡 */
+.bt-grid{{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}}
+.bt-card{{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:16px}}
+.bt-card .bt-head{{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:15px}}
+.bt-card .bt-tag{{font-size:11px;color:var(--faint);background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2px 10px}}
+.bt-card .bt-curve{{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:6px;margin-top:10px}}
+.bt-short{{background:var(--card2);border:1px dashed var(--border);border-radius:14px;padding:22px;text-align:center;margin-top:16px}}
+.bt-short h3{{margin:0 0 8px;color:var(--sub);font-size:15px}}
+.bt-short .sub{{color:var(--faint);font-size:12px;line-height:1.8}}
 /* 大卡片折叠 */
 .card{{transition:box-shadow .15s}}
 .card .card-h{{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}}
@@ -259,39 +263,40 @@ html = f"""<!doctype html>
 <br><b>历史快照</b>：右上角「标的报告」按月分类，点击当前页切换查看（不新开窗口）</div>
 </div>
 <div class="card" id="bt-all">
-<h2>📊 三池回测参考 <span class="badge badge-auto">股票/ETF/基金 · 独立策略</span></h2>
-<div class="sub">股票池 = 全市场自动筛池 Top3 · 月轮动 ｜ ETF/基金池 = 动量 Top10 · 半年轮动 —— 均为独立回测，监控表对应各档</div>
+<h2>📊 回测参考 <span class="badge badge-auto">三池独立 · 中/长线</span></h2>
+<div class="sub">股票池 = 全市场自动筛池 Top3 · 月轮动 ｜ ETF 池 = 动量 Top10 · 半年轮动 ｜ 基金池 = 净值动量 Top10 · 半年轮动 —— 各池独立回测，严格分开</div>
+<div class="bt-grid">
+<div class="bt-card" id="bt-stock">
+<div class="bt-head"><b>📈 股票池 中/长线</b><span class="bt-tag">月轮动 Top3</span></div>
 <div class="kpis">
-<div class="kpi"><div class="l">股票池 回测收益</div><div class="v" style="color:#f59e0b">+{s_auto["total_return_pct"]:.1f}%</div><div class="s">年化 {s_auto["annual_return_pct"]:.1f}% · 夏普 {s_auto["sharpe"]:.2f}</div></div>
-<div class="kpi"><div class="l">股票池 最大回撤</div><div class="v" style="color:#ef4444">{s_auto["max_drawdown_pct"]:.1f}%</div><div class="s">月轮动 Top3</div></div>
-<div class="kpi"><div class="l">ETF 池 回测收益</div><div class="v" style="color:#f59e0b">+{s_etf["total_return_pct"]:.1f}%</div><div class="s">年化 {s_etf["annual_return_pct"]:.1f}% · 夏普 {s_etf["sharpe"]:.2f}</div></div>
-<div class="kpi"><div class="l">ETF 池 最大回撤</div><div class="v" style="color:#ef4444">{s_etf["max_drawdown_pct"]:.1f}%</div><div class="s">半年轮动 Top10</div></div>
-<div class="kpi"><div class="l">基金池 回测收益</div><div class="v" style="color:#3b82f6">+{s_fund["total_return_pct"]:.1f}%</div><div class="s">年化 {s_fund["annual_return_pct"]:.1f}% · 夏普 {s_fund["sharpe"]:.2f}</div></div>
-<div class="kpi"><div class="l">基金池 最大回撤</div><div class="v" style="color:#ef4444">{s_fund["max_drawdown_pct"]:.1f}%</div><div class="s">半年轮动 Top10</div></div>
+<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#f59e0b">+{s_auto["total_return_pct"]:.1f}%</div><div class="s">2016-01~2026-08</div></div>
+<div class="kpi"><div class="l">年化</div><div class="v">{s_auto["annual_return_pct"]:.1f}%</div><div class="s">50万中性资金</div></div>
+<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">{s_auto["max_drawdown_pct"]:.1f}%</div><div class="s">夏普 {s_auto["sharpe"]:.2f}</div></div>
 </div>
-<div class="sub-pool">
-<div class="pool-panel" id="pool-etf">
-<div class="pool-head"><b>🟠 ETF 池</b><span class="pool-tag">动量 Top10 · 半年轮动</span></div>
+<div class="bt-curve" id="curve-chart-stock"></div>
+</div>
+<div class="bt-card" id="bt-etf">
+<div class="bt-head"><b>🟠 ETF 池 中/长线</b><span class="bt-tag">半年轮动 Top10</span></div>
 <div class="kpis">
 <div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#f59e0b">+{s_etf["total_return_pct"]:.1f}%</div><div class="s">2016-01~2026-08</div></div>
-<div class="kpi"><div class="l">年化</div><div class="v">{s_etf["annual_return_pct"]:.1f}%</div><div class="s">50万中性资金</div></div>
-<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">{s_etf["max_drawdown_pct"]:.1f}%</div><div class="s">回测参考</div></div>
-<div class="kpi"><div class="l">夏普</div><div class="v" style="color:#22c55e">{s_etf["sharpe"]:.3f}</div><div class="s">胜率 {s_etf.get("win_rate_pct",0):.0f}%</div></div>
-<div class="kpi"><div class="l">交易次数</div><div class="v">{s_etf.get("total_trades",0)}</div><div class="s">半年轮动</div></div>
+<div class="kpi"><div class="l">年化</div><div class="v">{s_etf["annual_return_pct"]:.1f}%</div><div class="s">胜率 {s_etf.get("win_rate_pct",0):.0f}%</div></div>
+<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">{s_etf["max_drawdown_pct"]:.1f}%</div><div class="s">夏普 {s_etf["sharpe"]:.2f} · {s_etf.get("total_trades",0)} 笔</div></div>
 </div>
-<div id="curve-chart-etf" style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:6px;margin-top:10px"></div>
+<div class="bt-curve" id="curve-chart-etf"></div>
 </div>
-<div class="pool-panel" id="pool-fund">
-<div class="pool-head"><b>🔵 基金池</b><span class="pool-tag">净值动量 Top10 · 半年轮动</span></div>
+<div class="bt-card" id="bt-fund">
+<div class="bt-head"><b>🔵 基金池 中/长线</b><span class="bt-tag">半年轮动 Top10</span></div>
 <div class="kpis">
 <div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#3b82f6">+{s_fund["total_return_pct"]:.1f}%</div><div class="s">2016-01~2026-08</div></div>
-<div class="kpi"><div class="l">年化</div><div class="v">{s_fund["annual_return_pct"]:.1f}%</div><div class="s">50万中性资金</div></div>
-<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">{s_fund["max_drawdown_pct"]:.1f}%</div><div class="s">回测参考</div></div>
-<div class="kpi"><div class="l">夏普</div><div class="v" style="color:#22c55e">{s_fund["sharpe"]:.3f}</div><div class="s">胜率 {s_fund.get("win_rate_pct",0):.0f}%</div></div>
-<div class="kpi"><div class="l">交易次数</div><div class="v">{s_fund.get("total_trades",0)}</div><div class="s">半年轮动</div></div>
+<div class="kpi"><div class="l">年化</div><div class="v">{s_fund["annual_return_pct"]:.1f}%</div><div class="s">胜率 {s_fund.get("win_rate_pct",0):.0f}%</div></div>
+<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">{s_fund["max_drawdown_pct"]:.1f}%</div><div class="s">夏普 {s_fund["sharpe"]:.2f} · {s_fund.get("total_trades",0)} 笔</div></div>
 </div>
-<div id="curve-chart-fund" style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:6px;margin-top:10px"></div>
+<div class="bt-curve" id="curve-chart-fund"></div>
 </div>
+</div>
+<div class="bt-short" id="bt-short">
+<h3>⚡ 短线池（股票 / ETF / 基金）— 占位</h3>
+<div class="sub">短线策略池预留位置 · 后续接入短线信号体系后在此展示（股票短线 / ETF 短线 / 基金短线 三个子池）</div>
 </div>
 </div>
 </div>
@@ -341,8 +346,9 @@ html = f"""<!doctype html>
 window.ENH.nav = [["overview","📊","监控总览"],["sys-auto","🅰️","全量池中/长线"],["sys-lite","🅱️","固定池中/长线"],["short","⚡","短线(占位)"]];
 /* 视图切换模式：滚动不更新导航高亮（COMMON_JS renderSidenav 检测此标志） */
 window.ENH.NAV_SWITCH = true;
-/* ETF/基金回测净值（独立策略，普适版视图展示） */
+/* 三池回测净值（股票/ETF/基金，监控总览展示） */
 window.ENH.sub_curves = {{
+  stock: {json.dumps(DATA["systems"]["v9_auto"]["equity"])},
   etf: {json.dumps(v_etf)},
   fund: {json.dumps(v_fund)},
 }};
@@ -371,7 +377,8 @@ function renderOneCurve(elId, vals, color, label, totalPct){{
 }}
 function renderSubCurve(){{
   var C=window.ENH.sub_curves;if(!C)return;
-  renderOneCurve('curve-chart-etf', C.etf, '#f59e0b', 'ETF 池', '+'+{s_etf["total_return_pct"]:.0f});
+  renderOneCurve('curve-chart-stock', C.stock, '#f59e0b', '股票池', '+'+{s_auto["total_return_pct"]:.0f});
+  renderOneCurve('curve-chart-etf', C.etf, '#ea580c', 'ETF 池', '+'+{s_etf["total_return_pct"]:.0f});
   renderOneCurve('curve-chart-fund', C.fund, '#3b82f6', '基金池', '+'+{s_fund["total_return_pct"]:.0f});
 }}
 /* 视图切换（hash 驱动：切换时更新 location.hash，加载/前进后退时按 hash 定位） */
