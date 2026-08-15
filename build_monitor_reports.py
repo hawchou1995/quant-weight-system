@@ -37,6 +37,7 @@ def render_trades(ts, label):
 
 reports_html = ""
 for c, d in sorted(details.items(), key=lambda kv: -kv[1]["score"]):
+    # 基金无 OHLC（净值型），K线用净值折线替代
     f = d["factors"]
     chg_txt = f'{d["chg"]:+.2f}%' if d["chg"] is not None else "—"
     chg_cls = "up" if (d["chg"] or 0) > 0 else "down"
@@ -61,8 +62,8 @@ for c, d in sorted(details.items(), key=lambda kv: -kv[1]["score"]):
 <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
 <div><h4>K线（近 250 日 · 红涨绿跌）</h4>{kline_svg(d["kline"], c)}</div>
 <div>
-<h4>v9-auto 交易史</h4>{render_trades(d["trades"]["v9_auto"], "v9-auto")}
-<h4>v8-lite 交易史</h4>{render_trades(d["trades"]["v8_lite"], "v8-lite")}
+<h4>普适版 交易史</h4>{render_trades(d["trades"]["v9_auto"], "普适版")}
+<h4>个人版 交易史</h4>{render_trades(d["trades"]["v8_lite"], "个人版")}
 </div></div>
 </div>'''
 
@@ -77,7 +78,7 @@ h4{{margin:10px 0 6px;font-size:13px;color:var(--sub)}}
 <div class="container">
 <div class="card" id="overview">
 <h2>📈 标的监控报告 <span class="badge badge-auto">2026-08-14 收盘口径</span></h2>
-<div class="sub">34 只监控标的 · 每份报告 = 当前信号（档位/得分/因子拆分）+ K线 + 两体系交易史 + 建议动作 · 顶部「标的报告」下拉可直达任意标的</div>
+<div class="sub">{len(details)} 只监控标的 · 每份报告 = 当前信号（档位/得分/因子拆分）+ K线 + 两体系交易史 + 建议动作 · 顶部「标的报告」下拉可直达任意标的</div>
 <div class="rule-box"><b>阅读指引</b>：档位 = 满仓加仓(≥75) / 轻仓加仓(≥60) / 观望(≥45) / 减至半仓(≥30) / 清仓(&lt;30)；建议动作为信号解读，执行与否由你决定；卖出闸门：移动止损 + 指数破位（v9: MA150 / v8: MA200）。</div>
 </div>
 {reports_html}

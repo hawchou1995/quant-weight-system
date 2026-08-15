@@ -297,8 +297,8 @@ function openDetail(code){
     '<h4>K线（近 250 日 · 红涨绿跌）</h4>'+klineSVG+
     '<h4>权重分与动量历史（近 250 日）</h4>'+facSVG+
     '<div class="trade-tabs">'+
-      '<button class="active" onclick="switchTradeTab(this,\'v9\')">v9-auto 交易史（'+(d.trades.v9_auto||[]).length+' 笔）</button>'+
-      '<button onclick="switchTradeTab(this,\'lite\')">v8-lite 交易史（'+(d.trades.v8_lite||[]).length+' 笔）</button></div>'+
+      '<button class="active" onclick="switchTradeTab(this,\'v9\')">普适版 交易史（'+(d.trades.v9_auto||[]).length+' 笔）</button>'+
+      '<button onclick="switchTradeTab(this,\'lite\')">个人版 交易史（'+(d.trades.v8_lite||[]).length+' 笔）</button></div>'+
     '<div id="trades-v9">'+tradesV9+'</div><div id="trades-lite" style="display:none">'+tradesLite+'</div>'+
     '</div>';
   mask.classList.add('open');
@@ -382,12 +382,19 @@ function renderCurve(){
   var W=1400,H=300,PAD_L=70,PAD_R=20,PAD_T=26,PAD_B=34;
   var x=function(i){return PAD_L+(W-PAD_L-PAD_R)*i/Math.max(1,n-1);};
   var all=va.concat(vl);
-  var vmax=Math.max(200,Math.ceil(Math.max.apply(null,all)/100)*100), vmin=50;
-  var y=function(v){return PAD_T+(H-PAD_T-PAD_B)*(1-(v-vmin)/(vmax-vmin));};
+  /* 对数 Y 轴：v8 净值 100→4100 而 v9 仅到 940，线性坐标下 v9 会被压扁贴底、刻度挤成"皱纹"。
+     用 log2 坐标 + 2 的幂次刻度（100/200/400/800/1.6k/3.2k），两条曲线都清晰可见 */
+  var lo=Math.max(50, Math.min.apply(null, all)*0.9), hi=Math.max(200, Math.max.apply(null, all));
+  var lmin=Math.log(lo), lmax=Math.log(hi);
+  var y=function(v){return PAD_T+(H-PAD_T-PAD_B)*(1-(Math.log(v)-lmin)/(lmax-lmin));};
+  function tickLabel(v){
+    if(v>=1000)return (v/1000).toFixed(v%1000===0?0:1)+'k';
+    return String(v);}
   var g='';
-  for(var yy=vmin;yy<=vmax;yy+=50){
-    g+='<line x1="'+PAD_L+'" y1="'+y(yy)+'" x2="'+(W-PAD_R)+'" y2="'+y(yy)+'" stroke="rgba(128,128,128,.15)"/>';
-    g+='<text x="'+(PAD_L-8)+'" y="'+(y(yy)+4)+'" font-size="12" fill="#9ca3af" text-anchor="end">'+yy+'</text>';}
+  for(var t=100;t<=hi*1.02;t*=2){
+    if(t<lo*0.95)continue;
+    g+='<line x1="'+PAD_L+'" y1="'+y(t)+'" x2="'+(W-PAD_R)+'" y2="'+y(t)+'" stroke="rgba(128,128,128,.15)"/>';
+    g+='<text x="'+(PAD_L-8)+'" y="'+(y(t)+4)+'" font-size="12" fill="#9ca3af" text-anchor="end">'+tickLabel(t)+'</text>';}
   var prevYr=null;
   for(var i=0;i<n;i++){
     var yr=2016+Math.floor(i/252);
@@ -398,8 +405,9 @@ function renderCurve(){
     return '<polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="'+width+'"/>';};
   el.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+g+
     poly(vl,'#3b82f6',2)+poly(va,'#f59e0b',2.5)+
-    '<text x="'+(PAD_L+10)+'" y="'+(PAD_T+18)+'" font-size="13" fill="#3b82f6">v8-lite 个人版 → +'+S.v8_lite.summary.total_return_pct+'%</text>'+
-    '<text x="'+(PAD_L+10)+'" y="'+(PAD_T+36)+'" font-size="13" fill="#f59e0b">v9-auto 普适版 → +'+S.v9_auto.summary.total_return_pct+'%</text></svg>';
+    '<text x="'+(PAD_L+10)+'" y="'+(PAD_T+18)+'" font-size="13" fill="#3b82f6">个人版 → +'+S.v8_lite.summary.total_return_pct+'%</text>'+
+    '<text x="'+(PAD_L+10)+'" y="'+(PAD_T+36)+'" font-size="13" fill="#f59e0b">普适版 → +'+S.v9_auto.summary.total_return_pct+'%</text>'+
+    '<text x="'+(W-PAD_R-6)+'" y="'+(PAD_T+8)+'" font-size="11" fill="#9ca3af" text-anchor="end">对数坐标 · 净值(100起)</text></svg>';
 }
 
 /* ---------- 报告页 K线容器（.kline-box[data-code]） ---------- */
