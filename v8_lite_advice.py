@@ -121,7 +121,7 @@ rows_html = ''
 for i, r in enumerate(rows, 1):
     tier_cls = {'满仓加仓': 't-full', '轻仓加仓': 't-add', '观望': 't-watch', '减至半仓': 't-cut', '清仓': 't-clear'}[r['tier']]
     chg = '' if r['tier_prev'] == r['tier'] else f"<span class='chg'>←{r['tier_prev']}</span>"
-    star = ' ★' if r['code'] in ('515880', '000636', '002463') else ''
+    star = ''  # 脱敏：不标注个人持仓
     ret1y = f"{r['ret1y']:+.0f}%" if r['ret1y'] is not None else '—'
     rows_html += f'''<tr>
 <td class="rank">{i}</td>
