@@ -186,7 +186,8 @@ window.ENH = window.ENH || {};
 window.ENH.nav = [["overview","📊","监控总览"],["sys-auto","🅰️","普适版"],["sys-lite","🅱️","个人版"]];
 window.ENH.NAV_SWITCH = true;
 window.switchView = function(key){
-  window.location.href = 'dual_system.html';   // 历史页不内嵌视图，导航点击回主页面
+  // 历史页不内嵌视图：跳回主页面并直接定位到对应视图（hash 驱动，主页面加载时自动切换）
+  window.location.href = 'dual_system.html#' + key;
 };
 function openSnap(file, date){
   document.getElementById('snap-viewer').classList.add('active');

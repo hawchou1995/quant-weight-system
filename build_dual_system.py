@@ -127,6 +127,14 @@ s_lite = DATA["systems"]["v8_lite"]["summary"]
 # ETF/基金独立回测（普适版视图展示）
 s_etf = json.load(open(BASE / "v8_etf_summary.json", encoding="utf-8"))["summary"]
 s_fund = json.load(open(BASE / "v8_fund_summary.json", encoding="utf-8"))["summary"]
+
+def load_curve_norm(f):
+    df = __import__("pandas").read_csv(BASE / f)
+    v = df["value"].astype(float).values
+    return [round(float(x), 2) for x in (v / v[0] * 100)]
+
+v_etf = load_curve_norm("v8_etf_equity.csv")
+v_fund = load_curve_norm("v8_fund_equity.csv")
 perm_stat = f'股票 {len(v8_main)} ｜ ETF {len(v8_etf)} ｜ 基金 {len(v8_fund)}'
 
 def system_block(vid, sid, title, badge, sub, kpis, rule, items, tbl_id, card_id, note):
@@ -249,6 +257,8 @@ html = f"""<!doctype html>
 <div class="kpi"><div class="l">基金年化</div><div class="v">{s_fund["annual_return_pct"]:.1f}%</div><div class="s">胜率 {s_fund.get("win_rate_pct",0):.0f}%</div></div>
 <div class="kpi"><div class="l">基金最大回撤</div><div class="v" style="color:#ef4444">{s_fund["max_drawdown_pct"]:.1f}%</div><div class="s">夏普 {s_fund["sharpe"]:.2f}</div></div>
 </div>
+<div class="sub" style="margin-top:10px"><b>回撤参考（净值曲线）</b>：ETF 池（橙）与基金池（蓝）十年净值走势，对数坐标 —— 回撤幅度可直接目测</div>
+<div id="curve-chart-sub" style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:6px"></div>
 </div>
 
 <!-- ============ 视图 B：个人版 ============ -->
@@ -285,14 +295,54 @@ html = f"""<!doctype html>
 window.ENH.nav = [["overview","📊","监控总览"],["sys-auto","🅰️","普适版"],["sys-lite","🅱️","个人版"]];
 /* 视图切换模式：滚动不更新导航高亮（COMMON_JS renderSidenav 检测此标志） */
 window.ENH.NAV_SWITCH = true;
-/* 视图切换 */
+/* ETF/基金回测净值（独立策略，普适版视图展示） */
+window.ENH.sub_curves = {{
+  etf: {json.dumps(v_etf)},
+  fund: {json.dumps(v_fund)},
+}};
+/* 渲染 ETF/基金回测净值曲线（对数坐标 · 双线） */
+function renderSubCurve(){{
+  var el=document.getElementById('curve-chart-sub');if(!el)return;
+  var C=window.ENH.sub_curves;if(!C)return;
+  var a=C.etf,b=C.fund,n=Math.max(a.length,b.length);
+  var W=1400,H=260,PAD_L=70,PAD_R=20,PAD_T=24,PAD_B=30;
+  var x=function(i){{return PAD_L+(W-PAD_L-PAD_R)*i/Math.max(1,n-1);}};
+  var all=a.concat(b);
+  var lo=Math.max(50,Math.min.apply(null,all)*0.9), hi=Math.max(200,Math.max.apply(null,all));
+  var lmin=Math.log(lo),lmax=Math.log(hi);
+  var y=function(v){{return PAD_T+(H-PAD_T-PAD_B)*(1-(Math.log(v)-lmin)/(lmax-lmin));}};
+  function tickLabel(v){{if(v>=1000)return (v/1000).toFixed(0)+'k';return String(v);}}
+  var g='';
+  for(var t=100;t<=hi*1.02;t*=2){{if(t<lo*0.95)continue;
+    g+='<line x1="'+PAD_L+'" y1="'+y(t)+'" x2="'+(W-PAD_R)+'" y2="'+y(t)+'" stroke="rgba(128,128,128,.15)"/>';
+    g+='<text x="'+(PAD_L-8)+'" y="'+(y(t)+4)+'" font-size="12" fill="#9ca3af" text-anchor="end">'+tickLabel(t)+'</text>';}}
+  var prevYr=null;
+  for(var i=0;i<n;i++){{var yr=2016+Math.floor(i/252);
+    if(yr!==prevYr){{g+='<text x="'+x(i)+'" y="'+(H-PAD_B+18)+'" font-size="13" fill="#9ca3af" text-anchor="middle">'+yr+'</text>';prevYr=yr;}}}}
+  function poly(vals,color,w){{
+    var pts='';
+    for(var i=0;i<vals.length;i+=3){{pts+=x(i).toFixed(1)+','+y(vals[i]).toFixed(1)+' ';}}
+    return '<polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="'+w+'"/>';}}
+  el.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+g+
+    poly(a,'#f59e0b',2)+poly(b,'#3b82f6',2)+
+    '<text x="'+(PAD_L+10)+'" y="'+(PAD_T+16)+'" font-size="13" fill="#f59e0b">ETF 池 → +'+{s_etf["total_return_pct"]:.0f}+'%</text>'+
+    '<text x="'+(PAD_L+10)+'" y="'+(PAD_T+34)+'" font-size="13" fill="#3b82f6">基金池 → +'+{s_fund["total_return_pct"]:.0f}+'%</text>'+
+    '<text x="'+(W-PAD_R-6)+'" y="'+(PAD_T+8)+'" font-size="11" fill="#9ca3af" text-anchor="end">对数坐标 · 净值(100起)</text></svg>';
+}}
+/* 视图切换（hash 驱动：切换时更新 location.hash，加载/前进后退时按 hash 定位） */
+var VIEW_MAP={{'overview':'view-overview','sys-auto':'view-auto','sys-lite':'view-lite','snapshot':'view-snapshot'}};
 function switchView(key){{
-  var map={{'overview':'view-overview','sys-auto':'view-auto','sys-lite':'view-lite','snapshot':'view-snapshot'}};
-  var v=map[key];if(!v)return;
+  var v=VIEW_MAP[key];if(!v)return;
   document.querySelectorAll('.view').forEach(function(x){{x.classList.remove('active');}});
   document.getElementById(v).classList.add('active');
   window.scrollTo(0,0);
+  if(location.hash!=='#'+key)try{{history.replaceState(null,'','#'+key)}}catch(e){{}}
 }}
+function applyHash(){{
+  var k=(location.hash||'').replace('#','');
+  if(VIEW_MAP[k])switchView(k);
+}}
+window.addEventListener('hashchange',applyHash);
 /* 右上角标的报告：按月分类历史快照（当前页内切换） */
 function renderReportMenu(){{
   var m=document.getElementById('report-menu');if(!m)return;
@@ -319,6 +369,8 @@ function showSnapshot(file, date){{
 {COMMON_JS}
 /* 覆盖：报告下拉用月度快照；左侧导航点击切换视图 */
 document.addEventListener('DOMContentLoaded',function(){{
+  applyHash();   // 按 URL hash 定位视图（历史页跳转 dual_system.html#sys-auto 直接显示普适版）
+  renderSubCurve();   // ETF/基金回测净值曲线
   renderReportMenu();
   document.querySelectorAll('#sidenav a[data-anchor]').forEach(function(a){{
     a.addEventListener('click',function(e){{
