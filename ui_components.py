@@ -167,25 +167,33 @@ function applyTheme(t){document.documentElement.setAttribute('data-theme',t);
 function toggleTheme(){var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';applyTheme(t)}
 try{applyTheme(localStorage.getItem('qw-theme')||'light')}catch(e){applyTheme('light')}
 
-/* ---------- 历史报告下拉（标的监控报告） ---------- */
+/* ---------- 历史报告下拉（优先月度收盘快照，按月分类；回退标的报告列表） ---------- */
 function toggleDrop(id){var el=document.getElementById(id);el.classList.toggle('open');
   if(id==='report-dd'&&!document.getElementById('report-menu').innerHTML){
     var m=document.getElementById('report-menu');
-    var h='<div class="head">标的监控报告（'+window.ENH.monitor_reports.length+' 只）</div>';
-    window.ENH.monitor_reports.forEach(function(r){
-      h+='<a href="monitor_reports.html#'+r.code+'" target="_blank">📈 '+r.name+'（'+r.code+'）· '+r.tier+'</a>';});
-    m.innerHTML=h;}}
+    if(window.SNAPSHOTS&&window.SNAPSHOTS.months&&window.SNAPSHOTS.months.length){
+      var h='<div class="head">历史收盘监控快照（'+window.SNAPSHOTS.snapshots.length+' 份）</div>';
+      window.SNAPSHOTS.months.forEach(function(g){
+        h+='<div class="snap-group">📅 '+g.month+'</div>';
+        g.items.forEach(function(s){
+          h+='<a class="snap-item" href="monitor/snapshots/'+s.file+'" target="_blank">📊 '+s.date+'（'+s.count+' 只）</a>';});});
+      m.innerHTML=h;
+    }else if(window.ENH.monitor_reports){
+      var h2='<div class="head">标的监控报告（'+window.ENH.monitor_reports.length+' 只）</div>';
+      window.ENH.monitor_reports.forEach(function(r){
+        h2+='<a href="monitor_reports.html#'+r.code+'" target="_blank">📈 '+r.name+'（'+r.code+'）· '+r.tier+'</a>';});
+      m.innerHTML=h2;}}
+  }
 document.addEventListener('click',function(e){
   document.querySelectorAll('.dropdown.open').forEach(function(d){
     if(!d.contains(e.target))d.classList.remove('open');});});
 
-/* ---------- 左侧导航（JS 点击滚动，不依赖 hash） ---------- */
+/* ---------- 左侧导航（JS 点击滚动，不依赖 hash；标的信息与表格同页，无独立报告入口） ---------- */
 function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)return;
   var html='<div class="sn-logo"><span class="dot"></span>量化权重监控</div><div class="sn-sep"></div>';
   window.ENH.nav.forEach(function(it){
     html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"><span class="ic">'+it[1]+'</span>'+it[2]+'</a>';});
   html+='<div class="sn-sep"></div><div class="sn-foot">'+
-    '<a href="monitor_reports.html" target="_blank"><span class="ic">📄</span>标的报告</a>'+
     '<a href="https://qingju.me/" target="_blank" rel="noopener"><span class="ic">💬</span>青橘社区</a></div>';
   nav.innerHTML=html;
   document.body.classList.add('sidenav-open');

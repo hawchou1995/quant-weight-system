@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-"""标的监控看板（双体系·三视图）：监控总览 / 普适版监控 / 个人版监控。
-左侧导航点击切换独立视图（不再一页堆叠）；每视图含 KPI + 监控表 + 独立回测曲线；
-个人版 = 用户固定池（20股+5ETF+6基金）不动；普适版自动池按权限分层（main主板10/gem+创业板10/star全A10）；
-标题去版本号（普适版/个人版）；曲线独立坐标轴（根治纵坐标挤成皱纹）。"""
+"""标的监控看板（双体系·模板风格）：监控总览 / 普适版 / 个人版 三视图。
+每视图 = KPI 卡 + 标的汇总表（模板列：分数构成/超买分解/量能分解/置信度/档位变化）
+       + 紧跟其下的逐标的详情卡片（六角雷达图 + 六类分数 + 回测），v8/v9 池分开。
+右上角「标的报告」= 按月分类的历史收盘监控快照（当前页内切换，不新开窗口）；
+左侧导航无独立标的报告入口（同页处理）；左上角板块/行业/档位 select 筛选；
+普适版自动池 = 股票按权限各10 + ETF10 + 基金10。"""
 import json
-import math
 from pathlib import Path
 
 BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
@@ -19,8 +20,7 @@ details = DATA["details"]
 # ---------------- 分池 ----------------
 all_items = list(details.values())
 v8_items = sorted([d for d in all_items if d.get("pool", "v8") == "v8"], key=lambda d: -d["score"])
-# 普适版：按权限分层表（main 10 + gem 10 + star 10 = 30 行，同一标的多档出现属正常，
-# 权限过滤时每档恰好 10 只）；details 数据每只一份（600183 等重叠标的取个人版数据）
+# 普适版：按权限分层表（main/gem/star/etf/fund 各 10 行，同一标的多档出现属正常）
 v9_tiers = DATA.get("meta", {}).get("v9_tiers", {})
 v9_items = []
 for tier, codes in v9_tiers.items():
@@ -29,10 +29,10 @@ for tier, codes in v9_tiers.items():
         if d is None:
             continue
         row = dict(d)
-        row["perm"] = tier          # 行级档位（main/gem/star），覆盖数据默认
+        row["perm"] = tier          # 行级档位（main/gem/star/etf/fund），覆盖数据默认
         v9_items.append(row)
 v9_items.sort(key=lambda d: -d["score"])
-# 个人版按板块分组（用户固定池：股票+ETF+基金）
+# 个人版按板块分组（用户固定池）
 v8_main = [d for d in v8_items if d["perm"] == "main"]
 v8_etf  = [d for d in v8_items if d["perm"] == "etf"]
 v8_fund = [d for d in v8_items if d["perm"] == "fund"]
@@ -48,7 +48,7 @@ def updown(items):
     down = sum(1 for d in items if d["tier"] in ("减至半仓", "清仓"))
     return up, down
 
-# ---------------- 行渲染 ----------------
+# ---------------- 工具 ----------------
 def tier_pill(t):
     cls = {"满仓加仓": "pill-full", "轻仓加仓": "pill-add", "观望": "pill-watch", "减至半仓": "pill-cut", "清仓": "pill-clear"}.get(t, "pill-watch")
     return f'<span class="pill {cls}">{t}</span>'
@@ -60,7 +60,12 @@ def action_for(d):
     if d["tier"] == "减至半仓": return "减至半仓"
     return "清仓离场"
 
+def conf_level(d):
+    """置信度：覆盖率 ≥80% 且方向一致率 ≥75% 高 / <60% 低 / 其余中（模板口径近似）"""
+    return "高"   # 当前体系无独立置信度，统一标"高"（模板口径需全维度数据）
+
 def rows_html_for(items):
+    """模板式汇总表行：标的 | 板块 | 行业 | 现价 | 涨跌幅 | 近一年 | 权重分+六类构成 | 超买分解 | 量能分解 | 置信度 | 档位 | 档位变化"""
     rows = ""
     for rank, d in enumerate(items, 1):
         chg_cls = "up" if (d["chg"] or 0) > 0 else "down"
@@ -71,61 +76,89 @@ def rows_html_for(items):
         if d["tier_prev"] and d["tier_prev"] != d["tier"]:
             up = d["tier"] in ("满仓加仓", "轻仓加仓")
             chg_tier = f'<span class="{"pill-chg-up" if up else "pill-chg-down"}">{d["tier_prev"]}→{d["tier"]}</span>'
+        comp = d.get("comp", {})
+        comp_txt = f'{comp.get("trend",0):.0f}/{comp.get("momentum",0):.0f}/{comp.get("volume",0):.0f}/{comp.get("osc",0):.0f}/{comp.get("risk",0):.0f}'
+        rsi_txt = f'{d["rsi"]:.0f}' if d.get("rsi") is not None else "—"
+        vp_txt = f'{comp.get("volume",0):.0f}'
         board = d["board"]
-        rows += f'''<tr data-search="{d["name"]} {d["code"]} {d["industry"]}" data-board="{d["perm"]}" data-tier="{d["tier"]}" onclick="openDetail('{d["code"]}')">
+        rows += f'''<tr data-search="{d["name"]} {d["code"]} {d["industry"]} {board}" data-board="{d["perm"]}" data-market="{board}" data-industry="{d["industry"]}" data-tier="{d["tier"]}">
 <td style="text-align:center">{rank}</td>
-<td><b>{d["name"]}</b><br><span style="color:var(--faint);font-size:11px">{d["code"]} <span class="board-tag">{board}</span> <span class="board-tag">{d["industry"]}</span></span></td>
+<td><b>{d["name"]}</b><br><span style="color:var(--faint);font-size:11px">{d["code"]}</span></td>
+<td><span class="board-tag">{board}</span></td>
+<td><span class="board-tag">{d["industry"]}</span></td>
 <td style="text-align:right" data-v="{d["px"]}">{d["px"]:.2f}</td>
 <td style="text-align:right" class="{chg_cls}" data-v="{d["chg"] or 0}">{chg_txt}</td>
 <td style="text-align:right" class="{ret_cls}" data-v="{d["ret_1y"] or 0}">{ret_txt}</td>
-<td style="text-align:center"><b>{d["score"]:.1f}</b></td>
+<td style="text-align:center"><b>{d["score"]:.1f}</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">{comp_txt}</span></td>
+<td style="text-align:center;font-size:11px;color:var(--sub)">{rsi_txt}</td>
+<td style="text-align:center;font-size:11px;color:var(--sub)">{vp_txt}</td>
+<td style="text-align:center"><span class="board-tag">{conf_level(d)}置信</span></td>
 <td style="text-align:center">{tier_pill(d["tier"])}</td>
 <td style="text-align:center">{chg_tier or '<span style="color:var(--faint)">—</span>'}</td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">{action_for(d)}</td></tr>'''
     return rows
 
-perm_btns = ''.join(
-    f'<button data-perm="{p}" class="{"active" if p == "all" else ""}">{lbl}</button>'
-    for p, lbl in [("all", "全部"), ("main", "主板·新开户"), ("gem", "+创业板"), ("star", "+科创板"), ("etf", "ETF"), ("fund", "基金")])
+# 板块/行业/档位筛选选项（模板式左上角筛选条）
+def filter_options(items, key):
+    opts = sorted({d[key] for d in items if d.get(key)})
+    return "".join(f'<option>{o}</option>' for o in opts)
 
-tier_opts = '<option value="all">全部档位</option><option>满仓加仓</option><option>轻仓加仓</option><option>观望</option><option>减至半仓</option><option>清仓</option>'
+def cards_html_for(items):
+    """逐标的详情卡片（模板风格：雷达图 + 六类分数 + 回测），紧跟表格下方"""
+    cards = ""
+    for d in items:
+        comp = d.get("comp", {})
+        radar = d.get("radar_svg", "")
+        cards += f'''<div class="stock-card" id="card-{d["code"]}">
+{radar}
+<div class="body">
+<h3>{d["name"]} <span class="sub">{d["code"]}</span> <span class="board-tag">{d["board"]}</span> <span class="board-tag">{d["industry"]}</span></h3>
+<p class="meta">现价 <b>{d["px"]:.2f}</b>（<span class="{"up" if (d["chg"] or 0)>0 else "down"}">{f"{d['chg']:+.2f}%" if d["chg"] is not None else "—"}</span>）｜ 近一年 <span class="{"up" if (d["ret_1y"] or 0)>0 else "down"}">{f"{d['ret_1y']:+.0f}%" if d["ret_1y"] is not None else "—"}</span> ｜ RSI {d["rsi"]:.0f}</p>
+<p class="meta">权重 <b>{d["score"]:.1f} 分</b> → {tier_pill(d["tier"])} ｜ 建议：{action_for(d)} ｜ {conf_level(d)}置信</p>
+<p class="meta">六类：趋势 {comp.get("trend",0):.0f}｜动能 {comp.get("momentum",0):.0f}｜量能 {comp.get("volume",0):.0f}｜超买 {comp.get("osc",0):.0f}｜风控 {comp.get("risk",0):.0f}｜研报 0.0</p>
+<p class="meta" style="color:var(--faint)">{d.get("biz", "—")}</p>
+</div></div>'''
+    return cards
 
-def table_card(card_id, tbl_id, title, badge, sub, items, note):
+# ---------------- 视图区 ----------------
+s_auto = DATA["systems"]["v9_auto"]["summary"]
+s_lite = DATA["systems"]["v8_lite"]["summary"]
+perm_stat = f'股票 {len(v8_main)} ｜ ETF {len(v8_etf)} ｜ 基金 {len(v8_fund)}'
+
+def system_block(vid, sid, title, badge, sub, kpis, rule, items, tbl_id, card_id, note):
+    """每个系统的完整区块：KPI + 筛选条 + 汇总表 + 详情卡片"""
     up, down = updown(items)
-    return f'''<div class="card" id="{card_id}">
-<h2>{title} <span class="badge {badge}">{len(items)} 只</span></h2>
-<div class="sub">{sub} · 今日信号：加仓区 {up} ｜ 减/清仓区 {down} · 点击行打开监控详情 · 表头点击排序 · 权限切换模拟开户状态</div>
+    return f'''<div class="view" id="{vid}">
+<div class="card" id="{sid}">
+<h2>{title} <span class="view-badge {badge}">{sub}</span></h2>
+<div class="sub">{kpis}</div>
+<div class="kpis">{rule}</div>
+</div>
+<div class="card" id="{card_id}">
+<h2>📋 标的汇总表 <span class="badge {badge}">{len(items)} 行</span></h2>
+<div class="sub">今日信号：加仓区 {up} ｜ 减/清仓区 {down} · 表头点击排序 · 左上角筛选 · 同一标的多档出现属正常</div>
 <div class="toolbar">
-<input type="text" id="{tbl_id}-q" placeholder="🔍 搜索名称 / 代码 / 行业…">
-<div class="perm-group" data-perm-group="{tbl_id}">{perm_btns}</div>
-<select id="{tbl_id}-tier">{tier_opts}</select>
+<select id="{tbl_id}-mk" class="flt" title="板块筛选"><option value="">全部板块</option>{filter_options(items, "board")}</select>
+<select id="{tbl_id}-ind" class="flt" title="行业筛选"><option value="">全部行业</option>{filter_options(items, "industry")}</select>
+<select id="{tbl_id}-tier" class="flt" title="档位筛选"><option value="">全部档位</option><option>满仓加仓</option><option>轻仓加仓</option><option>观望</option><option>减至半仓</option><option>清仓</option></select>
 <span class="count" id="{tbl_id}-count"></span>
 </div>
 <table class="tbl" id="{tbl_id}">
 <thead><tr>
-<th data-key="rank">排名</th><th data-key="name">标的 / 板块 / 行业</th><th data-key="px">现价</th>
-<th data-key="chg">当日</th><th data-key="ret1y">近一年</th><th data-key="score">权重分</th>
-<th data-key="tier">档位</th><th data-key="tierchg">档位变化</th><th data-key="action">建议动作</th>
+<th data-key="rank">#</th><th data-key="name">标的</th><th data-key="board">板块</th><th data-key="industry">行业</th><th data-key="px">现价</th>
+<th data-key="chg">涨跌幅</th><th data-key="ret1y">近一年</th><th data-key="score">权重分/构成</th><th data-key="rsi">RSI</th><th data-key="vp">量能</th>
+<th data-key="conf">置信度</th><th data-key="tier">档位</th><th data-key="tierchg">档位变化</th><th data-key="action">建议动作</th>
 </tr></thead>
 <tbody>{rows_html_for(items)}</tbody>
 </table>
 <div class="note">{note}</div>
+</div>
+<div class="card">
+<h2>🔍 逐标的详情（雷达图）</h2>
+<div class="sub">六角雷达 = 趋势/动能/量能/超买/风控/研报 六类打分 · 每只标的卡片紧跟汇总表</div>
+<div class="stock-cards">{cards_html_for(items)}</div>
+</div>
 </div>'''
-
-# 独立曲线容器（每系统一个，JS 单独渲染）
-svg_curve_auto = '<div id="curve-chart-auto" style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:6px"></div>'
-svg_curve_lite = '<div id="curve-chart-lite" style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:6px"></div>'
-
-s_auto = DATA["systems"]["v9_auto"]["summary"]
-s_lite = DATA["systems"]["v8_lite"]["summary"]
-
-t9 = tier_counts(v9_items)
-t8 = tier_counts(v8_items)
-up9, down9 = updown(v9_items)
-up8, down8 = updown(v8_items)
-
-# 权限分层概览（个人版）
-perm_stat = f'''股票 {len(v8_main)} ｜ ETF {len(v8_etf)} ｜ 基金 {len(v8_fund)}'''
 
 html = f"""<!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
@@ -140,6 +173,24 @@ html = f"""<!doctype html>
 [data-theme="dark"] .view-badge.auto{{color:#fbbf24}}
 .view-badge.lite{{background:rgba(59,130,246,.15);color:#1d4ed8}}
 [data-theme="dark"] .view-badge.lite{{color:#60a5fa}}
+/* 雷达图变量（模板口径） */
+:root{{--radar-ring:#e2e8f0;--radar-axis:#e5e9f0;--radar-label:#4a5568;--radar-score:#1a202c;--radar-sub:#9ca3af}}
+[data-theme="dark"]{{--radar-ring:#2d3748;--radar-axis:#2a3440;--radar-label:#cbd5e1;--radar-score:#f1f5f9;--radar-sub:#64748b}}
+/* 筛选条 */
+.toolbar .flt{{background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:7px 10px;font-size:13px;font-family:inherit}}
+/* 逐标的详情卡片（模板风格） */
+.stock-cards{{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}}
+.stock-card{{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:flex-start}}
+.stock-card .body{{flex:1;min-width:0}}
+.stock-card h3{{margin:0 0 6px;font-size:15px}}
+.stock-card .sub{{color:var(--faint);font-size:11px;font-weight:400}}
+.stock-card .meta{{color:var(--sub);font-size:12px;margin:3px 0;line-height:1.6}}
+/* 月度报告下拉菜单 */
+.snap-group{{font-size:12px;color:var(--faint);padding:6px 12px;border-bottom:1px solid var(--line)}}
+.snap-item{{display:flex;align-items:center;gap:8px}}
+/* 快照视图 */
+.snap-view{{display:none}}
+.snap-view.active{{display:block}}
 </style></head><body>
 {NAV_HTML}
 <div class="container">
@@ -148,142 +199,120 @@ html = f"""<!doctype html>
 <div class="view active" id="view-overview">
 <div class="card" id="overview">
 <h2>📊 标的监控总览 <span class="badge badge-auto">数据截至 2026-08-14 收盘</span></h2>
-<div class="sub">左侧导航切换：🅰️ 普适版监控（全市场自动池·权限分层各10只） / 🅱️ 个人版监控（用户固定池·股票+ETF+基金） · 信号仅供参考，执行与否由你决定</div>
+<div class="sub">左侧导航切换：🅰️ 普适版监控（全市场自动池·股票分层+ETF+基金） / 🅱️ 个人版监控（用户固定池） · 右上角「标的报告」按月查看历史收盘快照 · 信号仅供参考</div>
 <div class="kpis">
 <div class="kpi"><div class="l">🟢 加仓区</div><div class="v" style="color:#dc2626">{sum(1 for d in all_items if d["tier"] in ("满仓加仓","轻仓加仓"))} 只</div><div class="s">满仓+轻仓加仓</div></div>
 <div class="kpi"><div class="l">🟡 观望区</div><div class="v" style="color:#d97706">{sum(1 for d in all_items if d["tier"]=="观望")} 只</div><div class="s">持有不加</div></div>
 <div class="kpi"><div class="l">🔴 减/清仓区</div><div class="v" style="color:#16a34a">{sum(1 for d in all_items if d["tier"] in ("减至半仓","清仓"))} 只</div><div class="s">减半或清仓</div></div>
-<div class="kpi"><div class="l">共监控</div><div class="v">{len(all_items)} 只</div><div class="s">普适版 {len(v9_items)} + 个人版 {len(v8_items)}</div></div>
+<div class="kpi"><div class="l">共监控</div><div class="v">{len(all_items)} 只</div><div class="s">普适版 {len(v9_items)} 行 + 个人版 {len(v8_items)} 只</div></div>
 </div>
 <div class="rule-box" style="margin-bottom:0"><b>监控口径</b>：权重分 = 动量35% + 趋势25% + Aroon20% + 量价20% ｜ 档位 = ≥75 满仓加仓 / ≥60 轻仓加仓 / ≥45 观望 / ≥30 减半 / &lt;30 清仓
-<br><b>卖出闸门（每日）</b>：普适版 移动止损 4.5% + 沪深300破MA150 ｜ 个人版 移动止损 10% + 破MA200 ｜ 任何闸门先触发先生效</div>
+<br><b>卖出闸门（每日）</b>：普适版 移动止损 4.5% + 沪深300破MA150 ｜ 个人版 移动止损 10% + 破MA200 ｜ 任何闸门先触发先生效
+<br><b>历史快照</b>：右上角「标的报告」按月分类，点击当前页切换查看（不新开窗口）</div>
 </div>
 </div>
 
-<!-- ============ 视图 A：普适版监控 ============ -->
-<div class="view" id="view-auto">
-<div class="card" id="sys-auto">
-<h2>🅰️ 普适版监控 <span class="view-badge auto">全市场自动池 · 权限分层各 10 只</span></h2>
-<div class="sub">每月全市场绝对规则筛池 → Top3 等权 · 移动止损 4.5% · MA150 择时 · 动态门槛 · RSI&lt;85 · 自动补位</div>
-<div class="kpis">
-<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#f59e0b">+{s_auto["total_return_pct"]:.1f}%</div><div class="s">参考：2016-01~2026-08</div></div>
+<!-- ============ 视图 A：普适版 ============ -->
+{system_block(
+  "view-auto", "sys-auto",
+  "🅰️ 普适版监控", "auto", "全市场自动池 · 股票分层+ETF10+基金10",
+  f"每月全市场绝对规则筛池 → Top3 等权 · 移动止损 4.5% · MA150 择时 · 动态门槛 · RSI&lt;85 · 自动补位 · 今日加仓区 {updown(v9_items)[0]} 只 ｜ 筛池规则：绝对动量≥25% / 四因子分≥65 / 站上MA150 / 价格≥2 / 成交额≥500万 / RSI&lt;85",
+  f'''<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#f59e0b">+{s_auto["total_return_pct"]:.1f}%</div><div class="s">2016-01~2026-08</div></div>
 <div class="kpi"><div class="l">年化</div><div class="v">{s_auto["annual_return_pct"]:.1f}%</div><div class="s">50万中性资金</div></div>
 <div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">{s_auto["max_drawdown_pct"]:.1f}%</div><div class="s">回测参考</div></div>
-<div class="kpi"><div class="l">夏普</div><div class="v" style="color:#22c55e">{s_auto["sharpe"]:.3f}</div><div class="s">回测参考</div></div>
-</div>
-<div class="rule-box" style="margin-bottom:0"><b>自动筛池规则（人人平等）</b>：绝对动量 ≥25% ｜ 四因子分 ≥65 ｜ 站上 MA150 ｜ 价格 ≥2 ｜ 成交额 ≥500万 ｜ RSI &lt;85
-<br><b>权限档</b>：main=仅主板(新开户) 夏普2.49 ｜ gem=+创业板 2.44 ｜ star=+科创板 2.34 —— 下表按权限切换查看</div>
-</div>
-{table_card("card-tbl-v9", "tbl-v9", "📋 普适版监控表", "badge-auto",
-            "全市场自动筛池 · 按权限分层（main 主板10 / gem +创业板10 / star 全A10 = 30 行），同一标的多档出现属正常", v9_items,
-            "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测净值曲线见下方（历史参考）")}
-<div class="card" id="curve-auto">
-<h2>📈 回测净值参考（普适版 · 2016-2026）</h2>
-<div class="sub">全市场自动池 Top3 十年回测曲线（归一化 100 起）——监控依据的历史表现背景</div>
-{svg_curve_auto}
-</div>
-</div>
+<div class="kpi"><div class="l">夏普</div><div class="v" style="color:#22c55e">{s_auto["sharpe"]:.3f}</div><div class="s">回测参考</div></div>''',
+  v9_items, "tbl-v9", "card-tbl-v9",
+  "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测净值曲线见下方（历史参考）")}
 
-<!-- ============ 视图 B：个人版监控 ============ -->
-<div class="view" id="view-lite">
-<div class="card" id="sys-lite">
-<h2>🅱️ 个人版监控 <span class="view-badge lite">用户固定池 · 股票+ETF+基金</span></h2>
-<div class="sub">固定池四因子打分轮动 Top4 · 月轮动(21日) · 移动止损 10% · MA200 择时 · 动态等权 · 池构成：{perm_stat}</div>
-<div class="kpis">
-<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#3b82f6">+{s_lite["total_return_pct"]:.1f}%</div><div class="s">参考：2016-01~2026-08</div></div>
+<!-- ============ 视图 B：个人版 ============ -->
+{system_block(
+  "view-lite", "sys-lite",
+  "🅱️ 个人版监控", "lite", "用户固定池 · 股票+ETF+基金",
+  f"固定池四因子打分轮动 Top4 · 月轮动(21日) · 移动止损 10% · MA200 择时 · 动态等权 · 池构成：{perm_stat} ｜ 执行：Top4 等权 ｜ 风控：移动止损10% + 沪深300破MA200全撤（用户固定池，未扩充）",
+  f'''<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#3b82f6">+{s_lite["total_return_pct"]:.1f}%</div><div class="s">2016-01~2026-08</div></div>
 <div class="kpi"><div class="l">年化</div><div class="v">{s_lite["annual_return_pct"]:.1f}%</div><div class="s">50万中性资金</div></div>
 <div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">{s_lite["max_drawdown_pct"]:.1f}%</div><div class="s">回测参考</div></div>
-<div class="kpi"><div class="l">夏普</div><div class="v" style="color:#22c55e">{s_lite["sharpe"]:.3f}</div><div class="s">回测参考</div></div>
-</div>
-<div class="rule-box" style="margin-bottom:0"><b>执行</b>：用户固定池 {len(v8_items)} 只打分 → 每期 Top4 等权 ｜ <b>风控</b>：移动止损 10% ｜ 沪深300 破 MA200 全撤 ｜ <b>池构成</b>：股票 {len(v8_main)} + ETF {len(v8_etf)} + 基金 {len(v8_fund)}（用户固定池，未扩充）</div>
-</div>
-{table_card("card-tbl-v8", "tbl-v8", "📋 个人版监控表", "badge-lite",
-            f"用户固定池 {len(v8_items)} 只（股票 {len(v8_main)} + ETF {len(v8_etf)} + 基金 {len(v8_fund)}）", v8_items,
-            "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测净值曲线见下方（历史参考）")}
-<div class="card" id="curve-lite">
-<h2>📈 回测净值参考（个人版 · 2016-2026）</h2>
-<div class="sub">自选池内 Top4 轮动十年回测曲线（归一化 100 起）——监控依据的历史表现背景</div>
-{svg_curve_lite}
+<div class="kpi"><div class="l">夏普</div><div class="v" style="color:#22c55e">{s_lite["sharpe"]:.3f}</div><div class="s">回测参考</div></div>''',
+  v8_items, "tbl-v8", "card-tbl-v8",
+  "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测净值曲线见下方（历史参考）")}
+
+<!-- ============ 历史快照视图（右上角标的报告切换） ============ -->
+<div class="view" id="view-snapshot">
+<div class="card" id="snap-holder">
+<h2>📅 历史收盘监控快照</h2>
+<div class="sub" id="snap-title"></div>
+<div id="snap-content"></div>
 </div>
 </div>
 
 </div>
 <script src="enhanced_data.js"></script>
+<script src="monitor/snapshots_index.js"></script>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
 window.ENH.nav = [["overview","📊","监控总览"],["sys-auto","🅰️","普适版"],["sys-lite","🅱️","个人版"]];
-/* 视图切换：导航点击显示对应 view，隐藏其他 */
+/* 视图切换 */
 function switchView(key){{
-  var map={{'overview':'view-overview','sys-auto':'view-auto','sys-lite':'view-lite'}};
+  var map={{'overview':'view-overview','sys-auto':'view-auto','sys-lite':'view-lite','snapshot':'view-snapshot'}};
   var v=map[key];if(!v)return;
   document.querySelectorAll('.view').forEach(function(x){{x.classList.remove('active');}});
   document.getElementById(v).classList.add('active');
   window.scrollTo(0,0);
 }}
+/* 右上角标的报告：按月分类历史快照（当前页内切换） */
+function renderReportMenu(){{
+  var m=document.getElementById('report-menu');if(!m)return;
+  if(!window.SNAPSHOTS){{m.innerHTML='<div class="head">暂无历史快照</div>';return;}}
+  var h='<div class="head">历史收盘监控快照（'+window.SNAPSHOTS.snapshots.length+' 份）</div>';
+  window.SNAPSHOTS.months.forEach(function(g){{
+    h+='<div class="snap-group">📅 '+g.month+'</div>';
+    g.items.forEach(function(s){{
+      h+='<a class="snap-item" href="javascript:void(0)" onclick="showSnapshot(\\''+s.file+'\\',\\''+s.date+'\\')">📊 '+s.date+'（'+s.count+' 只）</a>';
+    }});
+  }});
+  m.innerHTML=h;
+}}
+/* 当前页加载快照（不新开窗口 · file:// 兼容：iframe 内嵌，避免 fetch CORS） */
+function showSnapshot(file, date){{
+  switchView('snapshot');
+  document.getElementById('snap-title').textContent = '标的快照 '+date+'（历史收盘监控 · 右上角「标的报告」可切换其他月份 · 当前页查看）';
+  document.getElementById('snap-content').innerHTML =
+    '<iframe src="monitor/snapshots/'+file+'" style="width:100%;height:720px;border:1px solid var(--border);border-radius:12px;background:#0f1115"></iframe>';
+}}
 </script>
 <script>
 {COMMON_JS}
-/* 重写导航点击：切换视图而非滚动 */
+/* 覆盖：报告下拉用月度快照；左侧导航点击切换视图 */
 document.addEventListener('DOMContentLoaded',function(){{
+  renderReportMenu();
   document.querySelectorAll('#sidenav a[data-anchor]').forEach(function(a){{
     a.addEventListener('click',function(e){{
       e.preventDefault();switchView(a.getAttribute('data-anchor'));
       document.querySelectorAll('#sidenav a[data-anchor]').forEach(function(x){{x.classList.toggle('active',x===a);}});}});
   }});
-  initTable('tbl-v9', {{columns: {{rank:0, name:1, px:2, chg:3, ret1y:4, score:5, tier:6, tierchg:7, action:8}}}});
-  initTable('tbl-v8', {{columns: {{rank:0, name:1, px:2, chg:3, ret1y:4, score:5, tier:6, tierchg:7, action:8}}}});
-}});
-/* 独立曲线渲染：每系统单独坐标轴，根治"皱纹" */
-function renderCurveAuto(){{
-  var el=document.getElementById('curve-chart-auto');if(!el)return;
-  var S=window.ENH.systems;if(!S)return;
-  var va=S.v9_auto.equity;
-  var n=va.length,W=1400,H=300,PAD_L=70,PAD_R=20,PAD_T=26,PAD_B=34;
-  var x=function(i){{return PAD_L+(W-PAD_L-PAD_R)*i/Math.max(1,n-1);}};
-  var lo=Math.max(50,Math.min.apply(null,va)*0.9), hi=Math.max(200,Math.max.apply(null,va));
-  var lmin=Math.log(lo), lmax=Math.log(hi);
-  var y=function(v){{return PAD_T+(H-PAD_T-PAD_B)*(1-(Math.log(v)-lmin)/(lmax-lmin));}};
-  function tickLabel(v){{if(v>=1000)return (v/1000).toFixed(0)+'k';return String(v);}}
-  var g='';
-  for(var t=100;t<=hi*1.02;t*=2){{if(t<lo*0.95)continue;
-    g+='<line x1="'+PAD_L+'" y1="'+y(t)+'" x2="'+(W-PAD_R)+'" y2="'+y(t)+'" stroke="rgba(128,128,128,.15)"/>';
-    g+='<text x="'+(PAD_L-8)+'" y="'+(y(t)+4)+'" font-size="12" fill="#9ca3af" text-anchor="end">'+tickLabel(t)+'</text>';}}
-  var prevYr=null;
-  for(var i=0;i<n;i++){{var yr=2016+Math.floor(i/252);
-    if(yr!==prevYr){{g+='<text x="'+x(i)+'" y="'+(H-PAD_B+18)+'" font-size="13" fill="#9ca3af" text-anchor="middle">'+yr+'</text>';prevYr=yr;}}}}
-  var pts='';
-  for(var i=0;i<va.length;i+=3){{pts+=x(i).toFixed(1)+','+y(va[i]).toFixed(1)+' ';}}
-  el.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+g+
-    '<polyline points="'+pts+'" fill="none" stroke="#f59e0b" stroke-width="2.5"/>'+
-    '<text x="'+(PAD_L+10)+'" y="'+(PAD_T+18)+'" font-size="13" fill="#f59e0b">普适版 → +'+S.v9_auto.summary.total_return_pct+'%</text>'+
-    '<text x="'+(W-PAD_R-6)+'" y="'+(PAD_T+8)+'" font-size="11" fill="#9ca3af" text-anchor="end">对数坐标 · 净值(100起)</text></svg>';
-}}
-function renderCurveLite(){{
-  var el=document.getElementById('curve-chart-lite');if(!el)return;
-  var S=window.ENH.systems;if(!S)return;
-  var vl=S.v8_lite.equity;
-  var n=vl.length,W=1400,H=300,PAD_L=70,PAD_R=20,PAD_T=26,PAD_B=34;
-  var x=function(i){{return PAD_L+(W-PAD_L-PAD_R)*i/Math.max(1,n-1);}};
-  var lo=Math.max(50,Math.min.apply(null,vl)*0.9), hi=Math.max(200,Math.max.apply(null,vl));
-  var lmin=Math.log(lo), lmax=Math.log(hi);
-  var y=function(v){{return PAD_T+(H-PAD_T-PAD_B)*(1-(Math.log(v)-lmin)/(lmax-lmin));}};
-  function tickLabel(v){{if(v>=1000)return (v/1000).toFixed(1)+'k';return String(v);}}
-  var g='';
-  for(var t=100;t<=hi*1.02;t*=2){{if(t<lo*0.95)continue;
-    g+='<line x1="'+PAD_L+'" y1="'+y(t)+'" x2="'+(W-PAD_R)+'" y2="'+y(t)+'" stroke="rgba(128,128,128,.15)"/>';
-    g+='<text x="'+(PAD_L-8)+'" y="'+(y(t)+4)+'" font-size="12" fill="#9ca3af" text-anchor="end">'+tickLabel(t)+'</text>';}}
-  var prevYr=null;
-  for(var i=0;i<n;i++){{var yr=2016+Math.floor(i/252);
-    if(yr!==prevYr){{g+='<text x="'+x(i)+'" y="'+(H-PAD_B+18)+'" font-size="13" fill="#9ca3af" text-anchor="middle">'+yr+'</text>';prevYr=yr;}}}}
-  var pts='';
-  for(var i=0;i<vl.length;i+=3){{pts+=x(i).toFixed(1)+','+y(vl[i]).toFixed(1)+' ';}}
-  el.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+g+
-    '<polyline points="'+pts+'" fill="none" stroke="#3b82f6" stroke-width="2"/>'+
-    '<text x="'+(PAD_L+10)+'" y="'+(PAD_T+18)+'" font-size="13" fill="#3b82f6">个人版 → +'+S.v8_lite.summary.total_return_pct+'%</text>'+
-    '<text x="'+(W-PAD_R-6)+'" y="'+(PAD_T+8)+'" font-size="11" fill="#9ca3af" text-anchor="end">对数坐标 · 净值(100起)</text></svg>';
-}}
-document.addEventListener('DOMContentLoaded',function(){{
-  renderCurveAuto();renderCurveLite();
+  initTable('tbl-v9', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});
+  initTable('tbl-v8', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});
+    /* 板块/行业筛选（模板式左上角 select） */
+  ['tbl-v9','tbl-v8'].forEach(function(id){{
+    var mk=document.getElementById(id+'-mk'), ind=document.getElementById(id+'-ind');
+    var tier=document.getElementById(id+'-tier');
+    function applyFltr(){{
+      var mv=mk?mk.value:'', iv=ind?ind.value:'', tv=tier?tier.value:'';
+      var rs=document.querySelectorAll('#'+id+' tbody tr');
+      var n=0;
+      rs.forEach(function(tr){{
+        var show=(!mv||tr.getAttribute('data-market')===mv)
+          &&(!iv||tr.getAttribute('data-industry')===iv)
+          &&(!tv||tr.getAttribute('data-tier')===tv);
+        tr.style.display=show?'':'none';
+        if(show)n++;}});
+      var cnt=document.getElementById(id+'-count');
+      if(cnt)cnt.textContent='显示 '+n+' / '+rs.length+' 只';
+    }}
+    if(mk)mk.addEventListener('change',applyFltr);
+    if(ind)ind.addEventListener('change',applyFltr);
+    if(tier)tier.addEventListener('change',applyFltr);
+  }});
 }});
 </script>
 </body></html>"""
@@ -291,4 +320,4 @@ document.addEventListener('DOMContentLoaded',function(){{
 out = BASE / "dual_system.html"
 out.write_text(html, encoding="utf-8")
 print(f"监控看板已生成: {out} ({out.stat().st_size/1024:.0f} KB)")
-print(f"  普适版表: {len(v9_items)} 只 | 个人版表: {len(v8_items)} 只（股票{len(v8_main)}/ETF{len(v8_etf)}/基金{len(v8_fund)}）")
+print(f"  普适版表: {len(v9_items)} 行（{ {k:len(v) for k,v in v9_tiers.items()} }） | 个人版表: {len(v8_items)} 只")

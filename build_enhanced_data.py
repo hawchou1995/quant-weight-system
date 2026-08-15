@@ -80,6 +80,47 @@ def rsi14(close, n=14):
     dn = (-d.clip(upper=0)).rolling(n).mean()
     return 100 - 100 / (1 + up / dn.replace(0, np.nan))
 
+# ---------------- 六类雷达图（模板风格：趋势/动能/量能/超买/风控/研报） ----------------
+def svg_radar(comp, score, size=104):
+    """六角雷达，与模板 monitor/render_dashboard.py svg_radar_light 一致"""
+    cx = cy = size / 2
+    R = size * 0.36
+    cats = ["trend", "momentum", "volume", "osc", "risk", "news"]
+    labels = ["趋势", "动能", "量能", "超买", "风控", "研报"]
+    angles = [math.radians(i * 60 - 90) for i in range(6)]
+
+    def pt(r, ang):
+        return (cx + r * math.cos(ang), cy + r * math.sin(ang))
+
+    parts = []
+    for ring in [0.25, 0.5, 0.75, 1.0]:
+        pts = " ".join(f"{pt(R*ring, a)[0]:.1f},{pt(R*ring, a)[1]:.1f}" for a in angles)
+        parts.append(f'<polygon points="{pts}" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>')
+    for a in angles:
+        x0, y0 = pt(0, a); x1, y1 = pt(R, a)
+        parts.append(f'<line x1="{x0:.1f}" y1="{y0:.1f}" x2="{x1:.1f}" y2="{y1:.1f}" style="stroke:var(--radar-axis)" stroke-width="1"/>')
+    vals = [comp.get(c, 50) for c in cats]
+    if abs(comp.get("news", 0) or 0) <= 5:
+        vals[5] = 50 + comp["news"] * 20
+    spts = " ".join(f"{pt(R*max(3,min(100,vals[i]))/100, angles[i])[0]:.1f},{pt(R*max(3,min(100,vals[i]))/100, angles[i])[1]:.1f}" for i in range(6))
+    if score >= 75: fill, stroke = "rgba(220,38,38,0.18)", "#dc2626"
+    elif score >= 60: fill, stroke = "rgba(234,88,12,0.16)", "#ea580c"
+    elif score >= 45: fill, stroke = "rgba(202,138,4,0.16)", "#ca8a04"
+    elif score >= 30: fill, stroke = "rgba(22,163,74,0.16)", "#16a34a"
+    else: fill, stroke = "rgba(2,132,199,0.16)", "#0284c7"
+    parts.append(f'<polygon points="{spts}" fill="{fill}" stroke="{stroke}" stroke-width="2" stroke-linejoin="round"/>')
+    for i in range(6):
+        xr, yr = pt(R * max(3, min(100, vals[i])) / 100, angles[i])
+        parts.append(f'<circle cx="{xr:.1f}" cy="{yr:.1f}" r="2.5" fill="{stroke}"/>')
+        lx, ly = pt(R * 1.22, angles[i])
+        anchor = "middle"
+        if abs(math.cos(angles[i])) > 0.7:
+            anchor = "start" if lx > cx else "end"
+        parts.append(f'<text x="{lx:.1f}" y="{ly:.1f}" style="fill:var(--radar-label)" font-size="8" text-anchor="{anchor}" font-weight="600">{labels[i]}</text>')
+    parts.append(f'<text x="{cx:.1f}" y="{cy+1:.1f}" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">{score:.1f}</text>')
+    parts.append(f'<text x="{cx:.1f}" y="{cy+13:.1f}" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text>')
+    return f'<svg viewBox="0 0 {size} {size}" style="width:{size}px;height:{size}px;flex:0 0 auto">{chr(10).join(parts)}</svg>'
+
 # ---------------- 池 ----------------
 pool = L.build_pool(verbose=False)
 pool_all = A.pool_all
@@ -99,6 +140,33 @@ def load_hist_df(c):
     df["date"] = pd.to_datetime(df["date"])
     df = df.sort_values("date").reset_index(drop=True)
     if len(df) < 250:
+        return None
+    return V.compute_factors_full(df).set_index("date")
+
+def load_fund_cache_df(c):
+    """全市场基金净值（fund_nav_cache，净值型）"""
+    f = BASE / "fund_nav_cache" / f"{c}.csv"
+    if not f.exists():
+        return None
+    df = pd.read_csv(f, dtype={"净值日期": str})
+    s = pd.Series(pd.to_numeric(df["单位净值"], errors="coerce").values,
+                  index=pd.to_datetime(df["净值日期"])).dropna()
+    if len(s) < 400:
+        return None
+    d = pd.DataFrame({"open": s.values, "high": s.values, "low": s.values,
+                      "close": s.values, "volume": 0.0, "amount": 0.0}, index=s.index)
+    return V.compute_factors_full(d)
+
+def load_etf_df(c):
+    """普适版 ETF（data_full sh5/sz1）"""
+    k = ("sh" if c.startswith(("5", "6")) else "sz") + c
+    f = BASE / "data_full" / f"{k}.csv"
+    if not f.exists():
+        return None
+    df = pd.read_csv(f, dtype={"date": str})
+    df["date"] = pd.to_datetime(df["date"])
+    df = df.sort_values("date").reset_index(drop=True)
+    if len(df) < 400:
         return None
     return V.compute_factors_full(df).set_index("date")
 
@@ -144,14 +212,26 @@ def v9_rank_by_perm(perm, top_n=10, mom_min=0.25, score_min=65, rsi_max=85):
 V9_MAIN = v9_rank_by_perm("main", 10)   # 主板 10 只
 V9_GEM  = v9_rank_by_perm("gem", 10)    # 主板+创业板 10 只
 V9_STAR = v9_rank_by_perm("star", 10)   # 全A 10 只
-# 普适版分层清单（每档 10 只，供监控表按权限过滤）
+# 普适版 ETF Top10（全市场 ETF 四因子打分，无权限限制）
+_etf_pool = json.load(open(BASE / "etf_top_pool.json", encoding="utf-8"))
+V9_ETF = [x["code"] for x in _etf_pool["top"][:10]]
+# 普适版基金 Top10（全市场基金净值打分，无权限限制；从缓存读，若不存在则回退用户 6 只）
+_fund_pool_f = BASE / "fund_top_pool.json"
+if _fund_pool_f.exists():
+    _fund_pool = json.load(open(_fund_pool_f, encoding="utf-8"))
+    V9_FUND = [x["code"] for x in _fund_pool["top"][:10]]
+else:
+    V9_FUND = FUNDS[:]
+# 普适版分层清单（股票按权限 + ETF + 基金，供监控表按类型/权限过滤）
 V9_TIERS = {
     "main": [k[-6:] for k in V9_MAIN],
     "gem":  [k[-6:] for k in V9_GEM],
     "star": [k[-6:] for k in V9_STAR],
+    "etf":  V9_ETF,
+    "fund": V9_FUND,
 }
 # 普适版监控池全集（分层，不去重——同一标的多档出现属正常）
-V9_CODES = V9_TIERS["main"] + V9_TIERS["gem"] + V9_TIERS["star"]
+V9_CODES = V9_TIERS["main"] + V9_TIERS["gem"] + V9_TIERS["star"] + V9_TIERS["etf"] + V9_TIERS["fund"]
 
 # 权限映射：main=主板 / gem=创业板 / star=科创板 / etf / fund
 PERM_OF = {}
@@ -176,9 +256,13 @@ details = {}
 for c in ALL_CODES:
     k = ("sh" if c.startswith(("6", "5")) else "sz") + c
     if c in FUNDS:
-        ddf = load_hist_df(c)          # 基金：data_hist 净值
+        ddf = load_hist_df(c)              # 个人版基金：data_hist 净值
+    elif c in V9_FUND:
+        ddf = load_fund_cache_df(c)        # 普适版基金：fund_nav_cache 净值
+    elif c in V9_ETF:
+        ddf = load_etf_df(c)               # 普适版 ETF：data_full sh5/sz1
     else:
-        ddf = get_pool_df(k)           # 股票/ETF：data_full
+        ddf = get_pool_df(k)               # 股票：data_full
     if ddf is None or len(ddf) == 0:
         continue
     # 最新收盘（08-14 或该标的最新）
@@ -199,6 +283,17 @@ for c in ALL_CODES:
         sc_prev = float(V.score_row(ddf.loc[prev_rebal]))
     # 四因子拆分（最新）
     fs = factor_split(r)
+    # 六类 comp（模板口径：趋势/动能/量能/超买/风控/研报）——四因子映射 + 波动率风控 + 无研报
+    vol20_raw = float(r["vol20"]) if not pd.isna(r["vol20"]) else None
+    comp = {
+        "trend": fs["trend"] if fs["trend"] is not None else 50,
+        "momentum": fs["mom"] if fs["mom"] is not None else 50,
+        "volume": fs["vp"],
+        "osc": fs["aroon"],
+        "risk": round(100 - min(100.0, (vol20_raw or 0.5) * 250), 1) if vol20_raw is not None else 50,
+        "news": 0.0,
+    }
+    radar_svg = svg_radar(comp, sc_now)
     # RSI
     rsi = float(rsi14(ddf["close"]).iloc[-1])
     # K线 250 日（缩到 60 点）
@@ -229,13 +324,13 @@ for c in ALL_CODES:
         "code": c, "key": k, "name": FUND_NAMES.get(c, names.get(k, c)),
         "pool": POOL_TAG.get(c, "v8"),   # v8=个人版自选池 / v9=普适版自动池
         "perm": PERM_OF.get(c, "main"),  # main/gem/star/etf/fund 权限档
-        "board": ("基金" if c in FUNDS else ("ETF" if k.startswith(("sh5", "sz1")) else ("创业板" if c.startswith("30") else ("科创板" if k.startswith("sh688") else "主板")))),
+        "board": ("基金" if (c in FUNDS or c in V9_FUND) else ("ETF" if (k.startswith(("sh5", "sz1")) or c in V9_ETF) else ("创业板" if c.startswith("30") else ("科创板" if k.startswith("sh688") else "主板")))),
         "industry": INDUSTRY.get(c, "—"), "biz": BIZ.get(c, "—"),
         "px": round(px, 2), "chg": round(chg, 2) if chg is not None else None,
         "ret_1y": round(ret_1y, 1) if ret_1y is not None else None,
         "score": round(sc_now, 1), "score_prev": round(sc_prev, 1) if sc_prev is not None else None,
         "tier": tier(sc_now), "tier_prev": tier(sc_prev) if sc_prev is not None else None,
-        "factors": fs, "rsi": round(rsi, 1),
+        "factors": fs, "comp": comp, "radar_svg": radar_svg, "rsi": round(rsi, 1),
         "kline": kline, "factor_hist": fh,
         "trades": {"v9_auto": tlist(th_auto), "v8_lite": tlist(th_lite)},
     }

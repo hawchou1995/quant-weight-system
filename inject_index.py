@@ -48,7 +48,6 @@ INJECT_JS = r"""
     items.forEach(function(it){
       html+='<a href="javascript:void(0)" data-navtab="'+it[0]+'"><span class="ic">'+it[1]+'</span>'+it[2]+'</a>';});
     html+='<div class="sn-sep"></div><div class="sn-foot">'+
-      '<a href="monitor_reports.html" target="_blank"><span class="ic">📄</span>标的报告</a>'+
       '<a href="https://qingju.me/" target="_blank" rel="noopener"><span class="ic">💬</span>青橘社区</a></div>';
     nav.innerHTML=html;
     document.body.classList.add('sidenav-open');
