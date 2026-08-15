@@ -15,3 +15,16 @@ dom_dump.html
 # 系统
 Thumbs.db
 .DS_Store
+
+# 大数据（不入库，运行时生成）
+data_full/
+data_hist/
+fund_nav_cache/
+*.pkl
+*.csv.bak
+
+# 中间实验结果与检查图
+*_results*.json
+*_neighbor*.json
+*_check.png
+deliver_*.png

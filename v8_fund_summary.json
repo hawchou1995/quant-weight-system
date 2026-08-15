@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "strategy_name": "v8 基金动量选基 v3（全市场Top10主仓+固定6只卫星≤3席/MA100择时）",
+    "symbol": "全市场 16171 只基金动量 Top10 + 固定 6 只基金卫星优先",
+    "start": "2016-01-04",
+    "end": "2026-08-14",
+    "initial_cash": 1000000.0,
+    "window_start_value": 1000000.0,
+    "final_value": 2843423.12,
+    "market": "china_a"
+  },
+  "summary": {
+    "total_return_pct": 184.34,
+    "annual_return_pct": 10.35,
+    "max_drawdown_pct": -22.59,
+    "sharpe": 0.687,
+    "win_rate_pct": 66.7,
+    "total_trades": 90
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "MA100+ns10": {
+    "total_return_pct": 49.97,
+    "annual_return_pct": 4.28,
+    "max_drawdown_pct": -14.48,
+    "sharpe": 0.605,
+    "win_rate_pct": 56.7,
+    "total_trades": 30
+  },
+  "MA100+ns15": {
+    "total_return_pct": 71.49,
+    "annual_return_pct": 5.74,
+    "max_drawdown_pct": -23.21,
+    "sharpe": 0.604,
+    "win_rate_pct": 50.0,
+    "total_trades": 22
+  },
+  "MA80": {
+    "total_return_pct": 112.06,
+    "annual_return_pct": 8.09,
+    "max_drawdown_pct": -30.66,
+    "sharpe": 0.688,
+    "win_rate_pct": 81.8,
+    "total_trades": 11
+  },
+  "MA60": {
+    "total_return_pct": 21.47,
+    "annual_return_pct": 2.03,
+    "max_drawdown_pct": -33.68,
+    "sharpe": 0.247,
+    "win_rate_pct": 52.9,
+    "total_trades": 17
+  }
+}

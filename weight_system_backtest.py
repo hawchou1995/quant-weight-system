@@ -32,31 +32,31 @@ from datetime import datetime
 # 0. 标的池（24 只：21 原池 + 603228 景旺电子 + 603339 四方科技 + 000636 风华高科，2026-08-10 用户新增）
 # ---------------------------------------------------------------------------
 UNIVERSE = [
-    # code, name, type, market, 研报情报(L1看多/L3谨慎/None)
-    ("300502", "新易盛", "股票", "sz", "L3"),
+    # code, name, type, market, 研报情报(L1看多/L3谨慎/None),
+    ("300502", "新易盛", "股票", "sz", "L1"),
     ("300308", "中际旭创", "股票", "sz", "L1"),
-    ("159516", "半导体设备ETF", "ETF", "sz", None),
-    ("600498", "烽火通信", "股票", "sh", None),
-    ("601138", "工业富联", "股票", "sh", None),
-    ("002463", "沪电股份", "股票", "sz", None),
-    ("002384", "东山精密", "股票", "sz", None),
-    ("600183", "生益科技", "股票", "sh", None),
+    ("159516", "半导体设备ETF", "ETF", "sz", "L1"),
+    ("600498", "烽火通信", "股票", "sh", "L3"),
+    ("601138", "工业富联", "股票", "sh", "L1"),
+    ("002463", "沪电股份", "股票", "sz", "L1"),
+    ("002384", "东山精密", "股票", "sz", "L1"),
+    ("600183", "生益科技", "股票", "sh", "L1"),
     ("300476", "胜宏科技", "股票", "sz", "L1"),
-    ("603986", "兆易创新", "股票", "sh", None),
-    ("002185", "华天科技", "股票", "sz", None),
-    ("605358", "立昂微", "股票", "sh", None),
-    ("603228", "景旺电子", "股票", "sh", None),
+    ("603986", "兆易创新", "股票", "sh", "L2"),
+    ("002185", "华天科技", "股票", "sz", "L2"),
+    ("605358", "立昂微", "股票", "sh", "L2"),
+    ("603228", "景旺电子", "股票", "sh", "L2"),
     ("603339", "四方科技", "股票", "sh", None),
-    ("000636", "风华高科", "股票", "sz", None),
-    ("515880", "通信ETF", "ETF", "sh", None),
-    ("516150", "稀土ETF嘉实", "ETF", "sh", None),
-    ("560390", "电网设备ETF易方达", "ETF", "sh", None),
+    ("000636", "风华高科", "股票", "sz", "L1"),
+    ("515880", "通信ETF", "ETF", "sh", "L2"),
+    ("516150", "稀土ETF嘉实", "ETF", "sh", "L2"),
+    ("560390", "电网设备ETF易方达", "ETF", "sh", "L1"),
     ("008254", "华宝致远混合C", "基金", "jj", None),
-    ("018036", "长城新能源车股C", "基金", "jj", None),
-    ("002891", "华夏移动互联CNY", "基金", "jj", None),
-    ("024239", "华夏全球QDII C", "基金", "jj", None),
-    ("014002", "浦银智能科技C", "基金", "jj", None),
-    ("020900", "天弘通信设备C", "基金", "jj", None),
+    ("018036", "长城新能源车股C", "基金", "jj", "L2"),
+    ("002891", "华夏移动互联CNY", "基金", "jj", "L2"),
+    ("024239", "华夏全球QDII C", "基金", "jj", "L2"),
+    ("014002", "浦银智能科技C", "基金", "jj", "L2"),
+    ("020900", "天弘通信设备C", "基金", "jj", "L2"),
 ]
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -77,12 +77,20 @@ WEIGHTS = {
 USE_MID_MA = False
 
 # 操作阈值（总分 0-100）
-BUY_STRONG = 75   # >=75 标准加仓（仓位升至 100%）
-BUY_WEAK = 60     # 60-74 轻仓加仓（仓位 50%）
+# v7.3（2026-08-15 全量池验证投产）：BUY_STRONG 75→70（更早满仓）、SELL_WEAK 40→45（更早减半仓），
+# 与 Aroon 打分叠加：全量池 6870 只 2016-2026 收益 +47.33%（基线 +37.14%）、回撤 39.34%、夏普 0.321
+BUY_STRONG = 70   # >=70 标准加仓（仓位升至 100%）
+BUY_WEAK = 60     # 60-69 轻仓加仓（仓位 50%）
 HOLD_UPPER = 60
 HOLD_LOWER = 45   # 45-59 观望
-SELL_WEAK = 40    # 30-44 减至半仓（仓位降至 50%，<30 清仓）
+SELL_WEAK = 45    # 45-59 观望；<45 减至半仓（仓位降至 50%，<30 清仓）
 SELL_STRONG = 30  # <30 清仓
+
+# ---- v7.3 Aroon(25) 趋势时间强度（2026-08-15 全量池验证投产）----
+# 素材源：IMA WorkBuddy 库候选；与 ADX（方向强度）互补，衡量新高/新低的时间距离
+# 全量池确认：Aroon 加减分 ±8 收益 +9.2pct、夏普 +0.035（子样本 1000 只 2016-2026）
+USE_AROON = True
+AROON_BONUS = 8   # aroon_osc >= 50 加分 / <= -50 减分（满分 100 体系内）
 
 # ---- v1.3 可配置开关（默认关闭，行为与 v1.2 完全一致）----
 DEADBAND_LO = 55  # 死区下限：总分在此区间视为观望（防止临界抖动）
@@ -184,6 +192,14 @@ def compute_indicators(df: pd.DataFrame) -> pd.DataFrame:
     # 60日回撤（距 60 日高点）
     d["high60"] = d["close"].rolling(60).max()
     d["dd60"] = (d["close"] / d["high60"] - 1) * 100
+    # Aroon(25)：趋势时间强度（v7.3 投产）
+    if USE_AROON:
+        ar_period = 25
+        ar_idx_up = d["high"].rolling(ar_period + 1).apply(lambda x: int(np.argmax(x)), raw=True)
+        ar_idx_dn = d["low"].rolling(ar_period + 1).apply(lambda x: int(np.argmin(x)), raw=True)
+        d["aroon_up"] = (100 * (ar_period - ar_idx_up) / ar_period).fillna(50)
+        d["aroon_down"] = (100 * (ar_period - ar_idx_dn) / ar_period).fillna(50)
+        d["aroon_osc"] = d["aroon_up"] - d["aroon_down"]
     return d
 
 
@@ -380,12 +396,15 @@ def score_risk(row):
 
 
 def score_news(row, news_level):
-    """研报情报类：L1 看多 70 / L2 中性 50 / L3 谨慎 30 / 无情报 50"""
+    """研报情报类·对称打分 v6（生产口径 data-标的快照-20260812/13）：
+    看多 L1 = +1.0 / 谨慎 L3 = -1.0 / 看空 L4 = -1.5 / L2 中性或 L3 以下 0"""
     if news_level == "L1":
-        return 70.0
+        return 1.0
     if news_level == "L3":
-        return 30.0
-    return 50.0
+        return -1.0
+    if news_level == "L4":
+        return -1.5
+    return 0.0
 
 
 def compute_total_score(row, news_level, is_fund=False):
@@ -399,6 +418,12 @@ def compute_total_score(row, news_level, is_fund=False):
         st * WEIGHTS["trend"] + sm * WEIGHTS["momentum"] + sv * WEIGHTS["volume"]
         + so * WEIGHTS["osc"] + sr * WEIGHTS["risk"] + sn * WEIGHTS["news"]
     )
+    # Aroon(25) 加减分（v7.3 投产，全量池验证：+9.2pct 收益 / +0.035 夏普）
+    if USE_AROON and not pd.isna(row.get("aroon_osc", np.nan)):
+        if row["aroon_osc"] >= 50:
+            total += AROON_BONUS
+        elif row["aroon_osc"] <= -50:
+            total -= AROON_BONUS
     comp = {"trend": st, "momentum": sm, "volume": sv, "osc": so, "risk": sr, "news": sn, "total": total}
     conf = compute_confidence(comp, is_fund=is_fund)
     return _clip(total), comp, conf
@@ -418,8 +443,8 @@ def compute_confidence(comp, is_fund=False):
         v = comp.get(c, 50)
         if c == "volume" and is_fund:
             continue          # 基金无量能：退化中性，不参与方向
-        if c == "news" and v == 50.0:
-            continue          # 无研报情报：中性，不参与方向
+        if c == "news" and v == 0.0:
+            continue          # 无研报情报/中性（0 分）：不参与方向
         if c == "risk" and v == 50.0:
             continue          # 退化中性（理论上 risk 总有值，防御）
         directional += 1

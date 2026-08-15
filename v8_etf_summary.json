@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "strategy_name": "v8 ETF 独立看板（Top10/半年轮动/6月动量）",
+    "symbol": "全量 ETF 截面选股 Top10",
+    "start": "2016-01-04",
+    "end": "2026-08-14",
+    "initial_cash": 1000000.0,
+    "window_start_value": 1000000.0,
+    "final_value": 2650697.74,
+    "market": "china_a"
+  },
+  "summary": {
+    "total_return_pct": 165.07,
+    "annual_return_pct": 9.62,
+    "max_drawdown_pct": -20.67,
+    "sharpe": 0.736,
+    "win_rate_pct": 67.0,
+    "total_trades": 103
+  }
+}

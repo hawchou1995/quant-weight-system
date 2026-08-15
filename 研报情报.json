@@ -1,0 +1,255 @@
+{
+  "schema": "研报情报-对称打分 v6",
+  "version": "v6",
+  "generated_at": "2026-08-13",
+  "scoring": {
+    "L1_看多": 1.0,
+    "L3_谨慎": -1.0,
+    "L4_看空": -1.5,
+    "L2_中性": 0.0,
+    "无研报": 0.0
+  },
+  "note": "与 data-标的快照-20260812/13 生产口径一致；news 权重 5%，对称分×0.05 计入总分",
+  "universe": [
+    {
+      "code": "300502",
+      "name": "新易盛",
+      "level": "L1",
+      "score": 1.0,
+      "direction": "看多",
+      "basis": "花旗目标价 701 元（3.2T/NPO 未定价）；H1 预增 77-103%；1.6T 逐季放量；光芯片 100% 自供",
+      "source_note": "research-鳄鱼派研报-光模块设备行业观察-20260605 / #938 核验",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "300308",
+      "name": "中际旭创",
+      "level": "L1",
+      "score": 1.0,
+      "direction": "看多",
+      "basis": "1.6T 全球份额 50-70%；Q1 净利 +262%；美银目标价 1650 元；订单锁至 2028",
+      "source_note": "research-鳄鱼派研报-光通信行业观察-20260525 / #954 核验",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "159516",
+      "name": "半导体设备ETF",
+      "level": "L1",
+      "score": 1.0,
+      "direction": "看多",
+      "basis": "SEMI 2026 全球设备销售 1659 亿美元 +23.2% 创新高；存储扩产设备投资 520 亿 +29%",
+      "source_note": "research-鳄鱼派每日信息速览-2026年7月 / e公司核验",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "600498",
+      "name": "烽火通信",
+      "level": "L3",
+      "score": -1.0,
+      "direction": "谨慎",
+      "basis": "PE-TTM 126.63（同业 35-44 倍）；定增 29.13 亿摊薄悬顶；净利率 1.75% 同业末位；验证点 8-27 中报",
+      "source_note": "research-烽火通信路演时间线研究报告-20260813",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "601138",
+      "name": "工业富联",
+      "level": "L1",
+      "score": 1.0,
+      "direction": "看多",
+      "basis": "H1 净利 237.4 亿 +95.99%（多源核验）；AI 服务器营收 +2.3 倍",
+      "source_note": "research-鳄鱼派研报提炼增量-2026-08-12",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "002463",
+      "name": "沪电股份",
+      "level": "L1",
+      "score": 1.0,
+      "direction": "看多",
+      "basis": "H1 预增 68-78%；800G 交换机 PCB 批量；176 亿三大扩产",
+      "source_note": "research-鳄鱼派研报-AI PCB从材料重估到利润兑现-20260511",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "002384",
+      "name": "东山精密",
+      "level": "L1",
+      "score": 1.0,
+      "direction": "看多",
+      "basis": "81 亿索尔思光电扩建（2026-07）；200G EML 量产；AI 服务器+新能源车双线",
+      "source_note": "research-鳄鱼派每日信息速览-2026年6月 / e公司核验",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "600183",
+      "name": "生益科技",
+      "level": "L1",
+      "score": 1.0,
+      "direction": "看多",
+      "basis": "M9 英伟达认证（大陆唯一）；H1 预增 117-131%；FR-4 涨价传导顺畅",
+      "source_note": "research-鳄鱼派研报-覆铜板行业观察-20260603 / #879 核验",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "300476",
+      "name": "胜宏科技",
+      "level": "L1",
+      "score": 1.0,
+      "direction": "看多",
+      "basis": "Rubin GPU 板批量交付；200 亿投资计划（148 亿产能）",
+      "source_note": "research-鳄鱼派研报-AI PCB从材料重估到利润兑现-20260511",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "000636",
+      "name": "风华高科",
+      "level": "L1",
+      "score": 1.0,
+      "direction": "看多",
+      "basis": "MLCC 涨价周期确立（三星 8/1 全线 +30%）；H1 预增 61.84-79.82%；高端占比 35-40%",
+      "source_note": "research-鳄鱼派研报-MLCC专题-20260603",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "560390",
+      "name": "电网设备ETF易方达",
+      "level": "L1",
+      "score": 1.0,
+      "direction": "看多",
+      "basis": "国网投资 8000 亿 +15%、两大电网冲刺万亿；AIDC 供电需求；4 月储能装机 +42%",
+      "source_note": "research-鳄鱼派研报-储能行业观察-20260603 / 电网行业观察",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "603986",
+      "name": "兆易创新",
+      "level": "L2",
+      "score": 0.0,
+      "direction": "中性",
+      "basis": "存储周期上行但无直接深度研报覆盖",
+      "source_note": "research-鳄鱼派每日信息速览-2026年7月",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "002185",
+      "name": "华天科技",
+      "level": "L2",
+      "score": 0.0,
+      "direction": "中性",
+      "basis": "封测受益存储扩产，直接覆盖少",
+      "source_note": "research-鳄鱼派每日信息速览-2026年7月",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "605358",
+      "name": "立昂微",
+      "level": "L2",
+      "score": 0.0,
+      "direction": "中性",
+      "basis": "半导体材料随晶圆厂扩产受益，无直接覆盖",
+      "source_note": "—（行业背景推断）",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "603228",
+      "name": "景旺电子",
+      "level": "L2",
+      "score": 0.0,
+      "direction": "中性",
+      "basis": "PCB 扩产接棒标的（东吴 #941）",
+      "source_note": "research-鳄鱼派研报-PCB行业观察-20260527",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "515880",
+      "name": "通信ETF",
+      "level": "L2",
+      "score": 0.0,
+      "direction": "中性",
+      "basis": "行业景气向上但短线情绪回调",
+      "source_note": "research-鳄鱼派每日复盘-20260813 / #938",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "516150",
+      "name": "稀土ETF嘉实",
+      "level": "L2",
+      "score": 0.0,
+      "direction": "中性",
+      "basis": "稀土战略小金属展望，无直接覆盖",
+      "source_note": "research-鳄鱼派每日信息速览-2026年6月",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "018036",
+      "name": "长城新能源车股C",
+      "level": "L2",
+      "score": 0.0,
+      "direction": "中性",
+      "basis": "出口强内销弱（7 月出口破百万 vs 国内环比 -13.1%）",
+      "source_note": "research-鳄鱼派研报提炼增量-2026-08-13",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "002891",
+      "name": "华夏移动互联CNY",
+      "level": "L2",
+      "score": 0.0,
+      "direction": "中性",
+      "basis": "腾讯 Q2 capex 528 亿翻近 3 倍；恒生科技走强",
+      "source_note": "research-鳄鱼派研报提炼增量-2026-08-13",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "024239",
+      "name": "华夏全球QDII C",
+      "level": "L2",
+      "score": 0.0,
+      "direction": "中性",
+      "basis": "美股韧性但估值高位",
+      "source_note": "research-鳄鱼派投资随笔-宽基指数新三年计划-20260630",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "014002",
+      "name": "浦银智能科技C",
+      "level": "L2",
+      "score": 0.0,
+      "direction": "中性",
+      "basis": "AI 硬件主线景气向上（行业推断）",
+      "source_note": "—（行业主线推断）",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "020900",
+      "name": "天弘通信设备C",
+      "level": "L2",
+      "score": 0.0,
+      "direction": "中性",
+      "basis": "同通信ETF：景气向上但短线回调",
+      "source_note": "research-鳄鱼派每日复盘-20260813",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "603339",
+      "name": "四方科技",
+      "level": null,
+      "score": 0.0,
+      "direction": "无研报",
+      "basis": "今日研报无直接覆盖",
+      "source_note": "—",
+      "date": "2026-08-13"
+    },
+    {
+      "code": "008254",
+      "name": "华宝致远混合C",
+      "level": null,
+      "score": 0.0,
+      "direction": "无研报",
+      "basis": "今日研报无直接覆盖",
+      "source_note": "—",
+      "date": "2026-08-13"
+    }
+  ]
+}

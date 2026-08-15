@@ -1,0 +1,12 @@
+{
+  "summary": {
+    "total_return_pct": 277.87,
+    "annual_return_pct": 13.35,
+    "max_drawdown_pct": -11.2,
+    "sharpe": 1.243,
+    "win_rate_pct": 53.4,
+    "total_trades": 118
+  },
+  "cash_boost_annual": 1.28,
+  "final_annual": 14.63
+}

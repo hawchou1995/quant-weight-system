@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "strategy_name": "v8 中长线权重看板 v5（全量池Top15主仓+固定池3席卫星/豁免波动/移动止损10%）",
+    "symbol": "全量池打分持仓：股票 5307 只→Top15 + 固定池 20 只豁免波动优先（卫星≤3席）",
+    "start": "2016-01-04",
+    "end": "2026-08-14",
+    "initial_cash": 1000000.0,
+    "window_start_value": 1000000.0,
+    "final_value": 7973755.25,
+    "market": "china_a"
+  },
+  "summary": {
+    "total_return_pct": 697.38,
+    "annual_return_pct": 21.62,
+    "max_drawdown_pct": -8.31,
+    "sharpe": 1.983,
+    "win_rate_pct": 55.7,
+    "total_trades": 470
+  }
+}
