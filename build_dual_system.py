@@ -135,6 +135,10 @@ def load_curve_norm(f):
 
 v_etf = load_curve_norm("v8_etf_equity.csv")
 v_fund = load_curve_norm("v8_fund_equity.csv")
+# 短线净值曲线（短线体系）
+v_short_etf = load_curve_norm("short_etf_equity.csv")
+v_short_fund = load_curve_norm("short_fund_equity.csv")
+v_short_stock = load_curve_norm("short_stock_equity.csv")
 perm_stat = f'股票 {len(v8_main)} ｜ ETF {len(v8_etf)} ｜ 基金 {len(v8_fund)}'
 
 def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extra_stat=None):
@@ -295,8 +299,8 @@ html = f"""<!doctype html>
 </div>
 </div>
 <div class="bt-short" id="bt-short">
-<h3>⚡ 短线池（股票 / ETF / 基金）— 占位</h3>
-<div class="sub">短线策略池预留位置 · 后续接入短线信号体系后在此展示（股票短线 / ETF 短线 / 基金短线 三个子池）</div>
+<h3>⚡ 短线池（股票 / ETF / 基金）— 已上线</h3>
+<div class="sub">短线四因子体系已接入（动量30/量价25/通道25/波动20 + 强势市门控；A 股个股用反转版）· 基金短线 +273.4%（夏普0.95）｜ ETF 短线 +125.9%（0.59）｜ 股票短线 +63.1%（0.37，反转）→ 点击左侧导航「⚡ 短线」查看完整看板与净值曲线</div>
 </div>
 </div>
 </div>
@@ -315,12 +319,41 @@ html = f"""<!doctype html>
   v8_items, "tbl-v8", "card-tbl-v8",
   "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测参考在监控总览视图")}
 
-<!-- ============ 视图 C：短线（占位） ============ -->
+<!-- ============ 视图 C：短线板块 ============ -->
 <div class="view" id="view-short">
 <div class="card">
-<h2>⚡ 短线板块 <span class="badge badge-auto">占位</span></h2>
-<div class="sub">短线策略板块预留位置——后续接入短线信号体系后在此展示</div>
-<div class="rule-box" style="margin-bottom:0">🛠️ 建设中：短线信号体系尚未接入。当前可用「全量池中/长线」「固定池中/长线」监控中长线信号，短线板块上线后自动填充。</div>
+<h2>⚡ 短线板块 <span class="badge badge-auto">全量监控 · 股票/ETF/基金</span></h2>
+<div class="sub">短线四因子打分（区别于中长线）：短线动量30% + 量价共振25% + 通道突破25% + 波动适配20% · 市况门控（沪深300&gt;MA20）· T+1 开盘换仓 · 轮动周期穷举 5/10/20 日</div>
+<div class="rule-box" style="margin-bottom:0"><b>信号设计来源</b>：知识库（量化指南针 20d/60d 动量 + 5 日量比 + 波动率因子；tb 开拓者唐奇安通道；妖股 C2 游资评分均线多头）＋ 市面短线体系（量价共振/通道突破）· <b>纪律</b>：只做强势市（底信号教训：熊市主场回撤 -76% 不可取）</div>
+</div>
+<div class="bt-grid">
+<div class="bt-card" id="bt-short-stock">
+<div class="bt-head"><b>📈 股票短线</b><span class="bt-tag">反转版 T10/H10/S50/MA30</span></div>
+<div class="kpis">
+<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#f59e0b">+63.1%</div><div class="s">全市场 5307 只</div></div>
+<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">-41.2%</div><div class="s">年化 4.9%</div></div>
+<div class="kpi"><div class="l">夏普</div><div class="v" style="color:#22c55e">0.374</div><div class="s">10日轮动 · 反转信号</div></div>
+</div>
+<div class="bt-curve" id="curve-short-stock"></div>
+</div>
+<div class="bt-card" id="bt-short-etf">
+<div class="bt-head"><b>🟠 ETF 短线</b><span class="bt-tag">T10/H10/S60</span></div>
+<div class="kpis">
+<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#f59e0b">+125.9%</div><div class="s">全量 1014 只</div></div>
+<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">-25.2%</div><div class="s">年化 8.0%</div></div>
+<div class="kpi"><div class="l">夏普</div><div class="v" style="color:#22c55e">0.587</div><div class="s">940 笔 · 10日轮动</div></div>
+</div>
+<div class="bt-curve" id="curve-short-etf"></div>
+</div>
+<div class="bt-card" id="bt-short-fund">
+<div class="bt-head"><b>🔵 基金短线</b><span class="bt-tag">T5/H5/S40</span></div>
+<div class="kpis">
+<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#3b82f6">+273.4%</div><div class="s">全量 14668 只</div></div>
+<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">-16.7%</div><div class="s">年化 13.2%</div></div>
+<div class="kpi"><div class="l">夏普</div><div class="v" style="color:#22c55e">0.953</div><div class="s">1019 笔 · 5日轮动</div></div>
+</div>
+<div class="bt-curve" id="curve-short-fund"></div>
+</div>
 </div>
 </div>
 
@@ -351,6 +384,9 @@ window.ENH.sub_curves = {{
   stock: {json.dumps(DATA["systems"]["v9_auto"]["equity"])},
   etf: {json.dumps(v_etf)},
   fund: {json.dumps(v_fund)},
+  short_etf: {json.dumps(v_short_etf)},
+  short_fund: {json.dumps(v_short_fund)},
+  short_stock: {json.dumps(v_short_stock)},
 }};
 /* 渲染 ETF/基金回测净值曲线（各自容器、各自对数坐标轴） */
 function renderOneCurve(elId, vals, color, label, totalPct){{
@@ -380,6 +416,9 @@ function renderSubCurve(){{
   renderOneCurve('curve-chart-stock', C.stock, '#f59e0b', '股票池', '+'+{s_auto["total_return_pct"]:.0f});
   renderOneCurve('curve-chart-etf', C.etf, '#ea580c', 'ETF 池', '+'+{s_etf["total_return_pct"]:.0f});
   renderOneCurve('curve-chart-fund', C.fund, '#3b82f6', '基金池', '+'+{s_fund["total_return_pct"]:.0f});
+  renderOneCurve('curve-short-etf', C.short_etf, '#ea580c', 'ETF 短线', '+126');
+  renderOneCurve('curve-short-fund', C.short_fund, '#3b82f6', '基金短线', '+273');
+  renderOneCurve('curve-short-stock', C.short_stock, '#f59e0b', '股票短线(反转)', '+63');
 }}
 /* 视图切换（hash 驱动：切换时更新 location.hash，加载/前进后退时按 hash 定位） */
 var VIEW_MAP={{'overview':'view-overview','sys-auto':'view-auto','sys-lite':'view-lite','short':'view-short','snapshot':'view-snapshot'}};

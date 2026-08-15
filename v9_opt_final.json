@@ -1,0 +1,50 @@
+{
+  "MA150_SL55": {
+    "total_return_pct": 825.03,
+    "annual_return_pct": 23.33,
+    "max_drawdown_pct": -13.31,
+    "sharpe": 1.577,
+    "win_rate_pct": 49.2,
+    "total_trades": 183
+  },
+  "MA150_SL6": {
+    "total_return_pct": 725.27,
+    "annual_return_pct": 22.01,
+    "max_drawdown_pct": -11.53,
+    "sharpe": 1.462,
+    "win_rate_pct": 48.1,
+    "total_trades": 183
+  },
+  "MA150_SL625": {
+    "total_return_pct": 737.14,
+    "annual_return_pct": 22.17,
+    "max_drawdown_pct": -12.85,
+    "sharpe": 1.439,
+    "win_rate_pct": 49.2,
+    "total_trades": 183
+  },
+  "MA140_SL6": {
+    "total_return_pct": 706.42,
+    "annual_return_pct": 21.74,
+    "max_drawdown_pct": -11.73,
+    "sharpe": 1.459,
+    "win_rate_pct": 48.0,
+    "total_trades": 177
+  },
+  "MA160_SL6": {
+    "total_return_pct": 680.73,
+    "annual_return_pct": 21.37,
+    "max_drawdown_pct": -17.36,
+    "sharpe": 1.377,
+    "win_rate_pct": 46.7,
+    "total_trades": 195
+  },
+  "MA150_SL6_sc70": {
+    "total_return_pct": 725.27,
+    "annual_return_pct": 22.01,
+    "max_drawdown_pct": -11.53,
+    "sharpe": 1.462,
+    "win_rate_pct": 48.1,
+    "total_trades": 183
+  }
+}
