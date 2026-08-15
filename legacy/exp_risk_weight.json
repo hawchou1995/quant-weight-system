@@ -1,0 +1,47 @@
+{
+  "基线(v1.0)": {
+    "pool24": {
+      "total_return_pct": 186.64,
+      "annual_return_pct": 98.52,
+      "max_drawdown_pct": 20.76,
+      "sharpe": 2.139,
+      "win_rate_pct": 88.7,
+      "total_trades": 213
+    },
+    "pool37": {
+      "avg_ret": 13.146666666666667,
+      "avg_dd": 31.874102564102564,
+      "wins": 20
+    }
+  },
+  "风控15/osc10": {
+    "pool24": {
+      "total_return_pct": 186.59,
+      "annual_return_pct": 98.49,
+      "max_drawdown_pct": 20.27,
+      "sharpe": 2.165,
+      "win_rate_pct": 88.3,
+      "total_trades": 223
+    },
+    "pool37": {
+      "avg_ret": 13.050512820512822,
+      "avg_dd": 31.763589743589744,
+      "wins": 20
+    }
+  },
+  "风控15/volume10": {
+    "pool24": {
+      "total_return_pct": 188.91,
+      "annual_return_pct": 99.54,
+      "max_drawdown_pct": 20.28,
+      "sharpe": 2.171,
+      "win_rate_pct": 89.1,
+      "total_trades": 220
+    },
+    "pool37": {
+      "avg_ret": 12.218974358974359,
+      "avg_dd": 32.022820512820516,
+      "wins": 20
+    }
+  }
+}
