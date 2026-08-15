@@ -47,6 +47,7 @@ try:
                 _row["is_short"] = True
                 _sp_items.append(_row)
     v9_short_items = _sp_items
+    v9_short_items.sort(key=lambda d: -d["score"])   # 全局权重分（短线分）降序，与其他表一致
     SHORT_POOL_ASOF = SHORT_POOL.get("as_of", "—")
 except Exception as _e:
     print("short_pool 加载失败:", _e)
