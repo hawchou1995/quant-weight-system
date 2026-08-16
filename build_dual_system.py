@@ -258,6 +258,7 @@ def bt_short_html():
     return ('<div class="card" id="bt-short">\n'
             '<h2>⚡ 短线回测参考 <span class="badge badge-auto">全量池短线 · 股票按权限分层</span></h2>\n'
             '<div class="sub">短线 = 动量30/量价25/通道25/波动20（A 股个股反转版）+ <b>MA5 生命线每日止损</b> + 强势市门控 · 股票按权限<b>互斥分层</b>（各池独立回测）｜ ETF/基金 = 动量短线 —— 与中长线独立，监控表「⚡ 全量池短线」视图对应此池</div>\n'
+            '<div class="sub" style="color:var(--sub)">💧 <b>滑点敏感性</b>（每边，sweep_slip.py 扫描）：股票 10bps→+462%/夏普1.99、20bps→+331%/1.69、30bps→+231%/1.39 ｜ ETF 10bps→+162%/1.36 ｜ 基金 30bps 申赎费下 +273%→+11% 归零 —— <b>基金短线必须 C 类份额</b>（0 申赎费）</div>\n'
             '<div class="bt-grid">' + cards + '</div>\n</div>')
 perm_stat = f'股票 {len(v8_main)} ｜ ETF {len(v8_etf)} ｜ 基金 {len(v8_fund)}'
 

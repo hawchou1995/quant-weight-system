@@ -1,0 +1,152 @@
+{
+  "股票": {
+    "0": {
+      "total_return_pct": 632.7,
+      "annual_return_pct": 20.65,
+      "max_drawdown_pct": -7.97,
+      "sharpe": 2.291,
+      "win_rate_pct": 53.7,
+      "total_trades": 1319.0
+    },
+    "5": {
+      "total_return_pct": 541.77,
+      "annual_return_pct": 19.15,
+      "max_drawdown_pct": -8.12,
+      "sharpe": 2.143,
+      "win_rate_pct": 52.2,
+      "total_trades": 1319.0
+    },
+    "10": {
+      "total_return_pct": 462.12,
+      "annual_return_pct": 17.67,
+      "max_drawdown_pct": -8.28,
+      "sharpe": 1.994,
+      "win_rate_pct": 50.4,
+      "total_trades": 1319.0
+    },
+    "20": {
+      "total_return_pct": 331.25,
+      "annual_return_pct": 14.77,
+      "max_drawdown_pct": -8.69,
+      "sharpe": 1.692,
+      "win_rate_pct": 47.3,
+      "total_trades": 1319.0
+    },
+    "30": {
+      "total_return_pct": 230.86,
+      "annual_return_pct": 11.94,
+      "max_drawdown_pct": -9.91,
+      "sharpe": 1.389,
+      "win_rate_pct": 44.4,
+      "total_trades": 1319.0
+    },
+    "50": {
+      "total_return_pct": 94.74,
+      "annual_return_pct": 6.48,
+      "max_drawdown_pct": -13.51,
+      "sharpe": 0.784,
+      "win_rate_pct": 38.7,
+      "total_trades": 1319.0
+    }
+  },
+  "ETF": {
+    "0": {
+      "total_return_pct": 239.21,
+      "annual_return_pct": 12.2,
+      "max_drawdown_pct": -9.25,
+      "sharpe": 1.737,
+      "win_rate_pct": 54.3,
+      "total_trades": 1261.0
+    },
+    "5": {
+      "total_return_pct": 197.58,
+      "annual_return_pct": 10.83,
+      "max_drawdown_pct": -9.96,
+      "sharpe": 1.548,
+      "win_rate_pct": 51.3,
+      "total_trades": 1261.0
+    },
+    "10": {
+      "total_return_pct": 162.05,
+      "annual_return_pct": 9.51,
+      "max_drawdown_pct": -10.67,
+      "sharpe": 1.364,
+      "win_rate_pct": 48.1,
+      "total_trades": 1260.0
+    },
+    "20": {
+      "total_return_pct": 100.98,
+      "annual_return_pct": 6.8,
+      "max_drawdown_pct": -12.07,
+      "sharpe": 0.988,
+      "win_rate_pct": 43.6,
+      "total_trades": 1258.0
+    },
+    "30": {
+      "total_return_pct": 55.06,
+      "annual_return_pct": 4.22,
+      "max_drawdown_pct": -16.41,
+      "sharpe": 0.626,
+      "win_rate_pct": 39.7,
+      "total_trades": 1258.0
+    },
+    "50": {
+      "total_return_pct": -7.21,
+      "annual_return_pct": -0.7,
+      "max_drawdown_pct": -32.52,
+      "sharpe": -0.059,
+      "win_rate_pct": 33.4,
+      "total_trades": 1256.0
+    }
+  },
+  "基金": {
+    "0": {
+      "total_return_pct": 273.35,
+      "annual_return_pct": 13.22,
+      "max_drawdown_pct": -16.71,
+      "sharpe": 0.953,
+      "win_rate_pct": 54.1,
+      "total_trades": 1019.0
+    },
+    "10": {
+      "total_return_pct": 149.2,
+      "annual_return_pct": 8.99,
+      "max_drawdown_pct": -20.23,
+      "sharpe": 0.681,
+      "win_rate_pct": 51.6,
+      "total_trades": 1018.0
+    },
+    "20": {
+      "total_return_pct": 65.83,
+      "annual_return_pct": 4.88,
+      "max_drawdown_pct": -28.55,
+      "sharpe": 0.409,
+      "win_rate_pct": 49.4,
+      "total_trades": 1016.0
+    },
+    "30": {
+      "total_return_pct": 10.6,
+      "annual_return_pct": 0.95,
+      "max_drawdown_pct": -42.14,
+      "sharpe": 0.141,
+      "win_rate_pct": 47.6,
+      "total_trades": 1016.0
+    },
+    "40": {
+      "total_return_pct": -23.92,
+      "annual_return_pct": -2.54,
+      "max_drawdown_pct": -58.07,
+      "sharpe": -0.102,
+      "win_rate_pct": 45.2,
+      "total_trades": 1016.0
+    },
+    "50": {
+      "total_return_pct": -51.72,
+      "annual_return_pct": -6.63,
+      "max_drawdown_pct": -70.59,
+      "sharpe": -0.391,
+      "win_rate_pct": 42.2,
+      "total_trades": 1017.0
+    }
+  }
+}

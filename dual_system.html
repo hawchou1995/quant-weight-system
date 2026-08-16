@@ -306,6 +306,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class="card" id="bt-short">
 <h2>⚡ 短线回测参考 <span class="badge badge-auto">全量池短线 · 股票按权限分层</span></h2>
 <div class="sub">短线 = 动量30/量价25/通道25/波动20（A 股个股反转版）+ <b>MA5 生命线每日止损</b> + 强势市门控 · 股票按权限<b>互斥分层</b>（各池独立回测）｜ ETF/基金 = 动量短线 —— 与中长线独立，监控表「⚡ 全量池短线」视图对应此池</div>
+<div class="sub" style="color:var(--sub)">💧 <b>滑点敏感性</b>（每边，sweep_slip.py 扫描）：股票 10bps→+462%/夏普1.99、20bps→+331%/1.69、30bps→+231%/1.39 ｜ ETF 10bps→+162%/1.36 ｜ 基金 30bps 申赎费下 +273%→+11% 归零 —— <b>基金短线必须 C 类份额</b>（0 申赎费）</div>
 <div class="bt-grid"><div class="bt-card" id="bt-short-stock-all">
 <div class="bt-head"><b>📈 短线 股票 一体</b><span class="bt-tag">T10/H10/S50 反转+MA5/MA30门控</span></div>
 <div class="kpis">
@@ -4960,7 +4961,11 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class="card">
 <h2>📝 更新日志 <span class="badge badge-auto">GitHub Release 风格</span></h2>
 <div class="sub">版本 / 日期 / 更新内容 —— 复盘发现系统设计缺陷 → 启动量化系统更新 → 在此登记</div>
-<details class="rel-item" open><summary><span class="rel-ver">v5.11.3</span><span class="rel-date">2026-08-16</span></summary><div class="rel-body"><div class="rev-md"><p><b>日志折叠 + 权限中文（用户反馈驱动）</b></p>
+<details class="rel-item" open><summary><span class="rel-ver">v5.11.5</span><span class="rel-date">2026-08-16</span></summary><div class="rel-body"><div class="rev-md"><p><b>README 全面更新（用户反馈驱动）</b></p>
+<ul><li>修复：根目录 README.md 长期停留在 v8 描述（缺 v5.9-v5.11.4 全部内容）——重写为 v5.11.4 全量文档（三池监控/两套体系/复盘闭环/版本历程/核心文件/快速开始/已知限制）</li></ul></div></div></details>
+<details class="rel-item"><summary><span class="rel-ver">v5.11.4</span><span class="rel-date">2026-08-16</span></summary><div class="rel-body"><div class="rev-md"><p><b>日志去重修复（用户反馈驱动）</b></p>
+<ul><li>修复：复盘日志出现多个相同日期条目——review_daily.py 每次重跑都向索引 insert 同 file 记录（重跑调试多次→3 条重复）；改为写索引前先按 file 替换（同日期复盘重跑自动覆盖），build_dual_system 渲染再加一层同 file 去重</li><li>修复：更新日志出现重复版本号——changelog.md 头部写入重复执行（v5.11.2/v5.11.3 各 2 段）；已清理重复段（20 个版本各一），解析层加同版本号去重兜底</li><li>修复：md_to_html 未转义内容中的 &lt; &gt;（changelog 里 <code>原生 &lt;details&gt;</code> 文本变成真实标签破坏 HTML 结构）——inline 先转义 &amp; &lt; &gt; 再包粗体/代码标签</li></ul></div></div></details>
+<details class="rel-item"><summary><span class="rel-ver">v5.11.3</span><span class="rel-date">2026-08-16</span></summary><div class="rel-body"><div class="rev-md"><p><b>日志折叠 + 权限中文（用户反馈驱动）</b></p>
 <ul><li>复盘日志按日期折叠：每篇一个原生 <code>&lt;details&gt;</code> 折叠面板（summary=日期/信号日/只数/胜率/缺陷），最新一篇默认展开、其余折叠；删除旧 JS 展开逻辑（openRev/REV_DETAILS）</li><li>更新日志按版本折叠：每个版本一个折叠面板（summary=版本号+日期徽章），最新版本默认展开；18 个版本不再全部平铺</li><li>复盘权限列改板块中文名：main→主板 / gem→创业板 / star→科创板 / etf→ETF / fund→基金（与三个监控池统一口径）</li></ul></div></div></details>
 <details class="rel-item"><summary><span class="rel-ver">v5.11.2</span><span class="rel-date">2026-08-16</span></summary><div class="rel-body"><div class="rev-md"><p><b>三池全量复盘 + ETF 数据链路修复（用户反馈驱动）</b></p>
 <ul><li>复盘引擎 v2：覆盖<b>三个监控池全部标的</b>——全量池中/长线（v9 50 只）+ 固定池中/长线（v8 30 只）+ 短线全量池（30 只），各池独立总览/明细/缺陷检测（vs 各自回测基准 v9 48.1% / v8 57.1% / 短线 54%）；信号用 V.score_row 在信号日重算（v9/v8 ≥60 轻仓加仓为买入信号，短线 ≥50）</li><li>修复：ETF 行情数据停滞——fetch_full_universe 是"存在即跳过"的全量建库脚本，<b>无增量更新机制</b>（ETF 1623 只全部滞后一天）；新增 update_daily.py 真增量（扫描滞后文件→拉最新合并去重），refresh_daily 接入；一次性补齐 1626 只（失败 250 只=退市/长期停牌）</li><li>修复：build_enhanced_data 个人版 ETF 缺分支（ETFS 落到股票路径→3 只缺失），补 load_etf_df→load_hist_df fallback（固定池恢复 30 只）</li><li>修复：复盘 MA5 破位率 100% 误报（compute_factors_full 无 ma5 列，改为 rolling(5) 现算）；基金 T+1 确认日标注恢复</li><li>体验：复盘日志/更新日志入口移到<b>左下角（青橘社区上方）</b>，主导航保持 4 项</li><li>演示复盘（08-13 信号 → 08-14）：88 只全量，买入信号 74，胜率 65%（全量池 84% / 固定池 54% / 短线股票 80% / 短线 ETF 70%）</li></ul></div></div></details>

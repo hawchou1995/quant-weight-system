@@ -81,7 +81,8 @@ def build_squeeze_events(pool, bw_th=0.02, vol_ratio=1.2, ma2_ok=True, min_px=1.
 
 
 def run_squeeze(pool, events, top_n=3, max_hold=3, take_profit=0.12, stop_loss=0.08,
-                ma5_exit=True, use_market=True, ma_win=20, cash0=1_000_000, fund_mode=False):
+                ma5_exit=True, use_market=True, ma_win=20, cash0=1_000_000, fund_mode=False,
+                slippage_bps=0):
     """布林收窄事件驱动回测（v2）：
     T 日收盘出信号 → T+1 开盘买入（基金按当日净值）；排序=量比降序取 TopN
     卖出：止盈 / 止损 / 最多持有 max_hold 天 / MA5 生命线（收盘<MA5 就跑）"""
@@ -137,6 +138,7 @@ def run_squeeze(pool, events, top_n=3, max_hold=3, take_profit=0.12, stop_loss=0
                 px = open_px.get(code)
                 if px is None or pd.isna(px) or px <= 0:
                     continue
+                px = px * (1 - slippage_bps / 10000)   # 卖出滑点：实际到手价下浮
                 sh = holdings.pop(code)
                 tax = sh * px * V.SELL_TAX
                 proceeds = sh * px * (1 - V.COMMISSION) - tax
@@ -291,9 +293,11 @@ def load_fund_pool(limit=None):
 # ---------------- 回测主循环 ----------------
 def run_short(pool, top_n=10, hold_days=10, score_min=50, cash0=1_000_000,
               use_market=True, ma_win=20, min_px=1.0, min_amt=2e6, fund_mode=False,
-              reversal=False, ma5_exit=False, take_profit=0.0, stop_loss=0.0):
+              reversal=False, ma5_exit=False, take_profit=0.0, stop_loss=0.0,
+              slippage_bps=0):
     """短线轮动回测：T 日收盘打分 → T+1 开盘换仓；市况门控（沪深300>MA）
-    v3 混合风控：ma5_exit=MA5生命线每日止损 / take_profit=止盈 / stop_loss=固定止损（默认关闭=纯轮动）"""
+    v3 混合风控：ma5_exit=MA5生命线每日止损 / take_profit=止盈 / stop_loss=固定止损（默认关闭=纯轮动）
+    slippage_bps=每边滑点/冲击成本（基点；买入价上浮、卖出价下浮；基金=T+1净值申购赎回费口径）"""
     idx = V.load_index(ma_win).set_index("date")
     in_market_map = idx["in_market"].to_dict()
     all_days = [d for d in idx.index if START <= str(d.date()) <= END]
@@ -335,6 +339,7 @@ def run_short(pool, top_n=10, hold_days=10, score_min=50, cash0=1_000_000,
                 px = open_px.get(code)
                 if px is None or pd.isna(px) or px <= 0:
                     continue
+                px = px * (1 - slippage_bps / 10000)   # 卖出滑点：实际到手价下浮
                 sh = holdings.pop(code)
                 tax = sh * px * V.SELL_TAX
                 proceeds = sh * px * (1 - V.COMMISSION) - tax
@@ -355,13 +360,14 @@ def run_short(pool, top_n=10, hold_days=10, score_min=50, cash0=1_000_000,
                     px = open_px.get(code)
                     if px is None or pd.isna(px) or px <= 0:
                         continue
-                    sh = int(per_target / (px * (1 + V.COMMISSION)))
+                    _buy_px = px * (1 + slippage_bps / 10000)   # 买入滑点：实际成本价上浮
+                    sh = int(per_target / (_buy_px * (1 + V.COMMISSION)))
                     if fund_mode:
                         sh = int(sh / 100) * 100  # 基金净值近似整百份
-                    if sh > 0 and sh * px * (1 + V.COMMISSION) <= cash:
-                        cash -= sh * px * (1 + V.COMMISSION)
+                    if sh > 0 and sh * _buy_px * (1 + V.COMMISSION) <= cash:
+                        cash -= sh * _buy_px * (1 + V.COMMISSION)
                         holdings[code] = sh
-                        entry_price[code] = px
+                        entry_price[code] = _buy_px
                         entry_date[code] = day
             pending_sell, pending_buy = set(), []
         if day in rebal_days and di < len(all_days) - 1:
