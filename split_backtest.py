@@ -27,16 +27,21 @@ V9_KW = dict(top_n=3, mom_min=0.25, score_min=65, stop_loss=0.055,
              use_timing=True, ma_window=150, cash0=500000)
 
 
-def v9_split():
+def v9_split(slip=0):
+    suffix = f"_slip{slip}" if slip else ""
     for group, label in GROUPS:
         t0 = time.time()
-        eq, tr = A.run_auto(perm=group, **V9_KW)
+        kw = dict(V9_KW)
+        if slip:
+            kw["slippage_bps"] = slip
+        eq, tr = A.run_auto(perm=group, **kw)
         s = V.summary(eq, tr)
         out = {"strategy": f"v9_split_{group}", "label": label,
-               "params": "T3/m25/s65/SL5.5/MA150 择时", "summary": s}
-        json.dump(out, open(BASE / f"v9split_{group}_summary.json", "w", encoding="utf-8"),
+               "params": "T3/m25/s65/SL5.5/MA150 择时" + (f" · 含{slip}bps滑点" if slip else ""),
+               "slippage_bps": slip, "summary": s}
+        json.dump(out, open(BASE / f"v9split_{group}{suffix}_summary.json", "w", encoding="utf-8"),
                   ensure_ascii=False, indent=2)
-        eq.to_csv(BASE / f"v9split_{group}_equity.csv", index=False)
+        eq.to_csv(BASE / f"v9split_{group}{suffix}_equity.csv", index=False)
         print(f"中长线[{group}] {label}: 收益 {s['total_return_pct']}% | 年化 {s['annual_return_pct']}% | "
               f"回撤 {s['max_drawdown_pct']}% | 夏普 {s['sharpe']} | 交易 {s['total_trades']} ({time.time()-t0:.0f}s)", flush=True)
 
@@ -94,8 +99,9 @@ if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("--mode", default="all", choices=["v9", "short", "all"])
+    ap.add_argument("--slip", type=int, default=0, help="滑点 bps（中长线 v9 模式）")
     args = ap.parse_args()
     if args.mode in ("v9", "all"):
-        v9_split()
+        v9_split(slip=args.slip)
     if args.mode in ("short", "all"):
         short_split()

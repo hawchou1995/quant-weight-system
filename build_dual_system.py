@@ -151,10 +151,19 @@ def cards_html_for(items):
 # ---------------- 视图区 ----------------
 s_auto = DATA["systems"]["v9_auto"]["summary"]
 s_lite = DATA["systems"]["v8_lite"]["summary"]
-# ETF/基金独立回测（v5.9：ETF 升级 v3 月频+MA5；基金维持混合版）
-s_etf = json.load(open(BASE / "etf_v3_final_summary.json", encoding="utf-8"))["summary"]
-ETF_TAG = json.load(open(BASE / "etf_v3_final_summary.json", encoding="utf-8"))["params"]
-s_fund = json.load(open(BASE / "v8_fund_summary.json", encoding="utf-8"))["summary"]
+# ETF/基金独立回测（v5.11.9 主显含滑点：ETF slip20 / 基金 slip30 申赎费，fallback 0 滑点）
+def _ml(f, b):
+    try:
+        d = json.load(open(BASE / f, encoding="utf-8"))
+        return d.get("summary", {}), d.get("params", b)
+    except Exception:
+        return {}, b
+
+s_etf, ETF_TAG = _ml("etf_v3_final_slip20_summary.json", "月频H21/Top5 · MA5")
+if not s_etf:
+    s_etf, ETF_TAG = _ml("etf_v3_final_summary.json", "月频H21/Top5 · MA5")
+s_fund, _ftag = _ml("v8_fund_summary.json", "Top10主仓+6卫星 · MA100")
+FUND_TAG = _ftag + " · 申赎费敏感度：30bps≈-10%（90笔/10年半年轮动，影响小）"
 
 def load_curve_norm(f):
     try:
@@ -164,7 +173,7 @@ def load_curve_norm(f):
     except Exception:
         return []
 
-v_etf = load_curve_norm("etf_v3_final_equity.csv")
+v_etf = load_curve_norm("etf_v3_final_slip20_equity.csv")
 v_fund = load_curve_norm("v8_fund_equity.csv")
 # 短线净值曲线（短线体系 v3 最优）
 v_short_etf = load_curve_norm("short_v3_etf_slip20_equity.csv")
@@ -172,7 +181,10 @@ v_short_fund = load_curve_norm("short_v3_fund_slip20_equity.csv")
 v_short_stock = load_curve_norm("short_v3_stock_slip20_equity.csv")
 # 分层净值曲线（v5.9：中长线 v9split + 短线 shortsplit，按权限互斥）
 _SPLIT_GROUPS = ["all", "main_only", "gem_only", "star_only"]
-v9split_curves = {g: load_curve_norm(f"v9split_{g}_equity.csv") for g in _SPLIT_GROUPS}
+v9split_curves = {}
+for g in _SPLIT_GROUPS:
+    v = load_curve_norm(f"v9split_{g}_slip20_equity.csv")
+    v9split_curves[g] = v if v else load_curve_norm(f"v9split_{g}_equity.csv")
 shortsplit_curves = {g: load_curve_norm(f"shortsplit_{g}_equity.csv") for g in _SPLIT_GROUPS}
 # 短线 v3 最优 summary（v5.11.7 起主显含滑点口径 slip20，fallback 0 滑点理想口径）
 def _ss(asset):
@@ -205,13 +217,15 @@ _STK_GROUPS = [
     ("gem", "纯创业板", "v9split_gem_only", "shortsplit_gem_only"),
     ("star", "纯科创板", "v9split_star_only", "shortsplit_star_only"),
 ]
-# 中长线分层 summary
+# 中长线分层 summary（v5.11.9 主显含滑点 slip20，fallback 0 滑点）
 s_stk = {}
 stk_tag = {}
 for g, label, v9f, _sf in _STK_GROUPS:
-    s, lbl, tag = _load_summary(v9f + "_summary.json")
+    s, lbl, tag = _load_summary(v9f + "_slip20_summary.json")
+    if not s:
+        s, lbl, tag = _load_summary(v9f + "_summary.json")
     s_stk[g] = s
-    stk_tag[g] = tag or label
+    stk_tag[g] = (tag or label) + (" · 含20bps滑点" if "滑点" not in (tag or "") else "")
 # 短线分层 summary
 ss_stk = {}
 ss_stk_tag = {}
@@ -244,7 +258,7 @@ def bt_all_html():
         bt_card("bt-stock-gem", "📈 股票 纯创业板", stk_tag["gem"], s_stk["gem"], "curve-chart-stock-gem"),
         bt_card("bt-stock-star", "📈 股票 纯科创板", stk_tag["star"], s_stk["star"], "curve-chart-stock-star"),
         bt_card("bt-etf", "🟠 ETF 池", ETF_TAG, s_etf, "curve-chart-etf"),
-        bt_card("bt-fund", "🔵 基金池", "净值动量轮动", s_fund, "curve-chart-fund", color="#3b82f6"),
+        bt_card("bt-fund", "🔵 基金池", FUND_TAG, s_fund, "curve-chart-fund", color="#3b82f6"),
     ])
     return ('<div class="card" id="bt-all">\n'
             '<h2>📊 回测参考 <span class="badge badge-auto">中/长线 · 股票按权限分层</span></h2>\n'

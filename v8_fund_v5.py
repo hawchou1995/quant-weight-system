@@ -63,7 +63,7 @@ print(f"交易日: {len(all_days_all)} 天, 末日 {all_days_all[-1].date()}", f
 
 
 def run_fund_v5(top_n=10, hold_days=126, ma_window=200,
-                nav_stop=None, circuit=None):
+                nav_stop=None, circuit=None, slippage_bps=0):
     """T+1 成交；nav_stop=个股净值回撤止损；circuit=组合熔断即时清仓"""
     in_market_map = build_market_map(ma_window)
     rebal = set(all_days_all[::hold_days])
@@ -90,6 +90,7 @@ def run_fund_v5(top_n=10, hold_days=126, ma_window=200,
                     px = last_nav.get(code)
                 if px is None:
                     continue
+                px = px * (1 - slippage_bps / 10000)
                 sh = holdings.pop(code)
                 peak_nav.pop(code, None)
                 pnl = sh * (px - entry_price[code])
@@ -114,6 +115,7 @@ def run_fund_v5(top_n=10, hold_days=126, ma_window=200,
                         px = last_nav.get(code)
                     if px is None:
                         continue
+                    px = px * (1 + slippage_bps / 10000)
                     sh = int(per / px)
                     if sh > 0 and sh * px <= cash:
                         cash -= sh * px
