@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>标的监控看板（2026-08-14）</title>
+<title>标的监控看板（2026-08-14 · 构建 08-16 12:04）</title>
 <style>
 :root{
   --bg:#f3f4f6; --card:#ffffff; --card2:#f9fafb; --border:#e5e7eb; --line:#f0f1f3;
@@ -4972,7 +4972,9 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class="card">
 <h2>📝 更新日志 <span class="badge badge-auto">GitHub Release 风格</span></h2>
 <div class="sub">版本 / 日期 / 更新内容 —— 复盘发现系统设计缺陷 → 启动量化系统更新 → 在此登记</div>
-<details class="rel-item" open><summary><span class="rel-ver">v5.11.7</span><span class="rel-date">2026-08-16</span></summary><div class="rel-body"><div class="rev-md"><p><b>滑点稳健参数优化 + 复盘累计总览 + HTML 同步（用户反馈驱动）</b></p>
+<details class="rel-item" open><summary><span class="rel-ver">v5.11.8</span><span class="rel-date">2026-08-16</span></summary><div class="rel-body"><div class="rev-md"><p><b>中长线滑点建模（用户反馈驱动）</b></p>
+<ul><li>v9_auto / v8_lite / etf_opt_v3 三个中长线引擎加 slippage_bps（买入上浮卖出下浮，佣金印花税原有）</li><li>中长线滑点扫描（sweep_ml_slip.py，slip 0/10/20/30）：<b>换手低 → 影响显著小于短线</b>——全量池 v9（年18笔）20bps -23% 夏普 1.43、30bps -31% ｜ 固定池 v8（年12笔）20bps -13%、30bps -18% ｜ ETF 中长线（年33笔）20bps -44%（绝对收益仍 +63%）、30bps -62% ｜ 对比短线股票 20bps -48%</li><li>结论：中长线在实盘 10-20bps 滑点区间内策略稳健（夏普 1.3+），滑点影响随换手率单调上升——换手率是成本敏感度的第一决定因素</li><li>看板总览中长线区加滑点敏感性说明；README 已知限制补充中长线数据</li></ul></div></div></details>
+<details class="rel-item"><summary><span class="rel-ver">v5.11.7</span><span class="rel-date">2026-08-16</span></summary><div class="rel-body"><div class="rev-md"><p><b>滑点稳健参数优化 + 复盘累计总览 + HTML 同步（用户反馈驱动）</b></p>
 <ul><li>滑点稳健扫描（slip_opt_grid.json，H×S 网格 × slip0/20）：<b>股票 S50→S55</b>（20bps 夏普 1.69→1.75、回撤 -8.7%→-7.1%；理想口径也提升 2.29→2.38）｜ ETF S50→S55 ｜ <b>基金 H5→H10 换手减半</b>（A类30bps +10.6%→+90.7%；C类5bps +205%→+243.5%）——换手率是滑点影响的第一杠杆</li><li>固化双口径：finalize_short_v3.py 输出理想 + 含滑点两套 summary/equity；<b>看板短线卡主显含滑点口径</b>（股票 +315.7%/1.75、ETF +103.3%/1.00、基金 C类 +243.5%/0.83，标签注明）</li><li>分层回测同步：split_backtest.py 短线改 S55 + 20bps 重跑（一体 +357.0% / 主板 +318.9% / 创业板 +458.4% / 科创板 +161.9%）——修复分层卡旧参数残留</li><li>复盘日志新增<b>累计总览</b>：解析各篇 md 总览表累加（天然防重），md 内"📈 累计总览（自首篇以来）"节 + review/cumulative.json</li></ul></div></div></details>
 <details class="rel-item"><summary><span class="rel-ver">v5.11.6</span><span class="rel-date">2026-08-16</span></summary><div class="rel-body"><div class="rev-md"><p><b>滑点/冲击成本建模（用户反馈驱动）</b></p>
 <ul><li>run_short/run_squeeze 加 slippage_bps 参数（每边：买入价上浮、卖出价下浮；基金=T+1 净值申赎费口径）</li><li>sweep_slip.py 敏感性扫描（三池最优参数 × 滑点网格）：<b>股票 10/20/30bps → +462%/+331%/+231%（夏普 1.99/1.69/1.39）</b>——高换手策略对滑点承受力强，实盘预期区间明确 ｜ ETF 10bps → +162%（30bps 以上失效）｜ <b>基金 30bps 申赎费下 +273%→+11% 归零——场外基金短线必须 C 类份额</b>（重要实盘结论）</li><li>看板短线区加滑点敏感性说明；README 已知限制更新（佣金万2.5+印花税万5 原本已含）</li></ul></div></div></details>
@@ -5010,6 +5012,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 
 </div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-16 12:04 · 版本 v5.11.8 · 数据截至 2026-08-14 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>

@@ -411,7 +411,7 @@ if _cf.exists():
 html = f"""<!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>标的监控看板（2026-08-14）</title>
+<title>标的监控看板（2026-08-14 · 构建 08-16 12:04）</title>
 <style>{THEME_CSS}
 /* 三视图切换 */
 .view{{display:none}}
@@ -571,6 +571,7 @@ html = f"""<!doctype html>
 </div>
 
 </div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-16 12:04 · 版本 v5.11.8 · 数据截至 2026-08-14 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({{top:0,behavior:'smooth'}})">↑</button>
