@@ -564,7 +564,7 @@ html = f"""<!doctype html>
 <script src="monitor/snapshots_index.js"></script>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
-window.ENH.nav = [["overview","📊","监控总览"],["sys-auto","🅰️","全量池中/长线"],["sys-lite","🅱️","固定池中/长线"],["short","⚡","全量池短线"],["review","📋","复盘日志"],["changelog","📝","更新日志"]];
+window.ENH.nav = [["overview","📊","监控总览"],["sys-auto","🅰️","全量池中/长线"],["sys-lite","🅱️","固定池中/长线"],["short","⚡","全量池短线"]];
 var REV_DETAILS={json.dumps(REVIEW_DETAILS, ensure_ascii=False)};
 function openRev(file){{
   var d=document.getElementById('rev-detail-body');if(!d)return;

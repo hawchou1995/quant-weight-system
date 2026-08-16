@@ -320,8 +320,10 @@ for c in ALL_CODES:
         ddf = load_hist_df(c)              # 个人版基金：data_hist 净值
     elif c in V9_FUND:
         ddf = load_fund_cache_df(c)        # 普适版基金：fund_nav_cache 净值
-    elif c in V9_ETF:
-        ddf = load_etf_df(c)               # 普适版 ETF：data_full sh5/sz1
+    elif c in V9_ETF or c in ETFS:
+        ddf = load_etf_df(c)               # 普适版/个人版 ETF：data_full sh5/sz1
+        if ddf is None:
+            ddf = load_hist_df(c)          # fallback：data_hist 净值
     else:
         ddf = get_pool_df(k)               # 股票：data_full
     if ddf is None or len(ddf) == 0:

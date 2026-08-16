@@ -29,9 +29,9 @@ def main():
     skip_fetch = "--skip-fetch" in args
     do_fund = "--fund" in args
 
-    print("== 1/5 股票/ETF 行情增量更新 ==", flush=True)
+    print("== 1/5 股票/ETF 行情增量更新（扫描滞后文件 → 拉最新合并）==", flush=True)
     if not skip_fetch:
-        run([PY, str(BASE / "fetch_full_universe.py")])
+        run([PY, str(BASE / "update_daily.py")])
     else:
         print("  跳过（--skip-fetch）", flush=True)
 

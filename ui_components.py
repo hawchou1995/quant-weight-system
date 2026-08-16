@@ -194,6 +194,8 @@ function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)retu
   window.ENH.nav.forEach(function(it){
     html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"><span class="ic">'+it[1]+'</span>'+it[2]+'</a>';});
   html+='<div class="sn-sep"></div><div class="sn-foot">'+
+    '<a href="javascript:void(0)" data-anchor="review"><span class="ic">📋</span>复盘日志</a>'+
+    '<a href="javascript:void(0)" data-anchor="changelog"><span class="ic">📝</span>更新日志</a>'+
     '<a href="https://qingju.me/" target="_blank" rel="noopener"><span class="ic">💬</span>青橘社区</a></div>';
   nav.innerHTML=html;
   document.body.classList.add('sidenav-open');
