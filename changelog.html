@@ -167,7 +167,38 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <h2 style="margin:0">📝 更新日志 <span class="badge badge-auto">GitHub Release 风格</span></h2>
 </div>
 <div class="sub">量化系统版本更新记录：复盘发现设计缺陷 → 启动系统更新 → 在此登记版本/日期/更新内容</div>
-<div class="rel"><div class="rel-head"></div><div class="rel-body"><h1>更新日志（量化权重系统）</h1>
+<div class="rel"><div class="rel-head">v5.11.4 - 2026-08-16</div><div class="rel-body">
+
+<p><b>日志去重修复（用户反馈驱动）</b></p>
+<div class='lg-item'>修复：复盘日志出现多个相同日期条目——review_daily.py 每次重跑都向索引 insert 同 file 记录（重跑调试多次→3 条重复）；改为写索引前先按 file 替换（同日期复盘重跑自动覆盖），build_dual_system 渲染再加一层同 file 去重</div>
+<div class='lg-item'>修复：更新日志出现重复版本号——changelog.md 头部写入重复执行（v5.11.2/v5.11.3 各 2 段）；已清理重复段（20 个版本各一），解析层加同版本号去重兜底</div>
+<div class='lg-item'>修复：md_to_html 未转义内容中的 < >（changelog 里 `原生 <details>` 文本变成真实标签破坏 HTML 结构）——inline 先转义 & < > 再包粗体/代码标签</div>
+
+</div></div><div class="rel"><div class="rel-head">v5.11.3 - 2026-08-16</div><div class="rel-body">
+
+<p><b>日志折叠 + 权限中文（用户反馈驱动）</b></p>
+<div class='lg-item'>复盘日志按日期折叠：每篇一个原生 `<details>` 折叠面板（summary=日期/信号日/只数/胜率/缺陷），最新一篇默认展开、其余折叠；删除旧 JS 展开逻辑（openRev/REV_DETAILS）</div>
+<div class='lg-item'>更新日志按版本折叠：每个版本一个折叠面板（summary=版本号+日期徽章），最新版本默认展开；18 个版本不再全部平铺</div>
+<div class='lg-item'>复盘权限列改板块中文名：main→主板 / gem→创业板 / star→科创板 / etf→ETF / fund→基金（与三个监控池统一口径）</div>
+
+</div></div><div class="rel"><div class="rel-head">v5.11.2 - 2026-08-16</div><div class="rel-body">
+
+<p><b>三池全量复盘 + ETF 数据链路修复（用户反馈驱动）</b></p>
+<div class='lg-item'>复盘引擎 v2：覆盖<b>三个监控池全部标的</b>——全量池中/长线（v9 50 只）+ 固定池中/长线（v8 30 只）+ 短线全量池（30 只），各池独立总览/明细/缺陷检测（vs 各自回测基准 v9 48.1% / v8 57.1% / 短线 54%）；信号用 V.score_row 在信号日重算（v9/v8 ≥60 轻仓加仓为买入信号，短线 ≥50）</div>
+<div class='lg-item'>修复：ETF 行情数据停滞——fetch_full_universe 是"存在即跳过"的全量建库脚本，<b>无增量更新机制</b>（ETF 1623 只全部滞后一天）；新增 update_daily.py 真增量（扫描滞后文件→拉最新合并去重），refresh_daily 接入；一次性补齐 1626 只（失败 250 只=退市/长期停牌）</div>
+<div class='lg-item'>修复：build_enhanced_data 个人版 ETF 缺分支（ETFS 落到股票路径→3 只缺失），补 load_etf_df→load_hist_df fallback（固定池恢复 30 只）</div>
+<div class='lg-item'>修复：复盘 MA5 破位率 100% 误报（compute_factors_full 无 ma5 列，改为 rolling(5) 现算）；基金 T+1 确认日标注恢复</div>
+<div class='lg-item'>体验：复盘日志/更新日志入口移到<b>左下角（青橘社区上方）</b>，主导航保持 4 项</div>
+<div class='lg-item'>演示复盘（08-13 信号 → 08-14）：88 只全量，买入信号 74，胜率 65%（全量池 84% / 固定池 54% / 短线股票 80% / 短线 ETF 70%）</div>
+
+</div></div><div class="rel"><div class="rel-head">v5.11.1 - 2026-08-16</div><div class="rel-body">
+
+<p><b>日志形态重构（用户反馈驱动）</b></p>
+<div class='lg-item'>修复：复盘日志 / 更新日志由独立页面（跳转后无法直接切换其他池）改为<b>主页面内嵌视图</b>——与各池同形态，左侧导航直接切换（view-review / view-changelog 注册进 VIEW_MAP，switchView 不再跳页）</div>
+<div class='lg-item'>修复：日志内容亮色主题下全黑不可读——原实现用 iframe 加载 .md 纯文本（浏览器默认黑字、不吃主题）；改为构建期 md→HTML 渲染（标题/表格/列表/粗体/引用），全部走 CSS 变量（var(--text)/var(--card) 等），亮色/暗色主题自动适配；表格复用 .tbl 主题样式</div>
+<div class='lg-item'>体验：复盘详情点击条目展开（自动展开最新一篇）；更新日志 GitHub release 卡片式（版本号 + 日期徽章 + 内容列表，17 个版本）</div>
+
+<h1>更新日志（量化权重系统）</h1>
 
 <div class='lg-note'>复盘发现系统设计缺陷 → 启动系统更新 → 在此登记。格式参照 GitHub Release：版本 / 日期 / 更新内容。</div>
 
@@ -319,6 +350,8 @@ function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)retu
   window.ENH.nav.forEach(function(it){
     html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"><span class="ic">'+it[1]+'</span>'+it[2]+'</a>';});
   html+='<div class="sn-sep"></div><div class="sn-foot">'+
+    '<a href="javascript:void(0)" data-anchor="review"><span class="ic">📋</span>复盘日志</a>'+
+    '<a href="javascript:void(0)" data-anchor="changelog"><span class="ic">📝</span>更新日志</a>'+
     '<a href="https://qingju.me/" target="_blank" rel="noopener"><span class="ic">💬</span>青橘社区</a></div>';
   nav.innerHTML=html;
   document.body.classList.add('sidenav-open');

@@ -38,3 +38,4 @@ fund_nav_cache/
 *_neighbor*.json
 *_check.png
 deliver_*.png
+data_full_fail_list.csv
