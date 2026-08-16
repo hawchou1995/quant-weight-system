@@ -16,12 +16,13 @@
 
 用法：python review_daily.py [--as-of 2026-08-13] [--calc 2026-08-14]
 """
+import os
 import sys, json, time
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(BASE))
 import short_engine as S
 import build_short_pool as B

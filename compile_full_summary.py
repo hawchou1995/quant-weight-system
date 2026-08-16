@@ -6,11 +6,12 @@
 1. 量化权重系统/data-全量回测池历史数据-20260814-full.md
 2. 复制到 Obsidian 02-投资研究-Investment/
 """
+import os
 import json, glob
 from pathlib import Path
 import pandas as pd
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 HIST = BASE / "data_full"
 NAMES = json.loads((BASE / "data_full_names.json").read_text(encoding="utf-8"))
 OUT_MD = BASE / "data-全量回测池历史数据-20260814-full.md"

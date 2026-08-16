@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """全量池 v6 基线 → HTML 仪表盘（中文）"""
+import os
 import json
 import sys
 from pathlib import Path
@@ -9,7 +10,7 @@ sys.path.insert(0, str(QBL))
 
 from render_dashboard import build_dashboard_data, render_dashboard
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 
 # 载入对照数据（全仓等权买入持有净值，供 overlay）
 import glob

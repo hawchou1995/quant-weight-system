@@ -8,10 +8,11 @@
 
 滑点口径：每边 bps（买入价上浮 + 卖出价下浮）；基金=T+1 净值申赎费口径（30bps 常见）
 """
+import os
 import sys, json, time
 from pathlib import Path
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(BASE))
 import short_engine as S
 import v8_selector as V

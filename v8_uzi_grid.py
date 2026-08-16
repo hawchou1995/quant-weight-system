@@ -9,11 +9,12 @@ UZI-Skill 规则提取 → v8 因子注入回测
 - F_OBV      OBV 趋势向上（20 日 OBV 斜率）
 注入 v8 打分网格，对比基线夏普 0.817
 """
+import os
 import sys, json, time, math
 from pathlib import Path
 import numpy as np
 import pandas as pd
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import v8_selector as V
 
 

@@ -4,12 +4,13 @@
 机制：净值动量 TopN 轮动 + 全部净值动量 < thresh → 空仓（熊市不硬扛）
 + MA 择时 + T+1 成交（场外基金真实规则）
 """
+import os
 import sys, json, time
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(BASE))
 import v8_selector as V
 import v8_fund_v5 as F   # 复用 navs / all_days_all / build_market_map / idx

@@ -5,12 +5,13 @@
 新机制：冷冻期（卖出后 N 天不买回）/ 动量阈值空仓（全负空仓）
 网格：动量类型 × 调仓周期 × TopN × 冷冻 × 空仓阈值
 """
+import os
 import sys, json, time
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(BASE))
 import v8_selector as V
 import v8_etf_run as E

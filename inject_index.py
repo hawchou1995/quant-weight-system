@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """index.html（五 tab 主看板）注入升级：顶部导航(历史报告/明暗/qingju.me) +
 左侧贴边导航(tab 切换) + 交易表排序/搜索/行点击详情。不动模板 JS。"""
+import os
 import re
 from pathlib import Path
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 import sys
 sys.path.insert(0, str(BASE))
 from ui_components import THEME_CSS, NAV_HTML, COMMON_JS

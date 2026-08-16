@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """双体系看板（模板样式）：v9-auto 普适版 + v8-lite 个人版，2026-08-14 收盘口径"""
+import os
 import json
 import math
 from pathlib import Path
@@ -7,7 +8,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 import sys
 sys.path.insert(0, str(BASE))
 import v8_selector as V

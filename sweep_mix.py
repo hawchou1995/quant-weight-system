@@ -2,12 +2,13 @@
 """短线 v3：动量截面轮动 + MA5生命线/止盈/止损 每日风控（v1 高收益 + v2 好风控混合）
 ====================================================================================
 """
+import os
 import sys, json, time
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(BASE))
 import short_engine as S
 import v8_selector as V

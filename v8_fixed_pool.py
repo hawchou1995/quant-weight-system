@@ -5,16 +5,17 @@
 对比：全量池 v3 基线
 注意：固定池存在上市时间偏置（部分标的 2016 后上市）——披露项
 """
+import os
 import sys, json, time, math, csv
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import v8_selector as V
 import v8_winrate as W
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 
 STOCKS = ['300502','300308','600498','601138','002463','002384','600183','300476','603986',
           '002185','605358','603228','603339','000636','605189','600403','002879','600162','000759','002474']

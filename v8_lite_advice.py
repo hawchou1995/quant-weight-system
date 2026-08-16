@@ -3,16 +3,17 @@
 生成"关注标的权重看板 v8-lite 加减仓建议"HTML（套用模板样式）
 数据：2026-07-23 再平衡排名 + 08-14 最新现价
 """
+import os
 import sys, json, math
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import v8_selector as V
 import v8_lite as L
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 pool = L.build_pool(verbose=False)
 
 NAME = {'300502':'新易盛','300308':'中际旭创','600498':'烽火通信','601138':'工业富联','002463':'沪电股份',

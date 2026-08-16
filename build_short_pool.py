@@ -7,12 +7,13 @@
 输出：short_pool.js（window.SHORT_POOL）+ short_pool.json
 详情复用 80 只 details 的行业/名称（命中），未命中用兜底；雷达六类 = 短线因子
 """
+import os
 import sys, json, math, re, time
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(BASE))
 import short_engine as S
 

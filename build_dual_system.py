@@ -5,10 +5,11 @@
 右上角「标的报告」= 按月分类的历史收盘监控快照（当前页内切换，不新开窗口）；
 左侧导航无独立标的报告入口（同页处理）；左上角板块/行业/档位 select 筛选；
 全量池自动池 = 股票按权限各10 + ETF10 + 基金10；回测参考统一放监控总览。"""
+import os
 import json, re
 from pathlib import Path
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 import sys
 sys.path.insert(0, str(BASE))
 from ui_components import THEME_CSS, NAV_HTML, COMMON_JS

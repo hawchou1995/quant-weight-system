@@ -4,9 +4,10 @@ v8 冲刺网格：F7 邻域微调（目标夏普 ≥0.8）
 F7 = Top20/H42/择时/止损20%/价格≥2/动量>0/波动<60%
 微调维度：动量门槛、波动上限、止损、持有期、TopN
 """
+import os
 import sys, json, time
 from pathlib import Path
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import v8_enhance2 as E
 
 pool = E.load_pool() if hasattr(E, "load_pool") else E.V.load_pool()

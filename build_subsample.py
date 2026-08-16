@@ -6,10 +6,11 @@
 （退市股在数据池中约 250/7420=3.4%，为验证退市暴露提升至 10%）
 输出：subsample_1000.txt（每行 code）
 """
+import os
 import glob, random
 from pathlib import Path
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 DATA = BASE / "data_full"
 OUT = BASE / "subsample_1000.txt"
 

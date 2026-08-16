@@ -7,9 +7,10 @@ S2 三拉兑现：持仓累计 3 次单日涨幅 ≥5% → 兑现 50%（减仓�
 S3 高位巨量：收盘距 60 日高点 <3% 且 量比 ≥2 → 次日开盘清仓
 对照：基线 + 单信号 + 两两组合 + 三信号全开
 """
+import os
 import sys, json, time
 from pathlib import Path
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from exp_engine import run_pool, BASE
 
 DATA = str(BASE / "data_full")

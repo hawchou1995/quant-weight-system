@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """标的监控报告总页：34 只标的各一份监控报告（信号/因子/K线/交易史/建议），锚点直达。"""
+import os
 import json
 from pathlib import Path
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 import sys
 sys.path.insert(0, str(BASE))
 from ui_components import THEME_CSS, NAV_HTML, COMMON_JS

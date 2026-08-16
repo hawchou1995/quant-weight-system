@@ -3,11 +3,12 @@
 v8 增强网格 v2：修正择时（单 MA200）+ 个股止损 + 低波/流动性过滤 + 因子合成
 目标：夏普 ≥0.8、回撤 ≤30%
 """
+import os
 import sys, json, time, math
 from pathlib import Path
 import numpy as np
 import pandas as pd
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import v8_selector as V
 
 # 单 MA200 择时版 run（去掉 fast 双均线），加个股止损

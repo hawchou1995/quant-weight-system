@@ -10,15 +10,16 @@ v9 普适信号体系：绝对打分 + 动态系数（不选 TopN，任何股票
 - 回测：全量池 5307 只，2016-2026
 目标：夏普≥1 / 回撤≤30% / 年化≥10%
 """
+import os
 import sys, json, time, math
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import v8_selector as V
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 
 
 def load_pool():

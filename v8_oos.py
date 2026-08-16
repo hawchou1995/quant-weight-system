@@ -7,11 +7,12 @@ v8 样本外验证（walk-forward）
 前半段 2016-2021（训练/参数选定期） vs 后半段 2022-2026（样本外）
 若后半段夏普/收益与前半段同量级 → 参数非过拟合
 """
+import os
 import sys, json, time
 from pathlib import Path
 import numpy as np
 import pandas as pd
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import v8_selector as V
 
 # 直接复用最终参数跑两个子窗口

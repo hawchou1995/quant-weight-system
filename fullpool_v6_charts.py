@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """全量池 v6 基线：组合净值 vs 全仓 buyhold 对照 + 年度收益 + 胜率分布"""
+import os
 import pandas as pd
 import numpy as np
 import matplotlib
@@ -7,7 +8,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 
 # 1. 组合净值（weight 策略，等权）
 eq = pd.read_csv(BASE / "fullpool_v6_equity.csv", dtype={"date": str})

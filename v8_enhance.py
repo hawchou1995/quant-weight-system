@@ -4,9 +4,10 @@ v8 增强网格：在最优基线（Top20/H42/择时）上叠加风控增强
 目标：夏普 ≥0.8、回撤 ≤30%
 增强项：回撤熔断（10/15/20%）、波动率目标仓位（0.12/0.15/0.18）、双均线快线（MA20/50/100）
 """
+import os
 import sys, json, time
 from pathlib import Path
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import v8_selector as V
 
 pool = V.load_pool()

@@ -7,15 +7,16 @@ v8-lite 个人投资者版：15 万资金 + 自选池内轮动 + 整手/价格�
 - 移动止损 10% + MA200 择时 + 42 日轮动 + 佣金万2.5 + 印花税
 - 目标：回撤 ≤25% / 夏普 ≥1 / 年化 ≥14%
 """
+import os
 import sys, json, time, math, csv
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import v8_selector as V
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 CASH0 = 500_000.0
 
 STOCKS = ['300502','300308','600498','601138','002463','002384','600183','300476','603986',

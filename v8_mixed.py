@@ -5,12 +5,13 @@
 - fixed_thresh: 固定池标的入选分数阈值
 其余参数与 v3 一致（Top15/季度轮动/MA200择时/移动止损10%）
 """
+import os
 import sys, json, time
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import v8_selector as V
 import v8_winrate as W
 

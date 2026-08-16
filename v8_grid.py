@@ -3,9 +3,10 @@
 v8 参数网格扫描：top_n × hold_days × timing × 因子权重
 目标：夏普 ≥0.8、回撤 ≤30%
 """
+import os
 import sys, json, time
 from pathlib import Path
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import v8_selector as V
 
 pool = V.load_pool()

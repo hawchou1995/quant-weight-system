@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """基金 H5 v3 补充穷举（基金净值型 5 日轮动是甜蜜点）"""
+import os
 import sys, json, time
 from pathlib import Path
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(BASE))
 import short_engine as S
 import v8_selector as V

@@ -5,12 +5,13 @@
 卖出：止盈 / 止损 / 最多持有 max_hold / MA5 生命线 / 市况转弱全撤
 网格：top_n × max_hold × take_profit × stop_loss × bw_th
 """
+import os
 import sys, json, time
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(BASE))
 import short_engine as S
 import v8_selector as V

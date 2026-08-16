@@ -5,10 +5,11 @@
 输出：v9split_<group>_summary.json + v9split_<group>_equity.csv
       shortsplit_<group>_summary.json + shortsplit_<group>_equity.csv
 """
+import os
 import sys, json, time
 from pathlib import Path
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(BASE))
 import v9_auto as A
 import v8_selector as V

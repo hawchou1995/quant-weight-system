@@ -7,9 +7,10 @@ B 组 - 权重扫描（单维 ±0.05）
 C 组 - 门槛扫描（四边界 ±5）
 D 组 - 上轮建议（buyhold 修复 / 涨跌停约束 / ETF 分池）
 """
+import os
 import sys, json, time
 from pathlib import Path
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from exp_engine import run_pool, BASE
 
 DATA = str(BASE / "data_full")

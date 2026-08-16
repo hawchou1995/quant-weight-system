@@ -5,9 +5,10 @@
 修正 exp_engine BACKTEST_START 后，全矩阵 + 三信号 + 关键组合统一重跑
 输出：exp_v3_results.json（含每实验完整指标）
 """
+import os
 import sys, json, time
 from pathlib import Path
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from exp_engine import run_pool, BASE
 
 DATA = str(BASE / "data_full")

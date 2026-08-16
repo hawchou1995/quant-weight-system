@@ -9,11 +9,12 @@ v8 夏普冲刺矩阵 v2（目标：夏普 ≥1.0，回撤 <30%，年化 >14%）
 3. 动量增强：mom12_1 门槛提高
 4. TopN 收缩 + 止损收窄
 """
+import os
 import sys, json, time, math, csv
 from pathlib import Path
 import numpy as np
 import pandas as pd
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import v8_selector as V
 
 

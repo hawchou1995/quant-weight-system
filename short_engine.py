@@ -10,12 +10,13 @@
 轮动：TopN × 周期 H（5/10/20 日）穷举
 股票/ETF 用 data_full OHLC，基金用净值（无成交量 → 量价因子退化为 0，动量/通道/波动仍有效）
 """
+import os
 import sys, json, time, math
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(BASE))
 import v8_selector as V
 

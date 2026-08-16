@@ -8,15 +8,16 @@
 成交口径升级：T 日净值触发/排名 → T+1 日净值成交（场外基金真实规则，更保守）
 基线也按 T+1 重跑，保证对比公平
 """
+import os
 import sys, json, time, math
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import v8_selector as V
 
-CACHE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统/fund_nav_cache")
+CACHE = BASE / "fund_nav_cache"
 START, END = "2016-01-04", "2026-08-14"
 
 t0 = time.time()

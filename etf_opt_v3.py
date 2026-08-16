@@ -2,12 +2,13 @@
 """ETF 中长线 v3 补扫：动量轮动 + MA5 每日止损（v3 短线验证的杀手锏）+ 月频/季频
 ================================================================================
 """
+import os
 import sys, json, time
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(BASE))
 import v8_selector as V
 import etf_opt_v2 as E2   # 复用 rsrs/slope/pool/run_etf_v2

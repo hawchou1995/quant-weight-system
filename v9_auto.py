@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 """v9-auto：绝对规则自动池 + 池内持仓（无人工选池的普适体系）"""
+import os
 import sys, time
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import math
 import v8_selector as V
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 pool_all = V.load_pool()
 
 

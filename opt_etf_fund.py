@@ -2,12 +2,13 @@
 """ETF/基金池优化实验：对齐股票池风控强度，扫描参数找更优组合。
 ETF：TopN × 轮动周期 × 止损 × 择时窗口
 基金：TopN × 轮动周期 × 净值止损 × 择时窗口"""
+import os
 import sys, json, time
 from pathlib import Path
 import pandas as pd
 import numpy as np
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(BASE))
 import v8_selector as V
 

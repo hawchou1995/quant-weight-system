@@ -6,9 +6,10 @@
 D2v2：真正跑 bh 策略（fix_buyhold=True 全仓）与 weight 对照
 D5：高位连板否决（IMA 黄金公式「4板+胜率0%」→ 连板≥4 清仓）——候选注入
 """
+import os
 import sys, json, time
 from pathlib import Path
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from exp_engine import run_pool, run_backtest, BASE
 import weight_system_backtest as W
 import pandas as pd

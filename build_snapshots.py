@@ -2,11 +2,12 @@
 """历史收盘监控快照：把 Obsidian data-标的快照-*.md 转成轻量 HTML 快照页
 （monitor/snapshots/<YYYY-MM-DD>.html），并生成 snapshots_index.js
 供看板右上角「标的报告」下拉按月分类引用（点击当前页内切换显示，不新开窗口）。"""
+import os
 import json
 import re
 from pathlib import Path
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 SNAP_DIR = BASE / "monitor" / "snapshots"
 OBS_DIR = Path("D:/Documents/Obsidian/WorkBuddy/wiki/02-投资研究-Investment")
 SNAP_DIR.mkdir(parents=True, exist_ok=True)

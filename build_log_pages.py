@@ -5,11 +5,12 @@
 更新日志：changelog.md 驱动（版本/日期/更新内容，GitHub release 格式），静态渲染
 导航：左侧导航「📋 复盘日志」「📝 更新日志」→ 独立页（当前窗口打开，带返回按钮）
 """
+import os
 import json, re
 from pathlib import Path
 import sys
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(BASE))
 from ui_components import THEME_CSS, NAV_HTML, COMMON_JS
 

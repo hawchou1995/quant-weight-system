@@ -4,10 +4,11 @@ v9 分层 slip20（split_backtest --mode v9 --slip 20）
 ETF 中长线 0/20（etf_v3_final + etf_v3_final_slip20）
 基金中长线 0/30（v8_fund_summary + v8_fund_slip30，V5 生产参数）
 """
+import os
 import sys, json, time, subprocess
 from pathlib import Path
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(BASE))
 PY = sys.executable
 t0 = time.time()

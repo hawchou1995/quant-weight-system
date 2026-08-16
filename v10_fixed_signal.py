@@ -9,16 +9,17 @@ v10 固定池信号仓位管理：自己的标的 + 看指标独立加减仓（�
 - 每日：移动止损（峰值回撤 10%）+ MA200 择时（指数下清仓）
 - 无 TopN：加仓档标的全部持有，不会因排名被踢
 """
+import os
 import sys, time, math
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import v8_selector as V
 import v8_lite as L
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 
 STOCKS = L.STOCKS
 ETFS = L.ETFS

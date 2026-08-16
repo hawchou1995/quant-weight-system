@@ -5,9 +5,10 @@
 子样本命中：A5 Aroon±8（夏普 +0.154）、S1 低开3%清仓（回撤 -3.5pct、夏普 +0.171）
 全量确认：基线 / Aroon±8 / S1低开3% / Aroon+S1 组合
 """
+import os
 import sys, json, time
 from pathlib import Path
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from exp_engine import run_pool, BASE
 
 DATA = str(BASE / "data_full")

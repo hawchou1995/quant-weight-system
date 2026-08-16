@@ -1,11 +1,12 @@
 {
   "strategy": "v8_etf_v3 中长线",
   "params": "月频H21/Top5/mom20动量/MA5每日止损/冷冻5天/MA150择时",
+  "slippage_bps": 0,
   "summary": {
-    "total_return_pct": 130.92,
-    "annual_return_pct": 8.21,
+    "total_return_pct": 112.88,
+    "annual_return_pct": 7.38,
     "max_drawdown_pct": -7.69,
-    "sharpe": 1.209,
+    "sharpe": 1.148,
     "win_rate_pct": 48.7,
     "total_trades": 335
   }

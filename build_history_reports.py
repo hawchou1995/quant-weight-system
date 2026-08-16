@@ -2,10 +2,11 @@
 """历史报告总览页 history_reports.html：按月分类列出全部历史收盘监控快照，
 右上角「标的报告」→ 历史报告总览 进入（当前窗口打开）；每份快照点击当前页 iframe 内嵌展示；
 顶部带「← 返回主页面」按钮。"""
+import os
 import json
 from pathlib import Path
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 import sys
 sys.path.insert(0, str(BASE))
 from ui_components import THEME_CSS, NAV_HTML, COMMON_JS

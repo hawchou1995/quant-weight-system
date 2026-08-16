@@ -11,12 +11,13 @@
 统计：T+1 开盘涨幅 / 盘中最高（相对 T 收盘）/ 2% 止盈命中 / 收盘 / T+2 收盘
 策略化：T+1 开盘买 → 2% 止盈（盘中触及）否则 T+1 收盘卖；对照持有 T+2 收盘
 """
+import os
 import sys, json, time
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(BASE))
 import short_engine as S
 import v8_selector as V

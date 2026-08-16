@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """生成全量回测池历史数据编译清单（区间/行数/涨幅）"""
+import os
 import glob
 from pathlib import Path
 import pandas as pd
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 HIST = BASE / "data_hist"
 
 # 代码 -> 名称（合并 UNIVERSE 与 data_tmp 已知集合）

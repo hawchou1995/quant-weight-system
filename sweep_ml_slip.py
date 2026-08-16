@@ -5,10 +5,11 @@
 引擎：v9_auto（全量池月轮动）/ v8_lite（固定池42日轮动）/ etf_opt_v3（ETF月频）
 扫描 slip {0, 10, 20, 30} bps
 """
+import os
 import sys, json, time
 from pathlib import Path
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(BASE))
 import v9_auto as A
 import v8_lite as L

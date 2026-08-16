@@ -6,6 +6,7 @@ v8 三体系看板（股票 / ETF / 基金 单页三 tab）
 - Tab ETF：v8_etf_*（Top20/H42，夏普 0.491）
 - Tab 基金：场外基金净值快照（6 只，净值型展示，无选股引擎）
 """
+import os
 import sys, json, csv
 from pathlib import Path
 import pandas as pd
@@ -14,7 +15,7 @@ QBL = Path(r"C:/Users/XAUTHUB/.workbuddy/plugins/marketplaces/experts/plugins/st
 sys.path.insert(0, str(QBL))
 from render_dashboard import build_dashboard_data, render_dashboard
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 
 # ============ Tab 1 股票（v8 v5 豁免波动版） ============
 stock_extra = [

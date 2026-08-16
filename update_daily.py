@@ -9,11 +9,12 @@
 
 用法：python update_daily.py [--limit N] [--only etf|stock]
 """
+import os
 import sys, time, json
 from pathlib import Path
 import pandas as pd
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(BASE))
 import fetch_full_universe as F
 

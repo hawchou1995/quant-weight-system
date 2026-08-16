@@ -5,10 +5,11 @@
 基准：T10/H10/S55 反转+MA5
 变体：小止盈（TP2-5%/SL3-5%）× 持有期 5/10 + 天量剔除 20 日
 """
+import os
 import sys, json, time
 from pathlib import Path
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(BASE))
 import short_engine as S
 import v8_selector as V

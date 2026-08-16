@@ -5,12 +5,13 @@ v8 分年度归因 + 空仓期现金管理测算
 1. 分年度收益/回撤（基于 v8_final_equity.csv）
 2. 空仓期天数统计 + 货基（年化 2%）收益增厚测算
 """
+import os
 import sys, json
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 eq = pd.read_csv(BASE / "v8_final_equity.csv", dtype={"date": str})
 eq["date"] = pd.to_datetime(eq["date"])
 eq = eq.sort_values("date").reset_index(drop=True)

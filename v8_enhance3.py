@@ -7,17 +7,18 @@ E5 联动阈值：阈值随沪深300 20日波动率调整（低波 50 / 中波 5
 ETF 混合：全量 ETF Top10 + 固定 5 只 ETF 卫星
 基金混合：全市场动量 Top10 + 固定 6 只基金卫星
 """
+import os
 import sys, json, time, math, csv
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import v8_selector as V
 import v8_mixed as M
 import v8_winrate as W
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 pool = M.pool
 FIXED_OK = M.FIXED_OK
 

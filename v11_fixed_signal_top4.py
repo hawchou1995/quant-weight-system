@@ -7,12 +7,13 @@ v8-lite v9 信号版：固定池 25 只 + v9 六项信号档位 + Top4 容量截
 - 减仓档 → 清仓（独立信号）；观望档 → 不持仓
 - 风控：移动止损 + 大盘择时
 """
+import os
 import sys, time, math
 from pathlib import Path
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import v8_selector as V
 import v10_fixed_signal as V10
 

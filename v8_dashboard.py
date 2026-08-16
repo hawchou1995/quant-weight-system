@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """v8 中长线权重看板 → HTML 仪表盘（中文）"""
+import os
 import sys
 from pathlib import Path
 
@@ -7,7 +8,7 @@ QBL = Path(r"C:/Users/XAUTHUB/.workbuddy/plugins/marketplaces/experts/plugins/st
 sys.path.insert(0, str(QBL))
 from render_dashboard import build_dashboard_data, render_dashboard
 
-BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
+BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 
 extra = [
     {"type": "text", "tab": "overview", "title": "核心结论",
