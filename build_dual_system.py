@@ -321,6 +321,8 @@ WATCH_CARD = f'''<div class="card" id="watch-card">
 def md_to_html(md):
     """轻量 markdown → HTML（标题/表格/列表/粗体/代码/引用），复用主题 .tbl 样式，全部走 CSS 变量"""
     def inline(s):
+        # 先转义 & < >（防内容里的 <details> 等破坏 HTML 结构），再包粗体/代码标签
+        s = s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
         s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
         s = re.sub(r"`([^`]+)`", r"<code>\1</code>", s)
         return s
@@ -361,10 +363,12 @@ def md_to_html(md):
 REVIEW_LIST_HTML = ""
 _rf = BASE / "review" / "review_index.json"
 _ridx = json.loads(_rf.read_text(encoding="utf-8")) if _rf.exists() else {"reviews": []}
+_seen_rf = set()
 for _i, _r in enumerate(_ridx.get("reviews", [])):
     _f = BASE / "review" / _r["file"]
-    if not _f.exists():
+    if not _f.exists() or _r["file"] in _seen_rf:
         continue
+    _seen_rf.add(_r["file"])
     _flag = "🔴" if _r.get("defects", 0) > 0 else "✅"
     _open = " open" if _i == 0 else ""          # 最新一篇默认展开，其余折叠
     REVIEW_LIST_HTML += (f'<details class="rev-item"{_open}>'
@@ -379,11 +383,15 @@ _cf = BASE / "changelog.md"
 if _cf.exists():
     _ct = _cf.read_text(encoding="utf-8")
     _cards = []
+    _seen_ver = set()
     for _i, _seg in enumerate(re.split(r"\n## ", "\n" + _ct)[1:]):
         _title = _seg.splitlines()[0].strip()
         _body = "\n".join(_seg.splitlines()[1:]).strip()
         _m = re.match(r"(v[\d.]+)\s*-\s*([\d-]+)", _title)
         _ver = _m.group(1) if _m else _title
+        if _ver in _seen_ver:
+            continue                        # 同版本号只渲染第一个，防 changelog 重复段
+        _seen_ver.add(_ver)
         _date = _m.group(2) if _m else ""
         _open = " open" if _i == 0 else ""       # 最新版本默认展开，其余折叠
         _cards.append(f'<details class="rel-item"{_open}>'

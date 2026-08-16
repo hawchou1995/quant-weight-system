@@ -281,6 +281,7 @@ def review(as_of=None, calc=None):
     idx = json.load(open(idx_f, encoding="utf-8")) if idx_f.exists() else {"reviews": []}
     wr_all = wins_all / len(buy_all) * 100 if buy_all else 0
     avg_all = sum(r["pct"] for r in buy_all) / len(buy_all) if buy_all else 0
+    idx["reviews"] = [r for r in idx.get("reviews", []) if r.get("file") != fname]  # 同 file 替换防重复
     idx["reviews"].insert(0, {"file": fname, "date": calc_date, "sig": as_of,
                               "n": len(rows), "win_rate": round(wr_all, 1), "avg": round(avg_all, 2),
                               "defects": len(defects)})
