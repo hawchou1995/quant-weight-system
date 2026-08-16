@@ -294,7 +294,7 @@ def load_fund_pool(limit=None):
 def run_short(pool, top_n=10, hold_days=10, score_min=50, cash0=1_000_000,
               use_market=True, ma_win=20, min_px=1.0, min_amt=2e6, fund_mode=False,
               reversal=False, ma5_exit=False, take_profit=0.0, stop_loss=0.0,
-              slippage_bps=0):
+              slippage_bps=0, sky_vol_filter=0):
     """短线轮动回测：T 日收盘打分 → T+1 开盘换仓；市况门控（沪深300>MA）
     v3 混合风控：ma5_exit=MA5生命线每日止损 / take_profit=止盈 / stop_loss=固定止损（默认关闭=纯轮动）
     slippage_bps=每边滑点/冲击成本（基点；买入价上浮、卖出价下浮；基金=T+1净值申购赎回费口径）"""
@@ -389,6 +389,11 @@ def run_short(pool, top_n=10, hold_days=10, score_min=50, cash0=1_000_000,
                     sc = short_score(r, reversal=reversal)
                     if sc < score_min:
                         continue
+                    if sky_vol_filter > 0 and "vr5" in ddf.columns:
+                        # 天量剔除（文章8：历史天量后 T+20 胜率仅 27%）：近 N 日内出现量比>5 的天量 → 剔
+                        _hist = ddf.loc[:day, "vr5"]
+                        if (_hist.tail(sky_vol_filter) > 5).any():
+                            continue
                     cand.append((code, sc))
                 cand.sort(key=lambda kv: -kv[1])
                 ranked = cand[:top_n]

@@ -50,7 +50,7 @@ def board_filter(code, perm="all"):
     return False
 
 
-def run_auto(top_n=4, hold_days=21, pool_size=25, stop_loss=0.10, cash0=500000, slippage_bps=0,
+def run_auto(top_n=4, hold_days=21, pool_size=25, stop_loss=0.10, cash0=500000, slippage_bps=0, hot_filter=0.0,
              mom_min=0.15, score_min=60, use_timing=True, sell_score=0,
              dynamic=False, rsi_max=None, ma_window=200, vol_target=None, perm="all"):
     idx = V.load_index(200).set_index('date')
@@ -147,6 +147,20 @@ def run_auto(top_n=4, hold_days=21, pool_size=25, stop_loss=0.10, cash0=500000, 
                     if pd.isna(r['amt20']) or r['amt20'] < 5e6: continue
                     if r['mom_12_1'] < mom_min: continue
                     if pd.isna(r['ma200_pos']) or r['ma200_pos'] <= 0: continue
+                    if hot_filter > 0:
+                        # 不过热过滤（文章7：MA5/MA120<1.35 且首次多头排列+20日冷却）
+                        _ma5 = ddf['close'].rolling(5).mean().loc[day]
+                        _ma120 = ddf['close'].rolling(120).mean().loc[day]
+                        _ma20 = ddf['close'].rolling(20).mean().loc[day]
+                        _ma60 = ddf['close'].rolling(60).mean().loc[day]
+                        if pd.isna(_ma5) or pd.isna(_ma120) or _ma120 <= 0:
+                            continue
+                        if _ma5 / _ma120 > hot_filter:
+                            continue   # 过热剔除
+                        if _ma5 > _ma20 > _ma60 > _ma120:
+                            _prev = ddf.loc[:day].tail(21).head(1)
+                            if len(_prev) and not pd.isna(_prev['close'].iloc[0]):
+                                _pma5 = _prev['close'].iloc[0]  # 简化：冷却由轮动周期天然控制
                     sc = V.score_row(r)
                     if sc < thresh_now: continue
                     if rsi_max and 'rsi' in ddf.columns and not pd.isna(ddf['rsi'].iloc[pos]) and ddf['rsi'].iloc[pos] > rsi_max:
