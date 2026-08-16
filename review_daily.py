@@ -41,6 +41,9 @@ BENCH_WIN = {
 
 TIER_W = [("满仓加仓", 75), ("轻仓加仓", 60), ("观望", 45), ("减至半仓", 30), ("清仓", 0)]
 
+# 权限 → 板块中文名（与三个监控池统一口径）
+PERM_ZH = {"main": "主板", "gem": "创业板", "star": "科创板", "etf": "ETF", "fund": "基金"}
+
 
 def tier_of(sc):
     for t, th in TIER_W:
@@ -265,7 +268,7 @@ def review(as_of=None, calc=None):
             else:
                 act = {"观望": "观望", "减至半仓": "卖出信号", "清仓": "卖出信号", "不买": "不买"}.get(r["tier"], "未触发")
                 pct_s, ma_s, st = "—", "—", "未买入"
-            md_lines.append(f"| {r['code']} | {r['name']} | {r['perm']} | {r['score']:.0f} | {r['tier']} | {act} | "
+            md_lines.append(f"| {r['code']} | {r['name']} | {PERM_ZH.get(r['perm'], r['perm'])} | {r['score']:.0f} | {r['tier']} | {act} | "
                             f"{r['buy_px'] if r['buy_px'] else '—'} | {r['cur_px']} | {pct_s} | {ma_s} | {st} |")
         md_lines.append("")
     md_lines.append("---")
