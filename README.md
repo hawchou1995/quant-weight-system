@@ -1,107 +1,85 @@
-# 量化权重系统 v8（Quant Weight System v8）
+# 量化权重系统 v5.11.4（Quant Weight System）
 
-A 股个人研究工具：**因子打分 + 截面选股 + 月度轮动 + 移动止损 + 大盘择时**，覆盖 **股票 / ETF / 基金** 三体系 + **个人版（v8-lite）**。纯 Python + pandas + akshare，无框架依赖。
+A 股个人研究工具：**因子打分 + 截面选股 + 事件驱动 + MA5 生命线 + 复盘闭环**，覆盖 **股票 / ETF / 基金** 三资产 × **中长线 + 短线** 两套体系。纯 Python + pandas + akshare，无框架依赖。
 
 > ⚠️ 个人研究工具，不构成任何投资建议。投资有风险，决策需谨慎。
+
+## 当前系统（v5.11.x）
+
+### 监控三个池（看板 `dual_system.html`）
+
+| 池 | 构成 | 信号 | 回测（最优参数） |
+|---|---|---|---|
+| **全量池中/长线**（普适版 v9） | 主板10 + 创业板10 + 科创板10 + ETF10 + 基金10 | 四因子权重分（动量35/趋势25/Aroon20/量价20）+ MA150 择时 | **+825% / 回撤-8% / 夏普1.58**（权限分层回测） |
+| **固定池中/长线**（个人版 v8） | 用户固定 30 只（20股+5ETF+5基金） | 同四因子 + 移动止损 + MA200 择时 | +3924% / 夏普1.85（长期复利） |
+| **短线全量池** | 股票反转 Top10（剔ST/退市）+ ETF动量10 + 基金动量10 | 短线分 = 动量30/量价25/通道25/波动20 + **MA5生命线每日止损** + 强势市门控 | 股票 **+632.7% / 回撤-8.0% / 夏普2.29** ｜ ETF +239.2% / 1.74 ｜ 基金 +273.4% / 0.95 |
+
+### 复盘闭环（每日收盘后）
+
+`review_daily.py` 复盘**三池全部标的**（88 只级）：信号日重算信号 → T+1 开盘买入 → 计算日收益 → 🟢吃到/🔴被套判定 → 各池胜率 vs 回测基准缺陷检测（发现设计缺陷 → 登记 `changelog.md` 并更新版本）。复盘日志/更新日志内嵌看板左下角，按日期/版本折叠。
 
 ## 版本历程
 
 | 版本 | 说明 |
 |---|---|
-| v4-v6 | 六类加权打分（趋势/动能/量能/超买超卖/风控/研报）+ 每日信号快照（`legacy/` 保留） |
-| **v8（当前）** | 四因子截面选股（动量 35% / 趋势 25% / Aroon 20% / 量价 20%）+ 月轮动 + 移动止损 + MA200 择时，全量池回测 |
+| v4-v6 | 六类加权打分 + 每日信号快照（`legacy/` 保留） |
+| v8 | 四因子截面选股 + 月轮动 + 移动止损 + MA200 择时（个人版体系定型） |
+| v5.9 | 中长线 ETF 优化（月频H21/Top5/20日动量/MA5止损/冷冻5天，夏普 0.565→1.209）；股票按权限互斥分层回测（主板/创业板/科创板）；总览 12 卡 |
+| v5.10 | 短线页三连修：tbl-short 交互绑定；短线视图改全市场信号池（build_short_pool）；短线专属权重体系（动量30/量价25/通道25/波动20）+ 买入口径档位 |
+| v5.11 | 复盘闭环系统（review_daily + 日志页 GitHub release 风格）；update_daily.py 真增量更新（修复 ETF 数据停滞）；复盘引擎 v2 三池全量；日志内嵌视图 + 折叠；权限列中文板块名 |
+| **v5.11.4（当前）** | 日志去重修复（复盘按 file 替换 / changelog 同版本去重 / md 转义）；公司复现指南 |
 
-## 系统架构（四体系）
+## 核心文件
 
 ```
 quant-weight-system/
-├── v9_auto.py               # ★普适版：全市场自动筛池→Top3（无人工选池，夏普1.715）
-├── v9_signal.py             # v9 探索版（绝对信号体系，验证"无选择=市场平均"）
-├── v8_selector.py          # 核心引擎：因子计算 + 打分 + 回测（全量池 5307 只缓存）
-├── v8_sprint2.py            # 参数化冲刺引擎（run_v8x）
-├── v8_mixed.py              # 混合引擎：全量池 Top15 主仓 + 固定池卫星
-├── v8_enhance3.py           # 增强引擎（卫星豁免波动 / 动态卫星 / 联动阈值）
-├── v8_lite.py               # ★个人版：自选池内轮动 Top4 + 整手约束 + 动态等权
-├── v8_fund_v5.py            # 基金动量选基（全市场净值池 + MA100 择时 + T+1）
-├── v8_lite_advice.py        # 加减仓建议页生成（模板样式 HTML）
-├── v8_triple_dashboard.py   # 四 tab 看板渲染（个人版/股票/ETF/基金）
-├── v8_daily_update.py       # 一键更新流水线（数据→回测→看板）
-├── v8_etf_run.py            # ETF 独立回测
-└── v8_update.bat            # Windows 计划任务入口
+├── short_engine.py          # ★短线引擎：因子/打分/回测（v2 布林收窄事件 + v3 混合）
+├── v9_auto.py               # ★普适版引擎：全市场自动筛池 + 权限分层回测
+├── v8_selector.py           # 核心引擎：因子计算 + 打分（单日 score_row 供复盘重算）
+├── v8_lite.py               # 个人版引擎（固定池轮动）
+├── build_dual_system.py     # ★主看板构建（三池视图 + 总览 12 卡 + 内嵌日志）
+├── build_enhanced_data.py   # 标的详情数据（enhanced_data.js，含短线分）
+├── build_short_pool.py      # ★短线信号池（calc_signals 支持历史信号日重算）
+├── refresh_daily.py         # ★每日一键刷新（行情→信号→看板→快照→复盘→日志）
+├── update_daily.py          # ★行情真增量更新（扫描滞后→拉最新合并）
+├── review_daily.py          # ★三池复盘引擎（信号→T+1→收益→缺陷检测）
+├── build_log_pages.py       # 独立日志页（review_log.html / changelog.html）
+├── finalize_short_v3.py     # 短线最优参数固化（summary + equity）
+├── split_backtest.py        # 股票按权限分层回测（中长线 + 短线）
+├── etf_opt_v3.py            # ETF 中长线优化（月频 + MA5）
+└── README-公司复现.md       # ★公司从零复现指南
 ```
 
-**五体系定位**：
-
-| 体系 | 范围 | 持仓 | 频率 | 定位 |
-|---|---|---|---|---|
-| **普适版** | 全市场 5307 只自动筛池（股票按权限各10 + ETF10 + 基金10） | Top3 | 月轮动 | **无人工选池**（夏普 1.715，止损4.5%/MA150/动态门槛/RSI<85） |
-| 个人版 | 用户固定池 30 只（20股+ETF4+基金6，不扩充） | Top4 | 月轮动 20 笔/年 | 自选池执行（50 万中性资金，参数化） |
-| ETF 池 | 全市场 1014 只 ETF 动量 Top10 | Top10 | 半年 | 独立策略（+165%，夏普 0.74） |
-| 基金池 | 全市场 14668 只净值动量 Top10 | Top10 | 半年 | 独立策略（+184%，夏普 0.69） |
-| 股票主体系 | 全市场 5307 只 | Top15 + 卫星 | 季度 | 策略研究基准 |
-| ETF | 全市场 888 只 | Top10 | 半年 | 低波动配置 |
-| 基金 | 全市场 16171 只 | Top10 + 卫星 | 半年 | 场外配置 |
-
-## 快速开始
+## 快速开始（日常使用）
 
 ```bash
-# 1. 环境
-pip install akshare pandas numpy
+# 1. 首次：抓数据 + 构建看板（详见 README-公司复现.md）
+python fetch_full_universe.py && python update_daily.py
+python refresh_daily.py --skip-fetch --fund     # 基金净值（约20分钟）
+python build_enhanced_data.py && python build_short_pool.py
+python build_dual_system.py && python build_log_pages.py
 
-# 2. 数据（akshare 全量日线，约 7400 只，首次约 1-2 小时）
-python compile_full_summary.py        # 或自行抓取到 data_full/ 目录
-python build_subsample.py             # （可选）1000 只分层子样本
+# 2. 以后每个交易日收盘后（15:30）
+python refresh_daily.py        # 2-3 分钟：行情增量→短线信号→看板→快照→复盘→日志
 
-# 3. 回测（个人版，15 秒内出结果）
-python -c "
-import sys; sys.path.insert(0,'.')
-import v8_lite as L
-pool = L.build_pool()
-eq, tr = L.run_lite(pool, top_n=4, hold_days=21, use_timing=True, stop_loss=0.10, cash0=500000)
-print(L.V.summary(eq, tr))
-"
-
-# 4. 生成加减仓建议页（08-14 口径示例）
-python v8_lite_advice.py              # → advice_v8lite.html
-
-# 5. 渲染四 tab 看板
-python v8_triple_dashboard.py         # → index.html（个人版默认激活）
-
-# 6. 每日/每月更新
-v8_update.bat                          # 或 schtasks 注册
-
-# 7. 普适版（全自动，无人工选池）
-python -c "
-import v9_auto as A
-eq, tr = A.run_auto(top_n=3, mom_min=0.25, score_min=65, stop_loss=0.045,
-                    dynamic=True, rsi_max=85, ma_window=150)
-print(A.V.summary(eq, tr))             # +839.6% / 夏普 1.715
-"
+# 3. 打开 dual_system.html
+#    左侧导航：监控总览 / 全量池中长线 / 固定池中长线 / 短线（信号池+持仓跟踪）
+#    左下角：📋 复盘日志 / 📝 更新日志
 ```
 
-## 核心规则（个人版 v8-lite）
+## 核心规则（中长线 + 短线）
 
-- **选股**：自选池内四因子打分（动量 35% / MA200 趋势 25% / Aroon 20% / 量价 20%），每月（21 交易日）重排，Top4 持仓
-- **加仓**：只在再平衡日执行，一次性补足目标仓位（总资金/TopN），**信号持续 ≠ 继续加仓**
-- **减仓三闸门**：① 移动止损——持仓峰值回撤 ≥10% 次日卖出 ② 月度换仓——排名跌出 Top4 卖出 ③ 大盘择时——沪深300 < MA200 全部清仓
-- **执行**：T 日收盘信号 → T+1 开盘执行；A 股 T+1；100 股整手；佣金万 2.5 + 印花税
-
-## 周一部署 Checklist（公司落地）
-
-1. `pip install akshare pandas numpy`
-2. 数据：跑 `compile_full_summary.py` 拉全量日线到 `data_full/`（或从公司行情源批量导出同名 CSV：`sh600000.csv` 等，列 `date/open/close/high/low/volume/amount`）
-3. 自选池：修改 `v8_lite.py` 中 `STOCKS / ETFS` 清单（25 只默认）；普适版自动池按权限分层（main/gem/star 各 10 只）由 `build_enhanced_data.py` 的 `V9_TIERS` 自动计算
-4. 验证回测：`python -c "import v8_lite as L; pool=L.build_pool(); print(L.V.summary(*L.run_lite(pool, top_n=4, hold_days=21)))"`
-5. 调度：`schtasks /create /tn v8_dashboard_update /sc monthly /d 1 /st 18:00 /tr "<路径>\v8_update.bat"`
-6. 看板：浏览器打开 `dual_system.html`（监控看板），`history_reports.html`（历史报告总览），`index.html`（回测主看板）
+- **中长线**：T 日收盘四因子打分 → T+1 开盘执行；月轮动（21 交易日）；减仓三闸门（移动止损 / 排名跌出 / 沪深300<MA200 清仓）
+- **短线**：收盘出信号（≥50 分即买入，档位=强买入/买入）→ T+1 开盘执行；**MA5 生命线每日检查**（收盘跌破 → 次日开盘卖）；10 日轮动换仓；ETF 止盈 12%；只做强势市（沪深300>MA20）
+- **口径**：A 股 T+1；100 股整手；佣金万 2.5 + 印花税；基金按 T+1 净值确认
 
 ## 已知限制
 
-- 回测口径：T 日收盘触发 → T+1 开盘成交（止损为当日 close 触发当日 open 成交的近似，影响 <1%）；场外基金为 T+1 净值成交
-- 新浪源 ETF 无复权参数，除权跳变已手工前复权修正；部分 ETF 数据末日与其他标的不同（mark-to-market 已兜底）
-- 回测窗口 2016-01 ~ 2026-08；数据每日更新后重跑
-- 个人版数字含"2026 强势池回测过去"的回顾偏置，外推需谨慎
-- 未建模涨跌停不可成交（影响 <0.2%）
+- 回测口径 T 日收盘触发 → T+1 开盘成交；未建模涨跌停不可成交（影响 <0.2%）
+- 新浪源 ETF 无复权参数，除权跳变已手工前复权修正
+- 回测窗口 2016-01 ~ 2026-08；股票短线高换手，实盘滑点/冲击成本未完全建模
+- 数据（data_full/fund_nav_cache/data_hist，约 1.3GB）不入库，公司复现需重抓或拷贝压缩包
+- 净值型基金（基金池）不适用 MA5 生命线（假跌破频繁止损，收益腰斩）——与中长线基金"择时收紧优于止损"结论一致
 
 ## 历史遗留（legacy/）
 
