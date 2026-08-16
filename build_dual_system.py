@@ -5,7 +5,7 @@
 右上角「标的报告」= 按月分类的历史收盘监控快照（当前页内切换，不新开窗口）；
 左侧导航无独立标的报告入口（同页处理）；左上角板块/行业/档位 select 筛选；
 全量池自动池 = 股票按权限各10 + ETF10 + 基金10；回测参考统一放监控总览。"""
-import json
+import json, re
 from pathlib import Path
 
 BASE = Path(r"C:/Users/XAUTHUB/WorkBuddy/投资/量化权重系统")
@@ -316,6 +316,78 @@ WATCH_CARD = f'''<div class="card" id="watch-card">
 </div>
 <div id="watch-table"></div>
 </div>'''
+
+# ---- 复盘日志 + 更新日志（v5.11.1 内嵌视图：与各池同形态，导航内切换）----
+def md_to_html(md):
+    """轻量 markdown → HTML（标题/表格/列表/粗体/代码/引用），复用主题 .tbl 样式，全部走 CSS 变量"""
+    def inline(s):
+        s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
+        s = re.sub(r"`([^`]+)`", r"<code>\1</code>", s)
+        return s
+    lines = md.splitlines()
+    out, i, n = [], 0, len(lines)
+    while i < n:
+        ln = lines[i]
+        if not ln.strip():
+            i += 1; continue
+        if ln.startswith("|"):
+            tbl = []
+            while i < n and lines[i].startswith("|"):
+                tbl.append(lines[i]); i += 1
+            if len(tbl) >= 2:
+                hdr = [c.strip() for c in tbl[0].strip("|").split("|")]
+                body = [[c.strip() for c in r.strip("|").split("|")] for r in tbl[2:]]
+                out.append('<table class="tbl"><thead><tr>' + "".join(f"<th>{inline(h)}</th>" for h in hdr) + "</tr></thead><tbody>")
+                for r in body:
+                    out.append("<tr>" + "".join(f"<td>{inline(c)}</td>" for c in r) + "</tr>")
+                out.append("</tbody></table>")
+            continue
+        if ln.startswith(("#### ", "### ", "## ", "# ")):
+            out.append(f"<h3>{inline(ln.split(' ', 1)[1])}</h3>"); i += 1; continue
+        if ln.startswith("- "):
+            items = []
+            while i < n and lines[i].startswith("- "):
+                items.append(f"<li>{inline(lines[i][2:])}</li>"); i += 1
+            out.append("<ul>" + "".join(items) + "</ul>"); continue
+        if ln.startswith("> "):
+            q = []
+            while i < n and lines[i].startswith("> "):
+                q.append(inline(lines[i][2:])); i += 1
+            out.append("<blockquote>" + "<br>".join(q) + "</blockquote>"); continue
+        out.append(f"<p>{inline(ln)}</p>"); i += 1
+    return '<div class="rev-md">' + "\n".join(out) + "</div>"
+
+
+REVIEW_DETAILS = {}
+REVIEW_LIST_HTML = ""
+_rf = BASE / "review" / "review_index.json"
+_ridx = json.loads(_rf.read_text(encoding="utf-8")) if _rf.exists() else {"reviews": []}
+for _r in _ridx.get("reviews", []):
+    _f = BASE / "review" / _r["file"]
+    if not _f.exists():
+        continue
+    REVIEW_DETAILS[_r["file"]] = md_to_html(_f.read_text(encoding="utf-8"))
+    _flag = "🔴" if _r.get("defects", 0) > 0 else "✅"
+    REVIEW_LIST_HTML += (f'<button class="rev-btn" onclick="openRev(\'{_r["file"]}\')">{_flag} {_r["date"]}'
+                         f'（信号 {_r["sig"]} · {_r["n"]} 只 · 胜率 {_r.get("win_rate", 0)}% · 缺陷 {_r.get("defects", 0)} 项）</button>\n')
+if not REVIEW_LIST_HTML:
+    REVIEW_LIST_HTML = '<div class="sub" style="color:var(--faint)">暂无复盘记录 —— 每天收盘后运行 <code>python refresh_daily.py</code> 自动生成</div>'
+
+CHANGELOG_HTML = ""
+_cf = BASE / "changelog.md"
+if _cf.exists():
+    _ct = _cf.read_text(encoding="utf-8")
+    _cards = []
+    for _seg in re.split(r"\n## ", "\n" + _ct)[1:]:
+        _title = _seg.splitlines()[0].strip()
+        _body = "\n".join(_seg.splitlines()[1:]).strip()
+        _m = re.match(r"(v[\d.]+)\s*-\s*([\d-]+)", _title)
+        _ver = _m.group(1) if _m else _title
+        _date = _m.group(2) if _m else ""
+        _cards.append(f'<div class="rel-card"><div class="rel-head"><span class="rel-ver">{_ver}</span>'
+                      f'<span class="rel-date">{_date}</span></div><div class="rel-body">{md_to_html(_body)}</div></div>')
+    CHANGELOG_HTML = "\n".join(_cards)
+
 html = f"""<!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -347,6 +419,26 @@ html = f"""<!doctype html>
 .bt-card .bt-head{{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:15px}}
 .bt-card .bt-tag{{font-size:11px;color:var(--faint);background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2px 10px}}
 .bt-card .bt-curve{{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:6px;margin-top:10px}}
+/* 日志视图（内嵌，主题变量驱动） */
+.rev-btns{{display:flex;flex-wrap:wrap;gap:10px}}
+.rev-btn{{display:inline-block;padding:9px 16px;border-radius:10px;background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit}}
+.rev-btn:hover{{border-color:var(--accent);color:var(--accent)}}
+.rev-btn.active{{border-color:var(--accent);color:var(--accent);background:var(--card)}}
+#rev-detail{{display:none}}
+#rev-detail.active{{display:block}}
+#rev-detail-body .tbl{{width:100%;font-size:12px}}
+.rel-card{{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:14px}}
+.rel-head{{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}}
+.rel-ver{{font-weight:700;font-size:16px;color:var(--accent);letter-spacing:.5px}}
+.rel-date{{color:var(--faint);font-size:12px;background:var(--card);border:1px solid var(--border);padding:2px 10px;border-radius:20px}}
+.rel-body{{color:var(--text);font-size:13px;line-height:1.75}}
+.rel-body ul{{margin:6px 0 6px 18px;padding:0}}
+.rel-body li{{margin:4px 0}}
+.rel-body b{{color:var(--text)}}
+.rev-md h3{{font-size:15px;margin:16px 0 8px;color:var(--text)}}
+.rev-md h4{{font-size:14px;margin:12px 0 6px;color:var(--text)}}
+.rev-md p{{margin:6px 0;color:var(--text)}}
+.rev-md blockquote{{background:var(--card2);border-left:3px solid var(--accent);padding:8px 12px;margin:8px 0;border-radius:0 8px 8px 0;color:var(--sub)}}
 /* 持仓跟踪 */
 .watch-bar{{display:flex;gap:10px;align-items:center;margin-bottom:12px}}
 .watch-bar input{{flex:1;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:8px 12px;font-size:13px;font-family:inherit}}
@@ -439,6 +531,28 @@ html = f"""<!doctype html>
 </div>
 </div>
 
+<!-- ============ 视图 E：复盘日志（内嵌，与各池同形态） ============ -->
+<div class="view" id="view-review">
+<div class="card">
+<h2>📋 复盘日志 <span class="badge badge-auto">{len(REVIEW_DETAILS)} 篇</span></h2>
+<div class="sub">每个交易日复盘：信号标的哪些吃到 / 哪些被套 / 是否符合系统设计（对比回测基准）· 发现设计缺陷 → 启动系统更新并登记于「📝 更新日志」· 点击下方条目展开当日复盘详情</div>
+<div class="rev-btns">{REVIEW_LIST_HTML}</div>
+</div>
+<div class="card" id="rev-detail">
+<h2>📋 复盘详情</h2>
+<div id="rev-detail-body"></div>
+</div>
+</div>
+
+<!-- ============ 视图 F：更新日志（内嵌，GitHub release 风格） ============ -->
+<div class="view" id="view-changelog">
+<div class="card">
+<h2>📝 更新日志 <span class="badge badge-auto">GitHub Release 风格</span></h2>
+<div class="sub">版本 / 日期 / 更新内容 —— 复盘发现系统设计缺陷 → 启动量化系统更新 → 在此登记</div>
+{CHANGELOG_HTML}
+</div>
+</div>
+
 </div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
@@ -451,6 +565,21 @@ html = f"""<!doctype html>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
 window.ENH.nav = [["overview","📊","监控总览"],["sys-auto","🅰️","全量池中/长线"],["sys-lite","🅱️","固定池中/长线"],["short","⚡","全量池短线"],["review","📋","复盘日志"],["changelog","📝","更新日志"]];
+var REV_DETAILS={json.dumps(REVIEW_DETAILS, ensure_ascii=False)};
+function openRev(file){{
+  var d=document.getElementById('rev-detail-body');if(!d)return;
+  d.innerHTML=REV_DETAILS[file]||'<div class="sub">详情缺失</div>';
+  document.getElementById('rev-detail').classList.add('active');
+  document.querySelectorAll('.rev-btn').forEach(function(b){{
+    b.classList.toggle('active',(b.getAttribute('onclick')||'').indexOf(file)>=0);
+  }});
+  document.getElementById('rev-detail').scrollIntoView({{behavior:'smooth',block:'start'}});
+}}
+/* 进入复盘视图自动展开最新一篇 */
+(function(){{
+  var ks=Object.keys(REV_DETAILS||{{}});
+  if(ks.length)openRev(ks[0]);
+}})();
 /* 视图切换模式：滚动不更新导航高亮（COMMON_JS renderSidenav 检测此标志） */
 window.ENH.NAV_SWITCH = true;
 /* 三池回测净值（股票/ETF/基金，监控总览展示） */
@@ -505,10 +634,8 @@ function renderSubCurve(){{
   renderOneCurve('curve-short-fund', C.short_fund, '#3b82f6', '基金短线', '+'+{ss_fund["total_return_pct"]:.0f});
 }}
 /* 视图切换（hash 驱动：切换时更新 location.hash，加载/前进后退时按 hash 定位） */
-var VIEW_MAP={{'overview':'view-overview','sys-auto':'view-auto','sys-lite':'view-lite','short':'view-short','snapshot':'view-snapshot'}};
+var VIEW_MAP={{'overview':'view-overview','sys-auto':'view-auto','sys-lite':'view-lite','short':'view-short','snapshot':'view-snapshot','review':'view-review','changelog':'view-changelog'}};
 function switchView(key){{
-  if(key==='review'){{window.location.href='review_log.html';return;}}
-  if(key==='changelog'){{window.location.href='changelog.html';return;}}
   var v=VIEW_MAP[key];if(!v)return;
   document.querySelectorAll('.view').forEach(function(x){{x.classList.remove('active');}});
   document.getElementById(v).classList.add('active');

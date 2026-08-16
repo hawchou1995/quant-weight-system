@@ -42,7 +42,7 @@ def build_review_log():
 .rev-btn:hover{{border-color:var(--accent);color:var(--accent)}}
 #rev-viewer{{display:none;margin-top:18px}}
 #rev-viewer.active{{display:block}}
-#rev-viewer iframe{{width:100%;height:760px;border:1px solid var(--border);border-radius:12px;background:#0f1115}}
+#rev-viewer iframe{{width:100%;height:760px;border:1px solid var(--border);border-radius:12px;background:var(--card)}}
 .scroll-fab{{position:fixed;right:22px;bottom:22px;display:flex;flex-direction:column;gap:8px;z-index:950}}
 .scroll-fab button{{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);font-family:inherit}}
 </style></head><body>
@@ -69,7 +69,7 @@ function openRev(file){{
   v.classList.add('active');
   document.getElementById('rev-viewer-title').textContent='📋 复盘 '+file.replace('.md','').replace('_sig','（信号 ');
   document.getElementById('rev-viewer-body').innerHTML=
-    '<iframe src="review/'+file+'" style="width:100%;height:760px;border:1px solid var(--border);border-radius:12px;background:#0f1115"></iframe>';
+    '<iframe src="review/'+file+'" style="width:100%;height:760px;border:1px solid var(--border);border-radius:12px;background:var(--card)"></iframe>';
   v.scrollIntoView({{behavior:'smooth',block:'start'}});
 }}
 window.switchView=function(key){{
