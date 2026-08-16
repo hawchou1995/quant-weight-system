@@ -140,7 +140,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 .rev-btn:hover{border-color:var(--accent);color:var(--accent)}
 #rev-viewer{display:none;margin-top:18px}
 #rev-viewer.active{display:block}
-#rev-viewer iframe{width:100%;height:760px;border:1px solid var(--border);border-radius:12px;background:#0f1115}
+#rev-viewer iframe{width:100%;height:760px;border:1px solid var(--border);border-radius:12px;background:var(--card)}
 .scroll-fab{position:fixed;right:22px;bottom:22px;display:flex;flex-direction:column;gap:8px;z-index:950}
 .scroll-fab button{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);font-family:inherit}
 </style></head><body>
@@ -165,7 +165,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 <div class="sub">每交易日复盘：信号标的哪些吃到 / 哪些被套 / 是否符合系统设计 / 缺陷检测（grill）· 发现设计缺陷 → 启动系统更新并记录于更新日志</div>
 
-<div class="rev-btns"><a class="rev-btn" href="javascript:void(0)" onclick="openRev('2026-08-14_sig2026-08-13.md')">✅ 2026-08-14（信号 2026-08-13 · 20 只 · 胜率 40.0% · 缺陷 0 项）</a></div>
+<div class="rev-btns"><a class="rev-btn" href="javascript:void(0)" onclick="openRev('2026-08-14_sig2026-08-13.md')">✅ 2026-08-14（信号 2026-08-13 · 88 只 · 胜率 64.9% · 缺陷 0 项）</a></div>
 </div>
 <div class="card" id="rev-viewer">
 <h2 id="rev-viewer-title">📋 复盘详情</h2>
@@ -183,7 +183,7 @@ function openRev(file){
   v.classList.add('active');
   document.getElementById('rev-viewer-title').textContent='📋 复盘 '+file.replace('.md','').replace('_sig','（信号 ');
   document.getElementById('rev-viewer-body').innerHTML=
-    '<iframe src="review/'+file+'" style="width:100%;height:760px;border:1px solid var(--border);border-radius:12px;background:#0f1115"></iframe>';
+    '<iframe src="review/'+file+'" style="width:100%;height:760px;border:1px solid var(--border);border-radius:12px;background:var(--card)"></iframe>';
   v.scrollIntoView({behavior:'smooth',block:'start'});
 }
 window.switchView=function(key){
@@ -228,6 +228,8 @@ function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)retu
   window.ENH.nav.forEach(function(it){
     html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"><span class="ic">'+it[1]+'</span>'+it[2]+'</a>';});
   html+='<div class="sn-sep"></div><div class="sn-foot">'+
+    '<a href="javascript:void(0)" data-anchor="review"><span class="ic">📋</span>复盘日志</a>'+
+    '<a href="javascript:void(0)" data-anchor="changelog"><span class="ic">📝</span>更新日志</a>'+
     '<a href="https://qingju.me/" target="_blank" rel="noopener"><span class="ic">💬</span>青橘社区</a></div>';
   nav.innerHTML=html;
   document.body.classList.add('sidenav-open');
