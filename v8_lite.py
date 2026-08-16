@@ -53,7 +53,7 @@ def build_pool(verbose=True):
     return pool
 
 
-def run_lite(pool, top_n=8, hold_days=42, use_timing=True, stop_loss=0.10,
+def run_lite(pool, top_n=8, hold_days=42, use_timing=True, stop_loss=0.10, slippage_bps=0,
              min_price=1.0, cash0=CASH0, verbose=False):
     """池内轮动 + 整手约束 + 价格过滤"""
     idx = V.load_index(200).set_index("date")
@@ -98,6 +98,7 @@ def run_lite(pool, top_n=8, hold_days=42, use_timing=True, stop_loss=0.10,
                 px = open_px.get(code)
                 if px is None or pd.isna(px) or px <= 0:
                     continue
+                px = px * (1 - slippage_bps / 10000)   # 卖出滑点
                 sh = holdings.pop(code)
                 peak_price.pop(code, None)
                 tax = sh * px * V.SELL_TAX
@@ -123,6 +124,7 @@ def run_lite(pool, top_n=8, hold_days=42, use_timing=True, stop_loss=0.10,
                     px = open_px.get(code)
                     if px is None or pd.isna(px) or px <= 0:
                         continue
+                    px = px * (1 + slippage_bps / 10000)   # 买入滑点
                     # 整手买入：动态等权目标金额 + 现金自然约束
                     lot = 100
                     n_lots = int(budget / (px * lot * (1 + V.COMMISSION)))

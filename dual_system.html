@@ -253,6 +253,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class="card" id="bt-all">
 <h2>📊 回测参考 <span class="badge badge-auto">中/长线 · 股票按权限分层</span></h2>
 <div class="sub">股票 = 绝对规则筛池 Top3 · 月轮动 · 按权限<b>互斥分层</b>（一体/纯主板/纯创业板/纯科创板，各池独立回测）｜ ETF = 动量轮动 ｜ 基金 = 净值动量轮动 —— 各池严格分开</div>
+<div class="sub" style="color:var(--sub)">💧 <b>滑点敏感性</b>（每边，sweep_ml_slip.py 扫描）：中长线换手低、影响显著小于短线 —— 股票 20bps 收益 -23%（夏普 1.58→1.43）、30bps -31% ｜ 固定池 20bps -13%、30bps -18% ｜ ETF 中长线 20bps -44%（年 33 笔基数低，绝对收益仍 +63%）、30bps -62% —— 实盘 10-20bps 区间内中长线策略稳健</div>
 <div class="bt-grid"><div class="bt-card" id="bt-stock-all">
 <div class="bt-head"><b>📈 股票 一体（全A）</b><span class="bt-tag">T3/m25/s65/SL5.5/MA150 择时</span></div>
 <div class="kpis">
@@ -4971,7 +4972,9 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class="card">
 <h2>📝 更新日志 <span class="badge badge-auto">GitHub Release 风格</span></h2>
 <div class="sub">版本 / 日期 / 更新内容 —— 复盘发现系统设计缺陷 → 启动量化系统更新 → 在此登记</div>
-<details class="rel-item" open><summary><span class="rel-ver">v5.11.6</span><span class="rel-date">2026-08-16</span></summary><div class="rel-body"><div class="rev-md"><p><b>滑点/冲击成本建模（用户反馈驱动）</b></p>
+<details class="rel-item" open><summary><span class="rel-ver">v5.11.7</span><span class="rel-date">2026-08-16</span></summary><div class="rel-body"><div class="rev-md"><p><b>滑点稳健参数优化 + 复盘累计总览 + HTML 同步（用户反馈驱动）</b></p>
+<ul><li>滑点稳健扫描（slip_opt_grid.json，H×S 网格 × slip0/20）：<b>股票 S50→S55</b>（20bps 夏普 1.69→1.75、回撤 -8.7%→-7.1%；理想口径也提升 2.29→2.38）｜ ETF S50→S55 ｜ <b>基金 H5→H10 换手减半</b>（A类30bps +10.6%→+90.7%；C类5bps +205%→+243.5%）——换手率是滑点影响的第一杠杆</li><li>固化双口径：finalize_short_v3.py 输出理想 + 含滑点两套 summary/equity；<b>看板短线卡主显含滑点口径</b>（股票 +315.7%/1.75、ETF +103.3%/1.00、基金 C类 +243.5%/0.83，标签注明）</li><li>分层回测同步：split_backtest.py 短线改 S55 + 20bps 重跑（一体 +357.0% / 主板 +318.9% / 创业板 +458.4% / 科创板 +161.9%）——修复分层卡旧参数残留</li><li>复盘日志新增<b>累计总览</b>：解析各篇 md 总览表累加（天然防重），md 内"📈 累计总览（自首篇以来）"节 + review/cumulative.json</li></ul></div></div></details>
+<details class="rel-item"><summary><span class="rel-ver">v5.11.6</span><span class="rel-date">2026-08-16</span></summary><div class="rel-body"><div class="rev-md"><p><b>滑点/冲击成本建模（用户反馈驱动）</b></p>
 <ul><li>run_short/run_squeeze 加 slippage_bps 参数（每边：买入价上浮、卖出价下浮；基金=T+1 净值申赎费口径）</li><li>sweep_slip.py 敏感性扫描（三池最优参数 × 滑点网格）：<b>股票 10/20/30bps → +462%/+331%/+231%（夏普 1.99/1.69/1.39）</b>——高换手策略对滑点承受力强，实盘预期区间明确 ｜ ETF 10bps → +162%（30bps 以上失效）｜ <b>基金 30bps 申赎费下 +273%→+11% 归零——场外基金短线必须 C 类份额</b>（重要实盘结论）</li><li>看板短线区加滑点敏感性说明；README 已知限制更新（佣金万2.5+印花税万5 原本已含）</li></ul></div></div></details>
 <details class="rel-item"><summary><span class="rel-ver">v5.11.5</span><span class="rel-date">2026-08-16</span></summary><div class="rel-body"><div class="rev-md"><p><b>README 全面更新（用户反馈驱动）</b></p>
 <ul><li>修复：根目录 README.md 长期停留在 v8 描述（缺 v5.9-v5.11.4 全部内容）——重写为 v5.11.4 全量文档（三池监控/两套体系/复盘闭环/版本历程/核心文件/快速开始/已知限制）</li></ul></div></div></details>

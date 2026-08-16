@@ -13,7 +13,7 @@ import v8_selector as V
 import etf_opt_v2 as E2   # 复用 rsrs/slope/pool/run_etf_v2
 
 
-def run_etf_v3(pool, mom_type="mom20", top_n=5, hold_days=63, stop_loss=0.10,
+def run_etf_v3(pool, mom_type="mom20", top_n=5, hold_days=63, stop_loss=0.10, slippage_bps=0,
                freeze=0, mom_thresh=0.0, ma5_exit=True, use_timing=True, ma_win=150,
                cash0=1_000_000, min_amt=1e6, min_px=0.5, max_vol=0.60):
     """ETF 中长线 v3 = v2 逻辑 + MA5 生命线每日止损"""
@@ -60,6 +60,7 @@ def run_etf_v3(pool, mom_type="mom20", top_n=5, hold_days=63, stop_loss=0.10,
                 px = open_px.get(code)
                 if px is None or pd.isna(px) or px <= 0:
                     continue
+                px = px * (1 - slippage_bps / 10000)   # 卖出滑点
                 sh = holdings.pop(code)
                 tax = sh * px * V.SELL_TAX
                 proceeds = sh * px * (1 - V.COMMISSION) - tax
@@ -81,6 +82,7 @@ def run_etf_v3(pool, mom_type="mom20", top_n=5, hold_days=63, stop_loss=0.10,
                     px = open_px.get(code)
                     if px is None or pd.isna(px) or px <= 0:
                         continue
+                    px = px * (1 + slippage_bps / 10000)   # 买入滑点
                     sh = int(per_target / (px * (1 + V.COMMISSION)))
                     if sh > 0 and sh * px * (1 + V.COMMISSION) <= cash:
                         cash -= sh * px * (1 + V.COMMISSION)

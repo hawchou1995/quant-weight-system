@@ -50,7 +50,7 @@ def board_filter(code, perm="all"):
     return False
 
 
-def run_auto(top_n=4, hold_days=21, pool_size=25, stop_loss=0.10, cash0=500000,
+def run_auto(top_n=4, hold_days=21, pool_size=25, stop_loss=0.10, cash0=500000, slippage_bps=0,
              mom_min=0.15, score_min=60, use_timing=True, sell_score=0,
              dynamic=False, rsi_max=None, ma_window=200, vol_target=None, perm="all"):
     idx = V.load_index(200).set_index('date')
@@ -86,6 +86,7 @@ def run_auto(top_n=4, hold_days=21, pool_size=25, stop_loss=0.10, cash0=500000,
                 if code not in holdings: continue
                 px = open_px.get(code)
                 if px is None or pd.isna(px) or px <= 0: continue
+                px = px * (1 - slippage_bps / 10000)   # 卖出滑点
                 sh = holdings.pop(code); peak.pop(code, None)
                 tax = sh * px * V.SELL_TAX
                 proceeds = sh * px * (1 - V.COMMISSION) - tax
@@ -112,6 +113,7 @@ def run_auto(top_n=4, hold_days=21, pool_size=25, stop_loss=0.10, cash0=500000,
                     if code in holdings: continue
                     px = open_px.get(code)
                     if px is None or pd.isna(px) or px <= 0: continue
+                    px = px * (1 + slippage_bps / 10000)   # 买入滑点
                     lot = 100
                     n_lots = int(budget / (px * lot * (1 + V.COMMISSION)))
                     if n_lots < 1: continue

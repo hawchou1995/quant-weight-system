@@ -1,0 +1,104 @@
+{
+  "v9": {
+    "0": {
+      "total_return_pct": 825.03,
+      "annual_return_pct": 23.33,
+      "max_drawdown_pct": -13.31,
+      "sharpe": 1.577,
+      "win_rate_pct": 49.2,
+      "total_trades": 183.0
+    },
+    "10": {
+      "total_return_pct": 741.3,
+      "annual_return_pct": 22.23,
+      "max_drawdown_pct": -14.37,
+      "sharpe": 1.509,
+      "win_rate_pct": 48.6,
+      "total_trades": 183.0
+    },
+    "20": {
+      "total_return_pct": 638.1,
+      "annual_return_pct": 20.73,
+      "max_drawdown_pct": -15.45,
+      "sharpe": 1.427,
+      "win_rate_pct": 47.5,
+      "total_trades": 183.0
+    },
+    "30": {
+      "total_return_pct": 569.84,
+      "annual_return_pct": 19.63,
+      "max_drawdown_pct": -16.46,
+      "sharpe": 1.36,
+      "win_rate_pct": 47.0,
+      "total_trades": 183.0
+    }
+  },
+  "v8": {
+    "0": {
+      "total_return_pct": 1198.72,
+      "annual_return_pct": 27.34,
+      "max_drawdown_pct": -23.09,
+      "sharpe": 1.355,
+      "win_rate_pct": 52.5,
+      "total_trades": 122.0
+    },
+    "10": {
+      "total_return_pct": 1119.76,
+      "annual_return_pct": 26.59,
+      "max_drawdown_pct": -23.97,
+      "sharpe": 1.324,
+      "win_rate_pct": 50.8,
+      "total_trades": 122.0
+    },
+    "20": {
+      "total_return_pct": 1047.01,
+      "annual_return_pct": 25.86,
+      "max_drawdown_pct": -24.61,
+      "sharpe": 1.294,
+      "win_rate_pct": 48.4,
+      "total_trades": 122.0
+    },
+    "30": {
+      "total_return_pct": 981.72,
+      "annual_return_pct": 25.16,
+      "max_drawdown_pct": -26.34,
+      "sharpe": 1.264,
+      "win_rate_pct": 48.4,
+      "total_trades": 122.0
+    }
+  },
+  "etf": {
+    "0": {
+      "total_return_pct": 112.88,
+      "annual_return_pct": 7.38,
+      "max_drawdown_pct": -7.69,
+      "sharpe": 1.148,
+      "win_rate_pct": 48.7,
+      "total_trades": 335.0
+    },
+    "10": {
+      "total_return_pct": 86.18,
+      "annual_return_pct": 6.03,
+      "max_drawdown_pct": -10.72,
+      "sharpe": 0.945,
+      "win_rate_pct": 44.8,
+      "total_trades": 335.0
+    },
+    "20": {
+      "total_return_pct": 62.83,
+      "annual_return_pct": 4.7,
+      "max_drawdown_pct": -13.69,
+      "sharpe": 0.743,
+      "win_rate_pct": 40.6,
+      "total_trades": 335.0
+    },
+    "30": {
+      "total_return_pct": 42.41,
+      "annual_return_pct": 3.39,
+      "max_drawdown_pct": -16.56,
+      "sharpe": 0.544,
+      "win_rate_pct": 36.7,
+      "total_trades": 335.0
+    }
+  }
+}

@@ -249,6 +249,7 @@ def bt_all_html():
     return ('<div class="card" id="bt-all">\n'
             '<h2>📊 回测参考 <span class="badge badge-auto">中/长线 · 股票按权限分层</span></h2>\n'
             '<div class="sub">股票 = 绝对规则筛池 Top3 · 月轮动 · 按权限<b>互斥分层</b>（一体/纯主板/纯创业板/纯科创板，各池独立回测）｜ ETF = 动量轮动 ｜ 基金 = 净值动量轮动 —— 各池严格分开</div>\n'
+            '<div class="sub" style="color:var(--sub)">💧 <b>滑点敏感性</b>（每边，sweep_ml_slip.py 扫描）：中长线换手低、影响显著小于短线 —— 股票 20bps 收益 -23%（夏普 1.58→1.43）、30bps -31% ｜ 固定池 20bps -13%、30bps -18% ｜ ETF 中长线 20bps -44%（年 33 笔基数低，绝对收益仍 +63%）、30bps -62% —— 实盘 10-20bps 区间内中长线策略稳健</div>\n'
             '<div class="bt-grid">' + cards + '</div>\n</div>')
 
 
