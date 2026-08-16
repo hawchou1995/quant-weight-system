@@ -167,20 +167,27 @@ def load_curve_norm(f):
 v_etf = load_curve_norm("etf_v3_final_equity.csv")
 v_fund = load_curve_norm("v8_fund_equity.csv")
 # 短线净值曲线（短线体系 v3 最优）
-v_short_etf = load_curve_norm("short_v3_etf_equity.csv")
-v_short_fund = load_curve_norm("short_v3_fund_equity.csv")
-v_short_stock = load_curve_norm("short_v3_stock_equity.csv")
+v_short_etf = load_curve_norm("short_v3_etf_slip20_equity.csv")
+v_short_fund = load_curve_norm("short_v3_fund_slip20_equity.csv")
+v_short_stock = load_curve_norm("short_v3_stock_slip20_equity.csv")
 # 分层净值曲线（v5.9：中长线 v9split + 短线 shortsplit，按权限互斥）
 _SPLIT_GROUPS = ["all", "main_only", "gem_only", "star_only"]
 v9split_curves = {g: load_curve_norm(f"v9split_{g}_equity.csv") for g in _SPLIT_GROUPS}
 shortsplit_curves = {g: load_curve_norm(f"shortsplit_{g}_equity.csv") for g in _SPLIT_GROUPS}
-# 短线 v3 最优 summary（看板 KPI 卡读这里，不再用穷举中间结果）
-ss_stock = json.load(open(BASE / "short_v3_stock_summary.json", encoding="utf-8"))["summary"]
-ss_etf = json.load(open(BASE / "short_v3_etf_summary.json", encoding="utf-8"))["summary"]
-ss_fund = json.load(open(BASE / "short_v3_fund_summary.json", encoding="utf-8"))["summary"]
-ss_stock_tag = json.load(open(BASE / "short_v3_stock_summary.json", encoding="utf-8"))["params"]
-ss_etf_tag = json.load(open(BASE / "short_v3_etf_summary.json", encoding="utf-8"))["params"]
-ss_fund_tag = json.load(open(BASE / "short_v3_fund_summary.json", encoding="utf-8"))["params"]
+# 短线 v3 最优 summary（v5.11.7 起主显含滑点口径 slip20，fallback 0 滑点理想口径）
+def _ss(asset):
+    f = BASE / f"short_v3_{asset}_slip20_summary.json"
+    if f.exists():
+        return json.load(open(f, encoding="utf-8"))
+    return json.load(open(BASE / f"short_v3_{asset}_summary.json", encoding="utf-8"))
+
+_ss_s, _ss_e, _ss_f = _ss("stock"), _ss("etf"), _ss("fund")
+ss_stock = _ss_s["summary"]
+ss_etf = _ss_e["summary"]
+ss_fund = _ss_f["summary"]
+ss_stock_tag = _ss_s["params"] + f" · 含{_ss_s.get('slippage_bps', 0)}bps滑点"
+ss_etf_tag = _ss_e["params"] + f" · 含{_ss_e.get('slippage_bps', 0)}bps滑点"
+ss_fund_tag = _ss_f["params"] + f" · 含{_ss_f.get('slippage_bps', 0)}bps滑点"
 
 
 # ---- v5.9 分层回测（股票按权限互斥：一体/主板/创业板/科创板）----

@@ -1,13 +1,14 @@
 {
   "strategy": "shortsplit_main_only",
   "label": "纯主板",
-  "params": "T10/H10/S50 反转+MA5/MA30门控",
+  "params": "T10/H10/S55 反转+MA5/MA30门控 · 含20bps滑点",
+  "slippage_bps": 20,
   "summary": {
-    "total_return_pct": 676.15,
-    "annual_return_pct": 21.31,
-    "max_drawdown_pct": -8.61,
-    "sharpe": 2.347,
-    "win_rate_pct": 53.6,
-    "total_trades": 1313
+    "total_return_pct": 318.88,
+    "annual_return_pct": 14.46,
+    "max_drawdown_pct": -6.24,
+    "sharpe": 1.805,
+    "win_rate_pct": 46.8,
+    "total_trades": 1266
   }
 }

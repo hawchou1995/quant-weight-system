@@ -69,7 +69,7 @@ def _board_ok(code, group):
 
 
 def short_split():
-    # 股票池按板块分组建池（v3 短线参数：T10/H10/S50 反转 + MA5）
+    # 股票池按板块分组建池（v5.11.7 滑点稳健参数：T10/H10/S55 反转 + MA5，含 20bps 滑点）
     t0 = time.time()
     all_pool = S.load_stock_pool()
     print(f"全股票池 {len(all_pool)} 只 ({time.time()-t0:.0f}s)", flush=True)
@@ -78,11 +78,11 @@ def short_split():
         print(f"短线[{group}] {label}: 池 {len(pool)} 只", flush=True)
         S.short_score = _rev  # 反转版
         t1 = time.time()
-        eq, tr = S.run_short(pool, top_n=10, hold_days=10, score_min=50,
-                             ma5_exit=True, ma_win=30)
+        eq, tr = S.run_short(pool, top_n=10, hold_days=10, score_min=55,
+                             ma5_exit=True, ma_win=30, slippage_bps=20)
         s = V.summary(eq, tr)
         out = {"strategy": f"shortsplit_{group}", "label": label,
-               "params": "T10/H10/S50 反转+MA5/MA30门控", "summary": s}
+               "params": "T10/H10/S55 反转+MA5/MA30门控 · 含20bps滑点", "slippage_bps": 20, "summary": s}
         json.dump(out, open(BASE / f"shortsplit_{group}_summary.json", "w", encoding="utf-8"),
                   ensure_ascii=False, indent=2)
         eq.to_csv(BASE / f"shortsplit_{group}_equity.csv", index=False)

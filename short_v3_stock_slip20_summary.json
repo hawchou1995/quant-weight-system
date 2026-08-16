@@ -1,0 +1,13 @@
+{
+  "strategy": "short_v3_stock_slip20",
+  "params": "T10/H10/S55 · 反转+MA5",
+  "slippage_bps": 20,
+  "summary": {
+    "total_return_pct": 315.72,
+    "annual_return_pct": 14.37,
+    "max_drawdown_pct": -7.08,
+    "sharpe": 1.746,
+    "win_rate_pct": 47.2,
+    "total_trades": 1285
+  }
+}

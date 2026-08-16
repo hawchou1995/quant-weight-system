@@ -1,0 +1,54 @@
+{
+  "since": "2026-08-14",
+  "count": 1,
+  "pools": {
+    "全量池中/长线": {
+      "n": 33,
+      "buy": 31,
+      "wins": 26,
+      "losses": 5,
+      "flat": 0,
+      "sum_pct": 131.75
+    },
+    "固定池中/长线": {
+      "n": 25,
+      "buy": 13,
+      "wins": 7,
+      "losses": 5,
+      "flat": 1,
+      "sum_pct": 8.06
+    },
+    "短线全量池": {
+      "n": 30,
+      "buy": 30,
+      "wins": 15,
+      "losses": 5,
+      "flat": 10,
+      "sum_pct": 30.6
+    },
+    "短线·股票": {
+      "n": 10,
+      "buy": 10,
+      "wins": 8,
+      "losses": 2,
+      "flat": 0,
+      "sum_pct": 29.6
+    },
+    "短线·ETF": {
+      "n": 10,
+      "buy": 10,
+      "wins": 7,
+      "losses": 3,
+      "flat": 0,
+      "sum_pct": 1.0
+    },
+    "短线·基金": {
+      "n": 10,
+      "buy": 10,
+      "wins": 0,
+      "losses": 10,
+      "flat": 0,
+      "sum_pct": 0.0
+    }
+  }
+}

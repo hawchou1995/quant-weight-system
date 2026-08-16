@@ -1,12 +1,13 @@
 {
   "strategy": "short_v3_etf",
-  "params": "T10/H10/S50 · 动量+MA5+止盈12%",
+  "params": "T10/H10/S55 · 动量+MA5+止盈12%",
+  "slippage_bps": 0,
   "summary": {
-    "total_return_pct": 239.21,
-    "annual_return_pct": 12.2,
+    "total_return_pct": 243.76,
+    "annual_return_pct": 12.34,
     "max_drawdown_pct": -9.25,
-    "sharpe": 1.737,
-    "win_rate_pct": 54.3,
-    "total_trades": 1261
+    "sharpe": 1.753,
+    "win_rate_pct": 54.8,
+    "total_trades": 1198
   }
 }

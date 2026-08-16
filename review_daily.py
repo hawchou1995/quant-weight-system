@@ -81,6 +81,68 @@ def pool_codes(details, tag):
     return [c for c, d in details.items() if d.get("pool") == tag]
 
 
+def parse_pool_rows(md_text):
+    """解析单篇复盘 md 总览表的各池行 → {池名: {n, buy, wins, losses, flat, avg}}"""
+    rows, in_table = {}, False
+    for ln in md_text.splitlines():
+        if ln.startswith("| 池 |"):
+            in_table = True
+            continue
+        if in_table and ln.startswith("|"):
+            cells = [c.strip() for c in ln.strip("|").split("|")]
+            if len(cells) >= 8 and not cells[0].startswith("**"):
+                try:
+                    rows[cells[0]] = {
+                        "n": int(cells[1]), "buy": int(cells[2]), "wins": int(cells[3]),
+                        "losses": int(cells[4]), "flat": int(cells[5]),
+                        "avg": float(cells[7].replace("%", "").replace("+", "")),
+                    }
+                except (ValueError, IndexError):
+                    continue
+        elif in_table and not ln.startswith("|"):
+            break
+    return rows
+
+
+def build_cumulative():
+    """从 review_index.json 各篇 md 解析累加 → 自复盘以来累计统计（天然防重：同篇只解析一次）"""
+    idx_f = REVIEW_DIR / "review_index.json"
+    idx = json.load(open(idx_f, encoding="utf-8")) if idx_f.exists() else {"reviews": []}
+    acc = {}
+    for r in idx.get("reviews", []):
+        f = REVIEW_DIR / r["file"]
+        if not f.exists():
+            continue
+        for name, v in parse_pool_rows(f.read_text(encoding="utf-8")).items():
+            a = acc.setdefault(name, {"n": 0, "buy": 0, "wins": 0, "losses": 0, "flat": 0, "sum_pct": 0.0})
+            a["n"] += v["n"]; a["buy"] += v["buy"]; a["wins"] += v["wins"]
+            a["losses"] += v["losses"]; a["flat"] += v["flat"]; a["sum_pct"] += v["avg"] * v["buy"]
+    out = {"since": idx["reviews"][-1]["date"] if idx.get("reviews") else None,
+           "count": len(idx.get("reviews", [])), "pools": acc}
+    json.dump(out, open(REVIEW_DIR / "cumulative.json", "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    return out
+
+
+def cumulative_md(cum):
+    """累计总览 → md 表格"""
+    lines = [f"### 📈 累计总览（自 {cum['since']} 首篇复盘以来，共 {cum['count']} 篇）",
+             "| 池 | 累计标的 | 累计买入 | 🟢吃到 | 🔴被套 | ⚪持平 | 累计胜率 | 累计平均收益 |",
+             "|---|---|---|---|---|---|---|---|"]
+    t = {"n": 0, "buy": 0, "wins": 0, "losses": 0, "flat": 0, "sum_pct": 0.0}
+    for name, a in cum["pools"].items():
+        wr = a["wins"] / a["buy"] * 100 if a["buy"] else 0
+        avg = a["sum_pct"] / a["buy"] if a["buy"] else 0
+        lines.append(f"| {name} | {a['n']} | {a['buy']} | {a['wins']} | {a['losses']} | {a['flat']} | "
+                     f"{wr:.0f}% | {avg:+.2f}% |")
+        for k in t:
+            t[k] += a[k]
+    if t["buy"]:
+        lines.append(f"| **合计** | {t['n']} | {t['buy']} | {t['wins']} | {t['losses']} | {t['flat']} | "
+                     f"{t['wins']/t['buy']*100:.0f}% | {t['sum_pct']/t['buy']:+.2f}% |")
+    lines.append("")
+    return "\n".join(lines)
+
+
 def review(as_of=None, calc=None):
     t0 = time.time()
     details = load_details()
@@ -286,8 +348,13 @@ def review(as_of=None, calc=None):
                               "n": len(rows), "win_rate": round(wr_all, 1), "avg": round(avg_all, 2),
                               "defects": len(defects)})
     json.dump(idx, open(idx_f, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    # 累计总览（当天 md 已写盘 + 索引已更新 → 解析累加含当天，插入 md 后重写）
+    cum = build_cumulative()
+    _full = (REVIEW_DIR / fname).read_text(encoding="utf-8")
+    _full = _full.replace("### 🔍 缺陷检测（grill）", cumulative_md(cum) + "### 🔍 缺陷检测（grill）", 1)
+    (REVIEW_DIR / fname).write_text(_full, encoding="utf-8")
     print(f"✅ 复盘已生成 review/{fname}（三池 {len(rows)} 只，买入信号 {len(buy_all)}，胜率 {wr_all:.0f}%，"
-          f"缺陷 {len(defects)} 项，耗时 {time.time()-t0:.0f}s）")
+          f"缺陷 {len(defects)} 项，累计 {cum['count']} 篇，耗时 {time.time()-t0:.0f}s）")
     return fname
 
 
