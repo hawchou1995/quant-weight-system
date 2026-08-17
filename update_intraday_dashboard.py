@@ -25,8 +25,15 @@ MONITOR = Path(r"D:/Documents/Workbuddy/股票基金/行情监控")
 PY = sys.executable
 
 
-def patch_js_file(path, snap_items, today, note_tag, snap_date):
-    """把快照标的的 px/chg 写入 window.XXX 数据文件（保留其余结构）"""
+def patch_js_file(path, snap_items, today, note_tag, snap_date, quotes=None, ts=None):
+    """把标的 px/chg 写入 window.XXX 数据文件（保留其余结构）。
+
+    三池全量 patch（2026-08-17 修复）：数据文件 details 里的所有标的都尝试更新——
+      1) 快照标的（watchlist 60 根K线）→ 用快照末日行算 px/chg（优先，含昨收基准）
+      2) 非快照标的（v9_tiers/短线池 40 只）→ 用实时 quotes 补充（code -> {px, chg}）
+      3) 场外基金（setcode 33 / 不在 quotes）→ 跳过（净值 T-1，无法盘中实时）
+    ts：数据更新时间 HH:MM（2026-08-17 新增：精确到分钟，默认=本次 patch 时刻）
+    """
     src = Path(path).read_text(encoding="utf-8")
     m = re.search(r"window\.(\w+) = (.*);\s*$", src, re.S)
     if not m:
@@ -34,7 +41,10 @@ def patch_js_file(path, snap_items, today, note_tag, snap_date):
         return False
     var, body = m.group(1), m.group(2)
     data = json.loads(body)
-    patched = 0
+    quotes = quotes or {}
+    details = data.get("details", {})
+    # 1) 快照标的优先
+    snap_px = {}
     for it in snap_items:
         code = it["code"]
         rows = it["rows"]
@@ -49,19 +59,31 @@ def patch_js_file(path, snap_items, today, note_tag, snap_date):
         px = last["c"]
         prev_c = prev["c"]
         chg = round((px / prev_c - 1) * 100, 2) if prev_c else None
-        # 打 patch：enhanced_data.js 的 details 与 short_pool.js 的 details 结构一致
-        for store in (data.get("details", {}),):
-            if code in store:
-                store[code]["px"] = px
-                store[code]["chg"] = chg
-                patched += 1
+        snap_px[code] = (px, chg)
+    # 2) 全量 patch：details 里每个代码，快照优先、quotes 兜底
+    patched = 0
+    for code in list(details.keys()):
+        if code in snap_px:
+            px, chg = snap_px[code]
+        elif code in quotes:
+            px, chg = quotes[code]["px"], quotes[code]["chg"]
+        else:
+            continue  # 场外基金等无盘中数据
+        if px is None:
+            continue
+        details[code]["px"] = px
+        details[code]["chg"] = chg
+        patched += 1
     if patched:
+        intraday_note = f"{snap_date} 盘中行情（{note_tag}）· 分数为收盘口径"
         if "meta" in data:
             data["meta"]["as_of"] = snap_date  # 带横线 YYYY-MM-DD，与收盘口径一致
-            data["meta"]["intraday"] = f"{snap_date} 盘中行情（{note_tag}）· 分数为收盘口径"
+            data["meta"]["intraday"] = intraday_note
+            data["meta"]["intraday_ts"] = (ts or "").strip()  # 仅 HH:MM，日期用 as_of（防重复）
         elif "as_of" in data:
             data["as_of"] = snap_date
-            data["intraday_note"] = f"{snap_date} 盘中行情（{note_tag}）· 分数为收盘口径"
+            data["intraday_note"] = intraday_note
+            data["intraday_ts"] = (ts or "").strip()
     Path(path).write_text(f"window.{var} = {json.dumps(data, ensure_ascii=False)};", encoding="utf-8")
     print(f"✅ {path}: patch {patched} 只标的 px/chg → 今日盘中")
     return patched > 0
@@ -71,6 +93,10 @@ def main():
     import argparse, subprocess, datetime
     ap = argparse.ArgumentParser()
     ap.add_argument("--snapshot", default=datetime.date.today().strftime("%Y-%m-%d"))
+    ap.add_argument("--quotes", default=None,
+                    help="三池盘中行情补充 JSON（code -> {px,chg,name}），覆盖 v9_tiers/短线池非 watchlist 标的")
+    ap.add_argument("--ts", default=datetime.datetime.now().strftime("%H:%M"),
+                    help="数据更新时间 HH:MM（精确到分钟，默认=本次运行时刻）")
     args = ap.parse_args()
     snap_file = MONITOR / "raw_kline" / f"{args.snapshot}.json"
     if not snap_file.exists():
@@ -81,8 +107,17 @@ def main():
     snap_date = snap["snapshot_date"]
     print(f"盘中快照: {snap_date} | {len(snap['items'])} 标的")
 
-    ok1 = patch_js_file(BASE / "enhanced_data.js", snap["items"], today, "实时", snap_date)
-    ok2 = patch_js_file(BASE / "short_pool.js", snap["items"], today, "实时", snap_date)
+    quotes = None
+    if args.quotes:
+        qf = Path(args.quotes)
+        if qf.exists():
+            quotes = json.load(open(qf, encoding="utf-8")).get("quotes", {})
+            print(f"三池补充行情: {qf.name}（{len(quotes)} 只）")
+        else:
+            print(f"⚠️ quotes 文件不存在: {qf}（三池非 watchlist 标的将保持收盘口径）")
+
+    ok1 = patch_js_file(BASE / "enhanced_data.js", snap["items"], today, "实时", snap_date, quotes, ts=args.ts)
+    ok2 = patch_js_file(BASE / "short_pool.js", snap["items"], today, "实时", snap_date, quotes, ts=args.ts)
 
     if not (ok1 or ok2):
         print("⚠️ 无标的可 patch（快照可能为空或全为场外基金），跳过重建")

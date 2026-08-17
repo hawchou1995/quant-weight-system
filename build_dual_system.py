@@ -52,10 +52,14 @@ try:
     v9_short_items = _sp_items
     v9_short_items.sort(key=lambda d: -d["score"])   # 全局权重分（短线分）降序，与其他表一致
     SHORT_POOL_ASOF = SHORT_POOL.get("as_of", "—")
+    SHORT_POOL_INTRADAY = SHORT_POOL.get("intraday_note") or ""
+    SHORT_POOL_ASOF_MIN = SHORT_POOL.get("intraday_ts") or "15:00"
 except Exception as _e:
     print("short_pool 加载失败:", _e)
     v9_short_items = []
     SHORT_POOL_ASOF = "—"
+    SHORT_POOL_INTRADAY = ""
+    SHORT_POOL_ASOF_MIN = "15:00"
 # 个人版按板块分组（用户固定池，2026-08-17 去 ETF）
 v8_main = [d for d in v8_items if d["perm"] == "main"]
 v8_etf  = [d for d in v8_items if d["perm"] == "etf"]
@@ -67,9 +71,9 @@ def tier_counts(items):
         cnt[d["tier"]] = cnt.get(d["tier"], 0) + 1
     return cnt
 
-def updown(items):
-    up = sum(1 for d in items if d["tier"] in ("满仓加仓", "轻仓加仓"))
-    down = sum(1 for d in items if d["tier"] in ("减至半仓", "清仓"))
+def updown(items, add=("满仓加仓", "轻仓加仓"), cut=("减至半仓", "清仓")):
+    up = sum(1 for d in items if d["tier"] in add)
+    down = sum(1 for d in items if d["tier"] in cut)
     return up, down
 
 # ---------------- 工具 ----------------
@@ -278,19 +282,34 @@ def bt_short_html():
             '<div class="bt-grid">' + cards + '</div>\n</div>')
 perm_stat = f'股票 {len(v8_main)} ｜ 基金 {len(v8_fund)}'
 
-def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extra_stat=None, extra_card="", score_sub="趋势/动量/量能/超买/风控"):
+def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extra_stat=None, extra_card="", score_sub="趋势/动量/量能/超买/风控", as_of=None, intraday_note=None, as_of_min=None, tier_opts=None, tier_add=None, tier_watch=None, tier_cut=None):
     """每个系统的完整区块：系统头（标题+说明）+ 操作统计条 + 汇总表 + 详情卡片
-    回测参考统一放总览视图，这里只保留监控主体。extra_card=视图末尾追加卡片（如持仓跟踪）"""
-    up, down = updown(items)
+    回测参考统一放总览视图，这里只保留监控主体。extra_card=视图末尾追加卡片（如持仓跟踪）
+    as_of / intraday_note / as_of_min：三池数据更新时间徽章（2026-08-17 升级：精确到分钟，
+    盘中=patch 时刻 HH:MM，收盘=15:00）
+    tier_opts/tier_add/tier_watch/tier_cut：档位筛选与统计条口径（短线池=强买入/买入/不买，
+    与中长线池不同，2026-08-17 修复）"""
+    tier_opts = tier_opts or ["满仓加仓", "轻仓加仓", "观望", "减至半仓", "清仓"]
+    tier_add = tier_add or ("满仓加仓", "轻仓加仓")
+    tier_watch = tier_watch or ("观望",)
+    tier_cut = tier_cut or ("减至半仓", "清仓")
+    up, down = updown(items, tier_add, tier_cut)
     t8 = tier_counts(items)
+    asof_html = ""
+    if as_of:
+        _tag = "盘中实时" if intraday_note else "收盘"
+        _ts = as_of_min or ("15:00" if not intraday_note else "")
+        _ts_html = f" {_ts}" if _ts else ""
+        asof_html = f'<span class="view-badge auto" title="{intraday_note or "收盘数据"}">数据截至 {as_of}{_ts_html} · {_tag}</span>'
     stat_bar = (extra_stat if extra_stat else "") + f'''<div class="op-stats">
-<span class="op op-add">🟢 加仓区 <b>{t8.get("满仓加仓",0)+t8.get("轻仓加仓",0)}</b> 只</span>
-<span class="op op-watch">🟡 观望 <b>{t8.get("观望",0)}</b> 只</span>
-<span class="op op-cut">🔴 减/清仓区 <b>{t8.get("减至半仓",0)+t8.get("清仓",0)}</b> 只</span>
+<span class="op op-add">🟢 加仓区 <b>{sum(t8.get(t,0) for t in tier_add)}</b> 只</span>
+<span class="op op-watch">🟡 观望 <b>{sum(t8.get(t,0) for t in tier_watch)}</b> 只</span>
+<span class="op op-cut">🔴 减/清仓区 <b>{sum(t8.get(t,0) for t in tier_cut)}</b> 只</span>
 </div>'''
+    tier_opts_html = "".join(f"<option>{t}</option>" for t in tier_opts)
     return f'''<div class="view" id="{vid}">
 <div class="card" id="{sid}">
-<h2>{title} <span class="view-badge {badge}">{sub}</span></h2>
+<h2>{title} <span class="view-badge {badge}">{sub}</span>{asof_html}</h2>
 {stat_bar}
 </div>
 <div class="card" id="{card_id}">
@@ -300,7 +319,7 @@ def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extr
 <input type="text" id="{tbl_id}-q" placeholder="🔍 搜索名称 / 代码 / 行业…">
 <select id="{tbl_id}-mk" class="flt" title="板块筛选"><option value="">全部板块</option>{filter_options(items, "board")}</select>
 <select id="{tbl_id}-ind" class="flt" title="行业筛选"><option value="">全部行业</option>{filter_options(items, "industry")}</select>
-<select id="{tbl_id}-tier" class="flt" title="档位筛选"><option value="">全部档位</option><option>满仓加仓</option><option>轻仓加仓</option><option>观望</option><option>减至半仓</option><option>清仓</option></select>
+<select id="{tbl_id}-tier" class="flt" title="档位筛选"><option value="">全部档位</option>{tier_opts_html}</select>
 <span class="count" id="{tbl_id}-count"></span>
 <button id="{tbl_id}-buyonly" class="flt" title="只看买入候选（剔除减半/清仓）" style="cursor:pointer;padding:7px 12px">🔍 只看可买信号</button>
 </div>
@@ -534,14 +553,18 @@ html = f"""<!doctype html>
   "view-auto", "sys-auto",
   "🅰️ 全量池中/长线", "auto", "全市场自动池 · 股票分层+基金 ｜ 全市场绝对规则筛池 Top3 等权 · 月轮动 · 移动止损4.5% · MA150择时 ｜ 回测参考见「监控总览」",
   v9_items, "tbl-v9", "card-tbl-v9",
-  "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测参考在监控总览视图")}
+  "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测参考在监控总览视图",
+  as_of=DATA["meta"].get("as_of", "—"), intraday_note=DATA["meta"].get("intraday"),
+  as_of_min=DATA["meta"].get("intraday_ts") or DATA["meta"].get("as_of_min"))}
 
 <!-- ============ 视图 B：固定池中/长线 ============ -->
 {system_block(
   "view-lite", "sys-lite",
   "🅱️ 固定池中/长线", "lite", f"用户固定池 · 股票+基金 ｜ 四因子打分 Top4 · 月轮动21日 · 移动止损10% · MA200择时 ｜ 池构成：{perm_stat} ｜ 回测参考见「监控总览」",
   v8_items, "tbl-v8", "card-tbl-v8",
-  "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测参考在监控总览视图")}
+  "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测参考在监控总览视图",
+  as_of=DATA["meta"].get("as_of", "—"), intraday_note=DATA["meta"].get("intraday"),
+  as_of_min=DATA["meta"].get("intraday_ts") or DATA["meta"].get("as_of_min"))}
 
 <!-- ============ 视图 C：全量池短线（与中长线同结构：统计条+表格+雷达卡） ============ -->
 {system_block(
@@ -549,7 +572,10 @@ html = f"""<!doctype html>
   "⚡ 全量池短线", "auto", f"全市场短线信号 Top 池（数据截至 {SHORT_POOL_ASOF}）：股票=反转信号按权限分层各 Top10（主板/创业板/科创板各10，剔ST）｜ 基金=动量 Top10 · 短线分 = 动量30/量价25/通道25/波动20 · 回测参考见「监控总览」",
   v9_short_items, "tbl-short", "card-tbl-short",
   "信号池 = 回测买入清单：分数≥50 的 TopN 在轮动日全部买入 · 档位 = 短线买入口径（强买入/买入）· 持仓的减仓/清仓信号见下方「我的持仓跟踪」· 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览",
-  extra_card=WATCH_CARD, score_sub="动量/量价/通道/波动")}
+  extra_card=WATCH_CARD, score_sub="动量/量价/通道/波动",
+  as_of=SHORT_POOL_ASOF, intraday_note=SHORT_POOL_INTRADAY,
+  as_of_min=SHORT_POOL.get("intraday_ts") or SHORT_POOL_ASOF_MIN,
+  tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=())}
 
 <!-- ============ 历史快照视图（右上角标的报告切换） ============ -->
 <div class="view" id="view-snapshot">
