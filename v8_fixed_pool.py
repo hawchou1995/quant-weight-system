@@ -19,8 +19,8 @@ BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 
 STOCKS = ['300502','300308','600498','601138','002463','002384','600183','300476','603986',
           '002185','605358','603228','603339','000636','605189','600403','002879','600162','000759','002474']
-ETFS = ['159516','515880','516150','560390','159841']
-FUNDS = ['008254','018036','002891','024239','014002','020900']
+ETFS = []   # 2026-08-17 用户决策：ETF 表现不佳，全池去 ETF，后续不考虑投资
+FUNDS = ['008254','018036','002891','024239']   # 2026-08-17 去 014002/020900
 
 def to_key(c):
     return ('sh' if c.startswith(('6', '9')) else 'sz') + c
@@ -43,27 +43,10 @@ results['股票_固定池_Top15'] = run_stock('股票_固定池_Top15', stock_po
 results['股票_固定池_Top10'] = run_stock('股票_固定池_Top10', stock_pool, top_n=10, **B)
 results['股票_固定池_全持20'] = run_stock('股票_固定池_全持20', stock_pool, top_n=20, **B)
 
-# ---------- 2. ETF 固定池（5 只，从 data_full 构建因子） ----------
-etf_pool = {}
-for c in ETFS:
-    k = ('sh' if c.startswith('5') else 'sz') + c
-    f = BASE / 'data_full' / f"{k}.csv"
-    try:
-        df = pd.read_csv(f, dtype={'date': str})
-        df['date'] = pd.to_datetime(df['date'])
-        df = df.sort_values('date').reset_index(drop=True)
-        if len(df) < 400 or df['close'].pct_change().abs().max() > 0.25:
-            print(f"ETF {c}: 数据不足或异常跳过", flush=True)
-            continue
-        df = V.compute_factors_full(df).set_index('date')
-        etf_pool[k] = df
-    except Exception as e:
-        print(f"ETF {c}: {e}", flush=True)
-print(f"ETF 固定池: {len(etf_pool)} 只", flush=True)
-results['ETF_固定池_全持'] = run_stock('ETF_固定池_全持', etf_pool, top_n=len(etf_pool),
-                                     **{**B, 'min_price': 0.5, 'min_amt': 1e6})
+# ---------- 2. ETF 固定池（2026-08-17 用户决策移除，ETF 表现不佳不考虑投资） ----------
+# 原 ETF 回测分支已移除；若未来恢复，见 git 历史 v8_fixed_pool.py
 
-# ---------- 3. 基金固定池（6 只，全持 + MA100 择时 + T+1） ----------
+# ---------- 3. 基金固定池（4 只，全持 + MA100 择时 + T+1） ----------
 CACHE = BASE / 'fund_nav_cache'
 navs = {}
 for code in FUNDS:

@@ -4,7 +4,7 @@
        + 紧跟其下的逐标的详情卡片（六角雷达图 + 六类分数 + 回测），v8/v9 池分开。
 右上角「标的报告」= 按月分类的历史收盘监控快照（当前页内切换，不新开窗口）；
 左侧导航无独立标的报告入口（同页处理）；左上角板块/行业/档位 select 筛选；
-全量池自动池 = 股票按权限各10 + ETF10 + 基金10；回测参考统一放监控总览。"""
+全量池自动池 = 股票按权限各10 + 基金10；回测参考统一放监控总览。"""
 import os
 import json, re
 from pathlib import Path
@@ -17,11 +17,13 @@ from ui_components import THEME_CSS, NAV_HTML, COMMON_JS
 js_src = (BASE / "enhanced_data.js").read_text(encoding="utf-8")
 DATA = json.loads(js_src[len("window.ENH = "):-1])
 details = DATA["details"]
+import datetime as _dt
+build_ts = _dt.datetime.now().strftime("%Y-%m-%d %H:%M")
 
 # ---------------- 分池 ----------------
 all_items = list(details.values())
 v8_items = sorted([d for d in all_items if d.get("pool", "v8") == "v8"], key=lambda d: -d["score"])
-# 普适版：按权限分层表（main/gem/star/etf/fund 各 10 行，同一标的多档出现属正常）
+# 普适版：按权限分层表（main/gem/star/fund 各 10 行，同一标的多档出现属正常；2026-08-17 去 etf 层）
 v9_tiers = DATA.get("meta", {}).get("v9_tiers", {})
 v9_items = []
 for tier, codes in v9_tiers.items():
@@ -30,15 +32,15 @@ for tier, codes in v9_tiers.items():
         if d is None:
             continue
         row = dict(d)
-        row["perm"] = tier          # 行级档位（main/gem/star/etf/fund），覆盖数据默认
+        row["perm"] = tier          # 行级档位（main/gem/star/fund），覆盖数据默认
         v9_items.append(row)
 v9_items.sort(key=lambda d: -d["score"])
-# 短线信号池（v5.10）：全市场最新交易日短线分 Top 池（股票反转10 + ETF动量10 + 基金动量10）
+# 短线信号池（v5.10）：全市场最新交易日短线分 Top 池（股票反转10 + 基金动量10；2026-08-17 去 ETF）
 try:
     _sp_js = open(BASE / "short_pool.js", encoding="utf-8").read()
     SHORT_POOL = json.loads(_sp_js[len("window.SHORT_POOL = "):-1])
     _sp_items = []
-    for _grp in ("股票", "ETF", "基金"):
+    for _grp in ("股票", "基金"):
         for _c in SHORT_POOL["tiers"].get(_grp, []):
             _d = SHORT_POOL["details"].get(_c)
             if _d:
@@ -54,7 +56,7 @@ except Exception as _e:
     print("short_pool 加载失败:", _e)
     v9_short_items = []
     SHORT_POOL_ASOF = "—"
-# 个人版按板块分组（用户固定池）
+# 个人版按板块分组（用户固定池，2026-08-17 去 ETF）
 v8_main = [d for d in v8_items if d["perm"] == "main"]
 v8_etf  = [d for d in v8_items if d["perm"] == "etf"]
 v8_fund = [d for d in v8_items if d["perm"] == "fund"]
@@ -152,7 +154,7 @@ def cards_html_for(items):
 # ---------------- 视图区 ----------------
 s_auto = DATA["systems"]["v9_auto"]["summary"]
 s_lite = DATA["systems"]["v8_lite"]["summary"]
-# ETF/基金独立回测（v5.11.9 主显含滑点：ETF slip20 / 基金 slip30 申赎费，fallback 0 滑点）
+# 基金独立回测（v5.11.9 主显含滑点：基金 slip30 申赎费，fallback 0 滑点；2026-08-17 去 ETF）
 def _ml(f, b):
     try:
         d = json.load(open(BASE / f, encoding="utf-8"))
@@ -160,9 +162,6 @@ def _ml(f, b):
     except Exception:
         return {}, b
 
-s_etf, ETF_TAG = _ml("etf_v3_final_slip20_summary.json", "月频H21/Top5 · MA5")
-if not s_etf:
-    s_etf, ETF_TAG = _ml("etf_v3_final_summary.json", "月频H21/Top5 · MA5")
 s_fund, _ftag = _ml("v8_fund_summary.json", "Top10主仓+6卫星 · MA100")
 FUND_TAG = _ftag + " · 申赎费敏感度：30bps≈-10%（90笔/10年半年轮动，影响小）"
 
@@ -174,10 +173,8 @@ def load_curve_norm(f):
     except Exception:
         return []
 
-v_etf = load_curve_norm("etf_v3_final_slip20_equity.csv")
 v_fund = load_curve_norm("v8_fund_equity.csv")
-# 短线净值曲线（短线体系 v3 最优）
-v_short_etf = load_curve_norm("short_v3_etf_slip20_equity.csv")
+# 短线净值曲线（短线体系 v3 最优；2026-08-17 去 ETF）
 v_short_fund = load_curve_norm("short_v3_fund_slip20_equity.csv")
 v_short_stock = load_curve_norm("short_v3_stock_slip20_equity.csv")
 # 分层净值曲线（v5.9：中长线 v9split + 短线 shortsplit，按权限互斥）
@@ -194,12 +191,10 @@ def _ss(asset):
         return json.load(open(f, encoding="utf-8"))
     return json.load(open(BASE / f"short_v3_{asset}_summary.json", encoding="utf-8"))
 
-_ss_s, _ss_e, _ss_f = _ss("stock"), _ss("etf"), _ss("fund")
+_ss_s, _ss_f = _ss("stock"), _ss("fund")
 ss_stock = _ss_s["summary"]
-ss_etf = _ss_e["summary"]
 ss_fund = _ss_f["summary"]
 ss_stock_tag = _ss_s["params"] + f" · 含{_ss_s.get('slippage_bps', 0)}bps滑点"
-ss_etf_tag = _ss_e["params"] + f" · 含{_ss_e.get('slippage_bps', 0)}bps滑点"
 ss_fund_tag = _ss_f["params"] + f" · 含{_ss_f.get('slippage_bps', 0)}bps滑点"
 
 
@@ -252,38 +247,36 @@ def bt_card(cid, title, tag, s, curve_id, color="#f59e0b", sub="2016-01~2026-08"
 
 
 def bt_all_html():
-    """中长线回测参考 6 卡（股票分层 4 + ETF + 基金）"""
+    """中长线回测参考 5 卡（股票分层 4 + 基金；2026-08-17 去 ETF）"""
     cards = "".join([
         bt_card("bt-stock-all", "📈 股票 一体（全A）", stk_tag["all"], s_stk["all"], "curve-chart-stock-all"),
         bt_card("bt-stock-main", "📈 股票 纯主板", stk_tag["main"], s_stk["main"], "curve-chart-stock-main"),
         bt_card("bt-stock-gem", "📈 股票 纯创业板", stk_tag["gem"], s_stk["gem"], "curve-chart-stock-gem"),
         bt_card("bt-stock-star", "📈 股票 纯科创板", stk_tag["star"], s_stk["star"], "curve-chart-stock-star"),
-        bt_card("bt-etf", "🟠 ETF 池", ETF_TAG, s_etf, "curve-chart-etf"),
         bt_card("bt-fund", "🔵 基金池", FUND_TAG, s_fund, "curve-chart-fund", color="#3b82f6"),
     ])
     return ('<div class="card" id="bt-all">\n'
             '<h2>📊 回测参考 <span class="badge badge-auto">中/长线 · 股票按权限分层</span></h2>\n'
-            '<div class="sub">股票 = 绝对规则筛池 Top3 · 月轮动 · 按权限<b>互斥分层</b>（一体/纯主板/纯创业板/纯科创板，各池独立回测）｜ ETF = 动量轮动 ｜ 基金 = 净值动量轮动 —— 各池严格分开</div>\n'
-            '<div class="sub" style="color:var(--sub)">💧 <b>滑点敏感性</b>（每边，sweep_ml_slip.py 扫描）：中长线换手低、影响显著小于短线 —— 股票 20bps 收益 -23%（夏普 1.58→1.43）、30bps -31% ｜ 固定池 20bps -13%、30bps -18% ｜ ETF 中长线 20bps -44%（年 33 笔基数低，绝对收益仍 +63%）、30bps -62% —— 实盘 10-20bps 区间内中长线策略稳健</div>\n'
+            '<div class="sub">股票 = 绝对规则筛池 Top3 · 月轮动 · 按权限<b>互斥分层</b>（一体/纯主板/纯创业板/纯科创板，各池独立回测）｜ 基金 = 净值动量轮动 —— 各池严格分开（2026-08-17 去 ETF）</div>\n'
+            '<div class="sub" style="color:var(--sub)">💧 <b>滑点敏感性</b>（每边，sweep_ml_slip.py 扫描）：中长线换手低、影响显著小于短线 —— 股票 20bps 收益 -23%（夏普 1.58→1.43）、30bps -31% ｜ 固定池 20bps -13%、30bps -18% —— 实盘 10-20bps 区间内中长线策略稳健</div>\n'
             '<div class="bt-grid">' + cards + '</div>\n</div>')
 
 
 def bt_short_html():
-    """短线回测参考 6 卡（股票分层 4 + ETF + 基金）"""
+    """短线回测参考 5 卡（股票分层 4 + 基金；2026-08-17 去 ETF）"""
     cards = "".join([
         bt_card("bt-short-stock-all", "📈 短线 股票 一体", ss_stk_tag["all"], ss_stk["all"], "curve-short-stock-all"),
         bt_card("bt-short-stock-main", "📈 短线 纯主板", ss_stk_tag["main"], ss_stk["main"], "curve-short-stock-main"),
         bt_card("bt-short-stock-gem", "📈 短线 纯创业板", ss_stk_tag["gem"], ss_stk["gem"], "curve-short-stock-gem"),
         bt_card("bt-short-stock-star", "📈 短线 纯科创板", ss_stk_tag["star"], ss_stk["star"], "curve-short-stock-star"),
-        bt_card("bt-short-etf", "🟠 短线 ETF", ss_etf_tag, ss_etf, "curve-short-etf"),
         bt_card("bt-short-fund", "🔵 短线 基金", ss_fund_tag, ss_fund, "curve-short-fund", color="#3b82f6"),
     ])
     return ('<div class="card" id="bt-short">\n'
             '<h2>⚡ 短线回测参考 <span class="badge badge-auto">全量池短线 · 股票按权限分层</span></h2>\n'
-            '<div class="sub">短线 = 动量30/量价25/通道25/波动20（A 股个股反转版）+ <b>MA5 生命线每日止损</b> + 强势市门控 · 股票按权限<b>互斥分层</b>（各池独立回测）｜ ETF/基金 = 动量短线 —— 与中长线独立，监控表「⚡ 全量池短线」视图对应此池</div>\n'
-            '<div class="sub" style="color:var(--sub)">💧 <b>滑点敏感性</b>（每边，sweep_slip.py 扫描）：股票 10bps→+462%/夏普1.99、20bps→+331%/1.69、30bps→+231%/1.39 ｜ ETF 10bps→+162%/1.36 ｜ 基金 30bps 申赎费下 +273%→+11% 归零 —— <b>基金短线必须 C 类份额</b>（0 申赎费）</div>\n'
+            '<div class="sub">短线 = 动量30/量价25/通道25/波动20（A 股个股反转版）+ <b>MA5 生命线每日止损</b> + 强势市门控 · 股票按权限<b>互斥分层</b>（各池独立回测）｜ 基金 = 动量短线 —— 与中长线独立，监控表「⚡ 全量池短线」视图对应此池（2026-08-17 去 ETF）</div>\n'
+            '<div class="sub" style="color:var(--sub)">💧 <b>滑点敏感性</b>（每边，sweep_slip.py 扫描）：股票 10bps→+462%/夏普1.99、20bps→+331%/1.69、30bps→+231%/1.39 ｜ 基金 30bps 申赎费下 +273%→+11% 归零 —— <b>基金短线必须 C 类份额</b>（0 申赎费）</div>\n'
             '<div class="bt-grid">' + cards + '</div>\n</div>')
-perm_stat = f'股票 {len(v8_main)} ｜ ETF {len(v8_etf)} ｜ 基金 {len(v8_fund)}'
+perm_stat = f'股票 {len(v8_main)} ｜ 基金 {len(v8_fund)}'
 
 def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extra_stat=None, extra_card="", score_sub="趋势/动量/量能/超买/风控"):
     """每个系统的完整区块：系统头（标题+说明）+ 操作统计条 + 汇总表 + 详情卡片
@@ -426,7 +419,7 @@ if _cf.exists():
 html = f"""<!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>标的监控看板（2026-08-14 · 构建 08-16 12:04）</title>
+<title>标的监控看板（数据截至 {DATA["meta"].get("as_of", "—")} · 构建 {build_ts}）</title>
 <style>{THEME_CSS}
 /* 三视图切换 */
 .view{{display:none}}
@@ -448,7 +441,7 @@ html = f"""<!doctype html>
 .scroll-fab{{position:fixed;right:22px;bottom:22px;display:flex;flex-direction:column;gap:8px;z-index:950}}
 .scroll-fab button{{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);font-family:inherit}}
 .scroll-fab button:hover{{border-color:var(--accent);color:var(--accent)}}
-/* ETF/基金回测参考 · 三池独立大卡 */
+/* 基金回测参考 · 三池独立大卡（2026-08-17 去 ETF） */
 .bt-grid{{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}}
 .bt-card{{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:16px}}
 .bt-card .bt-head{{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:15px}}
@@ -522,7 +515,7 @@ html = f"""<!doctype html>
 <div class="view active" id="view-overview">
 <div class="card" id="overview">
 <h2>📊 标的监控总览 <span class="badge badge-auto">数据截至 2026-08-14 收盘</span></h2>
-<div class="sub">左侧导航切换：🅰️ 全量池中/长线（全市场自动池·股票分层+ETF+基金） / 🅱️ 固定池中/长线（用户固定池） / ⚡ 短线（占位） · 右上角「标的报告」按月查看历史收盘快照 · 信号仅供参考</div>
+<div class="sub">左侧导航切换：🅰️ 全量池中/长线（全市场自动池·股票分层+基金） / 🅱️ 固定池中/长线（用户固定池） / ⚡ 短线（占位） · 右上角「标的报告」按月查看历史收盘快照 · 信号仅供参考</div>
 <div class="kpis">
 <div class="kpi"><div class="l">🟢 加仓区</div><div class="v" style="color:#dc2626">{sum(1 for d in all_items if d["tier"] in ("满仓加仓","轻仓加仓"))} 只</div><div class="s">满仓+轻仓加仓</div></div>
 <div class="kpi"><div class="l">🟡 观望区</div><div class="v" style="color:#d97706">{sum(1 for d in all_items if d["tier"]=="观望")} 只</div><div class="s">持有不加</div></div>
@@ -539,21 +532,21 @@ html = f"""<!doctype html>
 <!-- ============ 视图 A：全量池中/长线 ============ -->
 {system_block(
   "view-auto", "sys-auto",
-  "🅰️ 全量池中/长线", "auto", "全市场自动池 · 股票分层+ETF+基金 ｜ 全市场绝对规则筛池 Top3 等权 · 月轮动 · 移动止损4.5% · MA150择时 ｜ 回测参考见「监控总览」",
+  "🅰️ 全量池中/长线", "auto", "全市场自动池 · 股票分层+基金 ｜ 全市场绝对规则筛池 Top3 等权 · 月轮动 · 移动止损4.5% · MA150择时 ｜ 回测参考见「监控总览」",
   v9_items, "tbl-v9", "card-tbl-v9",
   "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测参考在监控总览视图")}
 
 <!-- ============ 视图 B：固定池中/长线 ============ -->
 {system_block(
   "view-lite", "sys-lite",
-  "🅱️ 固定池中/长线", "lite", f"用户固定池 · 股票+ETF+基金 ｜ 四因子打分 Top4 · 月轮动21日 · 移动止损10% · MA200择时 ｜ 池构成：{perm_stat} ｜ 回测参考见「监控总览」",
+  "🅱️ 固定池中/长线", "lite", f"用户固定池 · 股票+基金 ｜ 四因子打分 Top4 · 月轮动21日 · 移动止损10% · MA200择时 ｜ 池构成：{perm_stat} ｜ 回测参考见「监控总览」",
   v8_items, "tbl-v8", "card-tbl-v8",
   "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测参考在监控总览视图")}
 
 <!-- ============ 视图 C：全量池短线（与中长线同结构：统计条+表格+雷达卡） ============ -->
 {system_block(
   "view-short", "sys-short",
-  "⚡ 全量池短线", "auto", f"全市场短线信号 Top 池（数据截至 {SHORT_POOL_ASOF}）：股票=反转信号 Top10（剔ST）｜ ETF=动量 Top10 ｜ 基金=动量 Top10 · 短线分 = 动量30/量价25/通道25/波动20 · 回测参考见「监控总览」",
+  "⚡ 全量池短线", "auto", f"全市场短线信号 Top 池（数据截至 {SHORT_POOL_ASOF}）：股票=反转信号 Top10（剔ST）｜ 基金=动量 Top10 · 短线分 = 动量30/量价25/通道25/波动20 · 回测参考见「监控总览」",
   v9_short_items, "tbl-short", "card-tbl-short",
   "信号池 = 回测买入清单：分数≥50 的 TopN 在轮动日全部买入 · 档位 = 短线买入口径（强买入/买入）· 持仓的减仓/清仓信号见下方「我的持仓跟踪」· 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览",
   extra_card=WATCH_CARD, score_sub="动量/量价/通道/波动")}
@@ -586,7 +579,7 @@ html = f"""<!doctype html>
 </div>
 
 </div>
-<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-16 12:04 · 版本 v5.11.8 · 数据截至 2026-08-14 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 {build_ts} · 版本 v5.11.8 · 数据截至 {DATA["meta"].get("as_of", "—")} · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({{top:0,behavior:'smooth'}})">↑</button>
@@ -600,12 +593,10 @@ html = f"""<!doctype html>
 window.ENH.nav = [["overview","📊","监控总览"],["sys-auto","🅰️","全量池中/长线"],["sys-lite","🅱️","固定池中/长线"],["short","⚡","全量池短线"]];
 /* 视图切换模式：滚动不更新导航高亮（COMMON_JS renderSidenav 检测此标志） */
 window.ENH.NAV_SWITCH = true;
-/* 三池回测净值（股票/ETF/基金，监控总览展示） */
+/* 三池回测净值（股票/基金，监控总览展示；2026-08-17 去 ETF） */
 window.ENH.sub_curves = {{
   stock: {json.dumps(DATA["systems"]["v9_auto"]["equity"])},
-  etf: {json.dumps(v_etf)},
   fund: {json.dumps(v_fund)},
-  short_etf: {json.dumps(v_short_etf)},
   short_fund: {json.dumps(v_short_fund)},
   short_stock: {json.dumps(v_short_stock)},
   stk_all: {json.dumps(v9split_curves["all"])}, stk_main: {json.dumps(v9split_curves["main_only"])},
@@ -613,7 +604,7 @@ window.ENH.sub_curves = {{
   sstk_all: {json.dumps(shortsplit_curves["all"])}, sstk_main: {json.dumps(shortsplit_curves["main_only"])},
   sstk_gem: {json.dumps(shortsplit_curves["gem_only"])}, sstk_star: {json.dumps(shortsplit_curves["star_only"])},
 }};
-/* 渲染 ETF/基金回测净值曲线（各自容器、各自对数坐标轴） */
+/* 渲染 基金回测净值曲线（各自容器、各自对数坐标轴） */
 function renderOneCurve(elId, vals, color, label, totalPct){{
   var el=document.getElementById(elId);if(!el)return;
   var n=vals.length,W=1400,H=240,PAD_L=70,PAD_R=20,PAD_T=22,PAD_B=28;
@@ -642,13 +633,11 @@ function renderSubCurve(){{
   renderOneCurve('curve-chart-stock-main', C.stk_main, '#ea580c', '纯主板', '+'+{round(s_stk["main"].get("total_return_pct") or 0):.0f});
   renderOneCurve('curve-chart-stock-gem', C.stk_gem, '#22c55e', '纯创业板', '+'+{round(s_stk["gem"].get("total_return_pct") or 0):.0f});
   renderOneCurve('curve-chart-stock-star', C.stk_star, '#8b5cf6', '纯科创板', '+'+{round(s_stk["star"].get("total_return_pct") or 0):.0f});
-  renderOneCurve('curve-chart-etf', C.etf, '#ea580c', 'ETF 池', '+'+{s_etf["total_return_pct"]:.0f});
   renderOneCurve('curve-chart-fund', C.fund, '#3b82f6', '基金池', '+'+{s_fund["total_return_pct"]:.0f});
   renderOneCurve('curve-short-stock-all', C.sstk_all, '#f59e0b', '短线 股票 一体', '+'+{round(ss_stk["all"].get("total_return_pct") or 0):.0f});
   renderOneCurve('curve-short-stock-main', C.sstk_main, '#ea580c', '短线 纯主板', '+'+{round(ss_stk["main"].get("total_return_pct") or 0):.0f});
   renderOneCurve('curve-short-stock-gem', C.sstk_gem, '#22c55e', '短线 纯创业板', '+'+{round(ss_stk["gem"].get("total_return_pct") or 0):.0f});
   renderOneCurve('curve-short-stock-star', C.sstk_star, '#8b5cf6', '短线 纯科创板', '+'+{round(ss_stk["star"].get("total_return_pct") or 0):.0f});
-  renderOneCurve('curve-short-etf', C.short_etf, '#ea580c', 'ETF 短线', '+'+{ss_etf["total_return_pct"]:.0f});
   renderOneCurve('curve-short-fund', C.short_fund, '#3b82f6', '基金短线', '+'+{ss_fund["total_return_pct"]:.0f});
 }}
 /* 视图切换（hash 驱动：切换时更新 location.hash，加载/前进后退时按 hash 定位） */
@@ -692,7 +681,7 @@ function showSnapshot(file, date){{
 /* 覆盖：报告下拉用月度快照；左侧导航点击切换视图 */
 document.addEventListener('DOMContentLoaded',function(){{
   applyHash();   // 按 URL hash 定位视图（历史页跳转 dual_system.html#sys-auto 直接显示普适版）
-  renderSubCurve();   // ETF/基金回测净值曲线
+  renderSubCurve();   // 基金回测净值曲线
   renderReportMenu();
   /* 持仓跟踪：localStorage 存代码 → 查 SHORT_SIGNALS 渲染状态（卖出规则与回测一致） */
   function renderWatch(){{
@@ -707,7 +696,7 @@ document.addEventListener('DOMContentLoaded',function(){{
     var h='<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>类型</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">短线分</th><th style="text-align:center">档位</th><th style="text-align:center">MA5</th><th style="text-align:center">建议动作</th></tr></thead><tbody>';
     codes.forEach(function(code){{
       var rec=null,grp='';
-      ['stock','etf','fund'].forEach(function(g){{if(S[g]&&S[g][code]){{rec=S[g][code];grp=g;}}}});
+      ['stock','fund'].forEach(function(g){{if(S[g]&&S[g][code]){{rec=S[g][code];grp=g;}}}});
       if(!rec){{h+='<tr><td>'+code+'</td><td colspan="8" style="color:var(--faint)">未找到该代码（检查输入 / 代码不在监控范围）</td></tr>';return;}}
       var act,actCls;
       if(rec.ma5_above===false){{act='⚠️ 次日卖出（破MA5）';actCls='down';}}
@@ -716,7 +705,7 @@ document.addEventListener('DOMContentLoaded',function(){{
       else if(!topSet[code]){{act='🔄 下次轮动换出';actCls='warn';}}
       else if(rec.tier==='轻仓加仓'||rec.tier==='满仓加仓'){{act='✅ 继续持有';actCls='up';}}
       else {{act='🟡 观望（不补不加）';actCls='warn';}}
-      var gName=grp==='stock'?'股票':(grp==='etf'?'ETF':'基金');
+      var gName=grp==='stock'?'股票':'基金';
       h+='<tr><td>'+code+'</td><td>'+rec.name+'</td><td>'+gName+'</td><td style="text-align:right">'+rec.px+'</td><td style="text-align:right" class="'+(rec.chg>0?'up':'down')+'">'+(rec.chg>0?'+':'')+rec.chg+'%</td><td style="text-align:center">'+rec.score+'</td><td style="text-align:center">'+rec.tier+'</td><td style="text-align:center">'+(rec.ma5_above?'✅ 上方':'⚠️ 下方')+'</td><td style="text-align:center" class="'+actCls+'">'+act+'</td></tr>';
     }});
     h+='</tbody></table>';

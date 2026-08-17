@@ -2,8 +2,8 @@
 """短线信号标的池（v5.10）：全市场最新交易日短线分 Top 池
 ================================================================
 - 股票：反转版短线分 Top10（全市场 data_full）
-- ETF：动量版短线分 Top10（全市场 sh5/sz1）
 - 基金：动量版短线分 Top10（fund_nav_cache，与回测同池）
+- （2026-08-17 用户决策：ETF 表现不佳，短线池去 ETF）
 输出：short_pool.js（window.SHORT_POOL）+ short_pool.json
 详情复用 80 只 details 的行业/名称（命中），未命中用兜底；雷达六类 = 短线因子
 """
@@ -187,30 +187,8 @@ def calc_signals(as_of=None):
     print(f"股票池 {len(stock_pool)} 只 → 反转分 Top10（剔 ST/退市 {len(stock_pool)-len(rows)} 只）({time.time()-t0:.0f}s)", flush=True)
     stock_top = rows[:10]
 
-    # 2) ETF 动量 Top10
-    etf_pool = S.load_etf_pool()
-    erows = []
-    for code, ddf in etf_pool.items():
-        if as_of is not None:
-            if as_of not in ddf.index:
-                continue
-            r = ddf.loc[as_of]
-        else:
-            r = ddf.iloc[-1]
-        if pd.isna(r["close"]) or r["close"] <= 0 or pd.isna(r["mom20"]):
-            continue
-        sc = S.short_score(r, reversal=False)
-        if pd.isna(sc):
-            continue
-        erows.append((code, float(sc), r, ddf))
-        _tail2 = ddf.loc[:as_of] if as_of is not None else ddf
-        sig_etf[code[-6:]] = {"name": NAMES.get(code, code[-6:]), "px": round(float(r["close"]), 2),
-                              "chg": round(float(r["close"] / (_tail2["close"].iloc[-2] if as_of else ddf["close"].iloc[-2]) - 1) * 100, 2),
-                              "score": round(float(sc), 1), "tier": tier_of(float(sc)),
-                              "ma5_above": bool(not pd.isna(r.get("ma5", np.nan)) and r["close"] > r["ma5"])}
-    erows.sort(key=lambda kv: -kv[1])
-    print(f"ETF 池 {len(etf_pool)} 只 → 动量分 Top10 ({time.time()-t0:.0f}s)", flush=True)
-    etf_top = erows[:10]
+    # 2) ETF 动量 Top10（2026-08-17 用户决策移除：ETF 表现不佳，短线池去 ETF）
+    etf_top = []
 
     # 3) 基金动量 Top10
     fund_pool = S.load_fund_pool(3000)
@@ -281,7 +259,6 @@ def calc_signals(as_of=None):
             "kline": [], "factor_hist": [], "trades": {"v9_auto": [], "v8_lite": []},
         }
     order = {"股票": [c[-6:] for c, _, _, _ in stock_top],
-             "ETF": [c[-6:] for c, _, _, _ in etf_top],
              "基金": [c[-6:] for c, _, _, _ in fund_top]}
     _eff = as_of if as_of is not None else str(ddf.index[-1].date())
     out = {"as_of": _eff, "details": details, "tiers": order}
@@ -297,7 +274,7 @@ def build(as_of=None):
         f.write("window.SHORT_POOL = " + json.dumps(out, ensure_ascii=False) + ";")
     with open(BASE / "short_signals.js", "w", encoding="utf-8") as f:
         f.write("window.SHORT_SIGNALS = " + json.dumps(sigs, ensure_ascii=False) + ";")
-    print(f"全市场信号 {len(sig_stock)}+{len(sig_etf)}+{len(sig_fund)} 只 → short_signals.js", flush=True)
+    print(f"全市场信号 {len(sig_stock)}+{len(sig_fund)} 只 → short_signals.js（2026-08-17 去 ETF）", flush=True)
 
 if __name__ == "__main__":
     import time

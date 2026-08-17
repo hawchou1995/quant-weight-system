@@ -220,11 +220,11 @@ rebal21 = [d for d in all_days[::21]]
 prev_rebal = [d for d in rebal21 if d < all_days[-1]][-2]   # 上次完整再平衡（档位变化对比）
 last_day = all_days[-1]                                     # 08-14
 
-# 个人版自选池：用户原始固定池（20 股 + 5 ETF = v8_lite 口径，不动） + 6 只基金
+# 个人版自选池：用户原始固定池（20 股，2026-08-17 去 ETF） + 4 只基金（去 014002/020900）
 MAIN_CODES = ['300502','300308','600498','601138','002463','002384','600183','300476','603986',
               '002185','605358','603228','603339','000636','605189','600403','002879','600162','000759','002474']
-ETFS = ['159516','515880','516150','560390','159841']
-FUNDS = ['008254','018036','002891','024239','014002','020900']
+ETFS = []   # 2026-08-17 用户决策：去 ETF
+FUNDS = ['008254','018036','002891','024239']   # 2026-08-17 去 014002/020900
 
 # 普适版自动池：按板块互补分层（main 主板10 / gem 创业板10 / star 科创板10 / etf 10 / fund 10），
 # 档间不重复，与个人版池也不重复——每档恰好 10 只唯一标的
@@ -274,31 +274,28 @@ _v8_used = set(MAIN_CODES) | set(ETFS) | set(FUNDS)
 V9_MAIN = v9_rank_board("main", 10, exclude=_v8_used)       # 主板 10
 V9_GEM  = v9_rank_board("gem", 10, exclude=_v8_used | set(V9_MAIN))   # 创业板 10
 V9_STAR = v9_rank_board("star", 10, exclude=_v8_used | set(V9_MAIN) | set(V9_GEM))  # 科创板 10
-# 普适版 ETF Top10（避开个人版 5 只 ETF）
-_etf_pool = json.load(open(BASE / "etf_top_pool.json", encoding="utf-8"))
-V9_ETF = [x["code"] for x in _etf_pool["top"] if x["code"] not in ETFS][:10]
-# 普适版基金 Top10（避开个人版 6 只基金；从缓存读）
+# 2026-08-17 用户决策：全池去 ETF（etf 分层移除，不再从 etf_top_pool.json 取）
+V9_ETF = []
+# 普适版基金 Top10（避开个人版 4 只基金；从缓存读）
 _fund_pool_f = BASE / "fund_top_pool.json"
 if _fund_pool_f.exists():
     _fund_pool = json.load(open(_fund_pool_f, encoding="utf-8"))
     V9_FUND = [x["code"] for x in _fund_pool["top"] if x["code"] not in FUNDS][:10]
 else:
     V9_FUND = FUNDS[:]
-# 普适版分层清单（股票按权限 + ETF + 基金，供监控表按类型/权限过滤）
+# 普适版分层清单（股票按权限 + 基金，供监控表按类型/权限过滤；2026-08-17 去 etf 层）
 V9_TIERS = {
     "main": [k[-6:] for k in V9_MAIN],
     "gem":  [k[-6:] for k in V9_GEM],
     "star": [k[-6:] for k in V9_STAR],
-    "etf":  V9_ETF,
     "fund": V9_FUND,
 }
 # 普适版监控池全集（分层，不去重——同一标的多档出现属正常）
-V9_CODES = V9_TIERS["main"] + V9_TIERS["gem"] + V9_TIERS["star"] + V9_TIERS["etf"] + V9_TIERS["fund"]
+V9_CODES = V9_TIERS["main"] + V9_TIERS["gem"] + V9_TIERS["star"] + V9_TIERS["fund"]
 
-# 权限映射：main=主板 / gem=创业板 / star=科创板 / etf / fund
+# 权限映射：main=主板 / gem=创业板 / star=科创板 / fund（2026-08-17 去 etf）
 PERM_OF = {}
 for c in MAIN_CODES: PERM_OF[c] = "main"
-for c in ETFS:       PERM_OF[c] = "etf"
 for c in FUNDS:      PERM_OF[c] = "fund"
 # 普适版按板块映射权限（用于普适版表权限过滤）
 for c in V9_CODES:
@@ -321,12 +318,8 @@ for c in ALL_CODES:
         ddf = load_hist_df(c)              # 个人版基金：data_hist 净值
     elif c in V9_FUND:
         ddf = load_fund_cache_df(c)        # 普适版基金：fund_nav_cache 净值
-    elif c in V9_ETF or c in ETFS:
-        ddf = load_etf_df(c)               # 普适版/个人版 ETF：data_full sh5/sz1
-        if ddf is None:
-            ddf = load_hist_df(c)          # fallback：data_hist 净值
     else:
-        ddf = get_pool_df(k)               # 股票：data_full
+        ddf = get_pool_df(k)               # 股票：data_full（2026-08-17 去 ETF）
     if ddf is None or len(ddf) == 0:
         continue
     # 最新收盘（08-14 或该标的最新）
