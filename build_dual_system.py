@@ -365,6 +365,13 @@ WATCH_CARD = f'''<div class="card" id="watch-card">
 <div id="watch-table"></div>
 </div>'''
 
+# 全量池中/长线年跟踪池（2026-08-17 用户需求：上榜跟踪 1 年，再上榜 +1 年；track_v9 由 build_enhanced_data.py 维护）
+WATCH_V9_CARD = f'''<div class="card" id="watch-v9-card">
+<h2>📌 全量池中/长线跟踪 <span class="badge badge-auto">上榜跟踪 1 年 · 再上榜 +1 年</span> <span class="count" id="watch-v9-count" style="font-size:12px"></span></h2>
+<div class="sub">上方全量池表<b>上榜标的</b>（v9_tiers：main/gem/star/fund）每次收盘自动加入跟踪，持续 1 年（365 天）；掉出池后保留至 entry+365 天（显示最后收盘快照）；<b>再次上榜 → 从再上榜日起重新计时 1 年</b> · 数据截至 {DATA["meta"].get("as_of", "—")}（收盘）</div>
+<div id="watch-v9-table"></div>
+</div>'''
+
 # ---- 复盘日志 + 更新日志（v5.11.1 内嵌视图：与各池同形态，导航内切换）----
 def md_to_html(md):
     """轻量 markdown → HTML（标题/表格/列表/粗体/代码/引用），复用主题 .tbl 样式，全部走 CSS 变量"""
@@ -566,6 +573,7 @@ html = f"""<!doctype html>
   "🅰️ 全量池中/长线", "auto", "全市场自动池 · 股票分层+基金 ｜ 全市场绝对规则筛池 Top3 等权 · 月轮动 · 移动止损4.5% · MA150择时 ｜ 回测参考见「监控总览」",
   v9_items, "tbl-v9", "card-tbl-v9",
   "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测参考在监控总览视图",
+  extra_card=WATCH_V9_CARD,
   as_of=DATA["meta"].get("as_of", "—"), intraday_note=DATA["meta"].get("intraday"),
   as_of_min=DATA["meta"].get("intraday_ts") or DATA["meta"].get("as_of_min"))}
 
@@ -631,7 +639,7 @@ html = f"""<!doctype html>
 /* 三视图导航（覆盖默认 4 项） */
 window.ENH.nav = [
   ["overview","📊","监控总览",[["overview","总览统计"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
-  ["sys-auto","🅰️","全量池中/长线",[["card-tbl-v9","标的汇总表"],["card-tbl-v9-detail","逐标的详情"]]],
+  ["sys-auto","🅰️","全量池中/长线",[["card-tbl-v9","标的汇总表"],["card-tbl-v9-detail","逐标的详情"],["watch-v9-card","中长线跟踪"]]],
   ["sys-lite","🅱️","固定池中/长线",[["card-tbl-v8","标的汇总表"],["card-tbl-v8-detail","逐标的详情"]]],
   ["short","⚡","全量池短线",[["card-tbl-short","标的汇总表"],["watch-card","短线跟踪"],["card-tbl-short-detail","逐标的详情"]]]
 ];
@@ -779,6 +787,50 @@ document.addEventListener('DOMContentLoaded',function(){{
   var wi=document.getElementById('watch-input');
   if(wi)wi.addEventListener('keydown',function(e){{if(e.key==='Enter'&&ws)ws.click();}});
   renderWatch();
+  /* 全量池中/长线年跟踪池（2026-08-17 用户需求：上榜 1 年，再上榜 +1 年；数据由 build_enhanced_data.py 维护） */
+  function renderV9Watch(){{
+    var box=document.getElementById('watch-v9-table');if(!box)return;
+    var E=window.ENH;if(!E||!E.track_v9){{box.innerHTML='<div class="sub">暂无跟踪数据</div>';return;}}
+    var track=E.track_v9||{{}};
+    var inPool={{}};
+    var t9=E.meta&&E.meta.v9_tiers?E.meta.v9_tiers:{{}};
+    Object.keys(t9).forEach(function(g){{(t9[g]||[]).forEach(function(c){{inPool[c]=1;}});}});
+    var now=new Date();var rows=[];
+    Object.keys(track).forEach(function(code){{
+      var t=track[code]||{{}};var entry=t.entry?new Date(String(t.entry).replace(/-/g,'/')):null;
+      var age=entry?Math.floor((now-entry)/86400000):0;
+      rows.push({{code:code,entry:t.entry||'—',age:age,pool:t.pool||'',last:t.last||{{}}}});
+    }});
+    var cnt=document.getElementById('watch-v9-count');
+    if(cnt)cnt.textContent='跟踪 '+rows.length+' 只';
+    if(!rows.length){{box.innerHTML='<div class="sub" style="color:var(--faint)">暂无跟踪 —— 全量池中/长线上榜标的自动加入，保留 1 年</div>';return;}}
+    rows.sort(function(a,b){{
+      var da=a.entry!=='—'?new Date(String(a.entry).replace(/-/g,'/')):null;
+      var db=b.entry!=='—'?new Date(String(b.entry).replace(/-/g,'/')):null;
+      if(!da)return 1;if(!db)return -1;return db-da;}});
+    var h='<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>板块</th><th style="text-align:center">入池日期</th><th style="text-align:center">已跟踪</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">权重分</th><th style="text-align:center">档位</th><th style="text-align:center">状态</th></tr></thead><tbody>';
+    rows.forEach(function(r){{
+      var code=r.code;
+      var live=E.details&&E.details[code];
+      var rec=live||r.last||{{}};
+      var nm=rec.name||'—';
+      var px=(rec.px!==undefined&&rec.px!==null)?rec.px:null;
+      var chg=(rec.chg!==undefined&&rec.chg!==null)?rec.chg:null;
+      var sc=(rec.score!==undefined&&rec.score!==null)?rec.score:null;
+      var tier=rec.tier||'—';
+      var inP=inPool[code]?1:0;
+      var ageS=r.age+' 天 / 剩 '+(365-r.age)+' 天';
+      var status=inP?'<span style="color:#dc2626;font-weight:600">在池</span>':'<span style="color:var(--faint)">已掉出池（观察）</span>';
+      h+='<tr><td>'+code+'</td><td>'+nm+'</td><td>'+(r.pool||'—')+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+ageS+'</td>'+
+         '<td style="text-align:right">'+(px===null?'—':px.toFixed(2))+'</td>'+
+         '<td style="text-align:right" class="'+(chg===null?'':(chg>0?'up':'down'))+'">'+(chg===null?'—':(chg>0?'+':'')+chg.toFixed(2)+'%')+'</td>'+
+         '<td style="text-align:center">'+(sc===null?'—':sc.toFixed(1))+'</td>'+
+         '<td style="text-align:center">'+tier+'</td><td style="text-align:center">'+status+'</td></tr>';
+    }});
+    h+='</tbody></table>';
+    box.innerHTML=h;
+  }}
+  renderV9Watch();
   /* 大卡片折叠：所有 .card 的标题可点击折叠/展开（.stock-card 小卡不受影响） */
   document.querySelectorAll('.card').forEach(function(card){{
     var h2=null;

@@ -230,12 +230,12 @@ function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)retu
           var el=document.getElementById(sub);
           if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
         },30);}
-      // 主项折叠/展开：切到新视图自动展开；同视图重复点击 = 折叠切换
+      // 主项折叠/展开：只有重复点击当前激活主项才折叠切换；首次/切新视图一律展开
       else if(a.getAttribute('data-toggle')&&a.nextElementSibling&&a.nextElementSibling.classList.contains('sn-sub')){
         var grp=a.nextElementSibling;
         var curMain=nav.querySelector('a[data-anchor]:not([data-sub]).active');
-        if(curMain&&curMain!==a){grp.classList.remove('collapsed');}
-        else{grp.classList.toggle('collapsed');}
+        if(curMain&&curMain===a){grp.classList.toggle('collapsed');}
+        else{grp.classList.remove('collapsed');}
       }
       nav.querySelectorAll('a[data-anchor]').forEach(function(x){x.classList.toggle('active',x===a);});
       // 子项点击时父主项保持高亮

@@ -408,6 +408,48 @@ def load_curve(f):
     v = df["value"].astype(float).values
     return v / v[0] * 100
 
+
+# ---------------- 全量池中/长线年跟踪池（2026-08-17 用户需求） ----------------
+def maintain_track_v9():
+    """上榜跟踪 1 年：v9_tiers 上榜标的自动入池。
+    规则：新上榜/再上榜（上次构建不在池）→ entry=今日（再上榜 = 重新计时 1 年）；
+         持续在池 → 保持 entry；掉出池保留最后快照；entry 满 365 天 → 移除。
+    track_v9: {code: {entry, last_seen, pool, last:{px,chg,score,tier,date}}}"""
+    today = str(last_day.date())
+    old, old_tiers = {}, {}
+    try:
+        _old = json.loads((BASE / "enhanced_data.js").read_text(encoding="utf-8")[len("window.ENH = "):-1])
+        old = _old.get("track_v9", {}) or {}
+        old_tiers = _old.get("meta", {}).get("v9_tiers", {}) or {}
+    except Exception:
+        pass
+    today_codes = {c for codes in V9_TIERS.values() for c in codes}
+    old_codes = {c for codes in old_tiers.values() for c in codes}
+    track = dict(old)
+    for code in today_codes:
+        d = details.get(code, {}) or {}
+        snap = {"px": d.get("px"), "chg": d.get("chg"), "score": d.get("score"),
+                "tier": d.get("tier"), "date": today}
+        rec = track.get(code)
+        if rec is None:
+            track[code] = {"entry": today, "last_seen": today,
+                           "pool": d.get("board", ""), "last": snap}
+        else:
+            if code not in old_codes and str(rec.get("last_seen", "")) < today:
+                rec["entry"] = today   # 再上榜：重新计时 1 年
+            rec["last_seen"] = today
+            if d:
+                rec["last"] = snap
+            track[code] = rec
+    # entry 满 365 天移除
+    from datetime import timedelta
+    cutoff = pd.Timestamp(last_day.date() - timedelta(days=365))
+    track = {c: r for c, r in track.items()
+             if pd.Timestamp(str(r.get("entry", today))) > cutoff}
+    print(f"全量池中/长线跟踪池: {len(track)} 只（上榜 1 年，再上榜 +1 年）", flush=True)
+    return track
+
+
 s_auto = json.load(open(BASE / "v9_auto_summary.json", encoding="utf-8"))["summary"]
 s_lite = json.load(open(BASE / "v8_lite_summary.json", encoding="utf-8"))["summary"]
 
@@ -422,6 +464,7 @@ out = {
     "meta": {"as_of": str(last_day.date()), "generated": __import__("datetime").datetime.now().strftime("%Y-%m-%d %H:%M"), "overlap": OVERLAP,
              "v9_tiers": V9_TIERS},
     "nav": [["overview", "📊", "监控总览"], ["sys-auto", "🅰️", "普适版"], ["sys-lite", "🅱️", "个人版"], ["table", "📋", "标的监控表"]],
+    "track_v9": maintain_track_v9(),
     "monitor_reports": [
         {"code": c, "name": d["name"], "tier": d["tier"]}
         for c, d in sorted(details.items(), key=lambda kv: -kv[1]["score"])
