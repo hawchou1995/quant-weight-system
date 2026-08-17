@@ -17,7 +17,7 @@ BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = BASE / "data_full"
 INDEX_FILE = BASE / "index_000300.csv"
 START = "2016-01-04"
-END = "2026-08-14"
+END = "2026-08-17"
 
 COMMISSION = 0.00025
 SELL_TAX = 0.0005

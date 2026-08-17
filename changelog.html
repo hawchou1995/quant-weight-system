@@ -167,7 +167,120 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <h2 style="margin:0">📝 更新日志 <span class="badge badge-auto">GitHub Release 风格</span></h2>
 </div>
 <div class="sub">量化系统版本更新记录：复盘发现设计缺陷 → 启动系统更新 → 在此登记版本/日期/更新内容</div>
-<div class="rel"><div class="rel-head">v5.11.4 - 2026-08-16</div><div class="rel-body">
+<div class="rel"><div class="rel-head">复盘登记 - 2026-08-17（无版本变更）</div><div class="rel-body">
+
+<p><b>收盘复盘缺陷登记（review/2026-08-17_sig2026-08-14.md）</b></p>
+<div class='lg-item'>🔴 深套标的：香江控股（600162，固定池）买入 4.66 → 现价 4.40，-5.58%（<-5% 深套线触发）；8/14 信号分 81 满仓加仓，T+1=8/17 开盘买入</div>
+<div class='lg-item'>三池复盘：83 标的 / 65 买入信号 / 胜率 75%（+2.70%）：全量池 87%（基准 48.1%）/ 固定池 75%（基准 57.1%）/ 短线 59%（基准 50.9%，其中创业板 40% 偏弱）</div>
+<div class='lg-item'>累计（3 篇）：246 标的 / 209 买入 / 胜率 66%（+2.25%）</div>
+
+<p><b>数据源降级记录（运营）</b></p>
+<div class='lg-item'>新浪日线源 8/17 收盘后未出当日 K 线（akshare stock_zh_a_daily / fund_etf_hist_sina 尾部仍为 8/14，腾讯源同样滞后）；按预案降级：新浪全市场实时快照（stock_zh_a_spot，股票）+ hq.sinajs.cn 实时接口（ETF）回填 8/17 日 K 共 7163 只（股票 5537 + ETF 1626），与 westock 交叉验证一致</div>
+<div class='lg-item'>因子缓存 v8_factor_cache.pkl 为当日早盘产物（尾部 8/14）未被流水线刷新，导致首次复盘 T+1 无数据全跳过 → 删除缓存重建后正常（复盘 83 明细，计算日 8/17）</div>
+<div class='lg-item'>⚠️ 观察项：build_short_pool as_of 标签取基金净值尾部（T-1，8/14），股票信号本身用最新日（8/17），仅标签口径不一致，未改代码（待用户决策是否修）</div>
+
+</div></div><div class="rel"><div class="rel-head">v5.11.13 - 2026-08-16</div><div class="rel-body">
+
+<p><b>README 版本不同步修复（用户反馈驱动：GitHub 显示 v5.11.4）</b></p>
+<div class='lg-item'>修复：README.md 标题长期停在 v5.11.4（v5.11.5 重写后 7 个版本只更新正文没动标题）；版本历程表同样停在 v5.11.4（当前）→ 补 v5.11.5-v5.11.12 全行，当前标 v5.11.12</div>
+<div class='lg-item'>顺带修复三处过时数字：①v9 行 +825%→+638.1%（v5.11.9 该更新实际未进 git，GitHub 上一直是 0 滑点口径）②短线行 ETF +103.3%→+84.1%（v5.11.12 qfq 修正）③中长线滑点行 ETF 绝对收益 +63%→+65.2%</div>
+<div class='lg-item'>教训：README 是 GitHub 门面，标题版本号 + 三池回测数字每次迭代都要纳入同步检查（与 build_dual_system 的卡数字同源核对）</div>
+
+</div></div><div class="rel"><div class="rel-head">v5.11.12 - 2026-08-16</div><div class="rel-body">
+
+<p><b>ETF 复权重抓（P1 落地，风险审查行动项）</b></p>
+<div class='lg-item'>fetch_etf_qfq.py：腾讯 qfq 分段翻页（640 根/页往前翻）重建全历史前复权——1454 只新旧对比：<b>92% 无差异、90 只（7%）差异>5% 且已全部修正</b>（除权失真实证存在）；腾讯限流后成功 416 只，剩余保留旧数据待补抓（etf_qfq_fail.json）</div>
+<div class='lg-item'>除权修正对回测影响：<b>ETF 短线 slip20 +103.3%→+84.1%</b>（夏普 1.00→0.85，此前高收益含除权失真）；中长线 +62.8%→+65.2%（持平）</div>
+<div class='lg-item'>看板 ETF 两卡已更新（短线 +84.1% / 中长线 +65.2%，标签注明 qfq 复权）；风险报告 P1 状态更新</div>
+
+</div></div><div class="rel"><div class="rel-head">v5.11.12 - 2026-08-16</div><div class="rel-body">
+
+<p><b>ETF 复权重抓（P1 落地，风险审查行动项）</b></p>
+<div class='lg-item'>fetch_etf_qfq.py：腾讯 qfq 分段翻页（640 根/页往前翻）重建全历史前复权——1454 只新旧对比：<b>92% 无差异、90 只（7%）差异>5% 且已全部修正</b>（除权失真实证存在）；腾讯限流后成功 416 只，剩余保留旧数据待补抓（etf_qfq_fail.json）</div>
+<div class='lg-item'>除权修正对回测影响：<b>ETF 短线 slip20 +103.3%→+84.1%</b>（夏普 1.00→0.85，此前高收益含除权失真）；中长线 +62.8%→+65.2%（持平）</div>
+<div class='lg-item'>看板 ETF 两卡已更新（短线 +84.1% / 中长线 +65.2%，标签注明 qfq 复权）；风险报告 P1 状态更新</div>
+
+</div></div><div class="rel"><div class="rel-head">v5.11.11 - 2026-08-16</div><div class="rel-body">
+
+<p><b>回测风险审查（过拟合/未来函数/幸存者偏差，用户 grill 驱动）</b></p>
+<div class='lg-item'>幸存者偏差：✅ 实证无——data_full 7421 只含 487 只退市/ST（腾讯源补抓），load_stock_pool 无在市过滤，回测中 ST/退市股可被持有且亏损真实计入（比常规回测更保守）</div>
+<div class='lg-item'>未来函数：✅ 核心时序正确（T 收盘信号→T+1 开盘成交，rolling/ewm 无中心窗口）；⚠️ 两处数据层风险——①在市股前复权 qfq=用最新除权因子回算历史（轻微未来函数，影响中偏小）②ETF 原始价未除权调整（README 声称手工修正但代码无实现）</div>
+<div class='lg-item'>过拟合：✅ 分段验证通过（seg_validate.py 固化）——短线 2016-21 夏普1.42 / 2022-26 2.08；v9 1.77/1.23；v8 1.07/1.15，两段均正无过拟合形态；残余风险=全历史一次性选优</div>
+<div class='lg-item'>行动项：P1 ETF 改东财复权接口重抓 + seg_validate.py 纳入每次参数优化交付；P2 股票复权方式评估 + 涨跌停/停牌保守处理开关</div>
+<div class='lg-item'>报告：research-回测风险审查-20260816.md（知识库）</div>
+</div></div><div class="rel"><div class="rel-head">v5.11.11 - 2026-08-16</div><div class="rel-body">
+
+<p><b>回测风险审查（过拟合/未来函数/幸存者偏差，用户 grill 驱动）</b></p>
+<div class='lg-item'>幸存者偏差：✅ 实证无——data_full 7421 只含 487 只退市/ST（腾讯源补抓），load_stock_pool 无在市过滤，回测中 ST/退市股可被持有且亏损真实计入（比常规回测更保守）</div>
+<div class='lg-item'>未来函数：✅ 核心时序正确（T 收盘信号→T+1 开盘成交，rolling/ewm 无中心窗口）；⚠️ 两处数据层风险——①在市股前复权 qfq=用最新除权因子回算历史（轻微未来函数，影响中偏小）②ETF 原始价未除权调整（README 声称手工修正但代码无实现）</div>
+<div class='lg-item'>过拟合：✅ 分段验证通过（seg_validate.py 固化）——短线 2016-21 夏普1.42 / 2022-26 2.08；v9 1.77/1.23；v8 1.07/1.15，两段均正无过拟合形态；残余风险=全历史一次性选优</div>
+<div class='lg-item'>行动项：P1 ETF 改东财复权接口重抓 + seg_validate.py 纳入每次参数优化交付；P2 股票复权方式评估 + 涨跌停/停牌保守处理开关</div>
+<div class='lg-item'>报告：research-回测风险审查-20260816.md（知识库）</div>
+</div></div><div class="rel"><div class="rel-head">v5.11.10 - 2026-08-16</div><div class="rel-body">
+
+<p><b>投产冒烟测试（模拟公司 GitHub 部署，grill 驱动）</b></p>
+<div class='lg-item'><b>grill 抓到重大投产风险：67 处硬编码家目录路径</b>（58 个文件 BASE = C:/Users/XAUTHUB/... + 22 处 sys.path + v8_fund_v5 CACHE）——公司 clone 到任意目录全部必崩 → <b>全部改为 __file__ 自动探测</b>（部署零配置）</div>
+<div class='lg-item'>冒烟测试（干净 clone → 解压数据包 → 全构建链）：clone 196 文件 ✅ ｜ 数据 7421+19359+62 ✅ ｜ enhanced_data 80 只 ✅ ｜ short_pool 4864+1014+2991 ✅ ｜ 主看板 841KB ✅ ｜ 日志页 ✅ ｜ 复盘三池 88 只 ✅ —— <b>公司部署链路全通</b></div>
+<div class='lg-item'>残余说明：fullpool_v6_dashboard/v8_dashboard/v8_triple_dashboard 引用本机 skill 参考目录（legacy 渲染，不在 refresh_daily 投产链），公司环境不影响主看板</div>
+
+<p><b>8 篇微信文章策略研究（穷举数据验证，用户提供文章清单）</b></p>
+<div class='lg-item'>4 个可量化方向全部穷举（含 20bps 滑点）：小止盈（文2）/ 冲高回落事件（文4）/ 不过热（文7）/ 天量剔除（文8）</div>
+<div class='lg-item'>结论：<b>无一跑赢现行三池参数</b>——①文2 小止盈 TP3%/SL5% 在反转池 -16.2%（毁灭性，反转=大赢小亏路线与止盈互斥）②文4 冲高率 87% 复现但策略化 -0.44%/笔（盘中最高=统计口径幻觉，REFX 未来函数不可成交）③文7 不过热 v9 无增益（动态门槛已覆盖）④文8 天量剔除无影响（Top10 轮动天然规避）</div>
+<div class='lg-item'>新增备用参数：short_engine.sky_vol_filter（天量剔除）/ v9_auto.hot_filter（不过热）</div>
+<div class='lg-item'>产出 research_articles.md 研究报告 + research_skyfall/opt 脚本与数据</div>
+<div class='lg-item'>交付：一键打开脚本「打开看板.bat」（双击即开 dual_system.html）</div>
+
+</div></div><div class="rel"><div class="rel-head">v5.11.10 - 2026-08-16</div><div class="rel-body">
+
+<p><b>投产冒烟测试（模拟公司 GitHub 部署，grill 驱动）</b></p>
+<div class='lg-item'><b>grill 抓到重大投产风险：67 处硬编码家目录路径</b>（58 个文件 BASE = C:/Users/XAUTHUB/... + 22 处 sys.path + v8_fund_v5 CACHE）——公司 clone 到任意目录全部必崩 → <b>全部改为 __file__ 自动探测</b>（部署零配置）</div>
+<div class='lg-item'>冒烟测试（干净 clone → 解压数据包 → 全构建链）：clone 196 文件 ✅ ｜ 数据 7421+19359+62 ✅ ｜ enhanced_data 80 只 ✅ ｜ short_pool 4864+1014+2991 ✅ ｜ 主看板 841KB ✅ ｜ 日志页 ✅ ｜ 复盘三池 88 只 ✅ —— <b>公司部署链路全通</b></div>
+<div class='lg-item'>残余说明：fullpool_v6_dashboard/v8_dashboard/v8_triple_dashboard 引用本机 skill 参考目录（legacy 渲染，不在 refresh_daily 投产链），公司环境不影响主看板</div>
+
+<p><b>8 篇微信文章策略研究（穷举数据验证，用户提供文章清单）</b></p>
+<div class='lg-item'>4 个可量化方向全部穷举（含 20bps 滑点）：小止盈（文2）/ 冲高回落事件（文4）/ 不过热（文7）/ 天量剔除（文8）</div>
+<div class='lg-item'>结论：<b>无一跑赢现行三池参数</b>——①文2 小止盈 TP3%/SL5% 在反转池 -16.2%（毁灭性，反转=大赢小亏路线与止盈互斥）②文4 冲高率 87% 复现但策略化 -0.44%/笔（盘中最高=统计口径幻觉，REFX 未来函数不可成交）③文7 不过热 v9 无增益（动态门槛已覆盖）④文8 天量剔除无影响（Top10 轮动天然规避）</div>
+<div class='lg-item'>新增备用参数：short_engine.sky_vol_filter（天量剔除）/ v9_auto.hot_filter（不过热）</div>
+<div class='lg-item'>产出 research_articles.md 研究报告 + research_skyfall/opt 脚本与数据</div>
+<div class='lg-item'>交付：一键打开脚本「打开看板.bat」（双击即开 dual_system.html）</div>
+
+</div></div><div class="rel"><div class="rel-head">v5.11.9 - 2026-08-16</div><div class="rel-body">
+
+<p><b>中长线回测卡同步含滑点口径（用户反馈驱动：'中长线还是老数据'）</b></p>
+<div class='lg-item'>v9 分层 4 卡 + ETF 卡 KPI 全部切换为含滑点口径（fallback 0 滑点）：一体 +638.1%（原 +825%）/ 主板 +431.7% / 创业板 +416.0% / 科创板 +112.6%（均含20bps）｜ ETF 中长线 +62.8%（原 +130.9%，含20bps）｜ 基金卡保持原版 +184.3% + 注明申赎费敏感度（30bps≈-10%，半年轮动影响小）</div>
+<div class='lg-item'>split_backtest v9 模式加 --slip 参数；run_fund_v5 加 slippage_bps（净值成交：买入上浮卖出下浮，市值/止损信号用真实净值——修正启发式误判卖出/市值方向）</div>
+<div class='lg-item'>踩坑：v8_fund_summary.json 生产版（+184.3% 混合版 v3）生成脚本不可考，被 V5 参数覆盖后从 git 恢复原版——<b>结论：生产 summary 文件覆盖前必须先查生成脚本</b></div>
+<div class='lg-item'>产物路径明确：dual_system.html（看板）/ review/（复盘）/ 各 *_summary.json（回测 KPI）/ 压缩包（Downloads/Chrome/量化交易）</div>
+
+</div></div><div class="rel"><div class="rel-head">v5.11.8 - 2026-08-16</div><div class="rel-body">
+
+<p><b>中长线滑点建模（用户反馈驱动）</b></p>
+<div class='lg-item'>v9_auto / v8_lite / etf_opt_v3 三个中长线引擎加 slippage_bps（买入上浮卖出下浮，佣金印花税原有）</div>
+<div class='lg-item'>中长线滑点扫描（sweep_ml_slip.py，slip 0/10/20/30）：<b>换手低 → 影响显著小于短线</b>——全量池 v9（年18笔）20bps -23% 夏普 1.43、30bps -31% ｜ 固定池 v8（年12笔）20bps -13%、30bps -18% ｜ ETF 中长线（年33笔）20bps -44%（绝对收益仍 +63%）、30bps -62% ｜ 对比短线股票 20bps -48%</div>
+<div class='lg-item'>结论：中长线在实盘 10-20bps 滑点区间内策略稳健（夏普 1.3+），滑点影响随换手率单调上升——换手率是成本敏感度的第一决定因素</div>
+<div class='lg-item'>看板总览中长线区加滑点敏感性说明；README 已知限制补充中长线数据</div>
+
+</div></div><div class="rel"><div class="rel-head">v5.11.7 - 2026-08-16</div><div class="rel-body">
+
+<p><b>滑点稳健参数优化 + 复盘累计总览 + HTML 同步（用户反馈驱动）</b></p>
+<div class='lg-item'>滑点稳健扫描（slip_opt_grid.json，H×S 网格 × slip0/20）：<b>股票 S50→S55</b>（20bps 夏普 1.69→1.75、回撤 -8.7%→-7.1%；理想口径也提升 2.29→2.38）｜ ETF S50→S55 ｜ <b>基金 H5→H10 换手减半</b>（A类30bps +10.6%→+90.7%；C类5bps +205%→+243.5%）——换手率是滑点影响的第一杠杆</div>
+<div class='lg-item'>固化双口径：finalize_short_v3.py 输出理想 + 含滑点两套 summary/equity；<b>看板短线卡主显含滑点口径</b>（股票 +315.7%/1.75、ETF +103.3%/1.00、基金 C类 +243.5%/0.83，标签注明）</div>
+<div class='lg-item'>分层回测同步：split_backtest.py 短线改 S55 + 20bps 重跑（一体 +357.0% / 主板 +318.9% / 创业板 +458.4% / 科创板 +161.9%）——修复分层卡旧参数残留</div>
+<div class='lg-item'>复盘日志新增<b>累计总览</b>：解析各篇 md 总览表累加（天然防重），md 内"📈 累计总览（自首篇以来）"节 + review/cumulative.json</div>
+
+</div></div><div class="rel"><div class="rel-head">v5.11.6 - 2026-08-16</div><div class="rel-body">
+
+<p><b>滑点/冲击成本建模（用户反馈驱动）</b></p>
+<div class='lg-item'>run_short/run_squeeze 加 slippage_bps 参数（每边：买入价上浮、卖出价下浮；基金=T+1 净值申赎费口径）</div>
+<div class='lg-item'>sweep_slip.py 敏感性扫描（三池最优参数 × 滑点网格）：<b>股票 10/20/30bps → +462%/+331%/+231%（夏普 1.99/1.69/1.39）</b>——高换手策略对滑点承受力强，实盘预期区间明确 ｜ ETF 10bps → +162%（30bps 以上失效）｜ <b>基金 30bps 申赎费下 +273%→+11% 归零——场外基金短线必须 C 类份额</b>（重要实盘结论）</div>
+<div class='lg-item'>看板短线区加滑点敏感性说明；README 已知限制更新（佣金万2.5+印花税万5 原本已含）</div>
+
+</div></div><div class="rel"><div class="rel-head">v5.11.5 - 2026-08-16</div><div class="rel-body">
+
+<p><b>README 全面更新（用户反馈驱动）</b></p>
+<div class='lg-item'>修复：根目录 README.md 长期停留在 v8 描述（缺 v5.9-v5.11.4 全部内容）——重写为 v5.11.4 全量文档（三池监控/两套体系/复盘闭环/版本历程/核心文件/快速开始/已知限制）</div>
+
+</div></div><div class="rel"><div class="rel-head">v5.11.4 - 2026-08-16</div><div class="rel-body">
 
 <p><b>日志去重修复（用户反馈驱动）</b></p>
 <div class='lg-item'>修复：复盘日志出现多个相同日期条目——review_daily.py 每次重跑都向索引 insert 同 file 记录（重跑调试多次→3 条重复）；改为写索引前先按 file 替换（同日期复盘重跑自动覆盖），build_dual_system 渲染再加一层同 file 去重</div>
