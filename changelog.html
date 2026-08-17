@@ -167,7 +167,15 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <h2 style="margin:0">📝 更新日志 <span class="badge badge-auto">GitHub Release 风格</span></h2>
 </div>
 <div class="sub">量化系统版本更新记录：复盘发现设计缺陷 → 启动系统更新 → 在此登记版本/日期/更新内容</div>
-<div class="rel"><div class="rel-head">复盘登记 - 2026-08-17（无版本变更）</div><div class="rel-body">
+<div class="rel"><div class="rel-head">功能升级 - 2026-08-17（用户需求，无版本变更）</div><div class="rel-body">
+
+<p><b>全量池短线跟踪自动化 + as_of 标签修复</b></p>
+<div class='lg-item'>① 自动跟踪（用户需求）：build_short_pool.py 新增 track 维护——短线表内<b>可买入标的（强买入/买入，短线分≥50）自动入池</b>（保留历史 entry 日期），<b>30 天后自动移除</b>（服务端 + 前端双重过期过滤）；build_dual_system.py「我的持仓跟踪」卡片升级为「📌 全量池短线跟踪」：自动列表 + 可选手动补充（localStorage，兼容原持仓代码），新增入池日期/已跟踪天数/剩余天数列</div>
+<div class='lg-item'>② as_of 标签修复（「看着是旧的」根因）：build_short_pool.py as_of 原取基金净值尾部（T-1）→ 改为<b>股票数据最新交易日（主口径）+ fund_as_of 单独标注 T-1</b>；看板标题/徽章/信号文件 as_of 恢复为 08-17</div>
+<div class='lg-item'>③ 运行时数据注入修复：HTML 从不加载 short_pool.js（window.SHORT_POOL 运行时不存在，旧 topSet 逻辑从未生效）→ 构建期内嵌精简 SHORT_POOL（as_of/fund_as_of/tiers/track）供跟踪渲染</div>
+<div class='lg-item'>验证：playwright 端到端（chromium-1234 + NODE_OPTIONS 需清空否则驱动报错）——跟踪表 33 行（自动 33 + 手动 0）、无 pageerror；线上标题「数据截至 2026-08-17」</div>
+
+</div></div><div class="rel"><div class="rel-head">复盘登记 - 2026-08-17（无版本变更）</div><div class="rel-body">
 
 <p><b>收盘复盘缺陷登记（review/2026-08-17_sig2026-08-14.md）</b></p>
 <div class='lg-item'>🔴 深套标的：香江控股（600162，固定池）买入 4.66 → 现价 4.40，-5.58%（<-5% 深套线触发）；8/14 信号分 81 满仓加仓，T+1=8/17 开盘买入</div>
@@ -177,7 +185,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <p><b>数据源降级记录（运营）</b></p>
 <div class='lg-item'>新浪日线源 8/17 收盘后未出当日 K 线（akshare stock_zh_a_daily / fund_etf_hist_sina 尾部仍为 8/14，腾讯源同样滞后）；按预案降级：新浪全市场实时快照（stock_zh_a_spot，股票）+ hq.sinajs.cn 实时接口（ETF）回填 8/17 日 K 共 7163 只（股票 5537 + ETF 1626），与 westock 交叉验证一致</div>
 <div class='lg-item'>因子缓存 v8_factor_cache.pkl 为当日早盘产物（尾部 8/14）未被流水线刷新，导致首次复盘 T+1 无数据全跳过 → 删除缓存重建后正常（复盘 83 明细，计算日 8/17）</div>
-<div class='lg-item'>⚠️ 观察项：build_short_pool as_of 标签取基金净值尾部（T-1，8/14），股票信号本身用最新日（8/17），仅标签口径不一致，未改代码（待用户决策是否修）</div>
+<div class='lg-item'>✅ as_of 标签口径已修复（见上方「功能升级」②）：股票主口径 08-17 + fund_as_of 单独标注 T-1</div>
 
 </div></div><div class="rel"><div class="rel-head">v5.11.13 - 2026-08-16</div><div class="rel-body">
 

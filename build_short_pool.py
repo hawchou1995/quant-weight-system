@@ -269,8 +269,12 @@ def calc_signals(as_of=None):
              "创业板": [c[-6:] for c, _, _, _ in stock_top_gem],
              "科创板": [c[-6:] for c, _, _, _ in stock_top_star],
              "基金": [c[-6:] for c, _, _, _ in fund_top]}
-    _eff = as_of if as_of is not None else str(ddf.index[-1].date())
-    out = {"as_of": _eff, "details": details, "tiers": order}
+    # 2026-08-17 修复：as_of 取股票数据最新交易日（主口径），基金净值 T-1 单独标注
+    _stock_tail = max((ddf.index[-1] for ddf in stock_pool.values() if len(ddf)), default=None)
+    _fund_tail = max((ddf.index[-1] for ddf in fund_pool.values() if len(ddf)), default=None)
+    _eff = as_of if as_of is not None else (str(_stock_tail.date()) if _stock_tail is not None else "—")
+    out = {"as_of": _eff, "fund_as_of": str(_fund_tail.date()) if _fund_tail is not None else _eff,
+           "details": details, "tiers": order}
     sigs = {"as_of": out["as_of"], "stock": sig_stock, "etf": sig_etf, "fund": sig_fund}
     return out, sigs
 
@@ -278,12 +282,27 @@ def calc_signals(as_of=None):
 def build(as_of=None):
     """计算并写文件（short_pool.js / short_signals.js / short_pool.json）"""
     out, sigs = calc_signals(as_of)
+    # ---- 自动跟踪池（2026-08-17 用户需求）：上方表格可买入标的（强买入/买入，分≥50）自动入池，30 天后自动移除 ----
+    try:
+        old = json.load(open(BASE / "short_pool.json", encoding="utf-8")).get("track", {}) or {}
+    except Exception:
+        old = {}
+    today = time.strftime("%Y-%m-%d")
+    track = dict(old)                      # 保留历史跟踪（含已掉出池的，满 30 天才删）
+    for code, d in out["details"].items():
+        if (d.get("short_score") or 0) >= 50:
+            if code not in track:
+                track[code] = {"entry": today, "pool": d.get("board", "")}
+    cutoff = pd.Timestamp.now() - pd.Timedelta(days=30)
+    track = {c: v for c, v in track.items() if pd.Timestamp(v.get("entry", today)) > cutoff}
+    out["track"] = track
     json.dump(out, open(BASE / "short_pool.json", "w", encoding="utf-8"), ensure_ascii=False, indent=2)
     with open(BASE / "short_pool.js", "w", encoding="utf-8") as f:
         f.write("window.SHORT_POOL = " + json.dumps(out, ensure_ascii=False) + ";")
     with open(BASE / "short_signals.js", "w", encoding="utf-8") as f:
         f.write("window.SHORT_SIGNALS = " + json.dumps(sigs, ensure_ascii=False) + ";")
     print(f"全市场信号 {len(sig_stock)}+{len(sig_fund)} 只 → short_signals.js（2026-08-17 去 ETF）", flush=True)
+    print(f"自动跟踪 {len(track)} 只（可买入标的，30 天过期移除）", flush=True)
 
 if __name__ == "__main__":
     import time

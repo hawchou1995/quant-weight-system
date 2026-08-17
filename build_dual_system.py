@@ -54,12 +54,17 @@ try:
     SHORT_POOL_ASOF = SHORT_POOL.get("as_of", "—")
     SHORT_POOL_INTRADAY = SHORT_POOL.get("intraday_note") or ""
     SHORT_POOL_ASOF_MIN = SHORT_POOL.get("intraday_ts") or "15:00"
+    # 运行时精简池数据（tiers/track 供「全量池短线跟踪」渲染；HTML 不加载 short_pool.js）
+    SHORT_POOL_SLIM = json.dumps(
+        {k: SHORT_POOL.get(k) for k in ("as_of", "fund_as_of", "tiers", "track")},
+        ensure_ascii=False)
 except Exception as _e:
     print("short_pool 加载失败:", _e)
     v9_short_items = []
     SHORT_POOL_ASOF = "—"
     SHORT_POOL_INTRADAY = ""
     SHORT_POOL_ASOF_MIN = "15:00"
+    SHORT_POOL_SLIM = '{}'
 # 个人版按板块分组（用户固定池，2026-08-17 去 ETF）
 v8_main = [d for d in v8_items if d["perm"] == "main"]
 v8_etf  = [d for d in v8_items if d["perm"] == "etf"]
@@ -343,11 +348,11 @@ def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extr
 
 
 WATCH_CARD = f'''<div class="card" id="watch-card">
-<h2>🔎 我的持仓跟踪 <span class="badge badge-auto">与回测同口径</span></h2>
-<div class="sub">卖出规则（与回测一致）：<b>收盘跌破 MA5 → 次日开盘卖出</b> ｜ 掉出信号池 → 下次轮动换出（约 10 个交易日）｜ 档位减半/清仓 → 按档位操作 · 数据截至 {SHORT_POOL_ASOF} · 每天收盘后跑 refresh_daily.py 刷新</div>
+<h2>📌 全量池短线跟踪 <span class="badge badge-auto">自动 · 保留 30 天</span></h2>
+<div class="sub">上方短线表<b>可买入标的（强买入/买入）</b>每次收盘自动加入跟踪，30 天后自动移除，无需手动添加 · 可手动补充个人持仓代码（如 600498）· 卖出规则（与回测一致）：<b>收盘跌破 MA5 → 次日开盘卖出</b> ｜ 掉出信号池 → 下次轮动换出 ｜ 档位减半/清仓 → 按档位操作 · 数据截至 {SHORT_POOL_ASOF}（基金净值 T-1：{SHORT_POOL.get("fund_as_of", "—")}）</div>
 <div class="watch-bar">
-<input type="text" id="watch-input" placeholder="持仓代码，逗号分隔，如：600641, 159502, 000742">
-<button id="watch-save">💾 保存持仓</button>
+<input type="text" id="watch-input" placeholder="可选：手动补充持仓代码，逗号分隔，如 600498, 002463">
+<button id="watch-save">💾 补充持仓</button>
 <span class="count" id="watch-count"></span>
 </div>
 <div id="watch-table"></div>
@@ -571,7 +576,7 @@ html = f"""<!doctype html>
   "view-short", "sys-short",
   "⚡ 全量池短线", "auto", f"全市场短线信号 Top 池（数据截至 {SHORT_POOL_ASOF}）：股票=反转信号按权限分层各 Top10（主板/创业板/科创板各10，剔ST）｜ 基金=动量 Top10 · 短线分 = 动量30/量价25/通道25/波动20 · 回测参考见「监控总览」",
   v9_short_items, "tbl-short", "card-tbl-short",
-  "信号池 = 回测买入清单：分数≥50 的 TopN 在轮动日全部买入 · 档位 = 短线买入口径（强买入/买入）· 持仓的减仓/清仓信号见下方「我的持仓跟踪」· 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览",
+  "信号池 = 回测买入清单：分数≥50 的 TopN 在轮动日全部买入 · 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览 · 基金行现价为 T-1 净值（场外基金净值次日公布）",
   extra_card=WATCH_CARD, score_sub="动量/量价/通道/波动",
   as_of=SHORT_POOL_ASOF, intraday_note=SHORT_POOL_INTRADAY,
   as_of_min=SHORT_POOL.get("intraday_ts") or SHORT_POOL_ASOF_MIN,
@@ -614,6 +619,7 @@ html = f"""<!doctype html>
 <script src="enhanced_data.js"></script>
 <script src="short_signals.js"></script>
 <script src="monitor/snapshots_index.js"></script>
+<script>window.SHORT_POOL = {SHORT_POOL_SLIM};</script>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
 window.ENH.nav = [["overview","📊","监控总览"],["sys-auto","🅰️","全量池中/长线"],["sys-lite","🅱️","固定池中/长线"],["short","⚡","全量池短线"]];
@@ -709,21 +715,31 @@ document.addEventListener('DOMContentLoaded',function(){{
   applyHash();   // 按 URL hash 定位视图（历史页跳转 dual_system.html#sys-auto 直接显示普适版）
   renderSubCurve();   // 基金回测净值曲线
   renderReportMenu();
-  /* 持仓跟踪：localStorage 存代码 → 查 SHORT_SIGNALS 渲染状态（卖出规则与回测一致） */
+  /* 全量池短线跟踪：自动跟踪池（SHORT_POOL.track，可买入标的 30 天）+ 可选手动补充（localStorage） */
   function renderWatch(){{
     var box=document.getElementById('watch-table');if(!box)return;
-    var codes=(localStorage.getItem('short_watchlist')||'').split(',').map(function(s){{return s.trim();}}).filter(Boolean);
     var S=window.SHORT_SIGNALS;if(!S){{box.innerHTML='<div class="sub">信号数据未加载（缺 short_signals.js）</div>';return;}}
+    var track=(window.SHORT_POOL&&window.SHORT_POOL.track)?window.SHORT_POOL.track:{{}};
+    var manual=(localStorage.getItem('short_watchlist')||'').split(',').map(function(s){{return s.trim();}}).filter(Boolean);
+    var now=new Date();var rows=[];
+    Object.keys(track).forEach(function(code){{
+      var t=track[code]||{{}};var entry=t.entry?new Date(String(t.entry).replace(/-/g,'/')):null;
+      var age=entry?Math.floor((now-entry)/86400000):0;
+      if(age>=30)return;   // 30 天过期（前端兜底，与服务端一致）
+      rows.push({{code:code,entry:t.entry||'—',age:age,auto:true}});
+    }});
+    manual.forEach(function(code){{rows.push({{code:code,entry:'—',age:null,auto:false}});}});
+    var seen={{}};rows=rows.filter(function(r){{if(seen[r.code])return false;seen[r.code]=1;return true;}});
+    var cnt=document.getElementById('watch-count');
+    if(cnt)cnt.textContent='跟踪 '+rows.length+' 只（自动 '+rows.filter(function(r){{return r.auto;}}).length+' + 手动 '+rows.filter(function(r){{return !r.auto;}}).length+'）';
+    if(!rows.length){{box.innerHTML='<div class="sub" style="color:var(--faint)">暂无跟踪 —— 短线表出现可买入标的（强买入/买入）后自动加入，保留 30 天</div>';return;}}
     var topSet={{}};
     if(window.SHORT_POOL){{Object.keys(window.SHORT_POOL.tiers||{{}}).forEach(function(g){{(window.SHORT_POOL.tiers[g]||[]).forEach(function(c){{topSet[c]=1;}});}});}}
-    var cnt=document.getElementById('watch-count');
-    if(cnt)cnt.textContent='跟踪 '+codes.length+' 只';
-    if(!codes.length){{box.innerHTML='<div class="sub" style="color:var(--faint)">未设置持仓 —— 在上方输入代码并保存，每天刷新后这里显示每只持仓的减仓/清仓信号</div>';return;}}
-    var h='<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>类型</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">短线分</th><th style="text-align:center">档位</th><th style="text-align:center">MA5</th><th style="text-align:center">建议动作</th></tr></thead><tbody>';
-    codes.forEach(function(code){{
-      var rec=null,grp='';
+    var h='<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>类型</th><th style="text-align:center">入池日期</th><th style="text-align:center">已跟踪</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">短线分</th><th style="text-align:center">档位</th><th style="text-align:center">MA5</th><th style="text-align:center">建议动作</th></tr></thead><tbody>';
+    rows.forEach(function(r){{
+      var code=r.code,rec=null,grp='';
       ['stock','fund'].forEach(function(g){{if(S[g]&&S[g][code]){{rec=S[g][code];grp=g;}}}});
-      if(!rec){{h+='<tr><td>'+code+'</td><td colspan="8" style="color:var(--faint)">未找到该代码（检查输入 / 代码不在监控范围）</td></tr>';return;}}
+      if(!rec){{h+='<tr><td>'+code+'</td><td colspan="10" style="color:var(--faint)">未找到该代码（可能已退市/不在监控范围）</td></tr>';return;}}
       var act,actCls;
       if(rec.ma5_above===false){{act='⚠️ 次日卖出（破MA5）';actCls='down';}}
       else if(rec.tier==='清仓'){{act='🔴 清仓';actCls='down';}}
@@ -732,7 +748,8 @@ document.addEventListener('DOMContentLoaded',function(){{
       else if(rec.tier==='轻仓加仓'||rec.tier==='满仓加仓'){{act='✅ 继续持有';actCls='up';}}
       else {{act='🟡 观望（不补不加）';actCls='warn';}}
       var gName=grp==='stock'?'股票':'基金';
-      h+='<tr><td>'+code+'</td><td>'+rec.name+'</td><td>'+gName+'</td><td style="text-align:right">'+rec.px+'</td><td style="text-align:right" class="'+(rec.chg>0?'up':'down')+'">'+(rec.chg>0?'+':'')+rec.chg+'%</td><td style="text-align:center">'+rec.score+'</td><td style="text-align:center">'+rec.tier+'</td><td style="text-align:center">'+(rec.ma5_above?'✅ 上方':'⚠️ 下方')+'</td><td style="text-align:center" class="'+actCls+'">'+act+'</td></tr>';
+      var ageS=r.age===null?'—':(r.age+' 天 / 剩 '+(30-r.age)+' 天');
+      h+='<tr><td>'+code+'</td><td>'+rec.name+'</td><td>'+gName+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+ageS+'</td><td style="text-align:right">'+rec.px+'</td><td style="text-align:right" class="'+(rec.chg>0?'up':'down')+'">'+(rec.chg>0?'+':'')+rec.chg+'%</td><td style="text-align:center">'+rec.score+'</td><td style="text-align:center">'+rec.tier+'</td><td style="text-align:center">'+(rec.ma5_above?'✅ 上方':'⚠️ 下方')+'</td><td style="text-align:center" class="'+actCls+'">'+act+'</td></tr>';
     }});
     h+='</tbody></table>';
     box.innerHTML=h;
