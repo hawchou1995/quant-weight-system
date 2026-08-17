@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>标的监控看板（数据截至 2026-08-17 · 构建 2026-08-17 19:05）</title>
+<title>标的监控看板（数据截至 2026-08-17 · 构建 2026-08-17 23:19）</title>
 <style>
 :root{
   --bg:#f3f4f6; --card:#ffffff; --card2:#f9fafb; --border:#e5e7eb; --line:#f0f1f3;
@@ -188,10 +188,6 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 .rev-md p{margin:6px 0;color:var(--text)}
 .rev-md blockquote{background:var(--card2);border-left:3px solid var(--accent);padding:8px 12px;margin:8px 0;border-radius:0 8px 8px 0;color:var(--sub)}
 /* 持仓跟踪 */
-.watch-bar{display:flex;gap:10px;align-items:center;margin-bottom:12px}
-.watch-bar input{flex:1;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:8px 12px;font-size:13px;font-family:inherit}
-.watch-bar button{background:var(--accent);border:none;color:#fff;border-radius:10px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:inherit}
-.watch-bar .count{color:var(--faint);font-size:12px}
 #watch-table .up{color:#22c55e} #watch-table .down{color:#ef4444} #watch-table .warn{color:#f59e0b}
 .bt-short{background:var(--card2);border:1px dashed var(--border);border-radius:14px;padding:22px;text-align:center;margin-top:16px}
 .bt-short h3{margin:0 0 8px;color:var(--sub);font-size:15px}
@@ -4139,13 +4135,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div></div></div>
 </div>
 <div class="card" id="watch-card">
-<h2>📌 全量池短线跟踪 <span class="badge badge-auto">自动 · 保留 30 天</span></h2>
-<div class="sub">上方短线表<b>可买入标的（强买入/买入）</b>每次收盘自动加入跟踪，30 天后自动移除，无需手动添加 · 可手动补充个人持仓代码（如 600498）· 卖出规则（与回测一致）：<b>收盘跌破 MA5 → 次日开盘卖出</b> ｜ 掉出信号池 → 下次轮动换出 ｜ 档位减半/清仓 → 按档位操作 · 数据截至 2026-08-17（基金净值 T-1：2026-08-14）</div>
-<div class="watch-bar">
-<input type="text" id="watch-input" placeholder="可选：手动补充持仓代码，逗号分隔，如 600498, 002463">
-<button id="watch-save">💾 补充持仓</button>
-<span class="count" id="watch-count"></span>
-</div>
+<h2>📌 全量池短线跟踪 <span class="badge badge-auto">自动 · 保留 30 天</span> <span class="count" id="watch-count" style="font-size:12px"></span></h2>
+<div class="sub">上方短线表<b>可买入标的（强买入/买入）</b>每次收盘自动加入跟踪，30 天后自动移除 · 卖出规则（与回测一致）：<b>收盘跌破 MA5 → 次日开盘卖出</b> ｜ 掉出信号池 → 下次轮动换出 ｜ 档位减半/清仓 → 按档位操作 · 数据截至 2026-08-17（基金净值 T-1：2026-08-14）</div>
 <div id="watch-table"></div>
 </div>
 </div>
@@ -4492,7 +4483,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 
 </div>
-<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-17 19:05 · 版本 v5.11.8 · 数据截至 2026-08-17 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-17 23:19 · 版本 v5.11.8 · 数据截至 2026-08-17 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
@@ -4929,23 +4920,20 @@ document.addEventListener('DOMContentLoaded',function(){
     var box=document.getElementById('watch-table');if(!box)return;
     var S=window.SHORT_SIGNALS;if(!S){box.innerHTML='<div class="sub">信号数据未加载（缺 short_signals.js）</div>';return;}
     var track=(window.SHORT_POOL&&window.SHORT_POOL.track)?window.SHORT_POOL.track:{};
-    var manual=(localStorage.getItem('short_watchlist')||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
     var now=new Date();var rows=[];
     Object.keys(track).forEach(function(code){
       var t=track[code]||{};var entry=t.entry?new Date(String(t.entry).replace(/-/g,'/')):null;
       var age=entry?Math.floor((now-entry)/86400000):0;
       if(age>=30)return;   // 30 天过期（前端兜底，与服务端一致）
-      rows.push({code:code,entry:t.entry||'—',age:age,auto:true,type:t.type||''});
+      rows.push({code:code,entry:t.entry||'—',age:age,type:t.type||''});
     });
-    manual.forEach(function(code){rows.push({code:code,entry:'—',age:null,auto:false,type:''});});
-    var seen={};rows=rows.filter(function(r){if(seen[r.code])return false;seen[r.code]=1;return true;});
-    // 按入池日期倒序（新入池在前，手动补充/无日期的排最后，2026-08-17 可读性优化）
+    // 按入池日期倒序（新入池在前，2026-08-17 可读性优化）
     rows.sort(function(a,b){
       var da=a.entry&&a.entry!=='—'?new Date(String(a.entry).replace(/-/g,'/')):null;
       var db=b.entry&&b.entry!=='—'?new Date(String(b.entry).replace(/-/g,'/')):null;
       if(!da&&!db)return 0;if(!da)return 1;if(!db)return -1;return db-da;});
     var cnt=document.getElementById('watch-count');
-    if(cnt)cnt.textContent='跟踪 '+rows.length+' 只（自动 '+rows.filter(function(r){return r.auto;}).length+' + 手动 '+rows.filter(function(r){return !r.auto;}).length+'）';
+    if(cnt)cnt.textContent='跟踪 '+rows.length+' 只';
     if(!rows.length){box.innerHTML='<div class="sub" style="color:var(--faint)">暂无跟踪 —— 短线表出现可买入标的（强买入/买入）后自动加入，保留 30 天</div>';return;}
     var topSet={};
     if(window.SHORT_POOL){Object.keys(window.SHORT_POOL.tiers||{}).forEach(function(g){(window.SHORT_POOL.tiers[g]||[]).forEach(function(c){topSet[c]=1;});});}
@@ -4971,10 +4959,8 @@ document.addEventListener('DOMContentLoaded',function(){
     h+='</tbody></table>';
     box.innerHTML=h;
   }
-  var ws=document.getElementById('watch-save');
-  if(ws){ws.addEventListener('click',function(){localStorage.setItem('short_watchlist',document.getElementById('watch-input').value);renderWatch();});}
-  var wi=document.getElementById('watch-input');
-  if(wi)wi.addEventListener('keydown',function(e){if(e.key==='Enter'&&ws)ws.click();});
+  // 2026-08-17 用户决策：移除手动补充功能，顺带清理旧 localStorage 残留（含用户误加的"金安国纪"条目）
+  try{localStorage.removeItem('short_watchlist');}catch(_e){}
   renderWatch();
   /* 全量池中/长线年跟踪池（2026-08-17 用户需求：上榜 1 年，再上榜 +1 年；数据由 build_enhanced_data.py 维护） */
   function renderV9Watch(){
