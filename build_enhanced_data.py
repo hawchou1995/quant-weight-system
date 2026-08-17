@@ -419,7 +419,7 @@ REPORTS_DIR = Path("D:/Documents/Obsidian/WorkBuddy/wiki/02-投资研究-Investm
 reports = sorted([f.name for f in REPORTS_DIR.glob("research-*.md")], reverse=True)
 
 out = {
-    "meta": {"as_of": "2026-08-14", "generated": "2026-08-15 23:20", "overlap": OVERLAP,
+    "meta": {"as_of": str(last_day.date()), "generated": __import__("datetime").datetime.now().strftime("%Y-%m-%d %H:%M"), "overlap": OVERLAP,
              "v9_tiers": V9_TIERS},
     "nav": [["overview", "📊", "监控总览"], ["sys-auto", "🅰️", "普适版"], ["sys-lite", "🅱️", "个人版"], ["table", "📋", "标的监控表"]],
     "monitor_reports": [

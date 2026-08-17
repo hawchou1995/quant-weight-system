@@ -514,7 +514,7 @@ html = f"""<!doctype html>
 <!-- ============ 视图 0：监控总览 ============ -->
 <div class="view active" id="view-overview">
 <div class="card" id="overview">
-<h2>📊 标的监控总览 <span class="badge badge-auto">数据截至 2026-08-14 收盘</span></h2>
+<h2>📊 标的监控总览 <span class="badge badge-auto">数据截至 {DATA["meta"].get("as_of", "—")}{"（盘中实时）" if DATA["meta"].get("intraday") else " 收盘"}</span></h2>
 <div class="sub">左侧导航切换：🅰️ 全量池中/长线（全市场自动池·股票分层+基金） / 🅱️ 固定池中/长线（用户固定池） / ⚡ 短线（占位） · 右上角「标的报告」按月查看历史收盘快照 · 信号仅供参考</div>
 <div class="kpis">
 <div class="kpi"><div class="l">🟢 加仓区</div><div class="v" style="color:#dc2626">{sum(1 for d in all_items if d["tier"] in ("满仓加仓","轻仓加仓"))} 只</div><div class="s">满仓+轻仓加仓</div></div>
