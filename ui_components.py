@@ -55,6 +55,11 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 .sidenav a .ic{font-size:16px;width:20px;text-align:center}
 .sidenav a:hover{background:var(--card2);color:var(--text)}
 .sidenav a.active{background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(239,68,68,.15));color:var(--accent);font-weight:600}
+.sidenav .sn-sub{margin:0 0 8px 22px;display:flex;flex-direction:column;gap:2px}
+.sidenav .sn-sub a{padding:5px 10px;font-size:12px;color:var(--sub);border-radius:8px;font-weight:400}
+.sidenav .sn-sub a .dot-sub{width:4px;height:4px;border-radius:50%;background:var(--line);flex:none}
+.sidenav .sn-sub a:hover{color:var(--text);background:var(--card2)}
+.sidenav .sn-sub a.active{color:var(--accent);font-weight:600;background:rgba(245,158,11,.08)}
 .sidenav .sn-foot{margin-top:auto;display:flex;flex-direction:column;gap:6px}
 body.sidenav-open .container{margin-left:190px}
 
@@ -192,7 +197,13 @@ document.addEventListener('click',function(e){
 function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)return;
   var html='<div class="sn-logo"><span class="dot"></span>量化权重监控</div><div class="sn-sep"></div>';
   window.ENH.nav.forEach(function(it){
-    html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"><span class="ic">'+it[1]+'</span>'+it[2]+'</a>';});
+    html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"><span class="ic">'+it[1]+'</span>'+it[2]+'</a>';
+    // 子章节（2026-08-17 用户需求）：点击先切视图再滚动到区块
+    var subs=it[3];
+    if(subs&&subs.length){
+      html+='<div class="sn-sub">';
+      subs.forEach(function(s){html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'" data-sub="'+s[0]+'"><span class="dot-sub"></span>'+s[1]+'</a>';});
+      html+='</div>';}});
   html+='<div class="sn-sep"></div><div class="sn-foot">'+
     '<a href="javascript:void(0)" data-anchor="review"><span class="ic">📋</span>复盘日志</a>'+
     '<a href="javascript:void(0)" data-anchor="changelog"><span class="ic">📝</span>更新日志</a>'+
@@ -203,12 +214,19 @@ function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)retu
     a.addEventListener('click',function(e){
       e.preventDefault();
       var t=a.getAttribute('data-anchor');
+      var sub=a.getAttribute('data-sub');
       // 视图切换模式：交给 switchView；否则滚动定位
       if(window.switchView){window.switchView(t);}
       else{
         var el=document.getElementById(t);
         if(el){el.scrollIntoView({behavior:'auto',block:'start'});
           window.scrollBy(0,-70);}}
+      // 子章节：切到所属视图后滚动到区块（延迟等视图激活，offset 适配顶栏）
+      if(sub){
+        setTimeout(function(){
+          var el=document.getElementById(sub);
+          if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+        },30);}
       nav.querySelectorAll('a[data-anchor]').forEach(function(x){x.classList.toggle('active',x===a);});});});
   // 滚动高亮：仅对可见元素生效（display:none 的视图跳过，避免视图切换模式下 active 乱跳）
   window.addEventListener('scroll',function(){

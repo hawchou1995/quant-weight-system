@@ -120,6 +120,12 @@ def rows_html_for(items):
         rsi_txt = f'{d["rsi"]:.0f}' if d.get("rsi") is not None else "—"
         vp_txt = f'{comp.get("volume",0):.0f}'
         board = d["board"]
+        # 开盘跳空高开规避（2026-08-17 用户需求）：盘中 patch 写入 gap（开盘 vs 昨收），>3% 当日不追
+        gap_badge = ""
+        if d.get("gap") is not None and d["gap"] > 3:
+            gap_badge = (f'<span class="badge" style="background:rgba(239,68,68,.15);color:#f87171;" '
+                         f'title="开盘跳空高开 {d["gap"]:.1f}%（vs 昨收），反转空间已被开盘吃掉，当日建议规避不追">'
+                         f'⚠ 高开{d["gap"]:.1f}% 规避</span>')
         rows += f'''<tr data-code="{d["code"]}" data-search="{d["name"]} {d["code"]} {d["industry"]} {board}" data-board="{d["perm"]}" data-market="{board}" data-industry="{d["industry"]}" data-tier="{d["tier"]}">
 <td style="text-align:center">{rank}</td>
 <td><b>{d["name"]}</b><br><span style="color:var(--faint);font-size:11px">{d["code"]}</span></td>
@@ -134,7 +140,7 @@ def rows_html_for(items):
 <td style="text-align:center" data-v="100"><span class="board-tag">{conf_level(d)}置信</span></td>
 <td style="text-align:center" data-v="{TIER_W.get(d["tier"], 0)}">{tier_pill(d["tier"])}</td>
 <td style="text-align:center" data-v="{1 if chg_tier else 0}">{chg_tier or '<span style="color:var(--faint)">—</span>'}</td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">{action_for(d)}</td></tr>'''
+<td style="text-align:center;font-size:12px;color:var(--sub)">{gap_badge if gap_badge else action_for(d)}</td></tr>'''
     return rows
 
 # 板块/行业/档位筛选选项（模板式左上角筛选条）
@@ -338,7 +344,7 @@ def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extr
 </table>
 <div class="note">{note}</div>
 </div>
-<div class="card">
+<div class="card" id="{card_id}-detail">
 <h2>🔍 逐标的详情（雷达图） <span class="count" id="{tbl_id}-cardcount" style="font-size:12px"></span></h2>
 <div class="sub">六角雷达 = 趋势/动能/量能/超买/风控/研报 六类打分 · 与上方表格搜索/筛选/排序联动</div>
 <div class="stock-cards" id="{tbl_id}-cards">{cards_html_for(items)}</div>
@@ -576,7 +582,7 @@ html = f"""<!doctype html>
   "view-short", "sys-short",
   "⚡ 全量池短线", "auto", f"全市场短线信号 Top 池（数据截至 {SHORT_POOL_ASOF}）：股票=反转信号按权限分层各 Top10（主板/创业板/科创板各10，剔ST）｜ 基金=动量 Top10 · 短线分 = 动量30/量价25/通道25/波动20 · 回测参考见「监控总览」",
   v9_short_items, "tbl-short", "card-tbl-short",
-  "信号池 = 回测买入清单：分数≥50 的 TopN 在轮动日全部买入 · 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览 · 基金行现价为 T-1 净值（场外基金净值次日公布）",
+  "信号池 = 回测买入清单：分数≥50 的 TopN 在轮动日全部买入 · 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览 · 基金行现价为 T-1 净值（场外基金净值次日公布）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：反转空间已被开盘吃掉，当日不追（9:30 盘中起生效）</b>",
   extra_card=WATCH_CARD, score_sub="动量/量价/通道/波动",
   as_of=SHORT_POOL_ASOF, intraday_note=SHORT_POOL_INTRADAY,
   as_of_min=SHORT_POOL.get("intraday_ts") or SHORT_POOL_ASOF_MIN,
@@ -622,7 +628,12 @@ html = f"""<!doctype html>
 <script>window.SHORT_POOL = {SHORT_POOL_SLIM};</script>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
-window.ENH.nav = [["overview","📊","监控总览"],["sys-auto","🅰️","全量池中/长线"],["sys-lite","🅱️","固定池中/长线"],["short","⚡","全量池短线"]];
+window.ENH.nav = [
+  ["overview","📊","监控总览",[["overview","总览统计"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
+  ["sys-auto","🅰️","全量池中/长线",[["card-tbl-v9","标的汇总表"],["card-tbl-v9-detail","逐标的详情"]]],
+  ["sys-lite","🅱️","固定池中/长线",[["card-tbl-v8","标的汇总表"],["card-tbl-v8-detail","逐标的详情"]]],
+  ["short","⚡","全量池短线",[["card-tbl-short","标的汇总表"],["watch-card","短线跟踪"],["card-tbl-short-detail","逐标的详情"]]]
+];
 /* 视图切换模式：滚动不更新导航高亮（COMMON_JS renderSidenav 检测此标志） */
 window.ENH.NAV_SWITCH = true;
 /* 三池回测净值（股票/基金，监控总览展示；2026-08-17 去 ETF） */
@@ -726,10 +737,15 @@ document.addEventListener('DOMContentLoaded',function(){{
       var t=track[code]||{{}};var entry=t.entry?new Date(String(t.entry).replace(/-/g,'/')):null;
       var age=entry?Math.floor((now-entry)/86400000):0;
       if(age>=30)return;   // 30 天过期（前端兜底，与服务端一致）
-      rows.push({{code:code,entry:t.entry||'—',age:age,auto:true}});
+      rows.push({{code:code,entry:t.entry||'—',age:age,auto:true,type:t.type||''}});
     }});
-    manual.forEach(function(code){{rows.push({{code:code,entry:'—',age:null,auto:false}});}});
+    manual.forEach(function(code){{rows.push({{code:code,entry:'—',age:null,auto:false,type:''}});}});
     var seen={{}};rows=rows.filter(function(r){{if(seen[r.code])return false;seen[r.code]=1;return true;}});
+    // 按入池日期倒序（新入池在前，手动补充/无日期的排最后，2026-08-17 可读性优化）
+    rows.sort(function(a,b){{
+      var da=a.entry&&a.entry!=='—'?new Date(String(a.entry).replace(/-/g,'/')):null;
+      var db=b.entry&&b.entry!=='—'?new Date(String(b.entry).replace(/-/g,'/')):null;
+      if(!da&&!db)return 0;if(!da)return 1;if(!db)return -1;return db-da;}});
     var cnt=document.getElementById('watch-count');
     if(cnt)cnt.textContent='跟踪 '+rows.length+' 只（自动 '+rows.filter(function(r){{return r.auto;}}).length+' + 手动 '+rows.filter(function(r){{return !r.auto;}}).length+'）';
     if(!rows.length){{box.innerHTML='<div class="sub" style="color:var(--faint)">暂无跟踪 —— 短线表出现可买入标的（强买入/买入）后自动加入，保留 30 天</div>';return;}}
@@ -738,7 +754,10 @@ document.addEventListener('DOMContentLoaded',function(){{
     var h='<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>类型</th><th style="text-align:center">入池日期</th><th style="text-align:center">已跟踪</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">短线分</th><th style="text-align:center">档位</th><th style="text-align:center">MA5</th><th style="text-align:center">建议动作</th></tr></thead><tbody>';
     rows.forEach(function(r){{
       var code=r.code,rec=null,grp='';
-      ['stock','fund'].forEach(function(g){{if(S[g]&&S[g][code]){{rec=S[g][code];grp=g;}}}});
+      // 类型优先（2026-08-17 修复：股票/场外基金 6 位代码可能冲突，如 002636 股票=金安国纪、基金=广发集裕债券A，后者曾覆盖前者）
+      if(r.type==='stock'||r.type==='fund'){{if(S[r.type]&&S[r.type][code]){{rec=S[r.type][code];grp=r.type;}}}}
+      if(!rec&&S.stock&&S.stock[code]){{rec=S.stock[code];grp='stock';}}
+      if(!rec&&S.fund&&S.fund[code]){{rec=S.fund[code];grp='fund';}}
       if(!rec){{h+='<tr><td>'+code+'</td><td colspan="10" style="color:var(--faint)">未找到该代码（可能已退市/不在监控范围）</td></tr>';return;}}
       var act,actCls;
       if(rec.ma5_above===false){{act='⚠️ 次日卖出（破MA5）';actCls='down';}}

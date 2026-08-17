@@ -297,19 +297,19 @@ def build(as_of=None):
             if _c not in track:
                 _od = (_old_full.get("details", {}) or {}).get(_c, {})
                 if (_od.get("short_score") or 0) >= 50:
-                    track[_c] = {"entry": _old_full.get("as_of") or today, "pool": _bd}
+                    track[_c] = {"entry": _old_full.get("as_of") or today, "pool": _bd, "type": "fund" if _bd == "基金" else "stock"}
     # ② 当前池可买入标的：入池（保留已有 entry）
     for code, d in out["details"].items():
         if (d.get("short_score") or 0) >= 50:
             if code not in track:
-                track[code] = {"entry": today, "pool": d.get("board", "")}
+                track[code] = {"entry": today, "pool": d.get("board", ""), "type": "fund" if d.get("board") == "基金" else "stock"}
     # ③ 一次性历史补偿：跟踪功能上线前（8/14 池）出现过的可买入标的，entry=2026-08-14
     if not _old_full.get("_backfilled_0814"):
         try:
             _hist_out, _ = calc_signals(as_of="2026-08-14")
             for _c, _d in _hist_out["details"].items():
                 if (_d.get("short_score") or 0) >= 50 and _c not in track:
-                    track[_c] = {"entry": "2026-08-14", "pool": _d.get("board", "")}
+                    track[_c] = {"entry": "2026-08-14", "pool": _d.get("board", ""), "type": "fund" if _d.get("board") == "基金" else "stock"}
             out["_backfilled_0814"] = True
             print(f"8/14 池历史补偿完成，跟踪池累计 {len(track)} 只", flush=True)
         except Exception as _e:

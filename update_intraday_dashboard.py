@@ -25,7 +25,7 @@ MONITOR = Path(r"D:/Documents/Workbuddy/股票基金/行情监控")
 PY = sys.executable
 
 
-def patch_js_file(path, snap_items, today, note_tag, snap_date, quotes=None, ts=None):
+def patch_js_file(path, snap_items, today, note_tag, snap_date, quotes=None, ts=None, write_gap=False):
     """把标的 px/chg 写入 window.XXX 数据文件（保留其余结构）。
 
     三池全量 patch（2026-08-17 修复）：数据文件 details 里的所有标的都尝试更新——
@@ -33,6 +33,8 @@ def patch_js_file(path, snap_items, today, note_tag, snap_date, quotes=None, ts=
       2) 非快照标的（v9_tiers/短线池 40 只）→ 用实时 quotes 补充（code -> {px, chg}）
       3) 场外基金（setcode 33 / 不在 quotes）→ 跳过（净值 T-1，无法盘中实时）
     ts：数据更新时间 HH:MM（2026-08-17 新增：精确到分钟，默认=本次 patch 时刻）
+    write_gap：2026-08-17 新增，短线池专用——quotes 里带 gap（开盘跳空%，开盘 vs 昨收）
+      时写入 details[code].gap，看板据此渲染「⚠ 高开规避」（>3% 当日不追）
     """
     src = Path(path).read_text(encoding="utf-8")
     m = re.search(r"window\.(\w+) = (.*);\s*$", src, re.S)
@@ -73,6 +75,10 @@ def patch_js_file(path, snap_items, today, note_tag, snap_date, quotes=None, ts=
             continue
         details[code]["px"] = px
         details[code]["chg"] = chg
+        if write_gap and details[code].get("board") != "基金" and code in quotes and quotes[code].get("gap") is not None:
+            details[code]["gap"] = round(float(quotes[code]["gap"]), 2)
+        elif write_gap:
+            details[code].pop("gap", None)  # 本次无 gap 数据则清除旧值，避免残留误导
         patched += 1
     if patched:
         intraday_note = f"{snap_date} 盘中行情（{note_tag}）· 分数为收盘口径"
@@ -117,7 +123,7 @@ def main():
             print(f"⚠️ quotes 文件不存在: {qf}（三池非 watchlist 标的将保持收盘口径）")
 
     ok1 = patch_js_file(BASE / "enhanced_data.js", snap["items"], today, "实时", snap_date, quotes, ts=args.ts)
-    ok2 = patch_js_file(BASE / "short_pool.js", snap["items"], today, "实时", snap_date, quotes, ts=args.ts)
+    ok2 = patch_js_file(BASE / "short_pool.js", snap["items"], today, "实时", snap_date, quotes, ts=args.ts, write_gap=True)
 
     if not (ok1 or ok2):
         print("⚠️ 无标的可 patch（快照可能为空或全为场外基金），跳过重建")
