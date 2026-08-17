@@ -35,12 +35,12 @@ for tier, codes in v9_tiers.items():
         row["perm"] = tier          # 行级档位（main/gem/star/fund），覆盖数据默认
         v9_items.append(row)
 v9_items.sort(key=lambda d: -d["score"])
-# 短线信号池（v5.10）：全市场最新交易日短线分 Top 池（股票反转10 + 基金动量10；2026-08-17 去 ETF）
+# 短线信号池（v5.10）：全市场最新交易日短线分 Top 池（股票反转按权限各10【主板/创业板/科创板】 + 基金动量10；2026-08-17 去 ETF）
 try:
     _sp_js = open(BASE / "short_pool.js", encoding="utf-8").read()
     SHORT_POOL = json.loads(_sp_js[len("window.SHORT_POOL = "):-1])
     _sp_items = []
-    for _grp in ("股票", "基金"):
+    for _grp in ("主板", "创业板", "科创板", "基金"):
         for _c in SHORT_POOL["tiers"].get(_grp, []):
             _d = SHORT_POOL["details"].get(_c)
             if _d:
@@ -546,7 +546,7 @@ html = f"""<!doctype html>
 <!-- ============ 视图 C：全量池短线（与中长线同结构：统计条+表格+雷达卡） ============ -->
 {system_block(
   "view-short", "sys-short",
-  "⚡ 全量池短线", "auto", f"全市场短线信号 Top 池（数据截至 {SHORT_POOL_ASOF}）：股票=反转信号 Top10（剔ST）｜ 基金=动量 Top10 · 短线分 = 动量30/量价25/通道25/波动20 · 回测参考见「监控总览」",
+  "⚡ 全量池短线", "auto", f"全市场短线信号 Top 池（数据截至 {SHORT_POOL_ASOF}）：股票=反转信号按权限分层各 Top10（主板/创业板/科创板各10，剔ST）｜ 基金=动量 Top10 · 短线分 = 动量30/量价25/通道25/波动20 · 回测参考见「监控总览」",
   v9_short_items, "tbl-short", "card-tbl-short",
   "信号池 = 回测买入清单：分数≥50 的 TopN 在轮动日全部买入 · 档位 = 短线买入口径（强买入/买入）· 持仓的减仓/清仓信号见下方「我的持仓跟踪」· 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览",
   extra_card=WATCH_CARD, score_sub="动量/量价/通道/波动")}

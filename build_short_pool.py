@@ -157,9 +157,9 @@ def calc_signals(as_of=None):
     global sig_stock, sig_etf, sig_fund
     sig_stock, sig_etf, sig_fund = {}, {}, {}
 
-    # 1) 股票反转 Top10（剔除 ST/*ST/S 股——反转信号选到 ST = 接飞刀）
+    # 1) 股票反转：按权限分层各取 Top10（主板/创业板/科创板，2026-08-17 用户决策）
     stock_pool = S.load_stock_pool()
-    rows = []
+    rows_by_board = {"主板": [], "创业板": [], "科创板": []}
     for code, ddf in stock_pool.items():
         if as_of is not None:
             if as_of not in ddf.index:
@@ -177,15 +177,22 @@ def calc_signals(as_of=None):
         sc = S.short_score(r, reversal=True)
         if pd.isna(sc):
             continue
-        rows.append((code, float(sc), r, ddf))
+        bd = board_of(code)
+        if bd not in rows_by_board:
+            continue
+        rows_by_board[bd].append((code, float(sc), r, ddf))
         _tail2 = ddf.loc[:as_of] if as_of is not None else ddf
         sig_stock[code[-6:]] = {"name": nm, "px": round(float(r["close"]), 2),
                                 "chg": round(float(r["close"] / (_tail2["close"].iloc[-2] if as_of else ddf["close"].iloc[-2]) - 1) * 100, 2),
                                 "score": round(float(sc), 1), "tier": tier_of(float(sc)),
                                 "ma5_above": bool(not pd.isna(r.get("ma5", np.nan)) and r["close"] > r["ma5"])}
-    rows.sort(key=lambda kv: -kv[1])
-    print(f"股票池 {len(stock_pool)} 只 → 反转分 Top10（剔 ST/退市 {len(stock_pool)-len(rows)} 只）({time.time()-t0:.0f}s)", flush=True)
-    stock_top = rows[:10]
+    for bd in ("主板", "创业板", "科创板"):
+        rows_by_board[bd].sort(key=lambda kv: -kv[1])
+        print(f"股票[{bd}] {len(rows_by_board[bd])} 只 → 反转分 Top10 ({time.time()-t0:.0f}s)", flush=True)
+    stock_top_main = rows_by_board["主板"][:10]
+    stock_top_gem  = rows_by_board["创业板"][:10]
+    stock_top_star = rows_by_board["科创板"][:10]
+    stock_top = stock_top_main + stock_top_gem + stock_top_star
 
     # 2) ETF 动量 Top10（2026-08-17 用户决策移除：ETF 表现不佳，短线池去 ETF）
     etf_top = []
@@ -258,7 +265,9 @@ def calc_signals(as_of=None):
             "rsi": round(rsi, 1) if rsi is not None else None,
             "kline": [], "factor_hist": [], "trades": {"v9_auto": [], "v8_lite": []},
         }
-    order = {"股票": [c[-6:] for c, _, _, _ in stock_top],
+    order = {"主板": [c[-6:] for c, _, _, _ in stock_top_main],
+             "创业板": [c[-6:] for c, _, _, _ in stock_top_gem],
+             "科创板": [c[-6:] for c, _, _, _ in stock_top_star],
              "基金": [c[-6:] for c, _, _, _ in fund_top]}
     _eff = as_of if as_of is not None else str(ddf.index[-1].date())
     out = {"as_of": _eff, "details": details, "tiers": order}
