@@ -472,7 +472,7 @@ def maintain_track_v9():
     cutoff = pd.Timestamp(last_day.date() - timedelta(days=365))
     track = {c: r for c, r in track.items()
              if pd.Timestamp(str(r.get("entry", today))) > cutoff}
-    print(f"全量池中/长线跟踪池: {len(track)} 只（上榜 1 年，再上榜 +1 年）", flush=True)
+    print(f"全量池中/长线跟踪池: {len(track)} 只（上榜 1 年，再上榜 +1 年；股票/基金一致）", flush=True)
     return track
 
 
