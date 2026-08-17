@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>标的监控看板（数据截至 2026-08-17 · 构建 2026-08-17 18:12）</title>
+<title>标的监控看板（数据截至 2026-08-17 · 构建 2026-08-17 18:25）</title>
 <style>
 :root{
   --bg:#f3f4f6; --card:#ffffff; --card2:#f9fafb; --border:#e5e7eb; --line:#f0f1f3;
@@ -54,6 +54,8 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 .sidenav a:hover{background:var(--card2);color:var(--text)}
 .sidenav a.active{background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(239,68,68,.15));color:var(--accent);font-weight:600}
 .sidenav .sn-sub{margin:0 0 8px 22px;display:flex;flex-direction:column;gap:2px}
+.sidenav .sn-sub.collapsed{display:none}
+.sidenav .sn-arrow{margin-left:auto;font-size:10px;color:var(--faint)}
 .sidenav .sn-sub a{padding:5px 10px;font-size:12px;color:var(--sub);border-radius:8px;font-weight:400}
 .sidenav .sn-sub a .dot-sub{width:4px;height:4px;border-radius:50%;background:var(--line);flex:none}
 .sidenav .sn-sub a:hover{color:var(--text);background:var(--card2)}
@@ -3373,15 +3375,15 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <!-- ============ 视图 C：全量池短线（与中长线同结构：统计条+表格+雷达卡） ============ -->
 <div class="view" id="view-short">
 <div class="card" id="sys-short">
-<h2>⚡ 全量池短线 <span class="view-badge auto">全市场短线信号 Top 池（数据截至 2026-08-17）：股票=反转信号按权限分层各 Top10（主板/创业板/科创板各10，剔ST）｜ 基金=动量 Top10 · 短线分 = 动量30/量价25/通道25/波动20 · 回测参考见「监控总览」</span><span class="view-badge auto" title="收盘数据">数据截至 2026-08-17 15:00 · 收盘</span></h2>
+<h2>⚡ 全量池短线 <span class="view-badge auto">全市场短线信号 Top 池（数据截至 2026-08-17）：股票=反转信号按权限分层，<b>仅保留买入信号（分≥50），不足 10 只不凑数</b>（主板/创业板/科创板各 ≤10，剔ST）｜ 基金=动量（分≥50 才入池）· 短线分 = 动量30/量价25/通道25/波动20 · 回测参考见「监控总览」</span><span class="view-badge auto" title="收盘数据">数据截至 2026-08-17 15:00 · 收盘</span></h2>
 <div class="op-stats">
 <span class="op op-add">🟢 加仓区 <b>33</b> 只</span>
-<span class="op op-watch">🟡 观望 <b>7</b> 只</span>
+<span class="op op-watch">🟡 观望 <b>0</b> 只</span>
 <span class="op op-cut">🔴 减/清仓区 <b>0</b> 只</span>
 </div>
 </div>
 <div class="card" id="card-tbl-short">
-<h2>📋 标的汇总表 <span class="badge auto">40 行</span></h2>
+<h2>📋 标的汇总表 <span class="badge auto">33 行</span></h2>
 <div class="sub">今日信号：加仓区 33 ｜ 减/清仓区 0 · 搜索/筛选/排序联动下方详情卡片 · 表头点击排序</div>
 <div class="toolbar">
 <input type="text" id="tbl-short-q" placeholder="🔍 搜索名称 / 代码 / 行业…">
@@ -3859,107 +3861,9 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
 <td style="text-align:center" data-v="4"><span class="pill pill-add">买入</span></td>
 <td style="text-align:center" data-v="0"><span style="color:var(--faint)">—</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">买入</td></tr><tr data-code="300862" data-search="蓝盾光电 300862 综合 创业板" data-board="short" data-market="创业板" data-industry="综合" data-tier="不买">
-<td style="text-align:center">34</td>
-<td><b>蓝盾光电</b><br><span style="color:var(--faint);font-size:11px">300862</span></td>
-<td><span class="board-tag">创业板</span></td>
-<td><span class="board-tag">综合</span></td>
-<td style="text-align:right" data-v="54.77">54.77</td>
-<td style="text-align:right" class="up" data-v="15.82">+15.82%</td>
-<td style="text-align:right" class="up" data-v="118.4">+118%</td>
-<td style="text-align:center"><b>49.9</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/5/100/50/5</span></td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">96</td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">100</td>
-<td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
-<td style="text-align:center" data-v="0"><span class="pill pill-watch">不买</span></td>
-<td style="text-align:center" data-v="0"><span style="color:var(--faint)">—</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">不买入</td></tr><tr data-code="688137" data-search="近岸蛋白 688137 综合 科创板" data-board="short" data-market="科创板" data-industry="综合" data-tier="不买">
-<td style="text-align:center">35</td>
-<td><b>近岸蛋白</b><br><span style="color:var(--faint);font-size:11px">688137</span></td>
-<td><span class="board-tag">科创板</span></td>
-<td><span class="board-tag">综合</span></td>
-<td style="text-align:right" data-v="68.43">68.43</td>
-<td style="text-align:right" class="down" data-v="-1.65">-1.65%</td>
-<td style="text-align:right" class="up" data-v="41.3">+41%</td>
-<td style="text-align:center"><b>47.9</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">0/5/100/50/5</span></td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">87</td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">100</td>
-<td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
-<td style="text-align:center" data-v="0"><span class="pill pill-watch">不买</span></td>
-<td style="text-align:center" data-v="0"><span style="color:var(--faint)">—</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">不买入</td></tr><tr data-code="688570" data-search="天玛智控 688570 综合 科创板" data-board="short" data-market="科创板" data-industry="综合" data-tier="不买">
-<td style="text-align:center">36</td>
-<td><b>天玛智控</b><br><span style="color:var(--faint);font-size:11px">688570</span></td>
-<td><span class="board-tag">科创板</span></td>
-<td><span class="board-tag">综合</span></td>
-<td style="text-align:right" data-v="15.38">15.38</td>
-<td style="text-align:right" class="up" data-v="1.79">+1.79%</td>
-<td style="text-align:right" class="down" data-v="-28.2">-28%</td>
-<td style="text-align:center"><b>47.7</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/30/100/50/62</span></td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">66</td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">100</td>
-<td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
-<td style="text-align:center" data-v="0"><span class="pill pill-watch">不买</span></td>
-<td style="text-align:center" data-v="0"><span style="color:var(--faint)">—</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">不买入</td></tr><tr data-code="688305" data-search="科德数控 688305 综合 科创板" data-board="short" data-market="科创板" data-industry="综合" data-tier="不买">
-<td style="text-align:center">37</td>
-<td><b>科德数控</b><br><span style="color:var(--faint);font-size:11px">688305</span></td>
-<td><span class="board-tag">科创板</span></td>
-<td><span class="board-tag">综合</span></td>
-<td style="text-align:right" data-v="69.9">69.90</td>
-<td style="text-align:right" class="up" data-v="7.62">+7.62%</td>
-<td style="text-align:right" class="up" data-v="16.3">+16%</td>
-<td style="text-align:center"><b>47.6</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/5/100/50/5</span></td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">86</td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">100</td>
-<td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
-<td style="text-align:center" data-v="0"><span class="pill pill-watch">不买</span></td>
-<td style="text-align:center" data-v="0"><span style="color:var(--faint)">—</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">不买入</td></tr><tr data-code="688505" data-search="复旦张江 688505 综合 科创板" data-board="short" data-market="科创板" data-industry="综合" data-tier="不买">
-<td style="text-align:center">38</td>
-<td><b>复旦张江</b><br><span style="color:var(--faint);font-size:11px">688505</span></td>
-<td><span class="board-tag">科创板</span></td>
-<td><span class="board-tag">综合</span></td>
-<td style="text-align:right" data-v="8.95">8.95</td>
-<td style="text-align:right" class="up" data-v="4.43">+4.43%</td>
-<td style="text-align:right" class="down" data-v="-18.3">-18%</td>
-<td style="text-align:center"><b>47.6</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/5/100/50/5</span></td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">92</td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">100</td>
-<td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
-<td style="text-align:center" data-v="0"><span class="pill pill-watch">不买</span></td>
-<td style="text-align:center" data-v="0"><span style="color:var(--faint)">—</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">不买入</td></tr><tr data-code="688317" data-search="之江生物 688317 综合 科创板" data-board="short" data-market="科创板" data-industry="综合" data-tier="不买">
-<td style="text-align:center">39</td>
-<td><b>之江生物</b><br><span style="color:var(--faint);font-size:11px">688317</span></td>
-<td><span class="board-tag">科创板</span></td>
-<td><span class="board-tag">综合</span></td>
-<td style="text-align:right" data-v="18.57">18.57</td>
-<td style="text-align:right" class="up" data-v="5.21">+5.21%</td>
-<td style="text-align:right" class="down" data-v="-28.6">-29%</td>
-<td style="text-align:center"><b>47.3</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/5/73/50/17</span></td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">88</td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">73</td>
-<td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
-<td style="text-align:center" data-v="0"><span class="pill pill-watch">不买</span></td>
-<td style="text-align:center" data-v="0"><span style="color:var(--faint)">—</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">不买入</td></tr><tr data-code="688623" data-search="双元科技 688623 综合 科创板" data-board="short" data-market="科创板" data-industry="综合" data-tier="不买">
-<td style="text-align:center">40</td>
-<td><b>双元科技</b><br><span style="color:var(--faint);font-size:11px">688623</span></td>
-<td><span class="board-tag">科创板</span></td>
-<td><span class="board-tag">综合</span></td>
-<td style="text-align:right" data-v="62.79">62.79</td>
-<td style="text-align:right" class="down" data-v="-3.28">-3.28%</td>
-<td style="text-align:right" class="up" data-v="32.1">+32%</td>
-<td style="text-align:center"><b>46.4</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">0/14/100/50/26</span></td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">57</td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">100</td>
-<td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
-<td style="text-align:center" data-v="0"><span class="pill pill-watch">不买</span></td>
-<td style="text-align:center" data-v="0"><span style="color:var(--faint)">—</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">不买入</td></tr></tbody>
+<td style="text-align:center;font-size:12px;color:var(--sub)">买入</td></tr></tbody>
 </table>
-<div class="note">信号池 = 回测买入清单：分数≥50 的 TopN 在轮动日全部买入 · 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览 · 基金行现价为 T-1 净值（场外基金净值次日公布）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：反转空间已被开盘吃掉，当日不追（9:30 盘中起生效）</b></div>
+<div class="note">信号池 = 回测买入清单：分数≥50 的 TopN 在轮动日全部买入 · 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览 · 基金行现价为 T-1 净值（场外基金净值次日公布）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：不追高，可等盘中回落至 3% 以内再考虑买入（9:30 盘中起生效）</b></div>
 </div>
 <div class="card" id="card-tbl-short-detail">
 <h2>🔍 逐标的详情（雷达图） <span class="count" id="tbl-short-cardcount" style="font-size:12px"></span></h2>
@@ -4227,62 +4131,6 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <p class="meta">现价 <b>4.05</b>（<span class="up">+1.25%</span>）｜ 近一年 <span class="down">-13%</span> ｜ RSI 85</p>
 <p class="meta">权重 <b>50.8 分</b> → <span class="pill pill-add">买入</span> ｜ 建议：买入 ｜ 高置信</p>
 <p class="meta">六类：趋势 100｜动能 27｜量能 93｜超买 50｜风控 38｜研报 0.0</p>
-<p class="meta" style="color:var(--faint)">—</p>
-</div></div><div class="stock-card" id="card-300862" data-code="300862" data-search="蓝盾光电 300862 综合 创业板" data-market="创业板" data-industry="综合" data-tier="不买">
-<div class="radar-wrap"><svg viewBox="0 0 120 120" width="120" height="120" style="flex:0 0 auto"><polygon points="60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="60.0" y2="16.8" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="97.4" y2="38.4" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="97.4" y2="81.6" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="60.0" y2="103.2" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="22.6" y2="81.6" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="22.6" y2="38.4" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,16.8 61.9,58.9 97.4,81.6 60.0,81.6 58.1,61.1 58.9,59.4" fill="var(--radar-warn)" fill-opacity="0.18" stroke="var(--radar-warn)" stroke-width="1.5"/><circle cx="60.0" cy="16.8" r="2.5" fill="var(--radar-warn)"/><text x="60.0" y="2.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">趋势</text><circle cx="61.9" cy="58.9" r="2.5" fill="var(--radar-warn)"/><text x="113.1" y="32.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">动能</text><circle cx="97.4" cy="81.6" r="2.5" fill="var(--radar-warn)"/><text x="113.1" y="93.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">量能</text><circle cx="60.0" cy="81.6" r="2.5" fill="var(--radar-warn)"/><text x="60.0" y="119.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">超买</text><circle cx="58.1" cy="61.1" r="2.5" fill="var(--radar-warn)"/><text x="6.9" y="93.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">风控</text><circle cx="58.9" cy="59.4" r="2.5" fill="var(--radar-warn)"/><text x="6.9" y="32.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">研报</text><text x="60.0" y="64.0" style="fill:var(--radar-warn)" font-size="15" font-weight="700" text-anchor="middle">50</text></svg></div>
-<div class="body">
-<h3>蓝盾光电 <span class="sub">300862</span> <span class="board-tag">创业板</span> <span class="board-tag">综合</span></h3>
-<p class="meta">现价 <b>54.77</b>（<span class="up">+15.82%</span>）｜ 近一年 <span class="up">+118%</span> ｜ RSI 96</p>
-<p class="meta">权重 <b>49.9 分</b> → <span class="pill pill-watch">不买</span> ｜ 建议：不买入 ｜ 高置信</p>
-<p class="meta">六类：趋势 100｜动能 5｜量能 100｜超买 50｜风控 5｜研报 0.0</p>
-<p class="meta" style="color:var(--faint)">—</p>
-</div></div><div class="stock-card" id="card-688137" data-code="688137" data-search="近岸蛋白 688137 综合 科创板" data-market="科创板" data-industry="综合" data-tier="不买">
-<div class="radar-wrap"><svg viewBox="0 0 120 120" width="120" height="120" style="flex:0 0 auto"><polygon points="60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="60.0" y2="16.8" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="97.4" y2="38.4" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="97.4" y2="81.6" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="60.0" y2="103.2" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="22.6" y2="81.6" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="22.6" y2="38.4" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,58.7 61.9,58.9 97.4,81.6 60.0,81.6 58.1,61.1 58.9,59.4" fill="var(--radar-warn)" fill-opacity="0.18" stroke="var(--radar-warn)" stroke-width="1.5"/><circle cx="60.0" cy="58.7" r="2.5" fill="var(--radar-warn)"/><text x="60.0" y="2.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">趋势</text><circle cx="61.9" cy="58.9" r="2.5" fill="var(--radar-warn)"/><text x="113.1" y="32.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">动能</text><circle cx="97.4" cy="81.6" r="2.5" fill="var(--radar-warn)"/><text x="113.1" y="93.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">量能</text><circle cx="60.0" cy="81.6" r="2.5" fill="var(--radar-warn)"/><text x="60.0" y="119.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">超买</text><circle cx="58.1" cy="61.1" r="2.5" fill="var(--radar-warn)"/><text x="6.9" y="93.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">风控</text><circle cx="58.9" cy="59.4" r="2.5" fill="var(--radar-warn)"/><text x="6.9" y="32.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">研报</text><text x="60.0" y="64.0" style="fill:var(--radar-warn)" font-size="15" font-weight="700" text-anchor="middle">48</text></svg></div>
-<div class="body">
-<h3>近岸蛋白 <span class="sub">688137</span> <span class="board-tag">科创板</span> <span class="board-tag">综合</span></h3>
-<p class="meta">现价 <b>68.43</b>（<span class="down">-1.65%</span>）｜ 近一年 <span class="up">+41%</span> ｜ RSI 87</p>
-<p class="meta">权重 <b>47.9 分</b> → <span class="pill pill-watch">不买</span> ｜ 建议：不买入 ｜ 高置信</p>
-<p class="meta">六类：趋势 0｜动能 5｜量能 100｜超买 50｜风控 5｜研报 0.0</p>
-<p class="meta" style="color:var(--faint)">—</p>
-</div></div><div class="stock-card" id="card-688570" data-code="688570" data-search="天玛智控 688570 综合 科创板" data-market="科创板" data-industry="综合" data-tier="不买">
-<div class="radar-wrap"><svg viewBox="0 0 120 120" width="120" height="120" style="flex:0 0 auto"><polygon points="60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="60.0" y2="16.8" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="97.4" y2="38.4" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="97.4" y2="81.6" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="60.0" y2="103.2" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="22.6" y2="81.6" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="22.6" y2="38.4" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,16.8 71.3,53.5 97.4,81.6 60.0,81.6 36.8,73.4 58.9,59.4" fill="var(--radar-warn)" fill-opacity="0.18" stroke="var(--radar-warn)" stroke-width="1.5"/><circle cx="60.0" cy="16.8" r="2.5" fill="var(--radar-warn)"/><text x="60.0" y="2.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">趋势</text><circle cx="71.3" cy="53.5" r="2.5" fill="var(--radar-warn)"/><text x="113.1" y="32.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">动能</text><circle cx="97.4" cy="81.6" r="2.5" fill="var(--radar-warn)"/><text x="113.1" y="93.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">量能</text><circle cx="60.0" cy="81.6" r="2.5" fill="var(--radar-warn)"/><text x="60.0" y="119.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">超买</text><circle cx="36.8" cy="73.4" r="2.5" fill="var(--radar-warn)"/><text x="6.9" y="93.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">风控</text><circle cx="58.9" cy="59.4" r="2.5" fill="var(--radar-warn)"/><text x="6.9" y="32.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">研报</text><text x="60.0" y="64.0" style="fill:var(--radar-warn)" font-size="15" font-weight="700" text-anchor="middle">48</text></svg></div>
-<div class="body">
-<h3>天玛智控 <span class="sub">688570</span> <span class="board-tag">科创板</span> <span class="board-tag">综合</span></h3>
-<p class="meta">现价 <b>15.38</b>（<span class="up">+1.79%</span>）｜ 近一年 <span class="down">-28%</span> ｜ RSI 66</p>
-<p class="meta">权重 <b>47.7 分</b> → <span class="pill pill-watch">不买</span> ｜ 建议：不买入 ｜ 高置信</p>
-<p class="meta">六类：趋势 100｜动能 30｜量能 100｜超买 50｜风控 62｜研报 0.0</p>
-<p class="meta" style="color:var(--faint)">—</p>
-</div></div><div class="stock-card" id="card-688305" data-code="688305" data-search="科德数控 688305 综合 科创板" data-market="科创板" data-industry="综合" data-tier="不买">
-<div class="radar-wrap"><svg viewBox="0 0 120 120" width="120" height="120" style="flex:0 0 auto"><polygon points="60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="60.0" y2="16.8" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="97.4" y2="38.4" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="97.4" y2="81.6" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="60.0" y2="103.2" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="22.6" y2="81.6" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="22.6" y2="38.4" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,16.8 61.9,58.9 97.4,81.6 60.0,81.6 58.1,61.1 58.9,59.4" fill="var(--radar-warn)" fill-opacity="0.18" stroke="var(--radar-warn)" stroke-width="1.5"/><circle cx="60.0" cy="16.8" r="2.5" fill="var(--radar-warn)"/><text x="60.0" y="2.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">趋势</text><circle cx="61.9" cy="58.9" r="2.5" fill="var(--radar-warn)"/><text x="113.1" y="32.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">动能</text><circle cx="97.4" cy="81.6" r="2.5" fill="var(--radar-warn)"/><text x="113.1" y="93.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">量能</text><circle cx="60.0" cy="81.6" r="2.5" fill="var(--radar-warn)"/><text x="60.0" y="119.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">超买</text><circle cx="58.1" cy="61.1" r="2.5" fill="var(--radar-warn)"/><text x="6.9" y="93.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">风控</text><circle cx="58.9" cy="59.4" r="2.5" fill="var(--radar-warn)"/><text x="6.9" y="32.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">研报</text><text x="60.0" y="64.0" style="fill:var(--radar-warn)" font-size="15" font-weight="700" text-anchor="middle">48</text></svg></div>
-<div class="body">
-<h3>科德数控 <span class="sub">688305</span> <span class="board-tag">科创板</span> <span class="board-tag">综合</span></h3>
-<p class="meta">现价 <b>69.90</b>（<span class="up">+7.62%</span>）｜ 近一年 <span class="up">+16%</span> ｜ RSI 86</p>
-<p class="meta">权重 <b>47.6 分</b> → <span class="pill pill-watch">不买</span> ｜ 建议：不买入 ｜ 高置信</p>
-<p class="meta">六类：趋势 100｜动能 5｜量能 100｜超买 50｜风控 5｜研报 0.0</p>
-<p class="meta" style="color:var(--faint)">—</p>
-</div></div><div class="stock-card" id="card-688505" data-code="688505" data-search="复旦张江 688505 综合 科创板" data-market="科创板" data-industry="综合" data-tier="不买">
-<div class="radar-wrap"><svg viewBox="0 0 120 120" width="120" height="120" style="flex:0 0 auto"><polygon points="60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="60.0" y2="16.8" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="97.4" y2="38.4" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="97.4" y2="81.6" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="60.0" y2="103.2" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="22.6" y2="81.6" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="22.6" y2="38.4" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,16.8 61.9,58.9 97.4,81.6 60.0,81.6 58.1,61.1 58.9,59.4" fill="var(--radar-warn)" fill-opacity="0.18" stroke="var(--radar-warn)" stroke-width="1.5"/><circle cx="60.0" cy="16.8" r="2.5" fill="var(--radar-warn)"/><text x="60.0" y="2.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">趋势</text><circle cx="61.9" cy="58.9" r="2.5" fill="var(--radar-warn)"/><text x="113.1" y="32.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">动能</text><circle cx="97.4" cy="81.6" r="2.5" fill="var(--radar-warn)"/><text x="113.1" y="93.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">量能</text><circle cx="60.0" cy="81.6" r="2.5" fill="var(--radar-warn)"/><text x="60.0" y="119.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">超买</text><circle cx="58.1" cy="61.1" r="2.5" fill="var(--radar-warn)"/><text x="6.9" y="93.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">风控</text><circle cx="58.9" cy="59.4" r="2.5" fill="var(--radar-warn)"/><text x="6.9" y="32.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">研报</text><text x="60.0" y="64.0" style="fill:var(--radar-warn)" font-size="15" font-weight="700" text-anchor="middle">48</text></svg></div>
-<div class="body">
-<h3>复旦张江 <span class="sub">688505</span> <span class="board-tag">科创板</span> <span class="board-tag">综合</span></h3>
-<p class="meta">现价 <b>8.95</b>（<span class="up">+4.43%</span>）｜ 近一年 <span class="down">-18%</span> ｜ RSI 92</p>
-<p class="meta">权重 <b>47.6 分</b> → <span class="pill pill-watch">不买</span> ｜ 建议：不买入 ｜ 高置信</p>
-<p class="meta">六类：趋势 100｜动能 5｜量能 100｜超买 50｜风控 5｜研报 0.0</p>
-<p class="meta" style="color:var(--faint)">—</p>
-</div></div><div class="stock-card" id="card-688317" data-code="688317" data-search="之江生物 688317 综合 科创板" data-market="科创板" data-industry="综合" data-tier="不买">
-<div class="radar-wrap"><svg viewBox="0 0 120 120" width="120" height="120" style="flex:0 0 auto"><polygon points="60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="60.0" y2="16.8" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="97.4" y2="38.4" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="97.4" y2="81.6" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="60.0" y2="103.2" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="22.6" y2="81.6" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="22.6" y2="38.4" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,16.8 61.9,58.9 87.2,75.7 60.0,81.6 53.7,63.7 58.9,59.4" fill="var(--radar-warn)" fill-opacity="0.18" stroke="var(--radar-warn)" stroke-width="1.5"/><circle cx="60.0" cy="16.8" r="2.5" fill="var(--radar-warn)"/><text x="60.0" y="2.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">趋势</text><circle cx="61.9" cy="58.9" r="2.5" fill="var(--radar-warn)"/><text x="113.1" y="32.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">动能</text><circle cx="87.2" cy="75.7" r="2.5" fill="var(--radar-warn)"/><text x="113.1" y="93.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">量能</text><circle cx="60.0" cy="81.6" r="2.5" fill="var(--radar-warn)"/><text x="60.0" y="119.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">超买</text><circle cx="53.7" cy="63.7" r="2.5" fill="var(--radar-warn)"/><text x="6.9" y="93.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">风控</text><circle cx="58.9" cy="59.4" r="2.5" fill="var(--radar-warn)"/><text x="6.9" y="32.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">研报</text><text x="60.0" y="64.0" style="fill:var(--radar-warn)" font-size="15" font-weight="700" text-anchor="middle">47</text></svg></div>
-<div class="body">
-<h3>之江生物 <span class="sub">688317</span> <span class="board-tag">科创板</span> <span class="board-tag">综合</span></h3>
-<p class="meta">现价 <b>18.57</b>（<span class="up">+5.21%</span>）｜ 近一年 <span class="down">-29%</span> ｜ RSI 88</p>
-<p class="meta">权重 <b>47.3 分</b> → <span class="pill pill-watch">不买</span> ｜ 建议：不买入 ｜ 高置信</p>
-<p class="meta">六类：趋势 100｜动能 5｜量能 73｜超买 50｜风控 17｜研报 0.0</p>
-<p class="meta" style="color:var(--faint)">—</p>
-</div></div><div class="stock-card" id="card-688623" data-code="688623" data-search="双元科技 688623 综合 科创板" data-market="科创板" data-industry="综合" data-tier="不买">
-<div class="radar-wrap"><svg viewBox="0 0 120 120" width="120" height="120" style="flex:0 0 auto"><polygon points="60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="60.0" y2="16.8" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="97.4" y2="38.4" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="97.4" y2="81.6" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="60.0" y2="103.2" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="22.6" y2="81.6" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="22.6" y2="38.4" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,58.7 65.1,57.1 97.4,81.6 60.0,81.6 50.3,65.6 58.9,59.4" fill="var(--radar-warn)" fill-opacity="0.18" stroke="var(--radar-warn)" stroke-width="1.5"/><circle cx="60.0" cy="58.7" r="2.5" fill="var(--radar-warn)"/><text x="60.0" y="2.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">趋势</text><circle cx="65.1" cy="57.1" r="2.5" fill="var(--radar-warn)"/><text x="113.1" y="32.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">动能</text><circle cx="97.4" cy="81.6" r="2.5" fill="var(--radar-warn)"/><text x="113.1" y="93.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">量能</text><circle cx="60.0" cy="81.6" r="2.5" fill="var(--radar-warn)"/><text x="60.0" y="119.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">超买</text><circle cx="50.3" cy="65.6" r="2.5" fill="var(--radar-warn)"/><text x="6.9" y="93.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">风控</text><circle cx="58.9" cy="59.4" r="2.5" fill="var(--radar-warn)"/><text x="6.9" y="32.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">研报</text><text x="60.0" y="64.0" style="fill:var(--radar-warn)" font-size="15" font-weight="700" text-anchor="middle">46</text></svg></div>
-<div class="body">
-<h3>双元科技 <span class="sub">688623</span> <span class="board-tag">科创板</span> <span class="board-tag">综合</span></h3>
-<p class="meta">现价 <b>62.79</b>（<span class="down">-3.28%</span>）｜ 近一年 <span class="up">+32%</span> ｜ RSI 57</p>
-<p class="meta">权重 <b>46.4 分</b> → <span class="pill pill-watch">不买</span> ｜ 建议：不买入 ｜ 高置信</p>
-<p class="meta">六类：趋势 0｜动能 14｜量能 100｜超买 50｜风控 26｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
 </div></div></div>
 </div>
@@ -4652,7 +4500,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 
 </div>
-<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-17 18:12 · 版本 v5.11.8 · 数据截至 2026-08-17 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-17 18:25 · 版本 v5.11.8 · 数据截至 2026-08-17 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
@@ -4661,7 +4509,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <script src="enhanced_data.js"></script>
 <script src="short_signals.js"></script>
 <script src="monitor/snapshots_index.js"></script>
-<script>window.SHORT_POOL = {"as_of": "2026-08-17", "fund_as_of": "2026-08-14", "tiers": {"主板": ["601952", "002033", "603858", "600251", "600261", "000019", "600435", "600363", "600864", "002556"], "创业板": ["300172", "300388", "300012", "300072", "300627", "300375", "300370", "301053", "300194", "300862"], "科创板": ["688513", "688029", "688068", "688739", "688137", "688570", "688305", "688505", "688317", "688623"], "基金": ["005005", "005006", "000314", "002017", "004355", "002158", "001796", "002133", "002495", "002496"]}, "track": {"601952": {"entry": "2026-08-17", "pool": "主板"}, "002033": {"entry": "2026-08-17", "pool": "主板"}, "603858": {"entry": "2026-08-17", "pool": "主板"}, "600251": {"entry": "2026-08-17", "pool": "主板"}, "600261": {"entry": "2026-08-17", "pool": "主板"}, "000019": {"entry": "2026-08-17", "pool": "主板"}, "600435": {"entry": "2026-08-17", "pool": "主板"}, "600363": {"entry": "2026-08-17", "pool": "主板"}, "600864": {"entry": "2026-08-17", "pool": "主板"}, "002556": {"entry": "2026-08-17", "pool": "主板"}, "300172": {"entry": "2026-08-17", "pool": "创业板"}, "300388": {"entry": "2026-08-17", "pool": "创业板"}, "300012": {"entry": "2026-08-17", "pool": "创业板"}, "300072": {"entry": "2026-08-17", "pool": "创业板"}, "300627": {"entry": "2026-08-17", "pool": "创业板"}, "300375": {"entry": "2026-08-17", "pool": "创业板"}, "300370": {"entry": "2026-08-17", "pool": "创业板"}, "301053": {"entry": "2026-08-17", "pool": "创业板"}, "300194": {"entry": "2026-08-17", "pool": "创业板"}, "688513": {"entry": "2026-08-17", "pool": "科创板"}, "688029": {"entry": "2026-08-17", "pool": "科创板"}, "688068": {"entry": "2026-08-17", "pool": "科创板"}, "688739": {"entry": "2026-08-17", "pool": "科创板"}, "005005": {"entry": "2026-08-17", "pool": "基金"}, "005006": {"entry": "2026-08-17", "pool": "基金"}, "000314": {"entry": "2026-08-17", "pool": "基金"}, "002017": {"entry": "2026-08-17", "pool": "基金"}, "004355": {"entry": "2026-08-17", "pool": "基金"}, "002158": {"entry": "2026-08-17", "pool": "基金"}, "001796": {"entry": "2026-08-17", "pool": "基金"}, "002133": {"entry": "2026-08-17", "pool": "基金"}, "002495": {"entry": "2026-08-17", "pool": "基金"}, "002496": {"entry": "2026-08-17", "pool": "基金"}, "002636": {"entry": "2026-08-14", "pool": "主板"}, "601890": {"entry": "2026-08-14", "pool": "主板"}, "000768": {"entry": "2026-08-14", "pool": "主板"}, "002030": {"entry": "2026-08-14", "pool": "主板"}, "000850": {"entry": "2026-08-14", "pool": "主板"}, "002536": {"entry": "2026-08-14", "pool": "主板"}, "603538": {"entry": "2026-08-14", "pool": "主板"}, "300247": {"entry": "2026-08-14", "pool": "创业板"}, "300453": {"entry": "2026-08-14", "pool": "创业板"}, "300912": {"entry": "2026-08-14", "pool": "创业板"}, "300009": {"entry": "2026-08-14", "pool": "创业板"}, "300406": {"entry": "2026-08-14", "pool": "创业板"}, "300832": {"entry": "2026-08-14", "pool": "创业板"}, "300463": {"entry": "2026-08-14", "pool": "创业板"}, "688137": {"entry": "2026-08-14", "pool": "科创板"}}};</script>
+<script>window.SHORT_POOL = {"as_of": "2026-08-17", "fund_as_of": "2026-08-14", "tiers": {"主板": ["601952", "002033", "603858", "600251", "600261", "000019", "600435", "600363", "600864", "002556"], "创业板": ["300172", "300388", "300012", "300072", "300627", "300375", "300370", "301053", "300194"], "科创板": ["688513", "688029", "688068", "688739"], "基金": ["005005", "005006", "000314", "002017", "004355", "002158", "001796", "002133", "002495", "002496"]}, "track": {"601952": {"entry": "2026-08-17", "pool": "主板"}, "002033": {"entry": "2026-08-17", "pool": "主板"}, "603858": {"entry": "2026-08-17", "pool": "主板"}, "600251": {"entry": "2026-08-17", "pool": "主板"}, "600261": {"entry": "2026-08-17", "pool": "主板"}, "000019": {"entry": "2026-08-17", "pool": "主板"}, "600435": {"entry": "2026-08-17", "pool": "主板"}, "600363": {"entry": "2026-08-17", "pool": "主板"}, "600864": {"entry": "2026-08-17", "pool": "主板"}, "002556": {"entry": "2026-08-17", "pool": "主板"}, "300172": {"entry": "2026-08-17", "pool": "创业板"}, "300388": {"entry": "2026-08-17", "pool": "创业板"}, "300012": {"entry": "2026-08-17", "pool": "创业板"}, "300072": {"entry": "2026-08-17", "pool": "创业板"}, "300627": {"entry": "2026-08-17", "pool": "创业板"}, "300375": {"entry": "2026-08-17", "pool": "创业板"}, "300370": {"entry": "2026-08-17", "pool": "创业板"}, "301053": {"entry": "2026-08-17", "pool": "创业板"}, "300194": {"entry": "2026-08-17", "pool": "创业板"}, "688513": {"entry": "2026-08-17", "pool": "科创板"}, "688029": {"entry": "2026-08-17", "pool": "科创板"}, "688068": {"entry": "2026-08-17", "pool": "科创板"}, "688739": {"entry": "2026-08-17", "pool": "科创板"}, "005005": {"entry": "2026-08-17", "pool": "基金"}, "005006": {"entry": "2026-08-17", "pool": "基金"}, "000314": {"entry": "2026-08-17", "pool": "基金"}, "002017": {"entry": "2026-08-17", "pool": "基金"}, "004355": {"entry": "2026-08-17", "pool": "基金"}, "002158": {"entry": "2026-08-17", "pool": "基金"}, "001796": {"entry": "2026-08-17", "pool": "基金"}, "002133": {"entry": "2026-08-17", "pool": "基金"}, "002495": {"entry": "2026-08-17", "pool": "基金"}, "002496": {"entry": "2026-08-17", "pool": "基金"}, "002636": {"entry": "2026-08-14", "pool": "主板"}, "601890": {"entry": "2026-08-14", "pool": "主板"}, "000768": {"entry": "2026-08-14", "pool": "主板"}, "002030": {"entry": "2026-08-14", "pool": "主板"}, "000850": {"entry": "2026-08-14", "pool": "主板"}, "002536": {"entry": "2026-08-14", "pool": "主板"}, "603538": {"entry": "2026-08-14", "pool": "主板"}, "300247": {"entry": "2026-08-14", "pool": "创业板"}, "300453": {"entry": "2026-08-14", "pool": "创业板"}, "300912": {"entry": "2026-08-14", "pool": "创业板"}, "300009": {"entry": "2026-08-14", "pool": "创业板"}, "300406": {"entry": "2026-08-14", "pool": "创业板"}, "300832": {"entry": "2026-08-14", "pool": "创业板"}, "300463": {"entry": "2026-08-14", "pool": "创业板"}, "688137": {"entry": "2026-08-14", "pool": "科创板"}}};</script>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
 window.ENH.nav = [
@@ -4789,10 +4637,11 @@ document.addEventListener('click',function(e){
 function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)return;
   var html='<div class="sn-logo"><span class="dot"></span>量化权重监控</div><div class="sn-sep"></div>';
   window.ENH.nav.forEach(function(it){
-    html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"><span class="ic">'+it[1]+'</span>'+it[2]+'</a>';
-    // 子章节（2026-08-17 用户需求）：点击先切视图再滚动到区块
     var subs=it[3];
-    if(subs&&subs.length){
+    var hasSubs=subs&&subs.length;
+    html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"'+(hasSubs?' data-toggle="1"':'')+'><span class="ic">'+it[1]+'</span>'+it[2]+(hasSubs?'<span class="sn-arrow">▾</span>':'')+'</a>';
+    // 子章节（2026-08-17 用户需求）：点击先切视图再滚动到区块；主项点击可折叠/展开
+    if(hasSubs){
       html+='<div class="sn-sub">';
       subs.forEach(function(s){html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'" data-sub="'+s[0]+'"><span class="dot-sub"></span>'+s[1]+'</a>';});
       html+='</div>';}});
@@ -4819,17 +4668,49 @@ function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)retu
           var el=document.getElementById(sub);
           if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
         },30);}
-      nav.querySelectorAll('a[data-anchor]').forEach(function(x){x.classList.toggle('active',x===a);});});});
-  // 滚动高亮：仅对可见元素生效（display:none 的视图跳过，避免视图切换模式下 active 乱跳）
+      // 主项折叠/展开：切到新视图自动展开；同视图重复点击 = 折叠切换
+      else if(a.getAttribute('data-toggle')&&a.nextElementSibling&&a.nextElementSibling.classList.contains('sn-sub')){
+        var grp=a.nextElementSibling;
+        var curMain=nav.querySelector('a[data-anchor]:not([data-sub]).active');
+        if(curMain&&curMain!==a){grp.classList.remove('collapsed');}
+        else{grp.classList.toggle('collapsed');}
+      }
+      nav.querySelectorAll('a[data-anchor]').forEach(function(x){x.classList.toggle('active',x===a);});
+      // 子项点击时父主项保持高亮
+      if(sub&&a.parentNode&&a.parentNode.classList.contains('sn-sub')){
+        var pm=nav.querySelector('a[data-anchor="'+t+'"]:not([data-sub])');
+        if(pm)pm.classList.add('active');}});});
+  // 滚动高亮：普通页按锚点滚动；视图切换模式按当前视图内区块高亮对应子导航（2026-08-17 用户需求）
   window.addEventListener('scroll',function(){
-    if(window.ENH&&window.ENH.NAV_SWITCH)return;   // 视图切换模式：滚动不更新 active
-    var anchors=window.ENH.nav.map(function(it){return it[0];});
-    var cur=anchors[0];
-    anchors.forEach(function(a){
-      var el=document.getElementById(a);
-      if(el&&el.offsetParent!==null&&el.getBoundingClientRect().top<=150)cur=a;});
+    if(!(window.ENH&&window.ENH.NAV_SWITCH)){
+      var anchors=window.ENH.nav.map(function(it){return it[0];});
+      var cur=anchors[0];
+      anchors.forEach(function(a){
+        var el=document.getElementById(a);
+        if(el&&el.offsetParent!==null&&el.getBoundingClientRect().top<=150)cur=a;});
+      nav.querySelectorAll('a[data-anchor]').forEach(function(a){
+        a.classList.toggle('active',a.getAttribute('data-anchor')===cur);});
+      return;}
+    var av=document.querySelector('.view.active');if(!av)return;
+    var hit=null;
+    nav.querySelectorAll('a[data-sub]').forEach(function(a){
+      var el=document.getElementById(a.getAttribute('data-sub'));
+      if(!el||!av.contains(el))return;
+      if(el.getBoundingClientRect().top<=140)hit=a;});
+    // 视图顶部回退：无区块命中时高亮当前视图的第一个子章节（2026-08-17）
+    if(!hit){
+      var curMain=null;
+      nav.querySelectorAll('a[data-anchor]:not([data-sub])').forEach(function(a){
+        if(window.VIEW_MAP&&window.VIEW_MAP[a.getAttribute('data-anchor')]===av.id)curMain=a;});
+      if(curMain&&curMain.nextElementSibling&&curMain.nextElementSibling.classList.contains('sn-sub')){
+        hit=curMain.nextElementSibling.querySelector('a[data-sub]');}
+    }
     nav.querySelectorAll('a[data-anchor]').forEach(function(a){
-      a.classList.toggle('active',a.getAttribute('data-anchor')===cur);});});}
+      if(a.getAttribute('data-sub')){a.classList.toggle('active',a===hit);return;}
+      var on=hit?hit.getAttribute('data-anchor')===a.getAttribute('data-anchor'):
+        (window.VIEW_MAP?window.VIEW_MAP[a.getAttribute('data-anchor')]===av.id:false);
+      a.classList.toggle('active',on);});
+    if(hit&&hit.parentNode&&hit.parentNode.classList.contains('sn-sub'))hit.parentNode.classList.remove('collapsed');});}
 
 /* ---------- 工具函数 ---------- */
 function fmtPct(v){if(v===null||v===undefined||isNaN(v))return '—';
@@ -5122,9 +5003,12 @@ document.addEventListener('DOMContentLoaded',function(){
   });
   document.querySelectorAll('#sidenav a[data-anchor]').forEach(function(a){
     a.addEventListener('click',function(e){
-      e.preventDefault();switchView(a.getAttribute('data-anchor'));
-      document.querySelectorAll('#sidenav a[data-anchor]').forEach(function(x){x.classList.toggle('active',x===a);});});
-  });
+      e.preventDefault();var t=a.getAttribute('data-anchor');switchView(t);
+      document.querySelectorAll('#sidenav a[data-anchor]').forEach(function(x){x.classList.toggle('active',x===a);});
+      // 子项点击时父主项保持高亮（2026-08-17）
+      if(a.getAttribute('data-sub')&&a.parentNode&&a.parentNode.classList.contains('sn-sub')){
+        var pm=document.querySelector('#sidenav a[data-anchor="'+t+'"]:not([data-sub])');
+        if(pm)pm.classList.add('active');}});});
   initTable('tbl-v9', {columns: {rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}});
   initTable('tbl-v8', {columns: {rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}});
   initTable('tbl-short', {columns: {rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}});
