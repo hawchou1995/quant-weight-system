@@ -1,0 +1,225 @@
+[
+ {
+  "code": "300502",
+  "name": "新易盛",
+  "type": "股票",
+  "market": "SZ",
+  "setcode": "0",
+  "industry": "光模块"
+ },
+ {
+  "code": "300308",
+  "name": "中际旭创",
+  "type": "股票",
+  "market": "SZ",
+  "setcode": "0",
+  "industry": "光模块"
+ },
+ {
+  "code": "159516",
+  "name": "半导体设备ETF",
+  "type": "ETF",
+  "market": "SZ",
+  "setcode": "0",
+  "industry": "半导体设备"
+ },
+ {
+  "code": "600498",
+  "name": "烽火通信",
+  "type": "股票",
+  "market": "SH",
+  "setcode": "1",
+  "industry": "通信设备"
+ },
+ {
+  "code": "601138",
+  "name": "工业富联",
+  "type": "股票",
+  "market": "SH",
+  "setcode": "1",
+  "industry": "电子制造"
+ },
+ {
+  "code": "002463",
+  "name": "沪电股份",
+  "type": "股票",
+  "market": "SZ",
+  "setcode": "0",
+  "industry": "PCB"
+ },
+ {
+  "code": "002384",
+  "name": "东山精密",
+  "type": "股票",
+  "market": "SZ",
+  "setcode": "0",
+  "industry": "电子制造"
+ },
+ {
+  "code": "600183",
+  "name": "生益科技",
+  "type": "股票",
+  "market": "SH",
+  "setcode": "1",
+  "industry": "覆铜板"
+ },
+ {
+  "code": "300476",
+  "name": "胜宏科技",
+  "type": "股票",
+  "market": "SZ",
+  "setcode": "0",
+  "industry": "PCB"
+ },
+ {
+  "code": "603986",
+  "name": "兆易创新",
+  "type": "股票",
+  "market": "SH",
+  "setcode": "1",
+  "industry": "半导体"
+ },
+ {
+  "code": "515880",
+  "name": "通信ETF",
+  "type": "ETF",
+  "market": "SH",
+  "setcode": "1",
+  "industry": "通信"
+ },
+ {
+  "code": "008254",
+  "name": "华宝致远混合C",
+  "type": "基金",
+  "market": "场外",
+  "setcode": "33",
+  "industry": "QDII混合"
+ },
+ {
+  "code": "018036",
+  "name": "长城新能源车股C",
+  "type": "基金",
+  "market": "场外",
+  "setcode": "33",
+  "industry": "新能源车"
+ },
+ {
+  "code": "002891",
+  "name": "华夏移动互联CNY",
+  "type": "基金",
+  "market": "场外",
+  "setcode": "33",
+  "industry": "移动互联"
+ },
+ {
+  "code": "024239",
+  "name": "华夏全球(QDII)C",
+  "type": "基金",
+  "market": "场外",
+  "setcode": "33",
+  "industry": "QDII科技"
+ },
+ {
+  "code": "014002",
+  "name": "浦银智能科技C",
+  "type": "基金",
+  "market": "场外",
+  "setcode": "33",
+  "industry": "智能科技"
+ },
+ {
+  "code": "516150",
+  "name": "稀土ETF嘉实",
+  "type": "ETF",
+  "market": "SH",
+  "setcode": "1",
+  "industry": "稀土"
+ },
+ {
+  "code": "560390",
+  "name": "电网设备ETF易方达",
+  "type": "ETF",
+  "market": "SH",
+  "setcode": "1",
+  "industry": "电网设备"
+ },
+ {
+  "code": "002185",
+  "name": "华天科技",
+  "type": "股票",
+  "market": "SZ",
+  "setcode": "0",
+  "industry": "半导体封测"
+ },
+ {
+  "code": "605358",
+  "name": "立昂微",
+  "type": "股票",
+  "market": "SH",
+  "setcode": "1",
+  "industry": "半导体硅片"
+ },
+ {
+  "code": "603228",
+  "name": "景旺电子",
+  "type": "股票",
+  "market": "SH",
+  "setcode": "1",
+  "industry": "PCB"
+ },
+ {
+  "code": "603339",
+  "name": "四方科技",
+  "type": "股票",
+  "market": "SH",
+  "setcode": "1",
+  "industry": "冷链设备"
+ },
+ {
+  "code": "000636",
+  "name": "风华高科",
+  "type": "股票",
+  "market": "SZ",
+  "setcode": "0",
+  "industry": "MLCC"
+ },
+ {
+  "code": "605189",
+  "name": "富春染织",
+  "type": "股票",
+  "market": "sh",
+  "industry": "纺织印染"
+ },
+ {
+  "code": "600403",
+  "name": "大有能源",
+  "type": "股票",
+  "market": "sh",
+  "setcode": "1",
+  "industry": "煤炭"
+ },
+ {
+  "code": "002879",
+  "name": "长缆科技",
+  "type": "股票",
+  "market": "sz",
+  "setcode": "0",
+  "industry": "电线电缆"
+ },
+ {
+  "code": "600162",
+  "name": "香江控股",
+  "type": "股票",
+  "market": "sh",
+  "setcode": "1",
+  "industry": "地产服务"
+ },
+ {
+  "code": "000759",
+  "name": "中百集团",
+  "type": "股票",
+  "market": "sz",
+  "setcode": "0",
+  "industry": "商业零售"
+ }
+]

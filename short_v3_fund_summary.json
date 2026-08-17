@@ -1,0 +1,13 @@
+{
+  "strategy": "short_v3_fund",
+  "params": "T5/H10/S40 · 动量（C类份额；换手减半抗申赎费）",
+  "slippage_bps": 0,
+  "summary": {
+    "total_return_pct": 287.12,
+    "annual_return_pct": 13.61,
+    "max_drawdown_pct": -25.73,
+    "sharpe": 0.909,
+    "win_rate_pct": 56.4,
+    "total_trades": 598
+  }
+}

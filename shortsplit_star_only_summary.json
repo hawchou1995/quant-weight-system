@@ -1,0 +1,14 @@
+{
+  "strategy": "shortsplit_star_only",
+  "label": "纯科创板",
+  "params": "T10/H10/S55 反转+MA5/MA30门控 · 含20bps滑点",
+  "slippage_bps": 20,
+  "summary": {
+    "total_return_pct": 161.88,
+    "annual_return_pct": 9.5,
+    "max_drawdown_pct": -14.83,
+    "sharpe": 0.946,
+    "win_rate_pct": 57.8,
+    "total_trades": 294
+  }
+}

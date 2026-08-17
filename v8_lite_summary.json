@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "strategy_name": "v8-lite 个人版 v3（50万/自选池25只内Top4/月轮动/动态等权/移动止损10%）",
+    "symbol": "自选池 25 只内轮动 Top4（动态等权，修复固定预算现金堆积）",
+    "start": "2016-01-04",
+    "end": "2026-08-14",
+    "initial_cash": 500000.0,
+    "window_start_value": 500000.0,
+    "final_value": 20118413.85,
+    "market": "china_a"
+  },
+  "summary": {
+    "total_return_pct": 3923.68,
+    "annual_return_pct": 41.66,
+    "max_drawdown_pct": -18.04,
+    "sharpe": 1.644,
+    "win_rate_pct": 57.1,
+    "total_trades": 210
+  }
+}

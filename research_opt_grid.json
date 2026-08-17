@@ -1,0 +1,66 @@
+{
+  "基准 H10/S55/MA5": {
+    "total_return_pct": 315.72,
+    "annual_return_pct": 14.37,
+    "max_drawdown_pct": -7.08,
+    "sharpe": 1.746,
+    "win_rate_pct": 47.2,
+    "total_trades": 1285.0
+  },
+  "文2小止盈 TP3%/SL5% H10": {
+    "total_return_pct": -16.18,
+    "annual_return_pct": -1.65,
+    "max_drawdown_pct": -23.93,
+    "sharpe": -0.27,
+    "win_rate_pct": 43.4,
+    "total_trades": 1285.0
+  },
+  "文2小止盈 TP2%/SL5% H5": {
+    "total_return_pct": -68.04,
+    "annual_return_pct": -10.19,
+    "max_drawdown_pct": -70.27,
+    "sharpe": -1.281,
+    "win_rate_pct": 39.3,
+    "total_trades": 2510.0
+  },
+  "文2小止盈 TP3%/SL5% H5": {
+    "total_return_pct": -55.09,
+    "annual_return_pct": -7.27,
+    "max_drawdown_pct": -58.19,
+    "sharpe": -0.872,
+    "win_rate_pct": 42.0,
+    "total_trades": 2504.0
+  },
+  "文2小止盈 TP5%/SL7% H10": {
+    "total_return_pct": 18.75,
+    "annual_return_pct": 1.63,
+    "max_drawdown_pct": -9.19,
+    "sharpe": 0.308,
+    "win_rate_pct": 46.2,
+    "total_trades": 1285.0
+  },
+  "文8天量剔除20日 H10": {
+    "total_return_pct": 315.72,
+    "annual_return_pct": 14.37,
+    "max_drawdown_pct": -7.08,
+    "sharpe": 1.746,
+    "win_rate_pct": 47.2,
+    "total_trades": 1285.0
+  },
+  "组合 TP3%+天量剔除 H10": {
+    "total_return_pct": -16.18,
+    "annual_return_pct": -1.65,
+    "max_drawdown_pct": -23.93,
+    "sharpe": -0.27,
+    "win_rate_pct": 43.4,
+    "total_trades": 1285.0
+  },
+  "组合 TP2%/SL5% H5+天量剔除": {
+    "total_return_pct": -68.04,
+    "annual_return_pct": -10.19,
+    "max_drawdown_pct": -70.27,
+    "sharpe": -1.281,
+    "win_rate_pct": 39.3,
+    "total_trades": 2510.0
+  }
+}

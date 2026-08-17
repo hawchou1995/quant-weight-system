@@ -1,0 +1,14 @@
+{
+  "strategy": "shortsplit_all",
+  "label": "股票一体 · 全A",
+  "params": "T10/H10/S55 反转+MA5/MA30门控 · 含20bps滑点",
+  "slippage_bps": 20,
+  "summary": {
+    "total_return_pct": 356.96,
+    "annual_return_pct": 15.4,
+    "max_drawdown_pct": -7.08,
+    "sharpe": 1.844,
+    "win_rate_pct": 47.3,
+    "total_trades": 1271
+  }
+}

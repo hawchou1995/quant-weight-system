@@ -1,0 +1,13 @@
+{
+  "strategy": "v9_split_main_only",
+  "label": "纯主板",
+  "params": "T3/m25/s65/SL5.5/MA150 择时",
+  "summary": {
+    "total_return_pct": 597.81,
+    "annual_return_pct": 20.1,
+    "max_drawdown_pct": -17.22,
+    "sharpe": 1.409,
+    "win_rate_pct": 48.1,
+    "total_trades": 183
+  }
+}

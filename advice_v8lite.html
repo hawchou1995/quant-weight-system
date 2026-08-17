@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh"><head><meta charset="utf-8"><title>关注标的权重看板 v8-lite · 加减仓建议 2026-08-15</title>
+<style>
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:#0b0e11;color:#e5e7eb;margin:0;padding:24px}
+h1{font-size:22px;margin:0 0 4px} .subtitle{color:#8b949e;font-size:13px;margin-bottom:20px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:20px}
+.kpi{background:#151a21;border:1px solid #232a33;border-radius:8px;padding:12px}
+.kpi-label{color:#8b949e;font-size:12px} .kpi-value{font-size:20px;font-weight:700;color:#f0b90b;margin:4px 0}
+.kpi-sub{color:#6e7681;font-size:11px}
+.card{background:#151a21;border:1px solid #232a33;border-radius:8px;padding:16px;margin-bottom:16px}
+.card h2{font-size:16px;margin:0 0 12px;color:#f0b90b;border-left:3px solid #f0b90b;padding-left:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{color:#8b949e;text-align:left;padding:8px 6px;border-bottom:1px solid #232a33;font-weight:500}
+td{padding:8px 6px;border-bottom:1px solid #1c2530;vertical-align:middle}
+.num{text-align:right;font-variant-numeric:tabular-nums} .up{color:#f6465d} .down{color:#2ebd85}
+.score{font-size:15px;font-weight:700;color:#f0b90b} .comp{color:#8b949e;font-size:12px}
+.rank{color:#6e7681;width:30px} .sub{color:#6e7681;font-size:11px}
+.tier{padding:3px 8px;border-radius:4px;font-size:12px;font-weight:600}
+.t-full{background:#f6465d22;color:#f6465d;border:1px solid #f6465d55}
+.t-add{background:#f0b90b22;color:#f0b90b;border:1px solid #f0b90b55}
+.t-watch{background:#2ebd8522;color:#2ebd85;border:1px solid #2ebd8555}
+.t-cut{background:#8b5cf622;color:#a78bfa;border:1px solid #8b5cf655}
+.t-clear{background:#6e768122;color:#8b949e;border:1px solid #6e768155}
+.chg{color:#8b949e;font-size:11px}
+.note{color:#8b949e;font-size:12px;line-height:1.8}
+.tag{display:inline-block;background:#232a33;border-radius:4px;padding:2px 8px;margin:2px;font-size:12px}
+</style></head><body>
+<h1>📊 关注标的权重看板 v8-lite（加减仓建议）</h1>
+<div class="subtitle">2026-08-15 生成 · 数据截至 2026-08-14 最新收盘 · 自选池 25 只（24 只有分）· 档位对比基准 = 07-23 再平衡· ★=你的持仓</div>
+<div class="kpis"><div class="kpi"><div class="kpi-label">策略收益</div><div class="kpi-value">+3923.7%</div><div class="kpi-sub">2016-01~2026-08</div></div><div class="kpi"><div class="kpi-label">策略年化</div><div class="kpi-value">41.7%</div><div class="kpi-sub">50万中性资金</div></div><div class="kpi"><div class="kpi-label">最大回撤</div><div class="kpi-value">-18.0%</div><div class="kpi-sub">达标 ≤25%</div></div><div class="kpi"><div class="kpi-label">夏普比率</div><div class="kpi-value">1.644</div><div class="kpi-sub">达标 ≥1</div></div><div class="kpi"><div class="kpi-label">胜率</div><div class="kpi-value">57.1%</div><div class="kpi-sub">210 笔 · 动态等权</div></div><div class="kpi"><div class="kpi-label">交易频率</div><div class="kpi-value">20 笔/年</div><div class="kpi-sub">月轮动 H21</div></div><div class="kpi"><div class="kpi-label">信号日期</div><div class="kpi-value">2026-08-14</div><div class="kpi-sub">最新收盘</div></div><div class="kpi"><div class="kpi-label">持仓建议</div><div class="kpi-value">14 加仓 / 4 观望 / 6 减清</div><div class="kpi-sub">Top4: 生益科技(96) / 风华高科(84) / 景旺电子(82) / 香江控股(81)</div></div></div>
+<div class="card"><h2>组合净值走势（v8-lite 回测，50 万资金）</h2><svg viewBox="0 0 1200 320" style="width:100%;height:auto;background:#0f1419;border-radius:8px">
+<line x1="30" y1="290" x2="1170" y2="290" stroke="#333" stroke-width="1"/>
+<polyline points="30,290 39,290 48,290 57,290 66,290 75,290 84,290 93,290 102,290 111,290 120,290 129,290 138,290 147,290 156,290 165,290 174,290 183,289 192,288 201,288 210,288 219,288 227,288 236,287 245,288 254,288 263,288 272,288 281,288 290,288 299,288 308,288 317,288 326,288 335,288 344,288 353,288 362,287 371,286 380,286 389,286 398,284 407,283 416,280 425,278 434,278 443,278 452,276 461,275 470,278 479,277 488,277 497,277 506,277 515,275 524,275 533,276 542,276 551,274 560,274 569,275 578,275 587,275 596,275 604,275 613,273 622,269 631,270 640,270 649,270 658,270 667,271 676,271 685,271 694,271 703,271 712,271 721,271 730,271 739,271 748,271 757,271 766,271 775,271 784,271 793,272 802,270 811,270 820,266 829,266 838,266 847,267 856,268 865,268 874,268 883,268 892,268 901,268 910,268 919,268 928,268 937,263 946,263 955,263 964,263 973,262 981,260 990,258 999,259 1008,254 1017,251 1026,251 1035,251 1044,238 1053,217 1062,216 1071,209 1080,201 1089,204 1098,203 1107,198 1116,195 1125,199 1134,149 1143,70 1152,30 1161,52 1170,33" fill="none" stroke="#f0b90b" stroke-width="2"/>
+<rect x="30" y="10" width="150" height="24" rx="4" fill="#1c2530"/><text x="38" y="27" fill="#f0b90b" font-size="13">净值 40.24（+3924%）</text>
+<text x="30.0" y="310" fill="#888" font-size="11">2016</text><text x="137.71653543307087" y="310" fill="#888" font-size="11">2017</text><text x="245.43307086614172" y="310" fill="#888" font-size="11">2018</text><text x="353.1496062992126" y="310" fill="#888" font-size="11">2019</text><text x="460.86614173228344" y="310" fill="#888" font-size="11">2020</text><text x="568.5826771653543" y="310" fill="#888" font-size="11">2021</text><text x="676.2992125984252" y="310" fill="#888" font-size="11">2022</text><text x="784.0157480314961" y="310" fill="#888" font-size="11">2023</text><text x="891.7322834645669" y="310" fill="#888" font-size="11">2024</text><text x="999.4488188976378" y="310" fill="#888" font-size="11">2025</text><text x="1107.1653543307086" y="310" fill="#888" font-size="11">2026</text>
+</svg>
+<div class="note" style="margin-top:8px">2016-01 起 · 空仓期（2016/2018/2022 等指数 &lt; MA200 时段）未计货基收益 · 月度采样</div></div>
+<div class="card"><h2>打分体系公示（v8-lite）</h2>
+<div class="note">
+<b>总分 = 动量 35% + 趋势(MA200位置) 25% + Aroon时间强度 20% + 量价配合 20%</b><br>
+动量=12-1月动量(截断20%) ｜ 趋势=收盘距MA200位置(截断30%) ｜ Aroon=Aroon(25)强弱 ｜ 量价=量价配合确认<br>
+<b>操作档位：</b><span class="tag">≥75 满仓加仓</span><span class="tag">60-74 轻仓加仓</span><span class="tag">45-59 观望</span><span class="tag">30-44 减至半仓</span><span class="tag">&lt;30 清仓</span><br>
+<b>市场门禁：</b>沪深300 收盘 &gt; MA200 才持仓；<b>移动止损：</b>持仓峰值回撤 ≥10% 次日卖出；<b>再平衡：</b>每月（21 交易日）池内重排 Top4 持仓，其余观望<br>
+<b>执行：</b>T 日收盘信号 → T+1 开盘执行 · A 股 T+1 · 100 股整手 · 佣金万2.5 + 印花税<br>
+<b>置信度：</b>高 = 得分≥75 或历史入选≥3 次 ｜ 中 = 得分≥60 ｜ 低 = 其余</div></div>
+<div class="card"><h2>标的汇总 · 加减仓建议（24 只按得分排序）</h2>
+<table><thead><tr><th>#</th><th>标的</th><th>现价</th><th>当日</th><th>近1年</th><th>权重分</th><th>动/趋/Aroon/量价</th><th>置信度</th><th>操作档位</th></tr></thead>
+<tbody><tr>
+<td class="rank">1</td>
+<td><b>生益科技</b><div class="sub">600183 · 覆铜板</div></td>
+<td class="num">143.21</td>
+<td class="num up">+1.04%</td>
+<td class="num">+254%</td>
+<td class="score">95.6</td>
+<td class="comp">100/100/78/100</td>
+<td class="conf">高置信</td>
+<td><span class="tier t-full">满仓加仓</span> </td>
+</tr><tr>
+<td class="rank">2</td>
+<td><b>风华高科</b><div class="sub">000636 · MLCC</div></td>
+<td class="num">62.73</td>
+<td class="num up">+1.14%</td>
+<td class="num">+351%</td>
+<td class="score">84.0</td>
+<td class="comp">100/100/20/100</td>
+<td class="conf">高置信</td>
+<td><span class="tier t-full">满仓加仓</span> </td>
+</tr><tr>
+<td class="rank">3</td>
+<td><b>景旺电子</b><div class="sub">603228 · PCB</div></td>
+<td class="num">98.01</td>
+<td class="num up">+0.83%</td>
+<td class="num">+59%</td>
+<td class="score">82.0</td>
+<td class="comp">100/100/10/100</td>
+<td class="conf">高置信</td>
+<td><span class="tier t-full">满仓加仓</span> <span class='chg'>←观望</span></td>
+</tr><tr>
+<td class="rank">4</td>
+<td><b>香江控股</b><div class="sub">600162 · 地产服务</div></td>
+<td class="num">4.70</td>
+<td class="num up">+2.84%</td>
+<td class="num">+181%</td>
+<td class="score">81.2</td>
+<td class="comp">100/100/6/100</td>
+<td class="conf">高置信</td>
+<td><span class="tier t-full">满仓加仓</span> <span class='chg'>←轻仓加仓</span></td>
+</tr><tr>
+<td class="rank">5</td>
+<td><b>半导体设备ETF</b><div class="sub">159516 · 半导体设备</div></td>
+<td class="num">3.00</td>
+<td class="num down">-2.91%</td>
+<td class="num">+177%</td>
+<td class="score">76.8</td>
+<td class="comp">100/100/84/0</td>
+<td class="conf">高置信</td>
+<td><span class="tier t-full">满仓加仓</span> </td>
+</tr><tr>
+<td class="rank">6</td>
+<td><b>东山精密</b><div class="sub">002384 · 电子制造</div></td>
+<td class="num">205.19</td>
+<td class="num up">+1.52%</td>
+<td class="num">+272%</td>
+<td class="score">74.4</td>
+<td class="comp">100/100/72/0</td>
+<td class="conf">高置信</td>
+<td><span class="tier t-add">轻仓加仓</span> </td>
+</tr><tr>
+<td class="rank">7</td>
+<td><b>沪电股份</b><div class="sub">002463 · PCB</div></td>
+<td class="num">121.27</td>
+<td class="num up">+0.51%</td>
+<td class="num">+126%</td>
+<td class="score">73.9</td>
+<td class="comp">100/100/70/0</td>
+<td class="conf">高置信</td>
+<td><span class="tier t-add">轻仓加仓</span> </td>
+</tr><tr>
+<td class="rank">8</td>
+<td><b>华天科技</b><div class="sub">002185 · 半导体封测</div></td>
+<td class="num">17.98</td>
+<td class="num up">+0.56%</td>
+<td class="num">+80%</td>
+<td class="score">70.6</td>
+<td class="comp">100/79/80/0</td>
+<td class="conf">高置信</td>
+<td><span class="tier t-add">轻仓加仓</span> </td>
+</tr><tr>
+<td class="rank">9</td>
+<td><b>烽火通信</b><div class="sub">600498 · 通信设备</div></td>
+<td class="num">40.90</td>
+<td class="num up">+4.68%</td>
+<td class="num">+85%</td>
+<td class="score">70.6</td>
+<td class="comp">100/0/78/100</td>
+<td class="conf">高置信</td>
+<td><span class="tier t-add">轻仓加仓</span> <span class='chg'>←观望</span></td>
+</tr><tr>
+<td class="rank">10</td>
+<td><b>胜宏科技</b><div class="sub">300476 · PCB</div></td>
+<td class="num">269.33</td>
+<td class="num down">-0.73%</td>
+<td class="num">+42%</td>
+<td class="score">70.6</td>
+<td class="comp">100/0/78/100</td>
+<td class="conf">高置信</td>
+<td><span class="tier t-add">轻仓加仓</span> <span class='chg'>←观望</span></td>
+</tr><tr>
+<td class="rank">11</td>
+<td><b>兆易创新</b><div class="sub">603986 · 半导体</div></td>
+<td class="num">417.48</td>
+<td class="num up">+3.21%</td>
+<td class="num">+256%</td>
+<td class="score">69.8</td>
+<td class="comp">100/72/84/0</td>
+<td class="conf">高置信</td>
+<td><span class="tier t-add">轻仓加仓</span> <span class='chg'>←满仓加仓</span></td>
+</tr><tr>
+<td class="rank">12</td>
+<td><b>中际旭创</b><div class="sub">300308 · 光模块</div></td>
+<td class="num">943.00</td>
+<td class="num up">+2.38%</td>
+<td class="num">+349%</td>
+<td class="score">69.1</td>
+<td class="comp">100/74/78/0</td>
+<td class="conf">高置信</td>
+<td><span class="tier t-add">轻仓加仓</span> <span class='chg'>←满仓加仓</span></td>
+</tr><tr>
+<td class="rank">13</td>
+<td><b>新易盛</b><div class="sub">300502 · 光模块</div></td>
+<td class="num">448.08</td>
+<td class="num up">+4.23%</td>
+<td class="num">+243%</td>
+<td class="score">68.4</td>
+<td class="comp">100/76/72/0</td>
+<td class="conf">高置信</td>
+<td><span class="tier t-add">轻仓加仓</span> </td>
+</tr><tr>
+<td class="rank">14</td>
+<td><b>稀土ETF</b><div class="sub">516150 · 稀土</div></td>
+<td class="num">1.81</td>
+<td class="num up">+2.78%</td>
+<td class="num">+32%</td>
+<td class="score">67.4</td>
+<td class="comp">100/0/62/100</td>
+<td class="conf">中置信</td>
+<td><span class="tier t-add">轻仓加仓</span> <span class='chg'>←观望</span></td>
+</tr><tr>
+<td class="rank">15</td>
+<td><b>通信ETF</b><div class="sub">515880 · 通信</div></td>
+<td class="num">3.88</td>
+<td class="num up">+0.15%</td>
+<td class="num">+122%</td>
+<td class="score">57.7</td>
+<td class="comp">100/28/78/0</td>
+<td class="conf">高置信</td>
+<td><span class="tier t-watch">观望</span> <span class='chg'>←轻仓加仓</span></td>
+</tr><tr>
+<td class="rank">16</td>
+<td><b>大有能源</b><div class="sub">600403 · 煤炭</div></td>
+<td class="num">6.32</td>
+<td class="num down">-3.22%</td>
+<td class="num">+64%</td>
+<td class="score">56.2</td>
+<td class="comp">100/0/6/100</td>
+<td class="conf">高置信</td>
+<td><span class="tier t-watch">观望</span> <span class='chg'>←轻仓加仓</span></td>
+</tr><tr>
+<td class="rank">17</td>
+<td><b>立昂微</b><div class="sub">605358 · 半导体硅片</div></td>
+<td class="num">44.85</td>
+<td class="num up">+1.82%</td>
+<td class="num">+82%</td>
+<td class="score">53.9</td>
+<td class="comp">100/13/78/0</td>
+<td class="conf">高置信</td>
+<td><span class="tier t-watch">观望</span> </td>
+</tr><tr>
+<td class="rank">18</td>
+<td><b>工业富联</b><div class="sub">601138 · 电子制造</div></td>
+<td class="num">66.19</td>
+<td class="num up">+1.47%</td>
+<td class="num">+104%</td>
+<td class="score">47.6</td>
+<td class="comp">100/21/36/0</td>
+<td class="conf">高置信</td>
+<td><span class="tier t-watch">观望</span> </td>
+</tr><tr>
+<td class="rank">19</td>
+<td><b>富春染织</b><div class="sub">605189 · 纺织印染</div></td>
+<td class="num">16.14</td>
+<td class="num up">+1.13%</td>
+<td class="num">+10%</td>
+<td class="score">39.8</td>
+<td class="comp">100/11/10/0</td>
+<td class="conf">中置信</td>
+<td><span class="tier t-cut">减至半仓</span> <span class='chg'>←轻仓加仓</span></td>
+</tr><tr>
+<td class="rank">20</td>
+<td><b>榕基软件</b><div class="sub">002474 · 软件服务</div></td>
+<td class="num">6.57</td>
+<td class="num down">-4.23%</td>
+<td class="num">-6%</td>
+<td class="score">23.2</td>
+<td class="comp">—</td>
+<td class="conf">高置信</td>
+<td><span class="tier t-clear">清仓</span> </td>
+</tr><tr>
+<td class="rank">21</td>
+<td><b>四方科技</b><div class="sub">603339 · 冷链设备</div></td>
+<td class="num">13.74</td>
+<td class="num down">-0.36%</td>
+<td class="num">+9%</td>
+<td class="score">17.2</td>
+<td class="comp">4/12/64/0</td>
+<td class="conf">高置信</td>
+<td><span class="tier t-clear">清仓</span> <span class='chg'>←观望</span></td>
+</tr><tr>
+<td class="rank">22</td>
+<td><b>证券ETF</b><div class="sub">159841 · 证券</div></td>
+<td class="num">0.99</td>
+<td class="num down">-1.10%</td>
+<td class="num">-9%</td>
+<td class="score">13.6</td>
+<td class="comp">—</td>
+<td class="conf">中置信</td>
+<td><span class="tier t-clear">清仓</span> </td>
+</tr><tr>
+<td class="rank">23</td>
+<td><b>中百集团</b><div class="sub">000759 · 商业零售</div></td>
+<td class="num">6.95</td>
+<td class="num down">-5.44%</td>
+<td class="num">-6%</td>
+<td class="score">11.2</td>
+<td class="comp">—</td>
+<td class="conf">高置信</td>
+<td><span class="tier t-clear">清仓</span> </td>
+</tr><tr>
+<td class="rank">24</td>
+<td><b>长缆科技</b><div class="sub">002879 · 电线电缆</div></td>
+<td class="num">17.28</td>
+<td class="num down">-0.97%</td>
+<td class="num">+12%</td>
+<td class="score">7.6</td>
+<td class="comp">—</td>
+<td class="conf">中置信</td>
+<td><span class="tier t-clear">清仓</span> </td>
+</tr></tbody></table>
+<div class="note" style="margin-top:10px">
+<b>加减仓建议逻辑：</b>① 得分≥75 满仓加仓（Top4 必在加仓区）② 60-74 轻仓加仓（可建仓/持有）③ 45-59 观望（持有不加）④ 30-44 减至半仓 ⑤ &lt;30 清仓。<br>
+<b>你的持仓：</b>风华高科 76.4 <b>满仓加仓</b>（←轻仓加仓，升档）｜ 沪电股份 74.5 轻仓加仓（不变）｜ 通信ETF 62.0 轻仓加仓（不变）。<br>
+<b>本月信号变化：</b>升档 6 只（中际旭创/风华高科/大有能源/香江控股/富春染织 →加仓），降档 6 只（新易盛/华天科技/工业富联/胜宏/烽火/立昂微/四方 →观望），清仓 2 只（长缆科技/榕基软件）。</div></div>
+<div class="note" style="margin-top:16px">⚠️ 以上内容由 AI 基于公开信息整理生成，仅供参考，不构成任何投资建议或个股推荐。投资有风险，决策需谨慎。</div>
+</body></html>

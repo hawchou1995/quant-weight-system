@@ -1,0 +1,18 @@
+{
+  "meta": {
+    "strategy_name": "v8 基金动量选基 Top5",
+    "symbol": "全市场权益基金动量选基 Top5",
+    "start": "2016-01-04",
+    "end": "2026-08-14",
+    "initial_cash": 1000000.0,
+    "market": "china_a"
+  },
+  "summary": {
+    "total_return_pct": -7.18,
+    "annual_return_pct": -0.7,
+    "max_drawdown_pct": -53.03,
+    "sharpe": 0.101,
+    "win_rate_pct": 46.4,
+    "total_trades": 304
+  }
+}

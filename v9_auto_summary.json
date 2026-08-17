@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "strategy_name": "v9-auto 普适信号体系 v3（自动补位：买不起自动换下一名）",
+    "symbol": "全市场 5307 只自动筛选池（无人工选池）→ Top3 等权（买得起的最强者）",
+    "start": "2016-01-04",
+    "end": "2026-08-14",
+    "initial_cash": 500000.0,
+    "window_start_value": 500000.0,
+    "final_value": 4698155.04,
+    "market": "china_a"
+  },
+  "summary": {
+    "total_return_pct": 839.63,
+    "annual_return_pct": 23.51,
+    "max_drawdown_pct": -10.93,
+    "sharpe": 1.715,
+    "win_rate_pct": 48.1,
+    "total_trades": 183
+  }
+}
