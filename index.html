@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>标的监控看板（数据截至 2026-08-17 · 构建 2026-08-17 16:54）</title>
+<title>标的监控看板（数据截至 2026-08-17 · 构建 2026-08-17 18:07）</title>
 <style>
 :root{
   --bg:#f3f4f6; --card:#ffffff; --card2:#f9fafb; --border:#e5e7eb; --line:#f0f1f3;
@@ -53,6 +53,11 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 .sidenav a .ic{font-size:16px;width:20px;text-align:center}
 .sidenav a:hover{background:var(--card2);color:var(--text)}
 .sidenav a.active{background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(239,68,68,.15));color:var(--accent);font-weight:600}
+.sidenav .sn-sub{margin:0 0 8px 22px;display:flex;flex-direction:column;gap:2px}
+.sidenav .sn-sub a{padding:5px 10px;font-size:12px;color:var(--sub);border-radius:8px;font-weight:400}
+.sidenav .sn-sub a .dot-sub{width:4px;height:4px;border-radius:50%;background:var(--line);flex:none}
+.sidenav .sn-sub a:hover{color:var(--text);background:var(--card2)}
+.sidenav .sn-sub a.active{color:var(--accent);font-weight:600;background:rgba(245,158,11,.08)}
 .sidenav .sn-foot{margin-top:auto;display:flex;flex-direction:column;gap:6px}
 body.sidenav-open .container{margin-left:190px}
 
@@ -934,7 +939,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </table>
 <div class="note">档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测参考在监控总览视图</div>
 </div>
-<div class="card">
+<div class="card" id="card-tbl-v9-detail">
 <h2>🔍 逐标的详情（雷达图） <span class="count" id="tbl-v9-cardcount" style="font-size:12px"></span></h2>
 <div class="sub">六角雷达 = 趋势/动能/量能/超买/风控/研报 六类打分 · 与上方表格搜索/筛选/排序联动</div>
 <div class="stock-cards" id="tbl-v9-cards"><div class="stock-card" id="card-600367" data-code="600367" data-search="红星发展 600367 综合 主板" data-market="主板" data-industry="综合" data-tier="满仓加仓">
@@ -2589,7 +2594,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </table>
 <div class="note">档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测参考在监控总览视图</div>
 </div>
-<div class="card">
+<div class="card" id="card-tbl-v8-detail">
 <h2>🔍 逐标的详情（雷达图） <span class="count" id="tbl-v8-cardcount" style="font-size:12px"></span></h2>
 <div class="sub">六角雷达 = 趋势/动能/量能/超买/风控/研报 六类打分 · 与上方表格搜索/筛选/排序联动</div>
 <div class="stock-cards" id="tbl-v8-cards"><div class="stock-card" id="card-000636" data-code="000636" data-search="风华高科 000636 电子 主板" data-market="主板" data-industry="电子" data-tier="满仓加仓">
@@ -3954,9 +3959,9 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center" data-v="0"><span style="color:var(--faint)">—</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">不买入</td></tr></tbody>
 </table>
-<div class="note">信号池 = 回测买入清单：分数≥50 的 TopN 在轮动日全部买入 · 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览 · 基金行现价为 T-1 净值（场外基金净值次日公布）</div>
+<div class="note">信号池 = 回测买入清单：分数≥50 的 TopN 在轮动日全部买入 · 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览 · 基金行现价为 T-1 净值（场外基金净值次日公布）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：反转空间已被开盘吃掉，当日不追（9:30 盘中起生效）</b></div>
 </div>
-<div class="card">
+<div class="card" id="card-tbl-short-detail">
 <h2>🔍 逐标的详情（雷达图） <span class="count" id="tbl-short-cardcount" style="font-size:12px"></span></h2>
 <div class="sub">六角雷达 = 趋势/动能/量能/超买/风控/研报 六类打分 · 与上方表格搜索/筛选/排序联动</div>
 <div class="stock-cards" id="tbl-short-cards"><div class="stock-card" id="card-005005" data-code="005005" data-search="中金瑞安混合发起A 005005 综合 基金" data-market="基金" data-industry="综合" data-tier="强买入">
@@ -4647,7 +4652,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 
 </div>
-<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-17 16:54 · 版本 v5.11.8 · 数据截至 2026-08-17 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-17 18:07 · 版本 v5.11.8 · 数据截至 2026-08-17 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
@@ -4659,7 +4664,12 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <script>window.SHORT_POOL = {"as_of": "2026-08-17", "fund_as_of": "2026-08-14", "tiers": {"主板": ["601952", "002033", "603858", "600251", "600261", "000019", "600435", "600363", "600864", "002556"], "创业板": ["300172", "300388", "300012", "300072", "300627", "300375", "300370", "301053", "300194", "300862"], "科创板": ["688513", "688029", "688068", "688739", "688137", "688570", "688305", "688505", "688317", "688623"], "基金": ["005005", "005006", "000314", "002017", "004355", "002158", "001796", "002133", "002495", "002496"]}, "track": {"601952": {"entry": "2026-08-17", "pool": "主板"}, "002033": {"entry": "2026-08-17", "pool": "主板"}, "603858": {"entry": "2026-08-17", "pool": "主板"}, "600251": {"entry": "2026-08-17", "pool": "主板"}, "600261": {"entry": "2026-08-17", "pool": "主板"}, "000019": {"entry": "2026-08-17", "pool": "主板"}, "600435": {"entry": "2026-08-17", "pool": "主板"}, "600363": {"entry": "2026-08-17", "pool": "主板"}, "600864": {"entry": "2026-08-17", "pool": "主板"}, "002556": {"entry": "2026-08-17", "pool": "主板"}, "300172": {"entry": "2026-08-17", "pool": "创业板"}, "300388": {"entry": "2026-08-17", "pool": "创业板"}, "300012": {"entry": "2026-08-17", "pool": "创业板"}, "300072": {"entry": "2026-08-17", "pool": "创业板"}, "300627": {"entry": "2026-08-17", "pool": "创业板"}, "300375": {"entry": "2026-08-17", "pool": "创业板"}, "300370": {"entry": "2026-08-17", "pool": "创业板"}, "301053": {"entry": "2026-08-17", "pool": "创业板"}, "300194": {"entry": "2026-08-17", "pool": "创业板"}, "688513": {"entry": "2026-08-17", "pool": "科创板"}, "688029": {"entry": "2026-08-17", "pool": "科创板"}, "688068": {"entry": "2026-08-17", "pool": "科创板"}, "688739": {"entry": "2026-08-17", "pool": "科创板"}, "005005": {"entry": "2026-08-17", "pool": "基金"}, "005006": {"entry": "2026-08-17", "pool": "基金"}, "000314": {"entry": "2026-08-17", "pool": "基金"}, "002017": {"entry": "2026-08-17", "pool": "基金"}, "004355": {"entry": "2026-08-17", "pool": "基金"}, "002158": {"entry": "2026-08-17", "pool": "基金"}, "001796": {"entry": "2026-08-17", "pool": "基金"}, "002133": {"entry": "2026-08-17", "pool": "基金"}, "002495": {"entry": "2026-08-17", "pool": "基金"}, "002496": {"entry": "2026-08-17", "pool": "基金"}, "002636": {"entry": "2026-08-14", "pool": "主板"}, "601890": {"entry": "2026-08-14", "pool": "主板"}, "000768": {"entry": "2026-08-14", "pool": "主板"}, "002030": {"entry": "2026-08-14", "pool": "主板"}, "000850": {"entry": "2026-08-14", "pool": "主板"}, "002536": {"entry": "2026-08-14", "pool": "主板"}, "603538": {"entry": "2026-08-14", "pool": "主板"}, "300247": {"entry": "2026-08-14", "pool": "创业板"}, "300453": {"entry": "2026-08-14", "pool": "创业板"}, "300912": {"entry": "2026-08-14", "pool": "创业板"}, "300009": {"entry": "2026-08-14", "pool": "创业板"}, "300406": {"entry": "2026-08-14", "pool": "创业板"}, "300832": {"entry": "2026-08-14", "pool": "创业板"}, "300463": {"entry": "2026-08-14", "pool": "创业板"}, "688137": {"entry": "2026-08-14", "pool": "科创板"}}};</script>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
-window.ENH.nav = [["overview","📊","监控总览"],["sys-auto","🅰️","全量池中/长线"],["sys-lite","🅱️","固定池中/长线"],["short","⚡","全量池短线"]];
+window.ENH.nav = [
+  ["overview","📊","监控总览",[["overview","总览统计"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
+  ["sys-auto","🅰️","全量池中/长线",[["card-tbl-v9","标的汇总表"],["card-tbl-v9-detail","逐标的详情"]]],
+  ["sys-lite","🅱️","固定池中/长线",[["card-tbl-v8","标的汇总表"],["card-tbl-v8-detail","逐标的详情"]]],
+  ["short","⚡","全量池短线",[["card-tbl-short","标的汇总表"],["watch-card","短线跟踪"],["card-tbl-short-detail","逐标的详情"]]]
+];
 /* 视图切换模式：滚动不更新导航高亮（COMMON_JS renderSidenav 检测此标志） */
 window.ENH.NAV_SWITCH = true;
 /* 三池回测净值（股票/基金，监控总览展示；2026-08-17 去 ETF） */
@@ -4779,7 +4789,13 @@ document.addEventListener('click',function(e){
 function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)return;
   var html='<div class="sn-logo"><span class="dot"></span>量化权重监控</div><div class="sn-sep"></div>';
   window.ENH.nav.forEach(function(it){
-    html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"><span class="ic">'+it[1]+'</span>'+it[2]+'</a>';});
+    html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"><span class="ic">'+it[1]+'</span>'+it[2]+'</a>';
+    // 子章节（2026-08-17 用户需求）：点击先切视图再滚动到区块
+    var subs=it[3];
+    if(subs&&subs.length){
+      html+='<div class="sn-sub">';
+      subs.forEach(function(s){html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'" data-sub="'+s[0]+'"><span class="dot-sub"></span>'+s[1]+'</a>';});
+      html+='</div>';}});
   html+='<div class="sn-sep"></div><div class="sn-foot">'+
     '<a href="javascript:void(0)" data-anchor="review"><span class="ic">📋</span>复盘日志</a>'+
     '<a href="javascript:void(0)" data-anchor="changelog"><span class="ic">📝</span>更新日志</a>'+
@@ -4790,12 +4806,19 @@ function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)retu
     a.addEventListener('click',function(e){
       e.preventDefault();
       var t=a.getAttribute('data-anchor');
+      var sub=a.getAttribute('data-sub');
       // 视图切换模式：交给 switchView；否则滚动定位
       if(window.switchView){window.switchView(t);}
       else{
         var el=document.getElementById(t);
         if(el){el.scrollIntoView({behavior:'auto',block:'start'});
           window.scrollBy(0,-70);}}
+      // 子章节：切到所属视图后滚动到区块（延迟等视图激活，offset 适配顶栏）
+      if(sub){
+        setTimeout(function(){
+          var el=document.getElementById(sub);
+          if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+        },30);}
       nav.querySelectorAll('a[data-anchor]').forEach(function(x){x.classList.toggle('active',x===a);});});});
   // 滚动高亮：仅对可见元素生效（display:none 的视图跳过，避免视图切换模式下 active 乱跳）
   window.addEventListener('scroll',function(){
@@ -5039,10 +5062,15 @@ document.addEventListener('DOMContentLoaded',function(){
       var t=track[code]||{};var entry=t.entry?new Date(String(t.entry).replace(/-/g,'/')):null;
       var age=entry?Math.floor((now-entry)/86400000):0;
       if(age>=30)return;   // 30 天过期（前端兜底，与服务端一致）
-      rows.push({code:code,entry:t.entry||'—',age:age,auto:true});
+      rows.push({code:code,entry:t.entry||'—',age:age,auto:true,type:t.type||''});
     });
-    manual.forEach(function(code){rows.push({code:code,entry:'—',age:null,auto:false});});
+    manual.forEach(function(code){rows.push({code:code,entry:'—',age:null,auto:false,type:''});});
     var seen={};rows=rows.filter(function(r){if(seen[r.code])return false;seen[r.code]=1;return true;});
+    // 按入池日期倒序（新入池在前，手动补充/无日期的排最后，2026-08-17 可读性优化）
+    rows.sort(function(a,b){
+      var da=a.entry&&a.entry!=='—'?new Date(String(a.entry).replace(/-/g,'/')):null;
+      var db=b.entry&&b.entry!=='—'?new Date(String(b.entry).replace(/-/g,'/')):null;
+      if(!da&&!db)return 0;if(!da)return 1;if(!db)return -1;return db-da;});
     var cnt=document.getElementById('watch-count');
     if(cnt)cnt.textContent='跟踪 '+rows.length+' 只（自动 '+rows.filter(function(r){return r.auto;}).length+' + 手动 '+rows.filter(function(r){return !r.auto;}).length+'）';
     if(!rows.length){box.innerHTML='<div class="sub" style="color:var(--faint)">暂无跟踪 —— 短线表出现可买入标的（强买入/买入）后自动加入，保留 30 天</div>';return;}
@@ -5051,7 +5079,10 @@ document.addEventListener('DOMContentLoaded',function(){
     var h='<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>类型</th><th style="text-align:center">入池日期</th><th style="text-align:center">已跟踪</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">短线分</th><th style="text-align:center">档位</th><th style="text-align:center">MA5</th><th style="text-align:center">建议动作</th></tr></thead><tbody>';
     rows.forEach(function(r){
       var code=r.code,rec=null,grp='';
-      ['stock','fund'].forEach(function(g){if(S[g]&&S[g][code]){rec=S[g][code];grp=g;}});
+      // 类型优先（2026-08-17 修复：股票/场外基金 6 位代码可能冲突，如 002636 股票=金安国纪、基金=广发集裕债券A，后者曾覆盖前者）
+      if(r.type==='stock'||r.type==='fund'){if(S[r.type]&&S[r.type][code]){rec=S[r.type][code];grp=r.type;}}
+      if(!rec&&S.stock&&S.stock[code]){rec=S.stock[code];grp='stock';}
+      if(!rec&&S.fund&&S.fund[code]){rec=S.fund[code];grp='fund';}
       if(!rec){h+='<tr><td>'+code+'</td><td colspan="10" style="color:var(--faint)">未找到该代码（可能已退市/不在监控范围）</td></tr>';return;}
       var act,actCls;
       if(rec.ma5_above===false){act='⚠️ 次日卖出（破MA5）';actCls='down';}
