@@ -103,6 +103,28 @@ def tier(sc):
     if sc >= 30: return "减至半仓"
     return "清仓"
 
+
+# 2026-08-17 方案 A：基金组权重分改用基金动量分（short_engine 口径），档位用动量强弱命名，
+# 不占用"满仓/清仓"的持仓操作语义（基金动量分预算 0-75，12m 强选入但 20d 可能偏弱）
+FUND_TIER = [("动量强", 55), ("动量中", 40), ("动量弱", 25), ("动量极弱", 0)]
+
+
+def fund_tier(sc):
+    for t, th in FUND_TIER:
+        if sc >= th:
+            return t
+    return "动量极弱"
+
+
+def fund_mom_score(ddf, asof=None):
+    """基金动量分（short_engine.short_score reversal=False：动量30+通道25+波动20，基金无量价→0）"""
+    cols = ddf[["open", "high", "low", "close", "volume", "amount"]]
+    if asof is not None:
+        cols = cols.loc[:asof]
+    fr = SH.short_factors(cols).iloc[-1]
+    sc = float(SH.short_score(fr, reversal=False))
+    return None if np.isnan(sc) else sc
+
 def factor_split(r):
     """四因子拆分（与 score_row 一致）"""
     mom = max(0.0, min(1.0, r["mom_12_1"] / 0.20)) * 100 if not np.isnan(r["mom_12_1"]) else None
@@ -328,16 +350,20 @@ for c in ALL_CODES:
     px = float(r["close"])
     if pd.isna(px) or px <= 0:
         continue
-    sc = float(V.score_row(r))
+    if c in V9_FUND:
+        # 方案 A（2026-08-17）：基金组权重分用基金动量分，避免四因子对基金退化同分（76.4）
+        sc = fund_mom_score(ddf)
+        sc_prev = fund_mom_score(ddf, asof=prev_rebal) if prev_rebal in ddf.index else None
+    else:
+        sc = float(V.score_row(r))
+        sc_prev = float(V.score_row(ddf.loc[prev_rebal])) if prev_rebal in ddf.index else None
+    # 档位（基金组用动量强弱分级）
+    _tier_f = fund_tier if c in V9_FUND else tier
+    sc_now = sc
     # 当日涨跌幅（最后两日）
     chg = float(ddf["close"].iloc[-1] / ddf["close"].iloc[-2] - 1) * 100 if len(ddf) >= 2 else None
     # 近一年
     ret_1y = float(px / ddf["close"].iloc[-252] - 1) * 100 if len(ddf) > 252 else None
-    # 档位（本次 vs 上次再平衡）
-    sc_now = sc
-    sc_prev = None
-    if prev_rebal in ddf.index:
-        sc_prev = float(V.score_row(ddf.loc[prev_rebal]))
     # 四因子拆分（最新）
     fs = factor_split(r)
     # 六类 comp（模板口径：趋势/动能/量能/超买/风控/研报）——四因子映射 + 波动率风控 + 无研报
@@ -395,7 +421,7 @@ for c in ALL_CODES:
         "px": round(px, 2), "chg": round(chg, 2) if chg is not None else None,
         "ret_1y": round(ret_1y, 1) if ret_1y is not None else None,
         "score": round(sc_now, 1), "score_prev": round(sc_prev, 1) if sc_prev is not None else None,
-        "tier": tier(sc_now), "tier_prev": tier(sc_prev) if sc_prev is not None else None,
+        "tier": _tier_f(sc_now), "tier_prev": _tier_f(sc_prev) if sc_prev is not None else None,
         "short_score": round(short_sc, 1), "short_tier": short_tier,
         "factors": fs, "comp": comp, "radar_svg": radar_svg, "rsi": round(rsi, 1),
         "kline": kline, "factor_hist": fh,

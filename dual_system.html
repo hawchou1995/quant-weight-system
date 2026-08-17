@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>标的监控看板（数据截至 2026-08-17 · 构建 2026-08-17 23:19）</title>
+<title>标的监控看板（数据截至 2026-08-17 · 构建 2026-08-17 23:49）</title>
 <style>
 :root{
   --bg:#f3f4f6; --card:#ffffff; --card2:#f9fafb; --border:#e5e7eb; --line:#f0f1f3;
@@ -244,7 +244,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <h2>📊 标的监控总览 <span class="badge badge-auto">数据截至 2026-08-17 收盘</span></h2>
 <div class="sub">左侧导航切换：🅰️ 全量池中/长线（全市场自动池·股票分层+基金） / 🅱️ 固定池中/长线（用户固定池） / ⚡ 短线（占位） · 右上角「标的报告」按月查看历史收盘快照 · 信号仅供参考</div>
 <div class="kpis">
-<div class="kpi"><div class="l">🟢 加仓区</div><div class="v" style="color:#dc2626">53 只</div><div class="s">满仓+轻仓加仓</div></div>
+<div class="kpi"><div class="l">🟢 加仓区</div><div class="v" style="color:#dc2626">43 只</div><div class="s">满仓+轻仓加仓</div></div>
 <div class="kpi"><div class="l">🟡 观望区</div><div class="v" style="color:#d97706">6 只</div><div class="s">持有不加</div></div>
 <div class="kpi"><div class="l">🔴 减/清仓区</div><div class="v" style="color:#16a34a">5 只</div><div class="s">减半或清仓</div></div>
 <div class="kpi"><div class="l">共监控</div><div class="v">64 只</div><div class="s">全量池 40 行 + 固定池 24 只</div></div>
@@ -351,14 +351,14 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class="card" id="sys-auto">
 <h2>🅰️ 全量池中/长线 <span class="view-badge auto">全市场自动池 · 股票分层+基金 ｜ 全市场绝对规则筛池 Top3 等权 · 月轮动 · 移动止损4.5% · MA150择时 ｜ 回测参考见「监控总览」</span><span class="view-badge auto" title="收盘数据">数据截至 2026-08-17 15:00 · 收盘</span></h2>
 <div class="op-stats">
-<span class="op op-add">🟢 加仓区 <b>40</b> 只</span>
+<span class="op op-add">🟢 加仓区 <b>30</b> 只</span>
 <span class="op op-watch">🟡 观望 <b>0</b> 只</span>
 <span class="op op-cut">🔴 减/清仓区 <b>0</b> 只</span>
 </div>
 </div>
 <div class="card" id="card-tbl-v9">
 <h2>📋 标的汇总表 <span class="badge auto">40 行</span></h2>
-<div class="sub">今日信号：加仓区 40 ｜ 减/清仓区 0 · 搜索/筛选/排序联动下方详情卡片 · 表头点击排序</div>
+<div class="sub">今日信号：加仓区 30 ｜ 减/清仓区 0 · 搜索/筛选/排序联动下方详情卡片 · 表头点击排序</div>
 <div class="toolbar">
 <input type="text" id="tbl-v9-q" placeholder="🔍 搜索名称 / 代码 / 行业…">
 <select id="tbl-v9-mk" class="flt" title="板块筛选"><option value="">全部板块</option><option>主板</option><option>创业板</option><option>基金</option><option>科创板</option></select>
@@ -793,49 +793,49 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
 <td style="text-align:center" data-v="5"><span class="pill pill-full">满仓加仓</span></td>
 <td style="text-align:center" data-v="0"><span style="color:var(--faint)">—</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-code="000742" data-search="国泰新经济混合A 000742 综合 基金" data-board="fund" data-market="基金" data-industry="综合" data-tier="满仓加仓">
+<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-code="001470" data-search="融通通鑫混合 001470 综合 基金" data-board="fund" data-market="基金" data-industry="综合" data-tier="动量中">
 <td style="text-align:center">31</td>
-<td><b>国泰新经济混合A</b><br><span style="color:var(--faint);font-size:11px">000742</span></td>
+<td><b>融通通鑫混合</b><br><span style="color:var(--faint);font-size:11px">001470</span></td>
 <td><span class="board-tag">基金</span></td>
 <td><span class="board-tag">综合</span></td>
-<td style="text-align:right" data-v="5.13">5.13</td>
-<td style="text-align:right" class="down" data-v="-0.81">-0.81%</td>
-<td style="text-align:right" class="up" data-v="143.6">+144%</td>
-<td style="text-align:center"><b>76.4</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/82/0</span></td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">44</td>
+<td style="text-align:right" data-v="3.16">3.16</td>
+<td style="text-align:right" class="down" data-v="0">+0.00%</td>
+<td style="text-align:right" class="up" data-v="75.0">+75%</td>
+<td style="text-align:center"><b>42.6</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/82/0</span></td>
+<td style="text-align:center;font-size:11px;color:var(--sub)">46</td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">0</td>
 <td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
-<td style="text-align:center" data-v="5"><span class="pill pill-full">满仓加仓</span></td>
-<td style="text-align:center" data-v="1"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-code="001060" data-search="前海开源高端装备A 001060 机械设备 基金" data-board="fund" data-market="基金" data-industry="机械设备" data-tier="满仓加仓">
+<td style="text-align:center" data-v="3"><span class="pill pill-watch">动量中</span></td>
+<td style="text-align:center" data-v="1"><span class="pill-chg-down">动量强→动量中</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">动量中（持有观察）</td></tr><tr data-code="001723" data-search="华商新动力A 001723 综合 基金" data-board="fund" data-market="基金" data-industry="综合" data-tier="动量弱">
 <td style="text-align:center">32</td>
-<td><b>前海开源高端装备A</b><br><span style="color:var(--faint);font-size:11px">001060</span></td>
-<td><span class="board-tag">基金</span></td>
-<td><span class="board-tag">机械设备</span></td>
-<td style="text-align:right" data-v="3.39">3.39</td>
-<td style="text-align:right" class="up" data-v="0.68">+0.68%</td>
-<td style="text-align:right" class="up" data-v="130.0">+130%</td>
-<td style="text-align:center"><b>76.4</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/82/0</span></td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">48</td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">0</td>
-<td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
-<td style="text-align:center" data-v="5"><span class="pill pill-full">满仓加仓</span></td>
-<td style="text-align:center" data-v="1"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-code="001198" data-search="东方惠新混合A 001198 综合 基金" data-board="fund" data-market="基金" data-industry="综合" data-tier="满仓加仓">
-<td style="text-align:center">33</td>
-<td><b>东方惠新混合A</b><br><span style="color:var(--faint);font-size:11px">001198</span></td>
+<td><b>华商新动力A</b><br><span style="color:var(--faint);font-size:11px">001723</span></td>
 <td><span class="board-tag">基金</span></td>
 <td><span class="board-tag">综合</span></td>
-<td style="text-align:right" data-v="3.11">3.11</td>
-<td style="text-align:right" class="up" data-v="0.58">+0.58%</td>
-<td style="text-align:right" class="up" data-v="182.4">+182%</td>
-<td style="text-align:center"><b>76.4</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/82/0</span></td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">45</td>
+<td style="text-align:right" data-v="1.96">1.96</td>
+<td style="text-align:right" class="up" data-v="0.67">+0.67%</td>
+<td style="text-align:right" class="up" data-v="145.3">+145%</td>
+<td style="text-align:center"><b>36.2</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/82/0</span></td>
+<td style="text-align:center;font-size:11px;color:var(--sub)">50</td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">0</td>
 <td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
-<td style="text-align:center" data-v="5"><span class="pill pill-full">满仓加仓</span></td>
-<td style="text-align:center" data-v="1"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-code="001411" data-search="诺安创新驱动A 001411 电子 基金" data-board="fund" data-market="基金" data-industry="电子" data-tier="满仓加仓">
+<td style="text-align:center" data-v="2"><span class="pill pill-cut">动量弱</span></td>
+<td style="text-align:center" data-v="1"><span class="pill-chg-down">动量中→动量弱</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">动量弱（关注轮出）</td></tr><tr data-code="002289" data-search="华商改革创新股票A 002289 综合 基金" data-board="fund" data-market="基金" data-industry="综合" data-tier="动量弱">
+<td style="text-align:center">33</td>
+<td><b>华商改革创新股票A</b><br><span style="color:var(--faint);font-size:11px">002289</span></td>
+<td><span class="board-tag">基金</span></td>
+<td><span class="board-tag">综合</span></td>
+<td style="text-align:right" data-v="5.99">5.99</td>
+<td style="text-align:right" class="up" data-v="0.74">+0.74%</td>
+<td style="text-align:right" class="up" data-v="156.8">+157%</td>
+<td style="text-align:center"><b>34.0</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/82/0</span></td>
+<td style="text-align:center;font-size:11px;color:var(--sub)">50</td>
+<td style="text-align:center;font-size:11px;color:var(--sub)">0</td>
+<td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
+<td style="text-align:center" data-v="2"><span class="pill pill-cut">动量弱</span></td>
+<td style="text-align:center" data-v="1"><span class="pill-chg-down">动量强→动量弱</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">动量弱（关注轮出）</td></tr><tr data-code="001411" data-search="诺安创新驱动A 001411 电子 基金" data-board="fund" data-market="基金" data-industry="电子" data-tier="动量弱">
 <td style="text-align:center">34</td>
 <td><b>诺安创新驱动A</b><br><span style="color:var(--faint);font-size:11px">001411</span></td>
 <td><span class="board-tag">基金</span></td>
@@ -843,97 +843,97 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:right" data-v="2.88">2.88</td>
 <td style="text-align:right" class="up" data-v="1.12">+1.12%</td>
 <td style="text-align:right" class="up" data-v="158.5">+158%</td>
-<td style="text-align:center"><b>76.4</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/82/0</span></td>
+<td style="text-align:center"><b>31.3</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/82/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">53</td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">0</td>
 <td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
-<td style="text-align:center" data-v="5"><span class="pill pill-full">满仓加仓</span></td>
-<td style="text-align:center" data-v="1"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-code="001470" data-search="融通通鑫混合 001470 综合 基金" data-board="fund" data-market="基金" data-industry="综合" data-tier="满仓加仓">
+<td style="text-align:center" data-v="2"><span class="pill pill-cut">动量弱</span></td>
+<td style="text-align:center" data-v="1"><span class="pill-chg-down">动量强→动量弱</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">动量弱（关注轮出）</td></tr><tr data-code="002051" data-search="诺安创新驱动C 002051 电子 基金" data-board="fund" data-market="基金" data-industry="电子" data-tier="动量弱">
 <td style="text-align:center">35</td>
-<td><b>融通通鑫混合</b><br><span style="color:var(--faint);font-size:11px">001470</span></td>
-<td><span class="board-tag">基金</span></td>
-<td><span class="board-tag">综合</span></td>
-<td style="text-align:right" data-v="3.16">3.16</td>
-<td style="text-align:right" class="down" data-v="0">+0.00%</td>
-<td style="text-align:right" class="up" data-v="75.0">+75%</td>
-<td style="text-align:center"><b>76.4</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/82/0</span></td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">46</td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">0</td>
-<td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
-<td style="text-align:center" data-v="5"><span class="pill pill-full">满仓加仓</span></td>
-<td style="text-align:center" data-v="1"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-code="001723" data-search="华商新动力A 001723 综合 基金" data-board="fund" data-market="基金" data-industry="综合" data-tier="满仓加仓">
-<td style="text-align:center">36</td>
-<td><b>华商新动力A</b><br><span style="color:var(--faint);font-size:11px">001723</span></td>
-<td><span class="board-tag">基金</span></td>
-<td><span class="board-tag">综合</span></td>
-<td style="text-align:right" data-v="1.96">1.96</td>
-<td style="text-align:right" class="up" data-v="0.67">+0.67%</td>
-<td style="text-align:right" class="up" data-v="145.3">+145%</td>
-<td style="text-align:center"><b>76.4</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/82/0</span></td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">50</td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">0</td>
-<td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
-<td style="text-align:center" data-v="5"><span class="pill pill-full">满仓加仓</span></td>
-<td style="text-align:center" data-v="1"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-code="001759" data-search="嘉实成长增强混合 001759 综合 基金" data-board="fund" data-market="基金" data-industry="综合" data-tier="满仓加仓">
-<td style="text-align:center">37</td>
-<td><b>嘉实成长增强混合</b><br><span style="color:var(--faint);font-size:11px">001759</span></td>
-<td><span class="board-tag">基金</span></td>
-<td><span class="board-tag">综合</span></td>
-<td style="text-align:right" data-v="3.32">3.32</td>
-<td style="text-align:right" class="up" data-v="1.62">+1.62%</td>
-<td style="text-align:right" class="up" data-v="111.9">+112%</td>
-<td style="text-align:center"><b>76.4</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/82/0</span></td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">46</td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">0</td>
-<td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
-<td style="text-align:center" data-v="5"><span class="pill pill-full">满仓加仓</span></td>
-<td style="text-align:center" data-v="1"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-code="002051" data-search="诺安创新驱动C 002051 电子 基金" data-board="fund" data-market="基金" data-industry="电子" data-tier="满仓加仓">
-<td style="text-align:center">38</td>
 <td><b>诺安创新驱动C</b><br><span style="color:var(--faint);font-size:11px">002051</span></td>
 <td><span class="board-tag">基金</span></td>
 <td><span class="board-tag">电子</span></td>
 <td style="text-align:right" data-v="2.84">2.84</td>
 <td style="text-align:right" class="up" data-v="1.14">+1.14%</td>
 <td style="text-align:right" class="up" data-v="158.3">+158%</td>
-<td style="text-align:center"><b>76.4</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/82/0</span></td>
+<td style="text-align:center"><b>31.3</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/82/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">53</td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">0</td>
 <td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
-<td style="text-align:center" data-v="5"><span class="pill pill-full">满仓加仓</span></td>
-<td style="text-align:center" data-v="1"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-code="002163" data-search="东方惠新混合C 002163 综合 基金" data-board="fund" data-market="基金" data-industry="综合" data-tier="满仓加仓">
+<td style="text-align:center" data-v="2"><span class="pill pill-cut">动量弱</span></td>
+<td style="text-align:center" data-v="1"><span class="pill-chg-down">动量强→动量弱</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">动量弱（关注轮出）</td></tr><tr data-code="001759" data-search="嘉实成长增强混合 001759 综合 基金" data-board="fund" data-market="基金" data-industry="综合" data-tier="动量弱">
+<td style="text-align:center">36</td>
+<td><b>嘉实成长增强混合</b><br><span style="color:var(--faint);font-size:11px">001759</span></td>
+<td><span class="board-tag">基金</span></td>
+<td><span class="board-tag">综合</span></td>
+<td style="text-align:right" data-v="3.32">3.32</td>
+<td style="text-align:right" class="up" data-v="1.62">+1.62%</td>
+<td style="text-align:right" class="up" data-v="111.9">+112%</td>
+<td style="text-align:center"><b>28.4</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/82/0</span></td>
+<td style="text-align:center;font-size:11px;color:var(--sub)">46</td>
+<td style="text-align:center;font-size:11px;color:var(--sub)">0</td>
+<td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
+<td style="text-align:center" data-v="2"><span class="pill pill-cut">动量弱</span></td>
+<td style="text-align:center" data-v="1"><span class="pill-chg-down">动量强→动量弱</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">动量弱（关注轮出）</td></tr><tr data-code="001060" data-search="前海开源高端装备A 001060 机械设备 基金" data-board="fund" data-market="基金" data-industry="机械设备" data-tier="动量弱">
+<td style="text-align:center">37</td>
+<td><b>前海开源高端装备A</b><br><span style="color:var(--faint);font-size:11px">001060</span></td>
+<td><span class="board-tag">基金</span></td>
+<td><span class="board-tag">机械设备</span></td>
+<td style="text-align:right" data-v="3.39">3.39</td>
+<td style="text-align:right" class="up" data-v="0.68">+0.68%</td>
+<td style="text-align:right" class="up" data-v="130.0">+130%</td>
+<td style="text-align:center"><b>25.5</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/82/0</span></td>
+<td style="text-align:center;font-size:11px;color:var(--sub)">48</td>
+<td style="text-align:center;font-size:11px;color:var(--sub)">0</td>
+<td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
+<td style="text-align:center" data-v="2"><span class="pill pill-cut">动量弱</span></td>
+<td style="text-align:center" data-v="1"><span class="pill-chg-down">动量强→动量弱</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">动量弱（关注轮出）</td></tr><tr data-code="000742" data-search="国泰新经济混合A 000742 综合 基金" data-board="fund" data-market="基金" data-industry="综合" data-tier="动量极弱">
+<td style="text-align:center">38</td>
+<td><b>国泰新经济混合A</b><br><span style="color:var(--faint);font-size:11px">000742</span></td>
+<td><span class="board-tag">基金</span></td>
+<td><span class="board-tag">综合</span></td>
+<td style="text-align:right" data-v="5.13">5.13</td>
+<td style="text-align:right" class="down" data-v="-0.81">-0.81%</td>
+<td style="text-align:right" class="up" data-v="143.6">+144%</td>
+<td style="text-align:center"><b>22.3</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/82/0</span></td>
+<td style="text-align:center;font-size:11px;color:var(--sub)">44</td>
+<td style="text-align:center;font-size:11px;color:var(--sub)">0</td>
+<td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
+<td style="text-align:center" data-v="1"><span class="pill pill-clear">动量极弱</span></td>
+<td style="text-align:center" data-v="1"><span class="pill-chg-down">动量强→动量极弱</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">动量极弱（或轮出）</td></tr><tr data-code="001198" data-search="东方惠新混合A 001198 综合 基金" data-board="fund" data-market="基金" data-industry="综合" data-tier="动量极弱">
 <td style="text-align:center">39</td>
+<td><b>东方惠新混合A</b><br><span style="color:var(--faint);font-size:11px">001198</span></td>
+<td><span class="board-tag">基金</span></td>
+<td><span class="board-tag">综合</span></td>
+<td style="text-align:right" data-v="3.11">3.11</td>
+<td style="text-align:right" class="up" data-v="0.58">+0.58%</td>
+<td style="text-align:right" class="up" data-v="182.4">+182%</td>
+<td style="text-align:center"><b>15.8</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/82/0</span></td>
+<td style="text-align:center;font-size:11px;color:var(--sub)">45</td>
+<td style="text-align:center;font-size:11px;color:var(--sub)">0</td>
+<td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
+<td style="text-align:center" data-v="1"><span class="pill pill-clear">动量极弱</span></td>
+<td style="text-align:center" data-v="1"><span class="pill-chg-down">动量强→动量极弱</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">动量极弱（或轮出）</td></tr><tr data-code="002163" data-search="东方惠新混合C 002163 综合 基金" data-board="fund" data-market="基金" data-industry="综合" data-tier="动量极弱">
+<td style="text-align:center">40</td>
 <td><b>东方惠新混合C</b><br><span style="color:var(--faint);font-size:11px">002163</span></td>
 <td><span class="board-tag">基金</span></td>
 <td><span class="board-tag">综合</span></td>
 <td style="text-align:right" data-v="3.08">3.08</td>
 <td style="text-align:right" class="up" data-v="0.58">+0.58%</td>
 <td style="text-align:right" class="up" data-v="181.5">+182%</td>
-<td style="text-align:center"><b>76.4</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/82/0</span></td>
+<td style="text-align:center"><b>15.7</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/82/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">45</td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">0</td>
 <td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
-<td style="text-align:center" data-v="5"><span class="pill pill-full">满仓加仓</span></td>
-<td style="text-align:center" data-v="1"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr><tr data-code="002289" data-search="华商改革创新股票A 002289 综合 基金" data-board="fund" data-market="基金" data-industry="综合" data-tier="满仓加仓">
-<td style="text-align:center">40</td>
-<td><b>华商改革创新股票A</b><br><span style="color:var(--faint);font-size:11px">002289</span></td>
-<td><span class="board-tag">基金</span></td>
-<td><span class="board-tag">综合</span></td>
-<td style="text-align:right" data-v="5.99">5.99</td>
-<td style="text-align:right" class="up" data-v="0.74">+0.74%</td>
-<td style="text-align:right" class="up" data-v="156.8">+157%</td>
-<td style="text-align:center"><b>76.4</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/82/0</span></td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">50</td>
-<td style="text-align:center;font-size:11px;color:var(--sub)">0</td>
-<td style="text-align:center" data-v="100"><span class="board-tag">高置信</span></td>
-<td style="text-align:center" data-v="5"><span class="pill pill-full">满仓加仓</span></td>
-<td style="text-align:center" data-v="1"><span class="pill-chg-up">轻仓加仓→满仓加仓</span></td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">持有至目标仓位</td></tr></tbody>
+<td style="text-align:center" data-v="1"><span class="pill pill-clear">动量极弱</span></td>
+<td style="text-align:center" data-v="1"><span class="pill-chg-down">动量强→动量极弱</span></td>
+<td style="text-align:center;font-size:12px;color:var(--sub)">动量极弱（或轮出）</td></tr></tbody>
 </table>
 <div class="note">档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测参考在监控总览视图</div>
 </div>
@@ -1900,7 +1900,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <p class="meta">权重 <b>92.4 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ 高置信</p>
 <p class="meta">六类：趋势 100｜动能 100｜量能 100｜超买 62｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
-</div></div><div class="stock-card" id="card-000742" data-code="000742" data-search="国泰新经济混合A 000742 综合 基金" data-market="基金" data-industry="综合" data-tier="满仓加仓">
+</div></div><div class="stock-card" id="card-001470" data-code="001470" data-search="融通通鑫混合 001470 综合 基金" data-market="基金" data-industry="综合" data-tier="动量中">
 <div class="radar-wrap"><svg viewBox="0 0 120 120" style="width:120px;height:120px;flex:0 0 auto"><polygon points="60.0,49.8 68.8,54.9 68.8,65.1 60.0,70.2 51.2,65.1 51.2,54.9" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
 <polygon points="60.0,39.6 77.7,49.8 77.7,70.2 60.0,80.4 42.3,70.2 42.3,49.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
 <polygon points="60.0,29.4 86.5,44.7 86.5,75.3 60.0,90.6 33.5,75.3 33.5,44.7" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
@@ -1911,156 +1911,28 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <line x1="60.0" y1="60.0" x2="60.0" y2="100.8" style="stroke:var(--radar-axis)" stroke-width="1"/>
 <line x1="60.0" y1="60.0" x2="24.7" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
 <line x1="60.0" y1="60.0" x2="24.7" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<polygon points="60.0,19.2 95.3,39.6 61.1,60.6 60.0,93.5 58.9,60.6 42.3,49.8" fill="rgba(220,38,38,0.18)" stroke="#dc2626" stroke-width="2" stroke-linejoin="round"/>
-<circle cx="60.0" cy="19.2" r="2.5" fill="#dc2626"/>
+<polygon points="60.0,19.2 95.3,39.6 61.1,60.6 60.0,93.5 58.9,60.6 42.3,49.8" fill="rgba(22,163,74,0.16)" stroke="#16a34a" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="60.0" cy="19.2" r="2.5" fill="#16a34a"/>
 <text x="60.0" y="6.1" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">趋势</text>
-<circle cx="95.3" cy="39.6" r="2.5" fill="#dc2626"/>
+<circle cx="95.3" cy="39.6" r="2.5" fill="#16a34a"/>
 <text x="110.2" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">动能</text>
-<circle cx="61.1" cy="60.6" r="2.5" fill="#dc2626"/>
+<circle cx="61.1" cy="60.6" r="2.5" fill="#16a34a"/>
 <text x="110.2" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">量能</text>
-<circle cx="60.0" cy="93.5" r="2.5" fill="#dc2626"/>
+<circle cx="60.0" cy="93.5" r="2.5" fill="#16a34a"/>
 <text x="60.0" y="115.9" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">超买</text>
-<circle cx="58.9" cy="60.6" r="2.5" fill="#dc2626"/>
+<circle cx="58.9" cy="60.6" r="2.5" fill="#16a34a"/>
 <text x="9.8" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">风控</text>
-<circle cx="42.3" cy="49.8" r="2.5" fill="#dc2626"/>
+<circle cx="42.3" cy="49.8" r="2.5" fill="#16a34a"/>
 <text x="9.8" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">研报</text>
-<text x="60.0" y="61.0" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">76.4</text>
-<text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
-<div class="body">
-<h3>国泰新经济混合A <span class="sub">000742</span> <span class="board-tag">基金</span> <span class="board-tag">综合</span></h3>
-<p class="meta">现价 <b>5.13</b>（<span class="down">-0.81%</span>）｜ 近一年 <span class="up">+144%</span> ｜ RSI 44</p>
-<p class="meta">权重 <b>76.4 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ 高置信</p>
-<p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 82｜风控 0｜研报 0.0</p>
-<p class="meta" style="color:var(--faint)">均衡配置</p>
-</div></div><div class="stock-card" id="card-001060" data-code="001060" data-search="前海开源高端装备A 001060 机械设备 基金" data-market="基金" data-industry="机械设备" data-tier="满仓加仓">
-<div class="radar-wrap"><svg viewBox="0 0 120 120" style="width:120px;height:120px;flex:0 0 auto"><polygon points="60.0,49.8 68.8,54.9 68.8,65.1 60.0,70.2 51.2,65.1 51.2,54.9" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<polygon points="60.0,39.6 77.7,49.8 77.7,70.2 60.0,80.4 42.3,70.2 42.3,49.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<polygon points="60.0,29.4 86.5,44.7 86.5,75.3 60.0,90.6 33.5,75.3 33.5,44.7" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<polygon points="60.0,19.2 95.3,39.6 95.3,80.4 60.0,100.8 24.7,80.4 24.7,39.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="60.0" y2="19.2" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="95.3" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="95.3" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="60.0" y2="100.8" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="24.7" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="24.7" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<polygon points="60.0,19.2 95.3,39.6 61.1,60.6 60.0,93.5 58.9,60.6 42.3,49.8" fill="rgba(220,38,38,0.18)" stroke="#dc2626" stroke-width="2" stroke-linejoin="round"/>
-<circle cx="60.0" cy="19.2" r="2.5" fill="#dc2626"/>
-<text x="60.0" y="6.1" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">趋势</text>
-<circle cx="95.3" cy="39.6" r="2.5" fill="#dc2626"/>
-<text x="110.2" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">动能</text>
-<circle cx="61.1" cy="60.6" r="2.5" fill="#dc2626"/>
-<text x="110.2" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">量能</text>
-<circle cx="60.0" cy="93.5" r="2.5" fill="#dc2626"/>
-<text x="60.0" y="115.9" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">超买</text>
-<circle cx="58.9" cy="60.6" r="2.5" fill="#dc2626"/>
-<text x="9.8" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">风控</text>
-<circle cx="42.3" cy="49.8" r="2.5" fill="#dc2626"/>
-<text x="9.8" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">研报</text>
-<text x="60.0" y="61.0" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">76.4</text>
-<text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
-<div class="body">
-<h3>前海开源高端装备A <span class="sub">001060</span> <span class="board-tag">基金</span> <span class="board-tag">机械设备</span></h3>
-<p class="meta">现价 <b>3.39</b>（<span class="up">+0.68%</span>）｜ 近一年 <span class="up">+130%</span> ｜ RSI 48</p>
-<p class="meta">权重 <b>76.4 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ 高置信</p>
-<p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 82｜风控 0｜研报 0.0</p>
-<p class="meta" style="color:var(--faint)">高端装备</p>
-</div></div><div class="stock-card" id="card-001198" data-code="001198" data-search="东方惠新混合A 001198 综合 基金" data-market="基金" data-industry="综合" data-tier="满仓加仓">
-<div class="radar-wrap"><svg viewBox="0 0 120 120" style="width:120px;height:120px;flex:0 0 auto"><polygon points="60.0,49.8 68.8,54.9 68.8,65.1 60.0,70.2 51.2,65.1 51.2,54.9" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<polygon points="60.0,39.6 77.7,49.8 77.7,70.2 60.0,80.4 42.3,70.2 42.3,49.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<polygon points="60.0,29.4 86.5,44.7 86.5,75.3 60.0,90.6 33.5,75.3 33.5,44.7" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<polygon points="60.0,19.2 95.3,39.6 95.3,80.4 60.0,100.8 24.7,80.4 24.7,39.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="60.0" y2="19.2" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="95.3" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="95.3" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="60.0" y2="100.8" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="24.7" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="24.7" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<polygon points="60.0,19.2 95.3,39.6 61.1,60.6 60.0,93.5 58.9,60.6 42.3,49.8" fill="rgba(220,38,38,0.18)" stroke="#dc2626" stroke-width="2" stroke-linejoin="round"/>
-<circle cx="60.0" cy="19.2" r="2.5" fill="#dc2626"/>
-<text x="60.0" y="6.1" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">趋势</text>
-<circle cx="95.3" cy="39.6" r="2.5" fill="#dc2626"/>
-<text x="110.2" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">动能</text>
-<circle cx="61.1" cy="60.6" r="2.5" fill="#dc2626"/>
-<text x="110.2" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">量能</text>
-<circle cx="60.0" cy="93.5" r="2.5" fill="#dc2626"/>
-<text x="60.0" y="115.9" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">超买</text>
-<circle cx="58.9" cy="60.6" r="2.5" fill="#dc2626"/>
-<text x="9.8" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">风控</text>
-<circle cx="42.3" cy="49.8" r="2.5" fill="#dc2626"/>
-<text x="9.8" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">研报</text>
-<text x="60.0" y="61.0" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">76.4</text>
-<text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
-<div class="body">
-<h3>东方惠新混合A <span class="sub">001198</span> <span class="board-tag">基金</span> <span class="board-tag">综合</span></h3>
-<p class="meta">现价 <b>3.11</b>（<span class="up">+0.58%</span>）｜ 近一年 <span class="up">+182%</span> ｜ RSI 45</p>
-<p class="meta">权重 <b>76.4 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ 高置信</p>
-<p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 82｜风控 0｜研报 0.0</p>
-<p class="meta" style="color:var(--faint)">灵活配置</p>
-</div></div><div class="stock-card" id="card-001411" data-code="001411" data-search="诺安创新驱动A 001411 电子 基金" data-market="基金" data-industry="电子" data-tier="满仓加仓">
-<div class="radar-wrap"><svg viewBox="0 0 120 120" style="width:120px;height:120px;flex:0 0 auto"><polygon points="60.0,49.8 68.8,54.9 68.8,65.1 60.0,70.2 51.2,65.1 51.2,54.9" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<polygon points="60.0,39.6 77.7,49.8 77.7,70.2 60.0,80.4 42.3,70.2 42.3,49.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<polygon points="60.0,29.4 86.5,44.7 86.5,75.3 60.0,90.6 33.5,75.3 33.5,44.7" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<polygon points="60.0,19.2 95.3,39.6 95.3,80.4 60.0,100.8 24.7,80.4 24.7,39.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="60.0" y2="19.2" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="95.3" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="95.3" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="60.0" y2="100.8" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="24.7" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="24.7" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<polygon points="60.0,19.2 95.3,39.6 61.1,60.6 60.0,93.5 58.9,60.6 42.3,49.8" fill="rgba(220,38,38,0.18)" stroke="#dc2626" stroke-width="2" stroke-linejoin="round"/>
-<circle cx="60.0" cy="19.2" r="2.5" fill="#dc2626"/>
-<text x="60.0" y="6.1" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">趋势</text>
-<circle cx="95.3" cy="39.6" r="2.5" fill="#dc2626"/>
-<text x="110.2" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">动能</text>
-<circle cx="61.1" cy="60.6" r="2.5" fill="#dc2626"/>
-<text x="110.2" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">量能</text>
-<circle cx="60.0" cy="93.5" r="2.5" fill="#dc2626"/>
-<text x="60.0" y="115.9" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">超买</text>
-<circle cx="58.9" cy="60.6" r="2.5" fill="#dc2626"/>
-<text x="9.8" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">风控</text>
-<circle cx="42.3" cy="49.8" r="2.5" fill="#dc2626"/>
-<text x="9.8" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">研报</text>
-<text x="60.0" y="61.0" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">76.4</text>
-<text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
-<div class="body">
-<h3>诺安创新驱动A <span class="sub">001411</span> <span class="board-tag">基金</span> <span class="board-tag">电子</span></h3>
-<p class="meta">现价 <b>2.88</b>（<span class="up">+1.12%</span>）｜ 近一年 <span class="up">+158%</span> ｜ RSI 53</p>
-<p class="meta">权重 <b>76.4 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ 高置信</p>
-<p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 82｜风控 0｜研报 0.0</p>
-<p class="meta" style="color:var(--faint)">科技成长</p>
-</div></div><div class="stock-card" id="card-001470" data-code="001470" data-search="融通通鑫混合 001470 综合 基金" data-market="基金" data-industry="综合" data-tier="满仓加仓">
-<div class="radar-wrap"><svg viewBox="0 0 120 120" style="width:120px;height:120px;flex:0 0 auto"><polygon points="60.0,49.8 68.8,54.9 68.8,65.1 60.0,70.2 51.2,65.1 51.2,54.9" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<polygon points="60.0,39.6 77.7,49.8 77.7,70.2 60.0,80.4 42.3,70.2 42.3,49.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<polygon points="60.0,29.4 86.5,44.7 86.5,75.3 60.0,90.6 33.5,75.3 33.5,44.7" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<polygon points="60.0,19.2 95.3,39.6 95.3,80.4 60.0,100.8 24.7,80.4 24.7,39.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="60.0" y2="19.2" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="95.3" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="95.3" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="60.0" y2="100.8" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="24.7" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="24.7" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<polygon points="60.0,19.2 95.3,39.6 61.1,60.6 60.0,93.5 58.9,60.6 42.3,49.8" fill="rgba(220,38,38,0.18)" stroke="#dc2626" stroke-width="2" stroke-linejoin="round"/>
-<circle cx="60.0" cy="19.2" r="2.5" fill="#dc2626"/>
-<text x="60.0" y="6.1" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">趋势</text>
-<circle cx="95.3" cy="39.6" r="2.5" fill="#dc2626"/>
-<text x="110.2" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">动能</text>
-<circle cx="61.1" cy="60.6" r="2.5" fill="#dc2626"/>
-<text x="110.2" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">量能</text>
-<circle cx="60.0" cy="93.5" r="2.5" fill="#dc2626"/>
-<text x="60.0" y="115.9" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">超买</text>
-<circle cx="58.9" cy="60.6" r="2.5" fill="#dc2626"/>
-<text x="9.8" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">风控</text>
-<circle cx="42.3" cy="49.8" r="2.5" fill="#dc2626"/>
-<text x="9.8" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">研报</text>
-<text x="60.0" y="61.0" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">76.4</text>
+<text x="60.0" y="61.0" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">42.6</text>
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>融通通鑫混合 <span class="sub">001470</span> <span class="board-tag">基金</span> <span class="board-tag">综合</span></h3>
 <p class="meta">现价 <b>3.16</b>（<span class="down">+0.00%</span>）｜ 近一年 <span class="up">+75%</span> ｜ RSI 46</p>
-<p class="meta">权重 <b>76.4 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ 高置信</p>
+<p class="meta">权重 <b>42.6 分</b> → <span class="pill pill-watch">动量中</span> ｜ 建议：动量中（持有观察） ｜ 高置信</p>
 <p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 82｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">灵活配置</p>
-</div></div><div class="stock-card" id="card-001723" data-code="001723" data-search="华商新动力A 001723 综合 基金" data-market="基金" data-industry="综合" data-tier="满仓加仓">
+</div></div><div class="stock-card" id="card-001723" data-code="001723" data-search="华商新动力A 001723 综合 基金" data-market="基金" data-industry="综合" data-tier="动量弱">
 <div class="radar-wrap"><svg viewBox="0 0 120 120" style="width:120px;height:120px;flex:0 0 auto"><polygon points="60.0,49.8 68.8,54.9 68.8,65.1 60.0,70.2 51.2,65.1 51.2,54.9" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
 <polygon points="60.0,39.6 77.7,49.8 77.7,70.2 60.0,80.4 42.3,70.2 42.3,49.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
 <polygon points="60.0,29.4 86.5,44.7 86.5,75.3 60.0,90.6 33.5,75.3 33.5,44.7" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
@@ -2071,28 +1943,28 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <line x1="60.0" y1="60.0" x2="60.0" y2="100.8" style="stroke:var(--radar-axis)" stroke-width="1"/>
 <line x1="60.0" y1="60.0" x2="24.7" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
 <line x1="60.0" y1="60.0" x2="24.7" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<polygon points="60.0,19.2 95.3,39.6 61.1,60.6 60.0,93.5 58.9,60.6 42.3,49.8" fill="rgba(220,38,38,0.18)" stroke="#dc2626" stroke-width="2" stroke-linejoin="round"/>
-<circle cx="60.0" cy="19.2" r="2.5" fill="#dc2626"/>
+<polygon points="60.0,19.2 95.3,39.6 61.1,60.6 60.0,93.5 58.9,60.6 42.3,49.8" fill="rgba(22,163,74,0.16)" stroke="#16a34a" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="60.0" cy="19.2" r="2.5" fill="#16a34a"/>
 <text x="60.0" y="6.1" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">趋势</text>
-<circle cx="95.3" cy="39.6" r="2.5" fill="#dc2626"/>
+<circle cx="95.3" cy="39.6" r="2.5" fill="#16a34a"/>
 <text x="110.2" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">动能</text>
-<circle cx="61.1" cy="60.6" r="2.5" fill="#dc2626"/>
+<circle cx="61.1" cy="60.6" r="2.5" fill="#16a34a"/>
 <text x="110.2" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">量能</text>
-<circle cx="60.0" cy="93.5" r="2.5" fill="#dc2626"/>
+<circle cx="60.0" cy="93.5" r="2.5" fill="#16a34a"/>
 <text x="60.0" y="115.9" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">超买</text>
-<circle cx="58.9" cy="60.6" r="2.5" fill="#dc2626"/>
+<circle cx="58.9" cy="60.6" r="2.5" fill="#16a34a"/>
 <text x="9.8" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">风控</text>
-<circle cx="42.3" cy="49.8" r="2.5" fill="#dc2626"/>
+<circle cx="42.3" cy="49.8" r="2.5" fill="#16a34a"/>
 <text x="9.8" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">研报</text>
-<text x="60.0" y="61.0" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">76.4</text>
+<text x="60.0" y="61.0" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">36.2</text>
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>华商新动力A <span class="sub">001723</span> <span class="board-tag">基金</span> <span class="board-tag">综合</span></h3>
 <p class="meta">现价 <b>1.96</b>（<span class="up">+0.67%</span>）｜ 近一年 <span class="up">+145%</span> ｜ RSI 50</p>
-<p class="meta">权重 <b>76.4 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ 高置信</p>
+<p class="meta">权重 <b>36.2 分</b> → <span class="pill pill-cut">动量弱</span> ｜ 建议：动量弱（关注轮出） ｜ 高置信</p>
 <p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 82｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">成长混合</p>
-</div></div><div class="stock-card" id="card-001759" data-code="001759" data-search="嘉实成长增强混合 001759 综合 基金" data-market="基金" data-industry="综合" data-tier="满仓加仓">
+</div></div><div class="stock-card" id="card-002289" data-code="002289" data-search="华商改革创新股票A 002289 综合 基金" data-market="基金" data-industry="综合" data-tier="动量弱">
 <div class="radar-wrap"><svg viewBox="0 0 120 120" style="width:120px;height:120px;flex:0 0 auto"><polygon points="60.0,49.8 68.8,54.9 68.8,65.1 60.0,70.2 51.2,65.1 51.2,54.9" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
 <polygon points="60.0,39.6 77.7,49.8 77.7,70.2 60.0,80.4 42.3,70.2 42.3,49.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
 <polygon points="60.0,29.4 86.5,44.7 86.5,75.3 60.0,90.6 33.5,75.3 33.5,44.7" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
@@ -2103,123 +1975,251 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <line x1="60.0" y1="60.0" x2="60.0" y2="100.8" style="stroke:var(--radar-axis)" stroke-width="1"/>
 <line x1="60.0" y1="60.0" x2="24.7" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
 <line x1="60.0" y1="60.0" x2="24.7" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<polygon points="60.0,19.2 95.3,39.6 61.1,60.6 60.0,93.5 58.9,60.6 42.3,49.8" fill="rgba(220,38,38,0.18)" stroke="#dc2626" stroke-width="2" stroke-linejoin="round"/>
-<circle cx="60.0" cy="19.2" r="2.5" fill="#dc2626"/>
+<polygon points="60.0,19.2 95.3,39.6 61.1,60.6 60.0,93.5 58.9,60.6 42.3,49.8" fill="rgba(22,163,74,0.16)" stroke="#16a34a" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="60.0" cy="19.2" r="2.5" fill="#16a34a"/>
 <text x="60.0" y="6.1" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">趋势</text>
-<circle cx="95.3" cy="39.6" r="2.5" fill="#dc2626"/>
+<circle cx="95.3" cy="39.6" r="2.5" fill="#16a34a"/>
 <text x="110.2" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">动能</text>
-<circle cx="61.1" cy="60.6" r="2.5" fill="#dc2626"/>
+<circle cx="61.1" cy="60.6" r="2.5" fill="#16a34a"/>
 <text x="110.2" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">量能</text>
-<circle cx="60.0" cy="93.5" r="2.5" fill="#dc2626"/>
+<circle cx="60.0" cy="93.5" r="2.5" fill="#16a34a"/>
 <text x="60.0" y="115.9" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">超买</text>
-<circle cx="58.9" cy="60.6" r="2.5" fill="#dc2626"/>
+<circle cx="58.9" cy="60.6" r="2.5" fill="#16a34a"/>
 <text x="9.8" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">风控</text>
-<circle cx="42.3" cy="49.8" r="2.5" fill="#dc2626"/>
+<circle cx="42.3" cy="49.8" r="2.5" fill="#16a34a"/>
 <text x="9.8" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">研报</text>
-<text x="60.0" y="61.0" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">76.4</text>
-<text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
-<div class="body">
-<h3>嘉实成长增强混合 <span class="sub">001759</span> <span class="board-tag">基金</span> <span class="board-tag">综合</span></h3>
-<p class="meta">现价 <b>3.32</b>（<span class="up">+1.62%</span>）｜ 近一年 <span class="up">+112%</span> ｜ RSI 46</p>
-<p class="meta">权重 <b>76.4 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ 高置信</p>
-<p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 82｜风控 0｜研报 0.0</p>
-<p class="meta" style="color:var(--faint)">成长混合</p>
-</div></div><div class="stock-card" id="card-002051" data-code="002051" data-search="诺安创新驱动C 002051 电子 基金" data-market="基金" data-industry="电子" data-tier="满仓加仓">
-<div class="radar-wrap"><svg viewBox="0 0 120 120" style="width:120px;height:120px;flex:0 0 auto"><polygon points="60.0,49.8 68.8,54.9 68.8,65.1 60.0,70.2 51.2,65.1 51.2,54.9" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<polygon points="60.0,39.6 77.7,49.8 77.7,70.2 60.0,80.4 42.3,70.2 42.3,49.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<polygon points="60.0,29.4 86.5,44.7 86.5,75.3 60.0,90.6 33.5,75.3 33.5,44.7" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<polygon points="60.0,19.2 95.3,39.6 95.3,80.4 60.0,100.8 24.7,80.4 24.7,39.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="60.0" y2="19.2" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="95.3" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="95.3" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="60.0" y2="100.8" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="24.7" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="24.7" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<polygon points="60.0,19.2 95.3,39.6 61.1,60.6 60.0,93.5 58.9,60.6 42.3,49.8" fill="rgba(220,38,38,0.18)" stroke="#dc2626" stroke-width="2" stroke-linejoin="round"/>
-<circle cx="60.0" cy="19.2" r="2.5" fill="#dc2626"/>
-<text x="60.0" y="6.1" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">趋势</text>
-<circle cx="95.3" cy="39.6" r="2.5" fill="#dc2626"/>
-<text x="110.2" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">动能</text>
-<circle cx="61.1" cy="60.6" r="2.5" fill="#dc2626"/>
-<text x="110.2" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">量能</text>
-<circle cx="60.0" cy="93.5" r="2.5" fill="#dc2626"/>
-<text x="60.0" y="115.9" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">超买</text>
-<circle cx="58.9" cy="60.6" r="2.5" fill="#dc2626"/>
-<text x="9.8" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">风控</text>
-<circle cx="42.3" cy="49.8" r="2.5" fill="#dc2626"/>
-<text x="9.8" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">研报</text>
-<text x="60.0" y="61.0" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">76.4</text>
-<text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
-<div class="body">
-<h3>诺安创新驱动C <span class="sub">002051</span> <span class="board-tag">基金</span> <span class="board-tag">电子</span></h3>
-<p class="meta">现价 <b>2.84</b>（<span class="up">+1.14%</span>）｜ 近一年 <span class="up">+158%</span> ｜ RSI 53</p>
-<p class="meta">权重 <b>76.4 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ 高置信</p>
-<p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 82｜风控 0｜研报 0.0</p>
-<p class="meta" style="color:var(--faint)">科技成长</p>
-</div></div><div class="stock-card" id="card-002163" data-code="002163" data-search="东方惠新混合C 002163 综合 基金" data-market="基金" data-industry="综合" data-tier="满仓加仓">
-<div class="radar-wrap"><svg viewBox="0 0 120 120" style="width:120px;height:120px;flex:0 0 auto"><polygon points="60.0,49.8 68.8,54.9 68.8,65.1 60.0,70.2 51.2,65.1 51.2,54.9" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<polygon points="60.0,39.6 77.7,49.8 77.7,70.2 60.0,80.4 42.3,70.2 42.3,49.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<polygon points="60.0,29.4 86.5,44.7 86.5,75.3 60.0,90.6 33.5,75.3 33.5,44.7" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<polygon points="60.0,19.2 95.3,39.6 95.3,80.4 60.0,100.8 24.7,80.4 24.7,39.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="60.0" y2="19.2" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="95.3" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="95.3" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="60.0" y2="100.8" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="24.7" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="24.7" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<polygon points="60.0,19.2 95.3,39.6 61.1,60.6 60.0,93.5 58.9,60.6 42.3,49.8" fill="rgba(220,38,38,0.18)" stroke="#dc2626" stroke-width="2" stroke-linejoin="round"/>
-<circle cx="60.0" cy="19.2" r="2.5" fill="#dc2626"/>
-<text x="60.0" y="6.1" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">趋势</text>
-<circle cx="95.3" cy="39.6" r="2.5" fill="#dc2626"/>
-<text x="110.2" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">动能</text>
-<circle cx="61.1" cy="60.6" r="2.5" fill="#dc2626"/>
-<text x="110.2" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">量能</text>
-<circle cx="60.0" cy="93.5" r="2.5" fill="#dc2626"/>
-<text x="60.0" y="115.9" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">超买</text>
-<circle cx="58.9" cy="60.6" r="2.5" fill="#dc2626"/>
-<text x="9.8" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">风控</text>
-<circle cx="42.3" cy="49.8" r="2.5" fill="#dc2626"/>
-<text x="9.8" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">研报</text>
-<text x="60.0" y="61.0" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">76.4</text>
-<text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
-<div class="body">
-<h3>东方惠新混合C <span class="sub">002163</span> <span class="board-tag">基金</span> <span class="board-tag">综合</span></h3>
-<p class="meta">现价 <b>3.08</b>（<span class="up">+0.58%</span>）｜ 近一年 <span class="up">+182%</span> ｜ RSI 45</p>
-<p class="meta">权重 <b>76.4 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ 高置信</p>
-<p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 82｜风控 0｜研报 0.0</p>
-<p class="meta" style="color:var(--faint)">灵活配置</p>
-</div></div><div class="stock-card" id="card-002289" data-code="002289" data-search="华商改革创新股票A 002289 综合 基金" data-market="基金" data-industry="综合" data-tier="满仓加仓">
-<div class="radar-wrap"><svg viewBox="0 0 120 120" style="width:120px;height:120px;flex:0 0 auto"><polygon points="60.0,49.8 68.8,54.9 68.8,65.1 60.0,70.2 51.2,65.1 51.2,54.9" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<polygon points="60.0,39.6 77.7,49.8 77.7,70.2 60.0,80.4 42.3,70.2 42.3,49.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<polygon points="60.0,29.4 86.5,44.7 86.5,75.3 60.0,90.6 33.5,75.3 33.5,44.7" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<polygon points="60.0,19.2 95.3,39.6 95.3,80.4 60.0,100.8 24.7,80.4 24.7,39.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="60.0" y2="19.2" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="95.3" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="95.3" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="60.0" y2="100.8" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="24.7" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<line x1="60.0" y1="60.0" x2="24.7" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
-<polygon points="60.0,19.2 95.3,39.6 61.1,60.6 60.0,93.5 58.9,60.6 42.3,49.8" fill="rgba(220,38,38,0.18)" stroke="#dc2626" stroke-width="2" stroke-linejoin="round"/>
-<circle cx="60.0" cy="19.2" r="2.5" fill="#dc2626"/>
-<text x="60.0" y="6.1" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">趋势</text>
-<circle cx="95.3" cy="39.6" r="2.5" fill="#dc2626"/>
-<text x="110.2" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">动能</text>
-<circle cx="61.1" cy="60.6" r="2.5" fill="#dc2626"/>
-<text x="110.2" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">量能</text>
-<circle cx="60.0" cy="93.5" r="2.5" fill="#dc2626"/>
-<text x="60.0" y="115.9" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">超买</text>
-<circle cx="58.9" cy="60.6" r="2.5" fill="#dc2626"/>
-<text x="9.8" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">风控</text>
-<circle cx="42.3" cy="49.8" r="2.5" fill="#dc2626"/>
-<text x="9.8" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">研报</text>
-<text x="60.0" y="61.0" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">76.4</text>
+<text x="60.0" y="61.0" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">34.0</text>
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>华商改革创新股票A <span class="sub">002289</span> <span class="board-tag">基金</span> <span class="board-tag">综合</span></h3>
 <p class="meta">现价 <b>5.99</b>（<span class="up">+0.74%</span>）｜ 近一年 <span class="up">+157%</span> ｜ RSI 50</p>
-<p class="meta">权重 <b>76.4 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ 高置信</p>
+<p class="meta">权重 <b>34.0 分</b> → <span class="pill pill-cut">动量弱</span> ｜ 建议：动量弱（关注轮出） ｜ 高置信</p>
 <p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 82｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">改革成长</p>
+</div></div><div class="stock-card" id="card-001411" data-code="001411" data-search="诺安创新驱动A 001411 电子 基金" data-market="基金" data-industry="电子" data-tier="动量弱">
+<div class="radar-wrap"><svg viewBox="0 0 120 120" style="width:120px;height:120px;flex:0 0 auto"><polygon points="60.0,49.8 68.8,54.9 68.8,65.1 60.0,70.2 51.2,65.1 51.2,54.9" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<polygon points="60.0,39.6 77.7,49.8 77.7,70.2 60.0,80.4 42.3,70.2 42.3,49.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<polygon points="60.0,29.4 86.5,44.7 86.5,75.3 60.0,90.6 33.5,75.3 33.5,44.7" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<polygon points="60.0,19.2 95.3,39.6 95.3,80.4 60.0,100.8 24.7,80.4 24.7,39.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="60.0" y2="19.2" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="95.3" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="95.3" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="60.0" y2="100.8" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="24.7" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="24.7" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<polygon points="60.0,19.2 95.3,39.6 61.1,60.6 60.0,93.5 58.9,60.6 42.3,49.8" fill="rgba(22,163,74,0.16)" stroke="#16a34a" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="60.0" cy="19.2" r="2.5" fill="#16a34a"/>
+<text x="60.0" y="6.1" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">趋势</text>
+<circle cx="95.3" cy="39.6" r="2.5" fill="#16a34a"/>
+<text x="110.2" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">动能</text>
+<circle cx="61.1" cy="60.6" r="2.5" fill="#16a34a"/>
+<text x="110.2" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">量能</text>
+<circle cx="60.0" cy="93.5" r="2.5" fill="#16a34a"/>
+<text x="60.0" y="115.9" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">超买</text>
+<circle cx="58.9" cy="60.6" r="2.5" fill="#16a34a"/>
+<text x="9.8" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">风控</text>
+<circle cx="42.3" cy="49.8" r="2.5" fill="#16a34a"/>
+<text x="9.8" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">研报</text>
+<text x="60.0" y="61.0" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">31.3</text>
+<text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
+<div class="body">
+<h3>诺安创新驱动A <span class="sub">001411</span> <span class="board-tag">基金</span> <span class="board-tag">电子</span></h3>
+<p class="meta">现价 <b>2.88</b>（<span class="up">+1.12%</span>）｜ 近一年 <span class="up">+158%</span> ｜ RSI 53</p>
+<p class="meta">权重 <b>31.3 分</b> → <span class="pill pill-cut">动量弱</span> ｜ 建议：动量弱（关注轮出） ｜ 高置信</p>
+<p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 82｜风控 0｜研报 0.0</p>
+<p class="meta" style="color:var(--faint)">科技成长</p>
+</div></div><div class="stock-card" id="card-002051" data-code="002051" data-search="诺安创新驱动C 002051 电子 基金" data-market="基金" data-industry="电子" data-tier="动量弱">
+<div class="radar-wrap"><svg viewBox="0 0 120 120" style="width:120px;height:120px;flex:0 0 auto"><polygon points="60.0,49.8 68.8,54.9 68.8,65.1 60.0,70.2 51.2,65.1 51.2,54.9" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<polygon points="60.0,39.6 77.7,49.8 77.7,70.2 60.0,80.4 42.3,70.2 42.3,49.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<polygon points="60.0,29.4 86.5,44.7 86.5,75.3 60.0,90.6 33.5,75.3 33.5,44.7" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<polygon points="60.0,19.2 95.3,39.6 95.3,80.4 60.0,100.8 24.7,80.4 24.7,39.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="60.0" y2="19.2" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="95.3" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="95.3" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="60.0" y2="100.8" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="24.7" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="24.7" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<polygon points="60.0,19.2 95.3,39.6 61.1,60.6 60.0,93.5 58.9,60.6 42.3,49.8" fill="rgba(22,163,74,0.16)" stroke="#16a34a" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="60.0" cy="19.2" r="2.5" fill="#16a34a"/>
+<text x="60.0" y="6.1" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">趋势</text>
+<circle cx="95.3" cy="39.6" r="2.5" fill="#16a34a"/>
+<text x="110.2" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">动能</text>
+<circle cx="61.1" cy="60.6" r="2.5" fill="#16a34a"/>
+<text x="110.2" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">量能</text>
+<circle cx="60.0" cy="93.5" r="2.5" fill="#16a34a"/>
+<text x="60.0" y="115.9" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">超买</text>
+<circle cx="58.9" cy="60.6" r="2.5" fill="#16a34a"/>
+<text x="9.8" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">风控</text>
+<circle cx="42.3" cy="49.8" r="2.5" fill="#16a34a"/>
+<text x="9.8" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">研报</text>
+<text x="60.0" y="61.0" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">31.3</text>
+<text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
+<div class="body">
+<h3>诺安创新驱动C <span class="sub">002051</span> <span class="board-tag">基金</span> <span class="board-tag">电子</span></h3>
+<p class="meta">现价 <b>2.84</b>（<span class="up">+1.14%</span>）｜ 近一年 <span class="up">+158%</span> ｜ RSI 53</p>
+<p class="meta">权重 <b>31.3 分</b> → <span class="pill pill-cut">动量弱</span> ｜ 建议：动量弱（关注轮出） ｜ 高置信</p>
+<p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 82｜风控 0｜研报 0.0</p>
+<p class="meta" style="color:var(--faint)">科技成长</p>
+</div></div><div class="stock-card" id="card-001759" data-code="001759" data-search="嘉实成长增强混合 001759 综合 基金" data-market="基金" data-industry="综合" data-tier="动量弱">
+<div class="radar-wrap"><svg viewBox="0 0 120 120" style="width:120px;height:120px;flex:0 0 auto"><polygon points="60.0,49.8 68.8,54.9 68.8,65.1 60.0,70.2 51.2,65.1 51.2,54.9" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<polygon points="60.0,39.6 77.7,49.8 77.7,70.2 60.0,80.4 42.3,70.2 42.3,49.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<polygon points="60.0,29.4 86.5,44.7 86.5,75.3 60.0,90.6 33.5,75.3 33.5,44.7" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<polygon points="60.0,19.2 95.3,39.6 95.3,80.4 60.0,100.8 24.7,80.4 24.7,39.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="60.0" y2="19.2" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="95.3" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="95.3" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="60.0" y2="100.8" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="24.7" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="24.7" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<polygon points="60.0,19.2 95.3,39.6 61.1,60.6 60.0,93.5 58.9,60.6 42.3,49.8" fill="rgba(2,132,199,0.16)" stroke="#0284c7" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="60.0" cy="19.2" r="2.5" fill="#0284c7"/>
+<text x="60.0" y="6.1" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">趋势</text>
+<circle cx="95.3" cy="39.6" r="2.5" fill="#0284c7"/>
+<text x="110.2" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">动能</text>
+<circle cx="61.1" cy="60.6" r="2.5" fill="#0284c7"/>
+<text x="110.2" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">量能</text>
+<circle cx="60.0" cy="93.5" r="2.5" fill="#0284c7"/>
+<text x="60.0" y="115.9" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">超买</text>
+<circle cx="58.9" cy="60.6" r="2.5" fill="#0284c7"/>
+<text x="9.8" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">风控</text>
+<circle cx="42.3" cy="49.8" r="2.5" fill="#0284c7"/>
+<text x="9.8" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">研报</text>
+<text x="60.0" y="61.0" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">28.4</text>
+<text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
+<div class="body">
+<h3>嘉实成长增强混合 <span class="sub">001759</span> <span class="board-tag">基金</span> <span class="board-tag">综合</span></h3>
+<p class="meta">现价 <b>3.32</b>（<span class="up">+1.62%</span>）｜ 近一年 <span class="up">+112%</span> ｜ RSI 46</p>
+<p class="meta">权重 <b>28.4 分</b> → <span class="pill pill-cut">动量弱</span> ｜ 建议：动量弱（关注轮出） ｜ 高置信</p>
+<p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 82｜风控 0｜研报 0.0</p>
+<p class="meta" style="color:var(--faint)">成长混合</p>
+</div></div><div class="stock-card" id="card-001060" data-code="001060" data-search="前海开源高端装备A 001060 机械设备 基金" data-market="基金" data-industry="机械设备" data-tier="动量弱">
+<div class="radar-wrap"><svg viewBox="0 0 120 120" style="width:120px;height:120px;flex:0 0 auto"><polygon points="60.0,49.8 68.8,54.9 68.8,65.1 60.0,70.2 51.2,65.1 51.2,54.9" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<polygon points="60.0,39.6 77.7,49.8 77.7,70.2 60.0,80.4 42.3,70.2 42.3,49.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<polygon points="60.0,29.4 86.5,44.7 86.5,75.3 60.0,90.6 33.5,75.3 33.5,44.7" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<polygon points="60.0,19.2 95.3,39.6 95.3,80.4 60.0,100.8 24.7,80.4 24.7,39.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="60.0" y2="19.2" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="95.3" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="95.3" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="60.0" y2="100.8" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="24.7" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="24.7" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<polygon points="60.0,19.2 95.3,39.6 61.1,60.6 60.0,93.5 58.9,60.6 42.3,49.8" fill="rgba(2,132,199,0.16)" stroke="#0284c7" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="60.0" cy="19.2" r="2.5" fill="#0284c7"/>
+<text x="60.0" y="6.1" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">趋势</text>
+<circle cx="95.3" cy="39.6" r="2.5" fill="#0284c7"/>
+<text x="110.2" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">动能</text>
+<circle cx="61.1" cy="60.6" r="2.5" fill="#0284c7"/>
+<text x="110.2" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">量能</text>
+<circle cx="60.0" cy="93.5" r="2.5" fill="#0284c7"/>
+<text x="60.0" y="115.9" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">超买</text>
+<circle cx="58.9" cy="60.6" r="2.5" fill="#0284c7"/>
+<text x="9.8" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">风控</text>
+<circle cx="42.3" cy="49.8" r="2.5" fill="#0284c7"/>
+<text x="9.8" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">研报</text>
+<text x="60.0" y="61.0" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">25.5</text>
+<text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
+<div class="body">
+<h3>前海开源高端装备A <span class="sub">001060</span> <span class="board-tag">基金</span> <span class="board-tag">机械设备</span></h3>
+<p class="meta">现价 <b>3.39</b>（<span class="up">+0.68%</span>）｜ 近一年 <span class="up">+130%</span> ｜ RSI 48</p>
+<p class="meta">权重 <b>25.5 分</b> → <span class="pill pill-cut">动量弱</span> ｜ 建议：动量弱（关注轮出） ｜ 高置信</p>
+<p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 82｜风控 0｜研报 0.0</p>
+<p class="meta" style="color:var(--faint)">高端装备</p>
+</div></div><div class="stock-card" id="card-000742" data-code="000742" data-search="国泰新经济混合A 000742 综合 基金" data-market="基金" data-industry="综合" data-tier="动量极弱">
+<div class="radar-wrap"><svg viewBox="0 0 120 120" style="width:120px;height:120px;flex:0 0 auto"><polygon points="60.0,49.8 68.8,54.9 68.8,65.1 60.0,70.2 51.2,65.1 51.2,54.9" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<polygon points="60.0,39.6 77.7,49.8 77.7,70.2 60.0,80.4 42.3,70.2 42.3,49.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<polygon points="60.0,29.4 86.5,44.7 86.5,75.3 60.0,90.6 33.5,75.3 33.5,44.7" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<polygon points="60.0,19.2 95.3,39.6 95.3,80.4 60.0,100.8 24.7,80.4 24.7,39.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="60.0" y2="19.2" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="95.3" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="95.3" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="60.0" y2="100.8" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="24.7" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="24.7" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<polygon points="60.0,19.2 95.3,39.6 61.1,60.6 60.0,93.5 58.9,60.6 42.3,49.8" fill="rgba(2,132,199,0.16)" stroke="#0284c7" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="60.0" cy="19.2" r="2.5" fill="#0284c7"/>
+<text x="60.0" y="6.1" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">趋势</text>
+<circle cx="95.3" cy="39.6" r="2.5" fill="#0284c7"/>
+<text x="110.2" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">动能</text>
+<circle cx="61.1" cy="60.6" r="2.5" fill="#0284c7"/>
+<text x="110.2" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">量能</text>
+<circle cx="60.0" cy="93.5" r="2.5" fill="#0284c7"/>
+<text x="60.0" y="115.9" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">超买</text>
+<circle cx="58.9" cy="60.6" r="2.5" fill="#0284c7"/>
+<text x="9.8" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">风控</text>
+<circle cx="42.3" cy="49.8" r="2.5" fill="#0284c7"/>
+<text x="9.8" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">研报</text>
+<text x="60.0" y="61.0" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">22.3</text>
+<text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
+<div class="body">
+<h3>国泰新经济混合A <span class="sub">000742</span> <span class="board-tag">基金</span> <span class="board-tag">综合</span></h3>
+<p class="meta">现价 <b>5.13</b>（<span class="down">-0.81%</span>）｜ 近一年 <span class="up">+144%</span> ｜ RSI 44</p>
+<p class="meta">权重 <b>22.3 分</b> → <span class="pill pill-clear">动量极弱</span> ｜ 建议：动量极弱（或轮出） ｜ 高置信</p>
+<p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 82｜风控 0｜研报 0.0</p>
+<p class="meta" style="color:var(--faint)">均衡配置</p>
+</div></div><div class="stock-card" id="card-001198" data-code="001198" data-search="东方惠新混合A 001198 综合 基金" data-market="基金" data-industry="综合" data-tier="动量极弱">
+<div class="radar-wrap"><svg viewBox="0 0 120 120" style="width:120px;height:120px;flex:0 0 auto"><polygon points="60.0,49.8 68.8,54.9 68.8,65.1 60.0,70.2 51.2,65.1 51.2,54.9" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<polygon points="60.0,39.6 77.7,49.8 77.7,70.2 60.0,80.4 42.3,70.2 42.3,49.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<polygon points="60.0,29.4 86.5,44.7 86.5,75.3 60.0,90.6 33.5,75.3 33.5,44.7" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<polygon points="60.0,19.2 95.3,39.6 95.3,80.4 60.0,100.8 24.7,80.4 24.7,39.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="60.0" y2="19.2" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="95.3" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="95.3" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="60.0" y2="100.8" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="24.7" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="24.7" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<polygon points="60.0,19.2 95.3,39.6 61.1,60.6 60.0,93.5 58.9,60.6 42.3,49.8" fill="rgba(2,132,199,0.16)" stroke="#0284c7" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="60.0" cy="19.2" r="2.5" fill="#0284c7"/>
+<text x="60.0" y="6.1" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">趋势</text>
+<circle cx="95.3" cy="39.6" r="2.5" fill="#0284c7"/>
+<text x="110.2" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">动能</text>
+<circle cx="61.1" cy="60.6" r="2.5" fill="#0284c7"/>
+<text x="110.2" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">量能</text>
+<circle cx="60.0" cy="93.5" r="2.5" fill="#0284c7"/>
+<text x="60.0" y="115.9" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">超买</text>
+<circle cx="58.9" cy="60.6" r="2.5" fill="#0284c7"/>
+<text x="9.8" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">风控</text>
+<circle cx="42.3" cy="49.8" r="2.5" fill="#0284c7"/>
+<text x="9.8" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">研报</text>
+<text x="60.0" y="61.0" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">15.8</text>
+<text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
+<div class="body">
+<h3>东方惠新混合A <span class="sub">001198</span> <span class="board-tag">基金</span> <span class="board-tag">综合</span></h3>
+<p class="meta">现价 <b>3.11</b>（<span class="up">+0.58%</span>）｜ 近一年 <span class="up">+182%</span> ｜ RSI 45</p>
+<p class="meta">权重 <b>15.8 分</b> → <span class="pill pill-clear">动量极弱</span> ｜ 建议：动量极弱（或轮出） ｜ 高置信</p>
+<p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 82｜风控 0｜研报 0.0</p>
+<p class="meta" style="color:var(--faint)">灵活配置</p>
+</div></div><div class="stock-card" id="card-002163" data-code="002163" data-search="东方惠新混合C 002163 综合 基金" data-market="基金" data-industry="综合" data-tier="动量极弱">
+<div class="radar-wrap"><svg viewBox="0 0 120 120" style="width:120px;height:120px;flex:0 0 auto"><polygon points="60.0,49.8 68.8,54.9 68.8,65.1 60.0,70.2 51.2,65.1 51.2,54.9" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<polygon points="60.0,39.6 77.7,49.8 77.7,70.2 60.0,80.4 42.3,70.2 42.3,49.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<polygon points="60.0,29.4 86.5,44.7 86.5,75.3 60.0,90.6 33.5,75.3 33.5,44.7" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<polygon points="60.0,19.2 95.3,39.6 95.3,80.4 60.0,100.8 24.7,80.4 24.7,39.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="60.0" y2="19.2" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="95.3" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="95.3" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="60.0" y2="100.8" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="24.7" y2="80.4" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<line x1="60.0" y1="60.0" x2="24.7" y2="39.6" style="stroke:var(--radar-axis)" stroke-width="1"/>
+<polygon points="60.0,19.2 95.3,39.6 61.1,60.6 60.0,93.5 58.9,60.6 42.3,49.8" fill="rgba(2,132,199,0.16)" stroke="#0284c7" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="60.0" cy="19.2" r="2.5" fill="#0284c7"/>
+<text x="60.0" y="6.1" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">趋势</text>
+<circle cx="95.3" cy="39.6" r="2.5" fill="#0284c7"/>
+<text x="110.2" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">动能</text>
+<circle cx="61.1" cy="60.6" r="2.5" fill="#0284c7"/>
+<text x="110.2" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">量能</text>
+<circle cx="60.0" cy="93.5" r="2.5" fill="#0284c7"/>
+<text x="60.0" y="115.9" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">超买</text>
+<circle cx="58.9" cy="60.6" r="2.5" fill="#0284c7"/>
+<text x="9.8" y="89.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">风控</text>
+<circle cx="42.3" cy="49.8" r="2.5" fill="#0284c7"/>
+<text x="9.8" y="31.0" style="fill:var(--radar-label)" font-size="8" text-anchor="middle" font-weight="600">研报</text>
+<text x="60.0" y="61.0" style="fill:var(--radar-score)" font-size="20" font-weight="800" text-anchor="middle">15.7</text>
+<text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
+<div class="body">
+<h3>东方惠新混合C <span class="sub">002163</span> <span class="board-tag">基金</span> <span class="board-tag">综合</span></h3>
+<p class="meta">现价 <b>3.08</b>（<span class="up">+0.58%</span>）｜ 近一年 <span class="up">+182%</span> ｜ RSI 45</p>
+<p class="meta">权重 <b>15.7 分</b> → <span class="pill pill-clear">动量极弱</span> ｜ 建议：动量极弱（或轮出） ｜ 高置信</p>
+<p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 82｜风控 0｜研报 0.0</p>
+<p class="meta" style="color:var(--faint)">灵活配置</p>
 </div></div></div>
 </div>
 <div class="card" id="watch-v9-card">
@@ -4483,7 +4483,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 
 </div>
-<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-17 23:19 · 版本 v5.11.8 · 数据截至 2026-08-17 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-17 23:49 · 版本 v5.11.8 · 数据截至 2026-08-17 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>

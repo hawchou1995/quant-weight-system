@@ -82,14 +82,20 @@ def updown(items, add=("满仓加仓", "轻仓加仓"), cut=("减至半仓", "�
     return up, down
 
 # ---------------- 工具 ----------------
-TIER_W = {"满仓加仓": 5, "强买入": 5, "轻仓加仓": 4, "买入": 4, "观望": 3, "减至半仓": 2, "清仓": 1, "不买": 0}
+TIER_W = {"满仓加仓": 5, "强买入": 5, "动量强": 5, "轻仓加仓": 4, "买入": 4, "观望": 3, "动量中": 3,
+          "减至半仓": 2, "动量弱": 2, "清仓": 1, "动量极弱": 1, "不买": 0}
 
 def tier_pill(t):
-    cls = {"满仓加仓": "pill-full", "强买入": "pill-full", "轻仓加仓": "pill-add", "买入": "pill-add",
-           "观望": "pill-watch", "减至半仓": "pill-cut", "清仓": "pill-clear", "不买": "pill-watch"}.get(t, "pill-watch")
+    cls = {"满仓加仓": "pill-full", "强买入": "pill-full", "动量强": "pill-full", "轻仓加仓": "pill-add", "买入": "pill-add",
+           "观望": "pill-watch", "动量中": "pill-watch", "减至半仓": "pill-cut", "动量弱": "pill-cut",
+           "清仓": "pill-clear", "动量极弱": "pill-clear", "不买": "pill-watch"}.get(t, "pill-watch")
     return f'<span class="pill {cls}">{t}</span>'
 
 def action_for(d):
+    if d["tier"] == "动量强": return "动量强（池内优选）"
+    if d["tier"] == "动量中": return "动量中（持有观察）"
+    if d["tier"] == "动量弱": return "动量弱（关注轮出）"
+    if d["tier"] == "动量极弱": return "动量极弱（或轮出）"
     if d["tier"] in ("满仓加仓",): return "持有至目标仓位"
     if d["tier"] == "轻仓加仓": return "可加至目标仓位"
     if d["tier"] == "观望": return "持有不加 / 观望"
