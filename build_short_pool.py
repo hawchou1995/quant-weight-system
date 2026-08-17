@@ -284,15 +284,36 @@ def build(as_of=None):
     out, sigs = calc_signals(as_of)
     # ---- 自动跟踪池（2026-08-17 用户需求）：上方表格可买入标的（强买入/买入，分≥50）自动入池，30 天后自动移除 ----
     try:
-        old = json.load(open(BASE / "short_pool.json", encoding="utf-8")).get("track", {}) or {}
+        _old_full = json.load(open(BASE / "short_pool.json", encoding="utf-8"))
     except Exception:
-        old = {}
+        _old_full = {}
+    old = _old_full.get("track", {}) or {}
     today = time.strftime("%Y-%m-%d")
     track = dict(old)                      # 保留历史跟踪（含已掉出池的，满 30 天才删）
+    # ① 回溯上次构建的池：昨天在池且可买入、今天掉出的标的，按上次 as_of 补录（用户场景：8/14 第一位 8/17 掉出仍可跟踪）
+    _old_tiers = _old_full.get("tiers", {}) or {}
+    for _bd, _codes in _old_tiers.items():
+        for _c in _codes:
+            if _c not in track:
+                _od = (_old_full.get("details", {}) or {}).get(_c, {})
+                if (_od.get("short_score") or 0) >= 50:
+                    track[_c] = {"entry": _old_full.get("as_of") or today, "pool": _bd}
+    # ② 当前池可买入标的：入池（保留已有 entry）
     for code, d in out["details"].items():
         if (d.get("short_score") or 0) >= 50:
             if code not in track:
                 track[code] = {"entry": today, "pool": d.get("board", "")}
+    # ③ 一次性历史补偿：跟踪功能上线前（8/14 池）出现过的可买入标的，entry=2026-08-14
+    if not _old_full.get("_backfilled_0814"):
+        try:
+            _hist_out, _ = calc_signals(as_of="2026-08-14")
+            for _c, _d in _hist_out["details"].items():
+                if (_d.get("short_score") or 0) >= 50 and _c not in track:
+                    track[_c] = {"entry": "2026-08-14", "pool": _d.get("board", "")}
+            out["_backfilled_0814"] = True
+            print(f"8/14 池历史补偿完成，跟踪池累计 {len(track)} 只", flush=True)
+        except Exception as _e:
+            print("8/14 池历史补偿失败:", _e, flush=True)
     cutoff = pd.Timestamp.now() - pd.Timedelta(days=30)
     track = {c: v for c, v in track.items() if pd.Timestamp(v.get("entry", today)) > cutoff}
     out["track"] = track
