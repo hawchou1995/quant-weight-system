@@ -188,10 +188,12 @@ def calc_signals(as_of=None):
                                 "ma5_above": bool(not pd.isna(r.get("ma5", np.nan)) and r["close"] > r["ma5"])}
     for bd in ("主板", "创业板", "科创板"):
         rows_by_board[bd].sort(key=lambda kv: -kv[1])
-        print(f"股票[{bd}] {len(rows_by_board[bd])} 只 → 反转分 Top10 ({time.time()-t0:.0f}s)", flush=True)
-    stock_top_main = rows_by_board["主板"][:10]
-    stock_top_gem  = rows_by_board["创业板"][:10]
-    stock_top_star = rows_by_board["科创板"][:10]
+        # 2026-08-17 用户决策：只保留买入信号（分≥50），不足 10 只不凑数；超 10 只封顶 Top10
+        rows_by_board[bd] = [kv for kv in rows_by_board[bd] if kv[1] >= 50][:10]
+        print(f"股票[{bd}] 买入信号 {len(rows_by_board[bd])} 只（分≥50，不凑数）({time.time()-t0:.0f}s)", flush=True)
+    stock_top_main = rows_by_board["主板"]
+    stock_top_gem  = rows_by_board["创业板"]
+    stock_top_star = rows_by_board["科创板"]
     stock_top = stock_top_main + stock_top_gem + stock_top_star
 
     # 2) ETF 动量 Top10（2026-08-17 用户决策移除：ETF 表现不佳，短线池去 ETF）
@@ -219,8 +221,9 @@ def calc_signals(as_of=None):
                                "score": round(float(sc), 1), "tier": tier_of(float(sc)),
                                "ma5_above": bool(not pd.isna(r.get("ma5", np.nan)) and r["close"] > r["ma5"])}
     frows.sort(key=lambda kv: -kv[1])
-    print(f"基金池 {len(fund_pool)} 只 → 动量分 Top10 ({time.time()-t0:.0f}s)", flush=True)
-    fund_top = frows[:10]
+    # 2026-08-17 用户决策：基金同样只保留买入信号（分≥50），不凑数
+    fund_top = [kv for kv in frows if kv[1] >= 50][:10]
+    print(f"基金池 买入信号 {len(fund_top)} 只（分≥50，不凑数）({time.time()-t0:.0f}s)", flush=True)
 
     # 详情构建
     details = {}

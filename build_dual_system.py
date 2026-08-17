@@ -120,12 +120,13 @@ def rows_html_for(items):
         rsi_txt = f'{d["rsi"]:.0f}' if d.get("rsi") is not None else "—"
         vp_txt = f'{comp.get("volume",0):.0f}'
         board = d["board"]
-        # 开盘跳空高开规避（2026-08-17 用户需求）：盘中 patch 写入 gap（开盘 vs 昨收），>3% 当日不追
+        # 开盘跳空高开规避（2026-08-17 用户需求）：盘中 patch 写入 gap（开盘 vs 昨收），>3% 不追高，
+        # 可等盘中回落至 3% 以内再考虑买入
         gap_badge = ""
         if d.get("gap") is not None and d["gap"] > 3:
             gap_badge = (f'<span class="badge" style="background:rgba(239,68,68,.15);color:#f87171;" '
-                         f'title="开盘跳空高开 {d["gap"]:.1f}%（vs 昨收），反转空间已被开盘吃掉，当日建议规避不追">'
-                         f'⚠ 高开{d["gap"]:.1f}% 规避</span>')
+                         f'title="开盘跳空高开 {d["gap"]:.1f}%（vs 昨收），反转空间被开盘吃掉，不追高；可等盘中回落至 3% 以内再考虑买入">'
+                         f'⚠ 高开{d["gap"]:.1f}% 规避（回落&lt;3%可买）</span>')
         rows += f'''<tr data-code="{d["code"]}" data-search="{d["name"]} {d["code"]} {d["industry"]} {board}" data-board="{d["perm"]}" data-market="{board}" data-industry="{d["industry"]}" data-tier="{d["tier"]}">
 <td style="text-align:center">{rank}</td>
 <td><b>{d["name"]}</b><br><span style="color:var(--faint);font-size:11px">{d["code"]}</span></td>
@@ -580,9 +581,9 @@ html = f"""<!doctype html>
 <!-- ============ 视图 C：全量池短线（与中长线同结构：统计条+表格+雷达卡） ============ -->
 {system_block(
   "view-short", "sys-short",
-  "⚡ 全量池短线", "auto", f"全市场短线信号 Top 池（数据截至 {SHORT_POOL_ASOF}）：股票=反转信号按权限分层各 Top10（主板/创业板/科创板各10，剔ST）｜ 基金=动量 Top10 · 短线分 = 动量30/量价25/通道25/波动20 · 回测参考见「监控总览」",
+  "⚡ 全量池短线", "auto", f"全市场短线信号 Top 池（数据截至 {SHORT_POOL_ASOF}）：股票=反转信号按权限分层，<b>仅保留买入信号（分≥50），不足 10 只不凑数</b>（主板/创业板/科创板各 ≤10，剔ST）｜ 基金=动量（分≥50 才入池）· 短线分 = 动量30/量价25/通道25/波动20 · 回测参考见「监控总览」",
   v9_short_items, "tbl-short", "card-tbl-short",
-  "信号池 = 回测买入清单：分数≥50 的 TopN 在轮动日全部买入 · 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览 · 基金行现价为 T-1 净值（场外基金净值次日公布）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：反转空间已被开盘吃掉，当日不追（9:30 盘中起生效）</b>",
+  "信号池 = 回测买入清单：分数≥50 的 TopN 在轮动日全部买入 · 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览 · 基金行现价为 T-1 净值（场外基金净值次日公布）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：不追高，可等盘中回落至 3% 以内再考虑买入（9:30 盘中起生效）</b>",
   extra_card=WATCH_CARD, score_sub="动量/量价/通道/波动",
   as_of=SHORT_POOL_ASOF, intraday_note=SHORT_POOL_INTRADAY,
   as_of_min=SHORT_POOL.get("intraday_ts") or SHORT_POOL_ASOF_MIN,
@@ -797,9 +798,12 @@ document.addEventListener('DOMContentLoaded',function(){{
   }});
   document.querySelectorAll('#sidenav a[data-anchor]').forEach(function(a){{
     a.addEventListener('click',function(e){{
-      e.preventDefault();switchView(a.getAttribute('data-anchor'));
-      document.querySelectorAll('#sidenav a[data-anchor]').forEach(function(x){{x.classList.toggle('active',x===a);}});}});
-  }});
+      e.preventDefault();var t=a.getAttribute('data-anchor');switchView(t);
+      document.querySelectorAll('#sidenav a[data-anchor]').forEach(function(x){{x.classList.toggle('active',x===a);}});
+      // 子项点击时父主项保持高亮（2026-08-17）
+      if(a.getAttribute('data-sub')&&a.parentNode&&a.parentNode.classList.contains('sn-sub')){{
+        var pm=document.querySelector('#sidenav a[data-anchor="'+t+'"]:not([data-sub])');
+        if(pm)pm.classList.add('active');}}}});}});
   initTable('tbl-v9', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});
   initTable('tbl-v8', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});
   initTable('tbl-short', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});

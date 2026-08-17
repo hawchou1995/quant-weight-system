@@ -56,6 +56,8 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 .sidenav a:hover{background:var(--card2);color:var(--text)}
 .sidenav a.active{background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(239,68,68,.15));color:var(--accent);font-weight:600}
 .sidenav .sn-sub{margin:0 0 8px 22px;display:flex;flex-direction:column;gap:2px}
+.sidenav .sn-sub.collapsed{display:none}
+.sidenav .sn-arrow{margin-left:auto;font-size:10px;color:var(--faint)}
 .sidenav .sn-sub a{padding:5px 10px;font-size:12px;color:var(--sub);border-radius:8px;font-weight:400}
 .sidenav .sn-sub a .dot-sub{width:4px;height:4px;border-radius:50%;background:var(--line);flex:none}
 .sidenav .sn-sub a:hover{color:var(--text);background:var(--card2)}
@@ -197,10 +199,11 @@ document.addEventListener('click',function(e){
 function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)return;
   var html='<div class="sn-logo"><span class="dot"></span>量化权重监控</div><div class="sn-sep"></div>';
   window.ENH.nav.forEach(function(it){
-    html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"><span class="ic">'+it[1]+'</span>'+it[2]+'</a>';
-    // 子章节（2026-08-17 用户需求）：点击先切视图再滚动到区块
     var subs=it[3];
-    if(subs&&subs.length){
+    var hasSubs=subs&&subs.length;
+    html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"'+(hasSubs?' data-toggle="1"':'')+'><span class="ic">'+it[1]+'</span>'+it[2]+(hasSubs?'<span class="sn-arrow">▾</span>':'')+'</a>';
+    // 子章节（2026-08-17 用户需求）：点击先切视图再滚动到区块；主项点击可折叠/展开
+    if(hasSubs){
       html+='<div class="sn-sub">';
       subs.forEach(function(s){html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'" data-sub="'+s[0]+'"><span class="dot-sub"></span>'+s[1]+'</a>';});
       html+='</div>';}});
@@ -227,17 +230,49 @@ function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)retu
           var el=document.getElementById(sub);
           if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
         },30);}
-      nav.querySelectorAll('a[data-anchor]').forEach(function(x){x.classList.toggle('active',x===a);});});});
-  // 滚动高亮：仅对可见元素生效（display:none 的视图跳过，避免视图切换模式下 active 乱跳）
+      // 主项折叠/展开：切到新视图自动展开；同视图重复点击 = 折叠切换
+      else if(a.getAttribute('data-toggle')&&a.nextElementSibling&&a.nextElementSibling.classList.contains('sn-sub')){
+        var grp=a.nextElementSibling;
+        var curMain=nav.querySelector('a[data-anchor]:not([data-sub]).active');
+        if(curMain&&curMain!==a){grp.classList.remove('collapsed');}
+        else{grp.classList.toggle('collapsed');}
+      }
+      nav.querySelectorAll('a[data-anchor]').forEach(function(x){x.classList.toggle('active',x===a);});
+      // 子项点击时父主项保持高亮
+      if(sub&&a.parentNode&&a.parentNode.classList.contains('sn-sub')){
+        var pm=nav.querySelector('a[data-anchor="'+t+'"]:not([data-sub])');
+        if(pm)pm.classList.add('active');}});});
+  // 滚动高亮：普通页按锚点滚动；视图切换模式按当前视图内区块高亮对应子导航（2026-08-17 用户需求）
   window.addEventListener('scroll',function(){
-    if(window.ENH&&window.ENH.NAV_SWITCH)return;   // 视图切换模式：滚动不更新 active
-    var anchors=window.ENH.nav.map(function(it){return it[0];});
-    var cur=anchors[0];
-    anchors.forEach(function(a){
-      var el=document.getElementById(a);
-      if(el&&el.offsetParent!==null&&el.getBoundingClientRect().top<=150)cur=a;});
+    if(!(window.ENH&&window.ENH.NAV_SWITCH)){
+      var anchors=window.ENH.nav.map(function(it){return it[0];});
+      var cur=anchors[0];
+      anchors.forEach(function(a){
+        var el=document.getElementById(a);
+        if(el&&el.offsetParent!==null&&el.getBoundingClientRect().top<=150)cur=a;});
+      nav.querySelectorAll('a[data-anchor]').forEach(function(a){
+        a.classList.toggle('active',a.getAttribute('data-anchor')===cur);});
+      return;}
+    var av=document.querySelector('.view.active');if(!av)return;
+    var hit=null;
+    nav.querySelectorAll('a[data-sub]').forEach(function(a){
+      var el=document.getElementById(a.getAttribute('data-sub'));
+      if(!el||!av.contains(el))return;
+      if(el.getBoundingClientRect().top<=140)hit=a;});
+    // 视图顶部回退：无区块命中时高亮当前视图的第一个子章节（2026-08-17）
+    if(!hit){
+      var curMain=null;
+      nav.querySelectorAll('a[data-anchor]:not([data-sub])').forEach(function(a){
+        if(window.VIEW_MAP&&window.VIEW_MAP[a.getAttribute('data-anchor')]===av.id)curMain=a;});
+      if(curMain&&curMain.nextElementSibling&&curMain.nextElementSibling.classList.contains('sn-sub')){
+        hit=curMain.nextElementSibling.querySelector('a[data-sub]');}
+    }
     nav.querySelectorAll('a[data-anchor]').forEach(function(a){
-      a.classList.toggle('active',a.getAttribute('data-anchor')===cur);});});}
+      if(a.getAttribute('data-sub')){a.classList.toggle('active',a===hit);return;}
+      var on=hit?hit.getAttribute('data-anchor')===a.getAttribute('data-anchor'):
+        (window.VIEW_MAP?window.VIEW_MAP[a.getAttribute('data-anchor')]===av.id:false);
+      a.classList.toggle('active',on);});
+    if(hit&&hit.parentNode&&hit.parentNode.classList.contains('sn-sub'))hit.parentNode.classList.remove('collapsed');});}
 
 /* ---------- 工具函数 ---------- */
 function fmtPct(v){if(v===null||v===undefined||isNaN(v))return '—';
