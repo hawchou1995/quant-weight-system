@@ -53,6 +53,15 @@ def tier_of(sc):
     return "清仓"
 
 
+def short_tier_of(sc):
+    """短线买入口径（与 build_short_pool.buy_tier 一致）：≥60 强买入 / ≥50 买入 / 其余不买"""
+    if sc >= 60:
+        return "强买入"
+    if sc >= 50:
+        return "买入"
+    return "不买"
+
+
 def load_ddf(c, perm):
     """按权限加载带特征列的 ddf（复用 build_enhanced_data 的加载器）"""
     key = ("sh" if c.startswith(("6", "5")) else "sz") + c
@@ -70,10 +79,9 @@ def t_plus_1(ddf, as_of):
 
 
 def load_details():
-    """从 enhanced_data.js 读标的详情（pool 标签/名称/权限）"""
+    """从 enhanced_data.js 读完整数据（details/meta.v9_tiers 等）"""
     js = (BASE / "enhanced_data.js").read_text(encoding="utf-8")
-    D = json.loads(js[len("window.ENH = "):-1])
-    return D["details"]
+    return json.loads(js[len("window.ENH = "):-1])
 
 
 def pool_codes(details, tag):
@@ -144,7 +152,11 @@ def cumulative_md(cum):
 
 def review(as_of=None, calc=None):
     t0 = time.time()
-    details = load_details()
+    ENH = load_details()
+    details = ENH["details"]
+    # 2026-08-17 修复：全量池权限按 v9_tiers 分组映射（基金组曾因 details.perm 默认 main 被误标"主板"）
+    _v9_tiers = ENH.get("meta", {}).get("v9_tiers", {}) or {}
+    _v9_perm = {c: g for g, codes in _v9_tiers.items() for c in codes}
     v9_codes = pool_codes(details, "v9")          # 全量池中/长线 40 只
     v8_codes = pool_codes(details, "v8")          # 固定池中/长线 24 只
     if as_of is None:
@@ -160,8 +172,9 @@ def review(as_of=None, calc=None):
     pools = []
     for c in v9_codes:
         d = details[c]
+        _perm = _v9_perm.get(c, d.get("perm", "main"))
         pools.append({"pool": "全量池中/长线", "code": c, "name": d["name"],
-                      "perm": d.get("perm", "main"), "board": d.get("board", "")})
+                      "perm": _perm, "board": d.get("board") or PERM_ZH.get(_perm, "")})
     for c in v8_codes:
         d = details[c]
         pools.append({"pool": "固定池中/长线", "code": c, "name": d["name"],
@@ -177,6 +190,7 @@ def review(as_of=None, calc=None):
     # ---- 逐标的复盘 ----
     calc_day = pd.Timestamp(calc) if calc else None
     rows = []
+    pending_funds = []   # 基金 T+1 净值未公布（T-1 口径，下次复盘补录）
     for it in pools:
         ddf = load_ddf(it["code"], it["perm"])
         if ddf is None:
@@ -187,17 +201,23 @@ def review(as_of=None, calc=None):
         r = ddf.loc[sig_t]
         if pd.isna(r["close"]) or r["close"] <= 0 or pd.isna(r.get("mom_12_1", np.nan)):
             continue
+        # 3) 信号分与买入判定
         if it["pool"] == "短线全量池":
             score = float(out["details"][it["code"]]["short_score"])
-            t1_ = tier_of(score)
+            t1_ = short_tier_of(score)
             buy_sig = score >= 50          # 强买入/买入
         else:
             score = float(V.score_row(r))  # v9/v8 中长线分
             t1_ = tier_of(score)
             buy_sig = score >= 60          # 轻仓加仓及以上
-        # 2) T+1 开盘买入（基金=净值）
+        # 2026-08-17 用户决策：全量池中/长线、短线池 = 买入清单——不满足买入条件的标的直接不入日志（不凑数）
+        if not buy_sig and it["pool"] != "固定池中/长线":
+            continue
+        # 4) T+1 开盘买入（基金=净值）
         t1 = t_plus_1(ddf, sig_t)
         if t1 is None:
+            if it["perm"] == "fund":
+                pending_funds.append(it["code"])   # 基金净值 T+1 未公布 → 待确认
             continue
         if calc_day is not None:
             avail = ddf.index[ddf.index <= calc_day]
@@ -235,6 +255,8 @@ def review(as_of=None, calc=None):
     md_lines.append("| 池 | 标的 | 买入信号 | 🟢吃到 | 🔴被套 | ⚪持平 | 胜率 | 平均收益 | 最大亏 | 回测基准 |")
     md_lines.append("|---|---|---|---|---|---|---|---|---|---|")
     defects, pool_notes = [], []
+    if pending_funds:
+        pool_notes.append(f"⏳ 基金净值按 T+1 公布：{len(pending_funds)} 只基金（{'、'.join(pending_funds[:8])}{'…' if len(pending_funds) > 8 else ''}）待 T+1 净值确认，本次复盘跳过，下次复盘补录")
     groups = ["全量池中/长线", "固定池中/长线", "短线全量池"]
     for grp in groups:
         rs = [r for r in rows if r["pool"] == grp]
@@ -294,10 +316,10 @@ def review(as_of=None, calc=None):
         ma5_down = sum(1 for r in buy_all if not r["ma5_above"])
         if ma5_down / len(buy_all) > 0.5:
             defects.append(f"⚠️ **MA5 破位率 {ma5_down}/{len(buy_all)}（{ma5_down/len(buy_all)*100:.0f}% > 50%）**：趋势恶化，次日应批量减仓")
-        deep = [r for r in buy_all if r["pct"] < -5]
+        deep = [r for r in buy_all if r["pct"] < -8]
         if deep:
             names = "、".join(f"{r['name']}({r['pct']:.1f}%)" for r in deep[:5])
-            defects.append(f"🔴 **深套标的**（<-5%）：{names}")
+            defects.append(f"🔴 **深套标的**（<-8%，回测单笔分布 P1=-6.0%，-8% 属极值尾部）：{names}")
     md_lines.append("### 🔍 缺陷检测（grill）")
     if pool_notes:
         md_lines.extend([f"- {x}" for x in pool_notes])
