@@ -2,15 +2,15 @@
 """每日复盘引擎 v2（三池全量）
 ============================================
 复盘三个监控池的全部标的：
-  1. 全量池中/长线（普适版 v9，50 只：主板10+创业板10+科创板10+ETF10+基金10）
-  2. 固定池中/长线（个人版 v8，30 只：20股+5ETF+5基金）
-  3. 短线全量池（30 只：股票反转10 + ETF动量10 + 基金动量10）
+  1. 全量池中/长线（普适版 v9，40 只：主板10+创业板10+科创板10+基金10，2026-08-17 去 ETF）
+  2. 固定池中/长线（个人版 v8，24 只：20股+4基金，去 ETF/014002/020900）
+  3. 短线全量池（40 只：股票反转按权限各10【主板/创业板/科创板】 + 基金动量10，去 ETF）
 
 流程（每个池）：
 1. as_of 信号日：用当日行情重算信号分（v9/v8 用 V.score_row，短线用 calc_signals）
 2. 买入信号判定：v9/v8 = 档位 ≥ 轻仓加仓（分≥60）；短线 = 短分 ≥ 50（强买入/买入）
 3. 买入信号标的：T+1 开盘买入（基金=T+1 净值）→ 计算日收盘 → 收益/MA5 → 🟢吃到/🔴被套/⚪持平
-4. 缺陷检测（grill）：各池胜率 vs 回测基准（v9 48.1% / v8 57.1% / 短线按资产 54%）、
+4. 缺陷检测（grill）：各池胜率 vs 回测基准（v9 48.1% / v8 57.1% / 短线按板块 46.8~57.8%）、
    单池全败、MA5 破位>50%、深套<-5%
 5. 输出 review/<calc>_sig<as_of>.md + review/review_index.json
 
@@ -33,17 +33,17 @@ import v8_selector as V
 REVIEW_DIR = BASE / "review"
 REVIEW_DIR.mkdir(exist_ok=True)
 
-# 回测基准胜率（各池最优参数实测）
+# 回测基准胜率（各池最优参数实测；短线按板块，2026-08-17 去 ETF）
 BENCH_WIN = {
     "全量池中/长线": json.load(open(BASE / "v9_auto_summary.json", encoding="utf-8"))["summary"]["win_rate_pct"],
     "固定池中/长线": json.load(open(BASE / "v8_lite_summary.json", encoding="utf-8"))["summary"]["win_rate_pct"],
-    "短线全量池-股票": 53.7, "短线全量池-ETF": 54.3, "短线全量池-基金": 54.1,
+    "短线全量池-主板": 46.8, "短线全量池-创业板": 48.1, "短线全量池-科创板": 57.8, "短线全量池-基金": 55.5,
 }
 
 TIER_W = [("满仓加仓", 75), ("轻仓加仓", 60), ("观望", 45), ("减至半仓", 30), ("清仓", 0)]
 
-# 权限 → 板块中文名（与三个监控池统一口径）
-PERM_ZH = {"main": "主板", "gem": "创业板", "star": "科创板", "etf": "ETF", "fund": "基金"}
+# 权限 → 板块中文名（与三个监控池统一口径，2026-08-17 去 etf）
+PERM_ZH = {"main": "主板", "gem": "创业板", "star": "科创板", "fund": "基金"}
 
 
 def tier_of(sc):
@@ -58,8 +58,6 @@ def load_ddf(c, perm):
     key = ("sh" if c.startswith(("6", "5")) else "sz") + c
     if perm in ("main", "gem", "star"):
         return A.pool_all.get(key)
-    if perm == "etf":
-        return E.load_etf_df(c)
     d = E.load_fund_cache_df(c)
     if d is None:
         d = E.load_hist_df(c)
@@ -147,8 +145,8 @@ def cumulative_md(cum):
 def review(as_of=None, calc=None):
     t0 = time.time()
     details = load_details()
-    v9_codes = pool_codes(details, "v9")          # 全量池中/长线 50 只
-    v8_codes = pool_codes(details, "v8")          # 固定池中/长线 30 只
+    v9_codes = pool_codes(details, "v9")          # 全量池中/长线 40 只
+    v8_codes = pool_codes(details, "v8")          # 固定池中/长线 24 只
     if as_of is None:
         cur = json.load(open(BASE / "short_pool.json", encoding="utf-8"))
         as_of = cur["as_of"]
@@ -171,7 +169,7 @@ def review(as_of=None, calc=None):
     for grp, codes in out["tiers"].items():
         for c in codes:
             d = out["details"][c]
-            perm = "etf" if grp == "ETF" else ("fund" if grp == "基金" else "main")
+            perm = {"主板": "main", "创业板": "gem", "科创板": "star", "基金": "fund"}.get(grp, "main")
             pools.append({"pool": "短线全量池", "code": c, "name": d["name"],
                           "perm": perm, "board": grp})
     print(f"三池标的 {len(pools)} 只", flush=True)
@@ -249,8 +247,8 @@ def review(as_of=None, calc=None):
         avg = sum(r["pct"] for r in buy) / len(buy) if buy else None
         mx = min(r["pct"] for r in buy) if buy else None
         if grp == "短线全量池":
-            # 整体基准 = 资产细分基准按买入信号数加权
-            _w = [BENCH_WIN[f"短线全量池-{s}"] for s in ("股票", "ETF", "基金")
+            # 整体基准 = 板块细分基准按买入信号数加权
+            _w = [BENCH_WIN[f"短线全量池-{s}"] for s in ("主板", "创业板", "科创板", "基金")
                   for _ in [1] if any(r["board"] == s for r in rs)]
             bench = sum(_w) / len(_w) if _w else 54.0
         else:
@@ -264,8 +262,8 @@ def review(as_of=None, calc=None):
                 defects.append(f"⚠️ **{grp}胜率偏低**：{wr:.0f}% vs 回测基准 {bench}%（偏离 >15pct）")
             if all(r["pct"] < 0 for r in buy):
                 defects.append(f"🔴 **{grp}买入信号全败**：{len(buy)} 只全部被套，信号缺陷")
-    # 短线池按资产细分
-    for sub in ("股票", "ETF", "基金"):
+    # 短线池按板块细分
+    for sub in ("主板", "创业板", "科创板", "基金"):
         rs = [r for r in rows if r["pool"] == "短线全量池" and r["board"] == sub]
         if not rs:
             continue
