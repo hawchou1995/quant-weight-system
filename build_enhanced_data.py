@@ -465,8 +465,9 @@ def load_curve(f):
 # ---------------- 全量池中/长线年跟踪池（2026-08-17 用户需求） ----------------
 def maintain_track_v9():
     """上榜跟踪 1 年：v9_tiers 上榜标的自动入池。
-    规则（2026-08-18 用户拍板：昨日收盘上池标的信号隔离 + 每次重新上榜刷新入池/跟踪/出池时间）：
-      新上榜/再上榜 → 当日先入 pending（不入正式池，不参与信号），下一个收盘确认仍在榜后才转正式入池；
+    规则（2026-08-18 用户拍板：昨日收盘上池标的信号隔离 + 每次重新上榜刷新入池/跟踪/出池时间；
+          2026-08-19 用户拍板：进标的池=默认全买 → 隔日无论是否仍在榜一律转正式，保证跟踪卖出信号）：
+      新上榜/再上榜 → 当日先入 pending（不入正式池，不参与信号），下一个收盘无条件转正式入池；
       持续在池 → 保持 entry，更新 last_seen/exit；掉出池保留最后快照；entry 满 365 天 → 移除；
       每次转正式/重新上榜 → entry=确认收盘日、last_seen=今日、exit=entry+365（三个时间刷新）。
     返回 (track, pending)：track 只含正式池成员（渲染直接遍历），pending 独立字段不入正式池。"""
@@ -517,22 +518,26 @@ def maintain_track_v9():
                 rec["last"] = snap
             track[code] = rec
             pending.pop(code, None)
-    # 2) 旧 pending → 正式：只在上一收盘已在 pending（old_pending）且今日仍在榜 → 转 active
+    # 2) 旧 pending → 正式：隔日无论是否仍在榜一律转正式
+    #    （2026-08-19 用户拍板：进标的池=默认全买 → 必须跟踪卖出信号 → 掉榜也须入池跟踪）
     for code in list(old_pending.keys()):
-        if code in today_codes and code not in track:
-            d = details.get(code, {}) or {}
-            pe = pending.get(code) or old_pending[code]
-            entry = today                       # 确认收盘日
-            track[code] = {"entry": entry, "last_seen": today, "exit": _exit(entry),
-                           "status": "active",
-                           "pool": pe.get("pool", d.get("board", "")),
-                           "first_seen": pe.get("first_seen", str(_as_of_day.date())),
-                           "last": pe.get("last") or {"px": d.get("px"), "chg": d.get("chg"),
-                                            "score": d.get("score"), "tier": d.get("tier"), "date": today}}
-            pending.pop(code, None)
-        # 今日掉榜且从未转正 → 留待下面按 entry_candidate 超期清理（不入正式池）
+        if code in track:
+            continue
+        if code not in pending:
+            continue                        # 已在 1) 今日在榜处理并转过正式
+        d = details.get(code, {}) or {}
+        pe = pending.get(code) or old_pending[code]
+        entry = today                       # 确认收盘日
+        track[code] = {"entry": entry, "last_seen": today, "exit": _exit(entry),
+                       "status": "active",
+                       "pool": pe.get("pool", d.get("board", "")),
+                       "first_seen": pe.get("first_seen", str(_as_of_day.date())),
+                       "last": pe.get("last") or {"px": d.get("px"), "chg": d.get("chg"),
+                                        "score": d.get("score"), "tier": d.get("tier"), "date": today}}
+        pending.pop(code, None)
     # 3) 正式池中今日不在榜：保留快照、不动 entry（365 自动出池）
-    # 4) 清理 entry 满 365 天（出池时间 = entry+365）与 pending 超期（7 天未确认丢弃）
+    # 4) 清理 entry 满 365 天（出池时间 = entry+365）与 pending 超期（7 天未确认丢弃；
+    #    ⚠ 不再因「今日不在榜」清除 pending——隔日已无条件转正式，滞留 pending 的只有今日新上榜待明日转正的）
     cutoff = pd.Timestamp(last_day.date() - timedelta(days=365))
     track = {c: r for c, r in track.items()
              if pd.Timestamp(str(r.get("entry", today))) > cutoff}

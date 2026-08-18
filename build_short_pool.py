@@ -298,9 +298,10 @@ def build(as_of=None):
     """计算并写文件（short_pool.js / short_signals.js / short_pool.json）"""
     out, sigs = calc_signals(as_of)
     # ---- 自动跟踪池（2026-08-18 用户需求：与中长线一致，隔日入池 + 三时间）-----
-    # 上方表格可买入标的（强买入/买入，分≥50）上榜次日收盘确认后入池，30 天后自动移除（exit=entry+30）。
-    # 新上榜先入 track_pending_short（待确认，不入正式池、不参与信号），下个收盘确认仍在榜才转正式（entry=确认日）；
-    # 每次重新上榜/转正式刷新【入池 entry / 跟踪 last_seen / 出池 exit=entry+30】三时间。
+    # 上方表格可买入标的（强买入/买入，分≥50）上榜次日收盘无条件转正式跟踪（30 天后自动移除 exit=entry+30）。
+    # ⚠ 2026-08-19 用户拍板：进标的池=默认全买 → 必须跟踪卖出信号 → 隔日无论是否仍在榜一律转正式入池；
+    # 新上榜先入 track_pending_short（待确认，不入正式池、不参与信号），下个收盘无条件转正式（entry=确认日）；
+    # 每次转正式/重新上榜刷新【入池 entry / 跟踪 last_seen / 出池 exit=entry+30】三时间。
     try:
         _old_full = json.load(open(BASE / "short_pool.json", encoding="utf-8"))
     except Exception:
@@ -361,9 +362,23 @@ def build(as_of=None):
                                "last": _snap}
                 pending.pop(code, None)
             else:
-                # 全新上榜 → 入 pending（今日不入正式池、不参与信号，隔日确认）
+                # 全新上榜 → 入 pending（今日不入正式池、不参与信号，隔日无条件转正）
                 pending[code] = {"entry_candidate": today, "first_seen": today,
                                  "pool": _bd, "type": _snap["type"], "last": _snap}
+    # ②' 老 pending → 正式：隔日无论是否仍在榜一律转正式（2026-08-19 用户拍板：
+    #     进标的池=默认全买 → 必须跟踪卖出信号 → 掉榜也须入池跟踪）
+    for code in list(old_pending.keys()):
+        if code in track:
+            continue
+        if code not in pending:
+            continue                        # 已在 ② 中今日在池处理并转过正式
+        pe = pending[code]
+        _pd_ = pe.get("pool", "")
+        _ps_ = pe.get("last") or {"name": code, "pool": _pd_}
+        track[code] = {"entry": today, "last_seen": today, "exit": _exit(today), "status": "active",
+                       "pool": _pd_, "type": pe.get("type") or ("fund" if _pd_ == "基金" else "stock"),
+                       "first_seen": pe.get("first_seen", today), "last": _ps_}
+        pending.pop(code, None)
     # ③ 一次性历史补偿：跟踪功能上线前（8/14 池）出现过的可买入标的，直接入正式池（历史事实，entry=2026-08-14）
     if not _old_full.get("_backfilled_0814"):
         try:
@@ -376,9 +391,10 @@ def build(as_of=None):
             print(f"8/14 池历史补偿完成，正式跟踪池累计 {len(track)} 只、待确认 {len(pending)} 只", flush=True)
         except Exception as _e:
             print("8/14 池历史补偿失败:", _e, flush=True)
-    # ④ pending 兜底：掉出信号池且从未转正 → 移除；满 30 天移除
+    # ④ pending 兜底：只按 30 天到期清理；不再因「今日不在池」清除（隔日已无条件转正式的标的不该滞留 pending；
+    #     留在 pending 的只有「今日新上榜待明日转正」的，强制保留以便隔日入池跟踪卖出）
     cutoff = pd.Timestamp.now() - pd.Timedelta(days=30)
-    pending = {c: v for c, v in pending.items() if c in _today_codes and pd.Timestamp(v.get("entry_candidate", today)) > cutoff}
+    pending = {c: v for c, v in pending.items() if pd.Timestamp(v.get("entry_candidate", today)) > cutoff}
     track = {c: v for c, v in track.items() if pd.Timestamp(v.get("entry", today)) > cutoff}
     out["track"] = track
     out["track_pending_short"] = pending
