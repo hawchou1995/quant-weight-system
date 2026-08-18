@@ -515,10 +515,11 @@ def maintain_track_v9():
     return track
 
 
-s_auto = json.load(open(BASE / "v9_auto_summary.json", encoding="utf-8"))["summary"]
+_a80_json = json.load(open(BASE / "v9_auto_a80.json", encoding="utf-8"))
+s_auto = _a80_json["summary"]   # 2026-08-18 v5.11.15：A80_M80 Aroon 强趋势过滤
 s_lite = json.load(open(BASE / "v8_lite_summary.json", encoding="utf-8"))["summary"]
 
-v_auto = load_curve("v9_auto_equity.csv")
+v_auto = _a80_json["eq"]   # A80_M80 equity（绝对值，直接取值）
 v_lite = load_curve("v8_lite_equity.csv")
 
 # 历史报告列表
@@ -538,7 +539,7 @@ out = {
         for c, d in sorted(details.items(), key=lambda kv: -kv[1]["score"])
     ],
     "systems": {
-        "v9_auto": {"label": "普适版", "badge": "全市场自动池 · 无人工选池",
+        "v9_auto": {"label": "普适版", "badge": "全市场自动池 · 无人工选池 · Aroon强趋势过滤(A80_M80)",
                      "summary": s_auto, "equity": [round(float(x), 2) for x in v_auto]},
         "v8_lite": {"label": "个人版", "badge": "自选池 40 只 · 权限分层 · Top4 轮动",
                      "summary": s_lite, "equity": [round(float(x), 2) for x in v_lite]},
