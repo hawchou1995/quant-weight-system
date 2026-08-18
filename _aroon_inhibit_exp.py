@@ -17,9 +17,12 @@ import v8_selector as V
 import v9_auto as A
 
 
-def run_auto_inhibit(aroon_th=None, mom_th=None, fac=0.6, cap=False, start=None, end=None, **kw):
+def run_auto_inhibit(aroon_th=None, mom_th=None, fac=0.6, cap=False, start=None, end=None,
+                     aroon_th_map=None, **kw):
     """基于 v9_auto.run_auto 的 Aroon 抑制变体（移除累计置信 biass 一致）
-    start/end：可指定回测区间（默认 V.START/V.END），用于样本外稳健性校验。"""
+    start/end：可指定回测区间（默认 V.START/V.END），用于样本外稳健性校验。
+    aroon_th_map：dict date->(aroon_th, mom_th)，按日切换阈值（状态自适应）。
+                   map 值为 None 表示当「市场强」时关闭抑制（完全不放 Aroon 限制）。"""
     import v9_auto as MA
     pool_all = MA.pool_all
     top_n = kw.get("top_n", 4); hold_days = kw.get("hold_days", 21)
@@ -126,16 +129,22 @@ def run_auto_inhibit(aroon_th=None, mom_th=None, fac=0.6, cap=False, start=None,
                         sc = float(V.score_row(r))
                     except Exception:
                         continue
-                    # ===== Aroon 高位抑制注入 =====
-                    if aroon_th is not None and mom_th is not None:
-                        _a = r.get('aroon_osc')
-                        _m = r.get('mom_12_1')
-                        if not pd.isna(_a) and not pd.isna(_m):
-                            if float(_a) < aroon_th and float(_m) > mom_th:
-                                if cap:
-                                    sc = min(sc, 59.0)   # 封顶不入买入
-                                else:
-                                    sc *= fac          # 抑制因子
+                    # ===== Aroon 高位抑制注入（支持按日状态阈值映射）=====
+                    if aroon_th_map is not None:
+                        _day_th = aroon_th_map.get(str(day.date()))
+                    else:
+                        _day_th = (aroon_th, mom_th) if (aroon_th is not None and mom_th is not None) else None
+                    if _day_th is not None:
+                        _ath, _mth = _day_th
+                        if _ath is not None and _mth is not None:
+                            _a = r.get('aroon_osc')
+                            _m = r.get('mom_12_1')
+                            if not pd.isna(_a) and not pd.isna(_m):
+                                if float(_a) < _ath and float(_m) > _mth:
+                                    if cap:
+                                        sc = min(sc, 59.0)   # 封顶不入买入
+                                    else:
+                                        sc *= fac          # 抑制因子
                     if sc < thresh_now: continue
                     cand.append((code, sc))
                 cand.sort(key=lambda kv: -kv[1])
