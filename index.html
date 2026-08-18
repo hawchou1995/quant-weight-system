@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>标的监控看板（数据截至 2026-08-18 · 构建 2026-08-18 23:14）</title>
+<title>标的监控看板（数据截至 2026-08-18 · 构建 2026-08-18 23:34）</title>
 <style>
 :root{
   --bg:#f3f4f6; --card:#ffffff; --card2:#f9fafb; --border:#e5e7eb; --line:#f0f1f3;
@@ -2233,7 +2233,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 <div class="card" id="watch-v9-card">
 <h2>📌 全量池中/长线跟踪 <span class="badge badge-auto">上榜跟踪 1 年 · 再上榜 +1 年</span> </h2>
-<div class="sub">上方全量池表<b>上榜标的</b>（v9_tiers：main/gem/star/fund）每次收盘自动加入跟踪，持续 1 年（365 天）；掉出池后保留至 entry+365 天（显示最后收盘快照）；<b>再次上榜 → 从再上榜日起重新计时 1 年</b> · 数据截至 2026-08-18（收盘）</div>
+<div class="sub">上方全量池表<b>上榜标的</b>（v9_tiers：main/gem/star/fund）上榜次日收盘确认后自动加入跟踪，持续 1 年（365 天）；<b>2026-08-18 起新上榜先入「待确认」隔日入池</b>（隔离当日收盘信号）；每次重新上榜刷新【入池/跟踪/出池】时间 · 数据截至 2026-08-18（收盘）</div>
+<div id="watch-v9-pending"></div>
 <div class="toolbar" id="watch-v9-bar">
 <input type="text" id="watch-v9-q" name="watch-v9-q" placeholder="🔍 搜索代码 / 名称…" autocomplete="off" spellcheck="false" aria-label="搜索跟踪标的（代码或名称）">
 <select id="watch-v9-f-pool" class="flt" title="板块筛选" aria-label="按板块筛选"><option value="">全部板块</option></select>
@@ -4094,7 +4095,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 
 </div>
-<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-18 23:14 · 版本 v5.11.8 · 数据截至 2026-08-18 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-18 23:34 · 版本 v5.11.8 · 数据截至 2026-08-18 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
@@ -4627,6 +4628,21 @@ document.addEventListener('DOMContentLoaded',function(){
     var t9=E.meta&&E.meta.v9_tiers?E.meta.v9_tiers:{};
     Object.keys(t9).forEach(function(g){(t9[g]||[]).forEach(function(c){inPool[c]=1;});});
     var now=new Date();var rows=[];
+    // 待确认（pending）：今日/前几日上榜、下个收盘确认后入正式池
+    var pendBox=document.getElementById('watch-v9-pending');
+    var pnd=E.track_pending_v9||{};
+    var pkeys=Object.keys(pnd);
+    if(pendBox){
+      if(pkeys.length){
+        var ph='<div class="sub" style="margin-bottom:6px;color:#d97706">⏳ 待确认 '+pkeys.length+' 只 —— 上榜后下一收盘确认在榜再入池（隔离当日信号）</div><table class="tbl"><tbody>';
+        pkeys.forEach(function(c){
+          var p=pnd[c]||{};var last=p.last||{};var nm=last.name||(E.details&&E.details[c]&&E.details[c].name)||c;
+          ph+='<tr><td>'+c+'</td><td>'+nm+'</td><td style="text-align:center">'+p.pool+'</td><td style="text-align:center">'+(p.entry_candidate||'—')+'</td><td style="text-align:right">'+(last.px!==undefined&&last.px!==null?last.px.toFixed(2):'—')+'</td><td style="text-align:center">'+(last.tier||'—')+'</td></tr>';
+        });
+        ph+='</tbody></table>';
+        pendBox.innerHTML=ph;
+      } else {pendBox.innerHTML='';}
+    }
     Object.keys(track).forEach(function(code){
       var t=track[code]||{};var entry=t.entry?new Date(String(t.entry).replace(/-/g,'/')):null;
       var age=entry?Math.floor((now-entry)/86400000):0;
@@ -4675,12 +4691,13 @@ document.addEventListener('DOMContentLoaded',function(){
     var cnt=document.getElementById('watch-v9-count');
     if(cnt)cnt.textContent='筛选 '+filtered.length+' / 共 '+rows.length+' 只';
     if(!filtered.length){box.innerHTML='<div class="sub" style="color:var(--faint)">无匹配标的 —— 调整搜索/筛选条件后重试</div>';return;}
-    var h='<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>板块</th><th style="text-align:center">入池日期</th><th style="text-align:center">已跟踪</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">权重分</th><th style="text-align:center">档位</th><th style="text-align:center">状态</th></tr></thead><tbody>';
+    var h='<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>板块</th><th style="text-align:center">入池日期</th><th style="text-align:center">出池日期</th><th style="text-align:center">已跟踪</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">权重分</th><th style="text-align:center">档位</th><th style="text-align:center">状态</th></tr></thead><tbody>';
     filtered.forEach(function(r){
       var rec=r.rec;var px=(rec.px!==undefined&&rec.px!==null)?rec.px:null;
       var ageS=r.age+' 天 / 剩 '+(365-r.age)+' 天';
+      var exitT=t.exit||'—';
       var status=r.inPool?'<span style="color:#dc2626;font-weight:600">在池</span>':'<span style="color:var(--faint)">已掉出池（观察）</span>';
-      h+='<tr><td>'+r.code+'</td><td>'+(rec.name||'—')+'</td><td>'+r.pool+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+ageS+'</td>'+
+      h+='<tr><td>'+r.code+'</td><td>'+(rec.name||'—')+'</td><td>'+r.pool+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+exitT+'</td><td style="text-align:center">'+ageS+'</td>'+
          '<td style="text-align:right">'+(px===null?'—':px.toFixed(2))+'</td>'+
          '<td style="text-align:right" class="'+(r.chg===null?'':(r.chg>0?'up':'down'))+'">'+(r.chg===null?'—':(r.chg>0?'+':'')+r.chg.toFixed(2)+'%')+'</td>'+
          '<td style="text-align:center">'+(r.score===null?'—':r.score.toFixed(1))+'</td>'+
