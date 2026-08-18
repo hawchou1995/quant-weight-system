@@ -446,8 +446,10 @@ def md_to_html(md):
 REVIEW_LIST_HTML = ""
 _rf = BASE / "review" / "review_index.json"
 _ridx = json.loads(_rf.read_text(encoding="utf-8")) if _rf.exists() else {"reviews": []}
+# 2026-08-18 晚：按日期降序（最新在前），最新一篇默认展开
+_rev_sorted = sorted(_ridx.get("reviews", []), key=lambda r: r.get("date", ""), reverse=True)
 _seen_rf = set()
-for _i, _r in enumerate(_ridx.get("reviews", [])):
+for _i, _r in enumerate(_rev_sorted):
     _f = BASE / "review" / _r["file"]
     if not _f.exists() or _r["file"] in _seen_rf:
         continue
@@ -460,6 +462,32 @@ for _i, _r in enumerate(_ridx.get("reviews", [])):
                          f'<div class="rev-body">{md_to_html(_f.read_text(encoding="utf-8"))}</div></details>\n')
 if not REVIEW_LIST_HTML:
     REVIEW_LIST_HTML = '<div class="sub" style="color:var(--faint)">暂无复盘记录 —— 每天收盘后运行 <code>python refresh_daily.py</code> 自动生成</div>'
+
+# 累计总览独立卡片（2026-08-18 晚：内嵌视图顶部只显示一份，data 来自 cumulative.json）
+_rev_cum = ""
+_cum_f = BASE / "review" / "cumulative.json"
+if _cum_f.exists():
+    _cdata = json.loads(_cum_f.read_text(encoding="utf-8"))
+    if _cdata.get("pools"):
+        _crows = []
+        _CT = {"n": 0, "buy": 0, "wins": 0, "losses": 0, "flat": 0, "sum_pct": 0.0}
+        for _cn, _ca in _cdata["pools"].items():
+            _cwr = (_ca["wins"] / _ca["buy"] * 100) if _ca.get("buy") else 0
+            _cavg = (_ca["sum_pct"] / _ca["buy"]) if _ca.get("buy") else 0
+            _crows.append(f"<tr><td>{_cn}</td><td>{_ca['n']}</td><td>{_ca['buy']}</td><td>{_ca['wins']}</td>"
+                          f"<td>{_ca['losses']}</td><td>{_ca['flat']}</td><td>{_cwr:.0f}%</td><td>{_cavg:+.2f}%</td></tr>")
+            for _k in _CT:
+                _CT[_k] += _ca[_k]
+        if _CT["buy"]:
+            _crows.append(f"<tr class='rev-cum-total'><td>合计</td><td>{_CT['n']}</td><td>{_CT['buy']}</td><td>{_CT['wins']}</td>"
+                          f"<td>{_CT['losses']}</td><td>{_CT['flat']}</td><td>{_CT['wins']/_CT['buy']*100:.0f}%</td>"
+                          f"<td>{_CT['sum_pct']/_CT['buy']:+.2f}%</td></tr>")
+        _rev_cum = (f'<div class="rev-cum"><div class="rev-cum-title">📈 累计总览'
+                    f'<span class="rev-cum-badge">自 {_cdata.get("since","—")} · {_cdata.get("count",0)} 篇</span></div>'
+                    f'<div class="rev-cum-sub">三池累计信号标的（防重累加；短线·基金 T+1 净值未出计持平）</div>'
+                    f'<table class="tbl"><thead><tr><th>池</th><th>累计标的</th><th>累计买入</th><th>🟢吃到</th>'
+                    f'<th>🔴被套</th><th>⚪持平</th><th>累计胜率</th><th>累计均收</th></tr></thead>'
+                    f'<tbody>{"".join(_crows)}</tbody></table></div>')
 
 CHANGELOG_HTML = ""
 _cf = BASE / "changelog.md"
@@ -524,6 +552,13 @@ html = f"""<!doctype html>
 .rev-flag{{font-size:13px}}
 .rev-meta{{color:var(--faint);font-size:12px}}
 .rev-body{{padding:14px 16px}}
+/* 累计总览独立卡片（2026-08-18 晚：内嵌视图顶部仅一份） */
+.rev-cum{{background:linear-gradient(135deg,var(--card2),var(--card));border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:14px}}
+.rev-cum-title{{font-size:16px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:10px;margin-bottom:6px}}
+.rev-cum-badge{{font-size:11px;color:var(--faint);background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2px 10px;font-weight:400}}
+.rev-cum-sub{{color:var(--faint);font-size:12px;margin-bottom:8px}}
+.rev-cum .tbl th{{background:var(--card2)}}
+.rev-cum .tbl tbody tr.rev-cum-total td{{font-weight:700;background:var(--card2)}}
 .rel-ver{{font-weight:700;font-size:15px;color:var(--accent);letter-spacing:.5px}}
 .rel-date{{color:var(--faint);font-size:12px;background:var(--card);border:1px solid var(--border);padding:2px 10px;border-radius:20px}}
 .rel-body{{color:var(--text);font-size:13px;line-height:1.75}}
@@ -634,9 +669,10 @@ html = f"""<!doctype html>
 
 <!-- ============ 视图 E：复盘日志（内嵌，与各池同形态） ============ -->
 <div class="view" id="view-review">
+{_rev_cum}
 <div class="card">
-<h2>📋 复盘日志 <span class="badge badge-auto">{len(_ridx.get("reviews", []))} 篇</span></h2>
-<div class="sub">每个交易日复盘：信号标的哪些吃到 / 哪些被套 / 是否符合系统设计（对比回测基准）· 发现设计缺陷 → 启动系统更新并登记于「📝 更新日志」· 点击日期展开/折叠当日复盘详情</div>
+<h2>📋 复盘日志 <span class="badge badge-auto">{len(_rev_sorted)} 篇</span></h2>
+<div class="sub">每个交易日复盘：信号标的哪些吃到 / 哪些被套 / 是否符合系统设计（对比回测基准）· 发现设计缺陷 → 启动系统更新并登记于「📝 更新日志」· 点击日期展开/折叠当日复盘详情（日期降序，最新在前）</div>
 {REVIEW_LIST_HTML}
 </div>
 </div>

@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>标的监控看板（数据截至 2026-08-18 · 构建 2026-08-18 19:00）</title>
+<title>标的监控看板（数据截至 2026-08-18 · 构建 2026-08-18 19:20）</title>
 <style>
 :root{
   --bg:#f3f4f6; --card:#ffffff; --card2:#f9fafb; --border:#e5e7eb; --line:#f0f1f3;
@@ -177,6 +177,13 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 .rev-flag{font-size:13px}
 .rev-meta{color:var(--faint);font-size:12px}
 .rev-body{padding:14px 16px}
+/* 累计总览独立卡片（2026-08-18 晚：内嵌视图顶部仅一份） */
+.rev-cum{background:linear-gradient(135deg,var(--card2),var(--card));border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:14px}
+.rev-cum-title{font-size:16px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.rev-cum-badge{font-size:11px;color:var(--faint);background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2px 10px;font-weight:400}
+.rev-cum-sub{color:var(--faint);font-size:12px;margin-bottom:8px}
+.rev-cum .tbl th{background:var(--card2)}
+.rev-cum .tbl tbody tr.rev-cum-total td{font-weight:700;background:var(--card2)}
 .rel-ver{font-weight:700;font-size:15px;color:var(--accent);letter-spacing:.5px}
 .rel-date{color:var(--faint);font-size:12px;background:var(--card);border:1px solid var(--border);padding:2px 10px;border-radius:20px}
 .rel-body{color:var(--text);font-size:13px;line-height:1.75}
@@ -3766,22 +3773,202 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 
 <!-- ============ 视图 E：复盘日志（内嵌，与各池同形态） ============ -->
 <div class="view" id="view-review">
+<div class="rev-cum"><div class="rev-cum-title">📈 累计总览<span class="rev-cum-badge">自 2026-08-14 · 3 篇</span></div><div class="rev-cum-sub">三池累计信号标的（防重累加；短线·基金 T+1 净值未出计持平）</div><table class="tbl"><thead><tr><th>池</th><th>累计标的</th><th>累计买入</th><th>🟢吃到</th><th>🔴被套</th><th>⚪持平</th><th>累计胜率</th><th>累计均收</th></tr></thead><tbody><tr><td>全量池中/长线</td><td>89</td><td>89</td><td>63</td><td>26</td><td>0</td><td>71%</td><td>+2.94%</td></tr><tr><td>固定池中/长线</td><td>48</td><td>26</td><td>12</td><td>14</td><td>0</td><td>46%</td><td>+0.38%</td></tr><tr><td>短线全量池</td><td>85</td><td>85</td><td>44</td><td>30</td><td>11</td><td>52%</td><td>+1.18%</td></tr><tr><td>短线·主板</td><td>30</td><td>30</td><td>20</td><td>10</td><td>0</td><td>67%</td><td>+1.99%</td></tr><tr><td>短线·创业板</td><td>29</td><td>29</td><td>13</td><td>15</td><td>1</td><td>45%</td><td>+0.62%</td></tr><tr><td>短线·科创板</td><td>16</td><td>16</td><td>11</td><td>5</td><td>0</td><td>69%</td><td>+1.45%</td></tr><tr><td>短线·基金</td><td>10</td><td>10</td><td>0</td><td>0</td><td>10</td><td>0%</td><td>+0.00%</td></tr><tr class='rev-cum-total'><td>合计</td><td>307</td><td>285</td><td>163</td><td>100</td><td>22</td><td>57%</td><td>+1.66%</td></tr></tbody></table></div>
 <div class="card">
 <h2>📋 复盘日志 <span class="badge badge-auto">3 篇</span></h2>
-<div class="sub">每个交易日复盘：信号标的哪些吃到 / 哪些被套 / 是否符合系统设计（对比回测基准）· 发现设计缺陷 → 启动系统更新并登记于「📝 更新日志」· 点击日期展开/折叠当日复盘详情</div>
-<details class="rev-item" open><summary><span class="rev-flag">✅</span><b>2026-08-14</b><span class="rev-meta">信号 2026-08-13 · 85 只 · 胜率 66.2% · 缺陷 0 项</span></summary><div class="rev-body"><div class="rev-md"><h3>📋 复盘日志 v2.0（三池全量）</h3>
-<h3>🗓 2026-08-18 ｜ 信号日 2026-08-13 → 计算日 2026-08-14（T+1 持仓）</h3>
-<h3>📈 累计总览（自 2026-08-18 首篇复盘以来，共 3 篇）</h3>
-<table class="tbl"><thead><tr><th>池</th><th>累计标的</th><th>累计买入</th><th>🟢吃到</th><th>🔴被套</th><th>⚪持平</th><th>累计胜率</th><th>累计平均收益</th></tr></thead><tbody>
-<tr><td>全量池中/长线</td><td>89</td><td>89</td><td>63</td><td>26</td><td>0</td><td>71%</td><td>+2.94%</td></tr>
-<tr><td>固定池中/长线</td><td>48</td><td>26</td><td>12</td><td>14</td><td>0</td><td>46%</td><td>+0.38%</td></tr>
-<tr><td>短线全量池</td><td>85</td><td>85</td><td>44</td><td>30</td><td>11</td><td>52%</td><td>+1.18%</td></tr>
-<tr><td>短线·主板</td><td>30</td><td>30</td><td>20</td><td>10</td><td>0</td><td>67%</td><td>+1.99%</td></tr>
-<tr><td>短线·创业板</td><td>29</td><td>29</td><td>13</td><td>16</td><td>0</td><td>45%</td><td>+0.62%</td></tr>
-<tr><td>短线·科创板</td><td>16</td><td>16</td><td>11</td><td>5</td><td>0</td><td>69%</td><td>+1.45%</td></tr>
-<tr><td>短线·基金</td><td>10</td><td>10</td><td>0</td><td>0</td><td>10</td><td>0%</td><td>+0.00%</td></tr>
-<tr><td><b>合计</b></td><td>307</td><td>285</td><td>163</td><td>101</td><td>21</td><td>57%</td><td>+1.66%</td></tr>
+<div class="sub">每个交易日复盘：信号标的哪些吃到 / 哪些被套 / 是否符合系统设计（对比回测基准）· 发现设计缺陷 → 启动系统更新并登记于「📝 更新日志」· 点击日期展开/折叠当日复盘详情（日期降序，最新在前）</div>
+<details class="rev-item" open><summary><span class="rev-flag">🔴</span><b>2026-08-18</b><span class="rev-meta">信号 2026-08-17 · 69 只 · 胜率 37.1% · 缺陷 2 项</span></summary><div class="rev-body"><div class="rev-md"><h3>📋 复盘日志 v2.0（三池全量）</h3>
+<h3>🗓 2026-08-18 ｜ 信号日 2026-08-17 → 计算日 2026-08-18（T+1 持仓）</h3>
+<h3>📊 总览（三个监控池）</h3>
+<table class="tbl"><thead><tr><th>池</th><th>标的</th><th>买入信号</th><th>🟢吃到</th><th>🔴被套</th><th>⚪持平</th><th>胜率</th><th>平均收益</th><th>最大亏</th><th>回测基准</th></tr></thead><tbody>
+<tr><td>全量池中/长线</td><td>30</td><td>30</td><td>13</td><td>17</td><td>0</td><td>43%</td><td>+0.26%</td><td>-9.05%</td><td>48.1%</td></tr>
+<tr><td>固定池中/长线</td><td>16</td><td>9</td><td>1</td><td>8</td><td>0</td><td>11%</td><td>-1.40%</td><td>-3.37%</td><td>57.1%</td></tr>
+<tr><td>短线全量池</td><td>23</td><td>23</td><td>9</td><td>13</td><td>1</td><td>39%</td><td>+0.49%</td><td>-4.92%</td><td>50.9%</td></tr>
+<tr><td>短线·主板</td><td>10</td><td>10</td><td>6</td><td>4</td><td>0</td><td>60%</td><td>+2.32%</td><td>-3.37%</td><td>46.8%</td></tr>
+<tr><td>短线·创业板</td><td>9</td><td>9</td><td>2</td><td>6</td><td>1</td><td>22%</td><td>-0.35%</td><td>-1.45%</td><td>48.1%</td></tr>
+<tr><td>短线·科创板</td><td>4</td><td>4</td><td>1</td><td>3</td><td>0</td><td>25%</td><td>-2.21%</td><td>-4.92%</td><td>57.8%</td></tr>
+<tr><td><b>合计（买入信号）</b></td><td>69</td><td>62</td><td>23</td><td>38</td><td>1</td><td>37%</td><td>+0.10%</td><td>—</td><td>—</td></tr>
 </tbody></table>
+<h3>🔍 缺陷检测（grill）</h3>
+<ul><li>⚠️ <b>固定池中/长线信号失效预警</b>：胜率 11%（&lt;45%）且平均收益 -1.40%，偏离回测基准 57.1%</li><li>🔴 <b>深套标的</b>（&lt;-8%，回测单笔分布 P1=-6.0%，-8% 属极值尾部）：海川智能(-9.1%)</li></ul>
+<blockquote>⚠️ 发现缺陷 → 需启动量化系统更新，记录于更新日志（changelog）</blockquote>
+<h3>📑 明细</h3>
+<h3>全量池中/长线（30 只 · 信号 2026-08-17）</h3>
+<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>权限</th><th>信号分</th><th>档位</th><th>操作</th><th>买入价</th><th>现价</th><th>收益</th><th>MA5</th><th>判定</th></tr></thead><tbody>
+<tr><td>688432</td><td>有研硅</td><td>科创板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>43.62</td><td>49.48</td><td><b>+13.43%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>688677</td><td>海泰新光</td><td>科创板</td><td>92</td><td>满仓加仓</td><td>买入</td><td>87.99</td><td>96.54</td><td><b>+9.72%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>600367</td><td>红星发展</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>35.5</td><td>38.23</td><td><b>+7.69%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>688448</td><td>磁谷科技</td><td>科创板</td><td>92</td><td>满仓加仓</td><td>买入</td><td>60.0</td><td>63.58</td><td><b>+5.97%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>688392</td><td>骄成超声</td><td>科创板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>195.0</td><td>204.71</td><td><b>+4.98%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>600353</td><td>旭光电子</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>36.0</td><td>37.54</td><td><b>+4.28%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>300907</td><td>康平科技</td><td>创业板</td><td>94</td><td>满仓加仓</td><td>买入</td><td>50.73</td><td>52.56</td><td><b>+3.61%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>603663</td><td>三祥新材</td><td>主板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>44.67</td><td>45.87</td><td><b>+2.69%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>300936</td><td>中英科技</td><td>创业板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>86.28</td><td>87.65</td><td><b>+1.59%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>688530</td><td>欧莱新材</td><td>科创板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>67.99</td><td>69.02</td><td><b>+1.51%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>688479</td><td>友车科技</td><td>科创板</td><td>94</td><td>满仓加仓</td><td>买入</td><td>34.99</td><td>35.51</td><td><b>+1.49%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>603078</td><td>江化微</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>37.82</td><td>38.12</td><td><b>+0.79%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>688167</td><td>炬光科技</td><td>科创板</td><td>94</td><td>满仓加仓</td><td>买入</td><td>288.0</td><td>288.5</td><td><b>+0.17%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>601208</td><td>东材科技</td><td>主板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>49.58</td><td>49.48</td><td><b>-0.20%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>002536</td><td>飞龙股份</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>46.11</td><td>45.99</td><td><b>-0.26%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>003036</td><td>泰坦股份</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>60.0</td><td>59.57</td><td><b>-0.72%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>300903</td><td>科翔股份</td><td>创业板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>85.01</td><td>84.32</td><td><b>-0.81%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>688179</td><td>阿拉丁</td><td>科创板</td><td>92</td><td>满仓加仓</td><td>买入</td><td>23.88</td><td>23.64</td><td><b>-1.01%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>300985</td><td>致远新能</td><td>创业板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>42.05</td><td>41.2</td><td><b>-2.02%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>688549</td><td>中巨芯</td><td>科创板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>30.0</td><td>29.29</td><td><b>-2.37%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>600641</td><td>先导基电</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>36.78</td><td>35.8</td><td><b>-2.66%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>300566</td><td>激智科技</td><td>创业板</td><td>94</td><td>满仓加仓</td><td>买入</td><td>30.98</td><td>30.13</td><td><b>-2.74%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>301396</td><td>宏景科技</td><td>创业板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>220.0</td><td>213.51</td><td><b>-2.95%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>688300</td><td>联瑞新材</td><td>科创板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>166.0</td><td>160.0</td><td><b>-3.61%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
+<tr><td>603083</td><td>剑桥科技</td><td>主板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>193.44</td><td>186.05</td><td><b>-3.82%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>603618</td><td>杭电股份</td><td>主板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>30.7</td><td>29.5</td><td><b>-3.91%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>300814</td><td>中富电路</td><td>创业板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>156.89</td><td>150.18</td><td><b>-4.28%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>301018</td><td>申菱环境</td><td>创业板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>101.38</td><td>96.79</td><td><b>-4.53%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>300489</td><td>光智科技</td><td>创业板</td><td>94</td><td>满仓加仓</td><td>买入</td><td>263.0</td><td>249.34</td><td><b>-5.19%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
+<tr><td>300720</td><td>海川智能</td><td>创业板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>96.5</td><td>87.77</td><td><b>-9.05%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
+</tbody></table>
+<h3>固定池中/长线（16 只 · 信号 2026-08-17）</h3>
+<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>权限</th><th>信号分</th><th>档位</th><th>操作</th><th>买入价</th><th>现价</th><th>收益</th><th>MA5</th><th>判定</th></tr></thead><tbody>
+<tr><td>603228</td><td>景旺电子</td><td>主板</td><td>82</td><td>满仓加仓</td><td>买入</td><td>96.0</td><td>97.9</td><td><b>+1.98%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>002971</td><td>和远气体</td><td>主板</td><td>93</td><td>满仓加仓</td><td>买入</td><td>46.7</td><td>46.62</td><td><b>-0.17%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>000636</td><td>风华高科</td><td>主板</td><td>84</td><td>满仓加仓</td><td>买入</td><td>63.0</td><td>62.34</td><td><b>-1.05%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
+<tr><td>002185</td><td>华天科技</td><td>主板</td><td>76</td><td>满仓加仓</td><td>买入</td><td>19.0</td><td>18.7</td><td><b>-1.58%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>002463</td><td>沪电股份</td><td>主板</td><td>74</td><td>轻仓加仓</td><td>买入</td><td>125.7</td><td>123.59</td><td><b>-1.68%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>603629</td><td>利通电子</td><td>主板</td><td>85</td><td>满仓加仓</td><td>买入</td><td>138.85</td><td>136.47</td><td><b>-1.71%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>600498</td><td>烽火通信</td><td>主板</td><td>70</td><td>轻仓加仓</td><td>买入</td><td>41.73</td><td>40.95</td><td><b>-1.87%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>600183</td><td>生益科技</td><td>主板</td><td>74</td><td>轻仓加仓</td><td>买入</td><td>144.0</td><td>139.41</td><td><b>-3.19%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
+<tr><td>600162</td><td>香江控股</td><td>主板</td><td>81</td><td>满仓加仓</td><td>买入</td><td>4.45</td><td>4.3</td><td><b>-3.37%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
+<tr><td>605358</td><td>立昂微</td><td>主板</td><td>57</td><td>观望</td><td>观望</td><td>—</td><td>49.62</td><td>—</td><td>—</td><td>未买入</td></tr>
+<tr><td>603339</td><td>四方科技</td><td>主板</td><td>18</td><td>清仓</td><td>卖出信号</td><td>—</td><td>14.24</td><td>—</td><td>—</td><td>未买入</td></tr>
+<tr><td>605189</td><td>富春染织</td><td>主板</td><td>31</td><td>减至半仓</td><td>卖出信号</td><td>—</td><td>15.93</td><td>—</td><td>—</td><td>未买入</td></tr>
+<tr><td>600403</td><td>大有能源</td><td>主板</td><td>57</td><td>观望</td><td>观望</td><td>—</td><td>6.2</td><td>—</td><td>—</td><td>未买入</td></tr>
+<tr><td>002879</td><td>长缆科技</td><td>主板</td><td>8</td><td>清仓</td><td>卖出信号</td><td>—</td><td>16.99</td><td>—</td><td>—</td><td>未买入</td></tr>
+<tr><td>000759</td><td>中百集团</td><td>主板</td><td>11</td><td>清仓</td><td>卖出信号</td><td>—</td><td>6.99</td><td>—</td><td>—</td><td>未买入</td></tr>
+<tr><td>002820</td><td>桂发祥</td><td>主板</td><td>24</td><td>清仓</td><td>卖出信号</td><td>—</td><td>12.27</td><td>—</td><td>—</td><td>未买入</td></tr>
+</tbody></table>
+<h3>短线全量池（23 只 · 信号 2026-08-17）</h3>
+<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>权限</th><th>信号分</th><th>档位</th><th>操作</th><th>买入价</th><th>现价</th><th>收益</th><th>MA5</th><th>判定</th></tr></thead><tbody>
+<tr><td>601952</td><td>苏垦农发</td><td>主板</td><td>61</td><td>强买入</td><td>买入</td><td>8.44</td><td>9.38</td><td><b>+11.14%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>000019</td><td>深粮控股</td><td>主板</td><td>58</td><td>买入</td><td>买入</td><td>6.34</td><td>6.96</td><td><b>+9.78%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>600251</td><td>冠农股份</td><td>主板</td><td>59</td><td>买入</td><td>买入</td><td>9.89</td><td>10.43</td><td><b>+5.46%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>002556</td><td>辉隆股份</td><td>主板</td><td>58</td><td>买入</td><td>买入</td><td>5.09</td><td>5.3</td><td><b>+4.13%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>600261</td><td>阳光照明</td><td>主板</td><td>58</td><td>买入</td><td>买入</td><td>3.17</td><td>3.2</td><td><b>+0.95%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>300012</td><td>华测检测</td><td>创业板</td><td>53</td><td>买入</td><td>买入</td><td>15.09</td><td>15.22</td><td><b>+0.86%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>688029</td><td>南微医学</td><td>科创板</td><td>51</td><td>买入</td><td>买入</td><td>72.65</td><td>73.16</td><td><b>+0.70%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>300370</td><td>安控科技</td><td>创业板</td><td>51</td><td>买入</td><td>买入</td><td>2.23</td><td>2.24</td><td><b>+0.45%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>600435</td><td>北方导航</td><td>主板</td><td>58</td><td>买入</td><td>买入</td><td>11.15</td><td>11.17</td><td><b>+0.18%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>300172</td><td>中电环保</td><td>创业板</td><td>55</td><td>买入</td><td>买入</td><td>4.63</td><td>4.63</td><td><b>+0.00%</b></td><td>⚠️下方</td><td>⚪持平</td></tr>
+<tr><td>300375</td><td>鹏翎股份</td><td>创业板</td><td>52</td><td>买入</td><td>买入</td><td>4.02</td><td>4.01</td><td><b>-0.25%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>300388</td><td>节能国祯</td><td>创业板</td><td>54</td><td>买入</td><td>买入</td><td>6.89</td><td>6.86</td><td><b>-0.44%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
+<tr><td>002033</td><td>丽江股份</td><td>主板</td><td>59</td><td>买入</td><td>买入</td><td>9.03</td><td>8.97</td><td><b>-0.66%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>300194</td><td>福安药业</td><td>创业板</td><td>51</td><td>买入</td><td>买入</td><td>4.03</td><td>4.0</td><td><b>-0.74%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
+<tr><td>688739</td><td>成大生物</td><td>科创板</td><td>51</td><td>买入</td><td>买入</td><td>20.6</td><td>20.44</td><td><b>-0.78%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
+<tr><td>300072</td><td>海新能科</td><td>创业板</td><td>53</td><td>买入</td><td>买入</td><td>3.79</td><td>3.76</td><td><b>-0.79%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>300627</td><td>华测导航</td><td>创业板</td><td>52</td><td>买入</td><td>买入</td><td>29.0</td><td>28.76</td><td><b>-0.83%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>301053</td><td>远信工业</td><td>创业板</td><td>51</td><td>买入</td><td>买入</td><td>42.87</td><td>42.25</td><td><b>-1.45%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>603858</td><td>步长制药</td><td>主板</td><td>59</td><td>买入</td><td>买入</td><td>16.03</td><td>15.79</td><td><b>-1.50%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
+<tr><td>600363</td><td>联创光电</td><td>主板</td><td>58</td><td>买入</td><td>买入</td><td>20.77</td><td>20.17</td><td><b>-2.89%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
+<tr><td>600864</td><td>哈投股份</td><td>主板</td><td>58</td><td>买入</td><td>买入</td><td>5.64</td><td>5.45</td><td><b>-3.37%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
+<tr><td>688068</td><td>热景生物</td><td>科创板</td><td>51</td><td>买入</td><td>买入</td><td>115.65</td><td>111.21</td><td><b>-3.84%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
+<tr><td>688513</td><td>苑东生物</td><td>科创板</td><td>56</td><td>买入</td><td>买入</td><td>50.02</td><td>47.56</td><td><b>-4.92%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
+</tbody></table>
+<p>---</p>
+<blockquote>⚠️ 复盘内容由 AI 基于公开数据自动生成，仅供系统自检，不构成投资建议。</blockquote></div></div></details>
+<details class="rev-item"><summary><span class="rev-flag">✅</span><b>2026-08-17</b><span class="rev-meta">信号 2026-08-14 · 68 只 · 胜率 73.8% · 缺陷 0 项</span></summary><div class="rev-body"><div class="rev-md"><h3>📋 复盘日志 v2.0（三池全量）</h3>
+<h3>🗓 2026-08-18 ｜ 信号日 2026-08-14 → 计算日 2026-08-17（T+1 持仓）</h3>
+<h3>📊 总览（三个监控池）</h3>
+<table class="tbl"><thead><tr><th>池</th><th>标的</th><th>买入信号</th><th>🟢吃到</th><th>🔴被套</th><th>⚪持平</th><th>胜率</th><th>平均收益</th><th>最大亏</th><th>回测基准</th></tr></thead><tbody>
+<tr><td>全量池中/长线</td><td>30</td><td>30</td><td>26</td><td>4</td><td>0</td><td>87%</td><td>+4.45%</td><td>-0.81%</td><td>48.1%</td></tr>
+<tr><td>固定池中/长线</td><td>16</td><td>9</td><td>6</td><td>3</td><td>0</td><td>67%</td><td>+1.32%</td><td>-5.58%</td><td>57.1%</td></tr>
+<tr><td>短线全量池</td><td>22</td><td>22</td><td>13</td><td>9</td><td>0</td><td>59%</td><td>+0.99%</td><td>-2.22%</td><td>50.9%</td></tr>
+<tr><td>短线·主板</td><td>10</td><td>10</td><td>8</td><td>2</td><td>0</td><td>80%</td><td>+1.65%</td><td>-2.22%</td><td>46.8%</td></tr>
+<tr><td>短线·创业板</td><td>10</td><td>10</td><td>4</td><td>6</td><td>0</td><td>40%</td><td>-0.02%</td><td>-2.06%</td><td>48.1%</td></tr>
+<tr><td>短线·科创板</td><td>2</td><td>2</td><td>1</td><td>1</td><td>0</td><td>50%</td><td>+2.73%</td><td>-0.62%</td><td>57.8%</td></tr>
+<tr><td><b>合计（买入信号）</b></td><td>68</td><td>61</td><td>45</td><td>16</td><td>0</td><td>74%</td><td>+2.74%</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<h3>🔍 缺陷检测（grill）</h3>
+<ul><li>⏳ 基金净值按 T+1 公布：10 只基金（005005、005006、000314、002017、004355、002158、001796、002133…）待 T+1 净值确认，本次复盘跳过，下次复盘补录</li></ul>
+<h3>📑 明细</h3>
+<h3>全量池中/长线（30 只 · 信号 2026-08-14）</h3>
+<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>权限</th><th>信号分</th><th>档位</th><th>操作</th><th>买入价</th><th>现价</th><th>收益</th><th>MA5</th><th>判定</th></tr></thead><tbody>
+<tr><td>688677</td><td>海泰新光</td><td>科创板</td><td>76</td><td>满仓加仓</td><td>买入</td><td>74.76</td><td>89.76</td><td><b>+20.06%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>300566</td><td>激智科技</td><td>创业板</td><td>93</td><td>满仓加仓</td><td>买入</td><td>28.5</td><td>31.5</td><td><b>+10.53%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>688392</td><td>骄成超声</td><td>科创板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>172.59</td><td>188.3</td><td><b>+9.10%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>300936</td><td>中英科技</td><td>创业板</td><td>93</td><td>满仓加仓</td><td>买入</td><td>80.08</td><td>86.75</td><td><b>+8.33%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>002536</td><td>飞龙股份</td><td>主板</td><td>70</td><td>轻仓加仓</td><td>买入</td><td>42.99</td><td>46.11</td><td><b>+7.26%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>688448</td><td>磁谷科技</td><td>科创板</td><td>71</td><td>轻仓加仓</td><td>买入</td><td>56.01</td><td>59.8</td><td><b>+6.77%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>301018</td><td>申菱环境</td><td>创业板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>94.01</td><td>100.18</td><td><b>+6.56%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>688432</td><td>有研硅</td><td>科创板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>41.06</td><td>43.62</td><td><b>+6.23%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>688530</td><td>欧莱新材</td><td>科创板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>64.2</td><td>67.98</td><td><b>+5.89%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>301396</td><td>宏景科技</td><td>创业板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>215.0</td><td>227.48</td><td><b>+5.80%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>300903</td><td>科翔股份</td><td>创业板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>79.82</td><td>84.43</td><td><b>+5.78%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>688300</td><td>联瑞新材</td><td>科创板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>158.5</td><td>166.47</td><td><b>+5.03%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>003036</td><td>泰坦股份</td><td>主板</td><td>76</td><td>满仓加仓</td><td>买入</td><td>56.92</td><td>59.41</td><td><b>+4.37%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>600641</td><td>先导基电</td><td>主板</td><td>97</td><td>满仓加仓</td><td>买入</td><td>34.56</td><td>36.06</td><td><b>+4.34%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>688167</td><td>炬光科技</td><td>科创板</td><td>94</td><td>满仓加仓</td><td>买入</td><td>279.9</td><td>291.2</td><td><b>+4.04%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>603078</td><td>江化微</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>36.89</td><td>38.2</td><td><b>+3.55%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>600353</td><td>旭光电子</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>33.0</td><td>34.13</td><td><b>+3.42%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>688549</td><td>中巨芯</td><td>科创板</td><td>97</td><td>满仓加仓</td><td>买入</td><td>29.38</td><td>30.34</td><td><b>+3.27%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>600367</td><td>红星发展</td><td>主板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>33.76</td><td>34.75</td><td><b>+2.93%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>300814</td><td>中富电路</td><td>创业板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>153.39</td><td>157.81</td><td><b>+2.88%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>601208</td><td>东材科技</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>48.25</td><td>49.6</td><td><b>+2.80%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>300489</td><td>光智科技</td><td>创业板</td><td>94</td><td>满仓加仓</td><td>买入</td><td>252.05</td><td>258.45</td><td><b>+2.54%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>603663</td><td>三祥新材</td><td>主板</td><td>90</td><td>满仓加仓</td><td>买入</td><td>43.85</td><td>44.66</td><td><b>+1.85%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>300985</td><td>致远新能</td><td>创业板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>41.29</td><td>41.8</td><td><b>+1.24%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>300720</td><td>海川智能</td><td>创业板</td><td>76</td><td>满仓加仓</td><td>买入</td><td>95.59</td><td>96.5</td><td><b>+0.95%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>603083</td><td>剑桥科技</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>190.0</td><td>190.21</td><td><b>+0.11%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>688179</td><td>阿拉丁</td><td>科创板</td><td>93</td><td>满仓加仓</td><td>买入</td><td>23.95</td><td>23.88</td><td><b>-0.29%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>300907</td><td>康平科技</td><td>创业板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>51.29</td><td>51.1</td><td><b>-0.37%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>688479</td><td>友车科技</td><td>科创板</td><td>74</td><td>轻仓加仓</td><td>买入</td><td>34.45</td><td>34.19</td><td><b>-0.75%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
+<tr><td>603618</td><td>杭电股份</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>30.95</td><td>30.7</td><td><b>-0.81%</b></td><td>✅</td><td>🔴被套</td></tr>
+</tbody></table>
+<h3>固定池中/长线（16 只 · 信号 2026-08-14）</h3>
+<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>权限</th><th>信号分</th><th>档位</th><th>操作</th><th>买入价</th><th>现价</th><th>收益</th><th>MA5</th><th>判定</th></tr></thead><tbody>
+<tr><td>002185</td><td>华天科技</td><td>主板</td><td>71</td><td>轻仓加仓</td><td>买入</td><td>18.0</td><td>19.0</td><td><b>+5.56%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>603629</td><td>利通电子</td><td>主板</td><td>86</td><td>满仓加仓</td><td>买入</td><td>137.8</td><td>142.84</td><td><b>+3.66%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>600498</td><td>烽火通信</td><td>主板</td><td>71</td><td>轻仓加仓</td><td>买入</td><td>40.5</td><td>41.73</td><td><b>+3.04%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>002463</td><td>沪电股份</td><td>主板</td><td>74</td><td>轻仓加仓</td><td>买入</td><td>122.0</td><td>125.09</td><td><b>+2.53%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>002971</td><td>和远气体</td><td>主板</td><td>90</td><td>满仓加仓</td><td>买入</td><td>45.64</td><td>46.78</td><td><b>+2.50%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>000636</td><td>风华高科</td><td>主板</td><td>84</td><td>满仓加仓</td><td>买入</td><td>62.03</td><td>63.44</td><td><b>+2.27%</b></td><td>⚠️下方</td><td>🟢吃到</td></tr>
+<tr><td>600183</td><td>生益科技</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>145.9</td><td>144.49</td><td><b>-0.97%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>603228</td><td>景旺电子</td><td>主板</td><td>82</td><td>满仓加仓</td><td>买入</td><td>98.0</td><td>96.93</td><td><b>-1.09%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>600162</td><td>香江控股</td><td>主板</td><td>81</td><td>满仓加仓</td><td>买入</td><td>4.66</td><td>4.4</td><td><b>-5.58%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
+<tr><td>605358</td><td>立昂微</td><td>主板</td><td>54</td><td>观望</td><td>观望</td><td>—</td><td>46.59</td><td>—</td><td>—</td><td>未买入</td></tr>
+<tr><td>603339</td><td>四方科技</td><td>主板</td><td>18</td><td>清仓</td><td>卖出信号</td><td>—</td><td>14.14</td><td>—</td><td>—</td><td>未买入</td></tr>
+<tr><td>605189</td><td>富春染织</td><td>主板</td><td>40</td><td>减至半仓</td><td>卖出信号</td><td>—</td><td>16.27</td><td>—</td><td>—</td><td>未买入</td></tr>
+<tr><td>600403</td><td>大有能源</td><td>主板</td><td>56</td><td>观望</td><td>观望</td><td>—</td><td>6.3</td><td>—</td><td>—</td><td>未买入</td></tr>
+<tr><td>002879</td><td>长缆科技</td><td>主板</td><td>8</td><td>清仓</td><td>卖出信号</td><td>—</td><td>17.23</td><td>—</td><td>—</td><td>未买入</td></tr>
+<tr><td>000759</td><td>中百集团</td><td>主板</td><td>11</td><td>清仓</td><td>卖出信号</td><td>—</td><td>6.96</td><td>—</td><td>—</td><td>未买入</td></tr>
+<tr><td>002820</td><td>桂发祥</td><td>主板</td><td>23</td><td>清仓</td><td>卖出信号</td><td>—</td><td>11.15</td><td>—</td><td>—</td><td>未买入</td></tr>
+</tbody></table>
+<h3>短线全量池（22 只 · 信号 2026-08-14）</h3>
+<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>权限</th><th>信号分</th><th>档位</th><th>操作</th><th>买入价</th><th>现价</th><th>收益</th><th>MA5</th><th>判定</th></tr></thead><tbody>
+<tr><td>002536</td><td>飞龙股份</td><td>主板</td><td>56</td><td>买入</td><td>买入</td><td>42.99</td><td>46.11</td><td><b>+7.26%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>688137</td><td>近岸蛋白</td><td>科创板</td><td>50</td><td>买入</td><td>买入</td><td>64.5</td><td>68.43</td><td><b>+6.09%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>002636</td><td>金安国纪</td><td>主板</td><td>61</td><td>强买入</td><td>买入</td><td>68.21</td><td>71.39</td><td><b>+4.66%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>301053</td><td>远信工业</td><td>创业板</td><td>51</td><td>买入</td><td>买入</td><td>41.94</td><td>43.41</td><td><b>+3.51%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>600261</td><td>阳光照明</td><td>主板</td><td>56</td><td>买入</td><td>买入</td><td>3.09</td><td>3.16</td><td><b>+2.27%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>603538</td><td>美诺华</td><td>主板</td><td>56</td><td>买入</td><td>买入</td><td>30.48</td><td>31.14</td><td><b>+2.17%</b></td><td>⚠️下方</td><td>🟢吃到</td></tr>
+<tr><td>600251</td><td>冠农股份</td><td>主板</td><td>56</td><td>买入</td><td>买入</td><td>9.78</td><td>9.91</td><td><b>+1.33%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>300912</td><td>凯龙高科</td><td>创业板</td><td>53</td><td>买入</td><td>买入</td><td>20.77</td><td>21.01</td><td><b>+1.16%</b></td><td>⚠️下方</td><td>🟢吃到</td></tr>
+<tr><td>300247</td><td>融捷健康</td><td>创业板</td><td>55</td><td>买入</td><td>买入</td><td>3.83</td><td>3.87</td><td><b>+1.04%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>300172</td><td>中电环保</td><td>创业板</td><td>54</td><td>买入</td><td>买入</td><td>4.62</td><td>4.66</td><td><b>+0.87%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>000768</td><td>中航西飞</td><td>主板</td><td>58</td><td>买入</td><td>买入</td><td>21.44</td><td>21.6</td><td><b>+0.75%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>000850</td><td>华茂股份</td><td>主板</td><td>56</td><td>买入</td><td>买入</td><td>4.1</td><td>4.12</td><td><b>+0.49%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>601890</td><td>亚星锚链</td><td>主板</td><td>59</td><td>买入</td><td>买入</td><td>8.99</td><td>9.01</td><td><b>+0.22%</b></td><td>✅</td><td>🟢吃到</td></tr>
+<tr><td>002033</td><td>丽江股份</td><td>主板</td><td>61</td><td>强买入</td><td>买入</td><td>9.02</td><td>8.98</td><td><b>-0.44%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>300009</td><td>安科生物</td><td>创业板</td><td>52</td><td>买入</td><td>买入</td><td>8.86</td><td>8.82</td><td><b>-0.45%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>688739</td><td>成大生物</td><td>科创板</td><td>53</td><td>买入</td><td>买入</td><td>20.8</td><td>20.67</td><td><b>-0.62%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
+<tr><td>300453</td><td>三鑫医疗</td><td>创业板</td><td>54</td><td>买入</td><td>买入</td><td>10.07</td><td>10.0</td><td><b>-0.70%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>300388</td><td>节能国祯</td><td>创业板</td><td>58</td><td>买入</td><td>买入</td><td>6.99</td><td>6.93</td><td><b>-0.86%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>300463</td><td>迈克生物</td><td>创业板</td><td>51</td><td>买入</td><td>买入</td><td>9.68</td><td>9.56</td><td><b>-1.24%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>300406</td><td>九强生物</td><td>创业板</td><td>52</td><td>买入</td><td>买入</td><td>12.07</td><td>11.89</td><td><b>-1.49%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
+<tr><td>300832</td><td>新产业</td><td>创业板</td><td>52</td><td>买入</td><td>买入</td><td>52.53</td><td>51.45</td><td><b>-2.06%</b></td><td>✅</td><td>🔴被套</td></tr>
+<tr><td>002030</td><td>达安基因</td><td>主板</td><td>58</td><td>买入</td><td>买入</td><td>5.85</td><td>5.72</td><td><b>-2.22%</b></td><td>✅</td><td>🔴被套</td></tr>
+</tbody></table>
+<p>---</p>
+<blockquote>⚠️ 复盘内容由 AI 基于公开数据自动生成，仅供系统自检，不构成投资建议。</blockquote></div></div></details>
+<details class="rev-item"><summary><span class="rev-flag">✅</span><b>2026-08-14</b><span class="rev-meta">信号 2026-08-13 · 85 只 · 胜率 66.2% · 缺陷 0 项</span></summary><div class="rev-body"><div class="rev-md"><h3>📋 复盘日志 v2.0（三池全量）</h3>
+<h3>🗓 2026-08-18 ｜ 信号日 2026-08-13 → 计算日 2026-08-14（T+1 持仓）</h3>
 <h3>📊 总览（三个监控池）</h3>
 <table class="tbl"><thead><tr><th>池</th><th>标的</th><th>买入信号</th><th>🟢吃到</th><th>🔴被套</th><th>⚪持平</th><th>胜率</th><th>平均收益</th><th>最大亏</th><th>回测基准</th></tr></thead><tbody>
 <tr><td>全量池中/长线</td><td>29</td><td>29</td><td>24</td><td>5</td><td>0</td><td>83%</td><td>+4.15%</td><td>-1.98%</td><td>48.1%</td></tr>
@@ -3892,218 +4079,6 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </tbody></table>
 <p>---</p>
 <blockquote>⚠️ 复盘内容由 AI 基于公开数据自动生成，仅供系统自检，不构成投资建议。</blockquote></div></div></details>
-<details class="rev-item"><summary><span class="rev-flag">✅</span><b>2026-08-17</b><span class="rev-meta">信号 2026-08-14 · 68 只 · 胜率 73.8% · 缺陷 0 项</span></summary><div class="rev-body"><div class="rev-md"><h3>📋 复盘日志 v2.0（三池全量）</h3>
-<h3>🗓 2026-08-18 ｜ 信号日 2026-08-14 → 计算日 2026-08-17（T+1 持仓）</h3>
-<h3>📈 累计总览（自 2026-08-14 首篇复盘以来，共 3 篇）</h3>
-<table class="tbl"><thead><tr><th>池</th><th>累计标的</th><th>累计买入</th><th>🟢吃到</th><th>🔴被套</th><th>⚪持平</th><th>累计胜率</th><th>累计平均收益</th></tr></thead><tbody>
-<tr><td>全量池中/长线</td><td>93</td><td>91</td><td>65</td><td>26</td><td>0</td><td>71%</td><td>+3.00%</td></tr>
-<tr><td>固定池中/长线</td><td>52</td><td>29</td><td>13</td><td>16</td><td>0</td><td>45%</td><td>+0.16%</td></tr>
-<tr><td>短线全量池</td><td>85</td><td>85</td><td>44</td><td>30</td><td>11</td><td>52%</td><td>+1.18%</td></tr>
-<tr><td>短线·主板</td><td>30</td><td>30</td><td>20</td><td>10</td><td>0</td><td>67%</td><td>+1.99%</td></tr>
-<tr><td>短线·创业板</td><td>29</td><td>29</td><td>13</td><td>16</td><td>0</td><td>45%</td><td>+0.62%</td></tr>
-<tr><td>短线·科创板</td><td>16</td><td>16</td><td>11</td><td>5</td><td>0</td><td>69%</td><td>+1.45%</td></tr>
-<tr><td>短线·基金</td><td>10</td><td>10</td><td>0</td><td>10</td><td>0</td><td>0%</td><td>+0.00%</td></tr>
-<tr><td><b>合计</b></td><td>315</td><td>290</td><td>166</td><td>113</td><td>11</td><td>57%</td><td>+1.65%</td></tr>
-</tbody></table>
-<h3>📊 总览（三个监控池）</h3>
-<table class="tbl"><thead><tr><th>池</th><th>标的</th><th>买入信号</th><th>🟢吃到</th><th>🔴被套</th><th>⚪持平</th><th>胜率</th><th>平均收益</th><th>最大亏</th><th>回测基准</th></tr></thead><tbody>
-<tr><td>全量池中/长线</td><td>30</td><td>30</td><td>26</td><td>4</td><td>0</td><td>87%</td><td>+4.45%</td><td>-0.81%</td><td>48.1%</td></tr>
-<tr><td>固定池中/长线</td><td>16</td><td>9</td><td>6</td><td>3</td><td>0</td><td>67%</td><td>+1.32%</td><td>-5.58%</td><td>57.1%</td></tr>
-<tr><td>短线全量池</td><td>22</td><td>22</td><td>13</td><td>9</td><td>0</td><td>59%</td><td>+0.99%</td><td>-2.22%</td><td>50.9%</td></tr>
-<tr><td>短线·主板</td><td>10</td><td>10</td><td>8</td><td>2</td><td>0</td><td>80%</td><td>+1.65%</td><td>-2.22%</td><td>46.8%</td></tr>
-<tr><td>短线·创业板</td><td>10</td><td>10</td><td>4</td><td>6</td><td>0</td><td>40%</td><td>-0.02%</td><td>-2.06%</td><td>48.1%</td></tr>
-<tr><td>短线·科创板</td><td>2</td><td>2</td><td>1</td><td>1</td><td>0</td><td>50%</td><td>+2.73%</td><td>-0.62%</td><td>57.8%</td></tr>
-<tr><td><b>合计（买入信号）</b></td><td>68</td><td>61</td><td>45</td><td>16</td><td>0</td><td>74%</td><td>+2.74%</td><td>—</td><td>—</td></tr>
-</tbody></table>
-<h3>🔍 缺陷检测（grill）</h3>
-<ul><li>⏳ 基金净值按 T+1 公布：10 只基金（005005、005006、000314、002017、004355、002158、001796、002133…）待 T+1 净值确认，本次复盘跳过，下次复盘补录</li></ul>
-<h3>📑 明细</h3>
-<h3>全量池中/长线（30 只 · 信号 2026-08-14）</h3>
-<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>权限</th><th>信号分</th><th>档位</th><th>操作</th><th>买入价</th><th>现价</th><th>收益</th><th>MA5</th><th>判定</th></tr></thead><tbody>
-<tr><td>688677</td><td>海泰新光</td><td>科创板</td><td>76</td><td>满仓加仓</td><td>买入</td><td>74.76</td><td>89.76</td><td><b>+20.06%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>300566</td><td>激智科技</td><td>创业板</td><td>93</td><td>满仓加仓</td><td>买入</td><td>28.5</td><td>31.5</td><td><b>+10.53%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>688392</td><td>骄成超声</td><td>科创板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>172.59</td><td>188.3</td><td><b>+9.10%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>300936</td><td>中英科技</td><td>创业板</td><td>93</td><td>满仓加仓</td><td>买入</td><td>80.08</td><td>86.75</td><td><b>+8.33%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>002536</td><td>飞龙股份</td><td>主板</td><td>70</td><td>轻仓加仓</td><td>买入</td><td>42.99</td><td>46.11</td><td><b>+7.26%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>688448</td><td>磁谷科技</td><td>科创板</td><td>71</td><td>轻仓加仓</td><td>买入</td><td>56.01</td><td>59.8</td><td><b>+6.77%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>301018</td><td>申菱环境</td><td>创业板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>94.01</td><td>100.18</td><td><b>+6.56%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>688432</td><td>有研硅</td><td>科创板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>41.06</td><td>43.62</td><td><b>+6.23%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>688530</td><td>欧莱新材</td><td>科创板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>64.2</td><td>67.98</td><td><b>+5.89%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>301396</td><td>宏景科技</td><td>创业板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>215.0</td><td>227.48</td><td><b>+5.80%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>300903</td><td>科翔股份</td><td>创业板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>79.82</td><td>84.43</td><td><b>+5.78%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>688300</td><td>联瑞新材</td><td>科创板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>158.5</td><td>166.47</td><td><b>+5.03%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>003036</td><td>泰坦股份</td><td>主板</td><td>76</td><td>满仓加仓</td><td>买入</td><td>56.92</td><td>59.41</td><td><b>+4.37%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>600641</td><td>先导基电</td><td>主板</td><td>97</td><td>满仓加仓</td><td>买入</td><td>34.56</td><td>36.06</td><td><b>+4.34%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>688167</td><td>炬光科技</td><td>科创板</td><td>94</td><td>满仓加仓</td><td>买入</td><td>279.9</td><td>291.2</td><td><b>+4.04%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>603078</td><td>江化微</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>36.89</td><td>38.2</td><td><b>+3.55%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>600353</td><td>旭光电子</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>33.0</td><td>34.13</td><td><b>+3.42%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>688549</td><td>中巨芯</td><td>科创板</td><td>97</td><td>满仓加仓</td><td>买入</td><td>29.38</td><td>30.34</td><td><b>+3.27%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>600367</td><td>红星发展</td><td>主板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>33.76</td><td>34.75</td><td><b>+2.93%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>300814</td><td>中富电路</td><td>创业板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>153.39</td><td>157.81</td><td><b>+2.88%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>601208</td><td>东材科技</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>48.25</td><td>49.6</td><td><b>+2.80%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>300489</td><td>光智科技</td><td>创业板</td><td>94</td><td>满仓加仓</td><td>买入</td><td>252.05</td><td>258.45</td><td><b>+2.54%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>603663</td><td>三祥新材</td><td>主板</td><td>90</td><td>满仓加仓</td><td>买入</td><td>43.85</td><td>44.66</td><td><b>+1.85%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>300985</td><td>致远新能</td><td>创业板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>41.29</td><td>41.8</td><td><b>+1.24%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>300720</td><td>海川智能</td><td>创业板</td><td>76</td><td>满仓加仓</td><td>买入</td><td>95.59</td><td>96.5</td><td><b>+0.95%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>603083</td><td>剑桥科技</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>190.0</td><td>190.21</td><td><b>+0.11%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>688179</td><td>阿拉丁</td><td>科创板</td><td>93</td><td>满仓加仓</td><td>买入</td><td>23.95</td><td>23.88</td><td><b>-0.29%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>300907</td><td>康平科技</td><td>创业板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>51.29</td><td>51.1</td><td><b>-0.37%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>688479</td><td>友车科技</td><td>科创板</td><td>74</td><td>轻仓加仓</td><td>买入</td><td>34.45</td><td>34.19</td><td><b>-0.75%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
-<tr><td>603618</td><td>杭电股份</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>30.95</td><td>30.7</td><td><b>-0.81%</b></td><td>✅</td><td>🔴被套</td></tr>
-</tbody></table>
-<h3>固定池中/长线（16 只 · 信号 2026-08-14）</h3>
-<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>权限</th><th>信号分</th><th>档位</th><th>操作</th><th>买入价</th><th>现价</th><th>收益</th><th>MA5</th><th>判定</th></tr></thead><tbody>
-<tr><td>002185</td><td>华天科技</td><td>主板</td><td>71</td><td>轻仓加仓</td><td>买入</td><td>18.0</td><td>19.0</td><td><b>+5.56%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>603629</td><td>利通电子</td><td>主板</td><td>86</td><td>满仓加仓</td><td>买入</td><td>137.8</td><td>142.84</td><td><b>+3.66%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>600498</td><td>烽火通信</td><td>主板</td><td>71</td><td>轻仓加仓</td><td>买入</td><td>40.5</td><td>41.73</td><td><b>+3.04%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>002463</td><td>沪电股份</td><td>主板</td><td>74</td><td>轻仓加仓</td><td>买入</td><td>122.0</td><td>125.09</td><td><b>+2.53%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>002971</td><td>和远气体</td><td>主板</td><td>90</td><td>满仓加仓</td><td>买入</td><td>45.64</td><td>46.78</td><td><b>+2.50%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>000636</td><td>风华高科</td><td>主板</td><td>84</td><td>满仓加仓</td><td>买入</td><td>62.03</td><td>63.44</td><td><b>+2.27%</b></td><td>⚠️下方</td><td>🟢吃到</td></tr>
-<tr><td>600183</td><td>生益科技</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>145.9</td><td>144.49</td><td><b>-0.97%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>603228</td><td>景旺电子</td><td>主板</td><td>82</td><td>满仓加仓</td><td>买入</td><td>98.0</td><td>96.93</td><td><b>-1.09%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>600162</td><td>香江控股</td><td>主板</td><td>81</td><td>满仓加仓</td><td>买入</td><td>4.66</td><td>4.4</td><td><b>-5.58%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
-<tr><td>605358</td><td>立昂微</td><td>主板</td><td>54</td><td>观望</td><td>观望</td><td>—</td><td>46.59</td><td>—</td><td>—</td><td>未买入</td></tr>
-<tr><td>603339</td><td>四方科技</td><td>主板</td><td>18</td><td>清仓</td><td>卖出信号</td><td>—</td><td>14.14</td><td>—</td><td>—</td><td>未买入</td></tr>
-<tr><td>605189</td><td>富春染织</td><td>主板</td><td>40</td><td>减至半仓</td><td>卖出信号</td><td>—</td><td>16.27</td><td>—</td><td>—</td><td>未买入</td></tr>
-<tr><td>600403</td><td>大有能源</td><td>主板</td><td>56</td><td>观望</td><td>观望</td><td>—</td><td>6.3</td><td>—</td><td>—</td><td>未买入</td></tr>
-<tr><td>002879</td><td>长缆科技</td><td>主板</td><td>8</td><td>清仓</td><td>卖出信号</td><td>—</td><td>17.23</td><td>—</td><td>—</td><td>未买入</td></tr>
-<tr><td>000759</td><td>中百集团</td><td>主板</td><td>11</td><td>清仓</td><td>卖出信号</td><td>—</td><td>6.96</td><td>—</td><td>—</td><td>未买入</td></tr>
-<tr><td>002820</td><td>桂发祥</td><td>主板</td><td>23</td><td>清仓</td><td>卖出信号</td><td>—</td><td>11.15</td><td>—</td><td>—</td><td>未买入</td></tr>
-</tbody></table>
-<h3>短线全量池（22 只 · 信号 2026-08-14）</h3>
-<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>权限</th><th>信号分</th><th>档位</th><th>操作</th><th>买入价</th><th>现价</th><th>收益</th><th>MA5</th><th>判定</th></tr></thead><tbody>
-<tr><td>002536</td><td>飞龙股份</td><td>主板</td><td>56</td><td>买入</td><td>买入</td><td>42.99</td><td>46.11</td><td><b>+7.26%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>688137</td><td>近岸蛋白</td><td>科创板</td><td>50</td><td>买入</td><td>买入</td><td>64.5</td><td>68.43</td><td><b>+6.09%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>002636</td><td>金安国纪</td><td>主板</td><td>61</td><td>强买入</td><td>买入</td><td>68.21</td><td>71.39</td><td><b>+4.66%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>301053</td><td>远信工业</td><td>创业板</td><td>51</td><td>买入</td><td>买入</td><td>41.94</td><td>43.41</td><td><b>+3.51%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>600261</td><td>阳光照明</td><td>主板</td><td>56</td><td>买入</td><td>买入</td><td>3.09</td><td>3.16</td><td><b>+2.27%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>603538</td><td>美诺华</td><td>主板</td><td>56</td><td>买入</td><td>买入</td><td>30.48</td><td>31.14</td><td><b>+2.17%</b></td><td>⚠️下方</td><td>🟢吃到</td></tr>
-<tr><td>600251</td><td>冠农股份</td><td>主板</td><td>56</td><td>买入</td><td>买入</td><td>9.78</td><td>9.91</td><td><b>+1.33%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>300912</td><td>凯龙高科</td><td>创业板</td><td>53</td><td>买入</td><td>买入</td><td>20.77</td><td>21.01</td><td><b>+1.16%</b></td><td>⚠️下方</td><td>🟢吃到</td></tr>
-<tr><td>300247</td><td>融捷健康</td><td>创业板</td><td>55</td><td>买入</td><td>买入</td><td>3.83</td><td>3.87</td><td><b>+1.04%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>300172</td><td>中电环保</td><td>创业板</td><td>54</td><td>买入</td><td>买入</td><td>4.62</td><td>4.66</td><td><b>+0.87%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>000768</td><td>中航西飞</td><td>主板</td><td>58</td><td>买入</td><td>买入</td><td>21.44</td><td>21.6</td><td><b>+0.75%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>000850</td><td>华茂股份</td><td>主板</td><td>56</td><td>买入</td><td>买入</td><td>4.1</td><td>4.12</td><td><b>+0.49%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>601890</td><td>亚星锚链</td><td>主板</td><td>59</td><td>买入</td><td>买入</td><td>8.99</td><td>9.01</td><td><b>+0.22%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>002033</td><td>丽江股份</td><td>主板</td><td>61</td><td>强买入</td><td>买入</td><td>9.02</td><td>8.98</td><td><b>-0.44%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>300009</td><td>安科生物</td><td>创业板</td><td>52</td><td>买入</td><td>买入</td><td>8.86</td><td>8.82</td><td><b>-0.45%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>688739</td><td>成大生物</td><td>科创板</td><td>53</td><td>买入</td><td>买入</td><td>20.8</td><td>20.67</td><td><b>-0.62%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
-<tr><td>300453</td><td>三鑫医疗</td><td>创业板</td><td>54</td><td>买入</td><td>买入</td><td>10.07</td><td>10.0</td><td><b>-0.70%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>300388</td><td>节能国祯</td><td>创业板</td><td>58</td><td>买入</td><td>买入</td><td>6.99</td><td>6.93</td><td><b>-0.86%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>300463</td><td>迈克生物</td><td>创业板</td><td>51</td><td>买入</td><td>买入</td><td>9.68</td><td>9.56</td><td><b>-1.24%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>300406</td><td>九强生物</td><td>创业板</td><td>52</td><td>买入</td><td>买入</td><td>12.07</td><td>11.89</td><td><b>-1.49%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
-<tr><td>300832</td><td>新产业</td><td>创业板</td><td>52</td><td>买入</td><td>买入</td><td>52.53</td><td>51.45</td><td><b>-2.06%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>002030</td><td>达安基因</td><td>主板</td><td>58</td><td>买入</td><td>买入</td><td>5.85</td><td>5.72</td><td><b>-2.22%</b></td><td>✅</td><td>🔴被套</td></tr>
-</tbody></table>
-<p>---</p>
-<blockquote>⚠️ 复盘内容由 AI 基于公开数据自动生成，仅供系统自检，不构成投资建议。</blockquote></div></div></details>
-<details class="rev-item"><summary><span class="rev-flag">🔴</span><b>2026-08-18</b><span class="rev-meta">信号 2026-08-17 · 69 只 · 胜率 37.1% · 缺陷 2 项</span></summary><div class="rev-body"><div class="rev-md"><h3>📋 复盘日志 v2.0（三池全量）</h3>
-<h3>🗓 2026-08-18 ｜ 信号日 2026-08-17 → 计算日 2026-08-18（T+1 持仓）</h3>
-<h3>📈 累计总览（自 2026-08-14 首篇复盘以来，共 3 篇）</h3>
-<table class="tbl"><thead><tr><th>池</th><th>累计标的</th><th>累计买入</th><th>🟢吃到</th><th>🔴被套</th><th>⚪持平</th><th>累计胜率</th><th>累计平均收益</th></tr></thead><tbody>
-<tr><td>全量池中/长线</td><td>93</td><td>91</td><td>65</td><td>26</td><td>0</td><td>71%</td><td>+3.00%</td></tr>
-<tr><td>固定池中/长线</td><td>56</td><td>32</td><td>16</td><td>16</td><td>0</td><td>50%</td><td>+0.54%</td></tr>
-<tr><td>短线全量池</td><td>85</td><td>85</td><td>44</td><td>30</td><td>11</td><td>52%</td><td>+1.18%</td></tr>
-<tr><td>短线·主板</td><td>30</td><td>30</td><td>20</td><td>10</td><td>0</td><td>67%</td><td>+1.99%</td></tr>
-<tr><td>短线·创业板</td><td>29</td><td>29</td><td>13</td><td>16</td><td>0</td><td>45%</td><td>+0.62%</td></tr>
-<tr><td>短线·科创板</td><td>16</td><td>16</td><td>11</td><td>5</td><td>0</td><td>69%</td><td>+1.45%</td></tr>
-<tr><td>短线·基金</td><td>10</td><td>10</td><td>0</td><td>10</td><td>0</td><td>0%</td><td>+0.00%</td></tr>
-<tr><td><b>合计</b></td><td>319</td><td>293</td><td>169</td><td>113</td><td>11</td><td>58%</td><td>+1.68%</td></tr>
-</tbody></table>
-<h3>📊 总览（三个监控池）</h3>
-<table class="tbl"><thead><tr><th>池</th><th>标的</th><th>买入信号</th><th>🟢吃到</th><th>🔴被套</th><th>⚪持平</th><th>胜率</th><th>平均收益</th><th>最大亏</th><th>回测基准</th></tr></thead><tbody>
-<tr><td>全量池中/长线</td><td>30</td><td>30</td><td>13</td><td>17</td><td>0</td><td>43%</td><td>+0.26%</td><td>-9.05%</td><td>48.1%</td></tr>
-<tr><td>固定池中/长线</td><td>16</td><td>9</td><td>1</td><td>8</td><td>0</td><td>11%</td><td>-1.40%</td><td>-3.37%</td><td>57.1%</td></tr>
-<tr><td>短线全量池</td><td>23</td><td>23</td><td>9</td><td>13</td><td>1</td><td>39%</td><td>+0.49%</td><td>-4.92%</td><td>50.9%</td></tr>
-<tr><td>短线·主板</td><td>10</td><td>10</td><td>6</td><td>4</td><td>0</td><td>60%</td><td>+2.32%</td><td>-3.37%</td><td>46.8%</td></tr>
-<tr><td>短线·创业板</td><td>9</td><td>9</td><td>2</td><td>7</td><td>0</td><td>22%</td><td>-0.35%</td><td>-1.45%</td><td>48.1%</td></tr>
-<tr><td>短线·科创板</td><td>4</td><td>4</td><td>1</td><td>3</td><td>0</td><td>25%</td><td>-2.21%</td><td>-4.92%</td><td>57.8%</td></tr>
-<tr><td><b>合计（买入信号）</b></td><td>69</td><td>62</td><td>23</td><td>38</td><td>1</td><td>37%</td><td>+0.10%</td><td>—</td><td>—</td></tr>
-</tbody></table>
-<h3>🔍 缺陷检测（grill）</h3>
-<ul><li>⚠️ <b>固定池中/长线信号失效预警</b>：胜率 11%（&lt;45%）且平均收益 -1.40%，偏离回测基准 57.1%</li><li>🔴 <b>深套标的</b>（&lt;-8%，回测单笔分布 P1=-6.0%，-8% 属极值尾部）：海川智能(-9.1%)</li></ul>
-<blockquote>⚠️ 发现缺陷 → 需启动量化系统更新，记录于更新日志（changelog）</blockquote>
-<h3>📑 明细</h3>
-<h3>全量池中/长线（30 只 · 信号 2026-08-17）</h3>
-<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>权限</th><th>信号分</th><th>档位</th><th>操作</th><th>买入价</th><th>现价</th><th>收益</th><th>MA5</th><th>判定</th></tr></thead><tbody>
-<tr><td>688432</td><td>有研硅</td><td>科创板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>43.62</td><td>49.48</td><td><b>+13.43%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>688677</td><td>海泰新光</td><td>科创板</td><td>92</td><td>满仓加仓</td><td>买入</td><td>87.99</td><td>96.54</td><td><b>+9.72%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>600367</td><td>红星发展</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>35.5</td><td>38.23</td><td><b>+7.69%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>688448</td><td>磁谷科技</td><td>科创板</td><td>92</td><td>满仓加仓</td><td>买入</td><td>60.0</td><td>63.58</td><td><b>+5.97%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>688392</td><td>骄成超声</td><td>科创板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>195.0</td><td>204.71</td><td><b>+4.98%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>600353</td><td>旭光电子</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>36.0</td><td>37.54</td><td><b>+4.28%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>300907</td><td>康平科技</td><td>创业板</td><td>94</td><td>满仓加仓</td><td>买入</td><td>50.73</td><td>52.56</td><td><b>+3.61%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>603663</td><td>三祥新材</td><td>主板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>44.67</td><td>45.87</td><td><b>+2.69%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>300936</td><td>中英科技</td><td>创业板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>86.28</td><td>87.65</td><td><b>+1.59%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>688530</td><td>欧莱新材</td><td>科创板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>67.99</td><td>69.02</td><td><b>+1.51%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>688479</td><td>友车科技</td><td>科创板</td><td>94</td><td>满仓加仓</td><td>买入</td><td>34.99</td><td>35.51</td><td><b>+1.49%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>603078</td><td>江化微</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>37.82</td><td>38.12</td><td><b>+0.79%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>688167</td><td>炬光科技</td><td>科创板</td><td>94</td><td>满仓加仓</td><td>买入</td><td>288.0</td><td>288.5</td><td><b>+0.17%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>601208</td><td>东材科技</td><td>主板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>49.58</td><td>49.48</td><td><b>-0.20%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>002536</td><td>飞龙股份</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>46.11</td><td>45.99</td><td><b>-0.26%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>003036</td><td>泰坦股份</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>60.0</td><td>59.57</td><td><b>-0.72%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>300903</td><td>科翔股份</td><td>创业板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>85.01</td><td>84.32</td><td><b>-0.81%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>688179</td><td>阿拉丁</td><td>科创板</td><td>92</td><td>满仓加仓</td><td>买入</td><td>23.88</td><td>23.64</td><td><b>-1.01%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>300985</td><td>致远新能</td><td>创业板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>42.05</td><td>41.2</td><td><b>-2.02%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>688549</td><td>中巨芯</td><td>科创板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>30.0</td><td>29.29</td><td><b>-2.37%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>600641</td><td>先导基电</td><td>主板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>36.78</td><td>35.8</td><td><b>-2.66%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>300566</td><td>激智科技</td><td>创业板</td><td>94</td><td>满仓加仓</td><td>买入</td><td>30.98</td><td>30.13</td><td><b>-2.74%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>301396</td><td>宏景科技</td><td>创业板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>220.0</td><td>213.51</td><td><b>-2.95%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>688300</td><td>联瑞新材</td><td>科创板</td><td>96</td><td>满仓加仓</td><td>买入</td><td>166.0</td><td>160.0</td><td><b>-3.61%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
-<tr><td>603083</td><td>剑桥科技</td><td>主板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>193.44</td><td>186.05</td><td><b>-3.82%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>603618</td><td>杭电股份</td><td>主板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>30.7</td><td>29.5</td><td><b>-3.91%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>300814</td><td>中富电路</td><td>创业板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>156.89</td><td>150.18</td><td><b>-4.28%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>301018</td><td>申菱环境</td><td>创业板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>101.38</td><td>96.79</td><td><b>-4.53%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>300489</td><td>光智科技</td><td>创业板</td><td>94</td><td>满仓加仓</td><td>买入</td><td>263.0</td><td>249.34</td><td><b>-5.19%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
-<tr><td>300720</td><td>海川智能</td><td>创业板</td><td>95</td><td>满仓加仓</td><td>买入</td><td>96.5</td><td>87.77</td><td><b>-9.05%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
-</tbody></table>
-<h3>固定池中/长线（16 只 · 信号 2026-08-17）</h3>
-<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>权限</th><th>信号分</th><th>档位</th><th>操作</th><th>买入价</th><th>现价</th><th>收益</th><th>MA5</th><th>判定</th></tr></thead><tbody>
-<tr><td>603228</td><td>景旺电子</td><td>主板</td><td>82</td><td>满仓加仓</td><td>买入</td><td>96.0</td><td>97.9</td><td><b>+1.98%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>002971</td><td>和远气体</td><td>主板</td><td>93</td><td>满仓加仓</td><td>买入</td><td>46.7</td><td>46.62</td><td><b>-0.17%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>000636</td><td>风华高科</td><td>主板</td><td>84</td><td>满仓加仓</td><td>买入</td><td>63.0</td><td>62.34</td><td><b>-1.05%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
-<tr><td>002185</td><td>华天科技</td><td>主板</td><td>76</td><td>满仓加仓</td><td>买入</td><td>19.0</td><td>18.7</td><td><b>-1.58%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>002463</td><td>沪电股份</td><td>主板</td><td>74</td><td>轻仓加仓</td><td>买入</td><td>125.7</td><td>123.59</td><td><b>-1.68%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>603629</td><td>利通电子</td><td>主板</td><td>85</td><td>满仓加仓</td><td>买入</td><td>138.85</td><td>136.47</td><td><b>-1.71%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>600498</td><td>烽火通信</td><td>主板</td><td>70</td><td>轻仓加仓</td><td>买入</td><td>41.73</td><td>40.95</td><td><b>-1.87%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>600183</td><td>生益科技</td><td>主板</td><td>74</td><td>轻仓加仓</td><td>买入</td><td>144.0</td><td>139.41</td><td><b>-3.19%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
-<tr><td>600162</td><td>香江控股</td><td>主板</td><td>81</td><td>满仓加仓</td><td>买入</td><td>4.45</td><td>4.3</td><td><b>-3.37%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
-<tr><td>605358</td><td>立昂微</td><td>主板</td><td>57</td><td>观望</td><td>观望</td><td>—</td><td>49.62</td><td>—</td><td>—</td><td>未买入</td></tr>
-<tr><td>603339</td><td>四方科技</td><td>主板</td><td>18</td><td>清仓</td><td>卖出信号</td><td>—</td><td>14.24</td><td>—</td><td>—</td><td>未买入</td></tr>
-<tr><td>605189</td><td>富春染织</td><td>主板</td><td>31</td><td>减至半仓</td><td>卖出信号</td><td>—</td><td>15.93</td><td>—</td><td>—</td><td>未买入</td></tr>
-<tr><td>600403</td><td>大有能源</td><td>主板</td><td>57</td><td>观望</td><td>观望</td><td>—</td><td>6.2</td><td>—</td><td>—</td><td>未买入</td></tr>
-<tr><td>002879</td><td>长缆科技</td><td>主板</td><td>8</td><td>清仓</td><td>卖出信号</td><td>—</td><td>16.99</td><td>—</td><td>—</td><td>未买入</td></tr>
-<tr><td>000759</td><td>中百集团</td><td>主板</td><td>11</td><td>清仓</td><td>卖出信号</td><td>—</td><td>6.99</td><td>—</td><td>—</td><td>未买入</td></tr>
-<tr><td>002820</td><td>桂发祥</td><td>主板</td><td>24</td><td>清仓</td><td>卖出信号</td><td>—</td><td>12.27</td><td>—</td><td>—</td><td>未买入</td></tr>
-</tbody></table>
-<h3>短线全量池（23 只 · 信号 2026-08-17）</h3>
-<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>权限</th><th>信号分</th><th>档位</th><th>操作</th><th>买入价</th><th>现价</th><th>收益</th><th>MA5</th><th>判定</th></tr></thead><tbody>
-<tr><td>601952</td><td>苏垦农发</td><td>主板</td><td>61</td><td>强买入</td><td>买入</td><td>8.44</td><td>9.38</td><td><b>+11.14%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>000019</td><td>深粮控股</td><td>主板</td><td>58</td><td>买入</td><td>买入</td><td>6.34</td><td>6.96</td><td><b>+9.78%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>600251</td><td>冠农股份</td><td>主板</td><td>59</td><td>买入</td><td>买入</td><td>9.89</td><td>10.43</td><td><b>+5.46%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>002556</td><td>辉隆股份</td><td>主板</td><td>58</td><td>买入</td><td>买入</td><td>5.09</td><td>5.3</td><td><b>+4.13%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>600261</td><td>阳光照明</td><td>主板</td><td>58</td><td>买入</td><td>买入</td><td>3.17</td><td>3.2</td><td><b>+0.95%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>300012</td><td>华测检测</td><td>创业板</td><td>53</td><td>买入</td><td>买入</td><td>15.09</td><td>15.22</td><td><b>+0.86%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>688029</td><td>南微医学</td><td>科创板</td><td>51</td><td>买入</td><td>买入</td><td>72.65</td><td>73.16</td><td><b>+0.70%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>300370</td><td>安控科技</td><td>创业板</td><td>51</td><td>买入</td><td>买入</td><td>2.23</td><td>2.24</td><td><b>+0.45%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>600435</td><td>北方导航</td><td>主板</td><td>58</td><td>买入</td><td>买入</td><td>11.15</td><td>11.17</td><td><b>+0.18%</b></td><td>✅</td><td>🟢吃到</td></tr>
-<tr><td>300172</td><td>中电环保</td><td>创业板</td><td>55</td><td>买入</td><td>买入</td><td>4.63</td><td>4.63</td><td><b>+0.00%</b></td><td>⚠️下方</td><td>⚪持平</td></tr>
-<tr><td>300375</td><td>鹏翎股份</td><td>创业板</td><td>52</td><td>买入</td><td>买入</td><td>4.02</td><td>4.01</td><td><b>-0.25%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>300388</td><td>节能国祯</td><td>创业板</td><td>54</td><td>买入</td><td>买入</td><td>6.89</td><td>6.86</td><td><b>-0.44%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
-<tr><td>002033</td><td>丽江股份</td><td>主板</td><td>59</td><td>买入</td><td>买入</td><td>9.03</td><td>8.97</td><td><b>-0.66%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>300194</td><td>福安药业</td><td>创业板</td><td>51</td><td>买入</td><td>买入</td><td>4.03</td><td>4.0</td><td><b>-0.74%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
-<tr><td>688739</td><td>成大生物</td><td>科创板</td><td>51</td><td>买入</td><td>买入</td><td>20.6</td><td>20.44</td><td><b>-0.78%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
-<tr><td>300072</td><td>海新能科</td><td>创业板</td><td>53</td><td>买入</td><td>买入</td><td>3.79</td><td>3.76</td><td><b>-0.79%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>300627</td><td>华测导航</td><td>创业板</td><td>52</td><td>买入</td><td>买入</td><td>29.0</td><td>28.76</td><td><b>-0.83%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>301053</td><td>远信工业</td><td>创业板</td><td>51</td><td>买入</td><td>买入</td><td>42.87</td><td>42.25</td><td><b>-1.45%</b></td><td>✅</td><td>🔴被套</td></tr>
-<tr><td>603858</td><td>步长制药</td><td>主板</td><td>59</td><td>买入</td><td>买入</td><td>16.03</td><td>15.79</td><td><b>-1.50%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
-<tr><td>600363</td><td>联创光电</td><td>主板</td><td>58</td><td>买入</td><td>买入</td><td>20.77</td><td>20.17</td><td><b>-2.89%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
-<tr><td>600864</td><td>哈投股份</td><td>主板</td><td>58</td><td>买入</td><td>买入</td><td>5.64</td><td>5.45</td><td><b>-3.37%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
-<tr><td>688068</td><td>热景生物</td><td>科创板</td><td>51</td><td>买入</td><td>买入</td><td>115.65</td><td>111.21</td><td><b>-3.84%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
-<tr><td>688513</td><td>苑东生物</td><td>科创板</td><td>56</td><td>买入</td><td>买入</td><td>50.02</td><td>47.56</td><td><b>-4.92%</b></td><td>⚠️下方</td><td>🔴被套</td></tr>
-</tbody></table>
-<p>---</p>
-<blockquote>⚠️ 复盘内容由 AI 基于公开数据自动生成，仅供系统自检，不构成投资建议。</blockquote></div></div></details>
 
 </div>
 </div>
@@ -4177,7 +4152,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 
 </div>
-<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-18 19:00 · 版本 v5.11.8 · 数据截至 2026-08-18 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-18 19:20 · 版本 v5.11.8 · 数据截至 2026-08-18 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>

@@ -24,13 +24,43 @@ FAB = """
 def build_review_log():
     idx_f = BASE / "review" / "review_index.json"
     idx = json.loads(idx_f.read_text(encoding="utf-8")) if idx_f.exists() else {"reviews": []}
-    revs = idx.get("reviews", [])
+    # 2026-08-18 晚：日期降序（最新在前）
+    revs = sorted(idx.get("reviews", []), key=lambda r: r.get("date", ""), reverse=True)
     items = ""
     for r in revs:
         flag = "🔴" if r.get("defects", 0) > 0 else "✅"
         items += (f'<a class="rev-btn" href="javascript:void(0)" onclick="openRev(\'{r["file"]}\')">'
                   f'{flag} {r["date"]}（信号 {r["sig"]} · {r["n"]} 只 · 胜率 {r.get("win_rate",0)}% · 缺陷 {r.get("defects",0)} 项）</a>')
     empty = '<div class="sub" style="color:var(--faint)">暂无复盘记录 —— 每个交易日收盘后运行 <code>python review_daily.py</code> 生成</div>' if not items else ""
+    # 累计总览独立卡片（2026-08-18 晚：只在此页顶部显示一份，data 来自 cumulative.json）
+    cum_f = BASE / "review" / "cumulative.json"
+    cum = json.loads(cum_f.read_text(encoding="utf-8")) if cum_f.exists() else None
+    cum_html = ""
+    if cum and cum.get("pools"):
+        rows = []
+        T = {"n": 0, "buy": 0, "wins": 0, "losses": 0, "flat": 0, "sum_pct": 0.0}
+        for name, a in cum["pools"].items():
+            wr = (a["wins"] / a["buy"] * 100) if a.get("buy") else 0
+            avg = (a["sum_pct"] / a["buy"]) if a.get("buy") else 0
+            rows.append(f"<tr><td>{name}</td><td>{a['n']}</td><td>{a['buy']}</td><td>{a['wins']}</td>"
+                        f"<td>{a['losses']}</td><td>{a['flat']}</td><td>{wr:.0f}%</td><td>{avg:+.2f}%</td></tr>")
+            for k in T:
+                T[k] += a[k]
+        if T["buy"]:
+            rows.append(f"<tr style='font-weight:700'><td>合计</td><td>{T['n']}</td><td>{T['buy']}</td><td>{T['wins']}</td>"
+                        f"<td>{T['losses']}</td><td>{T['flat']}</td><td>{T['wins']/T['buy']*100:.0f}%</td>"
+                        f"<td>{T['sum_pct']/T['buy']:+.2f}%</td></tr>")
+        cum_html = f"""
+<div class="card">
+<div class="back-bar" style="margin-bottom:8px">
+<h2 style="margin:0">📈 累计总览 <span class="badge badge-auto">自 {cum.get('since','—')} · {cum.get('count',0)} 篇</span></h2>
+</div>
+<div class="sub">三池累计：所有已发复盘的信号标的合计（防重：同篇只累加一次；短线·基金 T+1 净值未出计 ⚪持平）</div>
+<div style="overflow-x:auto"><table class="cum-tbl">
+<thead><tr><th>池</th><th>累计标的</th><th>累计买入</th><th>🟢吃到</th><th>🔴被套</th><th>⚪持平</th><th>累计胜率</th><th>累计均收</th></tr></thead>
+<tbody>{''.join(rows)}</tbody>
+</table></div>
+</div>"""
     html = f"""<!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <title>复盘日志</title>
@@ -41,6 +71,10 @@ def build_review_log():
 .rev-btns{{display:flex;flex-wrap:wrap;gap:10px}}
 .rev-btn{{display:inline-block;padding:9px 16px;border-radius:10px;background:var(--card2);border:1px solid var(--border);color:var(--text);text-decoration:none;font-size:13px;cursor:pointer}}
 .rev-btn:hover{{border-color:var(--accent);color:var(--accent)}}
+.cum-tbl{{width:100%;border-collapse:collapse;margin-top:6px;font-size:13px}}
+.cum-tbl th,.cum-tbl td{{border:1px solid var(--border);padding:6px 10px;text-align:center}}
+.cum-tbl th{{background:var(--card2);color:var(--sub);font-weight:600}}
+.cum-tbl tbody tr:hover{{background:var(--card2)}}
 #rev-viewer{{display:none;margin-top:18px}}
 #rev-viewer.active{{display:block}}
 #rev-viewer iframe{{width:100%;height:760px;border:1px solid var(--border);border-radius:12px;background:var(--card)}}
@@ -49,12 +83,13 @@ def build_review_log():
 </style></head><body>
 {NAV_HTML}
 <div class="container">
+{cum_html}
 <div class="card">
 <div class="back-bar">
 <a class="back-btn" href="dual_system.html">← 返回主页面</a>
 <h2 style="margin:0">📋 复盘日志 <span class="badge badge-auto">{len(revs)} 篇</span></h2>
 </div>
-<div class="sub">每交易日复盘：信号标的哪些吃到 / 哪些被套 / 是否符合系统设计 / 缺陷检测（grill）· 发现设计缺陷 → 启动系统更新并记录于更新日志</div>
+<div class="sub">每交易日复盘：信号标的哪些吃到 / 哪些被套 / 是否符合系统设计 / 缺陷检测（grill）· 点击日期展开当日详情（日期降序，最新在前）</div>
 {empty}
 <div class="rev-btns">{items}</div>
 </div>
@@ -84,7 +119,7 @@ window.switchView=function(key){{
 </script>
 </body></html>"""
     (BASE / "review_log.html").write_text(html, encoding="utf-8")
-    print(f"review_log.html 生成（{len(revs)} 篇）")
+    print(f"review_log.html 生成（{len(revs)} 篇，累计总览独立卡片已加，日期降序）")
 
 
 def md_to_html(md):

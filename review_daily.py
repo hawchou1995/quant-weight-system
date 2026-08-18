@@ -373,11 +373,9 @@ def review(as_of=None, calc=None):
                               "n": len(rows), "win_rate": round(wr_all, 1), "avg": round(avg_all, 2),
                               "defects": len(defects)})
     json.dump(idx, open(idx_f, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
-    # 累计总览（2026-08-18 用户要求：顶部独立显示——插到「总览」之前，作为独立置顶区块）
+    # 累计总览（2026-08-18 晚：移除每篇 md 内嵌——累计总览只在复盘日志页顶部独立卡片显示一次，
+    # 见 build_log_pages.py 的「📈 累计总览」独立区块，data 来自 cumulative.json）
     cum = build_cumulative()
-    _full = (REVIEW_DIR / fname).read_text(encoding="utf-8")
-    _full = _full.replace("### 📊 总览（三个监控池）", cumulative_md(cum) + "### 📊 总览（三个监控池）", 1)
-    (REVIEW_DIR / fname).write_text(_full, encoding="utf-8")
     print(f"✅ 复盘已生成 review/{fname}（三池 {len(rows)} 只，买入信号 {len(buy_all)}，胜率 {wr_all:.0f}%，"
           f"缺陷 {len(defects)} 项，累计 {cum['count']} 篇，耗时 {time.time()-t0:.0f}s）")
     return fname
