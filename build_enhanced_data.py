@@ -296,7 +296,7 @@ def v9_rank_board(board, top_n=10, exclude=(), mom_min=0.25, score_min=65):
             continue
         if pd.isna(r['ma200_pos']) or r['ma200_pos'] <= 0:
             continue
-        sc = V.score_row(r)
+        sc = V.score_row_v2(r)  # 2026-08-18 A80_M80 替换：Aroon 强趋势过滤
         if sc < score_min:
             continue
         cand.append((code, sc))
@@ -371,8 +371,8 @@ for c in ALL_CODES:
         sc = fund_mom_score(ddf)
         sc_prev = fund_mom_score(ddf, asof=prev_rebal) if prev_rebal in ddf.index else None
     else:
-        sc = float(V.score_row(r))
-        sc_prev = float(V.score_row(ddf.loc[prev_rebal])) if prev_rebal in ddf.index else None
+        sc = float(V.score_row_v2(r))  # 2026-08-18 A80_M80 替换：Aroon 强趋势过滤
+        sc_prev = float(V.score_row_v2(ddf.loc[prev_rebal])) if prev_rebal in ddf.index else None
     # 档位（基金组用动量强弱分级）
     _tier_f = fund_tier if c in V9_FUND else tier
     sc_now = sc
@@ -417,7 +417,7 @@ for c in ALL_CODES:
         rr = ddf.loc[dt]
         if pd.isna(rr["mom_12_1"]):
             continue
-        fh.append({"d": str(dt.date()), "score": round(float(V.score_row(rr)), 1),
+        fh.append({"d": str(dt.date()), "score": round(float(V.score_row_v2(rr)), 1),
                    "mom": round(float(rr["mom_12_1"]) * 100, 1)})
     # 交易历史（两体系）
     th_auto = tr_auto[tr_auto["symbol"] == k]

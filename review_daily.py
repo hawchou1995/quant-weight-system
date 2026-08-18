@@ -217,7 +217,7 @@ def review(as_of=None, calc=None):
             t1_ = short_tier_of(score)
             buy_sig = score >= 50          # 强买入/买入
         else:
-            score = float(V.score_row(r))  # v9/v8 中长线分
+            score = float(V.score_row_v2(r))  # v9/v8 中长线分（2026-08-18 A80_M80 替换：Aroon 强趋势过滤）
             t1_ = tier_of(score)
             buy_sig = score >= 60          # 轻仓加仓及以上
         # 2026-08-17 用户决策：全量池中/长线、短线池 = 买入清单——不满足买入条件的标的直接不入日志（不凑数）

@@ -67,6 +67,19 @@ def score_row(r, w_mom=0.35, w_trend=0.25, w_aroon=0.20, w_vp=0.20):
     return s
 
 
+def score_row_v2(r, aroon_th=80, mom_th=0.8, fac=0.6, **w):
+    """生产中长线分（2026-08-18 A80_M80 替换版，与回测 A80_M80 精确同口径）：
+    原四因子分 score_row + Aroon 高位抑制——当 aroon_osc < 80 且 mom_12_1 > 0.8（
+    高位但强趋势确认不足）→ 总分 ×0.6，过滤掉"表面动量高、趋势确认弱"的追高标的。
+    全量池（v9）与固定池（v8）统一启用；短线池走 calc_signals 不受影响。"""
+    s = score_row(r, **w)
+    _a = r.get("aroon_osc", np.nan)
+    _m = r.get("mom_12_1", np.nan)
+    if not np.isnan(_a) and not np.isnan(_m) and float(_a) < aroon_th and float(_m) > mom_th:
+        s *= fac
+    return s
+
+
 # ---------------- 回测 ----------------
 def load_pool(use_cache=True):
     """预计算全量池因子（带 pickle 缓存）"""
