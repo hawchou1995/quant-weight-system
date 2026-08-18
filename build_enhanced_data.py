@@ -371,6 +371,13 @@ for c in ALL_CODES:
     chg = float(ddf["close"].iloc[-1] / ddf["close"].iloc[-2] - 1) * 100 if len(ddf) >= 2 else None
     # 近一年
     ret_1y = float(px / ddf["close"].iloc[-252] - 1) * 100 if len(ddf) > 252 else None
+    # 年线（MA200）偏离%（2026-08-18 口径对照：监控分看 20 日短期、池信号看年线位置，
+    # 两套会给同一标的相反结论——如榕基短期反抽分高但年线下方-19.8%。页面据此展示「年线下方」依据）
+    ma200_dev = None
+    if not pd.isna(px) and len(ddf) >= 200:
+        _m200 = ddf["close"].rolling(200).mean().iloc[-1]
+        if not pd.isna(_m200) and _m200 > 0:
+            ma200_dev = round((px / _m200 - 1) * 100, 1)
     # 四因子拆分（最新）
     fs = factor_split(r)
     # 六类 comp（模板口径：趋势/动能/量能/超买/风控/研报）——四因子映射 + 波动率风控 + 无研报
@@ -433,6 +440,7 @@ for c in ALL_CODES:
         "score": round(sc_now, 1), "score_prev": round(sc_prev, 1) if sc_prev is not None else None,
         "tier": _tier_f(sc_now), "tier_prev": _tier_f(sc_prev) if sc_prev is not None else None,
         "short_score": round(short_sc, 1), "short_tier": short_tier,
+        "ma200_dev": round(ma200_dev, 1) if ma200_dev is not None else None,
         "factors": fs, "comp": comp, "radar_svg": radar_svg, "rsi": round(rsi, 1),
         "kline": kline, "factor_hist": fh,
         "trades": {"v9_auto": tlist(th_auto), "v8_lite": tlist(th_lite)},
@@ -482,6 +490,18 @@ def maintain_track_v9():
     cutoff = pd.Timestamp(last_day.date() - timedelta(days=365))
     track = {c: r for c, r in track.items()
              if pd.Timestamp(str(r.get("entry", today))) > cutoff}
+    # 名称（2026-08-18 修复：跟踪池条目自带名称，掉出池的标的经常不在 details，渲染时无名称会显示代码。
+    # 资产类型判定用 rec.pool（该标的上榜时的 board 标注，'基金'=基金身份），而非当前 FUNDS/V9_FUND 集合——
+    # 掉出池的基金不在集合内会被误判为股票；且存在 A 股/基金 6 位撞号（如 002289 宇顺电子/华商改革创新股票A）。
+    # 撞号标的按基金身份上榜 → 显示基金名。）
+    for code, rec in track.items():
+        k = ("sh" if code.startswith(("6", "5")) else "sz") + code
+        if rec.get("pool") == "基金":
+            rec["name"] = (FUND_NAMES.get(code)
+                           or (details.get(code, {}) or {}).get("name")
+                           or names.get(k) or code)
+        else:
+            rec["name"] = (details.get(code, {}) or {}).get("name") or names.get(k, code)
     print(f"全量池中/长线跟踪池: {len(track)} 只（上榜 1 年，再上榜 +1 年；股票/基金一致）", flush=True)
     return track
 

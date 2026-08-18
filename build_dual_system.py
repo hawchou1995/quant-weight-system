@@ -162,12 +162,23 @@ def cards_html_for(items):
         comp = d.get("comp", {})
         radar = d.get("radar_svg", "")
         board = d["board"]
+        # 年线(MA200)位置（2026-08-18 口径对照）：池档位(收盘决策)偏空的长期依据；监控摘要的分数=20日短期强度
+        ma200_txt = ""
+        _dev = d.get("ma200_dev")
+        if _dev is not None:
+            if _dev < 0:
+                ma200_txt = (f'<span style="color:#60a5fa" title="收盘口径：现价在 MA200(年线) 下方 '
+                             f'{abs(_dev):.1f}%，长期结构偏空，池档位大概率偏弱（监控分仅为短期强度）">'
+                             f'年线下方 {abs(_dev):.1f}%</span>')
+            else:
+                ma200_txt = (f'<span style="color:var(--faint)" title="现价在 MA200(年线) 上方">'
+                             f'年线上方 {_dev:+.1f}%</span>')
         cards += f'''<div class="stock-card" id="card-{d["code"]}" data-code="{d["code"]}" data-search="{d["name"]} {d["code"]} {d["industry"]} {board}" data-market="{board}" data-industry="{d["industry"]}" data-tier="{d["tier"]}">
 <div class="radar-wrap">{radar}</div>
 <div class="body">
 <h3>{d["name"]} <span class="sub">{d["code"]}</span> <span class="board-tag">{board}</span> <span class="board-tag">{d["industry"]}</span></h3>
 <p class="meta">现价 <b>{d["px"]:.2f}</b>（<span class="{"up" if (d["chg"] or 0)>0 else "down"}">{f"{d['chg']:+.2f}%" if d["chg"] is not None else "—"}</span>）｜ 近一年 <span class="{"up" if (d["ret_1y"] or 0)>0 else "down"}">{f"{d['ret_1y']:+.0f}%" if d["ret_1y"] is not None else "—"}</span> ｜ RSI {d["rsi"]:.0f}</p>
-<p class="meta">权重 <b>{d["score"]:.1f} 分</b> → {tier_pill(d["tier"])} ｜ 建议：{action_for(d)} ｜ {conf_level(d)}置信</p>
+<p class="meta">权重 <b>{d["score"]:.1f} 分</b> → {tier_pill(d["tier"])} ｜ 建议：{action_for(d)} ｜ {ma200_txt}</p>
 <p class="meta">六类：趋势 {comp.get("trend",0):.0f}｜动能 {comp.get("momentum",0):.0f}｜量能 {comp.get("volume",0):.0f}｜超买 {comp.get("osc",0):.0f}｜风控 {comp.get("risk",0):.0f}｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">{d.get("biz", "—")}</p>
 </div></div>'''
