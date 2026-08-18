@@ -465,44 +465,80 @@ def load_curve(f):
 # ---------------- 全量池中/长线年跟踪池（2026-08-17 用户需求） ----------------
 def maintain_track_v9():
     """上榜跟踪 1 年：v9_tiers 上榜标的自动入池。
-    规则：新上榜/再上榜（上次构建不在池）→ entry=今日（再上榜 = 重新计时 1 年）；
-         持续在池 → 保持 entry；掉出池保留最后快照；entry 满 365 天 → 移除。
-    track_v9: {code: {entry, last_seen, pool, last:{px,chg,score,tier,date}}}"""
+    规则（2026-08-18 用户拍板：昨日收盘上池标的信号隔离 + 每次重新上榜刷新入池/跟踪/出池时间）：
+      新上榜/再上榜 → 当日先入 pending（不入正式池，不参与信号），下一个收盘确认仍在榜后才转正式入池；
+      持续在池 → 保持 entry，更新 last_seen/exit；掉出池保留最后快照；entry 满 365 天 → 移除；
+      每次转正式/重新上榜 → entry=确认收盘日、last_seen=今日、exit=entry+365（三个时间刷新）。
+    返回 (track, pending)：track 只含正式池成员（渲染直接遍历），pending 独立字段不入正式池。"""
     today = str(_as_of_day.date())
-    old, old_tiers = {}, {}
+    old, old_pending, old_tiers = {}, {}, {}
     try:
         _old = json.loads((BASE / "enhanced_data.js").read_text(encoding="utf-8")[len("window.ENH = "):-1])
         old = _old.get("track_v9", {}) or {}
+        old_pending = _old.get("track_pending_v9", {}) or {}
         old_tiers = _old.get("meta", {}).get("v9_tiers", {}) or {}
     except Exception:
         pass
     today_codes = {c for codes in V9_TIERS.values() for c in codes}
-    old_codes = {c for codes in old_tiers.values() for c in codes}
     track = dict(old)
+    pending = dict(old_pending)
+    from datetime import timedelta
+    def _exit(e):
+        return str((pd.Timestamp(e) + timedelta(days=365)).date())
+    # 迁移：旧 track 补齐 exit/status（新字段）
+    for code, rec in list(track.items()):
+        rec.setdefault("exit", _exit(rec.get("entry", today)))
+        rec.setdefault("status", "active")
+        rec.setdefault("last_seen", rec.get("last_seen") or today)
+    # 1) 今日在榜标的
     for code in today_codes:
         d = details.get(code, {}) or {}
         snap = {"px": d.get("px"), "chg": d.get("chg"), "score": d.get("score"),
                 "tier": d.get("tier"), "date": today}
         rec = track.get(code)
         if rec is None:
-            track[code] = {"entry": today, "last_seen": today,
-                           "pool": d.get("board", ""), "last": snap}
+            # 未在正式池 → pending（本次先登记，明/后一收盘确认在榜再转正）
+            if d:
+                pe = pending.get(code)
+                if pe is None:
+                    pending[code] = {"entry_candidate": today, "pool": d.get("board", ""),
+                                     "last": snap, "first_seen": today}
+                else:
+                    pe["last"] = snap          # 已在 pending：刷新快照
         else:
-            if code not in old_codes and str(rec.get("last_seen", "")) < today:
-                rec["entry"] = today   # 再上榜：重新计时 1 年
-            rec["last_seen"] = today
+            # 已在正式池 → 持续/再上榜
+            was_on = code in [c for v in old_tiers.values() for c in v]
+            if not was_on and str(rec.get("last_seen", "")) < today:
+                rec["entry"] = today           # 掉榜后重新上榜 → 刷新入池时间
+            rec["last_seen"] = today           # 更新跟踪时间
+            rec["exit"] = _exit(rec.get("entry", today))  # 出池时间 = entry+365
+            rec["status"] = "active"
             if d:
                 rec["last"] = snap
             track[code] = rec
-    # entry 满 365 天移除
-    from datetime import timedelta
+            pending.pop(code, None)
+    # 2) 旧 pending → 正式：只在上一收盘已在 pending（old_pending）且今日仍在榜 → 转 active
+    for code in list(old_pending.keys()):
+        if code in today_codes and code not in track:
+            d = details.get(code, {}) or {}
+            pe = pending.get(code) or old_pending[code]
+            entry = today                       # 确认收盘日
+            track[code] = {"entry": entry, "last_seen": today, "exit": _exit(entry),
+                           "status": "active",
+                           "pool": pe.get("pool", d.get("board", "")),
+                           "first_seen": pe.get("first_seen", str(_as_of_day.date())),
+                           "last": pe.get("last") or {"px": d.get("px"), "chg": d.get("chg"),
+                                            "score": d.get("score"), "tier": d.get("tier"), "date": today}}
+            pending.pop(code, None)
+        # 今日掉榜且从未转正 → 留待下面按 entry_candidate 超期清理（不入正式池）
+    # 3) 正式池中今日不在榜：保留快照、不动 entry（365 自动出池）
+    # 4) 清理 entry 满 365 天（出池时间 = entry+365）与 pending 超期（7 天未确认丢弃）
     cutoff = pd.Timestamp(last_day.date() - timedelta(days=365))
     track = {c: r for c, r in track.items()
              if pd.Timestamp(str(r.get("entry", today))) > cutoff}
-    # 名称（2026-08-18 修复：跟踪池条目自带名称，掉出池的标的经常不在 details，渲染时无名称会显示代码。
-    # 资产类型判定用 rec.pool（该标的上榜时的 board 标注，'基金'=基金身份），而非当前 FUNDS/V9_FUND 集合——
-    # 掉出池的基金不在集合内会被误判为股票；且存在 A 股/基金 6 位撞号（如 002289 宇顺电子/华商改革创新股票A）。
-    # 撞号标的按基金身份上榜 → 显示基金名。）
+    pending = {c: r for c, r in pending.items()
+               if pd.Timestamp(str(r.get("entry_candidate", today))) > cutoff}
+    # 5) 名称（2026-08-18 修复：掉出池标的常不在 details；资产类型按 rec.pool 判定防撞号）
     for code, rec in track.items():
         k = ("sh" if code.startswith(("6", "5")) else "sz") + code
         if rec.get("pool") == "基金":
@@ -511,8 +547,8 @@ def maintain_track_v9():
                            or names.get(k) or code)
         else:
             rec["name"] = (details.get(code, {}) or {}).get("name") or names.get(k, code)
-    print(f"全量池中/长线跟踪池: {len(track)} 只（上榜 1 年，再上榜 +1 年；股票/基金一致）", flush=True)
-    return track
+    print(f"全量池中/长线跟踪池: {len(track)} 只（正式） + {len(pending)} 只（待确认，隔日入池）", flush=True)
+    return track, pending
 
 
 _a80_json = json.load(open(BASE / "v9_auto_a80.json", encoding="utf-8"))
@@ -529,11 +565,12 @@ reports = sorted([f.name for f in REPORTS_DIR.glob("research-*.md")], reverse=Tr
 # 2026-08-18 as_of 口径修复：数据截至 = 池内标的实际最新交易日（取 max(ddf.index[-1])），
 # 而非 index_000300.csv 硬编码尾行（该指数文件手工维护易滞后，曾致 as_of 显示 08-17 但个股已含 08-18）
 _as_of_day = max(_eff_dates) if _eff_dates else last_day
+_track, _pending = maintain_track_v9()
 out = {
     "meta": {"as_of": str(_as_of_day.date()), "generated": __import__("datetime").datetime.now().strftime("%Y-%m-%d %H:%M"), "overlap": OVERLAP,
              "v9_tiers": V9_TIERS},
     "nav": [["overview", "📊", "监控总览"], ["sys-auto", "🅰️", "普适版"], ["sys-lite", "🅱️", "个人版"], ["table", "📋", "标的监控表"]],
-    "track_v9": maintain_track_v9(),
+    "track_v9": _track, "track_pending_v9": _pending,
     "monitor_reports": [
         {"code": c, "name": d["name"], "tier": d["tier"]}
         for c, d in sorted(details.items(), key=lambda kv: -kv[1]["score"])
