@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>标的监控看板（数据截至 2026-08-18 · 构建 2026-08-18 18:56）</title>
+<title>标的监控看板（数据截至 2026-08-18 · 构建 2026-08-18 19:00）</title>
 <style>
 :root{
   --bg:#f3f4f6; --card:#ffffff; --card2:#f9fafb; --border:#e5e7eb; --line:#f0f1f3;
@@ -4113,7 +4113,13 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class="card">
 <h2>📝 更新日志 <span class="badge badge-auto">GitHub Release 风格</span></h2>
 <div class="sub">版本 / 日期 / 更新内容 —— 复盘发现系统设计缺陷 → 启动量化系统更新 → 在此登记</div>
-<details class="rel-item" open><summary><span class="rel-ver">功能升级 - 2026-08-17（用户需求，无版本变更）</span><span class="rel-date"></span></summary><div class="rel-body"><div class="rev-md"><p><b>全量池短线跟踪自动化 + as_of 标签修复</b></p>
+<details class="rel-item" open><summary><span class="rel-ver">v5.11.14</span><span class="rel-date">2026-08-18</span></summary><div class="rel-body"><div class="rev-md"><p><b>复盘引擎修复（review_daily.py，复盘缺陷驱动）</b></p>
+<ul><li>① 累计总览置顶：从"插在缺陷检测前"改为<b>文档顶部独立区块</b>（用户要求"顶部独立显示"）</li><li>② flat 计数修复：短线子池 flat 原硬编码 0 → 计真实持平（基金 T+1 净值未出的⚪持平不再计🔴被套）</li><li>③ 解析表隔离：累计总览置顶后 <code>parse_pool_rows</code> 误把累计表当当日表重复累加（自乘缺陷）→ 只认「| 池 | 标的 |」当日总览表</li><li>④ 清理 n=0 空表存档（信号日=计算日 T+1 未到的空占位不再污染索引/累计）</li><li>⑤ 因子缓存重建：v8_factor_cache.pkl 停更致 08-18 复盘 T+1 无数据全跳过 → 删除重建（含 08-18）</li><li>补 08-18 独立复盘：信号 08-17 → 计算 08-18，69 只明细/买入 62/胜率 37%/缺陷 2（固定池信号失效预警 + 海川智能 -9.05% 深套）</li></ul>
+<p><b>固定池调整（用户指令）</b></p>
+<ul><li>去 东山精密 002384 / 兆易创新 603986 / 工业富联 601138；双源（Obsidian+本地）统一 20 只（16 股 + 4 基金）；旧池 300502/300308/300476/002474 移除、补 002820/002971/603629</li></ul>
+<p><b>短线池行业补全（用户反馈"综合太多"）</b></p>
+<ul><li>build_short_pool.py <code>STK_IND</code> 增 11 只（Wind 主营档案/申万一级验证）：辉隆=农林牧渔/东航物流=交通运输/太平洋=非银金融/贵航东风鹏翎=汽车/武控宇通=环保/华测=社会服务/苏垦步长=农林牧渔&amp;医药生物；重建后短线池股票行业 <b>0 个「综合」</b></li><li>验证：local + 线上 gh-pages 双重确认</li></ul></div></div></details>
+<details class="rel-item"><summary><span class="rel-ver">功能升级 - 2026-08-17（用户需求，无版本变更）</span><span class="rel-date"></span></summary><div class="rel-body"><div class="rev-md"><p><b>全量池短线跟踪自动化 + as_of 标签修复</b></p>
 <ul><li>① 自动跟踪（用户需求）：build_short_pool.py 新增 track 维护——短线表内<b>可买入标的（强买入/买入，短线分≥50）自动入池</b>（保留历史 entry 日期），<b>30 天后自动移除</b>（服务端 + 前端双重过期过滤）；build_dual_system.py「我的持仓跟踪」卡片升级为「📌 全量池短线跟踪」：自动列表 + 可选手动补充（localStorage，兼容原持仓代码），新增入池日期/已跟踪天数/剩余天数列</li><li>② as_of 标签修复（「看着是旧的」根因）：build_short_pool.py as_of 原取基金净值尾部（T-1）→ 改为<b>股票数据最新交易日（主口径）+ fund_as_of 单独标注 T-1</b>；看板标题/徽章/信号文件 as_of 恢复为 08-17</li><li>③ 运行时数据注入修复：HTML 从不加载 short_pool.js（window.SHORT_POOL 运行时不存在，旧 topSet 逻辑从未生效）→ 构建期内嵌精简 SHORT_POOL（as_of/fund_as_of/tiers/track）供跟踪渲染</li><li>验证：playwright 端到端（chromium-1234 + NODE_OPTIONS 需清空否则驱动报错）——跟踪表 33 行（自动 33 + 手动 0）、无 pageerror；线上标题「数据截至 2026-08-17」</li></ul></div></div></details>
 <details class="rel-item"><summary><span class="rel-ver">复盘登记 - 2026-08-17（无版本变更）</span><span class="rel-date"></span></summary><div class="rel-body"><div class="rev-md"><p><b>收盘复盘缺陷登记（review/2026-08-17_sig2026-08-14.md）</b></p>
 <ul><li>🔴 深套标的：香江控股（600162，固定池）买入 4.66 → 现价 4.40，-5.58%（&lt;-5% 深套线触发）；8/14 信号分 81 满仓加仓，T+1=8/17 开盘买入</li><li>三池复盘：83 标的 / 65 买入信号 / 胜率 75%（+2.70%）：全量池 87%（基准 48.1%）/ 固定池 75%（基准 57.1%）/ 短线 59%（基准 50.9%，其中创业板 40% 偏弱）</li><li>累计（3 篇）：246 标的 / 209 买入 / 胜率 66%（+2.25%）</li></ul>
@@ -4171,7 +4177,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 
 </div>
-<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-18 18:56 · 版本 v5.11.8 · 数据截至 2026-08-18 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-18 19:00 · 版本 v5.11.8 · 数据截至 2026-08-18 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
