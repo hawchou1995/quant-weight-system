@@ -67,10 +67,11 @@ def score_row(r, w_mom=0.35, w_trend=0.25, w_aroon=0.20, w_vp=0.20):
     return s
 
 
-def score_row_v2(r, aroon_th=80, mom_th=0.8, fac=0.6, **w):
-    """生产中长线分（2026-08-18 A80_M80 替换版，与回测 A80_M80 精确同口径）：
-    原四因子分 score_row + Aroon 高位抑制——当 aroon_osc < 80 且 mom_12_1 > 0.8（
+def score_row_v2(r, aroon_th=80, mom_th=0.78, fac=0.6, **w):
+    """生产中长线分（2026-08-18 A80 替换版，与回测 A80_M78 精确同口径）：
+    原四因子分 score_row + Aroon 高位抑制——当 aroon_osc < 80 且 mom_12_1 > 0.78（
     高位但强趋势确认不足）→ 总分 ×0.6，过滤掉"表面动量高、趋势确认弱"的追高标的。
+    mom_th=0.78（2026-08-18 路线A：敏感性验证 M78 全样本 +1136.7%/OOS 3/3 双升，优于 0.8）。
     全量池（v9）与固定池（v8）统一启用；短线池走 calc_signals 不受影响。"""
     s = score_row(r, **w)
     _a = r.get("aroon_osc", np.nan)

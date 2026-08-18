@@ -210,11 +210,13 @@ v_fund = load_curve_norm("v8_fund_equity.csv")
 # 短线净值曲线（短线体系 v3 最优；2026-08-17 去 ETF）
 v_short_fund = load_curve_norm("short_v3_fund_slip20_equity.csv")
 v_short_stock = load_curve_norm("short_v3_stock_slip20_equity.csv")
-# 分层净值曲线（v5.9：中长线 v9split + 短线 shortsplit，按权限互斥）
+# 分层净值曲线（v5.11.15 优先 A80_M78 版，fallback v5.9 旧版；短线 shortsplit 保持）
 _SPLIT_GROUPS = ["all", "main_only", "gem_only", "star_only"]
 v9split_curves = {}
 for g in _SPLIT_GROUPS:
-    v = load_curve_norm(f"v9split_{g}_slip20_equity.csv")
+    v = load_curve_norm(f"v9split_{g}_a80_equity.csv")          # v5.11.15 A80_M78
+    if not v:
+        v = load_curve_norm(f"v9split_{g}_slip20_equity.csv")
     v9split_curves[g] = v if v else load_curve_norm(f"v9split_{g}_equity.csv")
 shortsplit_curves = {g: load_curve_norm(f"shortsplit_{g}_equity.csv") for g in _SPLIT_GROUPS}
 # 短线 v3 最优 summary（v5.11.7 起主显含滑点口径 slip20，fallback 0 滑点理想口径）
@@ -246,15 +248,21 @@ _STK_GROUPS = [
     ("gem", "纯创业板", "v9split_gem_only", "shortsplit_gem_only"),
     ("star", "纯科创板", "v9split_star_only", "shortsplit_star_only"),
 ]
-# 中长线分层 summary（v5.11.9 主显含滑点 slip20，fallback 0 滑点）
+# 中长线分层 summary（v5.11.15 A80_M78 主显：Aroon强趋势过滤版，fallback 旧 slip20/0 滑点类）
 s_stk = {}
 stk_tag = {}
 for g, label, v9f, _sf in _STK_GROUPS:
-    s, lbl, tag = _load_summary(v9f + "_slip20_summary.json")
+    s, lbl, tag = _load_summary(v9f + "_a80_summary.json")       # v5.11.15 A80_M78
+    is_a80 = bool(s)
+    if not s:
+        s, lbl, tag = _load_summary(v9f + "_slip20_summary.json")  # fallback 旧
     if not s:
         s, lbl, tag = _load_summary(v9f + "_summary.json")
     s_stk[g] = s
-    stk_tag[g] = (tag or label) + (" · 含20bps滑点" if "滑点" not in (tag or "") else "")
+    if is_a80:
+        stk_tag[g] = (tag or label) + " · Aroon强趋势过滤(A80_M78)"
+    else:
+        stk_tag[g] = (tag or label) + (" · 含20bps滑点" if "滑点" not in (tag or "") else "")
 # 短线分层 summary
 ss_stk = {}
 ss_stk_tag = {}
@@ -639,7 +647,7 @@ html = f"""<!doctype html>
 <!-- ============ 视图 A：全量池中/长线 ============ -->
 {system_block(
   "view-auto", "sys-auto",
-  "🅰️ 全量池中/长线", "auto", "全市场自动池 · 股票分层+基金 ｜ 全市场绝对规则筛池 Top3 等权 · 月轮动 · 移动止损4.5% · MA150择时 ｜ 回测参考见「监控总览」",
+  "🅰️ 全量池中/长线", "auto", "全市场自动池 · 股票分层+基金 ｜ 评分=Aroon强趋势过滤(A80_M78) · 全市场绝对规则筛池 Top3 等权 · 月轮动 · 移动止损4.5% · MA150择时 ｜ 回测参考见「监控总览」",
   v9_items, "tbl-v9", "card-tbl-v9",
   "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测参考在监控总览视图",
   extra_card=WATCH_V9_CARD,
@@ -649,7 +657,7 @@ html = f"""<!doctype html>
 <!-- ============ 视图 B：固定池中/长线 ============ -->
 {system_block(
   "view-lite", "sys-lite",
-  "🅱️ 固定池中/长线", "lite", f"用户固定池 · 股票+基金 ｜ 四因子打分 Top4 · 月轮动21日 · 移动止损10% · MA200择时 ｜ 池构成：{perm_stat} ｜ 回测参考见「监控总览」",
+  "🅱️ 固定池中/长线", "lite", f"用户固定池 · 股票+基金 ｜ 评分=Aroon强趋势过滤(A80_M78) · 四因子打分 Top4 · 月轮动21日 · 移动止损10% · MA200择时 ｜ 池构成：{perm_stat} ｜ 回测参考见「监控总览」",
   v8_items, "tbl-v8", "card-tbl-v8",
   "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测参考在监控总览视图",
   as_of=DATA["meta"].get("as_of", "—"), intraday_note=DATA["meta"].get("intraday"),

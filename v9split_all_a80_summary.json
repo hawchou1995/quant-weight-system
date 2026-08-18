@@ -1,0 +1,15 @@
+{
+  "strategy": "v9_split_all_a80",
+  "label": "股票一体 · 全A",
+  "params": "T3/m25/s65/SL5.5/MA150 择时 · Aroon强趋势过滤(A80_M78)",
+  "aroon_th": 80,
+  "mom_th": 0.78,
+  "summary": {
+    "total_return_pct": 1063.44,
+    "annual_return_pct": 26.0,
+    "max_drawdown_pct": -14.87,
+    "sharpe": 1.67,
+    "win_rate_pct": 52.5,
+    "total_trades": 183
+  }
+}
