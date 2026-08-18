@@ -420,7 +420,10 @@ for c in ALL_CODES:
     short_sc = float(SH.short_score(_sr, reversal=(_board in ("主板", "创业板", "科创板"))))
     short_tier = tier(short_sc)
     details[c] = {
-        "code": c, "key": k, "name": FUND_NAMES.get(c, names.get(k, c)),
+        "code": c, "key": k,
+        # 名称按资产类型解析（2026-08-18 彻查修复）：基金名只对真基金代码生效——002474 这类
+        # 股票/基金撞号（榕基软件 vs 中邮睿信增强债券A）不能对股票套用基金名
+        "name": (FUND_NAMES.get(c) if (c in FUNDS or c in V9_FUND) else None) or names.get(k, c),
         "pool": POOL_TAG.get(c, "v8"),   # v8=个人版自选池 / v9=普适版自动池
         "perm": PERM_OF.get(c, "main"),  # main/gem/star/etf/fund 权限档
         "board": _board,
