@@ -1,0 +1,15 @@
+{
+  "strategy": "v9_split_gem_only_a80",
+  "label": "纯创业板",
+  "params": "T3/m25/s65/SL5.5/MA150 择时 · Aroon强趋势过滤(A80_M78)",
+  "aroon_th": 80,
+  "mom_th": 0.78,
+  "summary": {
+    "total_return_pct": 936.86,
+    "annual_return_pct": 24.64,
+    "max_drawdown_pct": -13.38,
+    "sharpe": 1.586,
+    "win_rate_pct": 56.1,
+    "total_trades": 180
+  }
+}
