@@ -89,10 +89,13 @@ def pool_codes(details, tag):
 
 
 def parse_pool_rows(md_text):
-    """解析单篇复盘 md 总览表的各池行 → {池名: {n, buy, wins, losses, flat, avg}}"""
+    """解析单篇复盘 md 当日总览表的各池行 → {池名: {n, buy, wins, losses, flat, avg}}
+    2026-08-18 修复：累计总览已置顶，"| 池 | 累计标的 |..." 也会以 "| 池 |" 开头——
+    必须精确匹配「当日总览」表头（第二列="标的"），否则把累计表当当日表重复累加（自乘缺陷）。
+    """
     rows, in_table = {}, False
     for ln in md_text.splitlines():
-        if ln.startswith("| 池 |"):
+        if ln.startswith("| 池 | 标的 |"):
             in_table = True
             continue
         if in_table and ln.startswith("|"):
@@ -299,7 +302,8 @@ def review(as_of=None, calc=None):
         bench = BENCH_WIN[f"短线全量池-{sub}"]
         if sub == "基金" and all(abs(r["pct"]) < 0.001 for r in buy):
             pool_notes.append("⚠️ 基金按 T+1 净值确认，收益待 T+2 净值（本次为确认日，无收益属正常）")
-        md_lines.append(f"| 短线·{sub} | {len(rs)} | {len(buy)} | {wins} | {len(buy)-wins} | 0 | "
+        flat_n = sum(1 for r in buy if abs(r["pct"]) < 0.001)
+        md_lines.append(f"| 短线·{sub} | {len(rs)} | {len(buy)} | {wins} | {len(buy)-wins-flat_n} | {flat_n} | "
                         f"{wr:.0f}% | {avg:+.2f}% | {mx:+.2f}% | {bench}% |")
     # 合计（买入信号）
     buy_all = [r for r in rows if r["buy_sig"] and r["pct"] is not None]
@@ -369,10 +373,10 @@ def review(as_of=None, calc=None):
                               "n": len(rows), "win_rate": round(wr_all, 1), "avg": round(avg_all, 2),
                               "defects": len(defects)})
     json.dump(idx, open(idx_f, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
-    # 累计总览（当天 md 已写盘 + 索引已更新 → 解析累加含当天，插入 md 后重写）
+    # 累计总览（2026-08-18 用户要求：顶部独立显示——插到「总览」之前，作为独立置顶区块）
     cum = build_cumulative()
     _full = (REVIEW_DIR / fname).read_text(encoding="utf-8")
-    _full = _full.replace("### 🔍 缺陷检测（grill）", cumulative_md(cum) + "### 🔍 缺陷检测（grill）", 1)
+    _full = _full.replace("### 📊 总览（三个监控池）", cumulative_md(cum) + "### 📊 总览（三个监控池）", 1)
     (REVIEW_DIR / fname).write_text(_full, encoding="utf-8")
     print(f"✅ 复盘已生成 review/{fname}（三池 {len(rows)} 只，买入信号 {len(buy_all)}，胜率 {wr_all:.0f}%，"
           f"缺陷 {len(defects)} 项，累计 {cum['count']} 篇，耗时 {time.time()-t0:.0f}s）")
