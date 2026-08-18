@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>标的监控看板（数据截至 2026-08-17 · 构建 2026-08-18 16:33）</title>
+<title>标的监控看板（数据截至 2026-08-18 · 构建 2026-08-18 16:43）</title>
 <style>
 :root{
   --bg:#f3f4f6; --card:#ffffff; --card2:#f9fafb; --border:#e5e7eb; --line:#f0f1f3;
@@ -243,7 +243,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <!-- ============ 视图 0：监控总览 ============ -->
 <div class="view active" id="view-overview">
 <div class="card" id="overview">
-<h2>📊 标的监控总览 <span class="badge badge-auto">数据截至 2026-08-17 收盘</span></h2>
+<h2>📊 标的监控总览 <span class="badge badge-auto">数据截至 2026-08-18 收盘</span></h2>
 <div class="sub">左侧导航切换：🅰️ 全量池中/长线（全市场自动池·股票分层+基金） / 🅱️ 固定池中/长线（用户固定池） / ⚡ 短线（占位） · 右上角「标的报告」按月查看历史收盘快照 · 信号仅供参考</div>
 <div class="kpis">
 <div class="kpi"><div class="l">🟢 加仓区</div><div class="v" style="color:#dc2626">44 只</div><div class="s">满仓+轻仓加仓</div></div>
@@ -351,7 +351,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <!-- ============ 视图 A：全量池中/长线 ============ -->
 <div class="view" id="view-auto">
 <div class="card" id="sys-auto">
-<h2>🅰️ 全量池中/长线 <span class="view-badge auto">全市场自动池 · 股票分层+基金 ｜ 全市场绝对规则筛池 Top3 等权 · 月轮动 · 移动止损4.5% · MA150择时 ｜ 回测参考见「监控总览」</span><span class="view-badge auto" title="收盘数据">数据截至 2026-08-17 15:00 · 收盘</span></h2>
+<h2>🅰️ 全量池中/长线 <span class="view-badge auto">全市场自动池 · 股票分层+基金 ｜ 全市场绝对规则筛池 Top3 等权 · 月轮动 · 移动止损4.5% · MA150择时 ｜ 回测参考见「监控总览」</span><span class="view-badge auto" title="收盘数据">数据截至 2026-08-18 15:00 · 收盘</span></h2>
 <div class="op-stats">
 <span class="op op-add">🟢 加仓区 <b>30</b> 只</span>
 <span class="op op-watch">🟡 观望 <b>0</b> 只</span>
@@ -2226,7 +2226,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 <div class="card" id="watch-v9-card">
 <h2>📌 全量池中/长线跟踪 <span class="badge badge-auto">上榜跟踪 1 年 · 再上榜 +1 年</span> </h2>
-<div class="sub">上方全量池表<b>上榜标的</b>（v9_tiers：main/gem/star/fund）每次收盘自动加入跟踪，持续 1 年（365 天）；掉出池后保留至 entry+365 天（显示最后收盘快照）；<b>再次上榜 → 从再上榜日起重新计时 1 年</b> · 数据截至 2026-08-17（收盘）</div>
+<div class="sub">上方全量池表<b>上榜标的</b>（v9_tiers：main/gem/star/fund）每次收盘自动加入跟踪，持续 1 年（365 天）；掉出池后保留至 entry+365 天（显示最后收盘快照）；<b>再次上榜 → 从再上榜日起重新计时 1 年</b> · 数据截至 2026-08-18（收盘）</div>
 <div class="toolbar" id="watch-v9-bar">
 <input type="text" id="watch-v9-q" name="watch-v9-q" placeholder="🔍 搜索代码 / 名称…" autocomplete="off" spellcheck="false" aria-label="搜索跟踪标的（代码或名称）">
 <select id="watch-v9-f-pool" class="flt" title="板块筛选" aria-label="按板块筛选"><option value="">全部板块</option></select>
@@ -2242,7 +2242,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <!-- ============ 视图 B：固定池中/长线 ============ -->
 <div class="view" id="view-lite">
 <div class="card" id="sys-lite">
-<h2>🅱️ 固定池中/长线 <span class="view-badge lite">用户固定池 · 股票+基金 ｜ 四因子打分 Top4 · 月轮动21日 · 移动止损10% · MA200择时 ｜ 池构成：股票 20 ｜ 基金 4 ｜ 回测参考见「监控总览」</span><span class="view-badge auto" title="收盘数据">数据截至 2026-08-17 15:00 · 收盘</span></h2>
+<h2>🅱️ 固定池中/长线 <span class="view-badge lite">用户固定池 · 股票+基金 ｜ 四因子打分 Top4 · 月轮动21日 · 移动止损10% · MA200择时 ｜ 池构成：股票 20 ｜ 基金 4 ｜ 回测参考见「监控总览」</span><span class="view-badge auto" title="收盘数据">数据截至 2026-08-18 15:00 · 收盘</span></h2>
 <div class="op-stats">
 <span class="op op-add">🟢 加仓区 <b>14</b> 只</span>
 <span class="op op-watch">🟡 观望 <b>4</b> 只</span>
@@ -3951,9 +3951,30 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <!-- ============ 视图 E：复盘日志（内嵌，与各池同形态） ============ -->
 <div class="view" id="view-review">
 <div class="card">
-<h2>📋 复盘日志 <span class="badge badge-auto">3 篇</span></h2>
+<h2>📋 复盘日志 <span class="badge badge-auto">4 篇</span></h2>
 <div class="sub">每个交易日复盘：信号标的哪些吃到 / 哪些被套 / 是否符合系统设计（对比回测基准）· 发现设计缺陷 → 启动系统更新并登记于「📝 更新日志」· 点击日期展开/折叠当日复盘详情</div>
-<details class="rev-item" open><summary><span class="rev-flag">✅</span><b>2026-08-17</b><span class="rev-meta">信号 2026-08-14 · 72 只 · 胜率 75.0% · 缺陷 0 项</span></summary><div class="rev-body"><div class="rev-md"><h3>📋 复盘日志 v2.0（三池全量）</h3>
+<details class="rev-item" open><summary><span class="rev-flag">✅</span><b>2026-08-18</b><span class="rev-meta">信号 2026-08-18 · 0 只 · 胜率 0% · 缺陷 0 项</span></summary><div class="rev-body"><div class="rev-md"><h3>📋 复盘日志 v2.0（三池全量）</h3>
+<h3>🗓 2026-08-18 ｜ 信号日 2026-08-18 → 计算日 2026-08-18（T+1 持仓）</h3>
+<h3>📊 总览（三个监控池）</h3>
+<table class="tbl"><thead><tr><th>池</th><th>标的</th><th>买入信号</th><th>🟢吃到</th><th>🔴被套</th><th>⚪持平</th><th>胜率</th><th>平均收益</th><th>最大亏</th><th>回测基准</th></tr></thead><tbody>
+</tbody></table>
+<h3>📈 累计总览（自 2026-08-14 首篇复盘以来，共 4 篇）</h3>
+<table class="tbl"><thead><tr><th>池</th><th>累计标的</th><th>累计买入</th><th>🟢吃到</th><th>🔴被套</th><th>⚪持平</th><th>累计胜率</th><th>累计平均收益</th></tr></thead><tbody>
+<tr><td>全量池中/长线</td><td>63</td><td>61</td><td>52</td><td>9</td><td>0</td><td>85%</td><td>+4.35%</td></tr>
+<tr><td>固定池中/长线</td><td>40</td><td>23</td><td>15</td><td>8</td><td>0</td><td>65%</td><td>+1.30%</td></tr>
+<tr><td>短线全量池</td><td>62</td><td>62</td><td>35</td><td>17</td><td>10</td><td>56%</td><td>+1.44%</td></tr>
+<tr><td>短线·主板</td><td>20</td><td>20</td><td>14</td><td>6</td><td>0</td><td>70%</td><td>+1.83%</td></tr>
+<tr><td>短线·创业板</td><td>20</td><td>20</td><td>11</td><td>9</td><td>0</td><td>55%</td><td>+1.05%</td></tr>
+<tr><td>短线·科创板</td><td>12</td><td>12</td><td>10</td><td>2</td><td>0</td><td>83%</td><td>+2.66%</td></tr>
+<tr><td>短线·基金</td><td>10</td><td>10</td><td>0</td><td>10</td><td>0</td><td>0%</td><td>+0.00%</td></tr>
+<tr><td><b>合计</b></td><td>227</td><td>208</td><td>137</td><td>61</td><td>10</td><td>66%</td><td>+2.28%</td></tr>
+</tbody></table>
+<h3>🔍 缺陷检测（grill）</h3>
+<ul><li>⚠️ <b>全量池中/长线</b>：标的行情缺失，本次跳过</li><li>⚠️ <b>固定池中/长线</b>：标的行情缺失，本次跳过</li><li>⚠️ <b>短线全量池</b>：标的行情缺失，本次跳过</li></ul>
+<h3>📑 明细</h3>
+<p>---</p>
+<blockquote>⚠️ 复盘内容由 AI 基于公开数据自动生成，仅供系统自检，不构成投资建议。</blockquote></div></div></details>
+<details class="rev-item"><summary><span class="rev-flag">✅</span><b>2026-08-17</b><span class="rev-meta">信号 2026-08-14 · 72 只 · 胜率 75.0% · 缺陷 0 项</span></summary><div class="rev-body"><div class="rev-md"><h3>📋 复盘日志 v2.0（三池全量）</h3>
 <h3>🗓 2026-08-17 ｜ 信号日 2026-08-14 → 计算日 2026-08-17（T+1 持仓）</h3>
 <h3>📊 总览（三个监控池）</h3>
 <table class="tbl"><thead><tr><th>池</th><th>标的</th><th>买入信号</th><th>🟢吃到</th><th>🔴被套</th><th>⚪持平</th><th>胜率</th><th>平均收益</th><th>最大亏</th><th>回测基准</th></tr></thead><tbody>
@@ -4281,7 +4302,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 
 </div>
-<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-18 16:33 · 版本 v5.11.8 · 数据截至 2026-08-17 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-18 16:43 · 版本 v5.11.8 · 数据截至 2026-08-18 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
