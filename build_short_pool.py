@@ -297,41 +297,91 @@ def calc_signals(as_of=None):
 def build(as_of=None):
     """计算并写文件（short_pool.js / short_signals.js / short_pool.json）"""
     out, sigs = calc_signals(as_of)
-    # ---- 自动跟踪池（2026-08-17 用户需求）：上方表格可买入标的（强买入/买入，分≥50）自动入池，30 天后自动移除 ----
+    # ---- 自动跟踪池（2026-08-18 用户需求：与中长线一致，隔日入池 + 三时间）-----
+    # 上方表格可买入标的（强买入/买入，分≥50）上榜次日收盘确认后入池，30 天后自动移除（exit=entry+30）。
+    # 新上榜先入 track_pending_short（待确认，不入正式池、不参与信号），下个收盘确认仍在榜才转正式（entry=确认日）；
+    # 每次重新上榜/转正式刷新【入池 entry / 跟踪 last_seen / 出池 exit=entry+30】三时间。
     try:
         _old_full = json.load(open(BASE / "short_pool.json", encoding="utf-8"))
     except Exception:
         _old_full = {}
-    old = _old_full.get("track", {}) or {}
+    old = _old_full.get("track", {}) or {}            # 旧正式池
+    old_pending = _old_full.get("track_pending_short", {}) or {}
     today = time.strftime("%Y-%m-%d")
-    track = dict(old)                      # 保留历史跟踪（含已掉出池的，满 30 天才删）
-    # ① 回溯上次构建的池：昨天在池且可买入、今天掉出的标的，按上次 as_of 补录（用户场景：8/14 第一位 8/17 掉出仍可跟踪）
+    track = dict(old)                                 # 正式跟踪（已确认 ≥1 个收盘）
+    pending = dict(old_pending)                       # 待确认（隔日入池候选）
+    def _exit(_e):
+        return str((pd.Timestamp(_e) + pd.Timedelta(days=30)).date())
+    # 迁移：旧正式池成员补 exit/status/last_seen/type（新字段；pool 兜底推断 type）
+    for _c, _rec in list(track.items()):
+        _rec.setdefault("exit", _exit(_rec.get("entry", today)))
+        _rec.setdefault("status", "active")
+        _rec.setdefault("last_seen", _rec.get("last_seen") or today)
+        if _rec.get("type") is None:
+            _rec["type"] = "fund" if _rec.get("pool") == "基金" else "stock"
     _old_tiers = _old_full.get("tiers", {}) or {}
+    _old_codes = {_c for _cs in _old_tiers.values() for _c in _cs}
+    _today_codes = {c for c, d in out["details"].items() if (d.get("short_score") or 0) >= 50}
+    # ① 回溯上次构建的池：昨天在池且可买入、今天掉出的标的，按上次 as_of 补录正式池（用户场景：8/14 第一位 8/17 掉出仍可跟踪）
     for _bd, _codes in _old_tiers.items():
         for _c in _codes:
-            if _c not in track:
+            if _c not in track and _c not in pending:
                 _od = (_old_full.get("details", {}) or {}).get(_c, {})
                 if (_od.get("short_score") or 0) >= 50:
-                    track[_c] = {"entry": _old_full.get("as_of") or today, "pool": _bd, "type": "fund" if _bd == "基金" else "stock"}
-    # ② 当前池可买入标的：入池（保留已有 entry）
+                    _e0 = _old_full.get("as_of") or today
+                    track[_c] = {"entry": _e0, "last_seen": _e0, "exit": _exit(_e0), "status": "active",
+                                 "pool": _bd, "type": "fund" if _bd == "基金" else "stock"}
+    # ② 当前池可买入标的
     for code, d in out["details"].items():
-        if (d.get("short_score") or 0) >= 50:
-            if code not in track:
-                track[code] = {"entry": today, "pool": d.get("board", ""), "type": "fund" if d.get("board") == "基金" else "stock"}
-    # ③ 一次性历史补偿：跟踪功能上线前（8/14 池）出现过的可买入标的，entry=2026-08-14
+        if (d.get("short_score") or 0) < 50:
+            continue
+        _bd = d.get("board", "")
+        _snap = {"name": d.get("name"), "score": d.get("short_score"), "tier": d.get("short_tier") or d.get("tier"),
+                 "pool": _bd, "type": "fund" if _bd == "基金" else "stock", "date": today}
+        rec = track.get(code)
+        if rec is not None:
+            # 已在正式池：持续在池 → 保持 entry，仅刷新 last_seen（若本次是重新上榜即上次不在池 → 刷新入口）
+            if code not in _old_codes:
+                rec["entry"] = today                   # 重新上榜：重新计时 30 天
+                rec["exit"] = _exit(today)
+            rec["last_seen"] = today
+            rec["status"] = "active"
+            rec["pool"] = _bd
+            rec["type"] = _snap["type"]
+            rec["last"] = _snap
+            track[code] = rec
+            pending.pop(code, None)
+        else:
+            pe = pending.get(code)
+            if pe is not None:
+                # 昨在 pending 且今仍在池 → 转正式（entry=今日确认收盘日）
+                _entry = today
+                track[code] = {"entry": _entry, "last_seen": today, "exit": _exit(_entry), "status": "active",
+                               "pool": _bd, "type": _snap["type"], "first_seen": pe.get("first_seen", today),
+                               "last": _snap}
+                pending.pop(code, None)
+            else:
+                # 全新上榜 → 入 pending（今日不入正式池、不参与信号，隔日确认）
+                pending[code] = {"entry_candidate": today, "first_seen": today,
+                                 "pool": _bd, "type": _snap["type"], "last": _snap}
+    # ③ 一次性历史补偿：跟踪功能上线前（8/14 池）出现过的可买入标的，直接入正式池（历史事实，entry=2026-08-14）
     if not _old_full.get("_backfilled_0814"):
         try:
             _hist_out, _ = calc_signals(as_of="2026-08-14")
             for _c, _d in _hist_out["details"].items():
                 if (_d.get("short_score") or 0) >= 50 and _c not in track:
-                    track[_c] = {"entry": "2026-08-14", "pool": _d.get("board", ""), "type": "fund" if _d.get("board") == "基金" else "stock"}
+                    track[_c] = {"entry": "2026-08-14", "last_seen": "2026-08-14", "exit": _exit("2026-08-14"), "status": "active",
+                                 "pool": _d.get("board", ""), "type": "fund" if _d.get("board") == "基金" else "stock"}
             out["_backfilled_0814"] = True
-            print(f"8/14 池历史补偿完成，跟踪池累计 {len(track)} 只", flush=True)
+            print(f"8/14 池历史补偿完成，正式跟踪池累计 {len(track)} 只、待确认 {len(pending)} 只", flush=True)
         except Exception as _e:
             print("8/14 池历史补偿失败:", _e, flush=True)
+    # ④ pending 兜底：掉出信号池且从未转正 → 移除；满 30 天移除
     cutoff = pd.Timestamp.now() - pd.Timedelta(days=30)
+    pending = {c: v for c, v in pending.items() if c in _today_codes and pd.Timestamp(v.get("entry_candidate", today)) > cutoff}
     track = {c: v for c, v in track.items() if pd.Timestamp(v.get("entry", today)) > cutoff}
     out["track"] = track
+    out["track_pending_short"] = pending
     json.dump(out, open(BASE / "short_pool.json", "w", encoding="utf-8"), ensure_ascii=False, indent=2)
     with open(BASE / "short_pool.js", "w", encoding="utf-8") as f:
         f.write("window.SHORT_POOL = " + json.dumps(out, ensure_ascii=False) + ";")
