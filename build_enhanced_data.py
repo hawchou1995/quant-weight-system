@@ -341,6 +341,7 @@ tr_auto = pd.read_csv(BASE / "v9_auto_trades.csv")
 tr_lite = pd.read_csv(BASE / "v8_lite_trades.csv")
 
 details = {}
+_eff_dates = []   # 2026-08-18 as_of 口径修复：收集池内标的实际最新交易日（池数据尾行，非 index 硬编码）
 for c in ALL_CODES:
     k = ("sh" if c.startswith(("6", "5")) else "sz") + c
     if c in FUNDS:
@@ -353,6 +354,7 @@ for c in ALL_CODES:
         continue
     # 最新收盘（08-14 或该标的最新）
     eff = ddf.index[-1]
+    _eff_dates.append(eff)
     r = ddf.loc[eff]
     px = float(r["close"])
     if pd.isna(px) or px <= 0:
@@ -459,7 +461,7 @@ def maintain_track_v9():
     规则：新上榜/再上榜（上次构建不在池）→ entry=今日（再上榜 = 重新计时 1 年）；
          持续在池 → 保持 entry；掉出池保留最后快照；entry 满 365 天 → 移除。
     track_v9: {code: {entry, last_seen, pool, last:{px,chg,score,tier,date}}}"""
-    today = str(last_day.date())
+    today = str(_as_of_day.date())
     old, old_tiers = {}, {}
     try:
         _old = json.loads((BASE / "enhanced_data.js").read_text(encoding="utf-8")[len("window.ENH = "):-1])
@@ -516,8 +518,11 @@ v_lite = load_curve("v8_lite_equity.csv")
 REPORTS_DIR = Path("D:/Documents/Obsidian/WorkBuddy/wiki/02-投资研究-Investment")
 reports = sorted([f.name for f in REPORTS_DIR.glob("research-*.md")], reverse=True)
 
+# 2026-08-18 as_of 口径修复：数据截至 = 池内标的实际最新交易日（取 max(ddf.index[-1])），
+# 而非 index_000300.csv 硬编码尾行（该指数文件手工维护易滞后，曾致 as_of 显示 08-17 但个股已含 08-18）
+_as_of_day = max(_eff_dates) if _eff_dates else last_day
 out = {
-    "meta": {"as_of": str(last_day.date()), "generated": __import__("datetime").datetime.now().strftime("%Y-%m-%d %H:%M"), "overlap": OVERLAP,
+    "meta": {"as_of": str(_as_of_day.date()), "generated": __import__("datetime").datetime.now().strftime("%Y-%m-%d %H:%M"), "overlap": OVERLAP,
              "v9_tiers": V9_TIERS},
     "nav": [["overview", "📊", "监控总览"], ["sys-auto", "🅰️", "普适版"], ["sys-lite", "🅱️", "个人版"], ["table", "📋", "标的监控表"]],
     "track_v9": maintain_track_v9(),
