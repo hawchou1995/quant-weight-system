@@ -17,8 +17,9 @@ import v8_selector as V
 import v9_auto as A
 
 
-def run_auto_inhibit(aroon_th=None, mom_th=None, fac=0.6, cap=False, **kw):
-    """基于 v9_auto.run_auto 的 Aroon 抑制变体（移除累计置信 biass 一致）"""
+def run_auto_inhibit(aroon_th=None, mom_th=None, fac=0.6, cap=False, start=None, end=None, **kw):
+    """基于 v9_auto.run_auto 的 Aroon 抑制变体（移除累计置信 biass 一致）
+    start/end：可指定回测区间（默认 V.START/V.END），用于样本外稳健性校验。"""
     import v9_auto as MA
     pool_all = MA.pool_all
     top_n = kw.get("top_n", 4); hold_days = kw.get("hold_days", 21)
@@ -28,13 +29,14 @@ def run_auto_inhibit(aroon_th=None, mom_th=None, fac=0.6, cap=False, **kw):
     use_timing = kw.get("use_timing", True); sell_score = kw.get("sell_score", 0)
     dynamic = kw.get("dynamic", False); rsi_max = kw.get("rsi_max", None)
     ma_window = kw.get("ma_window", 200); perm = kw.get("perm", "all")
+    s0 = start or V.START; e0 = end or V.END
 
     idx = V.load_index(200).set_index('date')
     idx['idx_vol'] = idx['close'].pct_change().rolling(20).std() * math.sqrt(252)
     idx_vol = idx['idx_vol'].to_dict()
     idx['ma_t'] = idx['close'].rolling(ma_window).mean()
     in_market_map = {d: bool(pd.notna(r['ma_t']) and r['close'] > r['ma_t']) for d, r in idx.iterrows()}
-    all_days = [d for d in idx.index if V.START <= str(d.date()) <= V.END]
+    all_days = [d for d in idx.index if s0 <= str(d.date()) <= e0]
     rebal_days = set(all_days[::hold_days])
     cash = cash0
     holdings, ep, ed, peak = {}, {}, {}, {}
