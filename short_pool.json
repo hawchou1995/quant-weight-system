@@ -1028,225 +1028,620 @@
   "track": {
     "601952": {
       "entry": "2026-08-17",
-      "pool": "主板"
+      "pool": "主板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "002033": {
       "entry": "2026-08-17",
-      "pool": "主板"
+      "pool": "主板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock",
+      "last": {
+        "name": "丽江股份",
+        "score": 58.2,
+        "tier": "买入",
+        "pool": "主板",
+        "type": "stock",
+        "date": "2026-08-19"
+      }
     },
     "603858": {
       "entry": "2026-08-17",
-      "pool": "主板"
+      "pool": "主板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "600251": {
       "entry": "2026-08-17",
-      "pool": "主板"
+      "pool": "主板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock",
+      "last": {
+        "name": "冠农股份",
+        "score": 58.6,
+        "tier": "买入",
+        "pool": "主板",
+        "type": "stock",
+        "date": "2026-08-19"
+      }
     },
     "600261": {
       "entry": "2026-08-17",
-      "pool": "主板"
+      "pool": "主板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock",
+      "last": {
+        "name": "阳光照明",
+        "score": 58.0,
+        "tier": "买入",
+        "pool": "主板",
+        "type": "stock",
+        "date": "2026-08-19"
+      }
     },
     "000019": {
       "entry": "2026-08-17",
-      "pool": "主板"
+      "pool": "主板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "600435": {
       "entry": "2026-08-17",
-      "pool": "主板"
+      "pool": "主板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "600363": {
       "entry": "2026-08-17",
-      "pool": "主板"
+      "pool": "主板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "600864": {
       "entry": "2026-08-17",
-      "pool": "主板"
+      "pool": "主板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "002556": {
       "entry": "2026-08-17",
-      "pool": "主板"
+      "pool": "主板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock",
+      "last": {
+        "name": "辉隆股份",
+        "score": 59.4,
+        "tier": "买入",
+        "pool": "主板",
+        "type": "stock",
+        "date": "2026-08-19"
+      }
     },
     "300172": {
       "entry": "2026-08-17",
-      "pool": "创业板"
+      "pool": "创业板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "300388": {
       "entry": "2026-08-17",
-      "pool": "创业板"
+      "pool": "创业板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock",
+      "last": {
+        "name": "节能国祯",
+        "score": 51.8,
+        "tier": "买入",
+        "pool": "创业板",
+        "type": "stock",
+        "date": "2026-08-19"
+      }
     },
     "300012": {
       "entry": "2026-08-17",
-      "pool": "创业板"
+      "pool": "创业板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock",
+      "last": {
+        "name": "华测检测",
+        "score": 51.7,
+        "tier": "买入",
+        "pool": "创业板",
+        "type": "stock",
+        "date": "2026-08-19"
+      }
     },
     "300072": {
       "entry": "2026-08-17",
-      "pool": "创业板"
+      "pool": "创业板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "300627": {
       "entry": "2026-08-17",
-      "pool": "创业板"
+      "pool": "创业板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "300375": {
       "entry": "2026-08-17",
-      "pool": "创业板"
+      "pool": "创业板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock",
+      "last": {
+        "name": "鹏翎股份",
+        "score": 52.2,
+        "tier": "买入",
+        "pool": "创业板",
+        "type": "stock",
+        "date": "2026-08-19"
+      }
     },
     "300370": {
       "entry": "2026-08-17",
-      "pool": "创业板"
+      "pool": "创业板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "301053": {
       "entry": "2026-08-17",
-      "pool": "创业板"
+      "pool": "创业板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "300194": {
       "entry": "2026-08-17",
-      "pool": "创业板"
+      "pool": "创业板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "688513": {
       "entry": "2026-08-17",
-      "pool": "科创板"
+      "pool": "科创板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "688029": {
       "entry": "2026-08-17",
-      "pool": "科创板"
+      "pool": "科创板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "688068": {
       "entry": "2026-08-17",
-      "pool": "科创板"
+      "pool": "科创板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "688739": {
       "entry": "2026-08-17",
-      "pool": "科创板"
+      "pool": "科创板",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "005005": {
       "entry": "2026-08-17",
-      "pool": "基金"
+      "pool": "基金",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "fund",
+      "last": {
+        "name": "中金瑞安混合发起A",
+        "score": 70.7,
+        "tier": "强买入",
+        "pool": "基金",
+        "type": "fund",
+        "date": "2026-08-19"
+      }
     },
     "005006": {
       "entry": "2026-08-17",
-      "pool": "基金"
+      "pool": "基金",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "fund",
+      "last": {
+        "name": "中金瑞安混合发起C",
+        "score": 70.6,
+        "tier": "强买入",
+        "pool": "基金",
+        "type": "fund",
+        "date": "2026-08-19"
+      }
     },
     "000314": {
       "entry": "2026-08-17",
-      "pool": "基金"
+      "pool": "基金",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "fund",
+      "last": {
+        "name": "招商瑞丰灵活配置混合发起式A",
+        "score": 63.3,
+        "tier": "强买入",
+        "pool": "基金",
+        "type": "fund",
+        "date": "2026-08-19"
+      }
     },
     "002017": {
       "entry": "2026-08-17",
-      "pool": "基金"
+      "pool": "基金",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "fund",
+      "last": {
+        "name": "招商瑞丰灵活配置混合发起式C",
+        "score": 63.2,
+        "tier": "强买入",
+        "pool": "基金",
+        "type": "fund",
+        "date": "2026-08-19"
+      }
     },
     "004355": {
       "entry": "2026-08-17",
-      "pool": "基金"
+      "pool": "基金",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "fund",
+      "last": {
+        "name": "嘉实丰和灵活配置混合A",
+        "score": 62.4,
+        "tier": "强买入",
+        "pool": "基金",
+        "type": "fund",
+        "date": "2026-08-19"
+      }
     },
     "002158": {
       "entry": "2026-08-17",
-      "pool": "基金"
+      "pool": "基金",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "fund",
+      "last": {
+        "name": "汇添富安鑫智选混合C",
+        "score": 61.2,
+        "tier": "强买入",
+        "pool": "基金",
+        "type": "fund",
+        "date": "2026-08-19"
+      }
     },
     "001796": {
       "entry": "2026-08-17",
-      "pool": "基金"
+      "pool": "基金",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "fund",
+      "last": {
+        "name": "汇添富安鑫智选混合A",
+        "score": 61.1,
+        "tier": "强买入",
+        "pool": "基金",
+        "type": "fund",
+        "date": "2026-08-19"
+      }
     },
     "002133": {
       "entry": "2026-08-17",
-      "pool": "基金"
+      "pool": "基金",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "fund",
+      "last": {
+        "name": "广发鑫益混合",
+        "score": 60.8,
+        "tier": "强买入",
+        "pool": "基金",
+        "type": "fund",
+        "date": "2026-08-19"
+      }
     },
     "002495": {
       "entry": "2026-08-17",
-      "pool": "基金"
+      "pool": "基金",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "fund",
+      "last": {
+        "name": "前海开源量化优选A",
+        "score": 60.8,
+        "tier": "强买入",
+        "pool": "基金",
+        "type": "fund",
+        "date": "2026-08-19"
+      }
     },
     "002496": {
       "entry": "2026-08-17",
-      "pool": "基金"
+      "pool": "基金",
+      "exit": "2026-09-16",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "fund",
+      "last": {
+        "name": "前海开源量化优选C",
+        "score": 60.6,
+        "tier": "强买入",
+        "pool": "基金",
+        "type": "fund",
+        "date": "2026-08-19"
+      }
     },
     "002636": {
       "entry": "2026-08-14",
-      "pool": "主板"
+      "pool": "主板",
+      "exit": "2026-09-13",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "601890": {
       "entry": "2026-08-14",
-      "pool": "主板"
+      "pool": "主板",
+      "exit": "2026-09-13",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "000768": {
       "entry": "2026-08-14",
-      "pool": "主板"
+      "pool": "主板",
+      "exit": "2026-09-13",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "002030": {
       "entry": "2026-08-14",
-      "pool": "主板"
+      "pool": "主板",
+      "exit": "2026-09-13",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "000850": {
       "entry": "2026-08-14",
-      "pool": "主板"
+      "pool": "主板",
+      "exit": "2026-09-13",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "002536": {
       "entry": "2026-08-14",
-      "pool": "主板"
+      "pool": "主板",
+      "exit": "2026-09-13",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "603538": {
       "entry": "2026-08-14",
-      "pool": "主板"
+      "pool": "主板",
+      "exit": "2026-09-13",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "300247": {
       "entry": "2026-08-14",
-      "pool": "创业板"
+      "pool": "创业板",
+      "exit": "2026-09-13",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "300453": {
       "entry": "2026-08-14",
-      "pool": "创业板"
+      "pool": "创业板",
+      "exit": "2026-09-13",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "300912": {
       "entry": "2026-08-14",
-      "pool": "创业板"
+      "pool": "创业板",
+      "exit": "2026-09-13",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "300009": {
       "entry": "2026-08-14",
-      "pool": "创业板"
+      "pool": "创业板",
+      "exit": "2026-09-13",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "300406": {
       "entry": "2026-08-14",
-      "pool": "创业板"
+      "pool": "创业板",
+      "exit": "2026-09-13",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "300832": {
       "entry": "2026-08-14",
-      "pool": "创业板"
+      "pool": "创业板",
+      "exit": "2026-09-13",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "300463": {
       "entry": "2026-08-14",
-      "pool": "创业板"
+      "pool": "创业板",
+      "exit": "2026-09-13",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "688137": {
       "entry": "2026-08-14",
-      "pool": "科创板"
+      "pool": "科创板",
+      "exit": "2026-09-13",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "type": "stock"
     },
     "600523": {
       "entry": "2026-08-18",
       "pool": "主板",
-      "type": "stock"
+      "type": "stock",
+      "exit": "2026-09-17",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "last": {
+        "name": "贵航股份",
+        "score": 56.8,
+        "tier": "买入",
+        "pool": "主板",
+        "type": "stock",
+        "date": "2026-08-19"
+      }
     },
     "601156": {
       "entry": "2026-08-18",
       "pool": "主板",
-      "type": "stock"
+      "type": "stock",
+      "exit": "2026-09-17",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "last": {
+        "name": "东航物流",
+        "score": 56.6,
+        "tier": "买入",
+        "pool": "主板",
+        "type": "stock",
+        "date": "2026-08-19"
+      }
     },
     "600081": {
       "entry": "2026-08-18",
       "pool": "主板",
-      "type": "stock"
+      "type": "stock",
+      "exit": "2026-09-17",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "last": {
+        "name": "东风科技",
+        "score": 56.6,
+        "tier": "买入",
+        "pool": "主板",
+        "type": "stock",
+        "date": "2026-08-19"
+      }
     },
     "600817": {
       "entry": "2026-08-18",
       "pool": "主板",
-      "type": "stock"
+      "type": "stock",
+      "exit": "2026-09-17",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "last": {
+        "name": "宇通重工",
+        "score": 56.2,
+        "tier": "买入",
+        "pool": "主板",
+        "type": "stock",
+        "date": "2026-08-19"
+      }
     },
     "601099": {
       "entry": "2026-08-18",
       "pool": "主板",
-      "type": "stock"
+      "type": "stock",
+      "exit": "2026-09-17",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "last": {
+        "name": "太平洋",
+        "score": 55.8,
+        "tier": "买入",
+        "pool": "主板",
+        "type": "stock",
+        "date": "2026-08-19"
+      }
     },
     "600168": {
       "entry": "2026-08-18",
       "pool": "主板",
-      "type": "stock"
+      "type": "stock",
+      "exit": "2026-09-17",
+      "status": "active",
+      "last_seen": "2026-08-19",
+      "last": {
+        "name": "武汉控股",
+        "score": 55.6,
+        "tier": "买入",
+        "pool": "主板",
+        "type": "stock",
+        "date": "2026-08-19"
+      }
     }
-  }
+  },
+  "track_pending_short": {}
 }
