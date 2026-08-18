@@ -365,7 +365,7 @@ WATCH_CARD = f'''<div class="card" id="watch-card">
 <div class="sub">上方短线表<b>可买入标的（强买入/买入）</b>每次收盘自动加入跟踪，30 天后自动移除 · 卖出规则（与回测一致）：<b>收盘跌破 MA5 → 次日开盘卖出</b> ｜ 掉出信号池 → 下次轮动换出 ｜ 档位减半/清仓 → 按档位操作 · 数据截至 {SHORT_POOL_ASOF}（基金净值 T-1：{SHORT_POOL.get("fund_as_of", "—")}）</div>
 <div class="toolbar" id="watch-bar">
 <input type="text" id="watch-q" name="watch-q" placeholder="🔍 搜索代码 / 名称…" autocomplete="off" spellcheck="false" aria-label="搜索跟踪标的（代码或名称）">
-<select id="watch-f-type" class="flt" title="类型筛选" aria-label="按类型筛选"><option value="">全部类型</option><option value="stock">股票</option><option value="fund">基金</option></select>
+<select id="watch-f-type" class="flt" title="类型/权限筛选" aria-label="按类型或权限筛选"><option value="">全部类型</option></select>
 <select id="watch-f-inpool" class="flt" title="在池状态筛选" aria-label="按在池状态筛选"><option value="">全部状态</option><option value="1">在池</option><option value="0">已掉出（待轮动换出）</option></select>
 <select id="watch-f-tier" class="flt" title="档位筛选" aria-label="按档位筛选"><option value="">全部档位</option></select>
 <select id="watch-sort" class="flt" title="排序方式" aria-label="排序方式"><option value="entry">加入时间 ↓</option><option value="chg">涨跌 ↓</option><option value="score">短线分 ↓</option><option value="name">名称 ↑</option><option value="left">剩余天数 ↑</option></select>
@@ -768,7 +768,7 @@ document.addEventListener('DOMContentLoaded',function(){{
       var t=track[code]||{{}};var entry=t.entry?new Date(String(t.entry).replace(/-/g,'/')):null;
       var age=entry?Math.floor((now-entry)/86400000):0;
       if(age>=30)return;   // 30 天过期（前端兜底，与服务端一致）
-      base.push({{code:code,entry:t.entry||'—',age:age,type:t.type||''}});
+      base.push({{code:code,entry:t.entry||'—',age:age,type:t.type||'',pool:t.pool||''}});
     }});
     var bar=document.getElementById('watch-bar');
     var topSet={{}};
@@ -780,7 +780,7 @@ document.addEventListener('DOMContentLoaded',function(){{
       if(r.type==='stock'||r.type==='fund'){{if(S[r.type]&&S[r.type][code]){{rec=S[r.type][code];grp=r.type;}}}}
       if(!rec&&S.stock&&S.stock[code]){{rec=S.stock[code];grp='stock';}}
       if(!rec&&S.fund&&S.fund[code]){{rec=S.fund[code];grp='fund';}}
-      if(!rec){{rows.push({{code:code,entry:r.entry,age:r.age,grp:grp,rec:null,inPool:0}});return;}}
+      if(!rec){{rows.push({{code:code,entry:r.entry,age:r.age,grp:grp,typeName:r.pool||'股票',rec:null,inPool:0}});return;}}
       var act,actCls;
       if(rec.ma5_above===false){{act='⚠️ 次日卖出（破MA5）';actCls='down';}}
       else if(rec.tier==='清仓'){{act='🔴 清仓';actCls='down';}}
@@ -788,7 +788,8 @@ document.addEventListener('DOMContentLoaded',function(){{
       else if(!topSet[code]){{act='🔄 下次轮动换出';actCls='warn';}}
       else if(rec.tier==='轻仓加仓'||rec.tier==='满仓加仓'){{act='✅ 继续持有';actCls='up';}}
       else {{act='🟡 观望（不补不加）';actCls='warn';}}
-      rows.push({{code:code,entry:r.entry,age:r.age,grp:grp,rec:rec,act:act,actCls:actCls,inPool:topSet[code]?1:0}});
+      var typeName=(grp==='fund'||r.type==='fund')?'基金':(r.pool||'股票');   // 2026-08-18 用户需求：股票类型按权限细分（主板/创业板/科创板）
+      rows.push({{code:code,entry:r.entry,age:r.age,grp:grp,typeName:typeName,pool:r.pool,rec:rec,act:act,actCls:actCls,inPool:topSet[code]?1:0}});
     }});
     if(bar){{bar.style.display=rows.length?'':'none';}}
     if(!rows.length){{box.innerHTML='<div class="sub" style="color:var(--faint)">暂无跟踪 —— 短线表出现可买入标的（强买入/买入）后自动加入，保留 30 天</div>';return;}}
@@ -799,10 +800,16 @@ document.addEventListener('DOMContentLoaded',function(){{
     var ftier=document.getElementById('watch-f-tier').value;
     var sortKey=document.getElementById('watch-sort').value||'entry';
     fillTierOptions('watch-f-tier', rows.map(function(r){{return r.rec?r.rec.tier:null;}}));
+    var seenType={{}};var typeOpts=[];
+    rows.forEach(function(r){{if(r.typeName&&!seenType[r.typeName]){{seenType[r.typeName]=1;typeOpts.push(r.typeName);}}}});
+    var tsel=document.getElementById('watch-f-type');
+    if(tsel){{var tcur=tsel.value;
+      var th='<option value="">全部类型</option>'+typeOpts.map(function(t){{return '<option value="'+t+'">'+t+'</option>';}}).join('');
+      if(tsel.innerHTML!==th){{tsel.innerHTML=th;if(tcur)tsel.value=tcur;}}}}
     var filtered=rows.filter(function(r){{
       if(!r.rec)return false;
       if(q&&!(r.code.toLowerCase().indexOf(q)>=0||(r.rec.name||'').toLowerCase().indexOf(q)>=0))return false;
-      if(ftype&&r.grp!==ftype)return false;
+      if(ftype&&r.typeName!==ftype)return false;
       if(fpool!==''&&String(r.inPool)!==fpool)return false;
       if(ftier&&r.rec.tier!==ftier)return false;
       return true;
@@ -822,9 +829,8 @@ document.addEventListener('DOMContentLoaded',function(){{
     var h='<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>类型</th><th style="text-align:center">入池日期</th><th style="text-align:center">已跟踪</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">短线分</th><th style="text-align:center">档位</th><th style="text-align:center">MA5</th><th style="text-align:center">建议动作</th></tr></thead><tbody>';
     filtered.forEach(function(r){{
       var rec=r.rec;
-      var gName=r.grp==='stock'?'股票':'基金';
       var ageS=r.age===null?'—':(r.age+' 天 / 剩 '+(30-r.age)+' 天');
-      h+='<tr><td>'+r.code+'</td><td>'+rec.name+'</td><td>'+gName+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+ageS+'</td><td style="text-align:right">'+rec.px+'</td><td style="text-align:right" class="'+(rec.chg>0?'up':'down')+'">'+(rec.chg>0?'+':'')+rec.chg+'%</td><td style="text-align:center">'+rec.score+'</td><td style="text-align:center">'+rec.tier+'</td><td style="text-align:center">'+(rec.ma5_above?'✅ 上方':'⚠️ 下方')+'</td><td style="text-align:center" class="'+r.actCls+'">'+r.act+'</td></tr>';
+      h+='<tr><td>'+r.code+'</td><td>'+rec.name+'</td><td>'+r.typeName+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+ageS+'</td><td style="text-align:right">'+rec.px+'</td><td style="text-align:right" class="'+(rec.chg>0?'up':'down')+'">'+(rec.chg>0?'+':'')+rec.chg+'%</td><td style="text-align:center">'+rec.score+'</td><td style="text-align:center">'+rec.tier+'</td><td style="text-align:center">'+(rec.ma5_above?'✅ 上方':'⚠️ 下方')+'</td><td style="text-align:center" class="'+r.actCls+'">'+r.act+'</td></tr>';
     }});
     h+='</tbody></table>';
     box.innerHTML=h;
