@@ -37,27 +37,36 @@ def build_review_log():
     cum = json.loads(cum_f.read_text(encoding="utf-8")) if cum_f.exists() else None
     cum_html = ""
     if cum and cum.get("pools"):
+        # 回测基准映射（与 review_daily.BENCH_WIN 同源；累计池名 → 基准%）
+        BENCH_MAP = {
+            "全量池中/长线": 48.1, "固定池中/长线": 57.1,
+            "短线·主板": 46.8, "短线·创业板": 48.1, "短线·科创板": 57.8, "短线·基金": 55.5,
+        }
         rows = []
         T = {"n": 0, "buy": 0, "wins": 0, "losses": 0, "flat": 0, "sum_pct": 0.0}
         for name, a in cum["pools"].items():
             wr = (a["wins"] / a["buy"] * 100) if a.get("buy") else 0
             avg = (a["sum_pct"] / a["buy"]) if a.get("buy") else 0
+            bench = BENCH_MAP.get(name)
+            bench_s = f"{bench:.1f}%" if bench is not None else "—"
+            diff = f"（{(wr-bench):+0.1f}pct）" if bench is not None and a.get("buy") else ""
             rows.append(f"<tr><td>{name}</td><td>{a['n']}</td><td>{a['buy']}</td><td>{a['wins']}</td>"
-                        f"<td>{a['losses']}</td><td>{a['flat']}</td><td>{wr:.0f}%</td><td>{avg:+.2f}%</td></tr>")
+                        f"<td>{a['losses']}</td><td>{a['flat']}</td><td>{wr:.0f}%</td><td>{bench_s} {diff}</td>"
+                        f"<td>{avg:+.2f}%</td></tr>")
             for k in T:
                 T[k] += a[k]
         if T["buy"]:
             rows.append(f"<tr style='font-weight:700'><td>合计</td><td>{T['n']}</td><td>{T['buy']}</td><td>{T['wins']}</td>"
-                        f"<td>{T['losses']}</td><td>{T['flat']}</td><td>{T['wins']/T['buy']*100:.0f}%</td>"
+                        f"<td>{T['losses']}</td><td>{T['flat']}</td><td>{T['wins']/T['buy']*100:.0f}%</td><td>—</td>"
                         f"<td>{T['sum_pct']/T['buy']:+.2f}%</td></tr>")
         cum_html = f"""
 <div class="card">
 <div class="back-bar" style="margin-bottom:8px">
 <h2 style="margin:0">📈 累计总览 <span class="badge badge-auto">自 {cum.get('since','—')} · {cum.get('count',0)} 篇</span></h2>
 </div>
-<div class="sub">三池累计：所有已发复盘的信号标的合计（防重：同篇只累加一次；短线·基金 T+1 净值未出计 ⚪持平）</div>
+<div class="sub">三池累计：所有已发复盘的信号标的合计（防重：同篇只累加一次；短线·基金 T+1 净值未出计 ⚪持平）· 回测基准 = 各池 2016-01 起回测胜率</div>
 <div style="overflow-x:auto"><table class="cum-tbl">
-<thead><tr><th>池</th><th>累计标的</th><th>累计买入</th><th>🟢吃到</th><th>🔴被套</th><th>⚪持平</th><th>累计胜率</th><th>累计均收</th></tr></thead>
+<thead><tr><th>池</th><th>累计标的</th><th>累计买入</th><th>🟢吃到</th><th>🔴被套</th><th>⚪持平</th><th>累计胜率</th><th>回测基准</th><th>累计均收</th></tr></thead>
 <tbody>{''.join(rows)}</tbody>
 </table></div>
 </div>"""

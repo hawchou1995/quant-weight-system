@@ -469,24 +469,32 @@ _cum_f = BASE / "review" / "cumulative.json"
 if _cum_f.exists():
     _cdata = json.loads(_cum_f.read_text(encoding="utf-8"))
     if _cdata.get("pools"):
+        _CBENCH = {
+            "全量池中/长线": 48.1, "固定池中/长线": 57.1,
+            "短线·主板": 46.8, "短线·创业板": 48.1, "短线·科创板": 57.8, "短线·基金": 55.5,
+        }
         _crows = []
         _CT = {"n": 0, "buy": 0, "wins": 0, "losses": 0, "flat": 0, "sum_pct": 0.0}
         for _cn, _ca in _cdata["pools"].items():
             _cwr = (_ca["wins"] / _ca["buy"] * 100) if _ca.get("buy") else 0
             _cavg = (_ca["sum_pct"] / _ca["buy"]) if _ca.get("buy") else 0
+            _bench = _CBENCH.get(_cn)
+            _bench_s = f"{_bench:.1f}%" if _bench is not None else "—"
+            _diff = f"（{(_cwr-_bench):+0.1f}pct）" if _bench is not None and _ca.get("buy") else ""
             _crows.append(f"<tr><td>{_cn}</td><td>{_ca['n']}</td><td>{_ca['buy']}</td><td>{_ca['wins']}</td>"
-                          f"<td>{_ca['losses']}</td><td>{_ca['flat']}</td><td>{_cwr:.0f}%</td><td>{_cavg:+.2f}%</td></tr>")
+                          f"<td>{_ca['losses']}</td><td>{_ca['flat']}</td><td>{_cwr:.0f}%</td>"
+                          f"<td>{_bench_s} {_diff}</td><td>{_cavg:+.2f}%</td></tr>")
             for _k in _CT:
                 _CT[_k] += _ca[_k]
         if _CT["buy"]:
             _crows.append(f"<tr class='rev-cum-total'><td>合计</td><td>{_CT['n']}</td><td>{_CT['buy']}</td><td>{_CT['wins']}</td>"
                           f"<td>{_CT['losses']}</td><td>{_CT['flat']}</td><td>{_CT['wins']/_CT['buy']*100:.0f}%</td>"
-                          f"<td>{_CT['sum_pct']/_CT['buy']:+.2f}%</td></tr>")
+                          f"<td>—</td><td>{_CT['sum_pct']/_CT['buy']:+.2f}%</td></tr>")
         _rev_cum = (f'<div class="rev-cum"><div class="rev-cum-title">📈 累计总览'
                     f'<span class="rev-cum-badge">自 {_cdata.get("since","—")} · {_cdata.get("count",0)} 篇</span></div>'
-                    f'<div class="rev-cum-sub">三池累计信号标的（防重累加；短线·基金 T+1 净值未出计持平）</div>'
+                    f'<div class="rev-cum-sub">三池累计信号标的（防重累加；短线·基金 T+1 净值未出计持平）· 回测基准 = 2016 起回测胜率</div>'
                     f'<table class="tbl"><thead><tr><th>池</th><th>累计标的</th><th>累计买入</th><th>🟢吃到</th>'
-                    f'<th>🔴被套</th><th>⚪持平</th><th>累计胜率</th><th>累计均收</th></tr></thead>'
+                    f'<th>🔴被套</th><th>⚪持平</th><th>累计胜率</th><th>回测基准</th><th>累计均收</th></tr></thead>'
                     f'<tbody>{"".join(_crows)}</tbody></table></div>')
 
 CHANGELOG_HTML = ""

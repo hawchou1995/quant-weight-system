@@ -42,6 +42,13 @@ BENCH_WIN = {
 
 TIER_W = [("满仓加仓", 75), ("轻仓加仓", 60), ("观望", 45), ("减至半仓", 30), ("清仓", 0)]
 
+# 已知案例登记（2026-08-18）：缺陷检测命中已立项/已评估的标的时，标注状态而非纯告警。
+# code -> {kind, status}；kind 与缺陷类型匹配（deep=深套 / fix_pool_sig=固定池信号失效）
+KNOWN_CASES = {
+    "300720": {"kind": "deep",
+               "status": "🟡 已回测评估：Aroon 高位抑制敏感性 5/9 正向（A50/M060 最优 +304% vs 基线 192%=+112pct、回撤 -3.8pct、夏普 0.83），未达 ≥7/9 投产门槛 → 观察待投产"},
+}
+
 # 权限 → 板块中文名（与三个监控池统一口径，2026-08-17 去 etf）
 PERM_ZH = {"main": "主板", "gem": "创业板", "star": "科创板", "fund": "基金"}
 
@@ -322,7 +329,14 @@ def review(as_of=None, calc=None):
             defects.append(f"⚠️ **MA5 破位率 {ma5_down}/{len(buy_all)}（{ma5_down/len(buy_all)*100:.0f}% > 50%）**：趋势恶化，次日应批量减仓")
         deep = [r for r in buy_all if r["pct"] < -8]
         if deep:
-            names = "、".join(f"{r['name']}({r['pct']:.1f}%)" for r in deep[:5])
+            parts = []
+            for r in deep[:5]:
+                kc = KNOWN_CASES.get(r["code"])
+                if kc and kc.get("kind") == "deep":
+                    parts.append(f"{r['name']}({r['pct']:.1f}%) {kc['status']}")
+                else:
+                    parts.append(f"{r['name']}({r['pct']:.1f}%)")
+            names = "；".join(parts)
             defects.append(f"🔴 **深套标的**（<-8%，回测单笔分布 P1=-6.0%，-8% 属极值尾部）：{names}")
     md_lines.append("### 🔍 缺陷检测（grill）")
     if pool_notes:
