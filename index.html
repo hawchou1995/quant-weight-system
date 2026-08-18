@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>标的监控看板（数据截至 2026-08-18 · 构建 2026-08-18 09:48）</title>
+<title>标的监控看板（数据截至 2026-08-18 · 构建 2026-08-18 11:01）</title>
 <style>
 :root{
   --bg:#f3f4f6; --card:#ffffff; --card2:#f9fafb; --border:#e5e7eb; --line:#f0f1f3;
@@ -189,6 +189,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 .rev-md blockquote{background:var(--card2);border-left:3px solid var(--accent);padding:8px 12px;margin:8px 0;border-radius:0 8px 8px 0;color:var(--sub)}
 /* 持仓跟踪 */
 #watch-table .up{color:#22c55e} #watch-table .down{color:#ef4444} #watch-table .warn{color:#f59e0b}
+#watch-v9-table .up{color:#22c55e} #watch-v9-table .down{color:#ef4444} #watch-v9-table .warn{color:#f59e0b}
+#watch-table td,#watch-v9-table td{font-variant-numeric:tabular-nums}
 .bt-short{background:var(--card2);border:1px dashed var(--border);border-radius:14px;padding:22px;text-align:center;margin-top:16px}
 .bt-short h3{margin:0 0 8px;color:var(--sub);font-size:15px}
 .bt-short .sub{color:var(--faint);font-size:12px;line-height:1.8}
@@ -2223,8 +2225,16 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div></div></div>
 </div>
 <div class="card" id="watch-v9-card">
-<h2>📌 全量池中/长线跟踪 <span class="badge badge-auto">上榜跟踪 1 年 · 再上榜 +1 年</span> <span class="count" id="watch-v9-count" style="font-size:12px"></span></h2>
+<h2>📌 全量池中/长线跟踪 <span class="badge badge-auto">上榜跟踪 1 年 · 再上榜 +1 年</span> </h2>
 <div class="sub">上方全量池表<b>上榜标的</b>（v9_tiers：main/gem/star/fund）每次收盘自动加入跟踪，持续 1 年（365 天）；掉出池后保留至 entry+365 天（显示最后收盘快照）；<b>再次上榜 → 从再上榜日起重新计时 1 年</b> · 数据截至 2026-08-18（收盘）</div>
+<div class="toolbar" id="watch-v9-bar">
+<input type="text" id="watch-v9-q" name="watch-v9-q" placeholder="🔍 搜索代码 / 名称…" autocomplete="off" spellcheck="false" aria-label="搜索跟踪标的（代码或名称）">
+<select id="watch-v9-f-pool" class="flt" title="板块筛选" aria-label="按板块筛选"><option value="">全部板块</option></select>
+<select id="watch-v9-f-status" class="flt" title="状态筛选" aria-label="按状态筛选"><option value="">全部状态</option><option value="1">在池</option><option value="0">已掉出池（观察）</option></select>
+<select id="watch-v9-f-tier" class="flt" title="档位筛选" aria-label="按档位筛选"><option value="">全部档位</option></select>
+<select id="watch-v9-sort" class="flt" title="排序方式" aria-label="排序方式"><option value="entry">加入时间 ↓</option><option value="chg">涨跌 ↓</option><option value="score">权重分 ↓</option><option value="name">名称 ↑</option><option value="left">剩余天数 ↑</option></select>
+<span class="count" id="watch-v9-count"></span>
+</div>
 <div id="watch-v9-table"></div>
 </div>
 </div>
@@ -4135,8 +4145,16 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div></div></div>
 </div>
 <div class="card" id="watch-card">
-<h2>📌 全量池短线跟踪 <span class="badge badge-auto">自动 · 保留 30 天</span> <span class="count" id="watch-count" style="font-size:12px"></span></h2>
+<h2>📌 全量池短线跟踪 <span class="badge badge-auto">自动 · 保留 30 天</span></h2>
 <div class="sub">上方短线表<b>可买入标的（强买入/买入）</b>每次收盘自动加入跟踪，30 天后自动移除 · 卖出规则（与回测一致）：<b>收盘跌破 MA5 → 次日开盘卖出</b> ｜ 掉出信号池 → 下次轮动换出 ｜ 档位减半/清仓 → 按档位操作 · 数据截至 2026-08-18（基金净值 T-1：2026-08-14）</div>
+<div class="toolbar" id="watch-bar">
+<input type="text" id="watch-q" name="watch-q" placeholder="🔍 搜索代码 / 名称…" autocomplete="off" spellcheck="false" aria-label="搜索跟踪标的（代码或名称）">
+<select id="watch-f-type" class="flt" title="类型筛选" aria-label="按类型筛选"><option value="">全部类型</option><option value="stock">股票</option><option value="fund">基金</option></select>
+<select id="watch-f-inpool" class="flt" title="在池状态筛选" aria-label="按在池状态筛选"><option value="">全部状态</option><option value="1">在池</option><option value="0">已掉出（待轮动换出）</option></select>
+<select id="watch-f-tier" class="flt" title="档位筛选" aria-label="按档位筛选"><option value="">全部档位</option></select>
+<select id="watch-sort" class="flt" title="排序方式" aria-label="排序方式"><option value="entry">加入时间 ↓</option><option value="chg">涨跌 ↓</option><option value="score">短线分 ↓</option><option value="name">名称 ↑</option><option value="left">剩余天数 ↑</option></select>
+<span class="count" id="watch-count"></span>
+</div>
 <div id="watch-table"></div>
 </div>
 </div>
@@ -4483,7 +4501,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 
 </div>
-<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-18 09:48 · 版本 v5.11.8 · 数据截至 2026-08-18 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-18 11:01 · 版本 v5.11.8 · 数据截至 2026-08-18 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
@@ -4916,35 +4934,36 @@ document.addEventListener('DOMContentLoaded',function(){
   renderSubCurve();   // 基金回测净值曲线
   renderReportMenu();
   /* 全量池短线跟踪：自动跟踪池（SHORT_POOL.track，可买入标的 30 天）+ 可选手动补充（localStorage） */
+  function fillTierOptions(selId,tiers){
+    var sel=document.getElementById(selId);if(!sel)return;
+    var cur=sel.value;
+    var seen={};var opts=[];
+    tiers.forEach(function(t){if(t&&!seen[t]){seen[t]=1;opts.push(t);}});
+    var html='<option value="">全部档位</option>'+opts.map(function(t){return '<option value="'+t+'">'+t+'</option>';}).join('');
+    if(sel.innerHTML!==html){sel.innerHTML=html;if(cur)sel.value=cur;}
+  }
   function renderWatch(){
     var box=document.getElementById('watch-table');if(!box)return;
     var S=window.SHORT_SIGNALS;if(!S){box.innerHTML='<div class="sub">信号数据未加载（缺 short_signals.js）</div>';return;}
     var track=(window.SHORT_POOL&&window.SHORT_POOL.track)?window.SHORT_POOL.track:{};
-    var now=new Date();var rows=[];
+    var now=new Date();var base=[];
     Object.keys(track).forEach(function(code){
       var t=track[code]||{};var entry=t.entry?new Date(String(t.entry).replace(/-/g,'/')):null;
       var age=entry?Math.floor((now-entry)/86400000):0;
       if(age>=30)return;   // 30 天过期（前端兜底，与服务端一致）
-      rows.push({code:code,entry:t.entry||'—',age:age,type:t.type||''});
+      base.push({code:code,entry:t.entry||'—',age:age,type:t.type||''});
     });
-    // 按入池日期倒序（新入池在前，2026-08-17 可读性优化）
-    rows.sort(function(a,b){
-      var da=a.entry&&a.entry!=='—'?new Date(String(a.entry).replace(/-/g,'/')):null;
-      var db=b.entry&&b.entry!=='—'?new Date(String(b.entry).replace(/-/g,'/')):null;
-      if(!da&&!db)return 0;if(!da)return 1;if(!db)return -1;return db-da;});
-    var cnt=document.getElementById('watch-count');
-    if(cnt)cnt.textContent='跟踪 '+rows.length+' 只';
-    if(!rows.length){box.innerHTML='<div class="sub" style="color:var(--faint)">暂无跟踪 —— 短线表出现可买入标的（强买入/买入）后自动加入，保留 30 天</div>';return;}
+    var bar=document.getElementById('watch-bar');
     var topSet={};
     if(window.SHORT_POOL){Object.keys(window.SHORT_POOL.tiers||{}).forEach(function(g){(window.SHORT_POOL.tiers[g]||[]).forEach(function(c){topSet[c]=1;});});}
-    var h='<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>类型</th><th style="text-align:center">入池日期</th><th style="text-align:center">已跟踪</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">短线分</th><th style="text-align:center">档位</th><th style="text-align:center">MA5</th><th style="text-align:center">建议动作</th></tr></thead><tbody>';
-    rows.forEach(function(r){
+    // 解析信号数据（名称/涨跌/分/档位），未找到代码的单独标记
+    var rows=[];
+    base.forEach(function(r){
       var code=r.code,rec=null,grp='';
-      // 类型优先（2026-08-17 修复：股票/场外基金 6 位代码可能冲突，如 002636 股票=金安国纪、基金=广发集裕债券A，后者曾覆盖前者）
       if(r.type==='stock'||r.type==='fund'){if(S[r.type]&&S[r.type][code]){rec=S[r.type][code];grp=r.type;}}
       if(!rec&&S.stock&&S.stock[code]){rec=S.stock[code];grp='stock';}
       if(!rec&&S.fund&&S.fund[code]){rec=S.fund[code];grp='fund';}
-      if(!rec){h+='<tr><td>'+code+'</td><td colspan="10" style="color:var(--faint)">未找到该代码（可能已退市/不在监控范围）</td></tr>';return;}
+      if(!rec){rows.push({code:code,entry:r.entry,age:r.age,grp:grp,rec:null,inPool:0});return;}
       var act,actCls;
       if(rec.ma5_above===false){act='⚠️ 次日卖出（破MA5）';actCls='down';}
       else if(rec.tier==='清仓'){act='🔴 清仓';actCls='down';}
@@ -4952,15 +4971,53 @@ document.addEventListener('DOMContentLoaded',function(){
       else if(!topSet[code]){act='🔄 下次轮动换出';actCls='warn';}
       else if(rec.tier==='轻仓加仓'||rec.tier==='满仓加仓'){act='✅ 继续持有';actCls='up';}
       else {act='🟡 观望（不补不加）';actCls='warn';}
-      var gName=grp==='stock'?'股票':'基金';
+      rows.push({code:code,entry:r.entry,age:r.age,grp:grp,rec:rec,act:act,actCls:actCls,inPool:topSet[code]?1:0});
+    });
+    if(bar){bar.style.display=rows.length?'':'none';}
+    if(!rows.length){box.innerHTML='<div class="sub" style="color:var(--faint)">暂无跟踪 —— 短线表出现可买入标的（强买入/买入）后自动加入，保留 30 天</div>';return;}
+    // 读筛选/排序（uncontrolled，每次渲染读取 DOM）
+    var q=(document.getElementById('watch-q').value||'').trim().toLowerCase();
+    var ftype=document.getElementById('watch-f-type').value;
+    var fpool=document.getElementById('watch-f-inpool').value;
+    var ftier=document.getElementById('watch-f-tier').value;
+    var sortKey=document.getElementById('watch-sort').value||'entry';
+    fillTierOptions('watch-f-tier', rows.map(function(r){return r.rec?r.rec.tier:null;}));
+    var filtered=rows.filter(function(r){
+      if(!r.rec)return false;
+      if(q&&!(r.code.toLowerCase().indexOf(q)>=0||(r.rec.name||'').toLowerCase().indexOf(q)>=0))return false;
+      if(ftype&&r.grp!==ftype)return false;
+      if(fpool!==''&&String(r.inPool)!==fpool)return false;
+      if(ftier&&r.rec.tier!==ftier)return false;
+      return true;
+    });
+    filtered.sort(function(a,b){
+      if(sortKey==='name'){return (a.rec.name||'').localeCompare(b.rec.name||'');}
+      if(sortKey==='chg'){return (b.rec.chg||-999)-(a.rec.chg||-999);}
+      if(sortKey==='score'){return (b.rec.score||-999)-(a.rec.score||-999);}
+      if(sortKey==='left'){return a.age-b.age;}
+      var da=a.entry&&a.entry!=='—'?new Date(String(a.entry).replace(/-/g,'/')):null;
+      var db=b.entry&&b.entry!=='—'?new Date(String(b.entry).replace(/-/g,'/')):null;
+      if(!da&&!db)return 0;if(!da)return 1;if(!db)return -1;return db-da;
+    });
+    var cnt=document.getElementById('watch-count');
+    if(cnt)cnt.textContent='筛选 '+filtered.length+' / 共 '+rows.length+' 只';
+    if(!filtered.length){box.innerHTML='<div class="sub" style="color:var(--faint)">无匹配标的 —— 调整搜索/筛选条件后重试</div>';return;}
+    var h='<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>类型</th><th style="text-align:center">入池日期</th><th style="text-align:center">已跟踪</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">短线分</th><th style="text-align:center">档位</th><th style="text-align:center">MA5</th><th style="text-align:center">建议动作</th></tr></thead><tbody>';
+    filtered.forEach(function(r){
+      var rec=r.rec;
+      var gName=r.grp==='stock'?'股票':'基金';
       var ageS=r.age===null?'—':(r.age+' 天 / 剩 '+(30-r.age)+' 天');
-      h+='<tr><td>'+code+'</td><td>'+rec.name+'</td><td>'+gName+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+ageS+'</td><td style="text-align:right">'+rec.px+'</td><td style="text-align:right" class="'+(rec.chg>0?'up':'down')+'">'+(rec.chg>0?'+':'')+rec.chg+'%</td><td style="text-align:center">'+rec.score+'</td><td style="text-align:center">'+rec.tier+'</td><td style="text-align:center">'+(rec.ma5_above?'✅ 上方':'⚠️ 下方')+'</td><td style="text-align:center" class="'+actCls+'">'+act+'</td></tr>';
+      h+='<tr><td>'+r.code+'</td><td>'+rec.name+'</td><td>'+gName+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+ageS+'</td><td style="text-align:right">'+rec.px+'</td><td style="text-align:right" class="'+(rec.chg>0?'up':'down')+'">'+(rec.chg>0?'+':'')+rec.chg+'%</td><td style="text-align:center">'+rec.score+'</td><td style="text-align:center">'+rec.tier+'</td><td style="text-align:center">'+(rec.ma5_above?'✅ 上方':'⚠️ 下方')+'</td><td style="text-align:center" class="'+r.actCls+'">'+r.act+'</td></tr>';
     });
     h+='</tbody></table>';
     box.innerHTML=h;
   }
   // 2026-08-17 用户决策：移除手动补充功能，顺带清理旧 localStorage 残留（含用户误加的"金安国纪"条目）
   try{localStorage.removeItem('short_watchlist');}catch(_e){}
+  ['watch-q','watch-f-type','watch-f-inpool','watch-f-tier','watch-sort'].forEach(function(id){
+    var el=document.getElementById(id);if(!el)return;
+    el.addEventListener(id==='watch-q'?'input':'change',renderWatch);
+  });
   renderWatch();
   /* 全量池中/长线年跟踪池（2026-08-17 用户需求：上榜 1 年，再上榜 +1 年；数据由 build_enhanced_data.py 维护） */
   function renderV9Watch(){
@@ -4974,37 +5031,67 @@ document.addEventListener('DOMContentLoaded',function(){
     Object.keys(track).forEach(function(code){
       var t=track[code]||{};var entry=t.entry?new Date(String(t.entry).replace(/-/g,'/')):null;
       var age=entry?Math.floor((now-entry)/86400000):0;
-      rows.push({code:code,entry:t.entry||'—',age:age,pool:t.pool||'',last:t.last||{}});
+      var live=E.details&&E.details[code];
+      var rec=live||t.last||{};
+      var chg=(rec.chg!==undefined&&rec.chg!==null)?rec.chg:null;
+      var score=(rec.score!==undefined&&rec.score!==null)?rec.score:null;
+      rows.push({code:code,entry:t.entry||'—',age:age,pool:t.pool||'—',rec:rec,chg:chg,score:score,inPool:inPool[code]?1:0});
     });
-    var cnt=document.getElementById('watch-v9-count');
-    if(cnt)cnt.textContent='跟踪 '+rows.length+' 只';
+    var bar=document.getElementById('watch-v9-bar');
+    if(bar){bar.style.display=rows.length?'':'none';}
     if(!rows.length){box.innerHTML='<div class="sub" style="color:var(--faint)">暂无跟踪 —— 全量池中/长线上榜标的自动加入，保留 1 年</div>';return;}
-    rows.sort(function(a,b){
+    // 板块选项动态重建（保留当前选择）
+    var pools=[];var seenPool={};
+    rows.forEach(function(r){if(r.pool&&r.pool!=='—'&&!seenPool[r.pool]){seenPool[r.pool]=1;pools.push(r.pool);}});
+    var psel=document.getElementById('watch-v9-f-pool');
+    if(psel){var pcur=psel.value;
+      var ph='<option value="">全部板块</option>'+pools.map(function(p){return '<option value="'+p+'">'+p+'</option>';}).join('');
+      if(psel.innerHTML!==ph){psel.innerHTML=ph;if(pcur)psel.value=pcur;}}
+    fillTierOptions('watch-v9-f-tier', rows.map(function(r){return r.rec.tier||null;}));
+    // 读筛选/排序（uncontrolled）
+    var q=(document.getElementById('watch-v9-q').value||'').trim().toLowerCase();
+    var fpool=document.getElementById('watch-v9-f-pool').value;
+    var fstatus=document.getElementById('watch-v9-f-status').value;
+    var ftier=document.getElementById('watch-v9-f-tier').value;
+    var sortKey=document.getElementById('watch-v9-sort').value||'entry';
+    var filtered=rows.filter(function(r){
+      var nm=r.rec.name||'';
+      if(q&&!(r.code.toLowerCase().indexOf(q)>=0||nm.toLowerCase().indexOf(q)>=0))return false;
+      if(fpool&&r.pool!==fpool)return false;
+      if(fstatus!==''&&String(r.inPool)!==fstatus)return false;
+      if(ftier&&(r.rec.tier||'')!==ftier)return false;
+      return true;
+    });
+    filtered.sort(function(a,b){
+      if(sortKey==='name'){return (a.rec.name||'').localeCompare(b.rec.name||'');}
+      if(sortKey==='chg'){var ac=a.chg===null?-999:a.chg,bc=b.chg===null?-999:b.chg;return bc-ac;}
+      if(sortKey==='score'){var as=a.score===null?-999:a.score,bs=b.score===null?-999:b.score;return bs-as;}
+      if(sortKey==='left'){return a.age-b.age;}
       var da=a.entry!=='—'?new Date(String(a.entry).replace(/-/g,'/')):null;
       var db=b.entry!=='—'?new Date(String(b.entry).replace(/-/g,'/')):null;
-      if(!da)return 1;if(!db)return -1;return db-da;});
+      if(!da)return 1;if(!db)return -1;return db-da;
+    });
+    var cnt=document.getElementById('watch-v9-count');
+    if(cnt)cnt.textContent='筛选 '+filtered.length+' / 共 '+rows.length+' 只';
+    if(!filtered.length){box.innerHTML='<div class="sub" style="color:var(--faint)">无匹配标的 —— 调整搜索/筛选条件后重试</div>';return;}
     var h='<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>板块</th><th style="text-align:center">入池日期</th><th style="text-align:center">已跟踪</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">权重分</th><th style="text-align:center">档位</th><th style="text-align:center">状态</th></tr></thead><tbody>';
-    rows.forEach(function(r){
-      var code=r.code;
-      var live=E.details&&E.details[code];
-      var rec=live||r.last||{};
-      var nm=rec.name||'—';
-      var px=(rec.px!==undefined&&rec.px!==null)?rec.px:null;
-      var chg=(rec.chg!==undefined&&rec.chg!==null)?rec.chg:null;
-      var sc=(rec.score!==undefined&&rec.score!==null)?rec.score:null;
-      var tier=rec.tier||'—';
-      var inP=inPool[code]?1:0;
+    filtered.forEach(function(r){
+      var rec=r.rec;var px=(rec.px!==undefined&&rec.px!==null)?rec.px:null;
       var ageS=r.age+' 天 / 剩 '+(365-r.age)+' 天';
-      var status=inP?'<span style="color:#dc2626;font-weight:600">在池</span>':'<span style="color:var(--faint)">已掉出池（观察）</span>';
-      h+='<tr><td>'+code+'</td><td>'+nm+'</td><td>'+(r.pool||'—')+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+ageS+'</td>'+
+      var status=r.inPool?'<span style="color:#dc2626;font-weight:600">在池</span>':'<span style="color:var(--faint)">已掉出池（观察）</span>';
+      h+='<tr><td>'+r.code+'</td><td>'+(rec.name||'—')+'</td><td>'+r.pool+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+ageS+'</td>'+
          '<td style="text-align:right">'+(px===null?'—':px.toFixed(2))+'</td>'+
-         '<td style="text-align:right" class="'+(chg===null?'':(chg>0?'up':'down'))+'">'+(chg===null?'—':(chg>0?'+':'')+chg.toFixed(2)+'%')+'</td>'+
-         '<td style="text-align:center">'+(sc===null?'—':sc.toFixed(1))+'</td>'+
-         '<td style="text-align:center">'+tier+'</td><td style="text-align:center">'+status+'</td></tr>';
+         '<td style="text-align:right" class="'+(r.chg===null?'':(r.chg>0?'up':'down'))+'">'+(r.chg===null?'—':(r.chg>0?'+':'')+r.chg.toFixed(2)+'%')+'</td>'+
+         '<td style="text-align:center">'+(r.score===null?'—':r.score.toFixed(1))+'</td>'+
+         '<td style="text-align:center">'+(rec.tier||'—')+'</td><td style="text-align:center">'+status+'</td></tr>';
     });
     h+='</tbody></table>';
     box.innerHTML=h;
   }
+  ['watch-v9-q','watch-v9-f-pool','watch-v9-f-status','watch-v9-f-tier','watch-v9-sort'].forEach(function(id){
+    var el=document.getElementById(id);if(!el)return;
+    el.addEventListener(id==='watch-v9-q'?'input':'change',renderV9Watch);
+  });
   renderV9Watch();
   /* 大卡片折叠：所有 .card 的标题可点击折叠/展开（.stock-card 小卡不受影响） */
   document.querySelectorAll('.card').forEach(function(card){
