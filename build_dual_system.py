@@ -867,6 +867,8 @@ document.addEventListener('DOMContentLoaded',function(){{
       var age=entry?Math.floor((now-entry)/86400000):0;
       var live=E.details&&E.details[code];
       var rec=live||t.last||{{}};
+      // 2026-08-18：track 条目自带 name（掉出池标的不在 details）；名称兜底 t.name，避免显示 —/代码
+      if(!rec.name){{rec.name=t.name||code;}}
       var chg=(rec.chg!==undefined&&rec.chg!==null)?rec.chg:null;
       var score=(rec.score!==undefined&&rec.score!==null)?rec.score:null;
       rows.push({{code:code,entry:t.entry||'—',age:age,pool:t.pool||'—',rec:rec,chg:chg,score:score,inPool:inPool[code]?1:0}});
