@@ -145,6 +145,10 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 .rev-btns{display:flex;flex-wrap:wrap;gap:10px}
 .rev-btn{display:inline-block;padding:9px 16px;border-radius:10px;background:var(--card2);border:1px solid var(--border);color:var(--text);text-decoration:none;font-size:13px;cursor:pointer}
 .rev-btn:hover{border-color:var(--accent);color:var(--accent)}
+.cum-tbl{width:100%;border-collapse:collapse;margin-top:6px;font-size:13px}
+.cum-tbl th,.cum-tbl td{border:1px solid var(--border);padding:6px 10px;text-align:center}
+.cum-tbl th{background:var(--card2);color:var(--sub);font-weight:600}
+.cum-tbl tbody tr:hover{background:var(--card2)}
 #rev-viewer{display:none;margin-top:18px}
 #rev-viewer.active{display:block}
 #rev-viewer iframe{width:100%;height:760px;border:1px solid var(--border);border-radius:12px;background:var(--card)}
@@ -165,14 +169,25 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class="sidenav" id="sidenav"></div>
 
 <div class="container">
+
+<div class="card">
+<div class="back-bar" style="margin-bottom:8px">
+<h2 style="margin:0">📈 累计总览 <span class="badge badge-auto">自 2026-08-14 · 3 篇</span></h2>
+</div>
+<div class="sub">三池累计：所有已发复盘的信号标的合计（防重：同篇只累加一次；短线·基金 T+1 净值未出计 ⚪持平）</div>
+<div style="overflow-x:auto"><table class="cum-tbl">
+<thead><tr><th>池</th><th>累计标的</th><th>累计买入</th><th>🟢吃到</th><th>🔴被套</th><th>⚪持平</th><th>累计胜率</th><th>累计均收</th></tr></thead>
+<tbody><tr><td>全量池中/长线</td><td>89</td><td>89</td><td>63</td><td>26</td><td>0</td><td>71%</td><td>+2.94%</td></tr><tr><td>固定池中/长线</td><td>48</td><td>26</td><td>12</td><td>14</td><td>0</td><td>46%</td><td>+0.38%</td></tr><tr><td>短线全量池</td><td>85</td><td>85</td><td>44</td><td>30</td><td>11</td><td>52%</td><td>+1.18%</td></tr><tr><td>短线·主板</td><td>30</td><td>30</td><td>20</td><td>10</td><td>0</td><td>67%</td><td>+1.99%</td></tr><tr><td>短线·创业板</td><td>29</td><td>29</td><td>13</td><td>15</td><td>1</td><td>45%</td><td>+0.62%</td></tr><tr><td>短线·科创板</td><td>16</td><td>16</td><td>11</td><td>5</td><td>0</td><td>69%</td><td>+1.45%</td></tr><tr><td>短线·基金</td><td>10</td><td>10</td><td>0</td><td>0</td><td>10</td><td>0%</td><td>+0.00%</td></tr><tr style='font-weight:700'><td>合计</td><td>307</td><td>285</td><td>163</td><td>100</td><td>22</td><td>57%</td><td>+1.66%</td></tr></tbody>
+</table></div>
+</div>
 <div class="card">
 <div class="back-bar">
 <a class="back-btn" href="dual_system.html">← 返回主页面</a>
 <h2 style="margin:0">📋 复盘日志 <span class="badge badge-auto">3 篇</span></h2>
 </div>
-<div class="sub">每交易日复盘：信号标的哪些吃到 / 哪些被套 / 是否符合系统设计 / 缺陷检测（grill）· 发现设计缺陷 → 启动系统更新并记录于更新日志</div>
+<div class="sub">每交易日复盘：信号标的哪些吃到 / 哪些被套 / 是否符合系统设计 / 缺陷检测（grill）· 点击日期展开当日详情（日期降序，最新在前）</div>
 
-<div class="rev-btns"><a class="rev-btn" href="javascript:void(0)" onclick="openRev('2026-08-14_sig2026-08-13.md')">✅ 2026-08-14（信号 2026-08-13 · 85 只 · 胜率 66.2% · 缺陷 0 项）</a><a class="rev-btn" href="javascript:void(0)" onclick="openRev('2026-08-17_sig2026-08-14.md')">✅ 2026-08-17（信号 2026-08-14 · 68 只 · 胜率 73.8% · 缺陷 0 项）</a><a class="rev-btn" href="javascript:void(0)" onclick="openRev('2026-08-18_sig2026-08-17.md')">🔴 2026-08-18（信号 2026-08-17 · 69 只 · 胜率 37.1% · 缺陷 2 项）</a></div>
+<div class="rev-btns"><a class="rev-btn" href="javascript:void(0)" onclick="openRev('2026-08-18_sig2026-08-17.md')">🔴 2026-08-18（信号 2026-08-17 · 69 只 · 胜率 37.1% · 缺陷 2 项）</a><a class="rev-btn" href="javascript:void(0)" onclick="openRev('2026-08-17_sig2026-08-14.md')">✅ 2026-08-17（信号 2026-08-14 · 68 只 · 胜率 73.8% · 缺陷 0 项）</a><a class="rev-btn" href="javascript:void(0)" onclick="openRev('2026-08-14_sig2026-08-13.md')">✅ 2026-08-14（信号 2026-08-13 · 85 只 · 胜率 66.2% · 缺陷 0 项）</a></div>
 </div>
 <div class="card" id="rev-viewer">
 <h2 id="rev-viewer-title">📋 复盘详情</h2>
