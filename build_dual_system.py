@@ -687,12 +687,12 @@ html = f"""<!doctype html>
 </div>
 </div>
 
-<!-- ============ 视图 G：评论区（Twikoo） ============ -->
+<!-- ============ 视图 G：评论区（Artalk） ============ -->
 <div class="view" id="view-comment">
 <div class="card">
-<h2>💬 评论区 <span class="badge badge-auto">Twikoo</span></h2>
-<div class="sub">对本看板/策略的看法、问题、交流都欢迎 · 评论数据由 Twikoo 后端（Hugging Face Spaces）存储</div>
-<div id="tcomment"></div>
+<h2>💬 评论区 <span class="badge badge-auto">Artalk</span></h2>
+<div class="sub">对本看板/策略的看法、问题、交流都欢迎 · 评论数据由 Artalk 后端（PostgreSQL）存储</div>
+<div id="Comments"></div>
 </div>
 </div>
 
@@ -705,7 +705,8 @@ html = f"""<!doctype html>
 </div>
 <script src="enhanced_data.js"></script>
 <script src="short_signals.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/twikoo@1.7.19/dist/twikoo.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/artalk@2/dist/Artalk.css">
+<script src="https://unpkg.com/artalk@2/dist/Artalk.js"></script>
 <script>window.SHORT_POOL = {SHORT_POOL_SLIM};</script>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
@@ -779,18 +780,20 @@ function applyHash(){{
   if(VIEW_MAP[k])switchView(k);
 }}
 window.addEventListener('hashchange',applyHash);
-/* Twikoo 评论（Hugging Face Spaces 后端；envId 占位，部署后替换为 HF Space 直链如 https://xxx.hf.space） */
+/* Artalk 评论（PostgreSQL 后端；server 占位，部署后替换为 Artalk 服务直链如 https://xxx.hf.space） */
 var _sw0=switchView;
 function initComment(){{
-  if(window.__twikooInit)return;
-  var el=document.getElementById('tcomment');if(!el)return;
-  window.__twikooInit=true;
-  if(typeof twikoo!=='undefined'){{
-    twikoo.init({{
-      envId: 'TWIKOO_ENVID_PLACEHOLDER',
-      el: '#tcomment',
-      lang: 'zh-CN',
-      path: 'quant-weight-system',
+  if(window.__artalkInit)return;
+  var el=document.getElementById('Comments');if(!el)return;
+  window.__artalkInit=true;
+  if(typeof Artalk!=='undefined'){{
+    Artalk.init({{
+      el: '#Comments',
+      server: 'ARTALK_SERVER_PLACEHOLDER',   // ⚠ 部署后替换为 Artalk 服务地址（HF Space 直链）
+      site: '量化权重监控',
+      pageKey: 'quant-weight-system',
+      pageTitle: document.title,
+      locale: 'zh-CN',
     }});
   }}
 }}
