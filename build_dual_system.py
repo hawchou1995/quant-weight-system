@@ -789,7 +789,7 @@ function initComment(){{
   if(typeof Artalk!=='undefined'){{
     Artalk.init({{
       el: '#Comments',
-      server: 'ARTALK_SERVER_PLACEHOLDER',   // ⚠ 部署后替换为 Artalk 服务地址（HF Space 直链）
+      server: 'https://artalk-8iqt.onrender.com',   // ⚠ Artalk 后端（Render 免费层，2026-08-19 上线）
       site: '量化权重监控',
       pageKey: 'quant-weight-system',
       pageTitle: document.title,
