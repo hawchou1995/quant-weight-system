@@ -958,7 +958,7 @@ document.addEventListener('DOMContentLoaded',function(){{
       if(!rec.name){{rec.name=t.name||code;}}
       var chg=(rec.chg!==undefined&&rec.chg!==null)?rec.chg:null;
       var score=(rec.score!==undefined&&rec.score!==null)?rec.score:null;
-      rows.push({{code:code,entry:t.entry||'—',age:age,pool:t.pool||'—',rec:rec,chg:chg,score:score,inPool:inPool[code]?1:0}});
+      rows.push({{code:code,entry:t.entry||'—',exit:t.exit||'—',age:age,pool:t.pool||'—',rec:rec,chg:chg,score:score,inPool:inPool[code]?1:0}});
     }});
     var bar=document.getElementById('watch-v9-bar');
     if(bar){{bar.style.display=rows.length?'':'none';}}
@@ -1001,7 +1001,7 @@ document.addEventListener('DOMContentLoaded',function(){{
     filtered.forEach(function(r){{
       var rec=r.rec;var px=(rec.px!==undefined&&rec.px!==null)?rec.px:null;
       var ageS=r.age+' 天 / 剩 '+(365-r.age)+' 天';
-      var exitT=t.exit||'—';
+      var exitT=r.exit||'—';
       var status=r.inPool?'<span style="color:#dc2626;font-weight:600">在池</span>':'<span style="color:var(--faint)">已掉出池（观察）</span>';
       h+='<tr><td>'+r.code+'</td><td>'+(rec.name||'—')+'</td><td>'+r.pool+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+exitT+'</td><td style="text-align:center">'+ageS+'</td>'+
          '<td style="text-align:right">'+(px===null?'—':px.toFixed(2))+'</td>'+
