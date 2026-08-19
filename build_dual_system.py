@@ -692,7 +692,14 @@ html = f"""<!doctype html>
 <div class="card">
 <h2>💬 评论区 <span class="badge badge-auto">Artalk</span></h2>
 <div class="sub">对本看板/策略的看法、问题、交流都欢迎 · 评论数据由 Artalk 后端（PostgreSQL）存储</div>
-<div id="Comments"></div>
+<div id="comment-area">
+  <div id="Comments"></div>
+  <div id="comment-loading">💬 评论加载中…<span class="comment-loading-sub">（首次打开可能需要 30-60 秒，后端为 Render 免费层，闲置后休眠唤醒）</span></div>
+</div>
+<style>
+#comment-loading{{display:none;flex-direction:column;align-items:center;gap:6px;padding:36px 12px;color:var(--faint,#888);font-size:14px;border:1px dashed var(--line,#ddd);border-radius:12px;margin-top:12px}}
+#comment-loading .comment-loading-sub{{font-size:12px;opacity:.75}}
+</style>
 </div>
 </div>
 
@@ -797,9 +804,22 @@ function initComment(){{
     }});
   }}
 }}
+/* 评论加载占位：Artalk 冷启动期间（后台 conf 请求等待）#Comments 为空，
+   MutationObserver 监测渲染完成后隐藏"加载中"提示 */
+function watchCommentLoading(){{
+  var el=document.getElementById('Comments');
+  var ld=document.getElementById('comment-loading');
+  if(!el||!ld)return;
+  var upd=function(){{
+    var children=el.childElementCount>0 && el.querySelector('.atk-main-editor,.atk-list,textarea,.atk-name');
+    ld.style.display=(children)?'none':'flex';
+  }};
+  upd();
+  new MutationObserver(upd).observe(el,{{childList:true,subtree:true,attributes:false}});
+}}
 switchView=function(key){{
   _sw0(key);
-  if(key==='comment')initComment();
+  if(key==='comment'){{initComment();watchCommentLoading();}}
 }};
 </script>
 <script>
