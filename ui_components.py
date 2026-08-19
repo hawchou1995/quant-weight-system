@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""公共 UI 层：主题(明暗) / 顶部导航(历史报告+明暗+qingju.me) / 左侧贴边导航 /
+"""公共 UI 层：主题(明暗) / 顶部导航(明暗+qingju.me) / 左侧贴边导航 /
 表格交互(搜索/筛选/排序/权限切换) / 详情弹层(K线+因子+交易历史)。
 供 dual_system.html 与 index.html 共用（内联注入，无外部依赖）。"""
 
@@ -33,16 +33,6 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 .tb-btn.active{border-color:var(--accent);color:var(--accent)}
 .community{display:inline-block;padding:6px 14px;border-radius:20px;
   background:linear-gradient(135deg,#FF9A3D 0%,#F2701D 100%);color:#fff;text-decoration:none;font-weight:600;font-size:13px}
-/* 历史报告下拉 */
-.dropdown{position:relative}
-.dropdown-menu{position:absolute;right:0;top:calc(100% + 6px);background:var(--card);border:1px solid var(--border);
-  border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.15);width:360px;max-height:440px;overflow-y:auto;
-  padding:6px;display:none;z-index:950}
-.dropdown.open .dropdown-menu{display:block}
-.dropdown-menu a{display:block;padding:8px 12px;border-radius:8px;font-size:13px;color:var(--text);
-  text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dropdown-menu a:hover{background:var(--card2);color:var(--accent)}
-.dropdown-menu .head{font-size:12px;color:var(--faint);padding:6px 12px;border-bottom:1px solid var(--line);margin-bottom:4px}
 
 /* ---------- 左侧宽侧边栏（图标+文字） ---------- */
 .sidenav{position:fixed;left:0;top:0;bottom:0;width:190px;background:var(--nav-bg);border-right:1px solid var(--border);
@@ -148,10 +138,6 @@ NAV_HTML = """
 <div class="topbar">
   <div class="logo" onclick="location.hash='#overview'"><span class="dot"></span>量化权重监控</div>
   <div class="spacer"></div>
-  <div class="dropdown" id="report-dd">
-    <button class="tb-btn" onclick="toggleDrop('report-dd')">📄 标的报告 ▾</button>
-    <div class="dropdown-menu" id="report-menu"></div>
-  </div>
   <button class="tb-btn" id="theme-btn" onclick="toggleTheme()">🌙 夜间</button>
   <a class="community" href="https://qingju.me/" target="_blank" rel="noopener">💬 青橘社区</a>
 </div>
@@ -173,27 +159,6 @@ function applyTheme(t){document.documentElement.setAttribute('data-theme',t);
   try{localStorage.setItem('qw-theme',t)}catch(e){}}
 function toggleTheme(){var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';applyTheme(t)}
 try{applyTheme(localStorage.getItem('qw-theme')||'light')}catch(e){applyTheme('light')}
-
-/* ---------- 历史报告下拉（优先月度收盘快照，按月分类；回退标的报告列表） ---------- */
-function toggleDrop(id){var el=document.getElementById(id);el.classList.toggle('open');
-  if(id==='report-dd'&&!document.getElementById('report-menu').innerHTML){
-    var m=document.getElementById('report-menu');
-    if(window.SNAPSHOTS&&window.SNAPSHOTS.months&&window.SNAPSHOTS.months.length){
-      var h='<div class="head">历史收盘监控快照（'+window.SNAPSHOTS.snapshots.length+' 份）</div>';
-      window.SNAPSHOTS.months.forEach(function(g){
-        h+='<div class="snap-group">📅 '+g.month+'</div>';
-        g.items.forEach(function(s){
-          h+='<a class="snap-item" href="monitor/snapshots/'+s.file+'" target="_blank">📊 '+s.date+'（'+s.count+' 只）</a>';});});
-      m.innerHTML=h;
-    }else if(window.ENH.monitor_reports){
-      var h2='<div class="head">标的监控报告（'+window.ENH.monitor_reports.length+' 只）</div>';
-      window.ENH.monitor_reports.forEach(function(r){
-        h2+='<a href="monitor_reports.html#'+r.code+'" target="_blank">📈 '+r.name+'（'+r.code+'）· '+r.tier+'</a>';});
-      m.innerHTML=h2;}}
-  }
-document.addEventListener('click',function(e){
-  document.querySelectorAll('.dropdown.open').forEach(function(d){
-    if(!d.contains(e.target))d.classList.remove('open');});});
 
 /* ---------- 左侧导航（JS 点击滚动，不依赖 hash；标的信息与表格同页，无独立报告入口） ---------- */
 function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)return;

@@ -129,7 +129,7 @@ else:
     html += INJECT_JS
 
 # 移除重复的 COMMON_JS 注入（此处用不到 COMMON_JS 全文，只用了 openDetail 等函数——把 COMMON_JS 注入进来）
-# 需要 COMMON_JS 的函数：openDetail/renderKline/renderFactors/renderTrades/switchTradeTab/kpiHtml/tierPill/tierChg/fmtPct/toggleDrop/toggleTheme/applyTheme/renderSidenav
+# 需要 COMMON_JS 的函数：openDetail/renderKline/renderFactors/renderTrades/switchTradeTab/kpiHtml/tierPill/tierChg/fmtPct/toggleTheme/applyTheme/renderSidenav
 common_script = f"<script>{COMMON_JS}</script>"
 html = html.replace("</head>", common_script + "</head>", 1) if "</head>" in html else html
 

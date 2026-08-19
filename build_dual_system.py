@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-"""标的监控看板（双体系·模板风格）：监控总览 / 全量池中长线 / 固定池中长线 / 短线占位。
+"""标的监控看板（双体系·模板风格）：监控总览 / 全量池中长线 / 固定池中长线 / 短线。
 每视图 = KPI 卡 + 标的汇总表（模板列：分数构成/超买分解/量能分解/置信度/档位变化）
        + 紧跟其下的逐标的详情卡片（六角雷达图 + 六类分数 + 回测），v8/v9 池分开。
-右上角「标的报告」= 按月分类的历史收盘监控快照（当前页内切换，不新开窗口）；
-左侧导航无独立标的报告入口（同页处理）；左上角板块/行业/档位 select 筛选；
+左侧导航切换视图；左上角板块/行业/档位 select 筛选；
 全量池自动池 = 股票按权限各10 + 基金10；回测参考统一放监控总览。"""
 import os
 import json, re
@@ -618,12 +617,6 @@ html = f"""<!doctype html>
 .stock-card h3{{margin:0 0 6px;font-size:15px}}
 .stock-card .sub{{color:var(--faint);font-size:11px;font-weight:400}}
 .stock-card .meta{{color:var(--sub);font-size:12px;margin:3px 0;line-height:1.6}}
-/* 月度报告下拉菜单 */
-.snap-group{{font-size:12px;color:var(--faint);padding:6px 12px;border-bottom:1px solid var(--line)}}
-.snap-item{{display:flex;align-items:center;gap:8px}}
-/* 快照视图 */
-.snap-view{{display:none}}
-.snap-view.active{{display:block}}
 </style></head><body>
 {NAV_HTML}
 <div class="container">
@@ -632,7 +625,7 @@ html = f"""<!doctype html>
 <div class="view active" id="view-overview">
 <div class="card" id="overview">
 <h2>📊 标的监控总览 <span class="badge badge-auto">数据截至 {DATA["meta"].get("as_of", "—")}{"（盘中实时）" if DATA["meta"].get("intraday") else " 收盘"}</span></h2>
-<div class="sub">左侧导航切换：🅰️ 全量池中/长线（全市场自动池·股票分层+基金） / 🅱️ 固定池中/长线（用户固定池） / ⚡ 短线（占位） · 右上角「标的报告」按月查看历史收盘快照 · 信号仅供参考</div>
+<div class="sub">左侧导航切换：🅰️ 全量池中/长线（全市场自动池·股票分层+基金） / 🅱️ 固定池中/长线（用户固定池） / ⚡ 短线 · 信号仅供参考</div>
 <div class="kpis">
 <div class="kpi"><div class="l">🟢 加仓区</div><div class="v" style="color:#dc2626">{sum(1 for d in all_items if d["tier"] in ("满仓加仓","轻仓加仓"))} 只</div><div class="s">满仓+轻仓加仓</div></div>
 <div class="kpi"><div class="l">🟡 观望区</div><div class="v" style="color:#d97706">{sum(1 for d in all_items if d["tier"]=="观望")} 只</div><div class="s">持有不加</div></div>
@@ -640,8 +633,7 @@ html = f"""<!doctype html>
 <div class="kpi"><div class="l">共监控</div><div class="v">{len(all_items)} 只</div><div class="s">全量池 {len(v9_items)} 行 + 固定池 {len(v8_items)} 只</div></div>
 </div>
 <div class="rule-box" style="margin-bottom:0"><b>监控口径</b>：权重分 = 动量35% + 趋势25% + Aroon20% + 量价20% ｜ 档位 = ≥75 满仓加仓 / ≥60 轻仓加仓 / ≥45 观望 / ≥30 减半 / &lt;30 清仓
-<br><b>卖出闸门（每日）</b>：全量池 移动止损 4.5% + 沪深300破MA150 ｜ 固定池 移动止损 10% + 破MA200 ｜ 任何闸门先触发先生效
-<br><b>历史快照</b>：右上角「标的报告」按月分类，点击当前页切换查看（不新开窗口）</div>
+<br><b>卖出闸门（每日）</b>：全量池 移动止损 4.5% + 沪深300破MA150 ｜ 固定池 移动止损 10% + 破MA200 ｜ 任何闸门先触发先生效</div>
 </div>
 {bt_all_html()}
 {bt_short_html()}
@@ -676,15 +668,6 @@ html = f"""<!doctype html>
   as_of_min=SHORT_POOL.get("intraday_ts") or SHORT_POOL_ASOF_MIN,
   tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=())}
 
-<!-- ============ 历史快照视图（右上角标的报告切换） ============ -->
-<div class="view" id="view-snapshot">
-<div class="card" id="snap-holder">
-<h2>📅 历史收盘监控快照</h2>
-<div class="sub" id="snap-title"></div>
-<div id="snap-content"></div>
-</div>
-</div>
-
 <!-- ============ 视图 E：复盘日志（内嵌，与各池同形态） ============ -->
 <div class="view" id="view-review">
 {_rev_cum}
@@ -704,6 +687,15 @@ html = f"""<!doctype html>
 </div>
 </div>
 
+<!-- ============ 视图 G：评论区（Twikoo） ============ -->
+<div class="view" id="view-comment">
+<div class="card">
+<h2>💬 评论区 <span class="badge badge-auto">Twikoo</span></h2>
+<div class="sub">对本看板/策略的看法、问题、交流都欢迎 · 评论数据由 Twikoo 后端（Hugging Face Spaces）存储</div>
+<div id="tcomment"></div>
+</div>
+</div>
+
 </div>
 <div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 {build_ts} · 版本 v5.11.8 · 数据截至 {DATA["meta"].get("as_of", "—")} · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
@@ -713,7 +705,7 @@ html = f"""<!doctype html>
 </div>
 <script src="enhanced_data.js"></script>
 <script src="short_signals.js"></script>
-<script src="monitor/snapshots_index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.7.19/dist/twikoo.min.js"></script>
 <script>window.SHORT_POOL = {SHORT_POOL_SLIM};</script>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
@@ -721,7 +713,8 @@ window.ENH.nav = [
   ["overview","📊","监控总览",[["overview","总览统计"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
   ["sys-auto","🅰️","全量池中/长线",[["card-tbl-v9","标的汇总表"],["card-tbl-v9-detail","逐标的详情"],["watch-v9-card","中长线跟踪"]]],
   ["sys-lite","🅱️","固定池中/长线",[["card-tbl-v8","标的汇总表"],["card-tbl-v8-detail","逐标的详情"]]],
-  ["short","⚡","全量池短线",[["card-tbl-short","标的汇总表"],["watch-card","短线跟踪"],["card-tbl-short-detail","逐标的详情"]]]
+  ["short","⚡","全量池短线",[["card-tbl-short","标的汇总表"],["watch-card","短线跟踪"],["card-tbl-short-detail","逐标的详情"]]],
+  ["comment","💬","评论区",[]]
 ];
 /* 视图切换模式：滚动不更新导航高亮（COMMON_JS renderSidenav 检测此标志） */
 window.ENH.NAV_SWITCH = true;
@@ -773,7 +766,7 @@ function renderSubCurve(){{
   renderOneCurve('curve-short-fund', C.short_fund, '#3b82f6', '基金短线', '+'+{ss_fund["total_return_pct"]:.0f});
 }}
 /* 视图切换（hash 驱动：切换时更新 location.hash，加载/前进后退时按 hash 定位） */
-var VIEW_MAP={{'overview':'view-overview','sys-auto':'view-auto','sys-lite':'view-lite','short':'view-short','snapshot':'view-snapshot','review':'view-review','changelog':'view-changelog'}};
+var VIEW_MAP={{'overview':'view-overview','sys-auto':'view-auto','sys-lite':'view-lite','short':'view-short','review':'view-review','changelog':'view-changelog','comment':'view-comment'}};
 function switchView(key){{
   var v=VIEW_MAP[key];if(!v)return;
   document.querySelectorAll('.view').forEach(function(x){{x.classList.remove('active');}});
@@ -786,35 +779,32 @@ function applyHash(){{
   if(VIEW_MAP[k])switchView(k);
 }}
 window.addEventListener('hashchange',applyHash);
-/* 右上角标的报告：按月分类历史快照（当前页内切换） */
-function renderReportMenu(){{
-  var m=document.getElementById('report-menu');if(!m)return;
-  if(!window.SNAPSHOTS){{m.innerHTML='<div class="head">暂无历史快照</div>';return;}}
-  var h='<div class="head">历史收盘监控快照（'+window.SNAPSHOTS.snapshots.length+' 份）</div>';
-  h+='<a class="snap-item" style="font-weight:600;color:var(--accent)" href="history_reports.html">📚 历史报告总览（独立页）</a>';
-  window.SNAPSHOTS.months.forEach(function(g){{
-    h+='<div class="snap-group">📅 '+g.month+'</div>';
-    g.items.forEach(function(s){{
-      h+='<a class="snap-item" href="javascript:void(0)" onclick="showSnapshot(\\''+s.file+'\\',\\''+s.date+'\\')">📊 '+s.date+'（'+s.count+' 只）</a>';
+/* Twikoo 评论（Hugging Face Spaces 后端；envId 占位，部署后替换为 HF Space 直链如 https://xxx.hf.space） */
+var _sw0=switchView;
+function initComment(){{
+  if(window.__twikooInit)return;
+  var el=document.getElementById('tcomment');if(!el)return;
+  window.__twikooInit=true;
+  if(typeof twikoo!=='undefined'){{
+    twikoo.init({{
+      envId: 'TWIKOO_ENVID_PLACEHOLDER',
+      el: '#tcomment',
+      lang: 'zh-CN',
+      path: 'quant-weight-system',
     }});
-  }});
-  m.innerHTML=h;
+  }}
 }}
-/* 当前页加载快照（不新开窗口 · file:// 兼容：iframe 内嵌，避免 fetch CORS） */
-function showSnapshot(file, date){{
-  switchView('snapshot');
-  document.getElementById('snap-title').textContent = '标的快照 '+date+'（历史收盘监控 · 右上角「标的报告」可切换其他月份 · 当前页查看）';
-  document.getElementById('snap-content').innerHTML =
-    '<iframe src="monitor/snapshots/'+file+'" style="width:100%;height:720px;border:1px solid var(--border);border-radius:12px;background:#0f1115"></iframe>';
-}}
+switchView=function(key){{
+  _sw0(key);
+  if(key==='comment')initComment();
+}};
 </script>
 <script>
 {COMMON_JS}
-/* 覆盖：报告下拉用月度快照；左侧导航点击切换视图 */
+/* 覆盖：左侧导航点击切换视图 */
 document.addEventListener('DOMContentLoaded',function(){{
   applyHash();   // 按 URL hash 定位视图（历史页跳转 dual_system.html#sys-auto 直接显示普适版）
   renderSubCurve();   // 基金回测净值曲线
-  renderReportMenu();
   /* 全量池短线跟踪：自动跟踪池（SHORT_POOL.track，可买入标的 30 天）+ 可选手动补充（localStorage） */
   function fillTierOptions(selId,tiers){{
     var sel=document.getElementById(selId);if(!sel)return;
