@@ -1,0 +1,178 @@
+{
+ "oos": {
+  "baseline": {
+   "2016-2019": {
+    "total_return_pct": 75.83,
+    "max_drawdown_pct": -13.68,
+    "sharpe": 0.931,
+    "win_rate_pct": 48.4,
+    "total_trades": 95,
+    "secs": 6
+   },
+   "2020-2021": {
+    "total_return_pct": 216.47,
+    "max_drawdown_pct": -12.13,
+    "sharpe": 2.343,
+    "win_rate_pct": 57.4,
+    "total_trades": 68,
+    "secs": 5
+   },
+   "2022-2026": {
+    "total_return_pct": 145.22,
+    "max_drawdown_pct": -21.62,
+    "sharpe": 1.086,
+    "win_rate_pct": 54.6,
+    "total_trades": 108,
+    "secs": 10
+   }
+  },
+  "A75_M80": {
+   "2016-2019": {
+    "total_return_pct": 105.94,
+    "max_drawdown_pct": -12.3,
+    "sharpe": 1.152,
+    "win_rate_pct": 49.0,
+    "total_trades": 96,
+    "secs": 6
+   },
+   "2020-2021": {
+    "total_return_pct": 142.16,
+    "max_drawdown_pct": -15.75,
+    "sharpe": 1.878,
+    "win_rate_pct": 54.4,
+    "total_trades": 68,
+    "secs": 5
+   },
+   "2022-2026": {
+    "total_return_pct": 254.41,
+    "max_drawdown_pct": -17.69,
+    "sharpe": 1.499,
+    "win_rate_pct": 52.3,
+    "total_trades": 107,
+    "secs": 10
+   }
+  },
+  "A75_M90": {
+   "2016-2019": {
+    "total_return_pct": 106.85,
+    "max_drawdown_pct": -12.19,
+    "sharpe": 1.175,
+    "win_rate_pct": 49.5,
+    "total_trades": 95,
+    "secs": 6
+   },
+   "2020-2021": {
+    "total_return_pct": 142.88,
+    "max_drawdown_pct": -15.34,
+    "sharpe": 1.899,
+    "win_rate_pct": 52.9,
+    "total_trades": 68,
+    "secs": 5
+   },
+   "2022-2026": {
+    "total_return_pct": 216.84,
+    "max_drawdown_pct": -17.68,
+    "sharpe": 1.377,
+    "win_rate_pct": 52.3,
+    "total_trades": 107,
+    "secs": 12
+   }
+  },
+  "A75_M85": {
+   "2016-2019": {
+    "total_return_pct": 115.08,
+    "max_drawdown_pct": -12.19,
+    "sharpe": 1.21,
+    "win_rate_pct": 49.5,
+    "total_trades": 95,
+    "secs": 6
+   },
+   "2020-2021": {
+    "total_return_pct": 149.2,
+    "max_drawdown_pct": -14.32,
+    "sharpe": 1.93,
+    "win_rate_pct": 54.4,
+    "total_trades": 68,
+    "secs": 5
+   },
+   "2022-2026": {
+    "total_return_pct": 251.23,
+    "max_drawdown_pct": -17.68,
+    "sharpe": 1.492,
+    "win_rate_pct": 52.3,
+    "total_trades": 107,
+    "secs": 10
+   }
+  }
+ },
+ "oos_rel": {
+  "baseline": {
+   "2016-2019": {
+    "d_ret": 0.0,
+    "d_dd": 0.0,
+    "d_sharpe": 0.0
+   },
+   "2020-2021": {
+    "d_ret": 0.0,
+    "d_dd": 0.0,
+    "d_sharpe": 0.0
+   },
+   "2022-2026": {
+    "d_ret": 0.0,
+    "d_dd": 0.0,
+    "d_sharpe": 0.0
+   }
+  },
+  "A75_M80": {
+   "2016-2019": {
+    "d_ret": 30.11,
+    "d_dd": 1.38,
+    "d_sharpe": 0.221
+   },
+   "2020-2021": {
+    "d_ret": -74.31,
+    "d_dd": -3.62,
+    "d_sharpe": -0.465
+   },
+   "2022-2026": {
+    "d_ret": 109.19,
+    "d_dd": 3.93,
+    "d_sharpe": 0.413
+   }
+  },
+  "A75_M90": {
+   "2016-2019": {
+    "d_ret": 31.02,
+    "d_dd": 1.49,
+    "d_sharpe": 0.244
+   },
+   "2020-2021": {
+    "d_ret": -73.59,
+    "d_dd": -3.21,
+    "d_sharpe": -0.444
+   },
+   "2022-2026": {
+    "d_ret": 71.62,
+    "d_dd": 3.94,
+    "d_sharpe": 0.291
+   }
+  },
+  "A75_M85": {
+   "2016-2019": {
+    "d_ret": 39.25,
+    "d_dd": 1.49,
+    "d_sharpe": 0.279
+   },
+   "2020-2021": {
+    "d_ret": -67.27,
+    "d_dd": -2.19,
+    "d_sharpe": -0.413
+   },
+   "2022-2026": {
+    "d_ret": 106.01,
+    "d_dd": 3.94,
+    "d_sharpe": 0.406
+   }
+  }
+ }
+}
