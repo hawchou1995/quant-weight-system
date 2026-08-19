@@ -656,7 +656,7 @@ _track, _pending = maintain_track_v9()
 out = {
     "meta": {"as_of": str(_as_of_day.date()), "generated": __import__("datetime").datetime.now().strftime("%Y-%m-%d %H:%M"), "overlap": OVERLAP,
              "v9_tiers": V9_TIERS},
-    "nav": [["overview", "📊", "监控总览"], ["sys-auto", "🅰️", "普适版"], ["sys-lite", "🅱️", "个人版"], ["table", "📋", "标的监控表"]],
+    "nav": [["overview", "📊", "监控总览"], ["sys-auto", "🅰️", "全量池中/长线"], ["short", "⚡", "全量池短线"], ["table", "📋", "标的监控表"]],
     "track_v9": _track, "track_pending_v9": _pending,
     "monitor_reports": [
         {"code": c, "name": d["name"], "tier": d["tier"]}

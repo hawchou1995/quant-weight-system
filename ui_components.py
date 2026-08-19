@@ -150,8 +150,8 @@ NAV_HTML = """
 
 SIDENAV_ITEMS = [
     ("overview", "📊", "监控总览"),
-    ("sys-auto", "🅰️", "普适版"),
-    ("sys-lite", "🅱️", "个人版"),
+    ("sys-auto", "🅰️", "全量池中/长线"),
+    ("short", "⚡", "全量池短线"),
     ("table", "📋", "标的监控表"),
 ]
 
