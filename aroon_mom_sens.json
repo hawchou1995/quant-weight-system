@@ -1,0 +1,254 @@
+{
+ "full": {
+  "0.6": {
+   "label": "A80_M60",
+   "mom_th": 0.6,
+   "aroon_th": 80,
+   "total_return_pct": 486.69,
+   "annual_return_pct": 18.13,
+   "max_drawdown_pct": -16.21,
+   "sharpe": 1.009,
+   "win_rate_pct": 45.6,
+   "total_trades": 259,
+   "secs": 22
+  },
+  "0.65": {
+   "label": "A80_M65",
+   "mom_th": 0.65,
+   "aroon_th": 80,
+   "total_return_pct": 629.36,
+   "annual_return_pct": 20.58,
+   "max_drawdown_pct": -16.19,
+   "sharpe": 1.124,
+   "win_rate_pct": 46.3,
+   "total_trades": 259,
+   "secs": 21
+  },
+  "0.7": {
+   "label": "A80_M70",
+   "mom_th": 0.7,
+   "aroon_th": 80,
+   "total_return_pct": 822.73,
+   "annual_return_pct": 23.28,
+   "max_drawdown_pct": -16.51,
+   "sharpe": 1.233,
+   "win_rate_pct": 49.8,
+   "total_trades": 259,
+   "secs": 21
+  },
+  "0.75": {
+   "label": "A80_M75",
+   "mom_th": 0.75,
+   "aroon_th": 80,
+   "total_return_pct": 872.45,
+   "annual_return_pct": 23.89,
+   "max_drawdown_pct": -15.62,
+   "sharpe": 1.265,
+   "win_rate_pct": 49.0,
+   "total_trades": 259,
+   "secs": 21
+  },
+  "0.78": {
+   "label": "A80_M78",
+   "mom_th": 0.78,
+   "aroon_th": 80,
+   "total_return_pct": 1136.7,
+   "annual_return_pct": 26.73,
+   "max_drawdown_pct": -15.62,
+   "sharpe": 1.369,
+   "win_rate_pct": 49.8,
+   "total_trades": 259,
+   "secs": 21
+  },
+  "0.8": {
+   "label": "A80_M80",
+   "mom_th": 0.8,
+   "aroon_th": 80,
+   "total_return_pct": 1125.03,
+   "annual_return_pct": 26.62,
+   "max_drawdown_pct": -15.59,
+   "sharpe": 1.368,
+   "win_rate_pct": 49.8,
+   "total_trades": 259,
+   "secs": 21
+  },
+  "0.85": {
+   "label": "A80_M85",
+   "mom_th": 0.85,
+   "aroon_th": 80,
+   "total_return_pct": 960.71,
+   "annual_return_pct": 24.91,
+   "max_drawdown_pct": -16.24,
+   "sharpe": 1.302,
+   "win_rate_pct": 48.8,
+   "total_trades": 258,
+   "secs": 21
+  },
+  "0.9": {
+   "label": "A80_M90",
+   "mom_th": 0.9,
+   "aroon_th": 80,
+   "total_return_pct": 797.32,
+   "annual_return_pct": 22.96,
+   "max_drawdown_pct": -15.6,
+   "sharpe": 1.238,
+   "win_rate_pct": 48.1,
+   "total_trades": 258,
+   "secs": 21
+  }
+ },
+ "oos": {
+  "0.7": {
+   "2016-2019": {
+    "label": "A80_M70",
+    "mom_th": 0.7,
+    "aroon_th": 80,
+    "total_return_pct": 135.96,
+    "annual_return_pct": 24.01,
+    "max_drawdown_pct": -13.03,
+    "sharpe": 1.296,
+    "win_rate_pct": 49.0,
+    "total_trades": 96,
+    "secs": 6
+   },
+   "2020-2021": {
+    "label": "A80_M70",
+    "mom_th": 0.7,
+    "aroon_th": 80,
+    "total_return_pct": 99.61,
+    "annual_return_pct": 41.39,
+    "max_drawdown_pct": -20.61,
+    "sharpe": 1.554,
+    "win_rate_pct": 47.1,
+    "total_trades": 68,
+    "secs": 5
+   },
+   "2022-2026": {
+    "label": "A80_M70",
+    "mom_th": 0.7,
+    "aroon_th": 80,
+    "total_return_pct": 338.82,
+    "annual_return_pct": 37.77,
+    "max_drawdown_pct": -17.05,
+    "sharpe": 1.718,
+    "win_rate_pct": 53.3,
+    "total_trades": 107,
+    "secs": 10
+   }
+  },
+  "0.75": {
+   "2016-2019": {
+    "label": "A80_M75",
+    "mom_th": 0.75,
+    "aroon_th": 80,
+    "total_return_pct": 140.0,
+    "annual_return_pct": 24.54,
+    "max_drawdown_pct": -11.04,
+    "sharpe": 1.325,
+    "win_rate_pct": 49.0,
+    "total_trades": 96,
+    "secs": 6
+   },
+   "2020-2021": {
+    "label": "A80_M75",
+    "mom_th": 0.75,
+    "aroon_th": 80,
+    "total_return_pct": 126.61,
+    "annual_return_pct": 50.66,
+    "max_drawdown_pct": -17.5,
+    "sharpe": 1.755,
+    "win_rate_pct": 51.5,
+    "total_trades": 68,
+    "secs": 5
+   },
+   "2022-2026": {
+    "label": "A80_M75",
+    "mom_th": 0.75,
+    "aroon_th": 80,
+    "total_return_pct": 238.15,
+    "annual_return_pct": 30.2,
+    "max_drawdown_pct": -18.06,
+    "sharpe": 1.443,
+    "win_rate_pct": 52.3,
+    "total_trades": 107,
+    "secs": 10
+   }
+  },
+  "0.78": {
+   "2016-2019": {
+    "label": "A80_M78",
+    "mom_th": 0.78,
+    "aroon_th": 80,
+    "total_return_pct": 142.47,
+    "annual_return_pct": 24.86,
+    "max_drawdown_pct": -13.2,
+    "sharpe": 1.34,
+    "win_rate_pct": 50.0,
+    "total_trades": 96,
+    "secs": 7
+   },
+   "2020-2021": {
+    "label": "A80_M78",
+    "mom_th": 0.78,
+    "aroon_th": 80,
+    "total_return_pct": 145.04,
+    "annual_return_pct": 56.68,
+    "max_drawdown_pct": -15.73,
+    "sharpe": 1.897,
+    "win_rate_pct": 54.4,
+    "total_trades": 68,
+    "secs": 5
+   },
+   "2022-2026": {
+    "label": "A80_M78",
+    "mom_th": 0.78,
+    "aroon_th": 80,
+    "total_return_pct": 284.05,
+    "annual_return_pct": 33.84,
+    "max_drawdown_pct": -15.45,
+    "sharpe": 1.565,
+    "win_rate_pct": 52.3,
+    "total_trades": 107,
+    "secs": 10
+   }
+  },
+  "0.8": {
+   "2016-2019": {
+    "label": "A80_M80",
+    "mom_th": 0.8,
+    "aroon_th": 80,
+    "total_return_pct": 137.15,
+    "annual_return_pct": 24.17,
+    "max_drawdown_pct": -12.26,
+    "sharpe": 1.316,
+    "win_rate_pct": 50.0,
+    "total_trades": 96,
+    "secs": 6
+   },
+   "2020-2021": {
+    "label": "A80_M80",
+    "mom_th": 0.8,
+    "aroon_th": 80,
+    "total_return_pct": 142.16,
+    "annual_return_pct": 55.76,
+    "max_drawdown_pct": -15.75,
+    "sharpe": 1.878,
+    "win_rate_pct": 54.4,
+    "total_trades": 68,
+    "secs": 5
+   },
+   "2022-2026": {
+    "label": "A80_M80",
+    "mom_th": 0.8,
+    "aroon_th": 80,
+    "total_return_pct": 229.25,
+    "annual_return_pct": 29.45,
+    "max_drawdown_pct": -17.64,
+    "sharpe": 1.418,
+    "win_rate_pct": 51.4,
+    "total_trades": 107,
+    "secs": 11
+   }
+  }
+ }
+}
