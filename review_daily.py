@@ -269,9 +269,23 @@ def review(as_of=None, calc=None):
     calc_date = rows[0]["calc_date"] if rows else (str(calc_day.date()) if calc_day else as_of)
     print(f"明细 {len(rows)} 条, 计算日 {calc_date} ({time.time()-t0:.0f}s)", flush=True)
 
+    # ---- 市场情境（2026-08-19：缺陷检测市场相对校准，防大跌日误报）----
+    mkt_ret = None
+    try:
+        _idf = pd.read_csv(BASE / "index_000300.csv", dtype={"date": str}).dropna(subset=["close"])
+        _idc = dict(zip(_idf["date"], _idf["close"].astype(float)))
+        if calc_date in _idc:
+            _prev = max((d for d in _idc if d < calc_date), default=None)
+            if _prev:
+                mkt_ret = (_idc[calc_date] / _idc[_prev] - 1) * 100
+    except Exception:
+        pass
+    extreme = mkt_ret is not None and abs(mkt_ret) >= 1.5
+    mkt_tag = f"沪深300 {mkt_ret:+.2f}%" if mkt_ret is not None else "沪深300 数据缺失"
+
     # ---- 汇总（三池）+ 缺陷检测 ----
     md_lines = [f"# 📋 复盘日志 v2.0（三池全量）",
-                f"## 🗓 {time.strftime('%Y-%m-%d')} ｜ 信号日 {as_of} → 计算日 {calc_date}（T+1 持仓）", ""]
+                f"## 🗓 {time.strftime('%Y-%m-%d')} ｜ 信号日 {as_of} → 计算日 {calc_date}（T+1 持仓）｜ 市场 {mkt_tag}", ""]
     md_lines.append("### 📊 总览（三个监控池）")
     md_lines.append("| 池 | 标的 | 买入信号 | 🟢吃到 | 🔴被套 | ⚪持平 | 胜率 | 平均收益 | 最大亏 | 回测基准 |")
     md_lines.append("|---|---|---|---|---|---|---|---|---|---|")
@@ -304,12 +318,16 @@ def review(as_of=None, calc=None):
         md_lines.append(f"| {grp} | {len(rs)} | {len(buy)} | {wins} | {len(buy)-wins-sum(1 for r in buy if r['pct']==0)} | "
                         f"{sum(1 for r in buy if r['pct']==0)} | {wr:.0f}% | {avg:+.2f}% | {mx:+.2f}% | {bench:.1f}% |")
         if buy and len(buy) >= 5:
-            if wr < 45 and avg < 0:
-                defects.append(f"⚠️ **{grp}信号失效预警**：胜率 {wr:.0f}%（<45%）且平均收益 {avg:+.2f}%，偏离回测基准 {bench}%")
-            elif wr < bench - 15:
-                defects.append(f"⚠️ **{grp}胜率偏低**：{wr:.0f}% vs 回测基准 {bench}%（偏离 >15pct）")
-            if all(r["pct"] < 0 for r in buy):
-                defects.append(f"🔴 **{grp}买入信号全败**：{len(buy)} 只全部被套，信号缺陷")
+            # 2026-08-19 市场相对校准：绝对胜率/均值在极端行情日（|沪深300|≥1.5%）必然恶化，
+            # 只有「显著跑输大盘」才算信号缺陷；跑赢大盘的下跌（如 8/19 短线 -1.97% vs 大盘 -2.58%）
+            # 属市场 beta 而非设计缺陷，不登记 changelog。
+            mkt_bad = mkt_ret is not None and (avg or 0) < mkt_ret - 1.5  # 跑输大盘 >1.5pct
+            if wr < 45 and avg < 0 and mkt_bad:
+                defects.append(f"⚠️ **{grp}信号失效预警**：胜率 {wr:.0f}%（<45%）且平均收益 {avg:+.2f}%（跑输沪深300 {mkt_ret:+.2f}% 达 {avg-mkt_ret:+.2f}pct）")
+            elif wr < bench - 15 and mkt_bad:
+                defects.append(f"⚠️ **{grp}胜率偏低**：{wr:.0f}% vs 回测基准 {bench}%（偏离 >15pct 且跑输大盘 {mkt_ret:+.2f}%）")
+            if all(r["pct"] < 0 for r in buy) and (mkt_ret is None or (avg or 0) < mkt_ret - 2.5):
+                defects.append(f"🔴 **{grp}买入信号全败**：{len(buy)} 只全部被套（跑输沪深300 {mkt_ret:+.2f}% 达 {(avg or 0)-mkt_ret:+.2f}pct）")
     # 短线池按板块细分
     for sub in ("主板", "创业板", "科创板", "基金"):
         rs = [r for r in rows if r["pool"] == "短线全量池" and r["board"] == sub]
@@ -342,7 +360,12 @@ def review(as_of=None, calc=None):
     if buy_all:
         ma5_down = sum(1 for r in buy_all if not r["ma5_above"])
         if ma5_down / len(buy_all) > 0.5:
-            defects.append(f"⚠️ **MA5 破位率 {ma5_down}/{len(buy_all)}（{ma5_down/len(buy_all)*100:.0f}% > 50%）**：趋势恶化，次日应批量减仓")
+            _ma_line = f"⚠️ **MA5 破位率 {ma5_down}/{len(buy_all)}（{ma5_down/len(buy_all)*100:.0f}% > 50%）**：趋势恶化，次日应批量减仓"
+            if extreme:
+                # 极端行情下破位必超 50%，属市场后果非设计缺陷 → 记入观察（不触发 changelog）
+                pool_notes.append(_ma_line + f"（极端行情 {mkt_tag} 下属正常市场后果，非信号设计缺陷，操作建议仍执行）")
+            else:
+                defects.append(_ma_line)
         deep = [r for r in buy_all if r["pct"] < -8]
         if deep:
             parts = []
@@ -353,7 +376,8 @@ def review(as_of=None, calc=None):
                 else:
                     parts.append(f"{r['name']}({r['pct']:.1f}%)")
             names = "；".join(parts)
-            defects.append(f"🔴 **深套标的**（<-8%，回测单笔分布 P1=-6.0%，-8% 属极值尾部）：{names}")
+            # 深套=单笔尾部记录（回测单笔分布 P1=-6.0%，-8% 属极值尾部）：只记录不触发系统更新
+            pool_notes.append(f"🔴 **深套标的**（<-8%，回测单笔分布 P1=-6.0%，-8% 属极值尾部，单笔尾部亏损只记录不触发系统更新）：{names}")
     md_lines.append("### 🔍 缺陷检测（grill）")
     if pool_notes:
         md_lines.extend([f"- {x}" for x in pool_notes])

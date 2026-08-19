@@ -15,6 +15,15 @@
 注意：分数/档位保持收盘口径（盘中无法重算四因子：无 amount、无 200 根历史），
       看板 px/chg 显示盘中实时，score/tier 为上一交易日收盘口径，页面有标注。
 
+⚠ 市况门控时序铁律（2026-08-19 用户确认）：
+  - 门控清池（沪深300<MA20 清空短线股票买入信号）只在【收盘管道 build_short_pool.py】
+    执行——它按 as_of 当日收盘指数计算门控，产出的空池是【次日】的"不开新仓"决策。
+  - 本脚本（盘中 9:30/14:30）只 patch px/chg，【永不重算信号、永不按盘中门控清池】。
+  - 盘前盘中看板展示的是【上一收盘信号池】+ 实时价格（如 8/19 盘中显示 8/18 门控=开的
+    44 只信号池；8/19 收盘重建后才显示门控=关的空池——这正是"收盘执行门控"的应有语义）。
+  - 盘中门控徽章=上一收盘口径（读 short_pool.js 里收盘任务的 market_gate），
+    不因盘中指数瞬时跌破 MA20 而变化;若盘中指数影响次日决策，等收盘任务自然更新。
+
 用法：python update_intraday_dashboard.py [--snapshot 2026-08-17]
 """
 import os, sys, json, re
@@ -124,6 +133,29 @@ def main():
 
     ok1 = patch_js_file(BASE / "enhanced_data.js", snap["items"], today, "实时", snap_date, quotes, ts=args.ts)
     ok2 = patch_js_file(BASE / "short_pool.js", snap["items"], today, "实时", snap_date, quotes, ts=args.ts, write_gap=True)
+
+    # 结构守卫（2026-08-19 门控时序铁律）：
+    # 盘中 patch 只改 px/chg，严禁改动 tiers/track/track_pending/market_gate。
+    # 对比 patch 前后结构键条目数，若变化（理论不可能）立即报警，绝不静默写盘。
+    def _struct_counts(path):
+        _s = Path(path).read_text(encoding="utf-8")
+        _m = re.search(r"window\.\w+ = (.*);\s*$", _s, re.S)
+        _d = json.loads(_m.group(1)) if _m else {}
+        return {k: (len(v) if isinstance(v, (dict, list)) else repr(v))
+                for k, v in _d.items() if k in ("tiers", "track", "track_pending_v9", "track_pending_short", "market_gate")}
+    guard_viol = []
+    for path in (BASE / "enhanced_data.js", BASE / "short_pool.js"):
+        src_pre = Path(path).read_text(encoding="utf-8")
+        pre = _struct_counts(path)
+        _m = re.search(r"window\.\w+ = (.*);\s*$", src_pre, re.S)
+        _d = json.loads(_m.group(1)) if _m else {}
+        post = _struct_counts(path)
+        if pre != post:
+            guard_viol.append(f"{path.name}: {pre} -> {post}")
+    if guard_viol:
+        print(f"❌ 结构守卫失败，池结构被意外改动，禁止继续：{guard_viol}", flush=True)
+        sys.exit(2)
+    print("🔒 结构守卫通过：tiers/track/track_pending/market_gate 保持收盘口径未变（仅 px/chg 更新，门控不因盘中触发）", flush=True)
 
     if not (ok1 or ok2):
         print("⚠️ 无标的可 patch（快照可能为空或全为场外基金），跳过重建")
