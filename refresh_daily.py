@@ -47,7 +47,7 @@ def main():
         if codes:
             import v8_fund_system as FS
             for i, c in enumerate(codes):
-                FS.fetch_nav(c)
+                FS.fetch_nav(c, force=True)   # ⚠ force=True：不带 force 会命中缓存永不更新（2026-08-19 修复，基金净值曾停更 3 个交易日）
                 if i % 500 == 0:
                     print(f"  基金 {i}/{len(codes)} ({time.time()-t0:.0f}s)", flush=True)
         print(f"  基金更新完成 ({time.time()-t0:.0f}s)", flush=True)
