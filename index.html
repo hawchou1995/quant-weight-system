@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>标的监控看板（数据截至 2026-08-18 · 构建 2026-08-19 09:13）</title>
+<title>标的监控看板（数据截至 2026-08-18 · 构建 2026-08-19 09:28）</title>
 <style>
 :root{
   --bg:#f3f4f6; --card:#ffffff; --card2:#f9fafb; --border:#e5e7eb; --line:#f0f1f3;
@@ -31,16 +31,6 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 .tb-btn.active{border-color:var(--accent);color:var(--accent)}
 .community{display:inline-block;padding:6px 14px;border-radius:20px;
   background:linear-gradient(135deg,#FF9A3D 0%,#F2701D 100%);color:#fff;text-decoration:none;font-weight:600;font-size:13px}
-/* 历史报告下拉 */
-.dropdown{position:relative}
-.dropdown-menu{position:absolute;right:0;top:calc(100% + 6px);background:var(--card);border:1px solid var(--border);
-  border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.15);width:360px;max-height:440px;overflow-y:auto;
-  padding:6px;display:none;z-index:950}
-.dropdown.open .dropdown-menu{display:block}
-.dropdown-menu a{display:block;padding:8px 12px;border-radius:8px;font-size:13px;color:var(--text);
-  text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dropdown-menu a:hover{background:var(--card2);color:var(--accent)}
-.dropdown-menu .head{font-size:12px;color:var(--faint);padding:6px 12px;border-bottom:1px solid var(--line);margin-bottom:4px}
 
 /* ---------- 左侧宽侧边栏（图标+文字） ---------- */
 .sidenav{position:fixed;left:0;top:0;bottom:0;width:190px;background:var(--nav-bg);border-right:1px solid var(--border);
@@ -225,21 +215,11 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 .stock-card h3{margin:0 0 6px;font-size:15px}
 .stock-card .sub{color:var(--faint);font-size:11px;font-weight:400}
 .stock-card .meta{color:var(--sub);font-size:12px;margin:3px 0;line-height:1.6}
-/* 月度报告下拉菜单 */
-.snap-group{font-size:12px;color:var(--faint);padding:6px 12px;border-bottom:1px solid var(--line)}
-.snap-item{display:flex;align-items:center;gap:8px}
-/* 快照视图 */
-.snap-view{display:none}
-.snap-view.active{display:block}
 </style></head><body>
 
 <div class="topbar">
   <div class="logo" onclick="location.hash='#overview'"><span class="dot"></span>量化权重监控</div>
   <div class="spacer"></div>
-  <div class="dropdown" id="report-dd">
-    <button class="tb-btn" onclick="toggleDrop('report-dd')">📄 标的报告 ▾</button>
-    <div class="dropdown-menu" id="report-menu"></div>
-  </div>
   <button class="tb-btn" id="theme-btn" onclick="toggleTheme()">🌙 夜间</button>
   <a class="community" href="https://qingju.me/" target="_blank" rel="noopener">💬 青橘社区</a>
 </div>
@@ -251,7 +231,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class="view active" id="view-overview">
 <div class="card" id="overview">
 <h2>📊 标的监控总览 <span class="badge badge-auto">数据截至 2026-08-18 收盘</span></h2>
-<div class="sub">左侧导航切换：🅰️ 全量池中/长线（全市场自动池·股票分层+基金） / 🅱️ 固定池中/长线（用户固定池） / ⚡ 短线（占位） · 右上角「标的报告」按月查看历史收盘快照 · 信号仅供参考</div>
+<div class="sub">左侧导航切换：🅰️ 全量池中/长线（全市场自动池·股票分层+基金） / 🅱️ 固定池中/长线（用户固定池） / ⚡ 短线 · 信号仅供参考</div>
 <div class="kpis">
 <div class="kpi"><div class="l">🟢 加仓区</div><div class="v" style="color:#dc2626">34 只</div><div class="s">满仓+轻仓加仓</div></div>
 <div class="kpi"><div class="l">🟡 观望区</div><div class="v" style="color:#d97706">6 只</div><div class="s">持有不加</div></div>
@@ -259,8 +239,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class="kpi"><div class="l">共监控</div><div class="v">60 只</div><div class="s">全量池 40 行 + 固定池 20 只</div></div>
 </div>
 <div class="rule-box" style="margin-bottom:0"><b>监控口径</b>：权重分 = 动量35% + 趋势25% + Aroon20% + 量价20% ｜ 档位 = ≥75 满仓加仓 / ≥60 轻仓加仓 / ≥45 观望 / ≥30 减半 / &lt;30 清仓
-<br><b>卖出闸门（每日）</b>：全量池 移动止损 4.5% + 沪深300破MA150 ｜ 固定池 移动止损 10% + 破MA200 ｜ 任何闸门先触发先生效
-<br><b>历史快照</b>：右上角「标的报告」按月分类，点击当前页切换查看（不新开窗口）</div>
+<br><b>卖出闸门（每日）</b>：全量池 移动止损 4.5% + 沪深300破MA150 ｜ 固定池 移动止损 10% + 破MA200 ｜ 任何闸门先触发先生效</div>
 </div>
 <div class="card" id="bt-all">
 <h2>📊 回测参考 <span class="badge badge-auto">中/长线 · 股票按权限分层</span></h2>
@@ -3764,15 +3743,6 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 </div>
 
-<!-- ============ 历史快照视图（右上角标的报告切换） ============ -->
-<div class="view" id="view-snapshot">
-<div class="card" id="snap-holder">
-<h2>📅 历史收盘监控快照</h2>
-<div class="sub" id="snap-title"></div>
-<div id="snap-content"></div>
-</div>
-</div>
-
 <!-- ============ 视图 E：复盘日志（内嵌，与各池同形态） ============ -->
 <div class="view" id="view-review">
 <div class="rev-cum"><div class="rev-cum-title">📈 累计总览<span class="rev-cum-badge">自 2026-08-14 · 3 篇</span></div><div class="rev-cum-sub">三池累计信号标的（防重累加；短线·基金 T+1 净值未出计持平）· 回测基准 = 2016 起回测胜率</div><table class="tbl"><thead><tr><th>池</th><th>累计标的</th><th>累计买入</th><th>🟢吃到</th><th>🔴被套</th><th>⚪持平</th><th>累计胜率</th><th>回测基准</th><th>累计均收</th></tr></thead><tbody><tr><td>全量池中/长线</td><td>27</td><td>27</td><td>15</td><td>12</td><td>0</td><td>56%</td><td>48.1% （+7.5pct）</td><td>+1.53%</td></tr><tr><td>固定池中/长线</td><td>48</td><td>5</td><td>2</td><td>3</td><td>0</td><td>40%</td><td>57.1% （-17.1pct）</td><td>-0.40%</td></tr><tr><td>短线全量池</td><td>85</td><td>85</td><td>44</td><td>30</td><td>11</td><td>52%</td><td>— </td><td>+1.18%</td></tr><tr><td>短线·主板</td><td>30</td><td>30</td><td>20</td><td>10</td><td>0</td><td>67%</td><td>46.8% （+19.9pct）</td><td>+1.99%</td></tr><tr><td>短线·创业板</td><td>29</td><td>29</td><td>13</td><td>15</td><td>1</td><td>45%</td><td>48.1% （-3.3pct）</td><td>+0.62%</td></tr><tr><td>短线·科创板</td><td>16</td><td>16</td><td>11</td><td>5</td><td>0</td><td>69%</td><td>57.8% （+11.0pct）</td><td>+1.45%</td></tr><tr><td>短线·基金</td><td>10</td><td>10</td><td>0</td><td>0</td><td>10</td><td>0%</td><td>55.5% （-55.5pct）</td><td>+0.00%</td></tr><tr class='rev-cum-total'><td>合计</td><td>245</td><td>202</td><td>105</td><td>75</td><td>22</td><td>52%</td><td>—</td><td>+1.19%</td></tr></tbody></table></div>
@@ -4095,8 +4065,17 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 </div>
 
+<!-- ============ 视图 G：评论区（Twikoo） ============ -->
+<div class="view" id="view-comment">
+<div class="card">
+<h2>💬 评论区 <span class="badge badge-auto">Twikoo</span></h2>
+<div class="sub">对本看板/策略的看法、问题、交流都欢迎 · 评论数据由 Twikoo 后端（Hugging Face Spaces）存储</div>
+<div id="tcomment"></div>
 </div>
-<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-19 09:13 · 版本 v5.11.8 · 数据截至 2026-08-18 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
+</div>
+
+</div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-19 09:28 · 版本 v5.11.8 · 数据截至 2026-08-18 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
@@ -4104,7 +4083,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 <script src="enhanced_data.js"></script>
 <script src="short_signals.js"></script>
-<script src="monitor/snapshots_index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.7.19/dist/twikoo.min.js"></script>
 <script>window.SHORT_POOL = {"as_of": "2026-08-18", "fund_as_of": "2026-08-14", "tiers": {"主板": ["002556", "600251", "002033", "600261", "600523", "601156", "600081", "600817", "601099", "600168"], "创业板": ["300375", "300388", "300012"], "科创板": [], "基金": ["005005", "005006", "000314", "002017", "004355", "002158", "001796", "002133", "002495", "002496"]}, "track": {"601952": {"entry": "2026-08-17", "pool": "主板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "002033": {"entry": "2026-08-17", "pool": "主板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock", "last": {"name": "丽江股份", "score": 58.2, "tier": "买入", "pool": "主板", "type": "stock", "date": "2026-08-19"}}, "603858": {"entry": "2026-08-17", "pool": "主板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "600251": {"entry": "2026-08-17", "pool": "主板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock", "last": {"name": "冠农股份", "score": 58.6, "tier": "买入", "pool": "主板", "type": "stock", "date": "2026-08-19"}}, "600261": {"entry": "2026-08-17", "pool": "主板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock", "last": {"name": "阳光照明", "score": 58.0, "tier": "买入", "pool": "主板", "type": "stock", "date": "2026-08-19"}}, "000019": {"entry": "2026-08-17", "pool": "主板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "600435": {"entry": "2026-08-17", "pool": "主板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "600363": {"entry": "2026-08-17", "pool": "主板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "600864": {"entry": "2026-08-17", "pool": "主板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "002556": {"entry": "2026-08-17", "pool": "主板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock", "last": {"name": "辉隆股份", "score": 59.4, "tier": "买入", "pool": "主板", "type": "stock", "date": "2026-08-19"}}, "300172": {"entry": "2026-08-17", "pool": "创业板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "300388": {"entry": "2026-08-17", "pool": "创业板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock", "last": {"name": "节能国祯", "score": 51.8, "tier": "买入", "pool": "创业板", "type": "stock", "date": "2026-08-19"}}, "300012": {"entry": "2026-08-17", "pool": "创业板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock", "last": {"name": "华测检测", "score": 51.7, "tier": "买入", "pool": "创业板", "type": "stock", "date": "2026-08-19"}}, "300072": {"entry": "2026-08-17", "pool": "创业板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "300627": {"entry": "2026-08-17", "pool": "创业板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "300375": {"entry": "2026-08-17", "pool": "创业板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock", "last": {"name": "鹏翎股份", "score": 52.2, "tier": "买入", "pool": "创业板", "type": "stock", "date": "2026-08-19"}}, "300370": {"entry": "2026-08-17", "pool": "创业板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "301053": {"entry": "2026-08-17", "pool": "创业板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "300194": {"entry": "2026-08-17", "pool": "创业板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "688513": {"entry": "2026-08-17", "pool": "科创板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "688029": {"entry": "2026-08-17", "pool": "科创板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "688068": {"entry": "2026-08-17", "pool": "科创板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "688739": {"entry": "2026-08-17", "pool": "科创板", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "005005": {"entry": "2026-08-17", "pool": "基金", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "fund", "last": {"name": "中金瑞安混合发起A", "score": 70.7, "tier": "强买入", "pool": "基金", "type": "fund", "date": "2026-08-19"}}, "005006": {"entry": "2026-08-17", "pool": "基金", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "fund", "last": {"name": "中金瑞安混合发起C", "score": 70.6, "tier": "强买入", "pool": "基金", "type": "fund", "date": "2026-08-19"}}, "000314": {"entry": "2026-08-17", "pool": "基金", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "fund", "last": {"name": "招商瑞丰灵活配置混合发起式A", "score": 63.3, "tier": "强买入", "pool": "基金", "type": "fund", "date": "2026-08-19"}}, "002017": {"entry": "2026-08-17", "pool": "基金", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "fund", "last": {"name": "招商瑞丰灵活配置混合发起式C", "score": 63.2, "tier": "强买入", "pool": "基金", "type": "fund", "date": "2026-08-19"}}, "004355": {"entry": "2026-08-17", "pool": "基金", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "fund", "last": {"name": "嘉实丰和灵活配置混合A", "score": 62.4, "tier": "强买入", "pool": "基金", "type": "fund", "date": "2026-08-19"}}, "002158": {"entry": "2026-08-17", "pool": "基金", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "fund", "last": {"name": "汇添富安鑫智选混合C", "score": 61.2, "tier": "强买入", "pool": "基金", "type": "fund", "date": "2026-08-19"}}, "001796": {"entry": "2026-08-17", "pool": "基金", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "fund", "last": {"name": "汇添富安鑫智选混合A", "score": 61.1, "tier": "强买入", "pool": "基金", "type": "fund", "date": "2026-08-19"}}, "002133": {"entry": "2026-08-17", "pool": "基金", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "fund", "last": {"name": "广发鑫益混合", "score": 60.8, "tier": "强买入", "pool": "基金", "type": "fund", "date": "2026-08-19"}}, "002495": {"entry": "2026-08-17", "pool": "基金", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "fund", "last": {"name": "前海开源量化优选A", "score": 60.8, "tier": "强买入", "pool": "基金", "type": "fund", "date": "2026-08-19"}}, "002496": {"entry": "2026-08-17", "pool": "基金", "exit": "2026-09-16", "status": "active", "last_seen": "2026-08-19", "type": "fund", "last": {"name": "前海开源量化优选C", "score": 60.6, "tier": "强买入", "pool": "基金", "type": "fund", "date": "2026-08-19"}}, "002636": {"entry": "2026-08-14", "pool": "主板", "exit": "2026-09-13", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "601890": {"entry": "2026-08-14", "pool": "主板", "exit": "2026-09-13", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "000768": {"entry": "2026-08-14", "pool": "主板", "exit": "2026-09-13", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "002030": {"entry": "2026-08-14", "pool": "主板", "exit": "2026-09-13", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "000850": {"entry": "2026-08-14", "pool": "主板", "exit": "2026-09-13", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "002536": {"entry": "2026-08-14", "pool": "主板", "exit": "2026-09-13", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "603538": {"entry": "2026-08-14", "pool": "主板", "exit": "2026-09-13", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "300247": {"entry": "2026-08-14", "pool": "创业板", "exit": "2026-09-13", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "300453": {"entry": "2026-08-14", "pool": "创业板", "exit": "2026-09-13", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "300912": {"entry": "2026-08-14", "pool": "创业板", "exit": "2026-09-13", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "300009": {"entry": "2026-08-14", "pool": "创业板", "exit": "2026-09-13", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "300406": {"entry": "2026-08-14", "pool": "创业板", "exit": "2026-09-13", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "300832": {"entry": "2026-08-14", "pool": "创业板", "exit": "2026-09-13", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "300463": {"entry": "2026-08-14", "pool": "创业板", "exit": "2026-09-13", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "688137": {"entry": "2026-08-14", "pool": "科创板", "exit": "2026-09-13", "status": "active", "last_seen": "2026-08-19", "type": "stock"}, "600523": {"entry": "2026-08-18", "pool": "主板", "type": "stock", "exit": "2026-09-17", "status": "active", "last_seen": "2026-08-19", "last": {"name": "贵航股份", "score": 56.8, "tier": "买入", "pool": "主板", "type": "stock", "date": "2026-08-19"}}, "601156": {"entry": "2026-08-18", "pool": "主板", "type": "stock", "exit": "2026-09-17", "status": "active", "last_seen": "2026-08-19", "last": {"name": "东航物流", "score": 56.6, "tier": "买入", "pool": "主板", "type": "stock", "date": "2026-08-19"}}, "600081": {"entry": "2026-08-18", "pool": "主板", "type": "stock", "exit": "2026-09-17", "status": "active", "last_seen": "2026-08-19", "last": {"name": "东风科技", "score": 56.6, "tier": "买入", "pool": "主板", "type": "stock", "date": "2026-08-19"}}, "600817": {"entry": "2026-08-18", "pool": "主板", "type": "stock", "exit": "2026-09-17", "status": "active", "last_seen": "2026-08-19", "last": {"name": "宇通重工", "score": 56.2, "tier": "买入", "pool": "主板", "type": "stock", "date": "2026-08-19"}}, "601099": {"entry": "2026-08-18", "pool": "主板", "type": "stock", "exit": "2026-09-17", "status": "active", "last_seen": "2026-08-19", "last": {"name": "太平洋", "score": 55.8, "tier": "买入", "pool": "主板", "type": "stock", "date": "2026-08-19"}}, "600168": {"entry": "2026-08-18", "pool": "主板", "type": "stock", "exit": "2026-09-17", "status": "active", "last_seen": "2026-08-19", "last": {"name": "武汉控股", "score": 55.6, "tier": "买入", "pool": "主板", "type": "stock", "date": "2026-08-19"}}}, "track_pending_short": {}};</script>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
@@ -4112,7 +4091,8 @@ window.ENH.nav = [
   ["overview","📊","监控总览",[["overview","总览统计"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
   ["sys-auto","🅰️","全量池中/长线",[["card-tbl-v9","标的汇总表"],["card-tbl-v9-detail","逐标的详情"],["watch-v9-card","中长线跟踪"]]],
   ["sys-lite","🅱️","固定池中/长线",[["card-tbl-v8","标的汇总表"],["card-tbl-v8-detail","逐标的详情"]]],
-  ["short","⚡","全量池短线",[["card-tbl-short","标的汇总表"],["watch-card","短线跟踪"],["card-tbl-short-detail","逐标的详情"]]]
+  ["short","⚡","全量池短线",[["card-tbl-short","标的汇总表"],["watch-card","短线跟踪"],["card-tbl-short-detail","逐标的详情"]]],
+  ["comment","💬","评论区",[]]
 ];
 /* 视图切换模式：滚动不更新导航高亮（COMMON_JS renderSidenav 检测此标志） */
 window.ENH.NAV_SWITCH = true;
@@ -4164,7 +4144,7 @@ function renderSubCurve(){
   renderOneCurve('curve-short-fund', C.short_fund, '#3b82f6', '基金短线', '+'+243);
 }
 /* 视图切换（hash 驱动：切换时更新 location.hash，加载/前进后退时按 hash 定位） */
-var VIEW_MAP={'overview':'view-overview','sys-auto':'view-auto','sys-lite':'view-lite','short':'view-short','snapshot':'view-snapshot','review':'view-review','changelog':'view-changelog'};
+var VIEW_MAP={'overview':'view-overview','sys-auto':'view-auto','sys-lite':'view-lite','short':'view-short','review':'view-review','changelog':'view-changelog','comment':'view-comment'};
 function switchView(key){
   var v=VIEW_MAP[key];if(!v)return;
   document.querySelectorAll('.view').forEach(function(x){x.classList.remove('active');});
@@ -4177,27 +4157,25 @@ function applyHash(){
   if(VIEW_MAP[k])switchView(k);
 }
 window.addEventListener('hashchange',applyHash);
-/* 右上角标的报告：按月分类历史快照（当前页内切换） */
-function renderReportMenu(){
-  var m=document.getElementById('report-menu');if(!m)return;
-  if(!window.SNAPSHOTS){m.innerHTML='<div class="head">暂无历史快照</div>';return;}
-  var h='<div class="head">历史收盘监控快照（'+window.SNAPSHOTS.snapshots.length+' 份）</div>';
-  h+='<a class="snap-item" style="font-weight:600;color:var(--accent)" href="history_reports.html">📚 历史报告总览（独立页）</a>';
-  window.SNAPSHOTS.months.forEach(function(g){
-    h+='<div class="snap-group">📅 '+g.month+'</div>';
-    g.items.forEach(function(s){
-      h+='<a class="snap-item" href="javascript:void(0)" onclick="showSnapshot(\''+s.file+'\',\''+s.date+'\')">📊 '+s.date+'（'+s.count+' 只）</a>';
+/* Twikoo 评论（Hugging Face Spaces 后端；envId 占位，部署后替换为 HF Space 直链如 https://xxx.hf.space） */
+var _sw0=switchView;
+function initComment(){
+  if(window.__twikooInit)return;
+  var el=document.getElementById('tcomment');if(!el)return;
+  window.__twikooInit=true;
+  if(typeof twikoo!=='undefined'){
+    twikoo.init({
+      envId: 'TWIKOO_ENVID_PLACEHOLDER',
+      el: '#tcomment',
+      lang: 'zh-CN',
+      path: 'quant-weight-system',
     });
-  });
-  m.innerHTML=h;
+  }
 }
-/* 当前页加载快照（不新开窗口 · file:// 兼容：iframe 内嵌，避免 fetch CORS） */
-function showSnapshot(file, date){
-  switchView('snapshot');
-  document.getElementById('snap-title').textContent = '标的快照 '+date+'（历史收盘监控 · 右上角「标的报告」可切换其他月份 · 当前页查看）';
-  document.getElementById('snap-content').innerHTML =
-    '<iframe src="monitor/snapshots/'+file+'" style="width:100%;height:720px;border:1px solid var(--border);border-radius:12px;background:#0f1115"></iframe>';
-}
+switchView=function(key){
+  _sw0(key);
+  if(key==='comment')initComment();
+};
 </script>
 <script>
 
@@ -4207,27 +4185,6 @@ function applyTheme(t){document.documentElement.setAttribute('data-theme',t);
   try{localStorage.setItem('qw-theme',t)}catch(e){}}
 function toggleTheme(){var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';applyTheme(t)}
 try{applyTheme(localStorage.getItem('qw-theme')||'light')}catch(e){applyTheme('light')}
-
-/* ---------- 历史报告下拉（优先月度收盘快照，按月分类；回退标的报告列表） ---------- */
-function toggleDrop(id){var el=document.getElementById(id);el.classList.toggle('open');
-  if(id==='report-dd'&&!document.getElementById('report-menu').innerHTML){
-    var m=document.getElementById('report-menu');
-    if(window.SNAPSHOTS&&window.SNAPSHOTS.months&&window.SNAPSHOTS.months.length){
-      var h='<div class="head">历史收盘监控快照（'+window.SNAPSHOTS.snapshots.length+' 份）</div>';
-      window.SNAPSHOTS.months.forEach(function(g){
-        h+='<div class="snap-group">📅 '+g.month+'</div>';
-        g.items.forEach(function(s){
-          h+='<a class="snap-item" href="monitor/snapshots/'+s.file+'" target="_blank">📊 '+s.date+'（'+s.count+' 只）</a>';});});
-      m.innerHTML=h;
-    }else if(window.ENH.monitor_reports){
-      var h2='<div class="head">标的监控报告（'+window.ENH.monitor_reports.length+' 只）</div>';
-      window.ENH.monitor_reports.forEach(function(r){
-        h2+='<a href="monitor_reports.html#'+r.code+'" target="_blank">📈 '+r.name+'（'+r.code+'）· '+r.tier+'</a>';});
-      m.innerHTML=h2;}}
-  }
-document.addEventListener('click',function(e){
-  document.querySelectorAll('.dropdown.open').forEach(function(d){
-    if(!d.contains(e.target))d.classList.remove('open');});});
 
 /* ---------- 左侧导航（JS 点击滚动，不依赖 hash；标的信息与表格同页，无独立报告入口） ---------- */
 function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)return;
@@ -4523,11 +4480,10 @@ function renderKlineBoxes(){
     var d=window.ENH.details[box.getAttribute('data-code')];
     if(d&&d.kline)box.innerHTML=renderKline(d.kline);});}
 
-/* 覆盖：报告下拉用月度快照；左侧导航点击切换视图 */
+/* 覆盖：左侧导航点击切换视图 */
 document.addEventListener('DOMContentLoaded',function(){
   applyHash();   // 按 URL hash 定位视图（历史页跳转 dual_system.html#sys-auto 直接显示普适版）
   renderSubCurve();   // 基金回测净值曲线
-  renderReportMenu();
   /* 全量池短线跟踪：自动跟踪池（SHORT_POOL.track，可买入标的 30 天）+ 可选手动补充（localStorage） */
   function fillTierOptions(selId,tiers){
     var sel=document.getElementById(selId);if(!sel)return;
