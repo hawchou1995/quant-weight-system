@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-08-18",
+  "as_of": "2026-08-19",
   "fund_as_of": "2026-08-18",
   "details": {
     "005005": {
@@ -97,8 +97,8 @@
       "board": "基金",
       "industry": "均衡配置",
       "biz": "—",
-      "px": 2.01,
-      "chg": 1.1,
+      "px": 12.98,
+      "chg": -3.99,
       "ret_1y": 5.4,
       "score": 63.2,
       "score_prev": null,
@@ -183,8 +183,8 @@
       "board": "基金",
       "industry": "均衡配置",
       "biz": "—",
-      "px": 1.25,
-      "chg": 0.0,
+      "px": 26.6,
+      "chg": -6.37,
       "ret_1y": 39.7,
       "score": 61.2,
       "score_prev": null,
@@ -226,8 +226,8 @@
       "board": "基金",
       "industry": "均衡配置",
       "biz": "—",
-      "px": 3.09,
-      "chg": 1.58,
+      "px": 2.68,
+      "chg": -1.11,
       "ret_1y": 25.1,
       "score": 60.8,
       "score_prev": null,
@@ -269,8 +269,8 @@
       "board": "基金",
       "industry": "量化优选",
       "biz": "—",
-      "px": 2.01,
-      "chg": 0.3,
+      "px": 2.35,
+      "chg": -2.89,
       "ret_1y": 31.7,
       "score": 60.8,
       "score_prev": null,
@@ -312,8 +312,8 @@
       "board": "基金",
       "industry": "量化优选",
       "biz": "—",
-      "px": 1.96,
-      "chg": 0.26,
+      "px": 2.06,
+      "chg": -4.19,
       "ret_1y": 31.5,
       "score": 60.6,
       "score_prev": null,
@@ -464,7 +464,8 @@
       "exit": "2026-09-16",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "002033": {
       "entry": "2026-08-17",
@@ -476,11 +477,13 @@
       "last": {
         "name": "丽江股份",
         "score": 58.2,
-        "tier": "买入",
+        "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-08-19"
-      }
+        "date": "2026-08-19",
+        "gate_closed": true
+      },
+      "gate_closed": true
     },
     "603858": {
       "entry": "2026-08-17",
@@ -488,7 +491,8 @@
       "exit": "2026-09-16",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "600251": {
       "entry": "2026-08-17",
@@ -500,11 +504,13 @@
       "last": {
         "name": "冠农股份",
         "score": 58.6,
-        "tier": "买入",
+        "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-08-19"
-      }
+        "date": "2026-08-19",
+        "gate_closed": true
+      },
+      "gate_closed": true
     },
     "600261": {
       "entry": "2026-08-17",
@@ -516,11 +522,13 @@
       "last": {
         "name": "阳光照明",
         "score": 58.0,
-        "tier": "买入",
+        "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-08-19"
-      }
+        "date": "2026-08-19",
+        "gate_closed": true
+      },
+      "gate_closed": true
     },
     "000019": {
       "entry": "2026-08-17",
@@ -528,7 +536,8 @@
       "exit": "2026-09-16",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "600435": {
       "entry": "2026-08-17",
@@ -536,7 +545,8 @@
       "exit": "2026-09-16",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "600363": {
       "entry": "2026-08-17",
@@ -544,7 +554,8 @@
       "exit": "2026-09-16",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "600864": {
       "entry": "2026-08-17",
@@ -552,7 +563,8 @@
       "exit": "2026-09-16",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "002556": {
       "entry": "2026-08-17",
@@ -564,11 +576,13 @@
       "last": {
         "name": "辉隆股份",
         "score": 59.4,
-        "tier": "买入",
+        "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-08-19"
-      }
+        "date": "2026-08-19",
+        "gate_closed": true
+      },
+      "gate_closed": true
     },
     "300172": {
       "entry": "2026-08-17",
@@ -576,7 +590,8 @@
       "exit": "2026-09-16",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "300388": {
       "entry": "2026-08-17",
@@ -588,11 +603,13 @@
       "last": {
         "name": "节能国祯",
         "score": 51.8,
-        "tier": "买入",
+        "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-08-19"
-      }
+        "date": "2026-08-19",
+        "gate_closed": true
+      },
+      "gate_closed": true
     },
     "300012": {
       "entry": "2026-08-17",
@@ -604,11 +621,13 @@
       "last": {
         "name": "华测检测",
         "score": 51.7,
-        "tier": "买入",
+        "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-08-19"
-      }
+        "date": "2026-08-19",
+        "gate_closed": true
+      },
+      "gate_closed": true
     },
     "300072": {
       "entry": "2026-08-17",
@@ -616,7 +635,8 @@
       "exit": "2026-09-16",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "300627": {
       "entry": "2026-08-17",
@@ -624,7 +644,8 @@
       "exit": "2026-09-16",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "300375": {
       "entry": "2026-08-17",
@@ -636,11 +657,13 @@
       "last": {
         "name": "鹏翎股份",
         "score": 52.2,
-        "tier": "买入",
+        "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-08-19"
-      }
+        "date": "2026-08-19",
+        "gate_closed": true
+      },
+      "gate_closed": true
     },
     "300370": {
       "entry": "2026-08-17",
@@ -648,7 +671,8 @@
       "exit": "2026-09-16",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "301053": {
       "entry": "2026-08-17",
@@ -656,7 +680,8 @@
       "exit": "2026-09-16",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "300194": {
       "entry": "2026-08-17",
@@ -664,7 +689,8 @@
       "exit": "2026-09-16",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "688513": {
       "entry": "2026-08-17",
@@ -672,7 +698,8 @@
       "exit": "2026-09-16",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "688029": {
       "entry": "2026-08-17",
@@ -680,7 +707,8 @@
       "exit": "2026-09-16",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "688068": {
       "entry": "2026-08-17",
@@ -688,7 +716,8 @@
       "exit": "2026-09-16",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "688739": {
       "entry": "2026-08-17",
@@ -696,7 +725,8 @@
       "exit": "2026-09-16",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "005005": {
       "entry": "2026-08-17",
@@ -864,7 +894,8 @@
       "exit": "2026-09-13",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "601890": {
       "entry": "2026-08-14",
@@ -872,7 +903,8 @@
       "exit": "2026-09-13",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "000768": {
       "entry": "2026-08-14",
@@ -880,7 +912,8 @@
       "exit": "2026-09-13",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "002030": {
       "entry": "2026-08-14",
@@ -888,7 +921,8 @@
       "exit": "2026-09-13",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "000850": {
       "entry": "2026-08-14",
@@ -896,7 +930,8 @@
       "exit": "2026-09-13",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "002536": {
       "entry": "2026-08-14",
@@ -904,7 +939,8 @@
       "exit": "2026-09-13",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "603538": {
       "entry": "2026-08-14",
@@ -912,7 +948,8 @@
       "exit": "2026-09-13",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "300247": {
       "entry": "2026-08-14",
@@ -920,7 +957,8 @@
       "exit": "2026-09-13",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "300453": {
       "entry": "2026-08-14",
@@ -928,7 +966,8 @@
       "exit": "2026-09-13",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "300912": {
       "entry": "2026-08-14",
@@ -936,7 +975,8 @@
       "exit": "2026-09-13",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "300009": {
       "entry": "2026-08-14",
@@ -944,7 +984,8 @@
       "exit": "2026-09-13",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "300406": {
       "entry": "2026-08-14",
@@ -952,7 +993,8 @@
       "exit": "2026-09-13",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "300832": {
       "entry": "2026-08-14",
@@ -960,7 +1002,8 @@
       "exit": "2026-09-13",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "300463": {
       "entry": "2026-08-14",
@@ -968,7 +1011,8 @@
       "exit": "2026-09-13",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "688137": {
       "entry": "2026-08-14",
@@ -976,7 +1020,8 @@
       "exit": "2026-09-13",
       "status": "active",
       "last_seen": "2026-08-19",
-      "type": "stock"
+      "type": "stock",
+      "gate_closed": true
     },
     "600523": {
       "entry": "2026-08-18",
@@ -988,11 +1033,13 @@
       "last": {
         "name": "贵航股份",
         "score": 56.8,
-        "tier": "买入",
+        "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-08-19"
-      }
+        "date": "2026-08-19",
+        "gate_closed": true
+      },
+      "gate_closed": true
     },
     "601156": {
       "entry": "2026-08-18",
@@ -1004,11 +1051,13 @@
       "last": {
         "name": "东航物流",
         "score": 56.6,
-        "tier": "买入",
+        "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-08-19"
-      }
+        "date": "2026-08-19",
+        "gate_closed": true
+      },
+      "gate_closed": true
     },
     "600081": {
       "entry": "2026-08-18",
@@ -1020,11 +1069,13 @@
       "last": {
         "name": "东风科技",
         "score": 56.6,
-        "tier": "买入",
+        "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-08-19"
-      }
+        "date": "2026-08-19",
+        "gate_closed": true
+      },
+      "gate_closed": true
     },
     "600817": {
       "entry": "2026-08-18",
@@ -1036,11 +1087,13 @@
       "last": {
         "name": "宇通重工",
         "score": 56.2,
-        "tier": "买入",
+        "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-08-19"
-      }
+        "date": "2026-08-19",
+        "gate_closed": true
+      },
+      "gate_closed": true
     },
     "601099": {
       "entry": "2026-08-18",
@@ -1052,11 +1105,13 @@
       "last": {
         "name": "太平洋",
         "score": 55.8,
-        "tier": "买入",
+        "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-08-19"
-      }
+        "date": "2026-08-19",
+        "gate_closed": true
+      },
+      "gate_closed": true
     },
     "600168": {
       "entry": "2026-08-18",
@@ -1068,11 +1123,13 @@
       "last": {
         "name": "武汉控股",
         "score": 55.6,
-        "tier": "买入",
+        "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-08-19"
-      }
+        "date": "2026-08-19",
+        "gate_closed": true
+      },
+      "gate_closed": true
     }
   },
   "track_pending_short": {
@@ -1090,5 +1147,7 @@
         "date": "2026-08-19"
       }
     }
-  }
+  },
+  "intraday_note": "2026-08-19 盘中行情（实时）· 分数为收盘口径",
+  "intraday_ts": "14:35"
 }
