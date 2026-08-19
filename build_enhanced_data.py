@@ -634,7 +634,37 @@ def maintain_track_v9():
                            or names.get(k) or code)
         else:
             rec["name"] = (details.get(code, {}) or {}).get("name") or names.get(k, code)
-    print(f"全量池中/长线跟踪池: {len(track)} 只（正式） + {len(pending)} 只（待确认，隔日入池）", flush=True)
+    # 6) 刷新全部正式池成员快照（2026-08-19 修复：掉榜标的 last 只在离榜那天刷新，之后 px/chg 永远旧数据）。
+    #    details 只含「今日在榜 + 固定池」标的，掉榜标的须回 A.pool_all（全部 data_full）/基金净值缓存重算——
+    #    只要底层 data_full 有最新收盘，看板掉榜标的涨跌就跟着刷新；底层没更新时保留旧快照（数据层由 update_daily 覆盖）。
+    def _snap_from_data(_c):
+        _d = details.get(_c, {})
+        if _d:
+            return {"px": _d.get("px"), "chg": _d.get("chg"), "score": _d.get("score"),
+                    "tier": _d.get("tier"), "date": today}
+        _k = ("sh" if _c.startswith(("6", "5")) else "sz") + _c
+        _df = A.pool_all.get(_k)
+        if (_df is None or len(_df) == 0) and _c in V9_FUND:
+            _df = load_fund_cache_df(_c)
+        if _df is None or len(_df) == 0:
+            return None
+        _eff = _df.index[-1]
+        _r = _df.loc[_eff]
+        _px = float(_r["close"])
+        if pd.isna(_px) or _px <= 0:
+            return None
+        _chg = float(_df["close"].iloc[-1] / _df["close"].iloc[-2] - 1) * 100 if len(_df) >= 2 else None
+        _sc = float(V.score_row_v2(_r))
+        _tierf = fund_tier if _c in V9_FUND else tier
+        return {"px": round(_px, 2), "chg": round(_chg, 2) if _chg is not None else None,
+                "score": round(_sc, 1), "tier": _tierf(_sc), "date": str(_eff.date())}
+    _refreshed = 0
+    for code, rec in track.items():
+        _snap = _snap_from_data(code)
+        if _snap:
+            rec["last"] = _snap
+            _refreshed += 1
+    print(f"全量池中/长线跟踪池: {len(track)} 只（正式） + {len(pending)} 只（待确认，隔日入池），快照刷新 {_refreshed} 只", flush=True)
     return track, pending
 
 

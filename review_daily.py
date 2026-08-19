@@ -170,8 +170,16 @@ def review(as_of=None, calc=None):
     v9_codes = pool_codes(details, "v9")          # 全量池中/长线 40 只
     v8_codes = pool_codes(details, "v8")          # 固定池中/长线 24 只
     if as_of is None:
-        cur = json.load(open(BASE / "short_pool.json", encoding="utf-8"))
-        as_of = cur["as_of"]
+        # 2026-08-19 修复（收盘复盘全跳过根因）：默认信号日取「上一交易日」，保证 T+1 开盘买入日 = 最新交易日（存在）。
+        # 原实现取 short_pool 末日（=今日收盘）→ T+1 不存在 → 全部跳过误报「行情缺失」。
+        # ⚠ 勿用 E.all_days 取 [-2]：它被 v8_selector 的 END（08-17 回测截断）过滤，[-2] 会落到 08-14。
+        # 正确口径：index_000300.csv 日历的倒数第二行（数据日历），换算信号日 08-18 → T+1 08-19 开盘买入、08-19 收盘估值。
+        try:
+            _idx_cal = pd.read_csv(BASE / "index_000300.csv", dtype={"date": str})
+            as_of = _idx_cal["date"].iloc[-2]
+        except Exception:
+            cur = json.load(open(BASE / "short_pool.json", encoding="utf-8"))
+            as_of = cur["as_of"]
     sig_t = pd.Timestamp(as_of)
     out, _sigs = B.calc_signals(as_of)            # 短线全量池信号（不覆盖生产文件）
     as_of = out["as_of"]
@@ -201,6 +209,7 @@ def review(as_of=None, calc=None):
     calc_day = pd.Timestamp(calc) if calc else None
     rows = []
     pending_funds = []   # 基金 T+1 净值未公布（T-1 口径，下次复盘补录）
+    t1_pending = {}      # 2026-08-19：记录「T+1 交易日未到」的标的数（区分真缺失 vs 数据边界）
     for it in pools:
         ddf = load_ddf(it["code"], it["perm"])
         if ddf is None:
@@ -228,6 +237,8 @@ def review(as_of=None, calc=None):
         if t1 is None:
             if it["perm"] == "fund":
                 pending_funds.append(it["code"])   # 基金净值 T+1 未公布 → 待确认
+            else:
+                t1_pending[it["pool"]] = t1_pending.get(it["pool"], 0) + 1   # 股票 T+1 未到（数据边界）
             continue
         if calc_day is not None:
             avail = ddf.index[ddf.index <= calc_day]
@@ -271,7 +282,12 @@ def review(as_of=None, calc=None):
     for grp in groups:
         rs = [r for r in rows if r["pool"] == grp]
         if not rs:
-            pool_notes.append(f"⚠️ **{grp}**：标的行情缺失，本次跳过")
+            _np = t1_pending.get(grp, 0)
+            if _np:
+                # 2026-08-19 修复：T+1 未到 ≠ 行情缺失（此前误报「标的行情缺失」）
+                pool_notes.append(f"⏳ **{grp}**：信号日 {as_of} 的 T+1 开盘日尚未到来（{_np} 只标的无后续交易日）——属数据边界非行情缺失，T+1 交易日收盘后重跑补录")
+            else:
+                pool_notes.append(f"⚠️ **{grp}**：标的行情缺失，本次跳过")
             continue
         buy = [r for r in rs if r["buy_sig"] and r["pct"] is not None]
         wins = sum(1 for r in buy if r["pct"] > 0)

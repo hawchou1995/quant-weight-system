@@ -393,7 +393,8 @@ def build(as_of=None):
         if (d.get("short_score") or 0) < 50:
             continue
         _bd = d.get("board", "")
-        _snap = {"name": d.get("name"), "score": d.get("short_score"), "tier": d.get("short_tier") or d.get("tier"),
+        _snap = {"name": d.get("name"), "px": d.get("px"), "chg": d.get("chg"),
+                 "score": d.get("short_score"), "tier": d.get("short_tier") or d.get("tier"),
                  "pool": _bd, "type": "fund" if _bd == "基金" else "stock", "date": today}
         rec = track.get(code)
         if rec is not None:
