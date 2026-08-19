@@ -452,6 +452,18 @@ def build(as_of=None):
     cutoff = pd.Timestamp.now() - pd.Timedelta(days=30)
     pending = {c: v for c, v in pending.items() if pd.Timestamp(v.get("entry_candidate", today)) > cutoff}
     track = {c: v for c, v in track.items() if pd.Timestamp(v.get("entry", today)) > cutoff}
+    # ⑤ 市况门控关闭口径统一（2026-08-19 修复：门控关闭后跟踪池股票档位不得显示「买入」
+    #    误导可追——已入池标的仅保留卖出信号跟踪，档位改写「不开新仓·仅跟踪」，score 保留）
+    if not out.get("market_gate", {}).get("open", True):
+        for _rec in list(track.values()) + list(pending.values()):
+            if _rec.get("type") != "stock":
+                continue
+            _last = _rec.get("last")
+            if isinstance(_last, dict) and _last.get("tier"):
+                _last["tier"] = "不开新仓·仅跟踪"
+                _last["gate_closed"] = True
+            _rec["gate_closed"] = True
+        print(f"市况门控关闭：跟踪池股票档位改写「不开新仓·仅跟踪」（{sum(1 for r in track.values() if r.get('type')=='stock')} 只正式 + {sum(1 for r in pending.values() if r.get('type')=='stock')} 只待确认）", flush=True)
     out["track"] = track
     out["track_pending_short"] = pending
     json.dump(out, open(BASE / "short_pool.json", "w", encoding="utf-8"), ensure_ascii=False, indent=2)

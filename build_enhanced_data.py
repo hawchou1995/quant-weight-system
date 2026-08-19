@@ -541,7 +541,9 @@ def maintain_track_v9():
         old_tiers = _old.get("meta", {}).get("v9_tiers", {}) or {}
     except Exception:
         pass
-    today_codes = {c for codes in V9_TIERS.values() for c in codes}
+    today_codes = {c for codes in V9_TIERS.values() for c in codes} | set(MAIN_CODES) | set(ETFS) | set(FUNDS)
+    # 2026-08-19 用户需求：中长线固定池（MAIN_CODES 15 只）并入全量池跟踪池 track_v9，
+    # 统一跟踪卖出信号（掉出池也保留快照等卖出），生成时间由固定池不再独立维护跟踪而减少
     track = dict(old)
     pending = dict(old_pending)
     from datetime import timedelta
@@ -552,6 +554,25 @@ def maintain_track_v9():
         rec.setdefault("exit", _exit(rec.get("entry", today)))
         rec.setdefault("status", "active")
         rec.setdefault("last_seen", rec.get("last_seen") or today)
+    # 0) 固定池/基金池标的：无条件入正式池（用户长期自选/持仓，不走 pending 待确认，
+    #    保证固定池始终在 track_v9 内跟踪卖出信号；entry=今日、exit=+365，掉出 V9 榜也保留）
+    for code in set(MAIN_CODES) | set(ETFS) | set(FUNDS):
+        d = details.get(code, {}) or {}
+        rec = track.get(code)
+        snap = {"px": d.get("px"), "chg": d.get("chg"), "score": d.get("score"),
+                "tier": d.get("tier"), "date": today}
+        if rec is None:
+            track[code] = {"entry": today, "last_seen": today, "exit": _exit(today), "status": "active",
+                           "pool": d.get("board", ""), "type": "fund" if (code in FUNDS) else "stock",
+                           "last": snap, "first_seen": today}
+        else:
+            rec["last_seen"] = today
+            rec["status"] = "active"
+            rec["pool"] = d.get("board", rec.get("pool", ""))
+            if d:
+                rec["last"] = snap
+            track[code] = rec
+            pending.pop(code, None)
     # 1) 今日在榜标的
     for code in today_codes:
         d = details.get(code, {}) or {}

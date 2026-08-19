@@ -62,7 +62,7 @@ try:
     SHORT_POOL_ASOF_MIN = SHORT_POOL.get("intraday_ts") or "15:00"
     # 运行时精简池数据（tiers/track 供「全量池短线跟踪」渲染；HTML 不加载 short_pool.js）
     SHORT_POOL_SLIM = json.dumps(
-        {k: SHORT_POOL.get(k) for k in ("as_of", "fund_as_of", "tiers", "track", "track_pending_short")},
+        {k: SHORT_POOL.get(k) for k in ("as_of", "fund_as_of", "tiers", "track", "track_pending_short", "market_gate")},
         ensure_ascii=False)
 except Exception as _e:
     print("short_pool 加载失败:", _e)
@@ -402,6 +402,7 @@ WATCH_CARD = f'''<div class="card" id="watch-card">
 <h2>📌 全量池短线跟踪 <span class="badge badge-auto">自动 · 保留 30 天</span></h2>
 <div class="sub">上方短线表<b>可买入标的（强买入/买入）</b>上榜次日收盘确认后自动加入跟踪，30 天自动移除（<b>2026-08-18 起新上榜先入「待确认」隔日入池</b>，隔离当日收盘信号）· 卖出规则（与回测一致）：<b>收盘跌破 MA5 → 次日开盘卖出</b> ｜ 掉出信号池 → 下次轮动换出 ｜ 档位减半/清仓 → 按档位操作 · 每次重新上榜刷新【入池/跟踪/出池】时间 · 数据截至 {SHORT_POOL_ASOF}（基金净值 T-1：{SHORT_POOL.get("fund_as_of", "—")}）</div>
 <div id="watch-pending"></div>
+<div id="watch-gate"></div>
 <div class="toolbar" id="watch-bar">
 <input type="text" id="watch-q" name="watch-q" placeholder="🔍 搜索代码 / 名称…" autocomplete="off" spellcheck="false" aria-label="搜索跟踪标的（代码或名称）">
 <select id="watch-f-type" class="flt" title="类型/权限筛选" aria-label="按类型或权限筛选"><option value="">全部类型</option></select>
@@ -861,6 +862,15 @@ document.addEventListener('DOMContentLoaded',function(){{
     var box=document.getElementById('watch-table');if(!box)return;
     var S=window.SHORT_SIGNALS;if(!S){{box.innerHTML='<div class="sub">信号数据未加载（缺 short_signals.js）</div>';return;}}
     var track=(window.SHORT_POOL&&window.SHORT_POOL.track)?window.SHORT_POOL.track:{{}};
+    // 2026-08-19 市况门控口径统一：门控关闭时跟踪池档位已改写「不开新仓·仅跟踪」，顶部横幅提示
+    var _mg=(window.SHORT_POOL&&window.SHORT_POOL.market_gate)||{{}};
+    var _gateOpen=_mg.open;
+    var _gateBox=document.getElementById('watch-gate');
+    if(_gateBox){{
+      if(_gateOpen===false){{
+        _gateBox.innerHTML='<div class="sub" style="margin-bottom:6px;color:#c0392b">🚫 市况门控关闭（沪深300 '+( _mg.idx_close!=null?_mg.idx_close:'—')+' < MA20 '+( _mg.idx_ma20!=null?_mg.idx_ma20:'—')+'）—— 已入池标的仅跟踪卖出信号，不开新仓</div>';
+      }}else{{_gateBox.innerHTML='';}}
+    }}
     // 待确认（pending）：当日新上榜、下个收盘确认后入正式池（2026-08-18 用户需求，与中长线一致）
     var pnd=(window.SHORT_POOL&&window.SHORT_POOL.track_pending_short)?window.SHORT_POOL.track_pending_short:{{}};
     var pendBox=document.getElementById('watch-pending');
