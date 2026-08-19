@@ -11,6 +11,8 @@ from pathlib import Path
 BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 import sys
 sys.path.insert(0, str(BASE))
+import v8_selector as V
+sys.path.insert(0, str(BASE))
 from ui_components import THEME_CSS, NAV_HTML, COMMON_JS
 
 js_src = (BASE / "enhanced_data.js").read_text(encoding="utf-8")
@@ -51,6 +53,11 @@ try:
     v9_short_items = _sp_items
     v9_short_items.sort(key=lambda d: -d["score"])   # 全局权重分（短线分）降序，与其他表一致
     SHORT_POOL_ASOF = SHORT_POOL.get("as_of", "—")
+    _mg = SHORT_POOL.get("market_gate") or {}
+    if _mg.get("open"):
+        SHORT_POOL_GATE = f'<span class="badge badge-auto" style="background:#1f8a4c;color:#fff">市况门控 ✅ 开（{_mg.get("idx_close")} &gt; MA20 {_mg.get("idx_ma20")}）</span>'
+    else:
+        SHORT_POOL_GATE = f'<span class="badge badge-auto" style="background:#c0392b;color:#fff">市况门控 ❌ 关 · 不开新仓（沪深300 {_mg.get("idx_close")} &lt; MA20 {_mg.get("idx_ma20")}）</span>'
     SHORT_POOL_INTRADAY = SHORT_POOL.get("intraday_note") or ""
     SHORT_POOL_ASOF_MIN = SHORT_POOL.get("intraday_ts") or "15:00"
     # 运行时精简池数据（tiers/track 供「全量池短线跟踪」渲染；HTML 不加载 short_pool.js）
@@ -64,10 +71,23 @@ except Exception as _e:
     SHORT_POOL_INTRADAY = ""
     SHORT_POOL_ASOF_MIN = "15:00"
     SHORT_POOL_SLIM = '{}'
+    SHORT_POOL_GATE = ''
 # 个人版按板块分组（用户固定池，2026-08-17 去 ETF）
 v8_main = [d for d in v8_items if d["perm"] == "main"]
 v8_etf  = [d for d in v8_items if d["perm"] == "etf"]
 v8_fund = [d for d in v8_items if d["perm"] == "fund"]
+
+# 中长线 MA200 市况门控徽章（2026-08-19：与回测口径 use_timing=True/MA200 一致；沪深300<MA200 → 熊市保护，不回补新仓）
+try:
+    _idx_lt = V.load_index(200)
+    _lt_close = float(_idx_lt["close"].iloc[-1]); _lt_ma = float(_idx_lt["ma"].iloc[-1])
+    if _lt_close > _lt_ma:
+        LT_GATE_BADGE = f'<span class="badge badge-auto" style="background:#1f8a4c;color:#fff">市况门控 ✅ 开（沪深300 {_lt_close:.0f} &gt; MA200 {_lt_ma:.0f}）</span>'
+    else:
+        LT_GATE_BADGE = f'<span class="badge badge-auto" style="background:#c0392b;color:#fff">市况门控 ❌ 关 · 熊市保护不回补新仓（沪深300 {_lt_close:.0f} &lt; MA200 {_lt_ma:.0f}）</span>'
+except Exception as _e:
+    print("MA200 门控徽章计算失败:", _e)
+    LT_GATE_BADGE = ''
 
 def tier_counts(items):
     cnt = {}
@@ -641,7 +661,7 @@ html = f"""<!doctype html>
 <!-- ============ 视图 A：全量池中/长线 ============ -->
 {system_block(
   "view-auto", "sys-auto",
-  "🅰️ 全量池中/长线", "auto", "全市场自动池 · 股票分层+基金 ｜ 评分=Aroon强趋势过滤(A80_M78) · 全市场绝对规则筛池 Top3 等权 · 月轮动 · 移动止损4.5% · MA150择时 ｜ 回测参考见「监控总览」",
+  "🅰️ 全量池中/长线", "auto", f"全市场自动池 · 股票分层+基金 ｜ 评分=Aroon强趋势过滤(A80_M78) · 全市场绝对规则筛池 Top3 等权 · 月轮动 · 移动止损4.5% · MA200择时 · {LT_GATE_BADGE} ｜ 回测参考见「监控总览」",
   v9_items, "tbl-v9", "card-tbl-v9",
   "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测参考在监控总览视图",
   extra_card=WATCH_V9_CARD,
@@ -651,7 +671,7 @@ html = f"""<!doctype html>
 <!-- ============ 视图 B：固定池中/长线 ============ -->
 {system_block(
   "view-lite", "sys-lite",
-  "🅱️ 固定池中/长线", "lite", f"用户固定池 · 股票+基金 ｜ 评分=Aroon强趋势过滤(A80_M78) · 四因子打分 Top4 · 月轮动21日 · 移动止损10% · MA200择时 ｜ 池构成：{perm_stat} ｜ 回测参考见「监控总览」",
+  "🅱️ 固定池中/长线", "lite", f"用户固定池 · 股票+基金 ｜ 评分=Aroon强趋势过滤(A80_M78) · 四因子打分 Top4 · 月轮动21日 · 移动止损10% · MA200择时 · {LT_GATE_BADGE} ｜ 池构成：{perm_stat} ｜ 回测参考见「监控总览」",
   v8_items, "tbl-v8", "card-tbl-v8",
   "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测参考在监控总览视图",
   as_of=DATA["meta"].get("as_of", "—"), intraday_note=DATA["meta"].get("intraday"),
@@ -660,7 +680,7 @@ html = f"""<!doctype html>
 <!-- ============ 视图 C：全量池短线（与中长线同结构：统计条+表格+雷达卡） ============ -->
 {system_block(
   "view-short", "sys-short",
-  "⚡ 全量池短线", "auto", f"全市场短线信号 Top 池（数据截至 {SHORT_POOL_ASOF}）：股票=反转信号按权限分层，<b>仅保留买入信号（分≥50），不足 10 只不凑数</b>（主板/创业板/科创板各 ≤10，剔ST）｜ 基金=动量（分≥50 才入池）· 短线分 = 动量30/量价25/通道25/波动20 · 回测参考见「监控总览」",
+  "⚡ 全量池短线", "auto", f"全市场短线信号 Top 池（数据截至 {SHORT_POOL_ASOF}）{SHORT_POOL_GATE}：股票=反转信号按权限分层，<b>仅保留买入信号（分≥50），不足 10 只不凑数</b>（主板/创业板/科创板各 ≤10，剔ST）｜ 基金=动量（分≥50 才入池）· 短线分 = 动量30/量价25/通道25/波动20 · <b>市况门控：沪深300 &gt; MA20 才开新仓，门控关闭时股票池不出买入信号（持仓走「全量池短线跟踪」等卖出信号）</b> · 回测参考见「监控总览」",
   v9_short_items, "tbl-short", "card-tbl-short",
   "信号池 = 回测买入清单：分数≥50 的 TopN 在轮动日全部买入 · 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览 · 基金行现价为 T-1 净值（场外基金净值次日公布）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：不追高，可等盘中回落至 3% 以内再考虑买入（9:30 盘中起生效）</b>",
   extra_card=WATCH_CARD, score_sub="动量/量价/通道/波动",

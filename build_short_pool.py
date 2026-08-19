@@ -206,6 +206,20 @@ def calc_signals(as_of=None):
     global sig_stock, sig_etf, sig_fund
     sig_stock, sig_etf, sig_fund = {}, {}, {}
 
+    # 0) 市况门控（2026-08-19 接入实盘，与回测口径一致）：沪深300 > MA20 才开新仓；
+    #    门控关闭时清空股票买入信号（不进新仓），基金池不受门控（与回测引擎 use_market 一致）。
+    _idx = S.V.load_index(20)
+    _idx = _idx.set_index("date")
+    _gate_day = pd.Timestamp(as_of) if as_of is not None else _idx.index[-1]
+    _in_mkt = bool(_idx.loc[:_gate_day]["in_market"].iloc[-1]) if _gate_day in _idx.index else True
+    _idx_last = _idx.loc[:_gate_day]
+    _gate_close = float(_idx_last["close"].iloc[-1]) if len(_idx_last) else None
+    _gate_ma = float(_idx_last["ma"].iloc[-1]) if len(_idx_last) else None
+    market_gate = {"open": _in_mkt, "as_of": str(_gate_day.date()),
+                   "idx_close": round(_gate_close, 2) if _gate_close else None,
+                   "idx_ma20": round(_gate_ma, 2) if _gate_ma else None}
+    print(f"市况门控(沪深300>MA20): {'✅ 开' if _in_mkt else '❌ 关（不开新仓，池内走卖出信号）'} 收盘{_gate_close:.0f} vs MA20 {_gate_ma:.0f} ({time.time()-t0:.0f}s)", flush=True)
+
     # 1) 股票反转：按权限分层各取 Top10（主板/创业板/科创板，2026-08-17 用户决策）
     stock_pool = S.load_stock_pool()
     rows_by_board = {"主板": [], "创业板": [], "科创板": []}
@@ -238,7 +252,11 @@ def calc_signals(as_of=None):
     for bd in ("主板", "创业板", "科创板"):
         rows_by_board[bd].sort(key=lambda kv: -kv[1])
         # 2026-08-17 用户决策：只保留买入信号（分≥50），不足 10 只不凑数；超 10 只封顶 Top10
-        rows_by_board[bd] = [kv for kv in rows_by_board[bd] if kv[1] >= 50][:10]
+        # 2026-08-19 市况门控：门控关闭 → 清空股票买入信号（不开新仓），与回测口径一致
+        if _in_mkt:
+            rows_by_board[bd] = [kv for kv in rows_by_board[bd] if kv[1] >= 50][:10]
+        else:
+            rows_by_board[bd] = []
         print(f"股票[{bd}] 买入信号 {len(rows_by_board[bd])} 只（分≥50，不凑数）({time.time()-t0:.0f}s)", flush=True)
     stock_top_main = rows_by_board["主板"]
     stock_top_gem  = rows_by_board["创业板"]
@@ -327,7 +345,7 @@ def calc_signals(as_of=None):
     _fund_tail = max((ddf.index[-1] for ddf in fund_pool.values() if len(ddf)), default=None)
     _eff = as_of if as_of is not None else (str(_stock_tail.date()) if _stock_tail is not None else "—")
     out = {"as_of": _eff, "fund_as_of": str(_fund_tail.date()) if _fund_tail is not None else _eff,
-           "details": details, "tiers": order}
+           "details": details, "tiers": order, "market_gate": market_gate}
     sigs = {"as_of": out["as_of"], "stock": sig_stock, "etf": sig_etf, "fund": sig_fund}
     return out, sigs
 
