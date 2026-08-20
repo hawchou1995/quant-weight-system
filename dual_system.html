@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>标的监控看板（数据截至 2026-08-19 · 构建 2026-08-20 07:31）</title>
+<title>标的监控看板（数据截至 2026-08-20 · 构建 2026-08-20 09:47）</title>
 <style>
 :root{
   --bg:#f3f4f6; --card:#ffffff; --card2:#f9fafb; --border:#e5e7eb; --line:#f0f1f3;
@@ -234,7 +234,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <!-- ============ 视图 0：监控总览 ============ -->
 <div class="view active" id="view-overview">
 <div class="card" id="overview">
-<h2>📊 标的监控总览 <span class="badge badge-auto">数据截至 2026-08-19 收盘</span></h2>
+<h2>📊 标的监控总览 <span class="badge badge-auto">数据截至 2026-08-20（盘中实时）</span></h2>
 <div class="sub">左侧导航切换：🅰️ 全量池中/长线（全市场自动池·股票分层+基金） / 🅱️ 固定池中/长线（用户固定池） / ⚡ 短线 · 信号仅供参考</div>
 <div class="kpis">
 <div class="kpi"><div class="l">🟢 加仓区</div><div class="v" style="color:#dc2626">29 只</div><div class="s">满仓+轻仓加仓</div></div>
@@ -341,7 +341,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <!-- ============ 视图 A：全量池中/长线 ============ -->
 <div class="view" id="view-auto">
 <div class="card" id="sys-auto">
-<h2>🅰️ 全量池中/长线 <span class="view-badge auto">全市场自动池 · 股票分层+基金 ｜ 评分=Aroon强趋势过滤(A80_M78) · 全市场绝对规则筛池 Top3 等权 · 月轮动 · 移动止损4.5% · MA200择时 · <span class="badge badge-auto" style="background:#c0392b;color:#fff">市况门控 ❌ 关 · 熊市保护不回补新仓（沪深300 4604 &lt; MA200 4703）</span> ｜ 回测参考见「监控总览」</span><span class="view-badge auto" title="收盘数据">数据截至 2026-08-19 15:00 · 收盘</span></h2>
+<h2>🅰️ 全量池中/长线 <span class="view-badge auto">全市场自动池 · 股票分层+基金 ｜ 评分=Aroon强趋势过滤(A80_M78) · 全市场绝对规则筛池 Top3 等权 · 月轮动 · 移动止损4.5% · MA200择时 · <span class="badge badge-auto" style="background:#c0392b;color:#fff">市况门控 ❌ 关 · 熊市保护不回补新仓（沪深300 4604 &lt; MA200 4703）</span> ｜ 回测参考见「监控总览」</span><span class="view-badge auto" title="2026-08-20 盘中行情（实时）· 分数为收盘口径">数据截至 2026-08-20 09:43 · 盘中实时</span></h2>
 <div class="op-stats">
 <span class="op op-add">🟢 加仓区 <b>27</b> 只</span>
 <span class="op op-watch">🟡 观望 <b>6</b> 只</span>
@@ -370,8 +370,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>激智科技</b><br><span style="color:var(--faint);font-size:11px">300566</span></td>
 <td><span class="board-tag">创业板</span></td>
 <td><span class="board-tag">电子</span></td>
-<td style="text-align:right" data-v="27.99">27.99</td>
-<td style="text-align:right" class="down" data-v="-7.1">-7.10%</td>
+<td style="text-align:right" data-v="27.94">27.94</td>
+<td style="text-align:right" class="down" data-v="-0.18">-0.18%</td>
 <td style="text-align:right" class="up" data-v="44.0">+44%</td>
 <td style="text-align:center"><b>92.1</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">91/100/100/72/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">66</td>
@@ -384,8 +384,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>阿拉丁</b><br><span style="color:var(--faint);font-size:11px">688179</span></td>
 <td><span class="board-tag">科创板</span></td>
 <td><span class="board-tag">基础化工</span></td>
-<td style="text-align:right" data-v="23.45">23.45</td>
-<td style="text-align:right" class="down" data-v="-0.8">-0.80%</td>
+<td style="text-align:right" data-v="21.54">21.54</td>
+<td style="text-align:right" class="down" data-v="-8.14">-8.14%</td>
 <td style="text-align:right" class="up" data-v="55.5">+56%</td>
 <td style="text-align:center"><b>91.6</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/100/58/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">90</td>
@@ -398,8 +398,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>联芸科技</b><br><span style="color:var(--faint);font-size:11px">688449</span></td>
 <td><span class="board-tag">科创板</span></td>
 <td><span class="board-tag">电子</span></td>
-<td style="text-align:right" data-v="67.36">67.36</td>
-<td style="text-align:right" class="down" data-v="-5.17">-5.17%</td>
+<td style="text-align:right" data-v="68.09">68.09</td>
+<td style="text-align:right" class="up" data-v="1.08">+1.08%</td>
 <td style="text-align:right" class="up" data-v="52.7">+53%</td>
 <td style="text-align:center"><b>85.3</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">63/100/100/72/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">73</td>
@@ -412,8 +412,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>康平科技</b><br><span style="color:var(--faint);font-size:11px">300907</span></td>
 <td><span class="board-tag">创业板</span></td>
 <td><span class="board-tag">机械设备</span></td>
-<td style="text-align:right" data-v="49.04">49.04</td>
-<td style="text-align:right" class="down" data-v="-6.7">-6.70%</td>
+<td style="text-align:right" data-v="52.06">52.06</td>
+<td style="text-align:right" class="up" data-v="6.16">+6.16%</td>
 <td style="text-align:right" class="up" data-v="45.2">+45%</td>
 <td style="text-align:center"><b>84.8</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/100/24/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">83</td>
@@ -426,8 +426,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>鼎阳科技</b><br><span style="color:var(--faint);font-size:11px">688112</span></td>
 <td><span class="board-tag">科创板</span></td>
 <td><span class="board-tag">机械设备</span></td>
-<td style="text-align:right" data-v="67.84">67.84</td>
-<td style="text-align:right" class="down" data-v="-2.85">-2.85%</td>
+<td style="text-align:right" data-v="70.15">70.15</td>
+<td style="text-align:right" class="up" data-v="3.41">+3.41%</td>
 <td style="text-align:right" class="up" data-v="66.4">+66%</td>
 <td style="text-align:center"><b>84.4</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/100/22/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">84</td>
@@ -440,8 +440,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>药康生物</b><br><span style="color:var(--faint);font-size:11px">688046</span></td>
 <td><span class="board-tag">科创板</span></td>
 <td><span class="board-tag">医药生物</span></td>
-<td style="text-align:right" data-v="36.0">36.00</td>
-<td style="text-align:right" class="down" data-v="-10.0">-10.00%</td>
+<td style="text-align:right" data-v="35.95">35.95</td>
+<td style="text-align:right" class="down" data-v="-0.14">-0.14%</td>
 <td style="text-align:right" class="up" data-v="116.7">+117%</td>
 <td style="text-align:center"><b>83.2</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/100/16/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">74</td>
@@ -454,8 +454,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>英诺特</b><br><span style="color:var(--faint);font-size:11px">688253</span></td>
 <td><span class="board-tag">科创板</span></td>
 <td><span class="board-tag">医药生物</span></td>
-<td style="text-align:right" data-v="55.74">55.74</td>
-<td style="text-align:right" class="down" data-v="-8.52">-8.52%</td>
+<td style="text-align:right" data-v="58.77">58.77</td>
+<td style="text-align:right" class="up" data-v="5.44">+5.44%</td>
 <td style="text-align:right" class="up" data-v="72.0">+72%</td>
 <td style="text-align:center"><b>81.9</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">90/100/100/22/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">52</td>
@@ -468,8 +468,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>春秋电子</b><br><span style="color:var(--faint);font-size:11px">603890</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">电子</span></td>
-<td style="text-align:right" data-v="21.09">21.09</td>
-<td style="text-align:right" class="down" data-v="-4.53">-4.53%</td>
+<td style="text-align:right" data-v="18.05">18.05</td>
+<td style="text-align:right" class="down" data-v="-1.31">-1.31%</td>
 <td style="text-align:right" class="up" data-v="71.2">+71%</td>
 <td style="text-align:center"><b>81.2</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">55/100/100/62/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">62</td>
@@ -482,8 +482,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>哈药股份</b><br><span style="color:var(--faint);font-size:11px">600664</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">综合</span></td>
-<td style="text-align:right" data-v="9.01">9.01</td>
-<td style="text-align:right" class="up" data-v="1.12">+1.12%</td>
+<td style="text-align:right" data-v="9.03">9.03</td>
+<td style="text-align:right" class="down" data-v="-0.33">-0.33%</td>
 <td style="text-align:right" class="up" data-v="123.6">+124%</td>
 <td style="text-align:center"><b>80.8</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/100/4/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">82</td>
@@ -496,8 +496,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>创力集团</b><br><span style="color:var(--faint);font-size:11px">603012</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">综合</span></td>
-<td style="text-align:right" data-v="9.22">9.22</td>
-<td style="text-align:right" class="down" data-v="-2.23">-2.23%</td>
+<td style="text-align:right" data-v="8.86">8.86</td>
+<td style="text-align:right" class="up" data-v="0.11">+0.11%</td>
 <td style="text-align:right" class="up" data-v="57.6">+58%</td>
 <td style="text-align:center"><b>80.8</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">70/100/100/42/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">70</td>
@@ -510,8 +510,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>征和工业</b><br><span style="color:var(--faint);font-size:11px">003033</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">综合</span></td>
-<td style="text-align:right" data-v="71.0">71.00</td>
-<td style="text-align:right" class="up" data-v="8.96">+8.96%</td>
+<td style="text-align:right" data-v="66.34">66.34</td>
+<td style="text-align:right" class="up" data-v="0.7">+0.70%</td>
 <td style="text-align:right" class="up" data-v="56.5">+56%</td>
 <td style="text-align:center"><b>80.7</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">41/100/100/78/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">63</td>
@@ -524,8 +524,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>江河集团</b><br><span style="color:var(--faint);font-size:11px">601886</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">综合</span></td>
-<td style="text-align:right" data-v="12.75">12.75</td>
-<td style="text-align:right" class="up" data-v="8.51">+8.51%</td>
+<td style="text-align:right" data-v="13.19">13.19</td>
+<td style="text-align:right" class="up" data-v="3.69">+3.69%</td>
 <td style="text-align:right" class="up" data-v="81.6">+82%</td>
 <td style="text-align:center"><b>80.0</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/100/0/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">92</td>
@@ -538,8 +538,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>皓元医药</b><br><span style="color:var(--faint);font-size:11px">688131</span></td>
 <td><span class="board-tag">科创板</span></td>
 <td><span class="board-tag">医药生物</span></td>
-<td style="text-align:right" data-v="97.0">97.00</td>
-<td style="text-align:right" class="down" data-v="-3.39">-3.39%</td>
+<td style="text-align:right" data-v="101.56">101.56</td>
+<td style="text-align:right" class="up" data-v="4.7">+4.70%</td>
 <td style="text-align:right" class="up" data-v="79.1">+79%</td>
 <td style="text-align:center"><b>79.0</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">90/100/100/8/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">75</td>
@@ -552,8 +552,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>元力股份</b><br><span style="color:var(--faint);font-size:11px">300174</span></td>
 <td><span class="board-tag">创业板</span></td>
 <td><span class="board-tag">综合</span></td>
-<td style="text-align:right" data-v="21.15">21.15</td>
-<td style="text-align:right" class="up" data-v="2.03">+2.03%</td>
+<td style="text-align:right" data-v="19.5">19.50</td>
+<td style="text-align:right" class="up" data-v="1.46">+1.46%</td>
 <td style="text-align:right" class="up" data-v="38.5">+38%</td>
 <td style="text-align:center"><b>78.6</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">45/100/100/62/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">84</td>
@@ -566,8 +566,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>网宿科技</b><br><span style="color:var(--faint);font-size:11px">300017</span></td>
 <td><span class="board-tag">创业板</span></td>
 <td><span class="board-tag">电子</span></td>
-<td style="text-align:right" data-v="17.57">17.57</td>
-<td style="text-align:right" class="up" data-v="1.38">+1.38%</td>
+<td style="text-align:right" data-v="16.43">16.43</td>
+<td style="text-align:right" class="up" data-v="4.98">+4.98%</td>
 <td style="text-align:right" class="up" data-v="61.3">+61%</td>
 <td style="text-align:center"><b>78.5</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">73/100/100/26/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">74</td>
@@ -580,8 +580,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>威尔高</b><br><span style="color:var(--faint);font-size:11px">301251</span></td>
 <td><span class="board-tag">创业板</span></td>
 <td><span class="board-tag">综合</span></td>
-<td style="text-align:right" data-v="47.41">47.41</td>
-<td style="text-align:right" class="up" data-v="2.35">+2.35%</td>
+<td style="text-align:right" data-v="48.72">48.72</td>
+<td style="text-align:right" class="down" data-v="-1.16">-1.16%</td>
 <td style="text-align:right" class="up" data-v="46.2">+46%</td>
 <td style="text-align:center"><b>77.8</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">30/100/100/76/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">77</td>
@@ -594,8 +594,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>ST长方</b><br><span style="color:var(--faint);font-size:11px">300301</span></td>
 <td><span class="board-tag">创业板</span></td>
 <td><span class="board-tag">综合</span></td>
-<td style="text-align:right" data-v="3.41">3.41</td>
-<td style="text-align:right" class="down" data-v="0">+0.00%</td>
+<td style="text-align:right" data-v="3.3">3.30</td>
+<td style="text-align:right" class="down" data-v="-0.3">-0.30%</td>
 <td style="text-align:right" class="up" data-v="46.4">+46%</td>
 <td style="text-align:center"><b>77.4</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">45/100/100/56/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">51</td>
@@ -608,8 +608,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>耐科装备</b><br><span style="color:var(--faint);font-size:11px">688419</span></td>
 <td><span class="board-tag">科创板</span></td>
 <td><span class="board-tag">电子</span></td>
-<td style="text-align:right" data-v="47.55">47.55</td>
-<td style="text-align:right" class="down" data-v="-10.54">-10.54%</td>
+<td style="text-align:right" data-v="48.52">48.52</td>
+<td style="text-align:right" class="up" data-v="2.04">+2.04%</td>
 <td style="text-align:right" class="up" data-v="65.3">+65%</td>
 <td style="text-align:center"><b>77.4</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">32/100/100/72/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">71</td>
@@ -622,8 +622,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>宏昌科技</b><br><span style="color:var(--faint);font-size:11px">301008</span></td>
 <td><span class="board-tag">创业板</span></td>
 <td><span class="board-tag">电子</span></td>
-<td style="text-align:right" data-v="40.92">40.92</td>
-<td style="text-align:right" class="up" data-v="4.76">+4.76%</td>
+<td style="text-align:right" data-v="40.77">40.77</td>
+<td style="text-align:right" class="down" data-v="-2.44">-2.44%</td>
 <td style="text-align:right" class="up" data-v="71.5">+72%</td>
 <td style="text-align:center"><b>77.0</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">74/100/100/18/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">66</td>
@@ -636,8 +636,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>聚和材料</b><br><span style="color:var(--faint);font-size:11px">688503</span></td>
 <td><span class="board-tag">科创板</span></td>
 <td><span class="board-tag">电力设备</span></td>
-<td style="text-align:right" data-v="94.29">94.29</td>
-<td style="text-align:right" class="down" data-v="-7.67">-7.67%</td>
+<td style="text-align:right" data-v="96.22">96.22</td>
+<td style="text-align:right" class="up" data-v="2.05">+2.05%</td>
 <td style="text-align:right" class="up" data-v="93.3">+93%</td>
 <td style="text-align:center"><b>74.1</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">54/100/100/28/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">78</td>
@@ -650,8 +650,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>必易微</b><br><span style="color:var(--faint);font-size:11px">688045</span></td>
 <td><span class="board-tag">科创板</span></td>
 <td><span class="board-tag">电子</span></td>
-<td style="text-align:right" data-v="60.96">60.96</td>
-<td style="text-align:right" class="down" data-v="-7.93">-7.93%</td>
+<td style="text-align:right" data-v="62.17">62.17</td>
+<td style="text-align:right" class="up" data-v="1.98">+1.98%</td>
 <td style="text-align:right" class="up" data-v="59.0">+59%</td>
 <td style="text-align:center"><b>71.3</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">57/100/100/10/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">77</td>
@@ -664,8 +664,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>德邦科技</b><br><span style="color:var(--faint);font-size:11px">688035</span></td>
 <td><span class="board-tag">科创板</span></td>
 <td><span class="board-tag">电子</span></td>
-<td style="text-align:right" data-v="65.26">65.26</td>
-<td style="text-align:right" class="down" data-v="-8.92">-8.92%</td>
+<td style="text-align:right" data-v="67.24">67.24</td>
+<td style="text-align:right" class="up" data-v="3.03">+3.03%</td>
 <td style="text-align:right" class="up" data-v="56.2">+56%</td>
 <td style="text-align:center"><b>70.9</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">6/100/100/72/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">65</td>
@@ -678,8 +678,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>盛视科技</b><br><span style="color:var(--faint);font-size:11px">002990</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">计算机</span></td>
-<td style="text-align:right" data-v="50.42">50.42</td>
-<td style="text-align:right" class="down" data-v="-9.5">-9.50%</td>
+<td style="text-align:right" data-v="50.67">50.67</td>
+<td style="text-align:right" class="up" data-v="0.5">+0.50%</td>
 <td style="text-align:right" class="up" data-v="55.6">+56%</td>
 <td style="text-align:center"><b>70.1</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">83/100/0/72/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">68</td>
@@ -692,8 +692,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>*ST英飞</b><br><span style="color:var(--faint);font-size:11px">002528</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">计算机</span></td>
-<td style="text-align:right" data-v="5.05">5.05</td>
-<td style="text-align:right" class="down" data-v="-0.59">-0.59%</td>
+<td style="text-align:right" data-v="4.95">4.95</td>
+<td style="text-align:right" class="down" data-v="-1.98">-1.98%</td>
 <td style="text-align:right" class="up" data-v="74.7">+75%</td>
 <td style="text-align:center"><b>62.8</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/14/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">76</td>
@@ -748,8 +748,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>石药景峰</b><br><span style="color:var(--faint);font-size:11px">000908</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">医药生物</span></td>
-<td style="text-align:right" data-v="6.81">6.81</td>
-<td style="text-align:right" class="down" data-v="-3.95">-3.95%</td>
+<td style="text-align:right" data-v="6.95">6.95</td>
+<td style="text-align:right" class="up" data-v="2.06">+2.06%</td>
 <td style="text-align:right" class="up" data-v="65.7">+66%</td>
 <td style="text-align:center"><b>59.6</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">42/100/0/70/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">75</td>
@@ -762,8 +762,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>麦捷科技</b><br><span style="color:var(--faint);font-size:11px">300319</span></td>
 <td><span class="board-tag">创业板</span></td>
 <td><span class="board-tag">电子</span></td>
-<td style="text-align:right" data-v="17.0">17.00</td>
-<td style="text-align:right" class="down" data-v="-12.82">-12.82%</td>
+<td style="text-align:right" data-v="17.92">17.92</td>
+<td style="text-align:right" class="up" data-v="5.41">+5.41%</td>
 <td style="text-align:right" class="up" data-v="44.2">+44%</td>
 <td style="text-align:center"><b>59.0</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">49/100/0/58/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">65</td>
@@ -776,8 +776,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>四环生物</b><br><span style="color:var(--faint);font-size:11px">000518</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">医药生物</span></td>
-<td style="text-align:right" data-v="3.68">3.68</td>
-<td style="text-align:right" class="down" data-v="0">+0.00%</td>
+<td style="text-align:right" data-v="3.8">3.80</td>
+<td style="text-align:right" class="up" data-v="3.26">+3.26%</td>
 <td style="text-align:right" class="up" data-v="58.6">+59%</td>
 <td style="text-align:center"><b>57.8</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">75/100/0/20/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">57</td>
@@ -790,8 +790,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>双星新材</b><br><span style="color:var(--faint);font-size:11px">002585</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">基础化工</span></td>
-<td style="text-align:right" data-v="9.77">9.77</td>
-<td style="text-align:right" class="down" data-v="-7.66">-7.66%</td>
+<td style="text-align:right" data-v="9.89">9.89</td>
+<td style="text-align:right" class="up" data-v="1.23">+1.23%</td>
 <td style="text-align:right" class="up" data-v="68.4">+68%</td>
 <td style="text-align:center"><b>54.8</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">66/100/0/16/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">59</td>
@@ -804,8 +804,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>阿莱德</b><br><span style="color:var(--faint);font-size:11px">301419</span></td>
 <td><span class="board-tag">创业板</span></td>
 <td><span class="board-tag">通信</span></td>
-<td style="text-align:right" data-v="36.2">36.20</td>
-<td style="text-align:right" class="down" data-v="-7.63">-7.63%</td>
+<td style="text-align:right" data-v="37.1">37.10</td>
+<td style="text-align:right" class="up" data-v="2.49">+2.49%</td>
 <td style="text-align:right" class="up" data-v="41.5">+42%</td>
 <td style="text-align:center"><b>48.9</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">46/100/0/12/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">72</td>
@@ -818,8 +818,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>远信工业</b><br><span style="color:var(--faint);font-size:11px">301053</span></td>
 <td><span class="board-tag">创业板</span></td>
 <td><span class="board-tag">机械设备</span></td>
-<td style="text-align:right" data-v="41.5">41.50</td>
-<td style="text-align:right" class="down" data-v="-1.78">-1.78%</td>
+<td style="text-align:right" data-v="42.05">42.05</td>
+<td style="text-align:right" class="up" data-v="1.33">+1.33%</td>
 <td style="text-align:right" class="up" data-v="88.0">+88%</td>
 <td style="text-align:center"><b>48.1</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">94/100/100/8/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">58</td>
@@ -862,7 +862,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>激智科技 <span class="sub">300566</span> <span class="board-tag">创业板</span> <span class="board-tag">电子</span></h3>
-<p class="meta">现价 <b>27.99</b>（<span class="down">-7.10%</span>）｜ 近一年 <span class="up">+44%</span> ｜ RSI 66</p>
+<p class="meta">现价 <b>27.94</b>（<span class="down">-0.18%</span>）｜ 近一年 <span class="up">+44%</span> ｜ RSI 66</p>
 <p class="meta">权重 <b>92.1 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +27.2%</span></p>
 <p class="meta">六类：趋势 91｜动能 100｜量能 100｜超买 72｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -894,7 +894,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>阿拉丁 <span class="sub">688179</span> <span class="board-tag">科创板</span> <span class="board-tag">基础化工</span></h3>
-<p class="meta">现价 <b>23.45</b>（<span class="down">-0.80%</span>）｜ 近一年 <span class="up">+56%</span> ｜ RSI 90</p>
+<p class="meta">现价 <b>21.54</b>（<span class="down">-8.14%</span>）｜ 近一年 <span class="up">+56%</span> ｜ RSI 90</p>
 <p class="meta">权重 <b>91.6 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +31.1%</span></p>
 <p class="meta">六类：趋势 100｜动能 100｜量能 100｜超买 58｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -926,7 +926,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>联芸科技 <span class="sub">688449</span> <span class="board-tag">科创板</span> <span class="board-tag">电子</span></h3>
-<p class="meta">现价 <b>67.36</b>（<span class="down">-5.17%</span>）｜ 近一年 <span class="up">+53%</span> ｜ RSI 73</p>
+<p class="meta">现价 <b>68.09</b>（<span class="up">+1.08%</span>）｜ 近一年 <span class="up">+53%</span> ｜ RSI 73</p>
 <p class="meta">权重 <b>85.3 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +19.0%</span></p>
 <p class="meta">六类：趋势 63｜动能 100｜量能 100｜超买 72｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -958,7 +958,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>康平科技 <span class="sub">300907</span> <span class="board-tag">创业板</span> <span class="board-tag">机械设备</span></h3>
-<p class="meta">现价 <b>49.04</b>（<span class="down">-6.70%</span>）｜ 近一年 <span class="up">+45%</span> ｜ RSI 83</p>
+<p class="meta">现价 <b>52.06</b>（<span class="up">+6.16%</span>）｜ 近一年 <span class="up">+45%</span> ｜ RSI 83</p>
 <p class="meta">权重 <b>84.8 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +38.8%</span></p>
 <p class="meta">六类：趋势 100｜动能 100｜量能 100｜超买 24｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -990,7 +990,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>鼎阳科技 <span class="sub">688112</span> <span class="board-tag">科创板</span> <span class="board-tag">机械设备</span></h3>
-<p class="meta">现价 <b>67.84</b>（<span class="down">-2.85%</span>）｜ 近一年 <span class="up">+66%</span> ｜ RSI 84</p>
+<p class="meta">现价 <b>70.15</b>（<span class="up">+3.41%</span>）｜ 近一年 <span class="up">+66%</span> ｜ RSI 84</p>
 <p class="meta">权重 <b>84.4 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +37.2%</span></p>
 <p class="meta">六类：趋势 100｜动能 100｜量能 100｜超买 22｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1022,7 +1022,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>药康生物 <span class="sub">688046</span> <span class="board-tag">科创板</span> <span class="board-tag">医药生物</span></h3>
-<p class="meta">现价 <b>36.00</b>（<span class="down">-10.00%</span>）｜ 近一年 <span class="up">+117%</span> ｜ RSI 74</p>
+<p class="meta">现价 <b>35.95</b>（<span class="down">-0.14%</span>）｜ 近一年 <span class="up">+117%</span> ｜ RSI 74</p>
 <p class="meta">权重 <b>83.2 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +85.2%</span></p>
 <p class="meta">六类：趋势 100｜动能 100｜量能 100｜超买 16｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1054,7 +1054,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>英诺特 <span class="sub">688253</span> <span class="board-tag">科创板</span> <span class="board-tag">医药生物</span></h3>
-<p class="meta">现价 <b>55.74</b>（<span class="down">-8.52%</span>）｜ 近一年 <span class="up">+72%</span> ｜ RSI 52</p>
+<p class="meta">现价 <b>58.77</b>（<span class="up">+5.44%</span>）｜ 近一年 <span class="up">+72%</span> ｜ RSI 52</p>
 <p class="meta">权重 <b>81.9 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +27.0%</span></p>
 <p class="meta">六类：趋势 90｜动能 100｜量能 100｜超买 22｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1086,7 +1086,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>春秋电子 <span class="sub">603890</span> <span class="board-tag">主板</span> <span class="board-tag">电子</span></h3>
-<p class="meta">现价 <b>21.09</b>（<span class="down">-4.53%</span>）｜ 近一年 <span class="up">+71%</span> ｜ RSI 62</p>
+<p class="meta">现价 <b>18.05</b>（<span class="down">-1.31%</span>）｜ 近一年 <span class="up">+71%</span> ｜ RSI 62</p>
 <p class="meta">权重 <b>81.2 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +16.6%</span></p>
 <p class="meta">六类：趋势 55｜动能 100｜量能 100｜超买 62｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1118,7 +1118,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>哈药股份 <span class="sub">600664</span> <span class="board-tag">主板</span> <span class="board-tag">综合</span></h3>
-<p class="meta">现价 <b>9.01</b>（<span class="up">+1.12%</span>）｜ 近一年 <span class="up">+124%</span> ｜ RSI 82</p>
+<p class="meta">现价 <b>9.03</b>（<span class="down">-0.33%</span>）｜ 近一年 <span class="up">+124%</span> ｜ RSI 82</p>
 <p class="meta">权重 <b>80.8 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +131.8%</span></p>
 <p class="meta">六类：趋势 100｜动能 100｜量能 100｜超买 4｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1150,7 +1150,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>创力集团 <span class="sub">603012</span> <span class="board-tag">主板</span> <span class="board-tag">综合</span></h3>
-<p class="meta">现价 <b>9.22</b>（<span class="down">-2.23%</span>）｜ 近一年 <span class="up">+58%</span> ｜ RSI 70</p>
+<p class="meta">现价 <b>8.86</b>（<span class="up">+0.11%</span>）｜ 近一年 <span class="up">+58%</span> ｜ RSI 70</p>
 <p class="meta">权重 <b>80.8 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +20.9%</span></p>
 <p class="meta">六类：趋势 70｜动能 100｜量能 100｜超买 42｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1182,7 +1182,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>征和工业 <span class="sub">003033</span> <span class="board-tag">主板</span> <span class="board-tag">综合</span></h3>
-<p class="meta">现价 <b>71.00</b>（<span class="up">+8.96%</span>）｜ 近一年 <span class="up">+56%</span> ｜ RSI 63</p>
+<p class="meta">现价 <b>66.34</b>（<span class="up">+0.70%</span>）｜ 近一年 <span class="up">+56%</span> ｜ RSI 63</p>
 <p class="meta">权重 <b>80.7 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +12.2%</span></p>
 <p class="meta">六类：趋势 41｜动能 100｜量能 100｜超买 78｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1214,7 +1214,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>江河集团 <span class="sub">601886</span> <span class="board-tag">主板</span> <span class="board-tag">综合</span></h3>
-<p class="meta">现价 <b>12.75</b>（<span class="up">+8.51%</span>）｜ 近一年 <span class="up">+82%</span> ｜ RSI 92</p>
+<p class="meta">现价 <b>13.19</b>（<span class="up">+3.69%</span>）｜ 近一年 <span class="up">+82%</span> ｜ RSI 92</p>
 <p class="meta">权重 <b>80.0 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +49.8%</span></p>
 <p class="meta">六类：趋势 100｜动能 100｜量能 100｜超买 0｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1246,7 +1246,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>皓元医药 <span class="sub">688131</span> <span class="board-tag">科创板</span> <span class="board-tag">医药生物</span></h3>
-<p class="meta">现价 <b>97.00</b>（<span class="down">-3.39%</span>）｜ 近一年 <span class="up">+79%</span> ｜ RSI 75</p>
+<p class="meta">现价 <b>101.56</b>（<span class="up">+4.70%</span>）｜ 近一年 <span class="up">+79%</span> ｜ RSI 75</p>
 <p class="meta">权重 <b>79.0 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +26.9%</span></p>
 <p class="meta">六类：趋势 90｜动能 100｜量能 100｜超买 8｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1278,7 +1278,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>元力股份 <span class="sub">300174</span> <span class="board-tag">创业板</span> <span class="board-tag">综合</span></h3>
-<p class="meta">现价 <b>21.15</b>（<span class="up">+2.03%</span>）｜ 近一年 <span class="up">+38%</span> ｜ RSI 84</p>
+<p class="meta">现价 <b>19.50</b>（<span class="up">+1.46%</span>）｜ 近一年 <span class="up">+38%</span> ｜ RSI 84</p>
 <p class="meta">权重 <b>78.6 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +13.4%</span></p>
 <p class="meta">六类：趋势 45｜动能 100｜量能 100｜超买 62｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1310,7 +1310,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>网宿科技 <span class="sub">300017</span> <span class="board-tag">创业板</span> <span class="board-tag">电子</span></h3>
-<p class="meta">现价 <b>17.57</b>（<span class="up">+1.38%</span>）｜ 近一年 <span class="up">+61%</span> ｜ RSI 74</p>
+<p class="meta">现价 <b>16.43</b>（<span class="up">+4.98%</span>）｜ 近一年 <span class="up">+61%</span> ｜ RSI 74</p>
 <p class="meta">权重 <b>78.5 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +22.0%</span></p>
 <p class="meta">六类：趋势 73｜动能 100｜量能 100｜超买 26｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1342,7 +1342,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>威尔高 <span class="sub">301251</span> <span class="board-tag">创业板</span> <span class="board-tag">综合</span></h3>
-<p class="meta">现价 <b>47.41</b>（<span class="up">+2.35%</span>）｜ 近一年 <span class="up">+46%</span> ｜ RSI 77</p>
+<p class="meta">现价 <b>48.72</b>（<span class="down">-1.16%</span>）｜ 近一年 <span class="up">+46%</span> ｜ RSI 77</p>
 <p class="meta">权重 <b>77.8 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +9.1%</span></p>
 <p class="meta">六类：趋势 30｜动能 100｜量能 100｜超买 76｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1374,7 +1374,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>ST长方 <span class="sub">300301</span> <span class="board-tag">创业板</span> <span class="board-tag">综合</span></h3>
-<p class="meta">现价 <b>3.41</b>（<span class="down">+0.00%</span>）｜ 近一年 <span class="up">+46%</span> ｜ RSI 51</p>
+<p class="meta">现价 <b>3.30</b>（<span class="down">-0.30%</span>）｜ 近一年 <span class="up">+46%</span> ｜ RSI 51</p>
 <p class="meta">权重 <b>77.4 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +13.4%</span></p>
 <p class="meta">六类：趋势 45｜动能 100｜量能 100｜超买 56｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1406,7 +1406,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>耐科装备 <span class="sub">688419</span> <span class="board-tag">科创板</span> <span class="board-tag">电子</span></h3>
-<p class="meta">现价 <b>47.55</b>（<span class="down">-10.54%</span>）｜ 近一年 <span class="up">+65%</span> ｜ RSI 71</p>
+<p class="meta">现价 <b>48.52</b>（<span class="up">+2.04%</span>）｜ 近一年 <span class="up">+65%</span> ｜ RSI 71</p>
 <p class="meta">权重 <b>77.4 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +9.5%</span></p>
 <p class="meta">六类：趋势 32｜动能 100｜量能 100｜超买 72｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1438,7 +1438,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>宏昌科技 <span class="sub">301008</span> <span class="board-tag">创业板</span> <span class="board-tag">电子</span></h3>
-<p class="meta">现价 <b>40.92</b>（<span class="up">+4.76%</span>）｜ 近一年 <span class="up">+72%</span> ｜ RSI 66</p>
+<p class="meta">现价 <b>40.77</b>（<span class="down">-2.44%</span>）｜ 近一年 <span class="up">+72%</span> ｜ RSI 66</p>
 <p class="meta">权重 <b>77.0 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +22.0%</span></p>
 <p class="meta">六类：趋势 74｜动能 100｜量能 100｜超买 18｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1470,7 +1470,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>聚和材料 <span class="sub">688503</span> <span class="board-tag">科创板</span> <span class="board-tag">电力设备</span></h3>
-<p class="meta">现价 <b>94.29</b>（<span class="down">-7.67%</span>）｜ 近一年 <span class="up">+93%</span> ｜ RSI 78</p>
+<p class="meta">现价 <b>96.22</b>（<span class="up">+2.05%</span>）｜ 近一年 <span class="up">+93%</span> ｜ RSI 78</p>
 <p class="meta">权重 <b>74.1 分</b> → <span class="pill pill-add">轻仓加仓</span> ｜ 建议：可加至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +16.2%</span></p>
 <p class="meta">六类：趋势 54｜动能 100｜量能 100｜超买 28｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1502,7 +1502,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>必易微 <span class="sub">688045</span> <span class="board-tag">科创板</span> <span class="board-tag">电子</span></h3>
-<p class="meta">现价 <b>60.96</b>（<span class="down">-7.93%</span>）｜ 近一年 <span class="up">+59%</span> ｜ RSI 77</p>
+<p class="meta">现价 <b>62.17</b>（<span class="up">+1.98%</span>）｜ 近一年 <span class="up">+59%</span> ｜ RSI 77</p>
 <p class="meta">权重 <b>71.3 分</b> → <span class="pill pill-add">轻仓加仓</span> ｜ 建议：可加至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +17.2%</span></p>
 <p class="meta">六类：趋势 57｜动能 100｜量能 100｜超买 10｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1534,7 +1534,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>德邦科技 <span class="sub">688035</span> <span class="board-tag">科创板</span> <span class="board-tag">电子</span></h3>
-<p class="meta">现价 <b>65.26</b>（<span class="down">-8.92%</span>）｜ 近一年 <span class="up">+56%</span> ｜ RSI 65</p>
+<p class="meta">现价 <b>67.24</b>（<span class="up">+3.03%</span>）｜ 近一年 <span class="up">+56%</span> ｜ RSI 65</p>
 <p class="meta">权重 <b>70.9 分</b> → <span class="pill pill-add">轻仓加仓</span> ｜ 建议：可加至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +1.8%</span></p>
 <p class="meta">六类：趋势 6｜动能 100｜量能 100｜超买 72｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1566,7 +1566,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>盛视科技 <span class="sub">002990</span> <span class="board-tag">主板</span> <span class="board-tag">计算机</span></h3>
-<p class="meta">现价 <b>50.42</b>（<span class="down">-9.50%</span>）｜ 近一年 <span class="up">+56%</span> ｜ RSI 68</p>
+<p class="meta">现价 <b>50.67</b>（<span class="up">+0.50%</span>）｜ 近一年 <span class="up">+56%</span> ｜ RSI 68</p>
 <p class="meta">权重 <b>70.1 分</b> → <span class="pill pill-add">轻仓加仓</span> ｜ 建议：可加至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +24.8%</span></p>
 <p class="meta">六类：趋势 83｜动能 100｜量能 0｜超买 72｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1598,7 +1598,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>*ST英飞 <span class="sub">002528</span> <span class="board-tag">主板</span> <span class="board-tag">计算机</span></h3>
-<p class="meta">现价 <b>5.05</b>（<span class="down">-0.59%</span>）｜ 近一年 <span class="up">+75%</span> ｜ RSI 76</p>
+<p class="meta">现价 <b>4.95</b>（<span class="down">-1.98%</span>）｜ 近一年 <span class="up">+75%</span> ｜ RSI 76</p>
 <p class="meta">权重 <b>62.8 分</b> → <span class="pill pill-add">轻仓加仓</span> ｜ 建议：可加至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +33.8%</span></p>
 <p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 14｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1726,7 +1726,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>石药景峰 <span class="sub">000908</span> <span class="board-tag">主板</span> <span class="board-tag">医药生物</span></h3>
-<p class="meta">现价 <b>6.81</b>（<span class="down">-3.95%</span>）｜ 近一年 <span class="up">+66%</span> ｜ RSI 75</p>
+<p class="meta">现价 <b>6.95</b>（<span class="up">+2.06%</span>）｜ 近一年 <span class="up">+66%</span> ｜ RSI 75</p>
 <p class="meta">权重 <b>59.6 分</b> → <span class="pill pill-watch">观望</span> ｜ 建议：持有不加 / 观望 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +12.7%</span></p>
 <p class="meta">六类：趋势 42｜动能 100｜量能 0｜超买 70｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1758,7 +1758,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>麦捷科技 <span class="sub">300319</span> <span class="board-tag">创业板</span> <span class="board-tag">电子</span></h3>
-<p class="meta">现价 <b>17.00</b>（<span class="down">-12.82%</span>）｜ 近一年 <span class="up">+44%</span> ｜ RSI 65</p>
+<p class="meta">现价 <b>17.92</b>（<span class="up">+5.41%</span>）｜ 近一年 <span class="up">+44%</span> ｜ RSI 65</p>
 <p class="meta">权重 <b>59.0 分</b> → <span class="pill pill-watch">观望</span> ｜ 建议：持有不加 / 观望 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +14.8%</span></p>
 <p class="meta">六类：趋势 49｜动能 100｜量能 0｜超买 58｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1790,7 +1790,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>四环生物 <span class="sub">000518</span> <span class="board-tag">主板</span> <span class="board-tag">医药生物</span></h3>
-<p class="meta">现价 <b>3.68</b>（<span class="down">+0.00%</span>）｜ 近一年 <span class="up">+59%</span> ｜ RSI 57</p>
+<p class="meta">现价 <b>3.80</b>（<span class="up">+3.26%</span>）｜ 近一年 <span class="up">+59%</span> ｜ RSI 57</p>
 <p class="meta">权重 <b>57.8 分</b> → <span class="pill pill-watch">观望</span> ｜ 建议：持有不加 / 观望 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +22.6%</span></p>
 <p class="meta">六类：趋势 75｜动能 100｜量能 0｜超买 20｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1822,7 +1822,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>双星新材 <span class="sub">002585</span> <span class="board-tag">主板</span> <span class="board-tag">基础化工</span></h3>
-<p class="meta">现价 <b>9.77</b>（<span class="down">-7.66%</span>）｜ 近一年 <span class="up">+68%</span> ｜ RSI 59</p>
+<p class="meta">现价 <b>9.89</b>（<span class="up">+1.23%</span>）｜ 近一年 <span class="up">+68%</span> ｜ RSI 59</p>
 <p class="meta">权重 <b>54.8 分</b> → <span class="pill pill-watch">观望</span> ｜ 建议：持有不加 / 观望 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +19.9%</span></p>
 <p class="meta">六类：趋势 66｜动能 100｜量能 0｜超买 16｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1854,7 +1854,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>阿莱德 <span class="sub">301419</span> <span class="board-tag">创业板</span> <span class="board-tag">通信</span></h3>
-<p class="meta">现价 <b>36.20</b>（<span class="down">-7.63%</span>）｜ 近一年 <span class="up">+42%</span> ｜ RSI 72</p>
+<p class="meta">现价 <b>37.10</b>（<span class="up">+2.49%</span>）｜ 近一年 <span class="up">+42%</span> ｜ RSI 72</p>
 <p class="meta">权重 <b>48.9 分</b> → <span class="pill pill-watch">观望</span> ｜ 建议：持有不加 / 观望 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +13.8%</span></p>
 <p class="meta">六类：趋势 46｜动能 100｜量能 0｜超买 12｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1886,7 +1886,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>远信工业 <span class="sub">301053</span> <span class="board-tag">创业板</span> <span class="board-tag">机械设备</span></h3>
-<p class="meta">现价 <b>41.50</b>（<span class="down">-1.78%</span>）｜ 近一年 <span class="up">+88%</span> ｜ RSI 58</p>
+<p class="meta">现价 <b>42.05</b>（<span class="up">+1.33%</span>）｜ 近一年 <span class="up">+88%</span> ｜ RSI 58</p>
 <p class="meta">权重 <b>48.1 分</b> → <span class="pill pill-watch">观望</span> ｜ 建议：持有不加 / 观望 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +28.2%</span></p>
 <p class="meta">六类：趋势 94｜动能 100｜量能 100｜超买 8｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">—</p>
@@ -1894,7 +1894,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 <div class="card" id="watch-v9-card">
 <h2>📌 全量池中/长线跟踪 <span class="badge badge-auto">上榜跟踪 1 年 · 再上榜 +1 年</span> </h2>
-<div class="sub">上方全量池表<b>上榜标的</b>（v9_tiers：main/gem/star/fund）上榜次日收盘确认后自动加入跟踪，持续 1 年（365 天）；<b>2026-08-18 起新上榜先入「待确认」隔日入池</b>（隔离当日收盘信号）；每次重新上榜刷新【入池/跟踪/出池】时间 · 数据截至 2026-08-19（收盘）</div>
+<div class="sub">上方全量池表<b>上榜标的</b>（v9_tiers：main/gem/star/fund）上榜次日收盘确认后自动加入跟踪，持续 1 年（365 天）；<b>2026-08-18 起新上榜先入「待确认」隔日入池</b>（隔离当日收盘信号）；每次重新上榜刷新【入池/跟踪/出池】时间 · 数据截至 2026-08-20（收盘）</div>
 <div id="watch-v9-pending"></div>
 <div class="toolbar" id="watch-v9-bar">
 <input type="text" id="watch-v9-q" name="watch-v9-q" placeholder="🔍 搜索代码 / 名称…" autocomplete="off" spellcheck="false" aria-label="搜索跟踪标的（代码或名称）">
@@ -1911,7 +1911,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <!-- ============ 视图 B：固定池中/长线 ============ -->
 <div class="view" id="view-lite">
 <div class="card" id="sys-lite">
-<h2>🅱️ 固定池中/长线 <span class="view-badge lite">用户固定池 · 股票 ｜ 评分=Aroon强趋势过滤(A80_M78) · 四因子打分 · 月轮动21日 · 移动止损10% · MA200择时 · <span class="badge badge-auto" style="background:#c0392b;color:#fff">市况门控 ❌ 关 · 熊市保护不回补新仓（沪深300 4604 &lt; MA200 4703）</span> ｜ 池构成：股票 17 ｜ 基金 0 ｜ 回测参考见「监控总览」</span><span class="view-badge auto" title="收盘数据">数据截至 2026-08-19 15:00 · 收盘</span></h2>
+<h2>🅱️ 固定池中/长线 <span class="view-badge lite">用户固定池 · 股票 ｜ 评分=Aroon强趋势过滤(A80_M78) · 四因子打分 · 月轮动21日 · 移动止损10% · MA200择时 · <span class="badge badge-auto" style="background:#c0392b;color:#fff">市况门控 ❌ 关 · 熊市保护不回补新仓（沪深300 4604 &lt; MA200 4703）</span> ｜ 池构成：股票 17 ｜ 基金 0 ｜ 回测参考见「监控总览」</span><span class="view-badge auto" title="2026-08-20 盘中行情（实时）· 分数为收盘口径">数据截至 2026-08-20 09:43 · 盘中实时</span></h2>
 <div class="op-stats">
 <span class="op op-add">🟢 加仓区 <b>2</b> 只</span>
 <span class="op op-watch">🟡 观望 <b>1</b> 只</span>
@@ -1940,8 +1940,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>香江控股</b><br><span style="color:var(--faint);font-size:11px">600162</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">房地产</span></td>
-<td style="text-align:right" data-v="4.05">4.05</td>
-<td style="text-align:right" class="down" data-v="-5.81">-5.81%</td>
+<td style="text-align:right" data-v="4.06">4.06</td>
+<td style="text-align:right" class="up" data-v="0.25">+0.25%</td>
 <td style="text-align:right" class="up" data-v="141.1">+141%</td>
 <td style="text-align:center"><b>81.6</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/100/8/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">70</td>
@@ -1954,8 +1954,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>和远气体</b><br><span style="color:var(--faint);font-size:11px">002971</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">基础化工</span></td>
-<td style="text-align:right" data-v="43.5">43.50</td>
-<td style="text-align:right" class="down" data-v="-6.69">-6.69%</td>
+<td style="text-align:right" data-v="42.61">42.61</td>
+<td style="text-align:right" class="down" data-v="-2.05">-2.05%</td>
 <td style="text-align:right" class="up" data-v="60.9">+61%</td>
 <td style="text-align:center"><b>64.4</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">57/100/0/76/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">74</td>
@@ -1968,8 +1968,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>景旺电子</b><br><span style="color:var(--faint);font-size:11px">603228</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">电子</span></td>
-<td style="text-align:right" data-v="88.11">88.11</td>
-<td style="text-align:right" class="down" data-v="-10.0">-10.00%</td>
+<td style="text-align:right" data-v="88.8">88.80</td>
+<td style="text-align:right" class="up" data-v="0.78">+0.78%</td>
 <td style="text-align:right" class="up" data-v="49.0">+49%</td>
 <td style="text-align:center"><b>58.7</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">87/100/0/10/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">67</td>
@@ -1982,8 +1982,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>生益科技</b><br><span style="color:var(--faint);font-size:11px">600183</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">电子</span></td>
-<td style="text-align:right" data-v="125.47">125.47</td>
-<td style="text-align:right" class="down" data-v="-10.0">-10.00%</td>
+<td style="text-align:right" data-v="127.62">127.62</td>
+<td style="text-align:right" class="up" data-v="1.71">+1.71%</td>
 <td style="text-align:right" class="up" data-v="215.2">+215%</td>
 <td style="text-align:center"><b>44.6</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/72/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">65</td>
@@ -1996,8 +1996,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>沪电股份</b><br><span style="color:var(--faint);font-size:11px">002463</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">电子</span></td>
-<td style="text-align:right" data-v="123.59">123.59</td>
-<td style="text-align:right" class="down" data-v="-1.2">-1.20%</td>
+<td style="text-align:right" data-v="116.29">116.29</td>
+<td style="text-align:right" class="up" data-v="2.54">+2.54%</td>
 <td style="text-align:right" class="up" data-v="136.1">+136%</td>
 <td style="text-align:center"><b>44.4</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/70/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">66</td>
@@ -2010,8 +2010,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>立昂微</b><br><span style="color:var(--faint);font-size:11px">605358</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">电子</span></td>
-<td style="text-align:right" data-v="45.01">45.01</td>
-<td style="text-align:right" class="down" data-v="-9.29">-9.29%</td>
+<td style="text-align:right" data-v="44.5">44.50</td>
+<td style="text-align:right" class="down" data-v="-1.13">-1.13%</td>
 <td style="text-align:right" class="up" data-v="78.8">+79%</td>
 <td style="text-align:center"><b>43.5</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">12/100/100/72/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">68</td>
@@ -2024,8 +2024,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>大有能源</b><br><span style="color:var(--faint);font-size:11px">600403</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">煤炭</span></td>
-<td style="text-align:right" data-v="6.82">6.82</td>
-<td style="text-align:right" class="up" data-v="10.0">+10.00%</td>
+<td style="text-align:right" data-v="6.8">6.80</td>
+<td style="text-align:right" class="down" data-v="-0.29">-0.29%</td>
 <td style="text-align:right" class="up" data-v="74.4">+74%</td>
 <td style="text-align:center"><b>39.9</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">5/100/0/18/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">72</td>
@@ -2038,8 +2038,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>华天科技</b><br><span style="color:var(--faint);font-size:11px">002185</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">电子</span></td>
-<td style="text-align:right" data-v="17.36">17.36</td>
-<td style="text-align:right" class="down" data-v="-7.17">-7.17%</td>
+<td style="text-align:right" data-v="17.41">17.41</td>
+<td style="text-align:right" class="up" data-v="0.29">+0.29%</td>
 <td style="text-align:right" class="up" data-v="69.0">+69%</td>
 <td style="text-align:center"><b>39.4</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">62/100/0/76/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">65</td>
@@ -2052,8 +2052,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>利通电子</b><br><span style="color:var(--faint);font-size:11px">603629</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">电子</span></td>
-<td style="text-align:right" data-v="134.95">134.95</td>
-<td style="text-align:right" class="down" data-v="-1.11">-1.11%</td>
+<td style="text-align:right" data-v="128.26">128.26</td>
+<td style="text-align:right" class="down" data-v="-4.96">-4.96%</td>
 <td style="text-align:right" class="up" data-v="706.2">+706%</td>
 <td style="text-align:center"><b>39.1</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/26/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">77</td>
@@ -2066,8 +2066,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>风华高科</b><br><span style="color:var(--faint);font-size:11px">000636</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">电子</span></td>
-<td style="text-align:right" data-v="62.34">62.34</td>
-<td style="text-align:right" class="down" data-v="-1.73">-1.73%</td>
+<td style="text-align:right" data-v="55.48">55.48</td>
+<td style="text-align:right" class="down" data-v="-1.12">-1.12%</td>
 <td style="text-align:right" class="up" data-v="344.7">+345%</td>
 <td style="text-align:center"><b>38.4</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">100/100/0/20/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">76</td>
@@ -2080,8 +2080,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>斯迪克</b><br><span style="color:var(--faint);font-size:11px">300806</span></td>
 <td><span class="board-tag">创业板</span></td>
 <td><span class="board-tag">基础化工</span></td>
-<td style="text-align:right" data-v="46.78">46.78</td>
-<td style="text-align:right" class="down" data-v="-13.4">-13.40%</td>
+<td style="text-align:right" data-v="46.36">46.36</td>
+<td style="text-align:right" class="down" data-v="-0.9">-0.90%</td>
 <td style="text-align:right" class="up" data-v="248.3">+248%</td>
 <td style="text-align:center"><b>36.5</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">57/100/0/58/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">63</td>
@@ -2094,8 +2094,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>烽火通信</b><br><span style="color:var(--faint);font-size:11px">600498</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">通信</span></td>
-<td style="text-align:right" data-v="37.35">37.35</td>
-<td style="text-align:right" class="down" data-v="-8.79">-8.79%</td>
+<td style="text-align:right" data-v="37.65">37.65</td>
+<td style="text-align:right" class="up" data-v="0.8">+0.80%</td>
 <td style="text-align:right" class="up" data-v="67.4">+67%</td>
 <td style="text-align:center"><b>29.6</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">0/100/0/72/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">66</td>
@@ -2108,8 +2108,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>富春染织</b><br><span style="color:var(--faint);font-size:11px">605189</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">纺织服饰</span></td>
-<td style="text-align:right" data-v="14.34">14.34</td>
-<td style="text-align:right" class="down" data-v="-9.98">-9.98%</td>
+<td style="text-align:right" data-v="14.18">14.18</td>
+<td style="text-align:right" class="down" data-v="-1.12">-1.12%</td>
 <td style="text-align:right" class="down" data-v="-15.9">-16%</td>
 <td style="text-align:center"><b>27.1</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">0/65/0/22/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">36</td>
@@ -2122,8 +2122,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>中百集团</b><br><span style="color:var(--faint);font-size:11px">000759</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">商贸零售</span></td>
-<td style="text-align:right" data-v="6.53">6.53</td>
-<td style="text-align:right" class="down" data-v="-6.58">-6.58%</td>
+<td style="text-align:right" data-v="6.5">6.50</td>
+<td style="text-align:right" class="down" data-v="-0.46">-0.46%</td>
 <td style="text-align:right" class="down" data-v="-11.9">-12%</td>
 <td style="text-align:center"><b>12.0</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">0/0/0/60/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">47</td>
@@ -2136,8 +2136,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>四方科技</b><br><span style="color:var(--faint);font-size:11px">603339</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">机械设备</span></td>
-<td style="text-align:right" data-v="13.78">13.78</td>
-<td style="text-align:right" class="down" data-v="-3.23">-3.23%</td>
+<td style="text-align:right" data-v="13.9">13.90</td>
+<td style="text-align:right" class="up" data-v="0.87">+0.87%</td>
 <td style="text-align:right" class="up" data-v="6.3">+6%</td>
 <td style="text-align:center"><b>7.6</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">13/0/0/22/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">68</td>
@@ -2150,8 +2150,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>长缆科技</b><br><span style="color:var(--faint);font-size:11px">002879</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">电力设备</span></td>
-<td style="text-align:right" data-v="15.79">15.79</td>
-<td style="text-align:right" class="down" data-v="-7.06">-7.06%</td>
+<td style="text-align:right" data-v="16.01">16.01</td>
+<td style="text-align:right" class="up" data-v="1.39">+1.39%</td>
 <td style="text-align:right" class="up" data-v="0.6">+1%</td>
 <td style="text-align:center"><b>7.6</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">0/0/0/38/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">47</td>
@@ -2164,8 +2164,8 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td><b>桂发祥</b><br><span style="color:var(--faint);font-size:11px">002820</span></td>
 <td><span class="board-tag">主板</span></td>
 <td><span class="board-tag">食品饮料</span></td>
-<td style="text-align:right" data-v="11.04">11.04</td>
-<td style="text-align:right" class="down" data-v="-10.02">-10.02%</td>
+<td style="text-align:right" data-v="9.94">9.94</td>
+<td style="text-align:right" class="down" data-v="-9.96">-9.96%</td>
 <td style="text-align:right" class="up" data-v="0.7">+1%</td>
 <td style="text-align:center"><b>2.5</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">2/0/0/10/0</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">72</td>
@@ -2208,7 +2208,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>香江控股 <span class="sub">600162</span> <span class="board-tag">主板</span> <span class="board-tag">房地产</span></h3>
-<p class="meta">现价 <b>4.05</b>（<span class="down">-5.81%</span>）｜ 近一年 <span class="up">+141%</span> ｜ RSI 70</p>
+<p class="meta">现价 <b>4.06</b>（<span class="up">+0.25%</span>）｜ 近一年 <span class="up">+141%</span> ｜ RSI 70</p>
 <p class="meta">权重 <b>81.6 分</b> → <span class="pill pill-full">满仓加仓</span> ｜ 建议：持有至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +76.8%</span></p>
 <p class="meta">六类：趋势 100｜动能 100｜量能 100｜超买 8｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">园区地产</p>
@@ -2240,7 +2240,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>和远气体 <span class="sub">002971</span> <span class="board-tag">主板</span> <span class="board-tag">基础化工</span></h3>
-<p class="meta">现价 <b>43.50</b>（<span class="down">-6.69%</span>）｜ 近一年 <span class="up">+61%</span> ｜ RSI 74</p>
+<p class="meta">现价 <b>42.61</b>（<span class="down">-2.05%</span>）｜ 近一年 <span class="up">+61%</span> ｜ RSI 74</p>
 <p class="meta">权重 <b>64.4 分</b> → <span class="pill pill-add">轻仓加仓</span> ｜ 建议：可加至目标仓位 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +17.0%</span></p>
 <p class="meta">六类：趋势 57｜动能 100｜量能 0｜超买 76｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">工业气体</p>
@@ -2272,7 +2272,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>景旺电子 <span class="sub">603228</span> <span class="board-tag">主板</span> <span class="board-tag">电子</span></h3>
-<p class="meta">现价 <b>88.11</b>（<span class="down">-10.00%</span>）｜ 近一年 <span class="up">+49%</span> ｜ RSI 67</p>
+<p class="meta">现价 <b>88.80</b>（<span class="up">+0.78%</span>）｜ 近一年 <span class="up">+49%</span> ｜ RSI 67</p>
 <p class="meta">权重 <b>58.7 分</b> → <span class="pill pill-watch">观望</span> ｜ 建议：持有不加 / 观望 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +26.1%</span></p>
 <p class="meta">六类：趋势 87｜动能 100｜量能 0｜超买 10｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">PCB</p>
@@ -2304,7 +2304,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>生益科技 <span class="sub">600183</span> <span class="board-tag">主板</span> <span class="board-tag">电子</span></h3>
-<p class="meta">现价 <b>125.47</b>（<span class="down">-10.00%</span>）｜ 近一年 <span class="up">+215%</span> ｜ RSI 65</p>
+<p class="meta">现价 <b>127.62</b>（<span class="up">+1.71%</span>）｜ 近一年 <span class="up">+215%</span> ｜ RSI 65</p>
 <p class="meta">权重 <b>44.6 分</b> → <span class="pill pill-cut">减至半仓</span> ｜ 建议：减至半仓 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +38.8%</span></p>
 <p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 72｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">覆铜板</p>
@@ -2336,7 +2336,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>沪电股份 <span class="sub">002463</span> <span class="board-tag">主板</span> <span class="board-tag">电子</span></h3>
-<p class="meta">现价 <b>123.59</b>（<span class="down">-1.20%</span>）｜ 近一年 <span class="up">+136%</span> ｜ RSI 66</p>
+<p class="meta">现价 <b>116.29</b>（<span class="up">+2.54%</span>）｜ 近一年 <span class="up">+136%</span> ｜ RSI 66</p>
 <p class="meta">权重 <b>44.4 分</b> → <span class="pill pill-cut">减至半仓</span> ｜ 建议：减至半仓 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +31.6%</span></p>
 <p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 70｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">PCB(高多层)</p>
@@ -2368,7 +2368,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>立昂微 <span class="sub">605358</span> <span class="board-tag">主板</span> <span class="board-tag">电子</span></h3>
-<p class="meta">现价 <b>45.01</b>（<span class="down">-9.29%</span>）｜ 近一年 <span class="up">+79%</span> ｜ RSI 68</p>
+<p class="meta">现价 <b>44.50</b>（<span class="down">-1.13%</span>）｜ 近一年 <span class="up">+79%</span> ｜ RSI 68</p>
 <p class="meta">权重 <b>43.5 分</b> → <span class="pill pill-cut">减至半仓</span> ｜ 建议：减至半仓 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +3.7%</span></p>
 <p class="meta">六类：趋势 12｜动能 100｜量能 100｜超买 72｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">半导体硅片</p>
@@ -2400,7 +2400,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>大有能源 <span class="sub">600403</span> <span class="board-tag">主板</span> <span class="board-tag">煤炭</span></h3>
-<p class="meta">现价 <b>6.82</b>（<span class="up">+10.00%</span>）｜ 近一年 <span class="up">+74%</span> ｜ RSI 72</p>
+<p class="meta">现价 <b>6.80</b>（<span class="down">-0.29%</span>）｜ 近一年 <span class="up">+74%</span> ｜ RSI 72</p>
 <p class="meta">权重 <b>39.9 分</b> → <span class="pill pill-cut">减至半仓</span> ｜ 建议：减至半仓 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +1.6%</span></p>
 <p class="meta">六类：趋势 5｜动能 100｜量能 0｜超买 18｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">煤炭</p>
@@ -2432,7 +2432,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>华天科技 <span class="sub">002185</span> <span class="board-tag">主板</span> <span class="board-tag">电子</span></h3>
-<p class="meta">现价 <b>17.36</b>（<span class="down">-7.17%</span>）｜ 近一年 <span class="up">+69%</span> ｜ RSI 65</p>
+<p class="meta">现价 <b>17.41</b>（<span class="up">+0.29%</span>）｜ 近一年 <span class="up">+69%</span> ｜ RSI 65</p>
 <p class="meta">权重 <b>39.4 分</b> → <span class="pill pill-cut">减至半仓</span> ｜ 建议：减至半仓 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +18.5%</span></p>
 <p class="meta">六类：趋势 62｜动能 100｜量能 0｜超买 76｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">半导体封测</p>
@@ -2464,7 +2464,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>利通电子 <span class="sub">603629</span> <span class="board-tag">主板</span> <span class="board-tag">电子</span></h3>
-<p class="meta">现价 <b>134.95</b>（<span class="down">-1.11%</span>）｜ 近一年 <span class="up">+706%</span> ｜ RSI 77</p>
+<p class="meta">现价 <b>128.26</b>（<span class="down">-4.96%</span>）｜ 近一年 <span class="up">+706%</span> ｜ RSI 77</p>
 <p class="meta">权重 <b>39.1 分</b> → <span class="pill pill-cut">减至半仓</span> ｜ 建议：减至半仓 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +100.8%</span></p>
 <p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 26｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">服务器结构件/电子认证</p>
@@ -2496,7 +2496,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>风华高科 <span class="sub">000636</span> <span class="board-tag">主板</span> <span class="board-tag">电子</span></h3>
-<p class="meta">现价 <b>62.34</b>（<span class="down">-1.73%</span>）｜ 近一年 <span class="up">+345%</span> ｜ RSI 76</p>
+<p class="meta">现价 <b>55.48</b>（<span class="down">-1.12%</span>）｜ 近一年 <span class="up">+345%</span> ｜ RSI 76</p>
 <p class="meta">权重 <b>38.4 分</b> → <span class="pill pill-cut">减至半仓</span> ｜ 建议：减至半仓 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +94.7%</span></p>
 <p class="meta">六类：趋势 100｜动能 100｜量能 0｜超买 20｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">MLCC</p>
@@ -2528,7 +2528,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>斯迪克 <span class="sub">300806</span> <span class="board-tag">创业板</span> <span class="board-tag">基础化工</span></h3>
-<p class="meta">现价 <b>46.78</b>（<span class="down">-13.40%</span>）｜ 近一年 <span class="up">+248%</span> ｜ RSI 63</p>
+<p class="meta">现价 <b>46.36</b>（<span class="down">-0.90%</span>）｜ 近一年 <span class="up">+248%</span> ｜ RSI 63</p>
 <p class="meta">权重 <b>36.5 分</b> → <span class="pill pill-cut">减至半仓</span> ｜ 建议：减至半仓 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +17.0%</span></p>
 <p class="meta">六类：趋势 57｜动能 100｜量能 0｜超买 58｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">功能性膜材料/电子胶粘材料</p>
@@ -2560,7 +2560,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>烽火通信 <span class="sub">600498</span> <span class="board-tag">主板</span> <span class="board-tag">通信</span></h3>
-<p class="meta">现价 <b>37.35</b>（<span class="down">-8.79%</span>）｜ 近一年 <span class="up">+67%</span> ｜ RSI 66</p>
+<p class="meta">现价 <b>37.65</b>（<span class="up">+0.80%</span>）｜ 近一年 <span class="up">+67%</span> ｜ RSI 66</p>
 <p class="meta">权重 <b>29.6 分</b> → <span class="pill pill-clear">清仓</span> ｜ 建议：清仓离场 ｜ <span style="color:#60a5fa" title="收盘口径：现价在 MA200(年线) 下方 14.4%，长期结构偏空，池档位大概率偏弱（监控分仅为短期强度）">年线下方 14.4%</span></p>
 <p class="meta">六类：趋势 0｜动能 100｜量能 0｜超买 72｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">光通信设备</p>
@@ -2592,7 +2592,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>富春染织 <span class="sub">605189</span> <span class="board-tag">主板</span> <span class="board-tag">纺织服饰</span></h3>
-<p class="meta">现价 <b>14.34</b>（<span class="down">-9.98%</span>）｜ 近一年 <span class="down">-16%</span> ｜ RSI 36</p>
+<p class="meta">现价 <b>14.18</b>（<span class="down">-1.12%</span>）｜ 近一年 <span class="down">-16%</span> ｜ RSI 36</p>
 <p class="meta">权重 <b>27.1 分</b> → <span class="pill pill-clear">清仓</span> ｜ 建议：清仓离场 ｜ <span style="color:#60a5fa" title="收盘口径：现价在 MA200(年线) 下方 8.0%，长期结构偏空，池档位大概率偏弱（监控分仅为短期强度）">年线下方 8.0%</span></p>
 <p class="meta">六类：趋势 0｜动能 65｜量能 0｜超买 22｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">染整</p>
@@ -2624,7 +2624,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>中百集团 <span class="sub">000759</span> <span class="board-tag">主板</span> <span class="board-tag">商贸零售</span></h3>
-<p class="meta">现价 <b>6.53</b>（<span class="down">-6.58%</span>）｜ 近一年 <span class="down">-12%</span> ｜ RSI 47</p>
+<p class="meta">现价 <b>6.50</b>（<span class="down">-0.46%</span>）｜ 近一年 <span class="down">-12%</span> ｜ RSI 47</p>
 <p class="meta">权重 <b>12.0 分</b> → <span class="pill pill-clear">清仓</span> ｜ 建议：清仓离场 ｜ <span style="color:#60a5fa" title="收盘口径：现价在 MA200(年线) 下方 2.3%，长期结构偏空，池档位大概率偏弱（监控分仅为短期强度）">年线下方 2.3%</span></p>
 <p class="meta">六类：趋势 0｜动能 0｜量能 0｜超买 60｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">商超零售</p>
@@ -2656,7 +2656,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>四方科技 <span class="sub">603339</span> <span class="board-tag">主板</span> <span class="board-tag">机械设备</span></h3>
-<p class="meta">现价 <b>13.78</b>（<span class="down">-3.23%</span>）｜ 近一年 <span class="up">+6%</span> ｜ RSI 68</p>
+<p class="meta">现价 <b>13.90</b>（<span class="up">+0.87%</span>）｜ 近一年 <span class="up">+6%</span> ｜ RSI 68</p>
 <p class="meta">权重 <b>7.6 分</b> → <span class="pill pill-clear">清仓</span> ｜ 建议：清仓离场 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +3.9%</span></p>
 <p class="meta">六类：趋势 13｜动能 0｜量能 0｜超买 22｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">集装箱/冷链装备</p>
@@ -2688,7 +2688,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>长缆科技 <span class="sub">002879</span> <span class="board-tag">主板</span> <span class="board-tag">电力设备</span></h3>
-<p class="meta">现价 <b>15.79</b>（<span class="down">-7.06%</span>）｜ 近一年 <span class="up">+1%</span> ｜ RSI 47</p>
+<p class="meta">现价 <b>16.01</b>（<span class="up">+1.39%</span>）｜ 近一年 <span class="up">+1%</span> ｜ RSI 47</p>
 <p class="meta">权重 <b>7.6 分</b> → <span class="pill pill-clear">清仓</span> ｜ 建议：清仓离场 ｜ <span style="color:#60a5fa" title="收盘口径：现价在 MA200(年线) 下方 12.5%，长期结构偏空，池档位大概率偏弱（监控分仅为短期强度）">年线下方 12.5%</span></p>
 <p class="meta">六类：趋势 0｜动能 0｜量能 0｜超买 38｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">电缆附件</p>
@@ -2720,7 +2720,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <text x="60.0" y="73.0" style="fill:var(--radar-sub)" font-size="7" text-anchor="middle">总分</text></svg></div>
 <div class="body">
 <h3>桂发祥 <span class="sub">002820</span> <span class="board-tag">主板</span> <span class="board-tag">食品饮料</span></h3>
-<p class="meta">现价 <b>11.04</b>（<span class="down">-10.02%</span>）｜ 近一年 <span class="up">+1%</span> ｜ RSI 72</p>
+<p class="meta">现价 <b>9.94</b>（<span class="down">-9.96%</span>）｜ 近一年 <span class="up">+1%</span> ｜ RSI 72</p>
 <p class="meta">权重 <b>2.5 分</b> → <span class="pill pill-clear">清仓</span> ｜ 建议：清仓离场 ｜ <span style="color:var(--faint)" title="现价在 MA200(年线) 上方">年线上方 +0.6%</span></p>
 <p class="meta">六类：趋势 2｜动能 0｜量能 0｜超买 10｜风控 0｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">麻花/休闲食品</p>
@@ -3405,7 +3405,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 
 </div>
-<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-20 07:31 · 版本 v5.11.8 · 数据截至 2026-08-19 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-20 09:47 · 版本 v5.11.8 · 数据截至 2026-08-20 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
