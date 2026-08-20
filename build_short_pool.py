@@ -16,6 +16,7 @@ import pandas as pd
 BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(BASE))
 import short_engine as S
+import industry_pool as IP   # 2026-08-20：统一行业池（消灭「综合」兜底）
 
 # 名称
 NAMES = json.load(open(BASE / "data_full_names.json", encoding="utf-8"))
@@ -300,17 +301,18 @@ def calc_signals(as_of=None):
         ex = EXIST.get(bare)
         if ex:
             name = ex["name"]
-            industry = ex["industry"]
+            # 2026-08-20：统一行业池（池内已有行业直接采用；落「综合」则用统一池重判）
+            industry = ex["industry"] if ex["industry"] not in ("综合", "") else IP.industry_of(bare, name)
         else:
             name = NAMES.get(code, bare)
             if board == "ETF":
-                industry = etf_ind(name)
+                industry = IP.industry_of(bare, name)
             elif board == "基金":
                 fnn = fnames.get(bare, NAMES.get(code, bare))
-                industry = ind_by_name(fnn)   # 2026-08-19：基金不再一律「综合」，按真实基金名归主题/风格
+                industry = IP.fund_industry(fnn)   # 2026-08-20：基金用主题/风格（不套申万一级）
                 name = fnn
             else:
-                industry = STK_IND.get(bare, "综合")
+                industry = IP.industry_of(bare, name)   # 2026-08-20：统一行业池，不再落「综合」
         px = float(r["close"])
         _tail = ddf.loc[:as_of] if as_of is not None else ddf
         chg = float(_tail["close"].iloc[-1] / _tail["close"].iloc[-2] - 1) * 100 if len(_tail) >= 2 else None

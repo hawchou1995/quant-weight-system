@@ -15,6 +15,7 @@ import v8_selector as V
 import v9_auto as A
 import v8_lite as L
 import short_engine as SH   # v5.8：details 加 short_score/short_tier（短线视角）
+import industry_pool as IP  # 2026-08-20：全市场统一行业池（消灭「综合」兜底）
 
 names = json.load(open(BASE / "data_full_names.json", encoding="utf-8"))
 
@@ -513,9 +514,18 @@ for c in ALL_CODES:
                 for _, x in df.iterrows()]
     _board = ("基金" if (c in FUNDS or c in V9_FUND) else ("ETF" if (k.startswith(("sh5", "sz1")) or c in V9_ETF) else ("创业板" if c.startswith("30") else ("科创板" if k.startswith("sh688") else "主板"))))
     _nm = (FUND_NAMES.get(c) if (c in FUNDS or c in V9_FUND) else None) or names.get(k, c)
-    _industry = ETF_INDUSTRY.get(c) or INDUSTRY.get(c)
+    if _board == "基金":
+        # 2026-08-20：基金用主题/风格池（不套申万一级）；ETF_INDUSTRY 若有基金硬编码则优先
+        _industry = ETF_INDUSTRY.get(c) or INDUSTRY.get(c)
+        if not _industry or _industry == "综合":
+            _industry = IP.fund_industry(_nm)
+    else:
+        _industry = ETF_INDUSTRY.get(c) or INDUSTRY.get(c)
+        if not _industry or _industry == "综合":
+            # 2026-08-20：统一行业池（申万一级全市场）+名称关键词；不再落「综合」
+            _industry = IP.industry_of(c, _nm)
     if not _industry:
-        _industry = ind_by_name(_nm)   # 2026-08-19：不再一律「综合」，按名称关键词归具体行业
+        _industry = "其他"
     # 短线分（v5.8）：同一标的池的短线视角——股票用反转版、ETF/基金用动量版（v2/v3 回测验证）
     _sf = SH.short_factors(ddf)
     _sr = _sf.iloc[-1]

@@ -35,10 +35,12 @@ def main():
     as_of = lu.get("as_of", args.day or "—")
     print(f"涨停回溯 {len(items)} 只（{as_of}）", flush=True)
 
-    # 2) 按行业聚类
+    # 2) 按行业聚类（limit_up_follow 已用统一行业池标注；兜底不再落「综合」）
     by_ind = defaultdict(list)
     for it in items:
-        ind = it.get("industry") or "综合"
+        ind = it.get("industry") or "其他"
+        if ind == "综合":
+            ind = "其他"
         by_ind[ind].append(it)
 
     # 3) 板块热度计算
