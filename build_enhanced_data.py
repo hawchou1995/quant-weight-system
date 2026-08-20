@@ -347,6 +347,10 @@ def v9_rank_board(board, top_n=10, exclude=(), mom_min=0.25, score_min=65):
             continue
         if not _is_board(code, board):
             continue
+        # 2026-08-20 修复：中长线选池剔除 ST / *ST / S 开头 / 退市（与短线池口径一致）
+        _nm = names.get(code, "")
+        if "ST" in str(_nm).upper() or "退" in str(_nm) or str(_nm).lstrip().upper().startswith("S"):
+            continue
         if last_day not in ddf.index:
             continue
         r = ddf.loc[last_day]
@@ -579,6 +583,25 @@ def maintain_track_v9():
     today_codes = {c for codes in V9_TIERS.values() for c in codes} | set(MAIN_CODES) | set(ETFS) | set(FUNDS)
     # 2026-08-19 用户需求：中长线固定池（MAIN_CODES 15 只）并入全量池跟踪池 track_v9，
     # 统一跟踪卖出信号（掉出池也保留快照等卖出），生成时间由固定池不再独立维护跟踪而减少
+    # 2026-08-20 修复：全量池跟踪池清洗 ST / *ST / S开头 / 退市标的——
+    # 它们此前因 v9_rank_board 无 ST 过滤误入正式池（002528 *ST英飞 / 300301 ST长方），
+    # 从旧 track/pending 载入时即剔除（与短线池剔 ST 口径一致）。
+    def _is_forbidden(name_s):
+        s = str(name_s or "").upper()
+        return ("ST" in s or "退" in s or s.lstrip().startswith("S"))
+    try:
+        _drop = set()
+        for _c in list((old or {}).keys()) + list((old_pending or {}).keys()):
+            _cn = names.get(("sh" if str(_c).startswith(("6", "5")) else "sz") + str(_c), "")
+            if _is_forbidden(_cn or old.get(_c, {}).get("name", old_pending.get(_c, {}).get("name", ""))):
+                _drop.add(str(_c))
+        for _c in _drop:
+            old.pop(_c, None)
+            old_pending.pop(_c, None)
+        if _drop:
+            print(f"⚠ 跟踪池剔除 ST/退 标的: {sorted(_drop)}", flush=True)
+    except Exception as _e:
+        print(f"⚠ ST 清洗跳过: {_e}", flush=True)
     track = dict(old)
     pending = dict(old_pending)
     from datetime import timedelta
