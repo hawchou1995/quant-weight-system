@@ -424,6 +424,64 @@ WATCH_CARD = f'''<div class="card" id="watch-card">
 <div id="watch-table"></div>
 </div>'''
 
+# ---- 观察层卡片（2026-08-20 新增：涨停次日跟随 + 板块强度雷达；纯观察，不入主池/不下指令）----
+def _load_json_b(path, default=None):
+    _p = Path(path)
+    if _p.exists():
+        try:
+            return json.loads(_p.read_text(encoding="utf-8"))
+        except Exception:
+            return default or {}
+    return default or {}
+
+OBS_LU = _load_json_b(BASE / "limit_up_follow.json")
+OBS_SR = _load_json_b(BASE / "sector_radar.json")
+
+def obs_cards_html():
+    """涨停跟随 + 板块雷达 观察卡"""
+    # 涨停跟随
+    lu_items = OBS_LU.get("items", [])
+    lu_asof = OBS_LU.get("as_of", "—")
+    lu_rows = ""
+    for it in lu_items[:20]:
+        lu_rows += (f'<tr><td style="text-align:center"><span class="board-tag">{it.get("board","")}</span></td>'
+                    f'<td><b>{it.get("name","")}</b><br><span style="color:var(--faint);font-size:11px">{it.get("code","")}</span></td>'
+                    f'<td><span class="board-tag">{it.get("industry","")}</span></td>'
+                    f'<td style="text-align:right" class="up" data-v="{it.get("chg",0)}">+{it.get("chg",0):.2f}%</td>'
+                    f'<td style="text-align:center">{"连板×"+str(it.get("streak",1)) if it.get("streak",1)>1 else "首板"}</td>'
+                    f'<td style="text-align:right">{it.get("px",0):.2f}</td></tr>')
+    if not lu_items:
+        lu_rows = '<tr><td colspan="6" style="text-align:center;color:var(--faint)">当日无涨停（或数据未更新）</td></tr>'
+    lu_block = f'''<div class="card" id="card-luf">
+<h2>⚡ 涨停次日跟随 <span class="badge badge-auto">观察层 · {lu_asof}</span></h2>
+<div class="sub"><b>纯观察</b>：今日涨停股（主板≥9.5% / 创科≥19.5%，剔ST）次日是否有低吸机会，不在主评分池内、不下买入指令。T+1 参与条件：<b>低开或高开&lt;3%</b> 才考虑；一字/高开秒板的（open≈涨停）当日基本无机会。</div>
+<table class="tbl"><thead><tr><th>板块</th><th>标的</th><th>行业</th><th style="text-align:right">涨停%</th><th>板</th><th style="text-align:right">现价</th></tr></thead><tbody>{lu_rows}</tbody></table>
+</div>'''
+
+    # 板块雷达
+    sr_sectors = OBS_SR.get("sectors", [])
+    sr_asof = OBS_SR.get("as_of", "—")
+    sr_rows = ""
+    for s in sr_sectors[:12]:
+        hot_color = "#f59e0b" if "启动" in s.get("hot","") else ("#60a5fa" if "发酵" in s.get("hot","") else "var(--faint)")
+        mems = "、".join(m["name"] for m in s.get("members", [])[:6])
+        sr_rows += (f'<tr><td><b>{s.get("industry","")}</b></td>'
+                    f'<td style="text-align:center"><span style="color:{hot_color}">{s.get("hot","")}</span></td>'
+                    f'<td style="text-align:center">{s.get("limit_up",0)}</td>'
+                    f'<td style="text-align:center">{s.get("streak2",0)}</td>'
+                    f'<td style="text-align:center">+{s.get("avg_pct",0):.1f}%</td>'
+                    f'<td style="color:var(--faint);font-size:11px">{mems}</td></tr>')
+    if not sr_sectors:
+        sr_rows = '<tr><td colspan="6" style="text-align:center;color:var(--faint)">板块数据未生成</td></tr>'
+    sr_block = f'''<div class="card" id="card-sr">
+<h2>🧭 板块强度雷达 <span class="badge badge-auto">观察层 · {sr_asof}</span></h2>
+<div class="sub">按当日涨停家数聚类行业热度：<b>🔥板块启动</b>（≥3家涨停或≥2连板）/ ⚠发酵中。仅提示板块在发酵，非买入信号；参与需等 T+1 回调不追高。</div>
+<table class="tbl"><thead><tr><th>板块</th><th>热度</th><th>涨停家数</th><th>连板</th><th>均涨</th><th>成分（前6）</th></tr></thead><tbody>{sr_rows}</tbody></table>
+</div>'''
+    return lu_block + sr_block
+
+OBS_CARDS = obs_cards_html()
+
 # 全量池中/长线年跟踪池（2026-08-17 用户需求：上榜跟踪 1 年，再上榜 +1 年；track_v9 由 build_enhanced_data.py 维护）
 WATCH_V9_CARD = f'''<div class="card" id="watch-v9-card">
 <h2>📌 全量池中/长线跟踪 <span class="badge badge-auto">上榜跟踪 1 年 · 再上榜 +1 年</span> </h2>
@@ -694,7 +752,7 @@ html = f"""<!doctype html>
   "⚡ 全量池短线", "auto", f"全市场短线信号 Top 池（数据截至 {SHORT_POOL_ASOF}）{SHORT_POOL_GATE}：股票=反转信号按权限分层，<b>仅保留买入信号（分≥50），不足 10 只不凑数</b>（主板/创业板/科创板各 ≤10，剔ST）｜ 基金=动量（分≥50 才入池）· 短线分 = 动量30/量价25/通道25/波动20 · <b>市况门控仅提醒：沪深300 &gt; MA20 才开新仓；门控关闭时股票池照常入池展示，仅作参考（⚠ 非买入指令，不追高）；持仓卖出信号走「全量池短线跟踪」</b> · 回测参考见「监控总览」",
   v9_short_items, "tbl-short", "card-tbl-short",
   "信号池 = 回测买入清单：分数≥50 的 TopN 在轮动日全部买入 · 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览 · 基金行现价为 T-1 净值（场外基金净值次日公布）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：不追高，可等盘中回落至 3% 以内再考虑买入（9:30 盘中起生效）</b>",
-  extra_card=WATCH_CARD, score_sub="动量/量价/通道/波动",
+  extra_card=WATCH_CARD + OBS_CARDS, score_sub="动量/量价/通道/波动",
   as_of=SHORT_POOL_ASOF, intraday_note=SHORT_POOL_INTRADAY,
   as_of_min=SHORT_POOL.get("intraday_ts") or SHORT_POOL_ASOF_MIN,
   tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=())}
@@ -752,7 +810,7 @@ window.ENH.nav = [
   ["overview","📊","监控总览",[["overview","总览统计"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
   ["sys-auto","🅰️","全量池中/长线",[["card-tbl-v9","标的汇总表"],["card-tbl-v9-detail","逐标的详情"],["watch-v9-card","中长线跟踪"]]],
   ["sys-lite","🅱️","固定池中/长线",[["card-tbl-v8","标的汇总表"],["card-tbl-v8-detail","逐标的详情"]]],
-  ["short","⚡","全量池短线",[["card-tbl-short","标的汇总表"],["watch-card","短线跟踪"],["card-tbl-short-detail","逐标的详情"]]],
+  ["short","⚡","全量池短线",[["card-tbl-short","标的汇总表"],["watch-card","短线跟踪"],["card-luf","涨停次日跟随"],["card-sr","板块强度雷达"],["card-tbl-short-detail","逐标的详情"]]],
   ["comment","💬","评论区",[]]
 ];
 /* 视图切换模式：滚动不更新导航高亮（COMMON_JS renderSidenav 检测此标志） */

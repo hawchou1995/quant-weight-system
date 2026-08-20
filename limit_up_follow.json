@@ -1,0 +1,127 @@
+{
+ "as_of": "2026-08-20",
+ "note": "纯观察层：涨停次日跟随（不进评分主池、不下指令；T+1 低开或高开<3% 才考虑关注）",
+ "items": [
+  {
+   "code": "688276",
+   "name": "百克生物",
+   "board": "科创板",
+   "industry": "医药生物",
+   "px": 18.71,
+   "chg": 20.01,
+   "streak": 1,
+   "limit_60d": 0,
+   "intraday": true
+  },
+  {
+   "code": "301166",
+   "name": "优宁维",
+   "board": "创业板",
+   "industry": "综合",
+   "px": 34.06,
+   "chg": 20.01,
+   "streak": 1,
+   "limit_60d": 0,
+   "intraday": true
+  },
+  {
+   "code": "688114",
+   "name": "华大智造",
+   "board": "科创板",
+   "industry": "综合",
+   "px": 69.11,
+   "chg": 20.0,
+   "streak": 1,
+   "limit_60d": 0,
+   "intraday": true
+  },
+  {
+   "code": "688185",
+   "name": "康希诺",
+   "board": "科创板",
+   "industry": "综合",
+   "px": 64.43,
+   "chg": 20.0,
+   "streak": 1,
+   "limit_60d": 0,
+   "intraday": true
+  },
+  {
+   "code": "688356",
+   "name": "键凯科技",
+   "board": "科创板",
+   "industry": "计算机",
+   "px": 89.45,
+   "chg": 20.0,
+   "streak": 1,
+   "limit_60d": 0,
+   "intraday": true
+  },
+  {
+   "code": "300006",
+   "name": "莱美药业",
+   "board": "创业板",
+   "industry": "医药生物",
+   "px": 5.94,
+   "chg": 20.0,
+   "streak": 1,
+   "limit_60d": 0,
+   "intraday": true
+  },
+  {
+   "code": "300142",
+   "name": "沃森生物",
+   "board": "创业板",
+   "industry": "医药生物",
+   "px": 15.12,
+   "chg": 20.0,
+   "streak": 1,
+   "limit_60d": 0,
+   "intraday": true
+  },
+  {
+   "code": "300363",
+   "name": "博腾股份",
+   "board": "创业板",
+   "industry": "综合",
+   "px": 24.48,
+   "chg": 20.0,
+   "streak": 1,
+   "limit_60d": 0,
+   "intraday": true
+  },
+  {
+   "code": "600613",
+   "name": "神奇制药",
+   "board": "主板",
+   "industry": "医药生物",
+   "px": 8.56,
+   "chg": 10.03,
+   "streak": 1,
+   "limit_60d": 0,
+   "intraday": true
+  },
+  {
+   "code": "002437",
+   "name": "誉衡药业",
+   "board": "主板",
+   "industry": "医药生物",
+   "px": 4.73,
+   "chg": 10.0,
+   "streak": 1,
+   "limit_60d": 0,
+   "intraday": true
+  },
+  {
+   "code": "002693",
+   "name": "双成药业",
+   "board": "主板",
+   "industry": "医药生物",
+   "px": 10.25,
+   "chg": 9.98,
+   "streak": 1,
+   "limit_60d": 0,
+   "intraday": true
+  }
+ ]
+}
