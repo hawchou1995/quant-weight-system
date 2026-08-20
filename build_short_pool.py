@@ -252,11 +252,9 @@ def calc_signals(as_of=None):
     for bd in ("主板", "创业板", "科创板"):
         rows_by_board[bd].sort(key=lambda kv: -kv[1])
         # 2026-08-17 用户决策：只保留买入信号（分≥50），不足 10 只不凑数；超 10 只封顶 Top10
-        # 2026-08-19 市况门控：门控关闭 → 清空股票买入信号（不开新仓），与回测口径一致
-        if _in_mkt:
-            rows_by_board[bd] = [kv for kv in rows_by_board[bd] if kv[1] >= 50][:10]
-        else:
-            rows_by_board[bd] = []
+        # 2026-08-20 用户决策：市况门控改为「仅提醒」——门控关闭不再清空股票池，
+        #   权重分≥50 照常入池展示（仅供参不，非买入指令），由前端标题横幅提醒。
+        rows_by_board[bd] = [kv for kv in rows_by_board[bd] if kv[1] >= 50][:10]
         print(f"股票[{bd}] 买入信号 {len(rows_by_board[bd])} 只（分≥50，不凑数）({time.time()-t0:.0f}s)", flush=True)
     stock_top_main = rows_by_board["主板"]
     stock_top_gem  = rows_by_board["创业板"]
@@ -340,6 +338,14 @@ def calc_signals(as_of=None):
              "创业板": [c[-6:] for c, _, _, _ in stock_top_gem],
              "科创板": [c[-6:] for c, _, _, _ in stock_top_star],
              "基金": [c[-6:] for c, _, _, _ in fund_top]}
+    # 2026-08-20 用户决策：市况门控改为「仅提醒」——门控关闭不再清空股票池。
+    # 股票标的分≥50 照常入池展示（供参考，非买入指令），打 gate_closed 标记供前端标题/行级提醒；
+    # 基金不受门控（不加标记）。跟踪池安全口径「不开新仓·仅跟踪」由下方 ⑤ 保持。
+    if not _in_mkt:
+        for _c in [c[-6:] for c, _, _, _ in stock_top]:
+            if _c in details:
+                details[_c]["gate_closed"] = True
+        print(f"市况门控关闭：短线股票池 {len(stock_top)} 只标 gate_closed=仅提醒（照常入池供参考，非买入指令；跟踪池走安全口径）", flush=True)
     # 2026-08-17 修复：as_of 取股票数据最新交易日（主口径），基金净值 T-1 单独标注
     _stock_tail = max((ddf.index[-1] for ddf in stock_pool.values() if len(ddf)), default=None)
     _fund_tail = max((ddf.index[-1] for ddf in fund_pool.values() if len(ddf)), default=None)

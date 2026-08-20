@@ -59,7 +59,8 @@ try:
     if _mg.get("open"):
         SHORT_POOL_GATE = f'<span class="badge badge-auto" style="background:#1f8a4c;color:#fff">市况门控 ✅ 开（{_mg.get("idx_close")} &gt; MA20 {_mg.get("idx_ma20")}）</span>'
     else:
-        SHORT_POOL_GATE = f'<span class="badge badge-auto" style="background:#c0392b;color:#fff">市况门控 ❌ 关 · 不开新仓（沪深300 {_mg.get("idx_close")} &lt; MA20 {_mg.get("idx_ma20")}）</span>'
+        # 2026-08-20 用户决策：门控改为「仅提醒」——股票池分≥50 照常入池展示（供参考），不做买入指令
+        SHORT_POOL_GATE = f'<span class="badge badge-auto" style="background:#d97706;color:#fff">市况门控 ⚠ 关 · 仅提醒（沪深300 {_mg.get("idx_close")} &lt; MA20 {_mg.get("idx_ma20")}，股票照常入池仅供参不）</span>'
     SHORT_POOL_INTRADAY = SHORT_POOL.get("intraday_note") or ""
     SHORT_POOL_ASOF_MIN = SHORT_POOL.get("intraday_ts") or "15:00"
     # 运行时精简池数据（tiers/track 供「全量池短线跟踪」渲染；HTML 不加载 short_pool.js）
@@ -86,7 +87,8 @@ try:
     if _lt_close > _lt_ma:
         LT_GATE_BADGE = f'<span class="badge badge-auto" style="background:#1f8a4c;color:#fff">市况门控 ✅ 开（沪深300 {_lt_close:.0f} &gt; MA200 {_lt_ma:.0f}）</span>'
     else:
-        LT_GATE_BADGE = f'<span class="badge badge-auto" style="background:#c0392b;color:#fff">市况门控 ❌ 关 · 熊市保护不回补新仓（沪深300 {_lt_close:.0f} &lt; MA200 {_lt_ma:.0f}）</span>'
+        # 2026-08-20 用户决策：门控改为「仅提醒」——权重分达标照常入池供参考，非买入指令
+        LT_GATE_BADGE = f'<span class="badge badge-auto" style="background:#d97706;color:#fff">市况门控 ⚠ 关 · 仅提醒（沪深300 {_lt_close:.0f} &lt; MA200 {_lt_ma:.0f}，权重分达标照常入池仅供参不）</span>'
 except Exception as _e:
     print("MA200 门控徽章计算失败:", _e)
     LT_GATE_BADGE = ''
@@ -154,6 +156,12 @@ def rows_html_for(items):
             gap_badge = (f'<span class="badge" style="background:rgba(239,68,68,.15);color:#f87171;" '
                          f'title="开盘跳空高开 {d["gap"]:.1f}%（vs 昨收），反转空间被开盘吃掉，不追高；可等盘中回落至 3% 以内再考虑买入">'
                          f'⚠ 高开{d["gap"]:.1f}% 规避（回落&lt;3%可买）</span>')
+        # 2026-08-20 用户决策：市况门控改为「仅提醒」——门控关闭时入池股票标「仅提醒·非买入」，
+        # 仅供参不（不追高）；与 8/19 跟踪池安全口径（不开新仓·仅跟踪）区分开（两者都非买入指令）
+        gate_tag = ""
+        if d.get("gate_closed"):
+            gate_tag = ('<span class="badge" style="background:rgba(217,119,6,.18);color:#fbbf24;" '
+                        f'title="市况门控关闭：权重分≥50 照常入池仅供参考，非买入指令；不追高，持仓走跟踪池等卖出信号">仅提醒·非买入</span>')
         rows += f'''<tr data-code="{d["code"]}" data-search="{d["name"]} {d["code"]} {d["industry"]} {board}" data-board="{d["perm"]}" data-market="{board}" data-industry="{d["industry"]}" data-tier="{d["tier"]}">
 <td style="text-align:center">{rank}</td>
 <td><b>{d["name"]}</b><br><span style="color:var(--faint);font-size:11px">{d["code"]}</span></td>
@@ -168,7 +176,7 @@ def rows_html_for(items):
 <td style="text-align:center" data-v="100"><span class="board-tag">{conf_level(d)}置信</span></td>
 <td style="text-align:center" data-v="{TIER_W.get(d["tier"], 0)}">{tier_pill(d["tier"])}</td>
 <td style="text-align:center" data-v="{1 if chg_tier else 0}">{chg_tier or '<span style="color:var(--faint)">—</span>'}</td>
-<td style="text-align:center;font-size:12px;color:var(--sub)">{gap_badge if gap_badge else action_for(d)}</td></tr>'''
+<td style="text-align:center;font-size:12px;color:var(--sub)">{gap_badge if gap_badge else gate_tag if gate_tag else action_for(d)}</td></tr>'''
     return rows
 
 # 板块/行业/档位筛选选项（模板式左上角筛选条）
@@ -683,7 +691,7 @@ html = f"""<!doctype html>
 <!-- ============ 视图 C：全量池短线（与中长线同结构：统计条+表格+雷达卡） ============ -->
 {system_block(
   "view-short", "sys-short",
-  "⚡ 全量池短线", "auto", f"全市场短线信号 Top 池（数据截至 {SHORT_POOL_ASOF}）{SHORT_POOL_GATE}：股票=反转信号按权限分层，<b>仅保留买入信号（分≥50），不足 10 只不凑数</b>（主板/创业板/科创板各 ≤10，剔ST）｜ 基金=动量（分≥50 才入池）· 短线分 = 动量30/量价25/通道25/波动20 · <b>市况门控：沪深300 &gt; MA20 才开新仓，门控关闭时股票池不出买入信号（持仓走「全量池短线跟踪」等卖出信号）</b> · 回测参考见「监控总览」",
+  "⚡ 全量池短线", "auto", f"全市场短线信号 Top 池（数据截至 {SHORT_POOL_ASOF}）{SHORT_POOL_GATE}：股票=反转信号按权限分层，<b>仅保留买入信号（分≥50），不足 10 只不凑数</b>（主板/创业板/科创板各 ≤10，剔ST）｜ 基金=动量（分≥50 才入池）· 短线分 = 动量30/量价25/通道25/波动20 · <b>市况门控仅提醒：沪深300 &gt; MA20 才开新仓；门控关闭时股票池照常入池展示，仅作参考（⚠ 非买入指令，不追高）；持仓卖出信号走「全量池短线跟踪」</b> · 回测参考见「监控总览」",
   v9_short_items, "tbl-short", "card-tbl-short",
   "信号池 = 回测买入清单：分数≥50 的 TopN 在轮动日全部买入 · 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览 · 基金行现价为 T-1 净值（场外基金净值次日公布）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：不追高，可等盘中回落至 3% 以内再考虑买入（9:30 盘中起生效）</b>",
   extra_card=WATCH_CARD, score_sub="动量/量价/通道/波动",
@@ -870,7 +878,7 @@ document.addEventListener('DOMContentLoaded',function(){{
     var _gateBox=document.getElementById('watch-gate');
     if(_gateBox){{
       if(_gateOpen===false){{
-        _gateBox.innerHTML='<div class="sub" style="margin-bottom:6px;color:#c0392b">🚫 市况门控关闭（沪深300 '+( _mg.idx_close!=null?_mg.idx_close:'—')+' < MA20 '+( _mg.idx_ma20!=null?_mg.idx_ma20:'—')+'）—— 已入池标的仅跟踪卖出信号，不开新仓</div>';
+        _gateBox.innerHTML='<div class="sub" style="margin-bottom:6px;color:#d97706">⚠ 市况门控关闭（沪深300 '+( _mg.idx_close!=null?_mg.idx_close:'—')+' < MA20 '+( _mg.idx_ma20!=null?_mg.idx_ma20:'—')+'）—— 已入池跟踪标的仅跟踪卖出信号，「不开新仓·仅跟踪」（安全口径，非买入）</div>';
       }}else{{_gateBox.innerHTML='';}}
     }}
     // 待确认（pending）：当日新上榜、下个收盘确认后入正式池（2026-08-18 用户需求，与中长线一致）
