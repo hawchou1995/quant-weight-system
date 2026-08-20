@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """每日复盘引擎 v2（三池全量）
 ============================================
-复盘三个监控池的全部标的：
+复盘全部标的：
   1. 全量池中/长线（普适版 v9，40 只：主板10+创业板10+科创板10+基金10，2026-08-17 去 ETF）
-  2. 固定池中/长线（个人版 v8，24 只：20股+4基金，去 ETF/014002/020900）
-  3. 短线全量池（40 只：股票反转按权限各10【主板/创业板/科创板】 + 基金动量10，去 ETF）
+  2. 短线全量池（40 只：股票反转按权限各10【主板/创业板/科创板】 + 基金动量10，去 ETF）
+  （2026-08-19 晚用户决策：复盘日志已移除固定池中/长线——固定池已并入 track_v9，其信号在跟踪池呈现；
+   全量池中/长线与短线全量池一样按 主板/创业板/科创板/基金 四个板块细分展示总览）
 
 流程（每个池）：
 1. as_of 信号日：用当日行情重算信号分（v9/v8 用 V.score_row，短线用 calc_signals）
@@ -36,7 +37,6 @@ REVIEW_DIR.mkdir(exist_ok=True)
 # 回测基准胜率（各池最优参数实测；短线按板块，2026-08-17 去 ETF）
 BENCH_WIN = {
     "全量池中/长线": json.load(open(BASE / "v9_auto_summary.json", encoding="utf-8"))["summary"]["win_rate_pct"],
-    "固定池中/长线": json.load(open(BASE / "v8_lite_summary.json", encoding="utf-8"))["summary"]["win_rate_pct"],
     "短线全量池-主板": 46.8, "短线全量池-创业板": 48.1, "短线全量池-科创板": 57.8, "短线全量池-基金": 55.5,
 }
 
@@ -107,7 +107,8 @@ def parse_pool_rows(md_text):
             continue
         if in_table and ln.startswith("|"):
             cells = [c.strip() for c in ln.strip("|").split("|")]
-            if len(cells) >= 8 and not cells[0].startswith("**"):
+            if len(cells) >= 8 and not cells[0].startswith("**") and cells[0] not in ("固定池中/长线",):
+                # 2026-08-19：固定池已并入 track_v9，复盘日志不再统计固定池（含历史累计）
                 try:
                     rows[cells[0]] = {
                         "n": int(cells[1]), "buy": int(cells[2]), "wins": int(cells[3]),
@@ -167,8 +168,7 @@ def review(as_of=None, calc=None):
     # 2026-08-17 修复：全量池权限按 v9_tiers 分组映射（基金组曾因 details.perm 默认 main 被误标"主板"）
     _v9_tiers = ENH.get("meta", {}).get("v9_tiers", {}) or {}
     _v9_perm = {c: g for g, codes in _v9_tiers.items() for c in codes}
-    v9_codes = pool_codes(details, "v9")          # 全量池中/长线 40 只
-    v8_codes = pool_codes(details, "v8")          # 固定池中/长线 24 只
+    v9_codes = pool_codes(details, "v9")          # 全量池中/长线 40 只（含基金组 10）
     if as_of is None:
         # 2026-08-19 修复（收盘复盘全跳过根因）：默认信号日取「上一交易日」，保证 T+1 开盘买入日 = 最新交易日（存在）。
         # 原实现取 short_pool 末日（=今日收盘）→ T+1 不存在 → 全部跳过误报「行情缺失」。
@@ -183,8 +183,7 @@ def review(as_of=None, calc=None):
     sig_t = pd.Timestamp(as_of)
     out, _sigs = B.calc_signals(as_of)            # 短线全量池信号（不覆盖生产文件）
     as_of = out["as_of"]
-    print(f"信号 {as_of}: 全量池 {len(v9_codes)} + 固定池 {len(v8_codes)} + "
-          f"短线 {sum(len(v) for v in out['tiers'].values())} ({time.time()-t0:.0f}s)", flush=True)
+    print(f"信号 {as_of}: 全量池 {len(v9_codes)} + 短线 {sum(len(v) for v in out['tiers'].values())} ({time.time()-t0:.0f}s)", flush=True)
 
     # ---- 构建三个池的标的清单（统一结构）----
     pools = []
@@ -193,10 +192,6 @@ def review(as_of=None, calc=None):
         _perm = _v9_perm.get(c, d.get("perm", "main"))
         pools.append({"pool": "全量池中/长线", "code": c, "name": d["name"],
                       "perm": _perm, "board": d.get("board") or PERM_ZH.get(_perm, "")})
-    for c in v8_codes:
-        d = details[c]
-        pools.append({"pool": "固定池中/长线", "code": c, "name": d["name"],
-                      "perm": d.get("perm", "main"), "board": d.get("board", "")})
     for grp, codes in out["tiers"].items():
         for c in codes:
             d = out["details"][c]
@@ -230,7 +225,8 @@ def review(as_of=None, calc=None):
             t1_ = tier_of(score)
             buy_sig = score >= 60          # 轻仓加仓及以上
         # 2026-08-17 用户决策：全量池中/长线、短线池 = 买入清单——不满足买入条件的标的直接不入日志（不凑数）
-        if not buy_sig and it["pool"] != "固定池中/长线":
+        # 2026-08-19：固定池已并入 track_v9，复盘日志不再含固定池（无「未买入」行来源）
+        if not buy_sig:
             continue
         # 4) T+1 开盘买入（基金=净值）
         t1 = t_plus_1(ddf, sig_t)
@@ -284,15 +280,15 @@ def review(as_of=None, calc=None):
     mkt_tag = f"沪深300 {mkt_ret:+.2f}%" if mkt_ret is not None else "沪深300 数据缺失"
 
     # ---- 汇总（三池）+ 缺陷检测 ----
-    md_lines = [f"# 📋 复盘日志 v2.0（三池全量）",
+    md_lines = [f"# 📋 复盘日志 v2.1（全量中长线 + 短线双池）",
                 f"## 🗓 {time.strftime('%Y-%m-%d')} ｜ 信号日 {as_of} → 计算日 {calc_date}（T+1 持仓）｜ 市场 {mkt_tag}", ""]
-    md_lines.append("### 📊 总览（三个监控池）")
+    md_lines.append("### 📊 总览（全量中长线 + 短线，按板块细分）")
     md_lines.append("| 池 | 标的 | 买入信号 | 🟢吃到 | 🔴被套 | ⚪持平 | 胜率 | 平均收益 | 最大亏 | 回测基准 |")
     md_lines.append("|---|---|---|---|---|---|---|---|---|---|")
     defects, pool_notes = [], []
     if pending_funds:
         pool_notes.append(f"⏳ 基金净值按 T+1 公布：{len(pending_funds)} 只基金（{'、'.join(pending_funds[:8])}{'…' if len(pending_funds) > 8 else ''}）待 T+1 净值确认，本次复盘跳过，下次复盘补录")
-    groups = ["全量池中/长线", "固定池中/长线", "短线全量池"]
+    groups = ["全量池中/长线", "短线全量池"]
     for grp in groups:
         rs = [r for r in rows if r["pool"] == grp]
         if not rs:
@@ -342,10 +338,28 @@ def review(as_of=None, calc=None):
         mx = min(r["pct"] for r in buy)
         bench = BENCH_WIN[f"短线全量池-{sub}"]
         if sub == "基金" and all(abs(r["pct"]) < 0.001 for r in buy):
-            pool_notes.append("⚠️ 基金按 T+1 净值确认，收益待 T+2 净值（本次为确认日，无收益属正常）")
+            pool_notes.append("⚠️ 短线基金按 T+1 净值确认，收益待 T+2 净值（本次为确认日，无收益属正常）")
         flat_n = sum(1 for r in buy if abs(r["pct"]) < 0.001)
         md_lines.append(f"| 短线·{sub} | {len(rs)} | {len(buy)} | {wins} | {len(buy)-wins-flat_n} | {flat_n} | "
                         f"{wr:.0f}% | {avg:+.2f}% | {mx:+.2f}% | {bench}% |")
+    # 2026-08-19：全量池中/长线按板块细分（与短线全量池一致；基准统一用全量池整体胜率）
+    for sub in ("主板", "创业板", "科创板", "基金"):
+        rs = [r for r in rows if r["pool"] == "全量池中/长线" and r["board"] == sub]
+        if not rs:
+            continue
+        buy = [r for r in rs if r["buy_sig"] and r["pct"] is not None]
+        if not buy:
+            continue
+        wins = sum(1 for r in buy if r["pct"] > 0)
+        wr = wins / len(buy) * 100
+        avg = sum(r["pct"] for r in buy) / len(buy)
+        mx = min(r["pct"] for r in buy)
+        bench = BENCH_WIN["全量池中/长线"]
+        if sub == "基金" and all(abs(r["pct"]) < 0.001 for r in buy):
+            pool_notes.append("⚠️ 长线基金按 T+1 净值确认，收益待 T+2 净值（本次为确认日，无收益属正常）")
+        flat_n = sum(1 for r in buy if abs(r["pct"]) < 0.001)
+        md_lines.append(f"| 长线·{sub} | {len(rs)} | {len(buy)} | {wins} | {len(buy)-wins-flat_n} | {flat_n} | "
+                        f"{wr:.0f}% | {avg:+.2f}% | {mx:+.2f}% | {bench:.1f}% |")
     # 合计（买入信号）
     buy_all = [r for r in rows if r["buy_sig"] and r["pct"] is not None]
     if buy_all:

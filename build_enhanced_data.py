@@ -318,7 +318,9 @@ last_day = all_days[-1]                                     # 08-14
 # 加 300806斯迪克；2026-08-18 调整：去 002474榕基软件/300308中际旭创/300476胜宏科技/300502新易盛，加 002820桂发祥/002971和远气体/603629利通电子，
 # 2026-08-18 晚间再去 002384东山精密/603986兆易创新/601138工业富联；2026-08-17 去 ETF）
 MAIN_CODES = ['600498','600183','002185','605358','603228','603339','605189','600403','002879','600162','000759',
-              '002820','002971','603629','300806']
+              '002820','002971','603629','300806','002463','000636']
+# 2026-08-20 用户决策：固定池中/长线单独拎出独立视图 + 加回 002463沪电股份/000636风华高科 监控
+# （8/19 曾因"清仓离场"从 watchlist 移除，现用户要求恢复监控；watchlist 已同步 17 只）
 ETFS = []   # 2026-08-17 用户决策：去 ETF
 FUNDS = []   # 2026-08-19 用户清仓全部基金（008254/018036/002891/024239）
 
@@ -374,9 +376,30 @@ V9_STAR = v9_rank_board("star", 10, exclude=_v8_used | set(V9_MAIN) | set(V9_GEM
 V9_ETF = []
 # 普适版基金 Top10（避开个人版 4 只基金；从缓存读）
 _fund_pool_f = BASE / "fund_top_pool.json"
+# 2026-08-19 用户决策：榜上=买入清单——基金组上榜必须达中长线买入条件（score_row_v2≥60，轻仓加仓及以上），
+# 不达标不上榜、不凑数；达标几只算几只（今日 10 只基金 Aroon 深负全部 <60 → 基金组为空属正常）。
+def _fund_buy_score(c):
+    """基金中长线买入分（score_row_v2 @ 最新净值日）"""
+    _d = load_fund_cache_df(c)
+    if _d is None or len(_d) == 0:
+        return None
+    _r = _d.loc[_d.index[-1]]
+    if pd.isna(_r["close"]) or _r["close"] <= 0:
+        return None
+    return float(V.score_row_v2(_r))
+
 if _fund_pool_f.exists():
     _fund_pool = json.load(open(_fund_pool_f, encoding="utf-8"))
-    V9_FUND = [x["code"] for x in _fund_pool["top"] if x["code"] not in FUNDS][:10]
+    _fund_qual = []
+    for x in _fund_pool["top"]:
+        c = x["code"]
+        if c in FUNDS:
+            continue
+        _s = _fund_buy_score(c)
+        if _s is not None and _s >= 60:
+            _fund_qual.append((c, _s))
+    _fund_qual.sort(key=lambda kv: -kv[1])
+    V9_FUND = [c for c, _ in _fund_qual[:10]]
 else:
     V9_FUND = FUNDS[:]
 # 普适版分层清单（股票按权限 + 基金，供监控表按类型/权限过滤；2026-08-17 去 etf 层）
@@ -427,14 +450,15 @@ for c in ALL_CODES:
     if pd.isna(px) or px <= 0:
         continue
     if c in V9_FUND:
-        # 方案 A（2026-08-17）：基金组权重分用基金动量分，避免四因子对基金退化同分（76.4）
-        sc = fund_mom_score(ddf)
-        sc_prev = fund_mom_score(ddf, asof=prev_rebal) if prev_rebal in ddf.index else None
+        # 2026-08-19 用户决策：基金组上榜=达中长线买入条件（score_row_v2≥60），展示口径统一为买入分/买入档位，
+        # 不再用基金动量分「动量强/中/弱」档位（避免两套分数双口径混乱）；未达标基金已不入 V9_FUND。
+        sc = float(V.score_row_v2(r))
+        sc_prev = float(V.score_row_v2(ddf.loc[prev_rebal])) if prev_rebal in ddf.index else None
     else:
         sc = float(V.score_row_v2(r))  # 2026-08-18 A80_M80 替换：Aroon 强趋势过滤
         sc_prev = float(V.score_row_v2(ddf.loc[prev_rebal])) if prev_rebal in ddf.index else None
-    # 档位（基金组用动量强弱分级）
-    _tier_f = fund_tier if c in V9_FUND else tier
+    # 档位（基金组同样用买入档位，2026-08-19 用户决策统一口径）
+    _tier_f = tier
     sc_now = sc
     # 当日涨跌幅（最后两日）
     chg = float(ddf["close"].iloc[-1] / ddf["close"].iloc[-2] - 1) * 100 if len(ddf) >= 2 else None
@@ -655,7 +679,7 @@ def maintain_track_v9():
             return None
         _chg = float(_df["close"].iloc[-1] / _df["close"].iloc[-2] - 1) * 100 if len(_df) >= 2 else None
         _sc = float(V.score_row_v2(_r))
-        _tierf = fund_tier if _c in V9_FUND else tier
+        _tierf = tier
         return {"px": round(_px, 2), "chg": round(_chg, 2) if _chg is not None else None,
                 "score": round(_sc, 1), "tier": _tierf(_sc), "date": str(_eff.date())}
     _refreshed = 0
@@ -686,7 +710,7 @@ _track, _pending = maintain_track_v9()
 out = {
     "meta": {"as_of": str(_as_of_day.date()), "generated": __import__("datetime").datetime.now().strftime("%Y-%m-%d %H:%M"), "overlap": OVERLAP,
              "v9_tiers": V9_TIERS},
-    "nav": [["overview", "📊", "监控总览"], ["sys-auto", "🅰️", "全量池中/长线"], ["short", "⚡", "全量池短线"], ["table", "📋", "标的监控表"]],
+    "nav": [["overview", "📊", "监控总览"], ["sys-auto", "🅰️", "全量池中/长线"], ["sys-lite", "🅱️", "固定池中/长线"], ["short", "⚡", "全量池短线"], ["table", "📋", "标的监控表"]],
     "track_v9": _track, "track_pending_v9": _pending,
     "monitor_reports": [
         {"code": c, "name": d["name"], "tier": d["tier"]}

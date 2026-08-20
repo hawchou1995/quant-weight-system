@@ -63,7 +63,7 @@ html = f"""<!doctype html>
 <script>
 /* 历史页导航：指向主页面各视图（点击回到主页面对应视图） */
 window.ENH = window.ENH || {{}};
-window.ENH.nav = [["overview","📊","监控总览"],["sys-auto","🅰️","全量池中/长线"],["short","⚡","短线(占位)"]];
+window.ENH.nav = [["overview","📊","监控总览"],["sys-auto","🅰️","全量池中/长线"],["sys-lite","🅱️","固定池中/长线"],["short","⚡","短线(占位)"]];
 window.ENH.NAV_SWITCH = true;
 window.switchView = function(key){{
   // 历史页不内嵌视图：跳回主页面并直接定位到对应视图（hash 驱动，主页面加载时自动切换）

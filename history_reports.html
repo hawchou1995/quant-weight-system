@@ -30,16 +30,9 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 .tb-btn.active{border-color:var(--accent);color:var(--accent)}
 .community{display:inline-block;padding:6px 14px;border-radius:20px;
   background:linear-gradient(135deg,#FF9A3D 0%,#F2701D 100%);color:#fff;text-decoration:none;font-weight:600;font-size:13px}
-/* 历史报告下拉 */
-.dropdown{position:relative}
-.dropdown-menu{position:absolute;right:0;top:calc(100% + 6px);background:var(--card);border:1px solid var(--border);
-  border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.15);width:360px;max-height:440px;overflow-y:auto;
-  padding:6px;display:none;z-index:950}
-.dropdown.open .dropdown-menu{display:block}
-.dropdown-menu a{display:block;padding:8px 12px;border-radius:8px;font-size:13px;color:var(--text);
-  text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dropdown-menu a:hover{background:var(--card2);color:var(--accent)}
-.dropdown-menu .head{font-size:12px;color:var(--faint);padding:6px 12px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.gh-link{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;
+  background:var(--card2);border:1px solid var(--border);color:var(--text);text-decoration:none;transition:border-color .15s,color .15s}
+.gh-link:hover{border-color:var(--accent);color:var(--accent)}
 
 /* ---------- 左侧宽侧边栏（图标+文字） ---------- */
 .sidenav{position:fixed;left:0;top:0;bottom:0;width:190px;background:var(--nav-bg);border-right:1px solid var(--border);
@@ -52,6 +45,13 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 .sidenav a .ic{font-size:16px;width:20px;text-align:center}
 .sidenav a:hover{background:var(--card2);color:var(--text)}
 .sidenav a.active{background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(239,68,68,.15));color:var(--accent);font-weight:600}
+.sidenav .sn-sub{margin:0 0 8px 22px;display:flex;flex-direction:column;gap:2px}
+.sidenav .sn-sub.collapsed{display:none}
+.sidenav .sn-arrow{margin-left:auto;font-size:10px;color:var(--faint)}
+.sidenav .sn-sub a{padding:5px 10px;font-size:12px;color:var(--sub);border-radius:8px;font-weight:400}
+.sidenav .sn-sub a .dot-sub{width:4px;height:4px;border-radius:50%;background:var(--line);flex:none}
+.sidenav .sn-sub a:hover{color:var(--text);background:var(--card2)}
+.sidenav .sn-sub a.active{color:var(--accent);font-weight:600;background:rgba(245,158,11,.08)}
 .sidenav .sn-foot{margin-top:auto;display:flex;flex-direction:column;gap:6px}
 body.sidenav-open .container{margin-left:190px}
 
@@ -151,12 +151,9 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class="topbar">
   <div class="logo" onclick="location.hash='#overview'"><span class="dot"></span>量化权重监控</div>
   <div class="spacer"></div>
-  <div class="dropdown" id="report-dd">
-    <button class="tb-btn" onclick="toggleDrop('report-dd')">📄 标的报告 ▾</button>
-    <div class="dropdown-menu" id="report-menu"></div>
-  </div>
   <button class="tb-btn" id="theme-btn" onclick="toggleTheme()">🌙 夜间</button>
   <a class="community" href="https://qingju.me/" target="_blank" rel="noopener">💬 青橘社区</a>
+  <a class="gh-link" href="https://github.com/hawchou1995/quant-weight-system" target="_blank" rel="noopener" title="GitHub 开源项目（quant-weight-system）"><svg viewBox="0 0 16 16" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
 </div>
 <div class="sidenav" id="sidenav"></div>
 
@@ -164,10 +161,10 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class="card">
 <div class="back-bar">
 <a class="back-btn" href="dual_system.html">← 返回主页面</a>
-<h2 style="margin:0">📚 历史收盘监控报告 <span class="badge badge-auto">4 份</span></h2>
+<h2 style="margin:0">📚 历史收盘监控报告 <span class="badge badge-auto">1 份</span></h2>
 </div>
 <div class="sub">按月分类 · 点击任意快照在下方当前页展示（不新开窗口）· 主页面右上角「标的报告」也可直达</div>
-<div class="month-group"><h3>📅 2026-08</h3><div class="snap-btns"><a class="snap-btn" href="javascript:void(0)" onclick="openSnap('20260814_dual.html','2026-08-14')">📊 2026-08-14（50+30 只）</a><a class="snap-btn" href="javascript:void(0)" onclick="openSnap('20260814.html','2026-08-14')">📊 2026-08-14（60 只）</a><a class="snap-btn" href="javascript:void(0)" onclick="openSnap('20260813.html','2026-08-13')">📊 2026-08-13（60 只）</a><a class="snap-btn" href="javascript:void(0)" onclick="openSnap('20260812.html','2026-08-12')">📊 2026-08-12（56 只）</a></div></div>
+<div class="month-group"><h3>📅 2026-08</h3><div class="snap-btns"><a class="snap-btn" href="javascript:void(0)" onclick="openSnap('20260819_dual.html','2026-08-19')">📊 2026-08-19（40 只）</a></div></div>
 </div>
 <div class="card" id="snap-viewer">
 <h2 id="snap-viewer-title">📊 快照预览</h2>
@@ -206,33 +203,21 @@ function applyTheme(t){document.documentElement.setAttribute('data-theme',t);
 function toggleTheme(){var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';applyTheme(t)}
 try{applyTheme(localStorage.getItem('qw-theme')||'light')}catch(e){applyTheme('light')}
 
-/* ---------- 历史报告下拉（优先月度收盘快照，按月分类；回退标的报告列表） ---------- */
-function toggleDrop(id){var el=document.getElementById(id);el.classList.toggle('open');
-  if(id==='report-dd'&&!document.getElementById('report-menu').innerHTML){
-    var m=document.getElementById('report-menu');
-    if(window.SNAPSHOTS&&window.SNAPSHOTS.months&&window.SNAPSHOTS.months.length){
-      var h='<div class="head">历史收盘监控快照（'+window.SNAPSHOTS.snapshots.length+' 份）</div>';
-      window.SNAPSHOTS.months.forEach(function(g){
-        h+='<div class="snap-group">📅 '+g.month+'</div>';
-        g.items.forEach(function(s){
-          h+='<a class="snap-item" href="monitor/snapshots/'+s.file+'" target="_blank">📊 '+s.date+'（'+s.count+' 只）</a>';});});
-      m.innerHTML=h;
-    }else if(window.ENH.monitor_reports){
-      var h2='<div class="head">标的监控报告（'+window.ENH.monitor_reports.length+' 只）</div>';
-      window.ENH.monitor_reports.forEach(function(r){
-        h2+='<a href="monitor_reports.html#'+r.code+'" target="_blank">📈 '+r.name+'（'+r.code+'）· '+r.tier+'</a>';});
-      m.innerHTML=h2;}}
-  }
-document.addEventListener('click',function(e){
-  document.querySelectorAll('.dropdown.open').forEach(function(d){
-    if(!d.contains(e.target))d.classList.remove('open');});});
-
 /* ---------- 左侧导航（JS 点击滚动，不依赖 hash；标的信息与表格同页，无独立报告入口） ---------- */
 function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)return;
   var html='<div class="sn-logo"><span class="dot"></span>量化权重监控</div><div class="sn-sep"></div>';
   window.ENH.nav.forEach(function(it){
-    html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"><span class="ic">'+it[1]+'</span>'+it[2]+'</a>';});
+    var subs=it[3];
+    var hasSubs=subs&&subs.length;
+    html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"'+(hasSubs?' data-toggle="1"':'')+'><span class="ic">'+it[1]+'</span>'+it[2]+(hasSubs?'<span class="sn-arrow">▾</span>':'')+'</a>';
+    // 子章节（2026-08-17 用户需求）：点击先切视图再滚动到区块；主项点击可折叠/展开
+    if(hasSubs){
+      html+='<div class="sn-sub">';
+      subs.forEach(function(s){html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'" data-sub="'+s[0]+'"><span class="dot-sub"></span>'+s[1]+'</a>';});
+      html+='</div>';}});
   html+='<div class="sn-sep"></div><div class="sn-foot">'+
+    '<a href="javascript:void(0)" data-anchor="review"><span class="ic">📋</span>复盘日志</a>'+
+    '<a href="javascript:void(0)" data-anchor="changelog"><span class="ic">📝</span>更新日志</a>'+
     '<a href="https://qingju.me/" target="_blank" rel="noopener"><span class="ic">💬</span>青橘社区</a></div>';
   nav.innerHTML=html;
   document.body.classList.add('sidenav-open');
@@ -240,23 +225,62 @@ function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)retu
     a.addEventListener('click',function(e){
       e.preventDefault();
       var t=a.getAttribute('data-anchor');
+      var sub=a.getAttribute('data-sub');
       // 视图切换模式：交给 switchView；否则滚动定位
       if(window.switchView){window.switchView(t);}
       else{
         var el=document.getElementById(t);
         if(el){el.scrollIntoView({behavior:'auto',block:'start'});
           window.scrollBy(0,-70);}}
-      nav.querySelectorAll('a[data-anchor]').forEach(function(x){x.classList.toggle('active',x===a);});});});
-  // 滚动高亮：仅对可见元素生效（display:none 的视图跳过，避免视图切换模式下 active 乱跳）
+      // 子章节：切到所属视图后滚动到区块（延迟等视图激活，offset 适配顶栏）
+      if(sub){
+        setTimeout(function(){
+          var el=document.getElementById(sub);
+          if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+        },30);}
+      // 主项折叠/展开：只有重复点击当前激活主项才折叠切换；首次/切新视图一律展开
+      else if(a.getAttribute('data-toggle')&&a.nextElementSibling&&a.nextElementSibling.classList.contains('sn-sub')){
+        var grp=a.nextElementSibling;
+        var curMain=nav.querySelector('a[data-anchor]:not([data-sub]).active');
+        if(curMain&&curMain===a){grp.classList.toggle('collapsed');}
+        else{grp.classList.remove('collapsed');}
+      }
+      nav.querySelectorAll('a[data-anchor]').forEach(function(x){x.classList.toggle('active',x===a);});
+      // 子项点击时父主项保持高亮
+      if(sub&&a.parentNode&&a.parentNode.classList.contains('sn-sub')){
+        var pm=nav.querySelector('a[data-anchor="'+t+'"]:not([data-sub])');
+        if(pm)pm.classList.add('active');}});});
+  // 滚动高亮：普通页按锚点滚动；视图切换模式按当前视图内区块高亮对应子导航（2026-08-17 用户需求）
   window.addEventListener('scroll',function(){
-    if(window.ENH&&window.ENH.NAV_SWITCH)return;   // 视图切换模式：滚动不更新 active
-    var anchors=window.ENH.nav.map(function(it){return it[0];});
-    var cur=anchors[0];
-    anchors.forEach(function(a){
-      var el=document.getElementById(a);
-      if(el&&el.offsetParent!==null&&el.getBoundingClientRect().top<=150)cur=a;});
+    if(!(window.ENH&&window.ENH.NAV_SWITCH)){
+      var anchors=window.ENH.nav.map(function(it){return it[0];});
+      var cur=anchors[0];
+      anchors.forEach(function(a){
+        var el=document.getElementById(a);
+        if(el&&el.offsetParent!==null&&el.getBoundingClientRect().top<=150)cur=a;});
+      nav.querySelectorAll('a[data-anchor]').forEach(function(a){
+        a.classList.toggle('active',a.getAttribute('data-anchor')===cur);});
+      return;}
+    var av=document.querySelector('.view.active');if(!av)return;
+    var hit=null;
+    nav.querySelectorAll('a[data-sub]').forEach(function(a){
+      var el=document.getElementById(a.getAttribute('data-sub'));
+      if(!el||!av.contains(el))return;
+      if(el.getBoundingClientRect().top<=140)hit=a;});
+    // 视图顶部回退：无区块命中时高亮当前视图的第一个子章节（2026-08-17）
+    if(!hit){
+      var curMain=null;
+      nav.querySelectorAll('a[data-anchor]:not([data-sub])').forEach(function(a){
+        if(window.VIEW_MAP&&window.VIEW_MAP[a.getAttribute('data-anchor')]===av.id)curMain=a;});
+      if(curMain&&curMain.nextElementSibling&&curMain.nextElementSibling.classList.contains('sn-sub')){
+        hit=curMain.nextElementSibling.querySelector('a[data-sub]');}
+    }
     nav.querySelectorAll('a[data-anchor]').forEach(function(a){
-      a.classList.toggle('active',a.getAttribute('data-anchor')===cur);});});}
+      if(a.getAttribute('data-sub')){a.classList.toggle('active',a===hit);return;}
+      var on=hit?hit.getAttribute('data-anchor')===a.getAttribute('data-anchor'):
+        (window.VIEW_MAP?window.VIEW_MAP[a.getAttribute('data-anchor')]===av.id:false);
+      a.classList.toggle('active',on);});
+    if(hit&&hit.parentNode&&hit.parentNode.classList.contains('sn-sub'))hit.parentNode.classList.remove('collapsed');});}
 
 /* ---------- 工具函数 ---------- */
 function fmtPct(v){if(v===null||v===undefined||isNaN(v))return '—';
@@ -310,9 +334,13 @@ function initTable(tblId, opts){
       var idx=colIdx[k];
       var rs=rows().filter(function(tr){return tr.style.display!=='none'});
       rs.sort(function(a,b){
-        var va=parseFloat(a.children[idx].getAttribute('data-v')||a.children[idx].textContent.replace(/[+,%—]/g,'')||'0');
-        var vb=parseFloat(b.children[idx].getAttribute('data-v')||b.children[idx].textContent.replace(/[+,%—]/g,'')||'0');
-        return (va-vb)*state.sortDir;});
+        // 数值优先（data-v 或文本数字），文本列按中文 localeCompare 兜底（v5.10.6）
+        var ta=a.children[idx].getAttribute('data-v')||a.children[idx].textContent;
+        var tb=b.children[idx].getAttribute('data-v')||b.children[idx].textContent;
+        var va=parseFloat(String(ta).replace(/[+,%—→↓↑]/g,''));
+        var vb=parseFloat(String(tb).replace(/[+,%—→↓↑]/g,''));
+        if(!isNaN(va)&&!isNaN(vb))return (va-vb)*state.sortDir;
+        return String(ta).localeCompare(String(tb),'zh')*state.sortDir;});
       var tb=table.querySelector('tbody');
       rs.forEach(function(tr){tb.appendChild(tr);});});});
   apply();
