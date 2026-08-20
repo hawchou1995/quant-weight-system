@@ -457,6 +457,104 @@
    "gap": 0.0,
    "open": 3.15,
    "prev_close": 3.15
+  },
+  "300142": {
+   "px": 15.12,
+   "chg": 20.0,
+   "name": "沃森生物",
+   "gap": null,
+   "intraday": true
+  },
+  "688114": {
+   "px": 69.11,
+   "chg": 20.0,
+   "name": "华大智造",
+   "gap": null,
+   "intraday": true
+  },
+  "300363": {
+   "px": 24.48,
+   "chg": 20.0,
+   "name": "博腾股份",
+   "gap": null,
+   "intraday": true
+  },
+  "688276": {
+   "px": 18.71,
+   "chg": 20.01,
+   "name": "百克生物",
+   "gap": null,
+   "intraday": true
+  },
+  "301166": {
+   "px": 34.06,
+   "chg": 20.01,
+   "name": "优宁维",
+   "gap": null,
+   "intraday": true
+  },
+  "688356": {
+   "px": 89.45,
+   "chg": 20.0,
+   "name": "键凯科技",
+   "gap": null,
+   "intraday": true
+  },
+  "688185": {
+   "px": 64.43,
+   "chg": 20.0,
+   "name": "康希诺",
+   "gap": null,
+   "intraday": true
+  },
+  "300006": {
+   "px": 5.94,
+   "chg": 20.0,
+   "name": "莱美药业",
+   "gap": null,
+   "intraday": true
+  },
+  "002437": {
+   "px": 4.73,
+   "chg": 10.0,
+   "name": "誉衡药业",
+   "gap": null,
+   "intraday": true
+  },
+  "002693": {
+   "px": 10.25,
+   "chg": 9.98,
+   "name": "双成药业",
+   "gap": null,
+   "intraday": true
+  },
+  "600613": {
+   "px": 8.56,
+   "chg": 10.03,
+   "name": "神奇制药",
+   "gap": null,
+   "intraday": true
+  },
+  "603538": {
+   "px": 31.5,
+   "chg": 5.25,
+   "name": "美诺华",
+   "gap": null,
+   "intraday": true
+  },
+  "002900": {
+   "px": 16.79,
+   "chg": 7.42,
+   "name": "哈三联",
+   "gap": null,
+   "intraday": true
+  },
+  "600721": {
+   "px": 13.92,
+   "chg": 1.46,
+   "name": "百花医药",
+   "gap": null,
+   "intraday": true
   }
  }
 }
