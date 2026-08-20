@@ -907,6 +907,7 @@
     "idx_close": 4592.75,
     "idx_ma20": 4642.88
   },
+  "_backfilled_0814": true,
   "track": {
     "601952": {
       "entry": "2026-08-17",
@@ -2122,14 +2123,15 @@
         "gate_closed": true
       },
       "gate_closed": true
-    }
-  },
-  "track_pending_short": {
+    },
     "005947": {
-      "entry_candidate": "2026-08-20",
-      "first_seen": "2026-08-20",
+      "entry": "2026-08-20",
+      "last_seen": "2026-08-20",
+      "exit": "2026-09-19",
+      "status": "active",
       "pool": "基金",
       "type": "fund",
+      "first_seen": "2026-08-20",
       "last": {
         "name": "德邦民裕进取量化混合A",
         "px": 1.38,
@@ -2142,10 +2144,13 @@
       }
     },
     "005948": {
-      "entry_candidate": "2026-08-20",
-      "first_seen": "2026-08-20",
+      "entry": "2026-08-20",
+      "last_seen": "2026-08-20",
+      "exit": "2026-09-19",
+      "status": "active",
       "pool": "基金",
       "type": "fund",
+      "first_seen": "2026-08-20",
       "last": {
         "name": "德邦民裕进取量化混合C",
         "px": 1.33,
@@ -2158,10 +2163,13 @@
       }
     },
     "006608": {
-      "entry_candidate": "2026-08-20",
-      "first_seen": "2026-08-20",
+      "entry": "2026-08-20",
+      "last_seen": "2026-08-20",
+      "exit": "2026-09-19",
+      "status": "active",
       "pool": "基金",
       "type": "fund",
+      "first_seen": "2026-08-20",
       "last": {
         "name": "泓德研究优选混合",
         "px": 1.53,
@@ -2173,5 +2181,6 @@
         "date": "2026-08-20"
       }
     }
-  }
+  },
+  "track_pending_short": {}
 }
