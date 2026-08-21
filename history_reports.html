@@ -164,7 +164,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <h2 style="margin:0">📚 历史收盘监控报告 <span class="badge badge-auto">1 份</span></h2>
 </div>
 <div class="sub">按月分类 · 点击任意快照在下方当前页展示（不新开窗口）· 主页面右上角「标的报告」也可直达</div>
-<div class="month-group"><h3>📅 2026-08</h3><div class="snap-btns"><a class="snap-btn" href="javascript:void(0)" onclick="openSnap('20260820_dual.html','2026-08-20')">📊 2026-08-20（33+15 只）</a></div></div>
+<div class="month-group"><h3>📅 2026-08</h3><div class="snap-btns"><a class="snap-btn" href="javascript:void(0)" onclick="openSnap('20260820_dual.html','2026-08-20')">📊 2026-08-20（33+0 只）</a></div></div>
 </div>
 <div class="card" id="snap-viewer">
 <h2 id="snap-viewer-title">📊 快照预览</h2>
@@ -180,7 +180,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <script>
 /* 历史页导航：指向主页面各视图（点击回到主页面对应视图） */
 window.ENH = window.ENH || {};
-window.ENH.nav = [["overview","📊","监控总览"],["sys-auto","🅰️","全量池中/长线"],["sys-lite","🅱️","固定池中/长线"],["short","⚡","短线(占位)"]];
+window.ENH.nav = [["overview","📊","监控总览"],["sys-auto","🅰️","全量池中/长线"],["short","⚡","短线(占位)"]];
 window.ENH.NAV_SWITCH = true;
 window.switchView = function(key){
   // 历史页不内嵌视图：跳回主页面并直接定位到对应视图（hash 驱动，主页面加载时自动切换）
