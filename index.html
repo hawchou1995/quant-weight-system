@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>标的监控看板（数据截至 2026-08-21 · 构建 2026-08-21 13:18）</title>
+<title>标的监控看板（数据截至 2026-08-21 · 构建 2026-08-21 13:41）</title>
 <style>
 :root{
   --bg:#f3f4f6; --card:#ffffff; --card2:#f9fafb; --border:#e5e7eb; --line:#f0f1f3;
@@ -141,6 +141,14 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 [data-theme="dark"] .view-badge.auto{color:#fbbf24}
 .view-badge.lite{background:rgba(59,130,246,.15);color:#1d4ed8}
 [data-theme="dark"] .view-badge.lite{color:#60a5fa}
+/* 系统头部排版（2026-08-21）：标题+更新时间一左一右，标签按内容分行，门控最前 */
+.sys-head{display:flex;flex-direction:column;gap:10px}
+.sys-head-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.sys-head-top h2{margin:0;display:flex;align-items:center;flex-wrap:wrap;gap:4px}
+.sys-head-top .view-badge{margin-left:0}
+.sys-head-tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.sys-head-tags .badge{margin-left:0}
+.sys-head-note{color:var(--faint);font-size:12px;line-height:1.7}
 /* 雷达图变量（模板口径） */
 :root{--radar-ring:#e2e8f0;--radar-axis:#e5e9f0;--radar-label:#4a5568;--radar-score:#1a202c;--radar-sub:#9ca3af}
 [data-theme="dark"]{--radar-ring:#2d3748;--radar-axis:#2a3440;--radar-label:#cbd5e1;--radar-score:#f1f5f9;--radar-sub:#64748b}
@@ -341,7 +349,13 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <!-- ============ 视图 A：全量池中/长线 ============ -->
 <div class="view" id="view-auto">
 <div class="card" id="sys-auto">
-<h2>🅰️ 全量池中/长线 <span class="view-badge auto">全市场自动池 · 股票分层+基金 ｜ 评分=Aroon强趋势过滤(A80_M78) · 全市场绝对规则筛池 Top3 等权 · 月轮动 · 移动止损4.5% · MA200择时 · <span class="badge badge-auto" style="background:#d97706;color:#fff">市况门控 ⚠ 关 · 仅提醒（沪深300 4593 &lt; MA200 4702，权重分达标照常展示，仅供参考）</span> ｜ 回测参考见「监控总览」</span><span class="view-badge auto" title="2026-08-21 盘中行情（实时）· 分数为收盘口径">数据截至 2026-08-21 13:14 · 盘中实时</span></h2>
+<div class="sys-head">
+<div class="sys-head-top">
+<h2>🅰️ 全量池中/长线 <span class="view-badge auto">全市场自动池 · 股票分层+基金</span></h2>
+<span class="view-badge auto" title="2026-08-21 盘中行情（实时）· 分数为收盘口径">数据截至 2026-08-21 13:14 · 盘中实时</span>
+</div>
+<div class="sys-head-tags"><span class="badge badge-auto" style="background:#d97706;color:#fff">市况门控 ⚠ 关 · 仅提醒（沪深300 4593 &lt; MA200 4702，权重分达标照常展示，仅供参考）</span><span class="badge badge-auto">评分 = Aroon强趋势过滤(A80_M78)</span><span class="badge badge-auto">筛池 = 全市场绝对规则 Top3 等权 · 月轮动</span><span class="badge badge-auto">风控 = 移动止损4.5% · MA200择时</span></div><div class="sys-head-note">回测参考见「监控总览」视图</div>
+</div>
 <div class="op-stats">
 <span class="op op-add">🟢 加仓区 <b>27</b> 只</span>
 <span class="op op-watch">🟡 观望 <b>5</b> 只</span>
@@ -1911,7 +1925,13 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <!-- ============ 视图 C：全量池短线（与中长线同结构：统计条+表格+雷达卡） ============ -->
 <div class="view" id="view-short">
 <div class="card" id="sys-short">
-<h2>⚡ 全量池短线 <span class="view-badge auto">全市场短线信号 Top 池（数据截至 2026-08-21）<span class="badge badge-auto" style="background:#d97706;color:#fff">市况门控 ⚠ 关 · 仅提醒（沪深300 4592.75 &lt; MA20 4642.88，股票池照常展示，仅供参考）</span>：股票=反转信号按权限分层，<b>仅保留买入信号（分≥50），不足 10 只不凑数</b>（主板/创业板/科创板各 ≤10，剔ST）｜ 基金=动量（分≥50 才入池）· 短线分 = 动量30/量价25/通道25/波动20 · <b>市况门控仅提醒：沪深300 &gt; MA20 才开新仓；门控关闭时股票池照常入池展示，仅作参考（⚠ 非买入指令，不追高）；持仓卖出信号走「全量池短线跟踪」</b> · 回测参考见「监控总览」</span><span class="view-badge auto" title="2026-08-21 盘中行情（实时）· 分数为收盘口径">数据截至 2026-08-21 13:14 · 盘中实时</span></h2>
+<div class="sys-head">
+<div class="sys-head-top">
+<h2>⚡ 全量池短线 <span class="view-badge auto">全市场短线信号 Top 池</span></h2>
+<span class="view-badge auto" title="2026-08-21 盘中行情（实时）· 分数为收盘口径">数据截至 2026-08-21 13:14 · 盘中实时</span>
+</div>
+<div class="sys-head-tags"><span class="badge badge-auto" style="background:#d97706;color:#fff">市况门控 ⚠ 关 · 仅提醒（沪深300 4592.75 &lt; MA20 4642.88，股票池照常展示，仅供参考）</span><span class="badge badge-auto">股票 = 反转信号按权限分层 · 仅买入（分≥50），各 ≤10 不凑数，剔ST</span><span class="badge badge-auto">基金 = 动量（分≥50 才入池）</span><span class="badge badge-auto">短线分 = 动量30/量价25/通道25/波动20</span></div><div class="sys-head-note"><b>市况门控仅提醒：沪深300 &gt; MA20 才开新仓；门控关闭时股票池照常入池展示，仅作参考（⚠ 非买入指令，不追高）；持仓卖出信号走「全量池短线跟踪」</b> · 回测参考见「监控总览」</div>
+</div>
 <div class="op-stats">
 <span class="op op-add">🟢 加仓区 <b>36</b> 只</span>
 <span class="op op-watch">🟡 观望 <b>0</b> 只</span>
@@ -3207,7 +3227,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 
 </div>
-<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-21 13:18 · 版本 v5.11.8 · 数据截至 2026-08-21 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-21 13:41 · 版本 v5.11.8 · 数据截至 2026-08-21 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
