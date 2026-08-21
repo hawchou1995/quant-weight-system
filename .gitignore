@@ -39,3 +39,6 @@ fund_nav_cache/
 *_check.png
 deliver_*.png
 data_full_fail_list.csv
+
+# 因子缓存备份（体积 GB 级，不入库）
+v8_factor_cache.pkl.bak*

@@ -702,7 +702,10 @@ def maintain_track_v9():
                     "tier": _d.get("tier"), "date": today}
         _k = ("sh" if _c.startswith(("6", "5")) else "sz") + _c
         _df = A.pool_all.get(_k)
-        if (_df is None or len(_df) == 0) and _c in V9_FUND:
+        # 2026-08-20 修复：跟踪池「掉出 V9 买入榜但仍留池」的基金不在 A.pool_all 也不在 V9_FUND，
+        #   把兜底收窄为 `_c in V9_FUND` 会让这类基金永远停在旧快照 → 放宽为「代码命中基金特征即走净值缓存」，
+        #   覆盖 pool_all 外的全部跟踪池基金（爱招：净值基金以 0/1/5/16 开头，与股票不冲突）。
+        if (_df is None or len(_df) == 0) and (_c in V9_FUND or _c[:1] in ("0", "5") or _c.startswith("16")):
             _df = load_fund_cache_df(_c)
         if _df is None or len(_df) == 0:
             return None
