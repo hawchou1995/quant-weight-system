@@ -21,12 +21,15 @@ import pandas as pd
 
 BASE = Path(__file__).resolve().parent
 OUT = BASE / "data_full"
-COLS = ["date", "open", "high", "low", "close", "volume", "amount"]
+# ⚠ westock 行序 = [date, open, last, high, low, volume, amount]（last=收盘价）
+# 2026-08-21 修复：旧 COLS 按 [date,open,high,low,close,...] 解析导致 last→high/high→low/low→close 错位
+WESTOCK_COLS = ["date", "open", "last", "high", "low", "volume", "amount"]
 
 
 def merge_sym(sym, rows):
     """westock 行 → DataFrame → 与本地合并去重（keep=last 覆盖当日根）"""
-    df = pd.DataFrame(rows, columns=COLS)
+    df = pd.DataFrame(rows, columns=WESTOCK_COLS)
+    df = df.rename(columns={"last": "close"})
     df["date"] = df["date"].astype(str)
     f = OUT / f"{sym}.csv"
     if not f.exists():
