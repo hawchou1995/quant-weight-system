@@ -253,14 +253,21 @@ def review(as_of=None, calc=None):
         if buy_sig:
             buy_px = float(ddf.loc[t1, "close" if it["perm"] in ("fund",) else "open"])
             if buy_px > 0:
-                pct = (cur_px / buy_px - 1) * 100
-                # MA5 现算（compute_factors_full 无 ma5 列，统一 rolling 5）
-                ma5 = float(ddf["close"].rolling(5).mean().loc[avail[-1]]) if len(ddf) >= 5 else np.nan
-                row.update({
-                    "buy_px": round(buy_px, 4), "pct": round(pct, 2),
-                    "ma5_above": bool(not pd.isna(ma5) and cur_px > ma5),
-                    "status": ("🟢吃到" if pct > 0 else ("🔴被套" if pct < 0 else "⚪持平")),
-                })
+                # 2026-08-21 修复：基金 T+1 净值=确认日买入净值，确认日无收益（此前计入胜率分母 → 胜率恒 0%）。
+                # 收益须待 T+2 净值；T+2 未到时标记「⏳待T+2净值」并排除出胜率统计。
+                cur_d = pd.Timestamp(str(avail[-1].date()))
+                t1_d = pd.Timestamp(str(t1.date()))
+                if it["perm"] == "fund" and cur_d <= t1_d:
+                    row.update({"buy_px": round(buy_px, 4), "status": "⏳待T+2净值"})
+                else:
+                    pct = (cur_px / buy_px - 1) * 100
+                    # MA5 现算（compute_factors_full 无 ma5 列，统一 rolling 5）
+                    ma5 = float(ddf["close"].rolling(5).mean().loc[avail[-1]]) if len(ddf) >= 5 else np.nan
+                    row.update({
+                        "buy_px": round(buy_px, 4), "pct": round(pct, 2),
+                        "ma5_above": bool(not pd.isna(ma5) and cur_px > ma5),
+                        "status": ("🟢吃到" if pct > 0 else ("🔴被套" if pct < 0 else "⚪持平")),
+                    })
         rows.append(row)
     calc_date = rows[0]["calc_date"] if rows else (str(calc_day.date()) if calc_day else as_of)
     print(f"明细 {len(rows)} 条, 计算日 {calc_date} ({time.time()-t0:.0f}s)", flush=True)
@@ -311,8 +318,13 @@ def review(as_of=None, calc=None):
             bench = sum(_w) / len(_w) if _w else 54.0
         else:
             bench = BENCH_WIN[grp]
-        md_lines.append(f"| {grp} | {len(rs)} | {len(buy)} | {wins} | {len(buy)-wins-sum(1 for r in buy if r['pct']==0)} | "
-                        f"{sum(1 for r in buy if r['pct']==0)} | {wr:.0f}% | {avg:+.2f}% | {mx:+.2f}% | {bench:.1f}% |")
+        if buy:
+            md_lines.append(f"| {grp} | {len(rs)} | {len(buy)} | {wins} | {len(buy)-wins-sum(1 for r in buy if r['pct']==0)} | "
+                            f"{sum(1 for r in buy if r['pct']==0)} | {wr:.0f}% | {avg:+.2f}% | {mx:+.2f}% | {bench:.1f}% |")
+        else:
+            # 2026-08-21：全部待 T+2 净值（基金确认日）→ 行仍显示，胜率/收益为 —（不再伪 0%）
+            _pend = sum(1 for r in rs if r["status"] == "⏳待T+2净值")
+            md_lines.append(f"| {grp} | {len(rs)} | {len(rs)} | 0 | 0 | {_pend} | — | — | — | {bench:.1f}% |")
         if buy and len(buy) >= 5:
             # 2026-08-19 市场相对校准：绝对胜率/均值在极端行情日（|沪深300|≥1.5%）必然恶化，
             # 只有「显著跑输大盘」才算信号缺陷；跑赢大盘的下跌（如 8/19 短线 -1.97% vs 大盘 -2.58%）
@@ -331,14 +343,17 @@ def review(as_of=None, calc=None):
             continue
         buy = [r for r in rs if r["buy_sig"] and r["pct"] is not None]
         if not buy:
+            # 2026-08-21：全部待 T+2 净值（基金确认日）→ 行仍显示，不隐藏
+            _pend = sum(1 for r in rs if r["status"] == "⏳待T+2净值")
+            md_lines.append(f"| 短线·{sub} | {len(rs)} | {len(rs)} | 0 | 0 | {_pend} | — | — | — | {BENCH_WIN[f'短线全量池-{sub}']}% |")
+            if sub == "基金" and _pend:
+                pool_notes.append("⏳ 短线基金已按 T+1 净值确认买入，收益待 T+2 净值（确认日无收益属正常，非亏损）")
             continue
         wins = sum(1 for r in buy if r["pct"] > 0)
         wr = wins / len(buy) * 100
         avg = sum(r["pct"] for r in buy) / len(buy)
         mx = min(r["pct"] for r in buy)
         bench = BENCH_WIN[f"短线全量池-{sub}"]
-        if sub == "基金" and all(abs(r["pct"]) < 0.001 for r in buy):
-            pool_notes.append("⚠️ 短线基金按 T+1 净值确认，收益待 T+2 净值（本次为确认日，无收益属正常）")
         flat_n = sum(1 for r in buy if abs(r["pct"]) < 0.001)
         md_lines.append(f"| 短线·{sub} | {len(rs)} | {len(buy)} | {wins} | {len(buy)-wins-flat_n} | {flat_n} | "
                         f"{wr:.0f}% | {avg:+.2f}% | {mx:+.2f}% | {bench}% |")
@@ -349,14 +364,17 @@ def review(as_of=None, calc=None):
             continue
         buy = [r for r in rs if r["buy_sig"] and r["pct"] is not None]
         if not buy:
+            # 2026-08-21：长线基金确认日 → 行仍显示，胜率/收益为 —
+            _pend = sum(1 for r in rs if r["status"] == "⏳待T+2净值")
+            md_lines.append(f"| 长线·{sub} | {len(rs)} | {len(rs)} | 0 | 0 | {_pend} | — | — | — | {BENCH_WIN['全量池中/长线']:.1f}% |")
+            if sub == "基金" and _pend:
+                pool_notes.append("⏳ 长线基金已按 T+1 净值确认买入，收益待 T+2 净值（确认日无收益属正常，非亏损）")
             continue
         wins = sum(1 for r in buy if r["pct"] > 0)
         wr = wins / len(buy) * 100
         avg = sum(r["pct"] for r in buy) / len(buy)
         mx = min(r["pct"] for r in buy)
         bench = BENCH_WIN["全量池中/长线"]
-        if sub == "基金" and all(abs(r["pct"]) < 0.001 for r in buy):
-            pool_notes.append("⚠️ 长线基金按 T+1 净值确认，收益待 T+2 净值（本次为确认日，无收益属正常）")
         flat_n = sum(1 for r in buy if abs(r["pct"]) < 0.001)
         md_lines.append(f"| 长线·{sub} | {len(rs)} | {len(buy)} | {wins} | {len(buy)-wins-flat_n} | {flat_n} | "
                         f"{wr:.0f}% | {avg:+.2f}% | {mx:+.2f}% | {bench:.1f}% |")
@@ -418,7 +436,7 @@ def review(as_of=None, calc=None):
             if r["buy_sig"]:
                 act = "买入" if r["tier"] in ("满仓加仓", "轻仓加仓", "强买入", "买入") else "买入(弱)"
                 pct_s = f"**{r['pct']:+.2f}%**" if r["pct"] is not None else "—"
-                ma_s = "✅" if r["ma5_above"] else "⚠️下方"
+                ma_s = "✅" if r["ma5_above"] else ("⚠️下方" if r["ma5_above"] is not None else "—")
                 st = r["status"]
             else:
                 act = {"观望": "观望", "减至半仓": "卖出信号", "清仓": "卖出信号", "不买": "不买"}.get(r["tier"], "未触发")
