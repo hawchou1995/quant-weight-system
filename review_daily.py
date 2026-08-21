@@ -100,6 +100,8 @@ def parse_pool_rows(md_text):
     2026-08-18 修复：累计总览已置顶，"| 池 | 累计标的 |..." 也会以 "| 池 |" 开头——
     必须精确匹配「当日总览」表头（第二列="标的"），否则把累计表当当日表重复累加（自乘缺陷）。
     2026-08-21 兼容：总览已扩展至 12 列（新增超额胜率/超额收益），avg 列位置前移，通过列数自适应。
+    2026-08-21 修复：avg="—"（长线基金等 T+2 净值）不再跳过整行——n/buy/wins/losses/flat 照常累计，
+    仅 avg 记 None（累计 sum_pct 不加）；此前长线·基金永远 avg="—" 导致累计总览缺该池行。
     """
     rows, in_table = {}, False
     for ln in md_text.splitlines():
@@ -118,12 +120,11 @@ def parse_pool_rows(md_text):
                         avg_s = cells[8]
                     else:
                         avg_s = cells[7]
-                    if avg_s in ("—", "–", "-"):
-                        continue
+                    avg = None if avg_s in ("—", "–", "-") else float(avg_s.replace("%", "").replace("+", ""))
                     rows[cells[0]] = {
                         "n": int(cells[1]), "buy": int(cells[2]), "wins": int(cells[3]),
                         "losses": int(cells[4]), "flat": int(cells[5]),
-                        "avg": float(avg_s.replace("%", "").replace("+", "")),
+                        "avg": avg,
                     }
                 except (ValueError, IndexError):
                     continue
@@ -133,7 +134,8 @@ def parse_pool_rows(md_text):
 
 
 def build_cumulative():
-    """从 review_index.json 各篇 md 解析累加 → 自复盘以来累计统计（天然防重：同篇只解析一次）"""
+    """从 review_index.json 各篇 md 解析累加 → 自复盘以来累计统计（天然防重：同篇只解析一次）
+    2026-08-21：avg=None（长线基金等 T+2 净值）不计入 sum_pct；累计池按「长线组→短线组」固定顺序输出。"""
     idx_f = REVIEW_DIR / "review_index.json"
     idx = json.load(open(idx_f, encoding="utf-8")) if idx_f.exists() else {"reviews": []}
     acc = {}
@@ -144,7 +146,14 @@ def build_cumulative():
         for name, v in parse_pool_rows(f.read_text(encoding="utf-8")).items():
             a = acc.setdefault(name, {"n": 0, "buy": 0, "wins": 0, "losses": 0, "flat": 0, "sum_pct": 0.0})
             a["n"] += v["n"]; a["buy"] += v["buy"]; a["wins"] += v["wins"]
-            a["losses"] += v["losses"]; a["flat"] += v["flat"]; a["sum_pct"] += v["avg"] * v["buy"]
+            a["losses"] += v["losses"]; a["flat"] += v["flat"]
+            if v["avg"] is not None:
+                a["sum_pct"] += v["avg"] * v["buy"]
+    # 2026-08-21 用户要求：长线和长线的在一起、短线和短线的在一起
+    _LT_ORDER = ["全量池中/长线", "长线·主板", "长线·创业板", "长线·科创板", "长线·基金"]
+    _ST_ORDER = ["短线全量池", "短线·主板", "短线·创业板", "短线·科创板", "短线·基金"]
+    _rank = {n: i for i, n in enumerate(_LT_ORDER + _ST_ORDER)}
+    acc = dict(sorted(acc.items(), key=lambda kv: (_rank.get(kv[0], 99), kv[0])))
     out = {"since": idx["reviews"][-1]["date"] if idx.get("reviews") else None,
            "count": len(idx.get("reviews", [])), "pools": acc}
     json.dump(out, open(REVIEW_DIR / "cumulative.json", "w", encoding="utf-8"), ensure_ascii=False, indent=2)

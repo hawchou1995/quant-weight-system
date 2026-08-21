@@ -39,12 +39,16 @@ def build_review_log():
     if cum and cum.get("pools"):
         # 回测基准映射（与 review_daily.BENCH_WIN 同源；累计池名 → 基准%）
         BENCH_MAP = {
-            "全量池中/长线": 48.1, "固定池中/长线": 57.1,
+            "全量池中/长线": 48.1, "长线·基金": 48.1,
             "短线·主板": 46.8, "短线·创业板": 48.1, "短线·科创板": 57.8, "短线·基金": 55.5,
         }
+        # 2026-08-21 用户要求：长线和长线的在一起、短线和短线的在一起
+        _LT_ORDER = ["全量池中/长线", "长线·主板", "长线·创业板", "长线·科创板", "长线·基金"]
+        _ST_ORDER = ["短线全量池", "短线·主板", "短线·创业板", "短线·科创板", "短线·基金"]
+        _rank = {n: i for i, n in enumerate(_LT_ORDER + _ST_ORDER)}
         rows = []
         T = {"n": 0, "buy": 0, "wins": 0, "losses": 0, "flat": 0, "sum_pct": 0.0}
-        for name, a in cum["pools"].items():
+        for name, a in sorted(cum["pools"].items(), key=lambda kv: (_rank.get(kv[0], 99), kv[0])):
             wr = (a["wins"] / a["buy"] * 100) if a.get("buy") else 0
             avg = (a["sum_pct"] / a["buy"]) if a.get("buy") else 0
             bench = BENCH_MAP.get(name)

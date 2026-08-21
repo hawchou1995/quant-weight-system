@@ -138,7 +138,7 @@ def scan_lag(target_date):
 
 
 def load_pool_codes():
-    """当前需保持新鲜的代码集 = 看板池（v9+固定池）+ 两跟踪池（含掉榜标的，backfill 曾漏掉它们）。
+    """当前需保持新鲜的代码集 = 看板池（v9 全量池，2026-08-21 起固定池已去除）+ 两跟踪池（含掉榜标的，backfill 曾漏掉它们）。
     返回 {sym 形如 sh600498} 集合"""
     codes = set()
     try:

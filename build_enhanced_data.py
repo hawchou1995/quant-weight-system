@@ -315,16 +315,17 @@ rebal21 = [d for d in all_days[::21]]
 prev_rebal = [d for d in rebal21 if d < all_days[-1]][-2]   # 上次完整再平衡（档位变化对比）
 last_day = all_days[-1]                                     # 08-14
 
-# 个人版自选池：用户固定池（15 股，2026-08-20 用户调整：去 600498烽火通信【已清仓】/600183生益科技，
-# 沪电 002463=减至半仓、风华 000636=仅一手先观望；2026-08-19 曾去 002463沪电/000636风华【清仓离场】后 8/20 加回监控，
-# 加 300806斯迪克；2026-08-18 调整：去 002474榕基软件/300308中际旭创/300476胜宏科技/300502新易盛，加 002820桂发祥/002971和远气体/603629利通电子，
-# 2026-08-18 晚间再去 002384东山精密/603986兆易创新/601138工业富联；2026-08-17 去 ETF）
-MAIN_CODES = ['002185','605358','603228','603339','605189','600403','002879','600162','000759',
-              '002820','002971','603629','300806','002463','000636']
-# 2026-08-20 用户决策：固定池中/长线单独拎出独立视图 + 加回 002463沪电股份/000636风华高科 监控（持仓·沪电减半/风华观望）
-# （8/19 曾因"清仓离场"从 watchlist 移除，现用户要求恢复监控；watchlist 已同步 15 只）
+# 个人版自选池（固定池）：2026-08-21 用户已清仓全部自买股票 → 彻底去除固定池（MAIN_CODES 置空）
+# 历史：曾为 15 股固定池（华天科技/立昂微/景旺电子…），2026-08-20 加回沪电/风华监控，2026-08-21 用户确认全清仓 → 移除
+MAIN_CODES = []   # 2026-08-21 用户清仓全部自买股票，固定池彻底去除（watchlist.json 同步置空）
+# 2026-08-20 用户决策已作废：固定池中/长线独立视图移除（2026-08-21）
 ETFS = []   # 2026-08-17 用户决策：去 ETF
 FUNDS = []   # 2026-08-19 用户清仓全部基金（008254/018036/002891/024239）
+# 历史固定池代码（17 只，2026-08-21 彻底去除，含 8/20 先移除的 600498烽火/600183生益）：
+# 用于从 track_v9 清出旧固定池标的（不在今日 V9 榜则移除；已清仓标的无需再跟踪卖出信号）
+FIXED_POOL_LEGACY = ['002185','605358','603228','603339','605189','600403','002879','600162',
+                     '000759','002820','002971','603629','300806','002463','000636',
+                     '600498','600183']
 
 # 普适版自动池：按板块互补分层（main 主板10 / gem 创业板10 / star 科创板10 / etf 10 / fund 10），
 # 档间不重复，与个人版池也不重复——每档恰好 10 只唯一标的
@@ -581,8 +582,7 @@ def maintain_track_v9():
     except Exception:
         pass
     today_codes = {c for codes in V9_TIERS.values() for c in codes} | set(MAIN_CODES) | set(ETFS) | set(FUNDS)
-    # 2026-08-19 用户需求：中长线固定池（MAIN_CODES 15 只）并入全量池跟踪池 track_v9，
-    # 统一跟踪卖出信号（掉出池也保留快照等卖出），生成时间由固定池不再独立维护跟踪而减少
+    # 2026-08-21 用户清仓全部自买股票 → MAIN_CODES=[]，固定池不再并入 track_v9（仅 V9_TIERS 跟踪）
     # 2026-08-20 修复：全量池跟踪池清洗 ST / *ST / S开头 / 退市标的——
     # 它们此前因 v9_rank_board 无 ST 过滤误入正式池（002528 *ST英飞 / 300301 ST长方），
     # 从旧 track/pending 载入时即剔除（与短线池剔 ST 口径一致）。
@@ -604,6 +604,17 @@ def maintain_track_v9():
         print(f"⚠ ST 清洗跳过: {_e}", flush=True)
     track = dict(old)
     pending = dict(old_pending)
+    # 2026-08-21 固定池清出：从旧 track/pending 移除历史固定池标的（FIXED_POOL_LEGACY 15 只）——
+    # 今日 V9 榜外的固定池标的彻底移除（15 只均不在榜）；若未来重新上 V9 榜将作为自动跟踪标的重新入池
+    try:
+        _fixed_drop = [c for c in FIXED_POOL_LEGACY if c not in today_codes]
+        for _c in _fixed_drop:
+            track.pop(_c, None)
+            pending.pop(_c, None)
+        if _fixed_drop:
+            print(f"⚠ 跟踪池清出固定池标的（2026-08-21 彻底去除）: {sorted(_fixed_drop)}", flush=True)
+    except Exception as _e:
+        print(f"⚠ 固定池清出跳过: {_e}", flush=True)
     from datetime import timedelta
     def _exit(e):
         return str((pd.Timestamp(e) + timedelta(days=365)).date())
@@ -612,8 +623,7 @@ def maintain_track_v9():
         rec.setdefault("exit", _exit(rec.get("entry", today)))
         rec.setdefault("status", "active")
         rec.setdefault("last_seen", rec.get("last_seen") or today)
-    # 0) 固定池/基金池标的：无条件入正式池（用户长期自选/持仓，不走 pending 待确认，
-    #    保证固定池始终在 track_v9 内跟踪卖出信号；entry=今日、exit=+365，掉出 V9 榜也保留）
+    # 0) 固定池/基金池标的：原无条件入正式池（2026-08-21 起 MAIN_CODES=[]，此循环为空操作，固定池彻底去除）
     for code in set(MAIN_CODES) | set(ETFS) | set(FUNDS):
         d = details.get(code, {}) or {}
         rec = track.get(code)
@@ -747,7 +757,7 @@ _track, _pending = maintain_track_v9()
 out = {
     "meta": {"as_of": str(_as_of_day.date()), "generated": __import__("datetime").datetime.now().strftime("%Y-%m-%d %H:%M"), "overlap": OVERLAP,
              "v9_tiers": V9_TIERS},
-    "nav": [["overview", "📊", "监控总览"], ["sys-auto", "🅰️", "全量池中/长线"], ["sys-lite", "🅱️", "固定池中/长线"], ["short", "⚡", "全量池短线"], ["table", "📋", "标的监控表"]],
+    "nav": [["overview", "📊", "监控总览"], ["sys-auto", "🅰️", "全量池中/长线"], ["short", "⚡", "全量池短线"], ["table", "📋", "标的监控表"]],
     "track_v9": _track, "track_pending_v9": _pending,
     "monitor_reports": [
         {"code": c, "name": d["name"], "tier": d["tier"]}
@@ -756,7 +766,7 @@ out = {
     "systems": {
         "v9_auto": {"label": "普适版", "badge": "全市场自动池 · 无人工选池 · Aroon强趋势过滤(A80_M80)",
                      "summary": s_auto, "equity": [round(float(x), 2) for x in v_auto]},
-        "v8_lite": {"label": "个人版", "badge": "自选池 40 只 · 权限分层 · Top4 轮动",
+        "v8_lite": {"label": "个人版·历史回测", "badge": "历史回测（原自选池）· Top4 轮动",
                      "summary": s_lite, "equity": [round(float(x), 2) for x in v_lite]},
     },
     "details": details,
@@ -765,6 +775,5 @@ out = {
 js = "window.ENH = " + json.dumps(out, ensure_ascii=False) + ";"
 (BASE / "enhanced_data.js").write_text(js, encoding="utf-8")
 print(f"enhanced_data.js 生成: {len(details)} 只标的 + 2 体系 + {len(reports)} 篇报告 ({(BASE/'enhanced_data.js').stat().st_size/1024:.0f} KB)")
-n_v8 = len([c for c in MAIN_CODES + ETFS + FUNDS if c in details])
 n_v9 = len([c for c in V9_CODES if c in details])
-print(f"  个人版自选池: {n_v8}/{len(MAIN_CODES)+len(ETFS)+len(FUNDS)} | 普适版自动池(分层去重): {n_v9}（main {len(V9_MAIN)} / gem {len(V9_GEM)} / star {len(V9_STAR)}）")
+print(f"  普适版自动池(分层去重): {n_v9}（main {len(V9_MAIN)} / gem {len(V9_GEM)} / star {len(V9_STAR)}）｜ 固定池已去除（MAIN_CODES=[]）")

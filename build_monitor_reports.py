@@ -64,7 +64,7 @@ for c, d in sorted(details.items(), key=lambda kv: -kv[1]["score"]):
 <div><h4>K线（近 250 日 · 红涨绿跌）</h4>{kline_svg(d["kline"], c)}</div>
 <div>
 <h4>普适版 交易史</h4>{render_trades(d["trades"]["v9_auto"], "普适版")}
-<h4>个人版 交易史</h4>{render_trades(d["trades"]["v8_lite"], "个人版")}
+<h4>v8-lite 回测交易史</h4>{render_trades(d["trades"]["v8_lite"], "v8-lite")}
 </div></div>
 </div>'''
 

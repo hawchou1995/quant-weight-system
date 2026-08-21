@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-"""标的监控看板（双体系·模板风格）：监控总览 / 全量池中长线 / 固定池中长线 / 短线。
+"""标的监控看板（模板风格）：监控总览 / 全量池中长线 / 短线。
 每视图 = KPI 卡 + 标的汇总表（模板列：分数构成/超买分解/量能分解/置信度/档位变化）
-       + 紧跟其下的逐标的详情卡片（六角雷达图 + 六类分数 + 回测），v8/v9 池分开。
+       + 紧跟其下的逐标的详情卡片（六角雷达图 + 六类分数 + 回测）。
 左侧导航切换视图；左上角板块/行业/档位 select 筛选；
-全量池自动池 = 股票按权限各10 + 基金10；回测参考统一放监控总览。"""
+全量池自动池 = 股票按权限各10 + 基金10；回测参考统一放监控总览。
+2026-08-21：固定池彻底去除（用户清仓全部自买股票），仅保留全量池+短线两体系。"""
 import os
 import json, re
 from pathlib import Path
@@ -23,9 +24,9 @@ build_ts = _dt.datetime.now().strftime("%Y-%m-%d %H:%M")
 
 # ---------------- 分池 ----------------
 all_items = list(details.values())
-# 2026-08-19 用户决策：中长线固定池并入全量池跟踪池，不再作为独立视图渲染（v8_items 仅保留统计用途）
+# 2026-08-21 用户清仓全部自买股票 → 固定池彻底去除（MAIN_CODES=[]），v8_items 恒为空（保留变量兼容）
 v8_items = sorted([d for d in all_items if d.get("pool", "v8") == "v8"], key=lambda d: -d["score"])
-track_v9_len = len(DATA.get("track_v9", {}) or {})   # 中长线跟踪池规模（含已并入的固定池）
+track_v9_len = len(DATA.get("track_v9", {}) or {})   # 中长线跟踪池规模（固定池已去除，仅全量池自动跟踪）
 # 普适版：按权限分层表（main/gem/star/fund 各 10 行，同一标的多档出现属正常；2026-08-17 去 etf 层）
 v9_tiers = DATA.get("meta", {}).get("v9_tiers", {})
 v9_items = []
@@ -60,7 +61,7 @@ try:
         SHORT_POOL_GATE = f'<span class="badge badge-auto" style="background:#1f8a4c;color:#fff">市况门控 ✅ 开（{_mg.get("idx_close")} &gt; MA20 {_mg.get("idx_ma20")}）</span>'
     else:
         # 2026-08-20 用户决策：门控改为「仅提醒」——股票池分≥50 照常入池展示（供参考），不做买入指令
-        SHORT_POOL_GATE = f'<span class="badge badge-auto" style="background:#d97706;color:#fff">市况门控 ⚠ 关 · 仅提醒（沪深300 {_mg.get("idx_close")} &lt; MA20 {_mg.get("idx_ma20")}，股票照常入池仅供参不）</span>'
+        SHORT_POOL_GATE = f'<span class="badge badge-auto" style="background:#d97706;color:#fff">市况门控 ⚠ 关 · 仅提醒（沪深300 {_mg.get("idx_close")} &lt; MA20 {_mg.get("idx_ma20")}，股票池照常展示，仅供参考）</span>'
     SHORT_POOL_INTRADAY = SHORT_POOL.get("intraday_note") or ""
     SHORT_POOL_ASOF_MIN = SHORT_POOL.get("intraday_ts") or "15:00"
     # 运行时精简池数据（tiers/track 供「全量池短线跟踪」渲染；HTML 不加载 short_pool.js）
@@ -75,10 +76,7 @@ except Exception as _e:
     SHORT_POOL_ASOF_MIN = "15:00"
     SHORT_POOL_SLIM = '{}'
     SHORT_POOL_GATE = ''
-# 个人版按板块分组（用户固定池，2026-08-17 去 ETF）
-v8_main = [d for d in v8_items if d["perm"] == "main"]
-v8_etf  = [d for d in v8_items if d["perm"] == "etf"]
-v8_fund = [d for d in v8_items if d["perm"] == "fund"]
+# 2026-08-21 固定池已去除，v8_main/v8_etf/v8_fund 不再使用
 
 # 中长线 MA200 市况门控徽章（2026-08-19：与回测口径 use_timing=True/MA200 一致；沪深300<MA200 → 熊市保护，不回补新仓）
 try:
@@ -88,7 +86,7 @@ try:
         LT_GATE_BADGE = f'<span class="badge badge-auto" style="background:#1f8a4c;color:#fff">市况门控 ✅ 开（沪深300 {_lt_close:.0f} &gt; MA200 {_lt_ma:.0f}）</span>'
     else:
         # 2026-08-20 用户决策：门控改为「仅提醒」——权重分达标照常入池供参考，非买入指令
-        LT_GATE_BADGE = f'<span class="badge badge-auto" style="background:#d97706;color:#fff">市况门控 ⚠ 关 · 仅提醒（沪深300 {_lt_close:.0f} &lt; MA200 {_lt_ma:.0f}，权重分达标照常入池仅供参不）</span>'
+        LT_GATE_BADGE = f'<span class="badge badge-auto" style="background:#d97706;color:#fff">市况门控 ⚠ 关 · 仅提醒（沪深300 {_lt_close:.0f} &lt; MA200 {_lt_ma:.0f}，权重分达标照常展示，仅供参考）</span>'
 except Exception as _e:
     print("MA200 门控徽章计算失败:", _e)
     LT_GATE_BADGE = ''
@@ -157,7 +155,7 @@ def rows_html_for(items):
                          f'title="开盘跳空高开 {d["gap"]:.1f}%（vs 昨收），反转空间被开盘吃掉，不追高；可等盘中回落至 3% 以内再考虑买入">'
                          f'⚠ 高开{d["gap"]:.1f}% 规避（回落&lt;3%可买）</span>')
         # 2026-08-20 用户决策：市况门控改为「仅提醒」——门控关闭时入池股票标「仅提醒·非买入」，
-        # 仅供参不（不追高）；与 8/19 跟踪池安全口径（不开新仓·仅跟踪）区分开（两者都非买入指令）
+        # 仅供参考（不追高）；与 8/19 跟踪池安全口径（不开新仓·仅跟踪）区分开（两者都非买入指令）
         gate_tag = ""
         if d.get("gate_closed"):
             gate_tag = ('<span class="badge" style="background:rgba(217,119,6,.18);color:#fbbf24;" '
@@ -328,7 +326,7 @@ def bt_all_html():
     return ('<div class="card" id="bt-all">\n'
             '<h2>📊 回测参考 <span class="badge badge-auto">中/长线 · 股票按权限分层</span></h2>\n'
             '<div class="sub">股票 = 绝对规则筛池 Top3 · 月轮动 · 按权限<b>互斥分层</b>（一体/纯主板/纯创业板/纯科创板，各池独立回测）｜ 基金 = 净值动量轮动 —— 各池严格分开（2026-08-17 去 ETF）</div>\n'
-            '<div class="sub" style="color:var(--sub)">💧 <b>滑点敏感性</b>（每边，sweep_ml_slip.py 扫描）：中长线换手低、影响显著小于短线 —— 股票 20bps 收益 -23%（夏普 1.58→1.43）、30bps -31% ｜ 固定池 20bps -13%、30bps -18% —— 实盘 10-20bps 区间内中长线策略稳健</div>\n'
+            '<div class="sub" style="color:var(--sub)">💧 <b>滑点敏感性</b>（每边，sweep_ml_slip.py 扫描）：中长线换手低、影响显著小于短线 —— 股票 20bps 收益 -23%（夏普 1.58→1.43）、30bps -31% ｜ 历史固定池（已去除）20bps -13%、30bps -18% —— 实盘 10-20bps 区间内中长线策略稳健</div>\n'
             '<div class="bt-grid">' + cards + '</div>\n</div>')
 
 
@@ -346,7 +344,7 @@ def bt_short_html():
             '<div class="sub">短线 = 动量30/量价25/通道25/波动20（A 股个股反转版）+ <b>MA5 生命线每日止损</b> + 强势市门控 · 股票按权限<b>互斥分层</b>（各池独立回测）｜ 基金 = 动量短线 —— 与中长线独立，监控表「⚡ 全量池短线」视图对应此池（2026-08-17 去 ETF）</div>\n'
             '<div class="sub" style="color:var(--sub)">💧 <b>滑点敏感性</b>（每边，sweep_slip.py 扫描）：股票 10bps→+462%/夏普1.99、20bps→+331%/1.69、30bps→+231%/1.39 ｜ 基金 30bps 申赎费下 +273%→+11% 归零 —— <b>基金短线必须 C 类份额</b>（0 申赎费）</div>\n'
             '<div class="bt-grid">' + cards + '</div>\n</div>')
-perm_stat = f'股票 {len(v8_main)} ｜ 基金 {len(v8_fund)}'
+perm_stat = ''   # 2026-08-21 固定池已去除
 
 def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extra_stat=None, extra_card="", score_sub="趋势/动量/量能/超买/风控", as_of=None, intraday_note=None, as_of_min=None, tier_opts=None, tier_add=None, tier_watch=None, tier_cut=None):
     """每个系统的完整区块：系统头（标题+说明）+ 操作统计条 + 汇总表 + 详情卡片
@@ -568,7 +566,7 @@ if _cum_f.exists():
     _cdata = json.loads(_cum_f.read_text(encoding="utf-8"))
     if _cdata.get("pools"):
         _CBENCH = {
-            "全量池中/长线": 48.1, "固定池中/长线": 57.1,
+            "全量池中/长线": 48.1,
             "短线·主板": 46.8, "短线·创业板": 48.1, "短线·科创板": 57.8, "短线·基金": 55.5,
         }
         _crows = []
@@ -714,15 +712,15 @@ html = f"""<!doctype html>
 <div class="view active" id="view-overview">
 <div class="card" id="overview">
 <h2>📊 标的监控总览 <span class="badge badge-auto">数据截至 {DATA["meta"].get("as_of", "—")}{"（盘中实时）" if DATA["meta"].get("intraday") else " 收盘"}</span></h2>
-<div class="sub">左侧导航切换：🅰️ 全量池中/长线（全市场自动池·股票分层+基金） / 🅱️ 固定池中/长线（用户固定池） / ⚡ 短线 · 信号仅供参考</div>
+<div class="sub">左侧导航切换：🅰️ 全量池中/长线（全市场自动池·股票分层+基金） / ⚡ 短线 · 信号仅供参考</div>
 <div class="kpis">
 <div class="kpi"><div class="l">🟢 加仓区</div><div class="v" style="color:#dc2626">{sum(1 for d in all_items if d["tier"] in ("满仓加仓","轻仓加仓"))} 只</div><div class="s">满仓+轻仓加仓</div></div>
 <div class="kpi"><div class="l">🟡 观望区</div><div class="v" style="color:#d97706">{sum(1 for d in all_items if d["tier"]=="观望")} 只</div><div class="s">持有不加</div></div>
 <div class="kpi"><div class="l">🔴 减/清仓区</div><div class="v" style="color:#16a34a">{sum(1 for d in all_items if d["tier"] in ("减至半仓","清仓"))} 只</div><div class="s">减半或清仓</div></div>
-<div class="kpi"><div class="l">共监控</div><div class="v">{len(all_items)} 只</div><div class="s">全量池 {len(v9_items)} 行 + 固定池 {len(v8_items)} 只</div></div>
+<div class="kpi"><div class="l">共监控</div><div class="v">{len(all_items)} 只</div><div class="s">全量池 {len(v9_items)} 行</div></div>
 </div>
 <div class="rule-box" style="margin-bottom:0"><b>监控口径</b>：权重分 = 动量35% + 趋势25% + Aroon20% + 量价20% ｜ 档位 = ≥75 满仓加仓 / ≥60 轻仓加仓 / ≥45 观望 / ≥30 减半 / &lt;30 清仓
-<br><b>卖出闸门（每日）</b>：全量池 移动止损 4.5% + 沪深300破MA150 ｜ 固定池 移动止损 10% + 破MA200 ｜ 任何闸门先触发先生效</div>
+<br><b>卖出闸门（每日）</b>：全量池 移动止损 4.5% + 沪深300破MA150 ｜ 任何闸门先触发先生效</div>
 </div>
 {bt_all_html()}
 {bt_short_html()}
@@ -734,15 +732,6 @@ html = f"""<!doctype html>
   v9_items, "tbl-v9", "card-tbl-v9",
   "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测参考在监控总览视图",
   extra_card=WATCH_V9_CARD,
-  as_of=DATA["meta"].get("as_of", "—"), intraday_note=DATA["meta"].get("intraday"),
-  as_of_min=DATA["meta"].get("intraday_ts") or DATA["meta"].get("as_of_min"))}
-
-<!-- ============ 视图 B：固定池中/长线 ============ -->
-{system_block(
-  "view-lite", "sys-lite",
-  "🅱️ 固定池中/长线", "lite", f"用户固定池 · 股票 ｜ 评分=Aroon强趋势过滤(A80_M78) · 四因子打分 · 月轮动21日 · 移动止损10% · MA200择时 · {LT_GATE_BADGE} ｜ 池构成：{perm_stat} ｜ 回测参考见「监控总览」",
-  v8_items, "tbl-v8", "card-tbl-v8",
-  "档位变化对比上次再平衡 · 建议动作 = 当前档位下的操作指引 · 回测参考在监控总览视图",
   as_of=DATA["meta"].get("as_of", "—"), intraday_note=DATA["meta"].get("intraday"),
   as_of_min=DATA["meta"].get("intraday_ts") or DATA["meta"].get("as_of_min"))}
 
@@ -809,7 +798,6 @@ html = f"""<!doctype html>
 window.ENH.nav = [
   ["overview","📊","监控总览",[["overview","总览统计"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
   ["sys-auto","🅰️","全量池中/长线",[["card-tbl-v9","标的汇总表"],["card-tbl-v9-detail","逐标的详情"],["watch-v9-card","中长线跟踪"]]],
-  ["sys-lite","🅱️","固定池中/长线",[["card-tbl-v8","标的汇总表"],["card-tbl-v8-detail","逐标的详情"]]],
   ["short","⚡","全量池短线",[["card-tbl-short","标的汇总表"],["watch-card","短线跟踪"],["card-luf","涨停次日跟随"],["card-sr","板块强度雷达"],["card-tbl-short-detail","逐标的详情"]]],
   ["comment","💬","评论区",[]]
 ];
@@ -863,7 +851,7 @@ function renderSubCurve(){{
   renderOneCurve('curve-short-fund', C.short_fund, '#3b82f6', '基金短线', '+'+{ss_fund["total_return_pct"]:.0f});
 }}
 /* 视图切换（hash 驱动：切换时更新 location.hash，加载/前进后退时按 hash 定位） */
-var VIEW_MAP={{'overview':'view-overview','sys-auto':'view-auto','sys-lite':'view-lite','short':'view-short','review':'view-review','changelog':'view-changelog','comment':'view-comment'}};
+var VIEW_MAP={{'overview':'view-overview','sys-auto':'view-auto','short':'view-short','review':'view-review','changelog':'view-changelog','comment':'view-comment'}};
 function switchView(key){{
   var v=VIEW_MAP[key];if(!v)return;
   document.querySelectorAll('.view').forEach(function(x){{x.classList.remove('active');}});
@@ -1154,10 +1142,9 @@ document.addEventListener('DOMContentLoaded',function(){{
         var pm=document.querySelector('#sidenav a[data-anchor="'+t+'"]:not([data-sub])');
         if(pm)pm.classList.add('active');}}}});}});
   initTable('tbl-v9', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});
-  initTable('tbl-v8', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});
   initTable('tbl-short', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});
   /* 统一联动：搜索 + 板块/行业/档位筛选 → 表格行 + 详情卡片同步；排序后卡片重排 */
-  ['tbl-v9','tbl-v8','tbl-short'].forEach(function(id){{
+  ['tbl-v9','tbl-short'].forEach(function(id){{
     var q=document.getElementById(id+'-q'), mk=document.getElementById(id+'-mk');
     var ind=document.getElementById(id+'-ind'), tier=document.getElementById(id+'-tier');
     var buyonly=document.getElementById(id+'-buyonly');
@@ -1229,4 +1216,4 @@ document.addEventListener('DOMContentLoaded',function(){{
 out = BASE / "dual_system.html"
 out.write_text(html, encoding="utf-8")
 print(f"监控看板已生成: {out} ({out.stat().st_size/1024:.0f} KB)")
-print(f"  普适版表: {len(v9_items)} 行（{ {k:len(v) for k,v in v9_tiers.items()} }） | 中长线跟踪池: {track_v9_len} 只（固定池已并入）")
+print(f"  普适版表: {len(v9_items)} 行（{ {k:len(v) for k,v in v9_tiers.items()} }） | 中长线跟踪池: {track_v9_len} 只")

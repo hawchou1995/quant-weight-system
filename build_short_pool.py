@@ -254,7 +254,7 @@ def calc_signals(as_of=None):
         rows_by_board[bd].sort(key=lambda kv: -kv[1])
         # 2026-08-17 用户决策：只保留买入信号（分≥50），不足 10 只不凑数；超 10 只封顶 Top10
         # 2026-08-20 用户决策：市况门控改为「仅提醒」——门控关闭不再清空股票池，
-        #   权重分≥50 照常入池展示（仅供参不，非买入指令），由前端标题横幅提醒。
+        #   权重分≥50 照常入池展示（仅供参考，非买入指令），由前端标题横幅提醒。
         rows_by_board[bd] = [kv for kv in rows_by_board[bd] if kv[1] >= 50][:10]
         print(f"股票[{bd}] 买入信号 {len(rows_by_board[bd])} 只（分≥50，不凑数）({time.time()-t0:.0f}s)", flush=True)
     stock_top_main = rows_by_board["主板"]

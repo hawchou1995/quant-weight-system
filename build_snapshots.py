@@ -72,7 +72,7 @@ td{{padding:9px 10px;border-bottom:1px solid #232833;vertical-align:middle}}
 index = {"snapshots": []}
 
 def build_dual_snapshot(date_str, v8_rows, v9_rows):
-    """双体系当日快照（2026-08-20 恢复：普适版全量池表 + 个人版固定池表）"""
+    """双体系当日快照（2026-08-21 起：仅普适版全量池表，固定池已彻底去除）"""
     def table(rows):
         trs = ""
         for i, r in enumerate(rows, 1):
@@ -85,8 +85,6 @@ def build_dual_snapshot(date_str, v8_rows, v9_rows):
 <td><span class="tier t-{tier_cls(r["tier"])}">{r["tier"]}</span></td></tr>'''
         return f'''<table><tr><th>#</th><th>标的</th><th>板块</th><th>行业</th><th>现价</th><th>涨跌幅</th><th>权重分</th><th>档位</th></tr>{trs}</table>'''
     h2 = '<h2 style="margin:22px 0 8px;font-size:16px">🅰️ 全量池中/长线（全市场自动池 · 分层）</h2>' + table(v9_rows)
-    if v8_rows:
-        h2 += '<h2 style="margin:22px 0 8px;font-size:16px">🅱️ 固定池中/长线（用户固定池）</h2>' + table(v8_rows)
     return f'''<!doctype html><html lang="zh"><head><meta charset="utf-8">
 <title>双体系监控快照 {date_str}</title>
 <style>
@@ -104,7 +102,7 @@ td{{padding:9px 10px;border-bottom:1px solid #232833;vertical-align:middle}}
 .t-clear{{background:rgba(107,114,128,.15);color:#9ca3af}}
 </style></head><body>
 <h1>📊 双体系监控快照 {date_str}</h1>
-<div class="sub">数据截至 {date_str} 收盘 · 🅰️ 全量池 = 全市场自动池分层（股票按权限 + 基金）｜ 🅱️ 固定池 = 用户固定池 · 档位 = 满仓加仓/轻仓加仓/观望/减至半仓/清仓</div>
+<div class="sub">数据截至 {date_str} 收盘 · 🅰️ 全量池 = 全市场自动池分层（股票按权限 + 基金）· 档位 = 满仓加仓/轻仓加仓/观望/减至半仓/清仓</div>
 {h2}
 </body></html>'''
 
@@ -125,14 +123,14 @@ try:
             if d:
                 v9_rows.append(d)
     v9_rows.sort(key=lambda d: -d["score"])
-    v8_rows = [d for d in ENH["details"].values() if d.get("pool", "v8") == "v8"]   # 固定池独立表（2026-08-20 恢复）
+    v8_rows = [d for d in ENH["details"].values() if d.get("pool", "v8") == "v8"]   # 2026-08-21 固定池已去除，恒为空
     v8_rows.sort(key=lambda d: -d["score"])
     ds = dt.replace("-", "")
     out = SNAP_DIR / f"{ds}_dual.html"
     out.write_text(build_dual_snapshot(dt, v8_rows, v9_rows), encoding="utf-8")
     index["snapshots"].append({"date": dt, "file": f"{ds}_dual.html",
                                "count": f"{len(v9_rows)}+{len(v8_rows)}", "dual": True})
-    print(f"快照 {dt}: 全量池 {len(v9_rows)} + 固定池 {len(v8_rows)} → {out.name}")
+    print(f"快照 {dt}: 全量池 {len(v9_rows)} 只 → {out.name}")
 except Exception as e:
     print(f"快照失败: {e}")
 
