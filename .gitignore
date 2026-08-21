@@ -40,5 +40,12 @@ fund_nav_cache/
 deliver_*.png
 data_full_fail_list.csv
 
+# 一次性调试文件归档（不入库）
+_tmp_0821_debug/
+data_full_fail_*.csv
+data_lag_verify*.csv
+westock_dump_*.json
+westock_verify*.txt
+
 # 因子缓存备份（体积 GB 级，不入库）
 v8_factor_cache.pkl.bak*
