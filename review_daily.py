@@ -85,6 +85,24 @@ def t_plus_1(ddf, as_of):
     return idx[0] if len(idx) else None
 
 
+def gate_status():
+    """市况门控状态：True=开（可统计），False=关（仅参考，复盘不统计）。
+    2026-08-21 用户要求：门控关时选股只记录仅供参考、不默认买入，复盘不计入胜率/收益统计。
+    短线=沪深300>MA20（short_pool.json market_gate）；中长线=沪深300>MA200（index_000300.csv）。"""
+    g = {"短线全量池": True, "全量池中/长线": True}
+    try:
+        _sp = json.load(open(BASE / "short_pool.json", encoding="utf-8"))
+        g["短线全量池"] = bool(_sp.get("market_gate", {}).get("open", True))
+    except Exception:
+        pass
+    try:
+        _idx = V.load_index(200)
+        g["全量池中/长线"] = bool(_idx["in_market"].iloc[-1])
+    except Exception:
+        pass
+    return g
+
+
 def load_details():
     """从 enhanced_data.js 读完整数据（details/meta.v9_tiers 等）"""
     js = (BASE / "enhanced_data.js").read_text(encoding="utf-8")
@@ -288,6 +306,7 @@ def review(as_of=None, calc=None):
                         "status": ("🟢吃到" if pct > 0 else ("🔴被套" if pct < 0 else "⚪持平")),
                     })
         rows.append(row)
+    gates = gate_status()   # 2026-08-21：门控关 → 该池仅参考、复盘不统计
     calc_date = rows[0]["calc_date"] if rows else (str(calc_day.date()) if calc_day else as_of)
     print(f"明细 {len(rows)} 条, 计算日 {calc_date} ({time.time()-t0:.0f}s)", flush=True)
 
@@ -337,6 +356,23 @@ def review(as_of=None, calc=None):
                 pool_notes.append(f"⏳ **{grp}**：信号日 {as_of} 的 T+1 开盘日尚未到来（{_np} 只标的无后续交易日）——属数据边界非行情缺失，T+1 交易日收盘后重跑补录")
             else:
                 pool_notes.append(f"⚠️ **{grp}**：标的行情缺失，本次跳过")
+            continue
+        # 2026-08-21 用户要求：门控关 → 该池仅参考、复盘不统计（总览行/子板块行显示「门控关·仅参考」）
+        if not gates.get(grp, True):
+            if grp == "短线全量池":
+                _w = [BENCH_WIN[f"短线全量池-{s}"] for s in ("主板", "创业板", "科创板", "基金")
+                      for _ in [1] if any(r["board"] == s for r in rs)]
+                _bench = sum(_w) / len(_w) if _w else 54.0
+            else:
+                _bench = BENCH_WIN[grp]
+            md_lines.append(f"| {grp} | {len(rs)} | — | — | — | — | 门控关·仅参考 | — | — | — | — | {_bench:.1f}% |")
+            pool_notes.append(f"⚠️ **{grp}市况门控关闭**（沪深300 < MA{'20' if grp == '短线全量池' else '200'}）：买入信号仅记录参考、不默认买入，未计入胜率/收益统计")
+            for sub in subs:
+                rs2 = [r for r in rows if r["pool"] == grp and r["board"] == sub]
+                if not rs2:
+                    continue
+                _b2 = BENCH_WIN[f"短线全量池-{sub}"] if grp == "短线全量池" else BENCH_WIN["全量池中/长线"]
+                md_lines.append(f"| {prefix}·{sub} | {len(rs2)} | — | — | — | — | 门控关·仅参考 | — | — | — | — | {_b2:.1f}% |")
             continue
         buy = [r for r in rs if r["buy_sig"] and r["pct"] is not None]
         wins = sum(1 for r in buy if r["pct"] > 0)
@@ -399,8 +435,8 @@ def review(as_of=None, calc=None):
             mx2_s = f"{mx2:+.2f}%"
             bench_s = f"{bench2:.1f}%" if grp == "全量池中/长线" else f"{bench2}%"
             md_lines.append(f"| {label} | {len(rs2)} | {len(buy2)} | {wins2} | {len(buy2)-wins2-flat_n2} | {flat_n2} | {wr2_s} | {wr_ex2_s} | {avg2_s} | {ex2_s} | {mx2_s} | {bench_s} |")
-    # 合计（买入信号）— 与总览同为 12 列
-    buy_all = [r for r in rows if r["buy_sig"] and r["pct"] is not None]
+    # 合计（买入信号）— 与总览同为 12 列；2026-08-21：门控关的池不计入统计
+    buy_all = [r for r in rows if r["buy_sig"] and r["pct"] is not None and gates.get(r["pool"], True)]
     if buy_all:
         wins_all = sum(1 for r in buy_all if r["pct"] > 0)
         avg_all = sum(r["pct"] for r in buy_all) / len(buy_all)
@@ -457,15 +493,16 @@ def review(as_of=None, calc=None):
         rs = [r for r in rows if r["pool"] == grp]
         if not rs:
             continue
-        md_lines.append(f"#### {grp}（{len(rs)} 只 · 信号 {as_of}）")
+        _g_open = gates.get(grp, True)
+        md_lines.append(f"#### {grp}（{len(rs)} 只 · 信号 {as_of}{' · 门控关·仅参考' if not _g_open else ''}）")
         md_lines.append("| 代码 | 名称 | 权限 | 信号分 | 档位 | 操作 | 买入价 | 现价 | 收益 | MA5 | 判定 |")
         md_lines.append("|---|---|---|---|---|---|---|---|---|---|---|")
         for r in sorted(rs, key=lambda x: -(x["pct"] if x["pct"] is not None else -999)):
             if r["buy_sig"]:
-                act = "买入" if r["tier"] in ("满仓加仓", "轻仓加仓", "强买入", "买入") else "买入(弱)"
+                act = "参考" if not _g_open else ("买入" if r["tier"] in ("满仓加仓", "轻仓加仓", "强买入", "买入") else "买入(弱)")
                 pct_s = f"**{r['pct']:+.2f}%**" if r["pct"] is not None else "—"
                 ma_s = "✅" if r["ma5_above"] else ("⚠️下方" if r["ma5_above"] is not None else "—")
-                st = r["status"]
+                st = r["status"] if _g_open else "仅参考"
             else:
                 act = {"观望": "观望", "减至半仓": "卖出信号", "清仓": "卖出信号", "不买": "不买"}.get(r["tier"], "未触发")
                 pct_s, ma_s, st = "—", "—", "未买入"
