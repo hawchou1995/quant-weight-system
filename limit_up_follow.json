@@ -833,16 +833,6 @@
    "limit_60d": 62
   },
   {
-   "code": "000735",
-   "name": "罗 牛 山",
-   "board": "主板",
-   "industry": "农林牧渔",
-   "px": 5.62,
-   "chg": 9.98,
-   "streak": 1,
-   "limit_60d": 27
-  },
-  {
    "code": "001318",
    "name": "阳光乳业",
    "board": "主板",
@@ -941,16 +931,6 @@
    "chg": 9.9,
    "streak": 1,
    "limit_60d": 60
-  },
-  {
-   "code": "600824",
-   "name": "XD益民集",
-   "board": "主板",
-   "industry": "商贸零售",
-   "px": 3.89,
-   "chg": 9.89,
-   "streak": 1,
-   "limit_60d": 32
   }
  ]
 }
