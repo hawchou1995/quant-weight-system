@@ -99,6 +99,7 @@ def parse_pool_rows(md_text):
     """解析单篇复盘 md 当日总览表的各池行 → {池名: {n, buy, wins, losses, flat, avg}}
     2026-08-18 修复：累计总览已置顶，"| 池 | 累计标的 |..." 也会以 "| 池 |" 开头——
     必须精确匹配「当日总览」表头（第二列="标的"），否则把累计表当当日表重复累加（自乘缺陷）。
+    2026-08-21 兼容：总览已扩展至 12 列（新增超额胜率/超额收益），avg 列位置前移，通过列数自适应。
     """
     rows, in_table = {}, False
     for ln in md_text.splitlines():
@@ -110,10 +111,19 @@ def parse_pool_rows(md_text):
             if len(cells) >= 8 and not cells[0].startswith("**") and cells[0] not in ("固定池中/长线",):
                 # 2026-08-19：固定池已并入 track_v9，复盘日志不再统计固定池（含历史累计）
                 try:
+                    # 兼容 10 列旧版与 12 列新版：avg 在「回测基准」前 3 列，倒数第 4 列为 avg
+                    # 新版：… | 胜率 | 超额胜率 | 平均收益 | 超额收益 | 最大亏 | 回测基准 |
+                    # 旧版：… | 胜率 | 平均收益 | 最大亏 | 回测基准 |
+                    if len(cells) >= 12:
+                        avg_s = cells[8]
+                    else:
+                        avg_s = cells[7]
+                    if avg_s in ("—", "–", "-"):
+                        continue
                     rows[cells[0]] = {
                         "n": int(cells[1]), "buy": int(cells[2]), "wins": int(cells[3]),
                         "losses": int(cells[4]), "flat": int(cells[5]),
-                        "avg": float(cells[7].replace("%", "").replace("+", "")),
+                        "avg": float(avg_s.replace("%", "").replace("+", "")),
                     }
                 except (ValueError, IndexError):
                     continue
@@ -290,18 +300,31 @@ def review(as_of=None, calc=None):
     md_lines = [f"# 📋 复盘日志 v2.1（全量中长线 + 短线双池）",
                 f"## 🗓 {time.strftime('%Y-%m-%d')} ｜ 信号日 {as_of} → 计算日 {calc_date}（T+1 持仓）｜ 市场 {mkt_tag}", ""]
     md_lines.append("### 📊 总览（全量中长线 + 短线，按板块细分）")
-    md_lines.append("| 池 | 标的 | 买入信号 | 🟢吃到 | 🔴被套 | ⚪持平 | 胜率 | 平均收益 | 最大亏 | 回测基准 |")
-    md_lines.append("|---|---|---|---|---|---|---|---|---|---|")
+    md_lines.append("| 池 | 标的 | 买入信号 | 🟢吃到 | 🔴被套 | ⚪持平 | 胜率 | 超额胜率 | 平均收益 | 超额收益 | 最大亏 | 回测基准 |")
+    md_lines.append("|---|---|---|---|---|---|---|---|---|---|---|---|")
     defects, pool_notes = [], []
     if pending_funds:
         pool_notes.append(f"⏳ 基金净值按 T+1 公布：{len(pending_funds)} 只基金（{'、'.join(pending_funds[:8])}{'…' if len(pending_funds) > 8 else ''}）待 T+1 净值确认，本次复盘跳过，下次复盘补录")
+    # 2026-08-21 用户要求：①长线四行连在一起、短线四行连在一起；②加「超额胜率/跑赢大盘率」并列展示
+    # 超额胜率 = T+1超额收益>0 的比例（pct > mkt_ret）；超额收益 = 平均收益 - mkt_ret
+    def _excess_row(buy_list):
+        if not buy_list or mkt_ret is None:
+            return None, None
+        beat = sum(1 for r in buy_list if r["pct"] is not None and r["pct"] > mkt_ret)
+        wr_ex = beat / len(buy_list) * 100 if buy_list else 0
+        return beat, wr_ex
+
     groups = ["全量池中/长线", "短线全量池"]
-    for grp in groups:
+    # 按用户要求：长线块（主表+四子行）先，再短线块（主表+四子行）
+    ordered = [
+        ("全量池中/长线", ["主板", "创业板", "科创板", "基金"], "长线"),
+        ("短线全量池", ["主板", "创业板", "科创板", "基金"], "短线"),
+    ]
+    for grp, subs, prefix in ordered:
         rs = [r for r in rows if r["pool"] == grp]
         if not rs:
             _np = t1_pending.get(grp, 0)
             if _np:
-                # 2026-08-19 修复：T+1 未到 ≠ 行情缺失（此前误报「标的行情缺失」）
                 pool_notes.append(f"⏳ **{grp}**：信号日 {as_of} 的 T+1 开盘日尚未到来（{_np} 只标的无后续交易日）——属数据边界非行情缺失，T+1 交易日收盘后重跑补录")
             else:
                 pool_notes.append(f"⚠️ **{grp}**：标的行情缺失，本次跳过")
@@ -311,82 +334,78 @@ def review(as_of=None, calc=None):
         wr = wins / len(buy) * 100 if buy else None
         avg = sum(r["pct"] for r in buy) / len(buy) if buy else None
         mx = min(r["pct"] for r in buy) if buy else None
+        _, wr_ex = _excess_row(buy)
+        excess = (avg - mkt_ret) if (avg is not None and mkt_ret is not None) else None
         if grp == "短线全量池":
-            # 整体基准 = 板块细分基准按买入信号数加权
             _w = [BENCH_WIN[f"短线全量池-{s}"] for s in ("主板", "创业板", "科创板", "基金")
                   for _ in [1] if any(r["board"] == s for r in rs)]
             bench = sum(_w) / len(_w) if _w else 54.0
         else:
             bench = BENCH_WIN[grp]
+        # 主行
         if buy:
+            wr_s = f"{wr:.0f}%"
+            wr_ex_s = f"{wr_ex:.0f}%" if wr_ex is not None else "—"
+            avg_s = f"{avg:+.2f}%"
+            ex_s = f"{excess:+.2f}%" if excess is not None else "—"
+            mx_s = f"{mx:+.2f}%"
             md_lines.append(f"| {grp} | {len(rs)} | {len(buy)} | {wins} | {len(buy)-wins-sum(1 for r in buy if r['pct']==0)} | "
-                            f"{sum(1 for r in buy if r['pct']==0)} | {wr:.0f}% | {avg:+.2f}% | {mx:+.2f}% | {bench:.1f}% |")
+                            f"{sum(1 for r in buy if r['pct']==0)} | {wr_s} | {wr_ex_s} | {avg_s} | {ex_s} | {mx_s} | {bench:.1f}% |")
         else:
-            # 2026-08-21：全部待 T+2 净值（基金确认日）→ 行仍显示，胜率/收益为 —（不再伪 0%）
             _pend = sum(1 for r in rs if r["status"] == "⏳待T+2净值")
-            md_lines.append(f"| {grp} | {len(rs)} | {len(rs)} | 0 | 0 | {_pend} | — | — | — | {bench:.1f}% |")
+            md_lines.append(f"| {grp} | {len(rs)} | {len(rs)} | 0 | 0 | {_pend} | — | — | — | — | — | {bench:.1f}% |")
         if buy and len(buy) >= 5:
-            # 2026-08-19 市场相对校准：绝对胜率/均值在极端行情日（|沪深300|≥1.5%）必然恶化，
-            # 只有「显著跑输大盘」才算信号缺陷；跑赢大盘的下跌（如 8/19 短线 -1.97% vs 大盘 -2.58%）
-            # 属市场 beta 而非设计缺陷，不登记 changelog。
-            mkt_bad = mkt_ret is not None and (avg or 0) < mkt_ret - 1.5  # 跑输大盘 >1.5pct
+            mkt_bad = mkt_ret is not None and (avg or 0) < mkt_ret - 1.5
             if wr < 45 and avg < 0 and mkt_bad:
                 defects.append(f"⚠️ **{grp}信号失效预警**：胜率 {wr:.0f}%（<45%）且平均收益 {avg:+.2f}%（跑输沪深300 {mkt_ret:+.2f}% 达 {avg-mkt_ret:+.2f}pct）")
             elif wr < bench - 15 and mkt_bad:
                 defects.append(f"⚠️ **{grp}胜率偏低**：{wr:.0f}% vs 回测基准 {bench}%（偏离 >15pct 且跑输大盘 {mkt_ret:+.2f}%）")
             if all(r["pct"] < 0 for r in buy) and (mkt_ret is None or (avg or 0) < mkt_ret - 2.5):
                 defects.append(f"🔴 **{grp}买入信号全败**：{len(buy)} 只全部被套（跑输沪深300 {mkt_ret:+.2f}% 达 {(avg or 0)-mkt_ret:+.2f}pct）")
-    # 短线池按板块细分
-    for sub in ("主板", "创业板", "科创板", "基金"):
-        rs = [r for r in rows if r["pool"] == "短线全量池" and r["board"] == sub]
-        if not rs:
-            continue
-        buy = [r for r in rs if r["buy_sig"] and r["pct"] is not None]
-        if not buy:
-            # 2026-08-21：全部待 T+2 净值（基金确认日）→ 行仍显示，不隐藏
-            _pend = sum(1 for r in rs if r["status"] == "⏳待T+2净值")
-            md_lines.append(f"| 短线·{sub} | {len(rs)} | {len(rs)} | 0 | 0 | {_pend} | — | — | — | {BENCH_WIN[f'短线全量池-{sub}']}% |")
-            if sub == "基金" and _pend:
-                pool_notes.append("⏳ 短线基金已按 T+1 净值确认买入，收益待 T+2 净值（确认日无收益属正常，非亏损）")
-            continue
-        wins = sum(1 for r in buy if r["pct"] > 0)
-        wr = wins / len(buy) * 100
-        avg = sum(r["pct"] for r in buy) / len(buy)
-        mx = min(r["pct"] for r in buy)
-        bench = BENCH_WIN[f"短线全量池-{sub}"]
-        flat_n = sum(1 for r in buy if abs(r["pct"]) < 0.001)
-        md_lines.append(f"| 短线·{sub} | {len(rs)} | {len(buy)} | {wins} | {len(buy)-wins-flat_n} | {flat_n} | "
-                        f"{wr:.0f}% | {avg:+.2f}% | {mx:+.2f}% | {bench}% |")
-    # 2026-08-19：全量池中/长线按板块细分（与短线全量池一致；基准统一用全量池整体胜率）
-    for sub in ("主板", "创业板", "科创板", "基金"):
-        rs = [r for r in rows if r["pool"] == "全量池中/长线" and r["board"] == sub]
-        if not rs:
-            continue
-        buy = [r for r in rs if r["buy_sig"] and r["pct"] is not None]
-        if not buy:
-            # 2026-08-21：长线基金确认日 → 行仍显示，胜率/收益为 —
-            _pend = sum(1 for r in rs if r["status"] == "⏳待T+2净值")
-            md_lines.append(f"| 长线·{sub} | {len(rs)} | {len(rs)} | 0 | 0 | {_pend} | — | — | — | {BENCH_WIN['全量池中/长线']:.1f}% |")
-            if sub == "基金" and _pend:
-                pool_notes.append("⏳ 长线基金已按 T+1 净值确认买入，收益待 T+2 净值（确认日无收益属正常，非亏损）")
-            continue
-        wins = sum(1 for r in buy if r["pct"] > 0)
-        wr = wins / len(buy) * 100
-        avg = sum(r["pct"] for r in buy) / len(buy)
-        mx = min(r["pct"] for r in buy)
-        bench = BENCH_WIN["全量池中/长线"]
-        flat_n = sum(1 for r in buy if abs(r["pct"]) < 0.001)
-        md_lines.append(f"| 长线·{sub} | {len(rs)} | {len(buy)} | {wins} | {len(buy)-wins-flat_n} | {flat_n} | "
-                        f"{wr:.0f}% | {avg:+.2f}% | {mx:+.2f}% | {bench:.1f}% |")
-    # 合计（买入信号）
+        # 紧接该池的四个子板块（保证四行连在一起）
+        for sub in subs:
+            rs2 = [r for r in rows if r["pool"] == grp and r["board"] == sub]
+            if not rs2:
+                continue
+            buy2 = [r for r in rs2 if r["buy_sig"] and r["pct"] is not None]
+            bench2 = BENCH_WIN[f"短线全量池-{sub}"] if grp == "短线全量池" else BENCH_WIN["全量池中/长线"]
+            label = f"{prefix}·{sub}"
+            if not buy2:
+                _pend = sum(1 for r in rs2 if r["status"] == "⏳待T+2净值")
+                md_lines.append(f"| {label} | {len(rs2)} | {len(rs2)} | 0 | 0 | {_pend} | — | — | — | — | — | {bench2:.1f}% |" if grp == "全量池中/长线" else f"| {label} | {len(rs2)} | {len(rs2)} | 0 | 0 | {_pend} | — | — | — | — | — | {bench2}% |")
+                if sub == "基金" and _pend:
+                    pool_notes.append(f"⏳ {label}已按 T+1 净值确认买入，收益待 T+2 净值（确认日无收益属正常，非亏损）")
+                continue
+            wins2 = sum(1 for r in buy2 if r["pct"] > 0)
+            wr2 = wins2 / len(buy2) * 100
+            avg2 = sum(r["pct"] for r in buy2) / len(buy2)
+            mx2 = min(r["pct"] for r in buy2)
+            _, wr_ex2 = _excess_row(buy2)
+            excess2 = (avg2 - mkt_ret) if mkt_ret is not None else None
+            flat_n2 = sum(1 for r in buy2 if abs(r["pct"]) < 0.001)
+            wr2_s = f"{wr2:.0f}%"
+            wr_ex2_s = f"{wr_ex2:.0f}%" if wr_ex2 is not None else "—"
+            avg2_s = f"{avg2:+.2f}%"
+            ex2_s = f"{excess2:+.2f}%" if excess2 is not None else "—"
+            mx2_s = f"{mx2:+.2f}%"
+            bench_s = f"{bench2:.1f}%" if grp == "全量池中/长线" else f"{bench2}%"
+            md_lines.append(f"| {label} | {len(rs2)} | {len(buy2)} | {wins2} | {len(buy2)-wins2-flat_n2} | {flat_n2} | {wr2_s} | {wr_ex2_s} | {avg2_s} | {ex2_s} | {mx2_s} | {bench_s} |")
+    # 合计（买入信号）— 与总览同为 12 列
     buy_all = [r for r in rows if r["buy_sig"] and r["pct"] is not None]
     if buy_all:
         wins_all = sum(1 for r in buy_all if r["pct"] > 0)
         avg_all = sum(r["pct"] for r in buy_all) / len(buy_all)
+        beat_all = sum(1 for r in buy_all if mkt_ret is not None and r["pct"] > mkt_ret)
+        wr_ex_all = beat_all / len(buy_all) * 100 if mkt_ret is not None else None
+        excess_all = (avg_all - mkt_ret) if mkt_ret is not None else None
+        flat_all = sum(1 for r in buy_all if abs(r["pct"]) < 0.001)
+        wr_all_s = f"{wins_all/len(buy_all)*100:.0f}%"
+        wr_ex_all_s = f"{wr_ex_all:.0f}%" if wr_ex_all is not None else "—"
+        avg_all_s = f"{avg_all:+.2f}%"
+        ex_all_s = f"{excess_all:+.2f}%" if excess_all is not None else "—"
         md_lines.append(f"| **合计（买入信号）** | {len(rows)} | {len(buy_all)} | {wins_all} | "
-                        f"{len(buy_all)-wins_all-sum(1 for r in buy_all if r['pct']==0)} | "
-                        f"{sum(1 for r in buy_all if r['pct']==0)} | {wins_all/len(buy_all)*100:.0f}% | "
-                        f"{avg_all:+.2f}% | — | — |")
+                        f"{len(buy_all)-wins_all-flat_all} | {flat_all} | {wr_all_s} | {wr_ex_all_s} | "
+                        f"{avg_all_s} | {ex_all_s} | — | — |")
     md_lines.append("")
     # MA5 破位率 / 深套（仅买入信号）
     if buy_all:
