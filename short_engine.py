@@ -240,7 +240,7 @@ def load_stock_pool():
     pool = {}
     for f in sorted((BASE / "data_full").glob("*.csv")):
         code = f.stem
-        if code.startswith(("bj", "sh5", "sz1")):
+        if code.startswith(("bj", "sh5", "sz1", "sh9")):  # sh9=B股（USD计价，流动性差，剔）
             continue
         try:
             df = pd.read_csv(f, dtype={"date": str})
