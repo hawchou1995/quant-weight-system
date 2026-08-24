@@ -355,12 +355,12 @@ def calc_signals(as_of=None):
     out = {"as_of": _eff, "fund_as_of": str(_fund_tail.date()) if _fund_tail is not None else _eff,
            "details": details, "tiers": order, "market_gate": market_gate}
     sigs = {"as_of": out["as_of"], "stock": sig_stock, "etf": sig_etf, "fund": sig_fund}
-    return out, sigs
+    return out, sigs, stock_pool, fund_pool
 
 
 def build(as_of=None):
     """计算并写文件（short_pool.js / short_signals.js / short_pool.json）"""
-    out, sigs = calc_signals(as_of)
+    out, sigs, stock_pool, fund_pool = calc_signals(as_of)
     # ---- 自动跟踪池（2026-08-18 用户需求：与中长线一致，隔日入池 + 三时间）-----
     # 上方表格可买入标的（强买入/买入，分≥50）上榜次日收盘无条件转正式跟踪（30 天后自动移除 exit=entry+30）。
     # ⚠ 2026-08-19 用户拍板：进标的池=默认全买 → 必须跟踪卖出信号 → 隔日无论是否仍在榜一律转正式入池；
@@ -447,7 +447,7 @@ def build(as_of=None):
     # ③ 一次性历史补偿：跟踪功能上线前（8/14 池）出现过的可买入标的，直接入正式池（历史事实，entry=2026-08-14）
     if not _old_full.get("_backfilled_0814"):
         try:
-            _hist_out, _ = calc_signals(as_of="2026-08-14")
+            _hist_out, _, _, _ = calc_signals(as_of="2026-08-14")
             for _c, _d in _hist_out["details"].items():
                 if (_d.get("short_score") or 0) >= 50 and _c not in track:
                     track[_c] = {"entry": "2026-08-14", "last_seen": "2026-08-14", "exit": _exit("2026-08-14"), "status": "active",
@@ -457,10 +457,77 @@ def build(as_of=None):
         except Exception as _e:
             print("8/14 池历史补偿失败:", _e, flush=True)
     # ④ pending 兜底：只按 30 天到期清理；不再因「今日不在池」清除（隔日已无条件转正式的标的不该滞留 pending；
-    #     留在 pending 的只有「今日新上榜待明日转正」的，强制保留以便隔日入池跟踪卖出）
+    #     留在 pending 里的标的只有「今日新上榜待明日转正」的，强制保留以便隔日入池跟踪卖出）
     cutoff = pd.Timestamp.now() - pd.Timedelta(days=30)
     pending = {c: v for c, v in pending.items() if pd.Timestamp(v.get("entry_candidate", today)) > cutoff}
     track = {c: v for c, v in track.items() if pd.Timestamp(v.get("entry", today)) > cutoff}
+    # ⑥ 刷新全部正式跟踪成员快照（2026-08-24 修复：掉出今日榜的跟踪标的 last 停留在最后信号日，
+    #    看板显示旧涨跌——典型：600508 上海能源 08-24 涨停(+10.02%)但跟踪池仍显示 08-21 的 +2.05%）。
+    #    在池标的由 ② 已刷新；掉榜标的回 stock_pool/fund_pool 按最新收盘重算 px/chg/score/tier。
+    #    与 v9 跟踪池（build_enhanced_data.py ⑥ _snap_from_data）同构；底层数据无最新行时保留旧快照。
+    def _ref_snap(_c, _rec):
+        _d = out["details"].get(_c)
+        if _d:
+            return {"name": _d.get("name"), "px": _d.get("px"), "chg": _d.get("chg"),
+                    "score": _d.get("short_score"), "tier": _d.get("short_tier") or _d.get("tier"),
+                    "pool": _d.get("board"), "type": "fund" if _d.get("board") == "基金" else "stock",
+                    "date": today}
+        _is_fund = _rec.get("pool") == "基金"
+        _k = ("sh" if _c.startswith(("6", "5")) else "sz") + _c
+        _df = fund_pool.get(_c) if _is_fund else stock_pool.get(_k)
+        if _df is None or len(_df) == 0:
+            _df = fund_pool.get(_c) if _is_fund else None   # 兜底：误判的基金/数据缺失
+        if _df is None or len(_df) == 0:
+            return None
+        if as_of is not None:
+            if as_of not in _df.index:
+                return None
+            _r = _df.loc[as_of]
+            _cls = _df["close"].loc[:as_of]
+        else:
+            _r = _df.iloc[-1]
+            _cls = _df["close"]
+        _px = float(_r["close"])
+        if pd.isna(_px) or _px <= 0:
+            return None
+        _chg = float(_cls.iloc[-1] / _cls.iloc[-2] - 1) * 100 if len(_cls) >= 2 else None
+        _sc = float(S.short_score(_r, reversal=not _is_fund))
+        if pd.isna(_sc):
+            return None
+        _old_last = _rec.get("last") or {}
+        return {"name": NAMES.get(_k, _old_last.get("name") or _c),
+                "px": round(_px, 2), "chg": round(_chg, 2) if _chg is not None else None,
+                "score": round(_sc, 1), "tier": buy_tier(_sc),
+                "pool": _rec.get("pool"), "type": "fund" if _is_fund else "stock",
+                "date": str(_df.index[-1].date())}
+    _refreshed = 0
+    _dropped_dead = 0
+    _stale_cutoff = str((pd.Timestamp(today) - pd.Timedelta(days=20)).date())
+    for _c, _rec in list(track.items()):
+        if _rec.get("last") and str(_rec["last"].get("date", "")) == today:
+            continue                          # ②/②' 今日已刷新（在池/转正式）
+        _old_date = str((_rec.get("last") or {}).get("date", ""))
+        _snap = _ref_snap(_c, _rec)
+        if _snap:
+            _sd = str(_snap.get("date", ""))
+            # 死数据/退市股：股票数据停在多年前（如 600317 营口港 2021 退市）→ 移出跟踪，
+            # 与 v9 maintain_track_v9 剔 ST/退市口径一致；基金净值 T-2 内属正常，不剔。
+            if _rec.get("type") == "stock" and _sd and _sd < _stale_cutoff:
+                del track[_c]
+                print(f"  剔除死数据跟踪成员 {_c} {_snap.get('name', _c)}（数据日期 {_sd}，疑似退市/停更）", flush=True)
+                _dropped_dead += 1
+                continue
+            _rec["last"] = _snap
+            _refreshed += 1
+        elif _rec.get("type") == "stock" and _old_date and _old_date < _stale_cutoff:
+            # 池内已无该股数据（新鲜度过滤剔出）且旧快照早于阈值 → 一并移出跟踪
+            del track[_c]
+            print(f"  剔除死数据跟踪成员 {_c} {_old_date}（全量池已无数据，疑似退市/停更）", flush=True)
+            _dropped_dead += 1
+    if _refreshed:
+        print(f"短线跟踪池快照刷新 {_refreshed} 只（掉榜成员回全量池重算 px/chg）", flush=True)
+    if _dropped_dead:
+        print(f"短线跟踪池剔除死数据/退市成员 {_dropped_dead} 只", flush=True)
     # ⑤ 市况门控关闭口径统一（2026-08-19 修复：门控关闭后跟踪池股票档位不得显示「买入」
     #    误导可追——已入池标的仅保留卖出信号跟踪，档位改写「不开新仓·仅跟踪」，score 保留）
     if not out.get("market_gate", {}).get("open", True):

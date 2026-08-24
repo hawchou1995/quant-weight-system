@@ -251,6 +251,14 @@ def load_stock_pool():
             pool[code] = short_factors(df).set_index("date")
         except Exception:
             continue
+    # 2026-08-24 修复：剔「死数据」标的——退市/改名后 data_full 停更的股票（如 600317 营口港
+    #   2021 年并入辽港股份后数据停在 2021-01-14）仍会以「最新行」参与短线打分并进池/跟踪，
+    #   看板显示多年前价格误导。以全市场最新交易日为基准，落后 >10 自然日的标的剔除
+    #   （停牌股同剔——不可交易，短线信号无意义；正常标的当日回填滞后 ≤1 日不受影响）。
+    if pool:
+        _max = max(df.index[-1] for df in pool.values())
+        _cut = _max - pd.Timedelta(days=10)
+        pool = {c: df for c, df in pool.items() if df.index[-1] >= _cut}
     return pool
 
 def load_etf_pool():

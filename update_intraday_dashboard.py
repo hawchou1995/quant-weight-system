@@ -89,6 +89,32 @@ def patch_js_file(path, snap_items, today, note_tag, snap_date, quotes=None, ts=
         elif write_gap:
             details[code].pop("gap", None)  # 本次无 gap 数据则清除旧值，避免残留误导
         patched += 1
+    # 3) 跟踪池 patch（2026-08-24 修复：跟踪表涨跌跟随实时——用户反馈 600508 08-24 涨停但
+    #    跟踪池仍显示 08-21 的 +2.05%；quotes/快照覆盖的代码才更新 last.px/chg，未覆盖的
+    #    掉榜成员保持收盘口径。只改 px/chg 值，不改成员/时间/档位（结构守卫只管结构不变）。
+    track_patched = 0
+    for _tk in ("track", "track_v9"):
+        _tr = data.get(_tk)
+        if not isinstance(_tr, dict):
+            continue
+        for code, _rec in _tr.items():
+            if code in snap_px:
+                px, chg = snap_px[code]
+            elif code in quotes:
+                px, chg = quotes[code]["px"], quotes[code]["chg"]
+            else:
+                continue
+            if px is None:
+                continue
+            _last = _rec.get("last")
+            if not isinstance(_last, dict):
+                _last = {}
+                _rec["last"] = _last
+            _last["px"] = px
+            _last["chg"] = chg
+            track_patched += 1
+    if track_patched:
+        print(f"  ↳ 跟踪池 last.px/chg patch {track_patched} 只（quotes/快照覆盖的代码）")
     if patched:
         intraday_note = f"{snap_date} 盘中行情（{note_tag}）· 分数为收盘口径"
         if "meta" in data:
