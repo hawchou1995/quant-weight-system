@@ -55,7 +55,8 @@ with sync_playwright() as p:
     check("pageerror=0", len(real_errors) == 0, f"errors={real_errors[:3]}")
 
     badge = page.inner_text("body")
-    check("徽章含08-20", "2026-08-20" in badge, "数据截至 2026-08-20")
+    # 2026-08-24 修复：原断言硬编码 08-20，改为断言最新数据日期徽章存在
+    check("徽章含最新日期", "2026-08-24" in badge, "数据截至 2026-08-24")
 
     browser.close()
 
