@@ -238,6 +238,12 @@ def calc_signals(as_of=None):
             continue
         if r["close"] < 1.5:   # 退市股/仙股过滤
             continue
+        # 2026-08-25 方案A（用户拍板）：流动性硬过滤——20日均成交额 < 3000万 剔除
+        # 回测验证（short_engine.run_short reversal=True，T10_H10_S50）：min_amt 2e6→3e7
+        #   收益 Δ+13.45pct、夏普 Δ+0.087、胜率 +0.7pct；稳健性 3 组参数 2/3 显著正、5e7 档 3/3 正。
+        # 单日放量冲榜但平时流动性差的标的（如 605158 amt20 仅 141 万）不再入池。
+        if pd.isna(r.get("amt20", np.nan)) or r["amt20"] < 3e7:
+            continue
         sc = S.short_score(r, reversal=True)
         if pd.isna(sc):
             continue
