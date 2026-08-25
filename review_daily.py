@@ -218,7 +218,7 @@ def review(as_of=None, calc=None):
             cur = json.load(open(BASE / "short_pool.json", encoding="utf-8"))
             as_of = cur["as_of"]
     sig_t = pd.Timestamp(as_of)
-    out, _sigs = B.calc_signals(as_of)            # 短线全量池信号（不覆盖生产文件）
+    out, _sigs, _spool, _fpool = B.calc_signals(as_of)   # 短线全量池信号（不覆盖生产文件）；build_short_pool calc_signals 现返回 4 元组（2026-08-24 跟踪池快照改造）
     as_of = out["as_of"]
     print(f"信号 {as_of}: 全量池 {len(v9_codes)} + 短线 {sum(len(v) for v in out['tiers'].values())} ({time.time()-t0:.0f}s)", flush=True)
 
