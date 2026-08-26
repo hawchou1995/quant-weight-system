@@ -937,15 +937,16 @@ document.addEventListener('DOMContentLoaded',function(){{
       if(!rec&&S.stock&&S.stock[code]){{rec=S.stock[code];grp='stock';}}
       if(!rec&&S.fund&&S.fund[code]){{rec=S.fund[code];grp='fund';}}
       if(!rec){{rows.push({{code:code,entry:r.entry,exit:r.exit||'—',age:r.age,grp:grp,typeName:r.pool||'股票',rec:null,inPool:0}});return;}}
-      var act,actCls;
-      if(rec.ma5_above===false){{act='⚠️ 次日卖出（破MA5）';actCls='down';}}
+      var act,actCls,tierDisp=rec.tier;
+      // 2026-08-26 修复：破MA5（收盘价<MA5）为硬性退出规则，档位同步改写「破MA5·卖出」，避免与建议动作「次日卖出」展示冲突
+      if(rec.ma5_above===false){{act='⚠️ 次日卖出（破MA5）';actCls='down';tierDisp='破MA5·卖出';}}
       else if(rec.tier==='清仓'){{act='🔴 清仓';actCls='down';}}
       else if(rec.tier==='减至半仓'){{act='🔴 减至半仓';actCls='down';}}
       else if(!topSet[code]){{act='🔄 下次轮动换出';actCls='warn';}}
       else if(rec.tier==='轻仓加仓'||rec.tier==='满仓加仓'){{act='✅ 继续持有';actCls='up';}}
       else {{act='🟡 观望（不补不加）';actCls='warn';}}
       var typeName=(grp==='fund'||r.type==='fund')?'基金':(r.pool||'股票');   // 2026-08-18 用户需求：股票类型按权限细分（主板/创业板/科创板）
-      rows.push({{code:code,entry:r.entry,exit:r.exit||'—',age:r.age,grp:grp,typeName:typeName,pool:r.pool,rec:rec,act:act,actCls:actCls,inPool:topSet[code]?1:0}});
+      rows.push({{code:code,entry:r.entry,exit:r.exit||'—',age:r.age,grp:grp,typeName:typeName,pool:r.pool,rec:rec,act:act,actCls:actCls,inPool:topSet[code]?1:0,tierDisp:tierDisp}});
     }});
     if(bar){{bar.style.display=rows.length?'':'none';}}
     if(!rows.length){{box.innerHTML='<div class="sub" style="color:var(--faint)">暂无跟踪 —— 短线表出现可买入标的（强买入/买入）后自动加入，保留 30 天</div>';return;}}
@@ -955,7 +956,7 @@ document.addEventListener('DOMContentLoaded',function(){{
     var fpool=document.getElementById('watch-f-inpool').value;
     var ftier=document.getElementById('watch-f-tier').value;
     var sortKey=document.getElementById('watch-sort').value||'entry';
-    fillTierOptions('watch-f-tier', rows.map(function(r){{return r.rec?r.rec.tier:null;}}));
+    fillTierOptions('watch-f-tier', rows.map(function(r){{return r.tierDisp||null;}}));
     var seenType={{}};var typeOpts=[];
     rows.forEach(function(r){{if(r.typeName&&!seenType[r.typeName]){{seenType[r.typeName]=1;typeOpts.push(r.typeName);}}}});
     var tsel=document.getElementById('watch-f-type');
@@ -967,7 +968,7 @@ document.addEventListener('DOMContentLoaded',function(){{
       if(q&&!(r.code.toLowerCase().indexOf(q)>=0||(r.rec.name||'').toLowerCase().indexOf(q)>=0))return false;
       if(ftype&&r.typeName!==ftype)return false;
       if(fpool!==''&&String(r.inPool)!==fpool)return false;
-      if(ftier&&r.rec.tier!==ftier)return false;
+      if(ftier&&(r.tierDisp||'')!==ftier)return false;
       return true;
     }});
     filtered.sort(function(a,b){{
@@ -986,7 +987,7 @@ document.addEventListener('DOMContentLoaded',function(){{
     filtered.forEach(function(r){{
       var rec=r.rec;
       var ageS=r.age===null?'—':(r.age+' 天 / 剩 '+(30-r.age)+' 天');
-      h+='<tr><td>'+r.code+'</td><td>'+rec.name+'</td><td>'+r.typeName+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+(r.exit||'—')+'</td><td style="text-align:center">'+ageS+'</td><td style="text-align:right">'+rec.px+'</td><td style="text-align:right" class="'+(rec.chg>0?'up':'down')+'">'+(rec.chg>0?'+':'')+rec.chg+'%</td><td style="text-align:center">'+rec.score+'</td><td style="text-align:center">'+rec.tier+'</td><td style="text-align:center">'+(rec.ma5_above?'✅ 上方':'⚠️ 下方')+'</td><td style="text-align:center" class="'+r.actCls+'">'+r.act+'</td></tr>';
+      h+='<tr><td>'+r.code+'</td><td>'+rec.name+'</td><td>'+r.typeName+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+(r.exit||'—')+'</td><td style="text-align:center">'+ageS+'</td><td style="text-align:right">'+rec.px+'</td><td style="text-align:right" class="'+(rec.chg>0?'up':'down')+'">'+(rec.chg>0?'+':'')+rec.chg+'%</td><td style="text-align:center">'+rec.score+'</td><td style="text-align:center">'+r.tierDisp+'</td><td style="text-align:center">'+(rec.ma5_above?'✅ 上方':'⚠️ 下方')+'</td><td style="text-align:center" class="'+r.actCls+'">'+r.act+'</td></tr>';
     }});
     h+='</tbody></table>';
     box.innerHTML=h;
