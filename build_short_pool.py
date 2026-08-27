@@ -223,6 +223,10 @@ def calc_signals(as_of=None):
 
     # 1) 股票反转：按权限分层各取 Top10（主板/创业板/科创板，2026-08-17 用户决策）
     stock_pool = S.load_stock_pool()
+    # 2026-08-27 修复：全市场最新交易日基准（停牌股新鲜度校验用）。
+    # 002274 华昌化工 08-26 起停牌，as_of=None 时 iloc[-1] 会取 08-25 旧数据评分入池（65.2 强买入），
+    # 看板显示旧价格误导。load_stock_pool 的 10 自然日阈值只挡「死数据」，挡不住短期停牌股。
+    _mkt_max = max(df.index[-1] for df in stock_pool.values()) if stock_pool else None
     rows_by_board = {"主板": [], "创业板": [], "科创板": []}
     for code, ddf in stock_pool.items():
         if as_of is not None:
@@ -231,6 +235,10 @@ def calc_signals(as_of=None):
             r = ddf.loc[as_of]
         else:
             r = ddf.iloc[-1]
+            # 2026-08-27 修复：停牌股新鲜度校验——数据日期落后全市场最新交易日 >1 自然日则跳过
+            # （停牌股不可交易，短线信号无意义；正常标的当日回填滞后 ≤1 日不受影响）
+            if _mkt_max is not None and (ddf.index[-1] - _mkt_max).days > 1:
+                continue
         if pd.isna(r["close"]) or r["close"] <= 0 or pd.isna(r["mom20"]):
             continue
         nm = NAMES.get(code, code[-6:])
@@ -276,9 +284,12 @@ def calc_signals(as_of=None):
     frows = []
     for code, ddf in fund_pool.items():
         if as_of is not None:
-            if as_of not in ddf.index:
+            # 2026-08-27 修复：基金净值 T+1 公布（as_of=最新交易日时净值只到 T-1），
+            # 严格 loc[as_of] 会全跳过致基金池 0 只；改取 as_of 前最近一天（与 _tail2 口径一致）
+            _sub = ddf.loc[:as_of]
+            if len(_sub) == 0:
                 continue
-            r = ddf.loc[as_of]
+            r = _sub.iloc[-1]
         else:
             r = ddf.iloc[-1]
         if pd.isna(r["close"]) or r["close"] <= 0 or pd.isna(r["mom20"]):

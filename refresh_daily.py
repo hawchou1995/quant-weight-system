@@ -55,7 +55,20 @@ def main():
         print("  跳过（基金净值未更新，短线基金池仍用旧数据；需更新加 --fund）", flush=True)
 
     print("== 3/5 全市场短线信号 Top 池重算 ==", flush=True)
-    run([PY, str(BASE / "build_short_pool.py")])
+    # 2026-08-27 修复：显式传 --as-of 最新交易日（index_000300.csv 最后一行）。
+    # 停牌股（无当日数据）走 calc_signals as_of 分支 `as_of not in ddf.index → continue` 自动跳过，
+    # 避免 002274 华昌化工式「停牌股用旧数据评分入池」；与 calc_signals 内新鲜度校验双保险。
+    _asof = None
+    try:
+        with open(BASE / "index_000300.csv", encoding="utf-8") as _f:
+            _lines = [l for l in _f if l.strip()]
+        _asof = _lines[-1].split(",")[0].strip()
+    except Exception:
+        _asof = None
+    if _asof:
+        run([PY, str(BASE / "build_short_pool.py"), "--as-of", _asof])
+    else:
+        run([PY, str(BASE / "build_short_pool.py")])
 
     print("== 4/5 监控看板重建 ==", flush=True)
     run([PY, str(BASE / "build_dual_system.py")])

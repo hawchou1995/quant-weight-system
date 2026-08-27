@@ -398,42 +398,42 @@
       },
       "gate_closed": true
     },
-    "002274": {
-      "code": "002274",
-      "key": "sz002274",
-      "name": "华昌化工",
+    "605028": {
+      "code": "605028",
+      "key": "sh605028",
+      "name": "世茂能源",
       "pool": "short",
       "perm": "short",
       "board": "主板",
-      "industry": "基础化工",
+      "industry": "公用事业",
       "biz": "—",
-      "px": 6.47,
-      "chg": 5.2,
-      "ret_1y": -3.9,
-      "score": 65.2,
+      "px": 24.27,
+      "chg": -0.94,
+      "ret_1y": 20.9,
+      "score": 65.1,
       "score_prev": null,
       "tier": "强买入",
       "tier_prev": null,
-      "short_score": 65.2,
+      "short_score": 65.1,
       "short_tier": "强买入",
       "factors": {
-        "mom": 18.3,
-        "vr": 3.93,
-        "trend": 100,
+        "mom": -10.3,
+        "vr": 2.84,
+        "trend": 0,
         "volume": 100,
         "osc": 50,
-        "risk": 75.8
+        "risk": 81.6
       },
       "comp": {
-        "trend": 100,
-        "momentum": 5,
+        "trend": 0,
+        "momentum": 81.0,
         "volume": 100,
         "osc": 50,
-        "risk": 75.8,
+        "risk": 81.6,
         "news": 0.0
       },
-      "radar_svg": "<svg viewBox=\"0 0 120 120\" width=\"120\" height=\"120\" style=\"flex:0 0 auto\"><polygon points=\"60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"16.8\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"103.2\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 61.9,58.9 97.4,81.6 60.0,81.6 31.6,76.4 58.9,59.4\" fill=\"var(--radar-good)\" fill-opacity=\"0.18\" stroke=\"var(--radar-good)\" stroke-width=\"1.5\"/><circle cx=\"60.0\" cy=\"16.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"2.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">趋势</text><circle cx=\"61.9\" cy=\"58.9\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">动能</text><circle cx=\"97.4\" cy=\"81.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">量能</text><circle cx=\"60.0\" cy=\"81.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"119.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">超买</text><circle cx=\"31.6\" cy=\"76.4\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">风控</text><circle cx=\"58.9\" cy=\"59.4\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">研报</text><text x=\"60.0\" y=\"64.0\" style=\"fill:var(--radar-good)\" font-size=\"15\" font-weight=\"700\" text-anchor=\"middle\">65</text></svg>",
-      "rsi": 79.2,
+      "radar_svg": "<svg viewBox=\"0 0 120 120\" width=\"120\" height=\"120\" style=\"flex:0 0 auto\"><polygon points=\"60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"16.8\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"103.2\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,58.7 90.3,42.5 97.4,81.6 60.0,81.6 29.5,77.6 58.9,59.4\" fill=\"var(--radar-good)\" fill-opacity=\"0.18\" stroke=\"var(--radar-good)\" stroke-width=\"1.5\"/><circle cx=\"60.0\" cy=\"58.7\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"2.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">趋势</text><circle cx=\"90.3\" cy=\"42.5\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">动能</text><circle cx=\"97.4\" cy=\"81.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">量能</text><circle cx=\"60.0\" cy=\"81.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"119.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">超买</text><circle cx=\"29.5\" cy=\"77.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">风控</text><circle cx=\"58.9\" cy=\"59.4\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">研报</text><text x=\"60.0\" y=\"64.0\" style=\"fill:var(--radar-good)\" font-size=\"15\" font-weight=\"700\" text-anchor=\"middle\">65</text></svg>",
+      "rsi": 30.8,
       "kline": [],
       "factor_hist": [],
       "trades": {
@@ -1764,7 +1764,7 @@
       "600739",
       "600971",
       "000685",
-      "002274"
+      "605028"
     ],
     "创业板": [
       "300498",
@@ -3574,9 +3574,9 @@
       "gate_closed": true
     },
     "003719": {
-      "entry": "2026-08-21",
+      "entry": "2026-08-27",
       "last_seen": "2026-08-27",
-      "exit": "2026-09-20",
+      "exit": "2026-09-26",
       "status": "active",
       "pool": "基金",
       "type": "fund",
@@ -3593,9 +3593,9 @@
       }
     },
     "001093": {
-      "entry": "2026-08-21",
+      "entry": "2026-08-27",
       "last_seen": "2026-08-27",
-      "exit": "2026-09-20",
+      "exit": "2026-09-26",
       "status": "active",
       "pool": "基金",
       "type": "fund",
@@ -3612,9 +3612,9 @@
       }
     },
     "001092": {
-      "entry": "2026-08-21",
+      "entry": "2026-08-27",
       "last_seen": "2026-08-27",
-      "exit": "2026-09-20",
+      "exit": "2026-09-26",
       "status": "active",
       "pool": "基金",
       "type": "fund",
@@ -3631,9 +3631,9 @@
       }
     },
     "001420": {
-      "entry": "2026-08-21",
+      "entry": "2026-08-27",
       "last_seen": "2026-08-27",
-      "exit": "2026-09-20",
+      "exit": "2026-09-26",
       "status": "active",
       "pool": "基金",
       "type": "fund",
@@ -3650,9 +3650,9 @@
       }
     },
     "001426": {
-      "entry": "2026-08-21",
+      "entry": "2026-08-27",
       "last_seen": "2026-08-27",
-      "exit": "2026-09-20",
+      "exit": "2026-09-26",
       "status": "active",
       "pool": "基金",
       "type": "fund",
@@ -3669,9 +3669,9 @@
       }
     },
     "003717": {
-      "entry": "2026-08-21",
+      "entry": "2026-08-27",
       "last_seen": "2026-08-27",
-      "exit": "2026-09-20",
+      "exit": "2026-09-26",
       "status": "active",
       "pool": "基金",
       "type": "fund",
@@ -3688,9 +3688,9 @@
       }
     },
     "005109": {
-      "entry": "2026-08-21",
+      "entry": "2026-08-27",
       "last_seen": "2026-08-27",
-      "exit": "2026-09-20",
+      "exit": "2026-09-26",
       "status": "active",
       "pool": "基金",
       "type": "fund",
@@ -3707,9 +3707,9 @@
       }
     },
     "005110": {
-      "entry": "2026-08-21",
+      "entry": "2026-08-27",
       "last_seen": "2026-08-27",
-      "exit": "2026-09-20",
+      "exit": "2026-09-26",
       "status": "active",
       "pool": "基金",
       "type": "fund",
@@ -3726,9 +3726,9 @@
       }
     },
     "001695": {
-      "entry": "2026-08-21",
+      "entry": "2026-08-27",
       "last_seen": "2026-08-27",
-      "exit": "2026-09-20",
+      "exit": "2026-09-26",
       "status": "active",
       "pool": "基金",
       "type": "fund",
@@ -3745,9 +3745,9 @@
       }
     },
     "001414": {
-      "entry": "2026-08-25",
+      "entry": "2026-08-27",
       "last_seen": "2026-08-27",
-      "exit": "2026-09-24",
+      "exit": "2026-09-26",
       "status": "active",
       "pool": "基金",
       "type": "fund",
@@ -3860,27 +3860,6 @@
         "px": 5.23,
         "chg": 0.0,
         "score": 63.2,
-        "tier": "不开新仓·仅跟踪",
-        "pool": "主板",
-        "type": "stock",
-        "date": "2026-08-27",
-        "gate_closed": true
-      },
-      "gate_closed": true
-    },
-    "002274": {
-      "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
-      "exit": "2026-09-26",
-      "status": "active",
-      "pool": "主板",
-      "type": "stock",
-      "first_seen": "2026-08-21",
-      "last": {
-        "name": "华昌化工",
-        "px": 6.47,
-        "chg": 5.2,
-        "score": 65.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
@@ -5967,14 +5946,15 @@
         "gate_closed": true
       },
       "gate_closed": true
-    }
-  },
-  "track_pending_short": {
+    },
     "002616": {
-      "entry_candidate": "2026-08-27",
-      "first_seen": "2026-08-27",
+      "entry": "2026-08-27",
+      "last_seen": "2026-08-27",
+      "exit": "2026-09-26",
+      "status": "active",
       "pool": "主板",
       "type": "stock",
+      "first_seen": "2026-08-27",
       "last": {
         "name": "长青集团",
         "px": 4.91,
@@ -5989,10 +5969,13 @@
       "gate_closed": true
     },
     "002321": {
-      "entry_candidate": "2026-08-27",
-      "first_seen": "2026-08-27",
+      "entry": "2026-08-27",
+      "last_seen": "2026-08-27",
+      "exit": "2026-09-26",
+      "status": "active",
       "pool": "主板",
       "type": "stock",
+      "first_seen": "2026-08-27",
       "last": {
         "name": "华英农业",
         "px": 2.11,
@@ -6007,10 +5990,13 @@
       "gate_closed": true
     },
     "000623": {
-      "entry_candidate": "2026-08-27",
-      "first_seen": "2026-08-27",
+      "entry": "2026-08-27",
+      "last_seen": "2026-08-27",
+      "exit": "2026-09-26",
+      "status": "active",
       "pool": "主板",
       "type": "stock",
+      "first_seen": "2026-08-27",
       "last": {
         "name": "吉林敖东",
         "px": 18.68,
@@ -6025,10 +6011,13 @@
       "gate_closed": true
     },
     "601059": {
-      "entry_candidate": "2026-08-27",
-      "first_seen": "2026-08-27",
+      "entry": "2026-08-27",
+      "last_seen": "2026-08-27",
+      "exit": "2026-09-26",
+      "status": "active",
       "pool": "主板",
       "type": "stock",
+      "first_seen": "2026-08-27",
       "last": {
         "name": "信达证券",
         "px": 16.88,
@@ -6043,10 +6032,13 @@
       "gate_closed": true
     },
     "600971": {
-      "entry_candidate": "2026-08-27",
-      "first_seen": "2026-08-27",
+      "entry": "2026-08-27",
+      "last_seen": "2026-08-27",
+      "exit": "2026-09-26",
+      "status": "active",
       "pool": "主板",
       "type": "stock",
+      "first_seen": "2026-08-27",
       "last": {
         "name": "恒源煤电",
         "px": 8.96,
@@ -6061,10 +6053,13 @@
       "gate_closed": true
     },
     "300761": {
-      "entry_candidate": "2026-08-27",
-      "first_seen": "2026-08-27",
+      "entry": "2026-08-27",
+      "last_seen": "2026-08-27",
+      "exit": "2026-09-26",
+      "status": "active",
       "pool": "创业板",
       "type": "stock",
+      "first_seen": "2026-08-27",
       "last": {
         "name": "立华股份",
         "px": 19.46,
@@ -6079,10 +6074,13 @@
       "gate_closed": true
     },
     "300999": {
-      "entry_candidate": "2026-08-27",
-      "first_seen": "2026-08-27",
+      "entry": "2026-08-27",
+      "last_seen": "2026-08-27",
+      "exit": "2026-09-26",
+      "status": "active",
       "pool": "创业板",
       "type": "stock",
+      "first_seen": "2026-08-27",
       "last": {
         "name": "金龙鱼",
         "px": 26.24,
@@ -6097,10 +6095,13 @@
       "gate_closed": true
     },
     "302132": {
-      "entry_candidate": "2026-08-27",
-      "first_seen": "2026-08-27",
+      "entry": "2026-08-27",
+      "last_seen": "2026-08-27",
+      "exit": "2026-09-26",
+      "status": "active",
       "pool": "创业板",
       "type": "stock",
+      "first_seen": "2026-08-27",
       "last": {
         "name": "中航成飞",
         "px": 59.71,
@@ -6115,10 +6116,13 @@
       "gate_closed": true
     },
     "301305": {
-      "entry_candidate": "2026-08-27",
-      "first_seen": "2026-08-27",
+      "entry": "2026-08-27",
+      "last_seen": "2026-08-27",
+      "exit": "2026-09-26",
+      "status": "active",
       "pool": "创业板",
       "type": "stock",
+      "first_seen": "2026-08-27",
       "last": {
         "name": "朗坤科技",
         "px": 24.93,
@@ -6133,10 +6137,13 @@
       "gate_closed": true
     },
     "300910": {
-      "entry_candidate": "2026-08-27",
-      "first_seen": "2026-08-27",
+      "entry": "2026-08-27",
+      "last_seen": "2026-08-27",
+      "exit": "2026-09-26",
+      "status": "active",
       "pool": "创业板",
       "type": "stock",
+      "first_seen": "2026-08-27",
       "last": {
         "name": "瑞丰新材",
         "px": 27.58,
@@ -6151,10 +6158,13 @@
       "gate_closed": true
     },
     "688351": {
-      "entry_candidate": "2026-08-27",
-      "first_seen": "2026-08-27",
+      "entry": "2026-08-27",
+      "last_seen": "2026-08-27",
+      "exit": "2026-09-26",
+      "status": "active",
       "pool": "科创板",
       "type": "stock",
+      "first_seen": "2026-08-27",
       "last": {
         "name": "微电生理",
         "px": 20.93,
@@ -6169,10 +6179,13 @@
       "gate_closed": true
     },
     "688575": {
-      "entry_candidate": "2026-08-27",
-      "first_seen": "2026-08-27",
+      "entry": "2026-08-27",
+      "last_seen": "2026-08-27",
+      "exit": "2026-09-26",
+      "status": "active",
       "pool": "科创板",
       "type": "stock",
+      "first_seen": "2026-08-27",
       "last": {
         "name": "亚辉龙",
         "px": 10.76,
@@ -6187,10 +6200,13 @@
       "gate_closed": true
     },
     "688708": {
-      "entry_candidate": "2026-08-27",
-      "first_seen": "2026-08-27",
+      "entry": "2026-08-27",
+      "last_seen": "2026-08-27",
+      "exit": "2026-09-26",
+      "status": "active",
       "pool": "科创板",
       "type": "stock",
+      "first_seen": "2026-08-27",
       "last": {
         "name": "佳驰科技",
         "px": 40.11,
@@ -6205,10 +6221,13 @@
       "gate_closed": true
     },
     "688489": {
-      "entry_candidate": "2026-08-27",
-      "first_seen": "2026-08-27",
+      "entry": "2026-08-27",
+      "last_seen": "2026-08-27",
+      "exit": "2026-09-26",
+      "status": "active",
       "pool": "科创板",
       "type": "stock",
+      "first_seen": "2026-08-27",
       "last": {
         "name": "三未信安",
         "px": 24.58,
@@ -6223,10 +6242,13 @@
       "gate_closed": true
     },
     "688798": {
-      "entry_candidate": "2026-08-27",
-      "first_seen": "2026-08-27",
+      "entry": "2026-08-27",
+      "last_seen": "2026-08-27",
+      "exit": "2026-09-26",
+      "status": "active",
       "pool": "科创板",
       "type": "stock",
+      "first_seen": "2026-08-27",
       "last": {
         "name": "艾为电子",
         "px": 61.93,
@@ -6239,6 +6261,28 @@
         "gate_closed": true
       },
       "gate_closed": true
+    },
+    "605028": {
+      "entry": "2026-08-27",
+      "last_seen": "2026-08-27",
+      "exit": "2026-09-26",
+      "status": "active",
+      "pool": "主板",
+      "type": "stock",
+      "first_seen": "2026-08-27",
+      "last": {
+        "name": "世茂能源",
+        "px": 24.27,
+        "chg": -0.94,
+        "score": 65.1,
+        "tier": "不开新仓·仅跟踪",
+        "pool": "主板",
+        "type": "stock",
+        "date": "2026-08-27",
+        "gate_closed": true
+      },
+      "gate_closed": true
     }
-  }
+  },
+  "track_pending_short": {}
 }
