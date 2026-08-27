@@ -1809,6 +1809,7 @@
     "idx_close": 4630.28,
     "idx_ma20": 4637.08
   },
+  "_backfilled_0814": true,
   "track": {
     "601952": {
       "entry": "2026-08-17",
@@ -6279,6 +6280,30 @@
         "pool": "主板",
         "type": "stock",
         "date": "2026-08-27",
+        "gate_closed": true
+      },
+      "gate_closed": true
+    },
+    "002274": {
+      "entry": "2026-08-27",
+      "last_seen": "2026-08-27",
+      "exit": "2026-09-26",
+      "status": "active",
+      "pool": "主板",
+      "type": "stock",
+      "first_seen": "2026-08-21",
+      "suspended": true,
+      "suspend_since": "2026-08-26",
+      "last": {
+        "name": "华昌化工",
+        "px": 6.47,
+        "chg": 5.2,
+        "score": 65.2,
+        "tier": "不开新仓·仅跟踪",
+        "pool": "主板",
+        "type": "stock",
+        "date": "2026-08-25",
+        "suspended": true,
         "gate_closed": true
       },
       "gate_closed": true
