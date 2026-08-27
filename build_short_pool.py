@@ -228,16 +228,38 @@ def calc_signals(as_of=None):
     # 看板显示旧价格误导。load_stock_pool 的 10 自然日阈值只挡「死数据」，挡不住短期停牌股。
     _mkt_max = max(df.index[-1] for df in stock_pool.values()) if stock_pool else None
     rows_by_board = {"主板": [], "创业板": [], "科创板": []}
+    def _susp_sig(_code, _ddf, _r):
+        """停牌股信号数据（suspended 标记，供跟踪池渲染；不参与买入信号池）。
+        2026-08-27 用户反馈：持仓股（如 002274 华昌化工）停牌期间仍需跟踪卖出信号，
+        删除跟踪池=过度修复；标记 suspended，前端显示「⏸ 停牌·复牌后跟踪」。"""
+        _nm = NAMES.get(_code, _code[-6:])
+        if "ST" in _nm or _nm.startswith("S") or "退" in _nm or _r["close"] <= 1.5:
+            return
+        _sc = S.short_score(_r, reversal=True)
+        if pd.isna(_sc):
+            return
+        sig_stock[_code[-6:]] = {"name": _nm, "px": round(float(_r["close"]), 2),
+                                  "chg": round(float(_r["close"] / _ddf["close"].iloc[-2] - 1) * 100, 2),
+                                  "score": round(float(_sc), 1), "tier": "停牌",
+                                  "ma5_above": None, "suspended": True,
+                                  "suspend_since": str(_ddf.index[-1].date())}
+
     for code, ddf in stock_pool.items():
         if as_of is not None:
             if as_of not in ddf.index:
+                # 2026-08-27 修复：as_of 分支停牌股同样保留信号数据（供跟踪池渲染）。
+                # 002274 华昌化工 08-26 起停牌，as_of=08-27 时无当日数据被 continue 跳过，
+                # 但持仓股停牌期间仍需跟踪卖出信号 → 标记 suspended 供前端显示「停牌·复牌后跟踪」。
+                if _mkt_max is not None and (_mkt_max - ddf.index[-1]).days > 1:
+                    _susp_sig(code, ddf, ddf.iloc[-1])
                 continue
             r = ddf.loc[as_of]
         else:
             r = ddf.iloc[-1]
             # 2026-08-27 修复：停牌股新鲜度校验——数据日期落后全市场最新交易日 >1 自然日则跳过
             # （停牌股不可交易，短线信号无意义；正常标的当日回填滞后 ≤1 日不受影响）
-            if _mkt_max is not None and (ddf.index[-1] - _mkt_max).days > 1:
+            if _mkt_max is not None and (_mkt_max - ddf.index[-1]).days > 1:
+                _susp_sig(code, ddf, r)
                 continue
         if pd.isna(r["close"]) or r["close"] <= 0 or pd.isna(r["mom20"]):
             continue

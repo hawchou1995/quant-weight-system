@@ -938,8 +938,10 @@ document.addEventListener('DOMContentLoaded',function(){{
       if(!rec&&S.fund&&S.fund[code]){{rec=S.fund[code];grp='fund';}}
       if(!rec){{rows.push({{code:code,entry:r.entry,exit:r.exit||'—',age:r.age,grp:grp,typeName:r.pool||'股票',rec:null,inPool:0}});return;}}
       var act,actCls,tierDisp=rec.tier;
+      // 2026-08-27 修复：停牌股（suspended）——持仓股停牌期间仍需跟踪卖出信号，显示「停牌·复牌后跟踪」
+      if(rec.suspended){{act='⏸ 停牌·复牌后跟踪';actCls='warn';tierDisp='停牌';}}
       // 2026-08-26 修复：破MA5（收盘价<MA5）为硬性退出规则，档位同步改写「破MA5·卖出」，避免与建议动作「次日卖出」展示冲突
-      if(rec.ma5_above===false){{act='⚠️ 次日卖出（破MA5）';actCls='down';tierDisp='破MA5·卖出';}}
+      else if(rec.ma5_above===false){{act='⚠️ 次日卖出（破MA5）';actCls='down';tierDisp='破MA5·卖出';}}
       else if(rec.tier==='清仓'){{act='🔴 清仓';actCls='down';}}
       else if(rec.tier==='减至半仓'){{act='🔴 减至半仓';actCls='down';}}
       else if(!topSet[code]){{act='🔄 下次轮动换出';actCls='warn';}}
@@ -987,7 +989,13 @@ document.addEventListener('DOMContentLoaded',function(){{
     filtered.forEach(function(r){{
       var rec=r.rec;
       var ageS=r.age===null?'—':(r.age+' 天 / 剩 '+(30-r.age)+' 天');
-      h+='<tr><td>'+r.code+'</td><td>'+rec.name+'</td><td>'+r.typeName+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+(r.exit||'—')+'</td><td style="text-align:center">'+ageS+'</td><td style="text-align:right">'+rec.px+'</td><td style="text-align:right" class="'+(rec.chg>0?'up':'down')+'">'+(rec.chg>0?'+':'')+rec.chg+'%</td><td style="text-align:center">'+rec.score+'</td><td style="text-align:center">'+r.tierDisp+'</td><td style="text-align:center">'+(rec.ma5_above?'✅ 上方':'⚠️ 下方')+'</td><td style="text-align:center" class="'+r.actCls+'">'+r.act+'</td></tr>';
+      // 2026-08-27 修复：停牌股显示「⏸ 停牌」徽章，涨跌/MA5 置「—」（旧数据不误导）
+      var susp=rec.suspended;
+      var nameDisp=rec.name+(susp?' <span class="badge badge-warn" style="background:var(--warn-bg,#fef3c7);color:#92400e;font-size:11px;padding:1px 6px;border-radius:8px;margin-left:4px">⏸ 停牌</span>':'');
+      var chgDisp=susp?'停牌':((rec.chg>0?'+':'')+rec.chg+'%');
+      var chgCls=susp?'':(rec.chg>0?'up':'down');
+      var ma5Disp=susp?'—':(rec.ma5_above?'✅ 上方':'⚠️ 下方');
+      h+='<tr><td>'+r.code+'</td><td>'+nameDisp+'</td><td>'+r.typeName+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+(r.exit||'—')+'</td><td style="text-align:center">'+ageS+'</td><td style="text-align:right">'+rec.px+'</td><td style="text-align:right" class="'+chgCls+'">'+chgDisp+'</td><td style="text-align:center">'+rec.score+'</td><td style="text-align:center">'+r.tierDisp+'</td><td style="text-align:center">'+ma5Disp+'</td><td style="text-align:center" class="'+r.actCls+'">'+r.act+'</td></tr>';
     }});
     h+='</tbody></table>';
     box.innerHTML=h;
