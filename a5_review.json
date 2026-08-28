@@ -1,0 +1,32 @@
+{
+  "file": "review_a5.md",
+  "as_of": "2026-08-27",
+  "updated": "2026-08-28 09:38:19",
+  "stats": {
+    "n": 0,
+    "win_rate": null,
+    "mean_net": null,
+    "mean_raw": null,
+    "tp_ratio": null,
+    "nav": 1.0
+  },
+  "gate": {
+    "verdict": "信号不足 0/30，继续积累",
+    "wr": {
+      "status": "waiting",
+      "note": "0/30"
+    },
+    "mn": {
+      "status": "waiting",
+      "note": "0/30"
+    },
+    "tp": {
+      "status": "waiting",
+      "note": "0/30"
+    }
+  },
+  "n_watch": 22,
+  "n_avoid": 4,
+  "n_pos": 1,
+  "n_closed": 0
+}
