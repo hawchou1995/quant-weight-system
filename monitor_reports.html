@@ -102,6 +102,11 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 .pill-chg-up{color:var(--up);font-size:11px}
 .pill-chg-down{color:var(--down);font-size:11px}
 .board-tag{font-size:11px;padding:1px 8px;border-radius:6px;background:var(--card2);border:1px solid var(--border);color:var(--sub)}
+/* 市场板块徽章配色（2026-08-28 打板视图：主板/创业板/科创板/北交所 交易机制区分） */
+.board-sh{background:rgba(96,125,139,.12);border-color:rgba(96,125,139,.35);color:#607d8b}
+.board-cy{background:rgba(220,38,38,.10);border-color:rgba(220,38,38,.35);color:#dc2626}
+.board-kc{background:rgba(124,58,237,.10);border-color:rgba(124,58,237,.35);color:#7c3aed}
+.board-bj{background:rgba(5,150,105,.10);border-color:rgba(5,150,105,.35);color:#059669}
 
 /* ---------- 详情弹层 ---------- */
 .modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:40px 16px}
@@ -158,7 +163,7 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-full">满仓加仓</span> <span style="color:var(--faint)">不变</span></span></h2>
 <div class="sub">— ｜ 建议：<b>持有至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">32.86</div><div class="s">-1.53%（当日）</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">32.49</div><div class="s">-2.64%（当日）</div></div>
 <div class="kpi"><div class="l">近一年</div><div class="v down">+92%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">86.0</div><div class="s"><span class="pill pill-full">满仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">50</div><div class="s">正常</div></div>
@@ -177,8 +182,8 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-full">满仓加仓</span> <span class="pill-chg-up">减至半仓→满仓加仓</span></span></h2>
 <div class="sub">— ｜ 建议：<b>持有至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">29.72</div><div class="s">+0.27%（当日）</div></div>
-<div class="kpi"><div class="l">近一年</div><div class="v up">+86%</div><div class="s">—</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">29.15</div><div class="s">-1.65%（当日）</div></div>
+<div class="kpi"><div class="l">近一年</div><div class="v down">+86%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">85.6</div><div class="s"><span class="pill pill-full">满仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">46</div><div class="s">正常</div></div>
 </div>
@@ -196,7 +201,7 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-full">满仓加仓</span> <span class="pill-chg-up">减至半仓→满仓加仓</span></span></h2>
 <div class="sub">— ｜ 建议：<b>持有至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">3.94</div><div class="s">-0.25%（当日）</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">3.95</div><div class="s">+0.00%（当日）</div></div>
 <div class="kpi"><div class="l">近一年</div><div class="v down">+72%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">85.1</div><div class="s"><span class="pill pill-full">满仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">42</div><div class="s">正常</div></div>
@@ -215,7 +220,7 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-full">满仓加仓</span> <span style="color:var(--faint)">不变</span></span></h2>
 <div class="sub">— ｜ 建议：<b>持有至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">16.68</div><div class="s">+0.00%（当日）</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">16.55</div><div class="s">-0.78%（当日）</div></div>
 <div class="kpi"><div class="l">近一年</div><div class="v down">+53%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">84.8</div><div class="s"><span class="pill pill-full">满仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">49</div><div class="s">正常</div></div>
@@ -234,8 +239,8 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-full">满仓加仓</span> <span class="pill-chg-up">轻仓加仓→满仓加仓</span></span></h2>
 <div class="sub">— ｜ 建议：<b>持有至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">51.51</div><div class="s">+0.29%（当日）</div></div>
-<div class="kpi"><div class="l">近一年</div><div class="v up">+42%</div><div class="s">—</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">50.64</div><div class="s">-1.40%（当日）</div></div>
+<div class="kpi"><div class="l">近一年</div><div class="v down">+42%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">84.8</div><div class="s"><span class="pill pill-full">满仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">74</div><div class="s">正常</div></div>
 </div>
@@ -253,7 +258,7 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-full">满仓加仓</span> <span class="pill-chg-up">观望→满仓加仓</span></span></h2>
 <div class="sub">— ｜ 建议：<b>持有至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">69.46</div><div class="s">-0.32%（当日）</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">69.64</div><div class="s">-0.06%（当日）</div></div>
 <div class="kpi"><div class="l">近一年</div><div class="v down">+79%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">84.0</div><div class="s"><span class="pill pill-full">满仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">72</div><div class="s">正常</div></div>
@@ -272,7 +277,7 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-full">满仓加仓</span> <span class="pill-chg-up">轻仓加仓→满仓加仓</span></span></h2>
 <div class="sub">— ｜ 建议：<b>持有至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">28.55</div><div class="s">-0.14%（当日）</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">28.02</div><div class="s">-1.99%（当日）</div></div>
 <div class="kpi"><div class="l">近一年</div><div class="v down">+47%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">83.4</div><div class="s"><span class="pill pill-full">满仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">55</div><div class="s">正常</div></div>
@@ -291,7 +296,7 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-full">满仓加仓</span> <span class="pill-chg-up">观望→满仓加仓</span></span></h2>
 <div class="sub">— ｜ 建议：<b>持有至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">17.13</div><div class="s">-0.70%（当日）</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">16.37</div><div class="s">-5.10%（当日）</div></div>
 <div class="kpi"><div class="l">近一年</div><div class="v down">+50%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">83.2</div><div class="s"><span class="pill pill-full">满仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">68</div><div class="s">正常</div></div>
@@ -310,7 +315,7 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-full">满仓加仓</span> <span style="color:var(--faint)">不变</span></span></h2>
 <div class="sub">— ｜ 建议：<b>持有至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">21.55</div><div class="s">+13.48%（当日）</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">21.08</div><div class="s">+11.01%（当日）</div></div>
 <div class="kpi"><div class="l">近一年</div><div class="v up">+55%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">82.5</div><div class="s"><span class="pill pill-full">满仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">58</div><div class="s">正常</div></div>
@@ -348,7 +353,7 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-full">满仓加仓</span> <span class="pill-chg-up">观望→满仓加仓</span></span></h2>
 <div class="sub">— ｜ 建议：<b>持有至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">54.43</div><div class="s">-1.73%（当日）</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">52.46</div><div class="s">-5.29%（当日）</div></div>
 <div class="kpi"><div class="l">近一年</div><div class="v down">+96%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">79.5</div><div class="s"><span class="pill pill-full">满仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">59</div><div class="s">正常</div></div>
@@ -367,7 +372,7 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-full">满仓加仓</span> <span class="pill-chg-up">观望→满仓加仓</span></span></h2>
 <div class="sub">— ｜ 建议：<b>持有至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">95.30</div><div class="s">-1.01%（当日）</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">93.77</div><div class="s">-2.60%（当日）</div></div>
 <div class="kpi"><div class="l">近一年</div><div class="v down">+76%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">78.5</div><div class="s"><span class="pill pill-full">满仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">52</div><div class="s">正常</div></div>
@@ -386,7 +391,7 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-full">满仓加仓</span> <span class="pill-chg-up">观望→满仓加仓</span></span></h2>
 <div class="sub">— ｜ 建议：<b>持有至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">55.91</div><div class="s">-0.27%（当日）</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">54.72</div><div class="s">-2.39%（当日）</div></div>
 <div class="kpi"><div class="l">近一年</div><div class="v down">+84%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">77.6</div><div class="s"><span class="pill pill-full">满仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">64</div><div class="s">正常</div></div>
@@ -405,8 +410,8 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-full">满仓加仓</span> <span class="pill-chg-up">观望→满仓加仓</span></span></h2>
 <div class="sub">— ｜ 建议：<b>持有至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">48.86</div><div class="s">+1.22%（当日）</div></div>
-<div class="kpi"><div class="l">近一年</div><div class="v up">+58%</div><div class="s">—</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">47.12</div><div class="s">-2.38%（当日）</div></div>
+<div class="kpi"><div class="l">近一年</div><div class="v down">+58%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">77.1</div><div class="s"><span class="pill pill-full">满仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">41</div><div class="s">正常</div></div>
 </div>
@@ -424,7 +429,7 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-full">满仓加仓</span> <span class="pill-chg-up">观望→满仓加仓</span></span></h2>
 <div class="sub">— ｜ 建议：<b>持有至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">67.70</div><div class="s">-1.28%（当日）</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">65.35</div><div class="s">-4.71%（当日）</div></div>
 <div class="kpi"><div class="l">近一年</div><div class="v down">+47%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">77.1</div><div class="s"><span class="pill pill-full">满仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">64</div><div class="s">正常</div></div>
@@ -443,8 +448,8 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-full">满仓加仓</span> <span class="pill-chg-up">观望→满仓加仓</span></span></h2>
 <div class="sub">— ｜ 建议：<b>持有至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">10.08</div><div class="s">+1.10%（当日）</div></div>
-<div class="kpi"><div class="l">近一年</div><div class="v up">+79%</div><div class="s">—</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">9.89</div><div class="s">-0.80%（当日）</div></div>
+<div class="kpi"><div class="l">近一年</div><div class="v down">+79%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">76.8</div><div class="s"><span class="pill pill-full">满仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">56</div><div class="s">正常</div></div>
 </div>
@@ -462,7 +467,7 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-full">满仓加仓</span> <span class="pill-chg-up">轻仓加仓→满仓加仓</span></span></h2>
 <div class="sub">— ｜ 建议：<b>持有至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">58.50</div><div class="s">+4.09%（当日）</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">56.85</div><div class="s">+1.16%（当日）</div></div>
 <div class="kpi"><div class="l">近一年</div><div class="v up">+21%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">76.5</div><div class="s"><span class="pill pill-full">满仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">39</div><div class="s">正常</div></div>
@@ -481,7 +486,7 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-full">满仓加仓</span> <span class="pill-chg-up">观望→满仓加仓</span></span></h2>
 <div class="sub">— ｜ 建议：<b>持有至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">98.54</div><div class="s">-0.36%（当日）</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">95.25</div><div class="s">-3.69%（当日）</div></div>
 <div class="kpi"><div class="l">近一年</div><div class="v down">+33%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">75.5</div><div class="s"><span class="pill pill-full">满仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">63</div><div class="s">正常</div></div>
@@ -500,7 +505,7 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-add">轻仓加仓</span> <span class="pill-chg-up">减至半仓→轻仓加仓</span></span></h2>
 <div class="sub">— ｜ 建议：<b>可加至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">9.42</div><div class="s">+2.61%（当日）</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">9.50</div><div class="s">+3.49%（当日）</div></div>
 <div class="kpi"><div class="l">近一年</div><div class="v up">+42%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">73.8</div><div class="s"><span class="pill pill-add">轻仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">37</div><div class="s">正常</div></div>
@@ -519,7 +524,7 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-add">轻仓加仓</span> <span class="pill-chg-up">满仓加仓→轻仓加仓</span></span></h2>
 <div class="sub">— ｜ 建议：<b>可加至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">20.22</div><div class="s">-0.05%（当日）</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">20.03</div><div class="s">-0.99%（当日）</div></div>
 <div class="kpi"><div class="l">近一年</div><div class="v down">+34%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">70.4</div><div class="s"><span class="pill pill-add">轻仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">47</div><div class="s">正常</div></div>
@@ -538,8 +543,8 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-add">轻仓加仓</span> <span class="pill-chg-up">减至半仓→轻仓加仓</span></span></h2>
 <div class="sub">— ｜ 建议：<b>可加至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">59.33</div><div class="s">+0.41%（当日）</div></div>
-<div class="kpi"><div class="l">近一年</div><div class="v up">+55%</div><div class="s">—</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">58.29</div><div class="s">-1.35%（当日）</div></div>
+<div class="kpi"><div class="l">近一年</div><div class="v down">+55%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">70.3</div><div class="s"><span class="pill pill-add">轻仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">56</div><div class="s">正常</div></div>
 </div>
@@ -557,7 +562,7 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-add">轻仓加仓</span> <span style="color:var(--faint)">不变</span></span></h2>
 <div class="sub">— ｜ 建议：<b>可加至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">6.53</div><div class="s">-1.80%（当日）</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">6.52</div><div class="s">-1.95%（当日）</div></div>
 <div class="kpi"><div class="l">近一年</div><div class="v down">+62%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">67.9</div><div class="s"><span class="pill pill-add">轻仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">41</div><div class="s">正常</div></div>
@@ -576,7 +581,7 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-add">轻仓加仓</span> <span class="pill-chg-up">满仓加仓→轻仓加仓</span></span></h2>
 <div class="sub">— ｜ 建议：<b>可加至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">20.86</div><div class="s">-0.71%（当日）</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">20.81</div><div class="s">-0.95%（当日）</div></div>
 <div class="kpi"><div class="l">近一年</div><div class="v down">+35%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">67.4</div><div class="s"><span class="pill pill-add">轻仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">52</div><div class="s">正常</div></div>
@@ -595,7 +600,7 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-add">轻仓加仓</span> <span class="pill-chg-up">减至半仓→轻仓加仓</span></span></h2>
 <div class="sub">— ｜ 建议：<b>可加至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">84.00</div><div class="s">-3.45%（当日）</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">78.16</div><div class="s">-10.16%（当日）</div></div>
 <div class="kpi"><div class="l">近一年</div><div class="v down">+72%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">65.8</div><div class="s"><span class="pill pill-add">轻仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">60</div><div class="s">正常</div></div>
@@ -614,8 +619,8 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-add">轻仓加仓</span> <span class="pill-chg-up">观望→轻仓加仓</span></span></h2>
 <div class="sub">— ｜ 建议：<b>可加至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">68.36</div><div class="s">-0.22%（当日）</div></div>
-<div class="kpi"><div class="l">近一年</div><div class="v down">+51%</div><div class="s">—</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">69.21</div><div class="s">+1.02%（当日）</div></div>
+<div class="kpi"><div class="l">近一年</div><div class="v up">+51%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">65.4</div><div class="s"><span class="pill pill-add">轻仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">56</div><div class="s">正常</div></div>
 </div>
@@ -633,7 +638,7 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-add">轻仓加仓</span> <span style="color:var(--faint)">不变</span></span></h2>
 <div class="sub">— ｜ 建议：<b>可加至目标仓位</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">22.83</div><div class="s">+2.01%（当日）</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">22.61</div><div class="s">+1.03%（当日）</div></div>
 <div class="kpi"><div class="l">近一年</div><div class="v up">+24%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">64.6</div><div class="s"><span class="pill pill-add">轻仓加仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">63</div><div class="s">正常</div></div>
@@ -709,8 +714,8 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-watch">观望</span> <span class="pill-chg-down">轻仓加仓→观望</span></span></h2>
 <div class="sub">— ｜ 建议：<b>持有不加 / 观望</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">37.20</div><div class="s">-0.32%（当日）</div></div>
-<div class="kpi"><div class="l">近一年</div><div class="v down">+48%</div><div class="s">—</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">38.50</div><div class="s">+3.16%（当日）</div></div>
+<div class="kpi"><div class="l">近一年</div><div class="v up">+48%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">58.2</div><div class="s"><span class="pill pill-watch">观望</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">60</div><div class="s">正常</div></div>
 </div>
@@ -728,7 +733,7 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-watch">观望</span> <span style="color:var(--faint)">不变</span></span></h2>
 <div class="sub">— ｜ 建议：<b>持有不加 / 观望</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">54.96</div><div class="s">+1.23%（当日）</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">55.83</div><div class="s">+2.84%（当日）</div></div>
 <div class="kpi"><div class="l">近一年</div><div class="v up">+68%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">48.3</div><div class="s"><span class="pill pill-watch">观望</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">14</div><div class="s">超卖</div></div>
@@ -747,8 +752,8 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-watch">观望</span> <span class="pill-chg-down">轻仓加仓→观望</span></span></h2>
 <div class="sub">— ｜ 建议：<b>持有不加 / 观望</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">39.52</div><div class="s">-0.33%（当日）</div></div>
-<div class="kpi"><div class="l">近一年</div><div class="v down">+54%</div><div class="s">—</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">40.14</div><div class="s">+1.24%（当日）</div></div>
+<div class="kpi"><div class="l">近一年</div><div class="v up">+54%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">45.6</div><div class="s"><span class="pill pill-watch">观望</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">50</div><div class="s">正常</div></div>
 </div>
@@ -766,7 +771,7 @@ h4{margin:10px 0 6px;font-size:13px;color:var(--sub)}
 <span style="margin-left:auto;display:inline-flex;gap:8px"><span class="pill pill-cut">减至半仓</span> <span class="pill-chg-down">满仓加仓→减至半仓</span></span></h2>
 <div class="sub">— ｜ 建议：<b>减至半仓</b>（回测体系信号，仅供参考）</div>
 <div class="kpis">
-<div class="kpi"><div class="l">现价</div><div class="v">12.30</div><div class="s">+2.41%（当日）</div></div>
+<div class="kpi"><div class="l">现价</div><div class="v">12.87</div><div class="s">+7.16%（当日）</div></div>
 <div class="kpi"><div class="l">近一年</div><div class="v up">+74%</div><div class="s">—</div></div>
 <div class="kpi"><div class="l">权重分</div><div class="v">41.3</div><div class="s"><span class="pill pill-cut">减至半仓</span></div></div>
 <div class="kpi"><div class="l">RSI(14)</div><div class="v">47</div><div class="s">正常</div></div>
