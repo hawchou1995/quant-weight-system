@@ -1,0 +1,53 @@
+name: rt-snapshot
+# GitHub Actions 盘中池内快照 MVP（2026-08-28，吸收 niuone 实时更新方法论）
+# 定位：替代本地 9:30/14:30 盘中自动化（拉池内行情 → patch chg/px/intraday → 部署）
+#       收盘 15:30 全量管道保留本地；EOD 重建自动覆盖盘中字段（幂等）
+# 工程模式：fail-retain（脚本失败→无 diff→不 commit 不部署）/ concurrency 幂等 / freshness 预检（脚本内）
+# 时区：GitHub schedule 用 UTC → 09:30/14:30 北京时间 = 01:30/06:30 UTC（中国无夏令时）
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 1 * * 1-5'   # 09:30 北京时间
+    - cron: '30 6 * * 1-5'   # 14:30 北京时间
+
+concurrency:
+  group: rt-snapshot
+  cancel-in-progress: false   # 不互相取消：宁可排队也不丢快照
+
+permissions:
+  contents: write   # gh-pages push + main 提交都需要（探针首跑 403 教训）
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 盘中快照 patch（fail-retain：失败不写盘，无 diff 即跳过提交）
+        id: snap
+        run: python .github/probe/rt_snapshot.py
+
+      - name: 提交快照（仅当数据有变化；休市/失败自动跳过）
+        run: |
+          if git diff --quiet -- enhanced_data.js short_pool.js a5_pool.js; then
+            echo "无变更（休市/数据未变），跳过 commit"
+          else
+            git config user.name "rt-snapshot[bot]"
+            git config user.email "rt-snapshot[bot]@users.noreply.github.com"
+            git add enhanced_data.js short_pool.js a5_pool.js .github/probe/snapshot_status.json
+            git commit -m "rt: 盘中池内快照 $(TZ=Asia/Shanghai date '+%H:%M')"
+            git push
+          fi
+
+      - name: 部署 gh-pages（仅盘中快照版；不动本地收盘产物）
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .
+          publish_branch: gh-pages
+          keep_files: true
+          exclude_assets: '.github,*.py,*.yml,*.pkl,*.csv'
