@@ -964,6 +964,25 @@ html = f"""<!doctype html>
 <div class="rule-box" style="margin-bottom:0"><b>监控口径</b>：权重分 = 动量35% + 趋势25% + Aroon20% + 量价20% ｜ 档位 = ≥75 满仓加仓 / ≥60 轻仓加仓 / ≥45 观望 / ≥30 减半 / &lt;30 清仓
 <br><b>卖出闸门（每日）</b>：全量池 移动止损 4.5% + 沪深300破MA150 ｜ 任何闸门先触发先生效</div>
 </div>
+<!-- 🌦 市场晴雨表（niuone 口径 · 30s 实时 · 纯展示非信号） -->
+<div class="card" id="mkt-weather" style="margin-top:14px">
+<h2>🌦 市场晴雨表 <span class="badge badge-auto" id="mw-badge">—</span></h2>
+<div class="sub">全市场情绪广度 = 红/绿盘家数 + 涨停/跌停/炸板 + 量能（照抄 niuone 口径 · 腾讯行情批量接口精算）· 交易时段每 30s 实时更新，收盘后定格静态精算 · <b>仅客观展示，不构成任何交易信号</b></div>
+<div id="mw-summary" class="mw-summary">等待数据…</div>
+<div id="mw-idx" class="mw-idx"></div>
+<div id="mw-chart" class="mw-chart"></div>
+<style>
+.mw-summary{{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;padding:6px 0 10px;font-size:13px}}
+.mw-big{{font-size:16px;font-weight:700;margin-right:4px}}
+.mw-item{{white-space:nowrap}}
+.mw-note{{color:var(--faint);font-size:11px;margin-left:auto}}
+.mw-idx{{display:flex;flex-wrap:wrap;gap:6px 14px;padding:6px 0 8px;border-top:1px dashed var(--border,#e2e8f0)}}
+.mw-idx-item{{font-size:12px;white-space:nowrap}}
+.mw-idx-item .n{{color:var(--sub)}}
+.mw-idx-item .p{{font-weight:600;margin:0 4px;font-variant-numeric:tabular-nums}}
+.mw-chart{{border-top:1px dashed var(--border,#e2e8f0);padding-top:10px}}
+</style>
+</div>
 {bt_all_html()}
 {bt_short_html()}
 {bt_a5_html()}
@@ -1043,7 +1062,7 @@ html = f"""<!doctype html>
 </div>
 
 </div>
-<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 {build_ts} · 版本 v5.11.8 · 数据截至 {DATA["meta"].get("as_of", "—")} · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 {build_ts} · 版本 v5.12.0（+🌦市场晴雨表） · 数据截至 {DATA["meta"].get("as_of", "—")} · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({{top:0,behavior:'smooth'}})">↑</button>
@@ -1052,13 +1071,15 @@ html = f"""<!doctype html>
 <script src="enhanced_data.js"></script>
 <script src="short_signals.js"></script>
 <script src="a5_pool.js"></script>
+<script src="market_breadth.js"></script>
+<script src="market_weather.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/artalk@2/dist/Artalk.css">
 <script src="https://unpkg.com/artalk@2/dist/Artalk.js"></script>
 <script>window.SHORT_POOL = {SHORT_POOL_SLIM};</script>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
 window.ENH.nav = [
-  ["overview","📊","监控总览",[["overview","总览统计"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
+  ["overview","📊","监控总览",[["overview","总览统计"],["mkt-weather","市场晴雨表"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
   ["sys-auto","🅰️","全量池中/长线",[["card-tbl-v9","标的汇总表"],["card-tbl-v9-detail","逐标的详情"],["watch-v9-card","中长线跟踪"]]],
   ["short","⚡","全量池短线",[["card-tbl-short","标的汇总表"],["watch-card","短线跟踪"],["card-tbl-short-detail","逐标的详情"]]],
   ["a5","🎯","打板实验",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
