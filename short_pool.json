@@ -1809,7 +1809,6 @@
     "idx_close": 4630.28,
     "idx_ma20": 4637.08
   },
-  "_backfilled_0814": true,
   "track": {
     "601952": {
       "entry": "2026-08-17",
@@ -2216,7 +2215,7 @@
       "pool": "科创板",
       "exit": "2026-09-24",
       "status": "active",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "type": "stock",
       "gate_closed": true,
       "last": {
@@ -2227,7 +2226,7 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       }
     },
@@ -3429,7 +3428,7 @@
     },
     "600739": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "主板",
@@ -3443,7 +3442,7 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3492,7 +3491,7 @@
     },
     "688139": {
       "entry": "2026-08-25",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-24",
       "status": "active",
       "pool": "科创板",
@@ -3506,7 +3505,7 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3576,7 +3575,7 @@
     },
     "003719": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "基金",
@@ -3590,12 +3589,12 @@
         "tier": "强买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-27"
+        "date": "2026-08-28"
       }
     },
     "001093": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "基金",
@@ -3609,12 +3608,12 @@
         "tier": "强买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-27"
+        "date": "2026-08-28"
       }
     },
     "001092": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "基金",
@@ -3628,12 +3627,12 @@
         "tier": "强买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-27"
+        "date": "2026-08-28"
       }
     },
     "001420": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "基金",
@@ -3647,12 +3646,12 @@
         "tier": "强买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-27"
+        "date": "2026-08-28"
       }
     },
     "001426": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "基金",
@@ -3666,12 +3665,12 @@
         "tier": "强买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-27"
+        "date": "2026-08-28"
       }
     },
     "003717": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "基金",
@@ -3685,12 +3684,12 @@
         "tier": "强买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-27"
+        "date": "2026-08-28"
       }
     },
     "005109": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "基金",
@@ -3704,12 +3703,12 @@
         "tier": "强买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-27"
+        "date": "2026-08-28"
       }
     },
     "005110": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "基金",
@@ -3723,12 +3722,12 @@
         "tier": "强买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-27"
+        "date": "2026-08-28"
       }
     },
     "001695": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "基金",
@@ -3742,12 +3741,12 @@
         "tier": "强买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-27"
+        "date": "2026-08-28"
       }
     },
     "001414": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "基金",
@@ -3761,7 +3760,7 @@
         "tier": "强买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-27"
+        "date": "2026-08-28"
       }
     },
     "002753": {
@@ -4144,7 +4143,7 @@
     },
     "300203": {
       "entry": "2026-08-25",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-24",
       "status": "active",
       "pool": "创业板",
@@ -4158,7 +4157,7 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4963,7 +4962,7 @@
     },
     "002069": {
       "entry": "2026-08-24",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-23",
       "status": "active",
       "pool": "主板",
@@ -4977,7 +4976,7 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
@@ -5404,7 +5403,7 @@
     },
     "300855": {
       "entry": "2026-08-26",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-25",
       "status": "active",
       "pool": "创业板",
@@ -5418,7 +5417,7 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
@@ -5488,7 +5487,7 @@
     },
     "300498": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "创业板",
@@ -5502,7 +5501,7 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
@@ -5593,7 +5592,7 @@
     },
     "688591": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "科创板",
@@ -5607,7 +5606,7 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
@@ -5656,7 +5655,7 @@
     },
     "002926": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "主板",
@@ -5670,14 +5669,14 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
     },
     "000685": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "主板",
@@ -5691,14 +5690,14 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
     },
     "300057": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "创业板",
@@ -5712,14 +5711,14 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
     },
     "300890": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "创业板",
@@ -5733,14 +5732,14 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
     },
     "688819": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "科创板",
@@ -5754,14 +5753,14 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
     },
     "688772": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "科创板",
@@ -5775,7 +5774,7 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
@@ -5950,7 +5949,7 @@
     },
     "002616": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "主板",
@@ -5964,14 +5963,14 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
     },
     "002321": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "主板",
@@ -5985,14 +5984,14 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
     },
     "000623": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "主板",
@@ -6006,14 +6005,14 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
     },
     "601059": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "主板",
@@ -6027,14 +6026,14 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
     },
     "600971": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "主板",
@@ -6048,14 +6047,14 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
     },
     "300761": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "创业板",
@@ -6069,14 +6068,14 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
     },
     "300999": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "创业板",
@@ -6090,14 +6089,14 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
     },
     "302132": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "创业板",
@@ -6111,14 +6110,14 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
     },
     "301305": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "创业板",
@@ -6132,14 +6131,14 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
     },
     "300910": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "创业板",
@@ -6153,14 +6152,14 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
     },
     "688351": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "科创板",
@@ -6174,14 +6173,14 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
     },
     "688575": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "科创板",
@@ -6195,14 +6194,14 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
     },
     "688708": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "科创板",
@@ -6216,14 +6215,14 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
     },
     "688489": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "科创板",
@@ -6237,14 +6236,14 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
     },
     "688798": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "科创板",
@@ -6258,14 +6257,14 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
     },
     "605028": {
       "entry": "2026-08-27",
-      "last_seen": "2026-08-27",
+      "last_seen": "2026-08-28",
       "exit": "2026-09-26",
       "status": "active",
       "pool": "主板",
@@ -6279,7 +6278,7 @@
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-08-27",
+        "date": "2026-08-28",
         "gate_closed": true
       },
       "gate_closed": true
