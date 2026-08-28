@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>标的监控看板（数据截至 2026-08-28 · 构建 2026-08-28 15:56）</title>
+<title>标的监控看板（数据截至 2026-08-28 · 构建 2026-08-28 23:32）</title>
 <style>
 :root{
   --bg:#f3f4f6; --card:#ffffff; --card2:#f9fafb; --border:#e5e7eb; --line:#f0f1f3;
@@ -247,7 +247,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <!-- ============ 视图 0：监控总览 ============ -->
 <div class="view active" id="view-overview">
 <div class="card" id="overview">
-<h2>📊 标的监控总览 <span class="badge badge-auto">数据截至 2026-08-28 收盘</span></h2>
+<h2>📊 标的监控总览 <span class="badge badge-auto">数据截至 2026-08-28（盘中实时）</span></h2>
 <div class="sub">左侧导航切换：🅰️ 全量池中/长线（全市场自动池·股票分层+基金） / ⚡ 短线 / 🎯 打板实验（模拟盘） · 信号仅供参考</div>
 <div class="kpis">
 <div class="kpi"><div class="l">🟢 加仓区</div><div class="v" style="color:#dc2626">26 只</div><div class="s">满仓+轻仓加仓</div></div>
@@ -381,7 +381,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class="sys-head">
 <div class="sys-head-top">
 <h2>🅰️ 全量池中/长线 <span class="view-badge auto">全市场自动池 · 股票分层+基金</span></h2>
-<span class="view-badge auto" title="收盘数据">数据截至 2026-08-28 15:00 · 收盘</span>
+<span class="view-badge auto" title="2026-08-28 盘中行情（16:14）· 分数为收盘口径">数据截至 2026-08-28 16:14 · 盘中实时</span>
 </div>
 <div class="sys-head-tags"><span class="badge badge-auto" style="background:#d97706;color:#fff">市况门控 ⚠ 关 · 仅提醒（沪深300 4609 &lt; MA200 4700，权重分达标照常展示，仅供参考）</span><span class="badge badge-auto">评分 = Aroon强趋势过滤(A80_M78)</span><span class="badge badge-auto">筛池 = 全市场绝对规则 Top3 等权 · 月轮动</span><span class="badge badge-auto">风控 = 移动止损4.5% · MA200择时</span></div><div class="sys-head-note">回测参考见「监控总览」视图</div>
 </div>
@@ -1957,7 +1957,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class="sys-head">
 <div class="sys-head-top">
 <h2>⚡ 全量池短线 <span class="view-badge auto">全市场短线信号 Top 池</span></h2>
-<span class="view-badge auto" title="收盘数据">数据截至 2026-08-28 15:00 · 收盘</span>
+<span class="view-badge auto" title="收盘数据">数据截至 2026-08-28 16:14 · 收盘</span>
 </div>
 <div class="sys-head-tags"><span class="badge badge-auto" style="background:#d97706;color:#fff">市况门控 ⚠ 关 · 仅提醒（沪深300 4609.18 &lt; MA20 4638.13，股票池照常展示，仅供参考）</span><span class="badge badge-auto">股票 = 反转信号按权限分层 · 仅买入（分≥50），各 ≤10 不凑数，剔ST</span><span class="badge badge-auto">基金 = 动量（分≥50 才入池）</span><span class="badge badge-auto">短线分 = 动量30/量价25/通道25/波动20</span></div><div class="sys-head-note"><b>市况门控仅提醒：沪深300 &gt; MA20 才开新仓；门控关闭时股票池照常入池展示，仅作参考（⚠ 非买入指令，不追高）；持仓卖出信号走「全量池短线跟踪」</b> · 回测参考见「监控总览」</div>
 </div>
@@ -2896,7 +2896,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class="sys-head">
 <div class="sys-head-top">
 <h2>🎯 打板实验 <span class="view-badge auto">A5_tp8t2 · 模拟盘</span></h2>
-<span class="view-badge auto" title="收盘数据">数据截至 2026-08-28 15:00 · 收盘</span>
+<span class="view-badge auto" title="行情截至 2026-08-28 16:14 · 清单（观察/回避/持仓）为 2026-08-28 收盘口径">数据截至 2026-08-28 16:14 · 盘中实时（清单为 2026-08-28 收盘口径）</span>
 </div>
 <div class="sys-head-tags">
 <span class="badge badge-auto" style="background:#d97706;color:#fff">⚠ 负期望实验系统 · 模拟盘验证中 · 禁止实盘</span>
@@ -2931,7 +2931,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class="card" id="a5-curve">
 <h2>📈 模拟盘净值曲线 <span class="badge badge-auto">已平仓复利</span></h2>
 <div class="sub">回测组合复利 -72.2% 警示：边缘太薄（σ≈5%/日），净值曲线难看属正常，验证的是边缘是否存在而非盈利</div>
-<svg viewBox="0 0 600 120" style="width:100%;max-width:700px;margin-top:10px"><polyline points="0,1.0;1,0.988533" fill="none" stroke="#f59e0b" stroke-width="2"/><text x="8" y="16" font-size="12" fill="#9ca3af">模拟盘净值 0.9885（2 个交易点）</text></svg>
+<svg viewBox="0 0 600 120" style="width:100%;max-width:700px;margin-top:10px"><polyline points="0,1.0 1,0.988533" fill="none" stroke="#f59e0b" stroke-width="2"/><text x="8" y="16" font-size="12" fill="#9ca3af">模拟盘净值 0.9885（2 个交易点）</text></svg>
 </div>
 </div>
 
@@ -3842,7 +3842,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 
 </div>
-<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-28 15:56 · 版本 v5.11.8 · 数据截至 2026-08-28 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-08-28 23:32 · 版本 v5.11.8 · 数据截至 2026-08-28 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>

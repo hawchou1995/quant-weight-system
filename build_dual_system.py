@@ -538,7 +538,7 @@ def a5_view_html():
     # 净值曲线（模拟盘点数少，线性折线）
     curve_html = ""
     if len(eq) >= 2:
-        pts = ";".join(f"{i},{v['nav']}" for i, v in enumerate(eq))
+        pts = " ".join(f"{i},{v['nav']}" for i, v in enumerate(eq))
         curve_html = (f'<svg viewBox="0 0 600 120" style="width:100%;max-width:700px;margin-top:10px">'
                       f'<polyline points="{pts}" fill="none" stroke="#f59e0b" stroke-width="2"/>'
                       f'<text x="8" y="16" font-size="12" fill="#9ca3af">模拟盘净值 {st.get("nav", 1.0):.4f}（{len(eq)} 个交易点）</text></svg>')
