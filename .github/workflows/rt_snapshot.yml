@@ -43,11 +43,15 @@ jobs:
             git push
           fi
 
-      - name: 部署 gh-pages（仅盘中快照版；不动本地收盘产物）
+      - name: 组装部署目录（仅盘中数据文件；HTML 由收盘本地管道部署）
+        run: |
+          mkdir -p staging
+          cp enhanced_data.js short_pool.js a5_pool.js staging/
+
+      - name: 部署 gh-pages（keep_files 保留 HTML，只更新数据文件）
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .
+          publish_dir: staging
           publish_branch: gh-pages
           keep_files: true
-          exclude_assets: '.github,*.py,*.yml,*.pkl,*.csv'
