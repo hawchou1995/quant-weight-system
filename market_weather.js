@@ -75,20 +75,36 @@
         try { return Number(JSON.parse(t).data.tc) || 0; } catch (e) { return null; }
       });
   }
+  var _breadthFailAt = 0;                 // 涨跌家数接口失败时间戳（退避用）
+  var BREADTH_RETRY_MS = 5 * 60 * 1000;   // 失败后 5 分钟不再重试（避免控制台刷 ERR_EMPTY_RESPONSE）
+  var BREADTH_URLS = [
+    // push2delay：实测可达且返回完整 CORS 头（github.io 可直连）；push2 主站被拦（ERR_EMPTY_RESPONSE）
+    'https://push2delay.eastmoney.com/api/qt/stock/get?secid=1.000001&fields=f43,f104,f105,f106&fltt=2',
+    'https://push2delay.eastmoney.com/api/qt/stock/get?secid=0.399001&fields=f43,f104,f105,f106&fltt=2',
+    'https://push2.eastmoney.com/api/qt/stock/get?secid=1.000001&fields=f43,f104,f105,f106&fltt=2',
+    'https://push2.eastmoney.com/api/qt/stock/get?secid=0.399001&fields=f43,f104,f105,f106&fltt=2'
+  ];
   function fetchBreadth() {
-    // 东财指数涨跌家数（浏览器侧可能可用；沙箱内受限）——失败则用静态/近似
-    var urls = ['https://push2.eastmoney.com/api/qt/stock/get?secid=1.000001&fields=f43,f104,f105,f106&fltt=2',
-      'https://push2.eastmoney.com/api/qt/stock/get?secid=0.399001&fields=f43,f104,f105,f106&fltt=2'];
+    // 非交易时段：不请求实时涨跌家数（直接用静态精算），避免无效请求与报错
+    if (!isTrading()) return Promise.resolve(null);
+    // 失败退避：5 分钟内不再尝试
+    if (_breadthFailAt && Date.now() - _breadthFailAt < BREADTH_RETRY_MS) return Promise.resolve(null);
+    var urls = BREADTH_URLS;
     return Promise.all(urls.map(function (u) { return fetchText(u).then(function (t) { try { return JSON.parse(t).data; } catch (e) { return null; } }).catch(function () { return null; }); }))
       .then(function (arr) {
-        var sh = arr[0], sz = arr[1];
-        if (sh && sz && isFinite(Number(sh.f104)) && isFinite(Number(sz.f104))) {
-          var red = Number(sh.f104) + Number(sz.f104);
-          var green = Number(sh.f105) + Number(sz.f105);
-          var flat = Number(sh.f106) + Number(sz.f106);
-          // 合理性闸：全市场红绿平总数应 ≥3000（防接口非交易时段返回占位值覆盖精算数据）
-          if (red + green + flat >= 3000) return { red: red, green: green, flat: flat, src: 'eastmoney' };
+        // 多源：push2delay 优先（sh=arr[0], sz=arr[1]），主站作 fallback（sh=arr[2], sz=arr[3]）
+        var pairs = [[arr[0], arr[1]], [arr[2], arr[3]]];
+        for (var p = 0; p < pairs.length; p++) {
+          var sh = pairs[p][0], sz = pairs[p][1];
+          if (sh && sz && isFinite(Number(sh.f104)) && isFinite(Number(sz.f104))) {
+            var red = Number(sh.f104) + Number(sz.f104);
+            var green = Number(sh.f105) + Number(sz.f105);
+            var flat = Number(sh.f106) + Number(sz.f106);
+            // 合理性闸：全市场红绿平总数应 ≥3000（防接口非交易时段返回占位值覆盖精算数据）
+            if (red + green + flat >= 3000) { _breadthFailAt = 0; return { red: red, green: green, flat: flat, src: 'eastmoney' }; }
+          }
         }
+        _breadthFailAt = Date.now();
         if (MB && MB.latest) return { red: MB.latest.red, green: MB.latest.green, flat: MB.latest.flat, src: 'static' };
         return null;
       });
@@ -107,8 +123,8 @@
     // 量能：静态精算的当日累计成交额（直连无两市聚合成交额接口时用静态）
     if (MB && MB.latest && MB.latest.turnover_yi) s.turnover_yi = MB.latest.turnover_yi;
     state.ts = { t: t, pools: pools, breadth: b, idx: idx };
-    state.live.push(s);
-    saveLocalTimeline();
+    // 仅交易时段写入曲线点（非交易时段采样点会污染时间轴/造成直线）
+    if (isTrading()) { state.live.push(s); saveLocalTimeline(); }
     render();
   }
   var _everPolled = false;
@@ -147,11 +163,15 @@
     var b = $('mw-summary');
     if (!b) return;
     var src = state.breadth || (MB && MB.latest) || null;
-    var pools = state.pools || (MB && MB.latest) || {};
-    if (!src && !pools.limit_up) { b.innerHTML = '<span style="color:var(--faint)">等待数据…</span>'; return; }
+    var pools = state.pools || {};
+    var stat = MB && MB.latest ? MB.latest : null;
+    if (!src && !stat) { b.innerHTML = '<span style="color:var(--faint)">等待数据…</span>'; return; }
     var red = src.red || 0, green = src.green || 0, flat = src.flat || 0;
-    var zt = pools.limit_up || 0, dt = pools.limit_down || 0, zb = pools.broken_limit || 0;
-    var tz = MB && MB.latest ? MB.latest.turnover_yi : null;
+    // 池数据：非交易时段/失败时回退静态（避免周六显示 0）
+    var zt = (pools.limit_up > 0) ? pools.limit_up : (stat ? stat.limit_up : 0);
+    var dt = (pools.limit_down > 0) ? pools.limit_down : (stat ? stat.limit_down : 0);
+    var zb = (pools.broken_limit > 0) ? pools.broken_limit : (stat ? stat.broken_limit : 0);
+    var tz = stat ? stat.turnover_yi : null;
     var sl = sentimentLevel(red, green, zt);
     var html = '<span class="mw-big" style="color:' + sl.color + '">情绪 ' + sl.lv + '</span>' +
       '<span class="mw-item">红盘 <b style="color:#dc2626">' + red + '</b></span>' +
@@ -178,13 +198,18 @@
       c.appendChild(el('div', { class: 'mw-idx-item' }, '<span class="n">' + x.name + '</span><span class="p">' + fmtNum(x.px) + '</span><span class="c" style="color:' + (up ? '#dc2626' : '#16a34a') + '">' + (up ? '+' : '') + fmtNum(x.chg) + '%</span>'));
     });
   }
+  function tMin(t) { var p = String(t).split(':'); return (+p[0]) * 60 + (+p[1]); }
   function chartData() {
     var staticTl = (MB && MB.timeline) ? MB.timeline : [];
     var liveTl = loadLocalTimeline();
     var map = {};
     staticTl.forEach(function (e) { map[e.t] = e; });
     liveTl.forEach(function (e) { map[e.t] = e; });
-    return Object.keys(map).sort().map(function (t) { return map[t]; });
+    // 只保留交易时段内（09:30-15:00）的点，按时间排序
+    return Object.keys(map)
+      .map(function (t) { return map[t]; })
+      .filter(function (e) { var m = tMin(e.t); return m >= 570 && m <= 900; })
+      .sort(function (a, b) { return tMin(a.t) - tMin(b.t); });
   }
   function renderChart() {
     var box = $('mw-chart');
@@ -205,13 +230,15 @@
     maxCnt = Math.ceil(maxCnt * 1.1 / 500) * 500;
     maxLt = Math.ceil(maxLt * 1.4 / 10) * 10;
     maxVol = Math.ceil(maxVol * 1.15 / 1000) * 1000;
-    var x = function (i) { return padL + (tl.length === 1 ? iw / 2 : iw * i / (tl.length - 1)); };
+    // x 轴 = 真实交易时间线性映射（09:30→左缘, 15:00→右缘），不依赖点数 → tick 永不重叠
+    var T0 = 570, T1 = 900; // 9:30 / 15:00 分钟
+    function x(t) { return padL + ((tMin(t) - T0) / (T1 - T0)) * iw; }
     var yCnt = function (v) { return padT + mainH - (v / maxCnt) * mainH; };
     var yLt = function (v) { return padT + mainH - (v / maxLt) * mainH; };
     var yVol = function (v) { return volTop + volH - (v / maxVol) * volH; };
     function poly(pts) { return pts.map(function (p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' '); }
     function line(series, yfn, color, w) {
-      var pts = tl.map(function (e, i) { return [x(i), yfn(e[series] || 0)]; });
+      var pts = tl.map(function (e, i) { return [x(e.t), yfn(e[series] || 0)]; });
       return '<polyline fill="none" stroke="' + color + '" stroke-width="' + (w || 1.6) + '" points="' + poly(pts) + '"/>';
     }
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto;display:block">';
@@ -228,24 +255,29 @@
     // 量能刻度
     svg += '<text x="' + padL + '" y="' + (volTop + volH + 10) + '" font-size="9" fill="var(--faint,#94a3b8)">量能(亿) ' + Math.round(maxVol / 1000) + 'k</text>';
     // 主区曲线
-    svg += line('red', yCnt, '#dc2626', 1.8);
-    svg += line('green', yCnt, '#16a34a', 1.8);
-    svg += line('limit_up', yLt, '#ef4444', 1.4);
-    svg += line('limit_down', yLt, '#22c55e', 1.4);
-    svg += line('broken_limit', yLt, '#f59e0b', 1.2);
+    if (tl.length === 1) {
+      // 单点（非交易时段仅收盘精算点）：画圆点标记 + 说明，避免空图/误读为直线
+      var e0 = tl[0];
+      var px0 = x(e0.t), py0 = yCnt(e0.red || 0);
+      svg += '<circle cx="' + px0.toFixed(1) + '" cy="' + py0.toFixed(1) + '" r="3.5" fill="#dc2626"/>';
+      svg += '<text x="' + px0.toFixed(1) + '" y="' + (py0 - 8).toFixed(1) + '" text-anchor="middle" font-size="9" fill="var(--faint,#94a3b8)">收盘精算 ' + (e0.red || 0) + '红</text>';
+      svg += '<text x="' + padL + '" y="' + (padT + mainH + 14) + '" font-size="9" fill="var(--faint,#94a3b8)">非交易时段 · 曲线将在交易日 09:30 起每 30s 自动采集</text>';
+    } else {
+      svg += line('red', yCnt, '#dc2626', 1.8);
+      svg += line('green', yCnt, '#16a34a', 1.8);
+      svg += line('limit_up', yLt, '#ef4444', 1.4);
+      svg += line('limit_down', yLt, '#22c55e', 1.4);
+      svg += line('broken_limit', yLt, '#f59e0b', 1.2);
+    }
     // 量能面积 + 线
-    var vpts = tl.map(function (e, i) { return [x(i), yVol(e.turnover_yi || 0)]; });
+    var vpts = tl.map(function (e, i) { return [x(e.t), yVol(e.turnover_yi || 0)]; });
     var area = vpts.map(function (p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); });
     svg += '<polygon fill="rgba(59,130,246,.18)" points="' + area.join(' ') + ' ' + padL + ',' + (volTop + volH) + ' ' + (W - padR) + ',' + (volTop + volH) + '"/>';
     svg += '<polyline fill="none" stroke="#3b82f6" stroke-width="1.4" points="' + poly(vpts) + '"/>';
-    // 时间轴
+    // 时间轴：固定 6 个刻度直接映射到固定位置（09:30/10:30/11:30/13:30/14:30/15:00），永不重叠
     var ticks = ['09:30', '10:30', '11:30', '13:30', '14:30', '15:00'];
     ticks.forEach(function (tt) {
-      var found = -1;
-      for (var i = 0; i < tl.length; i++) { if (tl[i].t >= tt) { found = i; break; } }
-      if (found > -1) {
-        svg += '<text x="' + x(found) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="9" fill="var(--faint,#94a3b8)">' + tt + '</text>';
-      }
+      svg += '<text x="' + x(tt).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="9" fill="var(--faint,#94a3b8)">' + tt + '</text>';
     });
     // hover 点
     svg += '<rect x="' + padL + '" y="' + padT + '" width="' + iw + '" height="' + (mainH + volH + 10) + '" fill="transparent"/>';
