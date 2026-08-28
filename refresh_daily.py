@@ -5,7 +5,7 @@
 1. 股票/ETF K线增量更新（新浪，已有文件秒跳，约 1-2 分钟增量）
 2. 基金净值更新（可选 --fund；东财全量 19359 只很慢，默认跳过）
 3. 全市场短线信号 Top 池重算（build_short_pool.py：股票反转10剔ST + ETF动量10 + 基金动量10）
-4. A5 打板实验数据桥 + 复盘（build_a5_pool.py → a5_pool.js；build_a5_review.py → review/review_a5.md + a5_review.json；2026-08-28 接入）
+4. A5 打板实验扫描 + 数据桥 + 复盘（paper_daban_a5.py 每日推进 → build_a5_pool.py → a5_pool.js；build_a5_review.py → review/review_a5.md + a5_review.json；2026-08-28 接入，扫描器 2026-08-28 补入管道）
 5. 监控看板重建（build_dual_system.py，内联 A5 视图 + 复盘区块）
 6. 历史快照归档 + 月度报告（build_snapshots.py / build_monitor_reports.py）
 7. 当日复盘（review_daily.py 三池信号复盘 + build_log_pages.py）
@@ -72,12 +72,15 @@ def main():
     else:
         run([PY, str(BASE / "build_short_pool.py")])
 
-    print("== 4/7 A5 打板实验数据桥 + 复盘（build_a5_pool → a5_pool.js → build_a5_review）==", flush=True)
+    print("== 4/7 A5 打板实验扫描 + 数据桥 + 复盘（paper_daban_a5 → build_a5_pool → a5_pool.js → build_a5_review）==", flush=True)
     # 2026-08-28 接入：A5_tp8t2 模拟盘第三系统。
-    # build_a5_pool.py 读打板目录 paper_state.json → a5_pool.js（window.A5_POOL）；
-    # build_a5_review.py 读 a5_pool.js → review/review_a5.md + review/a5_review.json（独立逐笔口径）。
+    # ① paper_daban_a5.py：每日推进扫描（入场确认/出场结算/新观察清单），幂等（last_scan==最新交易日跳过）。
+    #    ⚠ 2026-08-28 修复：此前管道只跑 build 不跑扫描，导致 last_scan 停在 08-27、打板池显示旧收盘。
+    # ② build_a5_pool.py 读打板目录 paper_state.json → a5_pool.js（window.A5_POOL）；
+    # ③ build_a5_review.py 读 a5_pool.js → review/review_a5.md + review/a5_review.json（独立逐笔口径）。
     # ⚠ 顺序必须在 build_dual_system.py 之前：看板 build 时内联 A5 数据与复盘区块。
     # 幂等：paper_state.json 无更新时也重跑，确保 as_of/验证统计与当日对齐。
+    run([PY, r"D:/Documents/Workbuddy/股票基金/打板系统A5实验_20260827/paper_daban_a5.py"])
     run([PY, str(BASE / "build_a5_pool.py")])
     run([PY, str(BASE / "build_a5_review.py")])
 
