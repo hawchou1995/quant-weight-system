@@ -105,6 +105,11 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 .pill-chg-up{color:var(--up);font-size:11px}
 .pill-chg-down{color:var(--down);font-size:11px}
 .board-tag{font-size:11px;padding:1px 8px;border-radius:6px;background:var(--card2);border:1px solid var(--border);color:var(--sub)}
+/* 市场板块徽章配色（2026-08-28 打板视图：主板/创业板/科创板/北交所 交易机制区分） */
+.board-sh{background:rgba(96,125,139,.12);border-color:rgba(96,125,139,.35);color:#607d8b}
+.board-cy{background:rgba(220,38,38,.10);border-color:rgba(220,38,38,.35);color:#dc2626}
+.board-kc{background:rgba(124,58,237,.10);border-color:rgba(124,58,237,.35);color:#7c3aed}
+.board-bj{background:rgba(5,150,105,.10);border-color:rgba(5,150,105,.35);color:#059669}
 
 /* ---------- 详情弹层 ---------- */
 .modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:40px 16px}

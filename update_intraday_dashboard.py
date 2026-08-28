@@ -130,6 +130,46 @@ def patch_js_file(path, snap_items, today, note_tag, snap_date, quotes=None, ts=
     return patched > 0
 
 
+def patch_a5_pool(quotes, ts, snap_date=None):
+    """A5 打板实验盘中 patch（2026-08-28 接入）：用实时 quotes 更新 a5_pool.js 各清单/持仓的
+    当日涨跌幅 chg 字段。观察清单/回避清单/持仓表当日涨跌列盘中实时显示。
+
+    只改 chg（当日涨跌幅%），不动 rel_pos/amt/gap/rsi/vr 等收盘口径字段（分数/清单保持收盘口径）。
+    盘中 patch 后 build_dual_system.py 重建时读取 a5_pool.js → A5 视图显示盘中实时。
+    15:30 收盘管道 build_a5_pool.py 全量重建，盘中 patch 自动消失。
+
+    返回 patched 数量。"""
+    path = BASE / "a5_pool.js"
+    if not path.exists():
+        print("  ↳ a5_pool.js 不存在，跳过 A5 patch")
+        return 0
+    src = path.read_text(encoding="utf-8")
+    m = re.search(r"window\.(\w+) = (.*);\s*$", src, re.S)
+    if not m:
+        print(f"  ↳ 无法解析 {path}，跳过 A5 patch")
+        return 0
+    var, body = m.group(1), m.group(2)
+    data = json.loads(body)
+    quotes = quotes or {}
+    patched = 0
+    for key in ("watchlist", "avoid", "positions"):
+        for it in data.get(key, []):
+            code = it.get("code")
+            # quotes 键为 6 位无前缀（如 600345），a5_pool.js code 带 sh/sz 前缀 → 兼容两种
+            q = quotes.get(code) or quotes.get(code[2:] if code and len(code) == 8 else "")
+            if q and q.get("chg") is not None:
+                it["chg"] = round(float(q["chg"]), 2)
+                patched += 1
+    if patched:
+        data["intraday"] = True
+        data["intraday_ts"] = (ts or "").strip()
+        # 行情日期（与清单 as_of 区分；徽章「数据截至」显示行情日期，括号注明清单收盘口径）
+        data["intraday_date"] = snap_date or ""
+    path.write_text(f"window.{var} = {json.dumps(data, ensure_ascii=False)};", encoding="utf-8")
+    print(f"  ↳ a5_pool.js: patch {patched} 只标的当日涨跌幅 → 盘中实时（A5 视图）")
+    return patched
+
+
 def main():
     import argparse, subprocess, datetime
     ap = argparse.ArgumentParser()
@@ -159,6 +199,8 @@ def main():
 
     ok1 = patch_js_file(BASE / "enhanced_data.js", snap["items"], today, "实时", snap_date, quotes, ts=args.ts)
     ok2 = patch_js_file(BASE / "short_pool.js", snap["items"], today, "实时", snap_date, quotes, ts=args.ts, write_gap=True)
+    # A5 打板实验盘中 patch（2026-08-28 接入：观察/回避/持仓表当日涨跌幅实时）
+    ok3 = patch_a5_pool(quotes, ts=args.ts, snap_date=args.snapshot)
 
     # 结构守卫（2026-08-19 门控时序铁律）：
     # 盘中 patch 只改 px/chg，严禁改动 tiers/track/track_pending/market_gate。
@@ -183,7 +225,7 @@ def main():
         sys.exit(2)
     print("🔒 结构守卫通过：tiers/track/track_pending/market_gate 保持收盘口径未变（仅 px/chg 更新，门控不因盘中触发）", flush=True)
 
-    if not (ok1 or ok2):
+    if not (ok1 or ok2 or ok3):
         print("⚠️ 无标的可 patch（快照可能为空或全为场外基金），跳过重建")
         sys.exit(0)
 

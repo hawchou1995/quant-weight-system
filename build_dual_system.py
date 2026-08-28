@@ -76,6 +76,21 @@ except Exception as _e:
     SHORT_POOL_ASOF_MIN = "15:00"
     SHORT_POOL_SLIM = '{}'
     SHORT_POOL_GATE = ''
+# A5_tp8t2 打板实验系统（第三个系统，2026-08-28 接入；数据由 build_a5_pool.py 生成）
+try:
+    _a5_js = open(BASE / "a5_pool.js", encoding="utf-8").read()
+    A5 = json.loads(_a5_js[len("window.A5_POOL = "):-1])
+    A5_ASOF = A5.get("as_of", "—")
+    A5_GATE = A5.get("gate", {})
+    A5_STATS = A5.get("stats", {})
+except Exception as _e:
+    print("a5_pool 加载失败:", _e)
+    A5 = {"watchlist": [], "avoid": [], "positions": [], "closed": [], "stats": {},
+          "gate": {"verdict": "数据未生成（先运行 build_a5_pool.py）"}, "bench": {},
+          "backtest": {}, "equity": []}
+    A5_ASOF = "—"
+    A5_GATE = {}
+    A5_STATS = {}
 # 2026-08-21 固定池已去除，v8_main/v8_etf/v8_fund 不再使用
 
 # 中长线 MA200 市况门控徽章（2026-08-19：与回测口径 use_timing=True/MA200 一致；沪深300<MA200 → 熊市保护，不回补新仓）
@@ -346,6 +361,244 @@ def bt_short_html():
             '<div class="bt-grid">' + cards + '</div>\n</div>')
 perm_stat = ''   # 2026-08-21 固定池已去除
 
+def bt_a5_html():
+    """打板实验（A5_tp8t2）回测参考卡 —— 如实展示 + 警示标注（2026-08-28 接入）
+    口径：全部信号 n=1116（验证门基准）+ 组合信号 n=625 + 组合净值 -72.2%（警示）"""
+    bt = A5.get("backtest", {})
+    _all = bt.get("all", {})
+    _comb = bt.get("comb", {})
+    _port = bt.get("port", {})
+    # 三卡：全部信号 / 组合信号 / 组合净值（警示）
+    c1 = f'''<div class="bt-card" id="bt-a5-all">
+<div class="bt-head"><b>📊 全部信号</b><span class="bt-tag">n={_all.get("n", "—")} · 验证门基准口径</span></div>
+<div class="kpis">
+<div class="kpi"><div class="l">胜率</div><div class="v">{_all.get("win_rate", "—")}%</div><div class="s">均值净 {_all.get("mean_net", "—"):+.2f}%</div></div>
+<div class="kpi"><div class="l">均值毛（零成本）</div><div class="v">{_all.get("mean_zero", "—"):+.2f}%</div><div class="s">中位数 {_all.get("median", "—"):+.2f}%</div></div>
+<div class="kpi"><div class="l">止盈出场占比</div><div class="v">{_all.get("tp_ratio", "—")}%</div><div class="s">盈亏比 {_all.get("pl_ratio", "—")} · 持有 {_all.get("avg_hold", "—")} 天</div></div>
+</div></div>'''
+    c2 = f'''<div class="bt-card" id="bt-a5-comb">
+<div class="bt-head"><b>📊 组合信号</b><span class="bt-tag">n={_comb.get("n", "—")} · 每日≤5/去重/情绪门控</span></div>
+<div class="kpis">
+<div class="kpi"><div class="l">胜率</div><div class="v">{_comb.get("win_rate", "—")}%</div><div class="s">均值净 {_comb.get("mean_net", "—"):+.2f}%</div></div>
+<div class="kpi"><div class="l">均值毛（零成本）</div><div class="v">{_comb.get("mean_zero", "—"):+.2f}%</div><div class="s">单笔算术期望为正</div></div>
+<div class="kpi"><div class="l">止盈出场占比</div><div class="v">{_comb.get("tp_ratio", "—")}%</div><div class="s">模拟盘实际执行=全部信号口径</div></div>
+</div></div>'''
+    c3 = f'''<div class="bt-card" id="bt-a5-port" style="border-color:rgba(239,68,68,.4)">
+<div class="bt-head"><b>⚠ 组合净值（必须正视）</b><span class="bt-tag">等权叠加 · 全持有期逐日复利 · {_port.get("days", "—")} 日</span></div>
+<div class="kpis">
+<div class="kpi"><div class="l">总收益</div><div class="v" style="color:#ef4444">{_port.get("total_return", "—"):+.1f}%</div><div class="s">年化 {_port.get("annual", "—"):+.1f}%</div></div>
+<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">{_port.get("max_dd", "—"):+.1f}%</div><div class="s">夏普 {_port.get("sharpe", "—")}</div></div>
+<div class="kpi"><div class="l">几何≈算术−σ²/2</div><div class="v" style="font-size:15px">边缘太薄</div><div class="s">σ≈5%/日 &gt; 边缘 +0.11%/笔</div></div>
+</div></div>'''
+    return (f'<div class="card" id="bt-a5">\n'
+            f'<h2>🎯 打板实验回测参考 <span class="badge badge-auto">A5_tp8t2 · 实验形态 · 模拟盘验证中</span></h2>\n'
+            f'<div class="sub">首板次日低开 2-5% + 日内冲高 +8% 止盈 + T+2 收盘兜底（止盈+T+2）· 回测 2016-01~2026-08 全量 4444 只 · 口径与 spec_A5_tp8t2.md 逐位一致</div>\n'
+            f'<div class="sub" style="color:#d97706">⚠ <b>负期望实验系统</b>：单笔算术期望为正（组合信号 +0.11%），但组合复利 <b>-72.2%</b> —— <b>验证通过前只允许模拟盘（单笔≤1-2%），禁止实盘</b>；验证门 30 信号/3 个月，均值&lt;-1% 立即停止</div>\n'
+            f'<div class="bt-grid">{c1}{c2}{c3}</div>\n</div>')
+
+
+def _a5_tbl_full(tbl_id, head_keys, rows, empty="（无）"):
+    """A5 交互式表格（2026-08-28 用户需求：与 v9/短线池共用同一交互标准）——
+    搜索 + 板块/行业筛选 + 表头点击排序（initTable）。rows = [(data_attrs, td_html_list), ...]"""
+    if not rows:
+        return f'<div class="sub" style="color:var(--faint)">{empty}</div>'
+    boards = sorted({r[0].get("data-market") for r in rows if r[0].get("data-market")})
+    inds = sorted({r[0].get("data-industry") for r in rows if r[0].get("data-industry")})
+    opt = lambda xs: "".join(f"<option>{x}</option>" for x in xs)
+    toolbar = (f'<div class="toolbar">'
+               f'<input type="text" id="{tbl_id}-q" placeholder="🔍 搜索名称 / 代码 / 板块 / 行业…">'
+               f'<select id="{tbl_id}-mk" class="flt" title="板块筛选"><option value="">全部板块</option>{opt(boards)}</select>'
+               f'<select id="{tbl_id}-ind" class="flt" title="行业筛选"><option value="">全部行业</option>{opt(inds)}</select>'
+               f'<span class="count" id="{tbl_id}-count"></span></div>')
+    head = "".join(f'<th data-key="{k}">{h}</th>' for k, h in head_keys)
+    body = "".join(
+        "<tr" + "".join(f' {k}="{v}"' for k, v in attrs.items()) + ">" + "".join(cells) + "</tr>"
+        for attrs, cells in rows)
+    return toolbar + f'<table class="tbl" id="{tbl_id}"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table>'
+
+
+def a5_view_html():
+    """第三个系统视图：🎯 打板实验（A5_tp8t2 模拟盘 + A2_tp3 回避清单）"""
+    st = A5_STATS
+    gate = A5_GATE
+    bench = A5.get("bench", {})
+    wl = A5.get("watchlist", [])
+    av = A5.get("avoid", [])
+    pos = A5.get("positions", [])
+    closed = A5.get("closed", [])
+    eq = A5.get("equity", [])
+    intraday = A5.get("intraday", False)
+
+    # 验证统计 KPI
+    kpis = []
+    kpis.append(f'<div class="kpi"><div class="l">已平仓信号</div><div class="v">{st.get("n", 0)}<span style="font-size:13px;color:var(--faint)">/30</span></div><div class="s">触发验证门判定</div></div>')
+    wr = st.get("win_rate")
+    kpis.append(f'<div class="kpi"><div class="l">模拟盘胜率</div><div class="v">{f"{wr:.1f}%" if wr is not None else "—"}</div><div class="s">回测基准 {bench.get("win_rate", "—")}%</div></div>')
+    mn = st.get("mean_net")
+    kpis.append(f'<div class="kpi"><div class="l">均值净收益</div><div class="v" style="color:{("var(--up)" if (mn or 0) >= 0 else "var(--down)")}">{f"{mn:+.2f}%" if mn is not None else "—"}</div><div class="s">基准 {bench.get("mean_net", "—"):+.2f}% · 闸 &gt;-0.5%</div></div>')
+    tp = st.get("tp_ratio")
+    kpis.append(f'<div class="kpi"><div class="l">止盈出场占比</div><div class="v">{f"{tp:.1f}%" if tp is not None else "—"}</div><div class="s">基准 {bench.get("tp_ratio", "—")}% · 闸 [12,32]%</div></div>')
+    kpis.append(f'<div class="kpi"><div class="l">模拟盘净值</div><div class="v">{st.get("nav", 1.0):.4f}</div><div class="s">已平仓复利</div></div>')
+
+    # 验证门三闸
+    gwr, gmn, gtp = gate.get("wr", {}), gate.get("mn", {}), gate.get("tp", {})
+    def _gate_pill(g, label, base):
+        if g.get("status") == "waiting":
+            return f'<span class="op op-watch">⏳ {label} {g.get("note", "")}</span>'
+        flag = "✅" if g.get("status") == "PASS" else "⛔"
+        cls = "op-add" if g.get("status") == "PASS" else "op-cut"
+        return f'<span class="op {cls}">{flag} {label} {g.get("note", "")}</span>'
+    gate_bar = ('<div class="op-stats">' +
+                _gate_pill(gwr, "胜率", bench.get("win_rate")) +
+                _gate_pill(gmn, "均值净", bench.get("mean_net")) +
+                _gate_pill(gtp, "止盈占比", bench.get("tp_ratio")) +
+                f'<span class="op" style="color:var(--sub)">{gate.get("verdict", "")}</span>' +
+                '</div>')
+
+    # 指标单元格（chg 当日涨跌幅 / ret_1y 近一年 / rsi / vr 量比 / ma5_dev）
+    def _chg_cell(v):
+        if v is None:
+            return '<span style="color:var(--faint)">—</span>'
+        cls = "up" if v > 0 else ("down" if v < 0 else "")
+        return f'<span class="{cls}">{v:+.2f}%</span>'
+    def _pct_cell(v, sig=1):
+        if v is None:
+            return '<span style="color:var(--faint)">—</span>'
+        cls = "up" if v > 0 else ("down" if v < 0 else "")
+        return f'<span class="{cls}">{v:+.{sig}f}%</span>'
+    def _num_cell(v, sig=1):
+        if v is None:
+            return '<span style="color:var(--faint)">—</span>'
+        return f'{v:.{sig}f}'
+    def _board_cell(v, ind=None):
+        """市场板块徽章（与 v9/短线池同标准：主板/创业板/科创板/北交所）；行业放入悬浮提示"""
+        if not v or v == "—":
+            return '<span style="color:var(--faint)">—</span>'
+        cls = {"主板": "board-sh", "创业板": "board-cy", "科创板": "board-kc", "北交所": "board-bj"}.get(v, "")
+        tip = f' title="行业：{ind}"' if ind else ""
+        return f'<span class="board-tag {cls}"{tip}>{v}</span>'
+    def _num_td(v, sig=1):
+        """数值单元格（data-v 供排序）"""
+        if v is None:
+            return '<td data-v="-99999">—</td>'
+        return f'<td data-v="{v}">{v:.{sig}f}</td>'
+    def _chg_td(v):
+        if v is None:
+            return '<td data-v="-99999">—</td>'
+        cls = "up" if v > 0 else ("down" if v < 0 else "")
+        return f'<td class="{cls}" data-v="{v}">{v:+.2f}%</td>'
+    def _pct_td(v, sig=1):
+        if v is None:
+            return '<td data-v="-99999">—</td>'
+        cls = "up" if v > 0 else ("down" if v < 0 else "")
+        return f'<td class="{cls}" data-v="{v}">{v:+.{sig}f}%</td>'
+    def _txt_td(v):
+        return f'<td>{v if v is not None else "—"}</td>'
+    def _row(attrs, cells):
+        return (attrs, cells)
+
+    # 观察清单（板块列与 v9 同标准：主板/创业板/科创板；行业进 data-search + 悬浮提示）
+    wl_rows = [_row(
+        {"data-code": w["code"], "data-search": f'{w["name"]} {w["code"]} {w.get("ind", "")} {w.get("board", "")}',
+         "data-market": w.get("board", ""), "data-industry": w.get("ind", "")},
+        [_txt_td(w["code"]), _txt_td(f'<b>{w["name"]}</b>'), _txt_td(_board_cell(w.get("board"), w.get("ind"))),
+         _txt_td(w["sb_date"]), _num_td(w.get("rel_pos"), 2), _txt_td(f'{w.get("amt", 0)/1e4:.0f}'),
+         _chg_td(w.get("chg")), _pct_td(w.get("ret_1y"), 1),
+         _num_td(w.get("rsi"), 1), _num_td(w.get("vr"), 2), _pct_td(w.get("ma5_dev"), 1)])
+        for w in sorted(wl, key=lambda x: -x.get("amt", 0))]
+    # 回避清单
+    av_rows = [_row(
+        {"data-code": a["code"], "data-search": f'{a["name"]} {a["code"]} {a.get("ind", "")} {a.get("board", "")}',
+         "data-market": a.get("board", ""), "data-industry": a.get("ind", "")},
+        [_txt_td(a["code"]), _txt_td(f'<b>{a["name"]}</b>'), _txt_td(_board_cell(a.get("board"), a.get("ind"))),
+         _txt_td(a["sb_date"]), _pct_td(a.get("gap")*100, 2), _num_td(a.get("rel_pos"), 2),
+         _txt_td(f'{a.get("amt", 0)/1e4:.0f}'), _chg_td(a.get("chg")), _pct_td(a.get("ret_1y"), 1),
+         _num_td(a.get("rsi"), 1), _num_td(a.get("vr"), 2), _pct_td(a.get("ma5_dev"), 1)])
+        for a in sorted(av, key=lambda x: -x.get("amt", 0))]
+    # 持仓（板块列与观察/回避清单对齐）
+    pos_rows = [_row(
+        {"data-code": p["code"], "data-search": f'{p["name"]} {p["code"]} {p.get("ind", "")} {p.get("board", "")}',
+         "data-market": p.get("board", ""), "data-industry": p.get("ind", "")},
+        [_txt_td(p["code"]), _txt_td(f'<b>{p["name"]}</b>'), _txt_td(_board_cell(p.get("board"), p.get("ind"))),
+         _txt_td(p["entry_date"]), _num_td(p["entry_px"], 2), _pct_td(p.get("gap")*100, 2),
+         _txt_td(f'T+{p.get("exit_stage", 1)}'), _chg_td(p.get("chg")), _pct_td(p.get("ret_1y"), 1),
+         _num_td(p.get("rsi"), 1), _num_td(p.get("vr"), 2), _pct_td(p.get("ma5_dev"), 1)])
+        for p in sorted(pos, key=lambda x: x.get("entry_date", ""))]
+    # 已平仓（出场原因中文化）
+    REASON_CN = {"tp": "止盈", "ts": "收盘卖", "force": "强平"}
+    closed_rows = [_row(
+        {"data-code": p["code"], "data-search": f'{p["name"]} {p["code"]} {p.get("ind", "")} {p.get("board", "")}',
+         "data-market": p.get("board", ""), "data-industry": p.get("ind", "")},
+        [_txt_td(p["code"]), _txt_td(f'<b>{p["name"]}</b>'), _txt_td(_board_cell(p.get("board"), p.get("ind"))),
+         _txt_td(p["entry_date"]), _txt_td(p["exit_date"]), _num_td(p["entry_px"], 2), _num_td(p["exit_px"], 2),
+         _txt_td(REASON_CN.get(p["exit_reason"], p["exit_reason"] or "—")),
+         _pct_td(p.get("net_ret", 0)*100, 2), _chg_td(p.get("chg")), _pct_td(p.get("ret_1y"), 1),
+         _num_td(p.get("rsi"), 1), _num_td(p.get("vr"), 2)])
+        for p in closed]
+    # 净值曲线（模拟盘点数少，线性折线）
+    curve_html = ""
+    if len(eq) >= 2:
+        pts = ";".join(f"{i},{v['nav']}" for i, v in enumerate(eq))
+        curve_html = (f'<svg viewBox="0 0 600 120" style="width:100%;max-width:700px;margin-top:10px">'
+                      f'<polyline points="{pts}" fill="none" stroke="#f59e0b" stroke-width="2"/>'
+                      f'<text x="8" y="16" font-size="12" fill="#9ca3af">模拟盘净值 {st.get("nav", 1.0):.4f}（{len(eq)} 个交易点）</text></svg>')
+    elif eq:
+        curve_html = f'<div class="sub" style="color:var(--faint)">净值曲线待积累（当前 {len(eq)} 个点）· 首个平仓后开始绘制</div>'
+
+    # 数据截至徽章（盘中 patch 后显示盘中实时）
+    if intraday:
+        idate = A5.get("intraday_date") or A5_ASOF
+        its = A5.get("intraday_ts") or ""
+        asof_badge = (f'<span class="view-badge auto" '
+                      f'title="行情截至 {idate} {its} · 清单（观察/回避/持仓）为 {A5_ASOF} 收盘口径">'
+                      f'数据截至 {idate} {its} · 盘中实时（清单为 {A5_ASOF} 收盘口径）</span>')
+    else:
+        asof_badge = f'<span class="view-badge auto" title="收盘数据">数据截至 {A5_ASOF} 15:00 · 收盘</span>'
+
+    return f'''<div class="view" id="view-a5">
+<div class="card" id="sys-a5">
+<div class="sys-head">
+<div class="sys-head-top">
+<h2>🎯 打板实验 <span class="view-badge auto">A5_tp8t2 · 模拟盘</span></h2>
+{asof_badge}
+</div>
+<div class="sys-head-tags">
+<span class="badge badge-auto" style="background:#d97706;color:#fff">⚠ 负期望实验系统 · 模拟盘验证中 · 禁止实盘</span>
+<span class="badge badge-auto">信号 = 首板次日低开 2-5% + 相对位置≤0.5 + 成交额≥5000万</span>
+<span class="badge badge-auto">出场 = 止盈+T+2（+8% 止盈 / T+2 兜底）</span>
+</div>
+<div class="sys-head-note"><b>定位</b>：单笔算术期望为正（组合信号 +0.11%）但组合复利 -72.2% —— 模拟盘边缘验证 30 信号/3 个月，通过前禁止实盘；A2_tp3 回避清单 = 负期望警示信号（胜率 63.1% 但均值 -1.39%），<b>不单独交易</b>，A5 入场若同时命中须严格执行 T+2 兜底</div>
+</div>
+<div class="kpis">{''.join(kpis)}</div>
+{gate_bar}
+</div>
+<div class="card" id="a5-watchlist">
+<h2>📋 观察清单 <span class="badge badge-auto">{len(wl)} 只</span></h2>
+<div class="sub">今日首板 · 明日低开 2-5% 则入场（与回测口径一致）· 当日涨跌幅为实时数据（早盘/尾盘/收盘更新），近一年/RSI/量比/MA5偏离为收盘口径</div>
+{_a5_tbl_full("a5-wl", [("code","代码"),("name","名称"),("board","板块"),("sbdate","首板日"),("relpos","相对位置"),("amt","成交额(万)"),("chg","当日涨跌"),("ret1y","近一年"),("rsi","RSI"),("vr","量比"),("ma5dev","MA5偏离")], wl_rows, "（无观察标的）")}
+</div>
+<div class="card" id="a5-avoid" style="border-color:rgba(217,119,6,.35)">
+<h2>⚠ A2_tp3 回避清单 <span class="badge badge-auto">{len(av)} 只 · 负期望警示</span></h2>
+<div class="sub">今日满足 A2_tp3 信号（首板次日低开 2-6% + 相对位置≤0.7 + 成交额≥5000万）· 回测胜率 63.1% 但单笔均值 -1.39%（盈亏比 0.29）→ <b>信号出现时回避或减仓，不追高</b></div>
+{_a5_tbl_full("a5-av", [("code","代码"),("name","名称"),("board","板块"),("sbdate","首板日"),("gap","今日低开"),("relpos","相对位置"),("amt","成交额(万)"),("chg","当日涨跌"),("ret1y","近一年"),("rsi","RSI"),("vr","量比"),("ma5dev","MA5偏离")], av_rows, "（无）")}
+</div>
+<div class="card" id="a5-positions">
+<h2>💼 模拟盘持仓 <span class="badge badge-auto">{len(pos)} 只</span></h2>
+<div class="sub">入场 = 开盘价低开确认 · 出场 T+1/T+2 冲高≥入场×1.08 止盈，否则收盘卖；涨停顺延/强平</div>
+{_a5_tbl_full("a5-pos", [("code","代码"),("name","名称"),("board","板块"),("entrydate","入场日"),("entrypx","入场价"),("gap","低开"),("stage","出场阶段"),("chg","当日涨跌"),("ret1y","近一年"),("rsi","RSI"),("vr","量比"),("ma5dev","MA5偏离")], pos_rows, "（无持仓）")}
+</div>
+<div class="card" id="a5-closed">
+<h2>📜 已平仓（累计） <span class="badge badge-auto">{len(closed)} 笔</span></h2>
+<div class="sub">模拟盘逐笔净收益（含成本买 0.525%/卖 0.625%）· 累计 ≥30 笔触发验证门判定</div>
+{_a5_tbl_full("a5-cl", [("code","代码"),("name","名称"),("board","板块"),("entrydate","入场日"),("exitdate","出场日"),("entrypx","入场价"),("exitpx","出场价"),("reason","原因"),("netret","净收益"),("chg","当日涨跌"),("ret1y","近一年"),("rsi","RSI"),("vr","量比")], closed_rows, "（尚无平仓记录）")}
+</div>
+<div class="card" id="a5-curve">
+<h2>📈 模拟盘净值曲线 <span class="badge badge-auto">已平仓复利</span></h2>
+<div class="sub">回测组合复利 -72.2% 警示：边缘太薄（σ≈5%/日），净值曲线难看属正常，验证的是边缘是否存在而非盈利</div>
+{curve_html}
+</div>
+</div>'''
+
 def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extra_stat=None, extra_card="", score_sub="趋势/动量/量能/超买/风控", as_of=None, intraday_note=None, as_of_min=None, tier_opts=None, tier_add=None, tier_watch=None, tier_cut=None, head_tags=None, head_note=""):
     """每个系统的完整区块：系统头（标题+说明）+ 操作统计条 + 汇总表 + 详情卡片
     回测参考统一放总览视图，这里只保留监控主体。extra_card=视图末尾追加卡片（如持仓跟踪）
@@ -515,6 +768,30 @@ for _i, _r in enumerate(_rev_sorted):
 if not REVIEW_LIST_HTML:
     REVIEW_LIST_HTML = '<div class="sub" style="color:var(--faint)">暂无复盘记录 —— 每天收盘后运行 <code>python refresh_daily.py</code> 自动生成</div>'
 
+# A5 打板实验复盘区块（2026-08-28 接入 view-review 顶部；数据来自 review/a5_review.json）
+A5_REVIEW_BLOCK = ""
+_a5rev_f = BASE / "review" / "a5_review.json"
+if _a5rev_f.exists():
+    _ar = json.loads(_a5rev_f.read_text(encoding="utf-8"))
+    _ars = _ar.get("stats", {})
+    _arg = _ar.get("gate", {})
+    _wr = _ars.get("win_rate")
+    _mn = _ars.get("mean_net")
+    _tp = _ars.get("tp_ratio")
+    _a5kpi = (
+        f'<div class="kpi"><div class="l">已平仓</div><div class="v">{_ars.get("n", 0)}/30</div><div class="s">触发判定阈值</div></div>'
+        f'<div class="kpi"><div class="l">胜率</div><div class="v">{f"{_wr:.1f}%" if _wr is not None else "—"}</div><div class="s">基准 46.1% · 闸 [35,55]%</div></div>'
+        f'<div class="kpi"><div class="l">均值净</div><div class="v" style="color:{("var(--up)" if (_mn or 0) >= 0 else "var(--down)")}">{f"{_mn:+.2f}%" if _mn is not None else "—"}</div><div class="s">基准 -0.17% · 闸 &gt;-0.5%</div></div>'
+        f'<div class="kpi"><div class="l">止盈占比</div><div class="v">{f"{_tp:.1f}%" if _tp is not None else "—"}</div><div class="s">基准 21.5% · 闸 [12,32]%</div></div>'
+        f'<div class="kpi"><div class="l">净值</div><div class="v">{_ars.get("nav", 1.0):.4f}</div><div class="s">已平仓复利</div></div>'
+    )
+    _flag = "✅" if _arg.get("verdict", "").startswith("✅") else ("⏳" if _arg.get("verdict", "").startswith("信号不足") else "⛔")
+    A5_REVIEW_BLOCK = (f'<div class="kpis" style="margin-bottom:10px">{_a5kpi}</div>'
+                       f'<div class="op-stats"><span class="op" style="color:var(--sub)">{_flag} 判定：{_arg.get("verdict", "—")}</span>'
+                       f'<span class="op" style="color:var(--faint)">观察清单 {_ar.get("n_watch", 0)} · 回避清单 {_ar.get("n_avoid", 0)} · 持仓 {_ar.get("n_pos", 0)} · 更新 {_ar.get("updated", "—")}</span></div>')
+else:
+    A5_REVIEW_BLOCK = '<div class="sub" style="color:var(--faint)">A5 模拟盘复盘未生成 —— 先运行 <code>python build_a5_pool.py && python build_a5_review.py</code></div>'
+
 # 累计总览独立卡片（2026-08-18 晚：内嵌视图顶部只显示一份，data 来自 cumulative.json）
 _rev_cum = ""
 _cum_f = BASE / "review" / "cumulative.json"
@@ -676,7 +953,7 @@ html = f"""<!doctype html>
 <div class="view active" id="view-overview">
 <div class="card" id="overview">
 <h2>📊 标的监控总览 <span class="badge badge-auto">数据截至 {DATA["meta"].get("as_of", "—")}{"（盘中实时）" if DATA["meta"].get("intraday") else " 收盘"}</span></h2>
-<div class="sub">左侧导航切换：🅰️ 全量池中/长线（全市场自动池·股票分层+基金） / ⚡ 短线 · 信号仅供参考</div>
+<div class="sub">左侧导航切换：🅰️ 全量池中/长线（全市场自动池·股票分层+基金） / ⚡ 短线 / 🎯 打板实验（模拟盘） · 信号仅供参考</div>
 <div class="kpis">
 <div class="kpi"><div class="l">🟢 加仓区</div><div class="v" style="color:#dc2626">{sum(1 for d in all_items if d["tier"] in ("满仓加仓","轻仓加仓"))} 只</div><div class="s">满仓+轻仓加仓</div></div>
 <div class="kpi"><div class="l">🟡 观望区</div><div class="v" style="color:#d97706">{sum(1 for d in all_items if d["tier"]=="观望")} 只</div><div class="s">持有不加</div></div>
@@ -688,6 +965,7 @@ html = f"""<!doctype html>
 </div>
 {bt_all_html()}
 {bt_short_html()}
+{bt_a5_html()}
 </div>
 <!-- ============ 视图 A：全量池中/长线 ============ -->
 {system_block(
@@ -720,9 +998,17 @@ html = f"""<!doctype html>
   as_of_min=SHORT_POOL.get("intraday_ts") or SHORT_POOL_ASOF_MIN,
   tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=())}
 
+<!-- ============ 视图 D：打板实验（第三个系统，A5_tp8t2 模拟盘 + A2_tp3 回避清单） ============ -->
+{a5_view_html()}
+
 <!-- ============ 视图 E：复盘日志（内嵌，与各池同形态） ============ -->
 <div class="view" id="view-review">
 {_rev_cum}
+<div class="card" id="a5-review-block" style="border-color:rgba(245,158,11,.35)">
+<h2>🎯 打板实验（A5_tp8t2）模拟盘验证 <span class="badge badge-auto">全部信号口径 · 非实盘指令</span></h2>
+<div class="sub">逐笔模拟盘跟踪（net_ret 含成本）· 验证门基准 = 全部信号口径（46.1%/-0.17%/21.5%）· 30 信号或 3 个月触发判定 · 详细见「🎯 打板实验」视图</div>
+{A5_REVIEW_BLOCK}
+</div>
 <div class="card">
 <h2>📋 复盘日志 <span class="badge badge-auto">{len(_rev_sorted)} 篇</span></h2>
 <div class="sub">每个交易日复盘：信号标的哪些吃到 / 哪些被套 / 是否符合系统设计（对比回测基准）· 发现设计缺陷 → 启动系统更新并登记于「📝 更新日志」· 点击日期展开/折叠当日复盘详情（日期降序，最新在前）</div>
@@ -764,6 +1050,7 @@ html = f"""<!doctype html>
 </div>
 <script src="enhanced_data.js"></script>
 <script src="short_signals.js"></script>
+<script src="a5_pool.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/artalk@2/dist/Artalk.css">
 <script src="https://unpkg.com/artalk@2/dist/Artalk.js"></script>
 <script>window.SHORT_POOL = {SHORT_POOL_SLIM};</script>
@@ -773,6 +1060,7 @@ window.ENH.nav = [
   ["overview","📊","监控总览",[["overview","总览统计"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
   ["sys-auto","🅰️","全量池中/长线",[["card-tbl-v9","标的汇总表"],["card-tbl-v9-detail","逐标的详情"],["watch-v9-card","中长线跟踪"]]],
   ["short","⚡","全量池短线",[["card-tbl-short","标的汇总表"],["watch-card","短线跟踪"],["card-tbl-short-detail","逐标的详情"]]],
+  ["a5","🎯","打板实验",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
   ["comment","💬","评论区",[]]
 ];
 /* 视图切换模式：滚动不更新导航高亮（COMMON_JS renderSidenav 检测此标志） */
@@ -825,7 +1113,7 @@ function renderSubCurve(){{
   renderOneCurve('curve-short-fund', C.short_fund, '#3b82f6', '基金短线', '+'+{ss_fund["total_return_pct"]:.0f});
 }}
 /* 视图切换（hash 驱动：切换时更新 location.hash，加载/前进后退时按 hash 定位） */
-var VIEW_MAP={{'overview':'view-overview','sys-auto':'view-auto','short':'view-short','review':'view-review','changelog':'view-changelog','comment':'view-comment'}};
+var VIEW_MAP={{'overview':'view-overview','sys-auto':'view-auto','short':'view-short','a5':'view-a5','review':'view-review','changelog':'view-changelog','comment':'view-comment'}};
 function switchView(key){{
   var v=VIEW_MAP[key];if(!v)return;
   document.querySelectorAll('.view').forEach(function(x){{x.classList.remove('active');}});
@@ -1126,6 +1414,28 @@ document.addEventListener('DOMContentLoaded',function(){{
         if(pm)pm.classList.add('active');}}}});}});
   initTable('tbl-v9', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});
   initTable('tbl-short', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});
+  /* A5 打板实验四表：与 v9/短线池同标准——表头排序 + 搜索 + 板块/行业筛选（2026-08-28） */
+  initTable('a5-wl', {{columns: {{code:0, name:1, board:2, sbdate:3, relpos:4, amt:5, chg:6, ret1y:7, rsi:8, vr:9, ma5dev:10}}}});
+  initTable('a5-av', {{columns: {{code:0, name:1, board:2, sbdate:3, gap:4, relpos:5, amt:6, chg:7, ret1y:8, rsi:9, vr:10, ma5dev:11}}}});
+  initTable('a5-pos', {{columns: {{code:0, name:1, board:2, entrydate:3, entrypx:4, gap:5, stage:6, chg:7, ret1y:8, rsi:9, vr:10, ma5dev:11}}}});
+  initTable('a5-cl', {{columns: {{code:0, name:1, board:2, entrydate:3, exitdate:4, entrypx:5, exitpx:6, reason:7, netret:8, chg:9, ret1y:10, rsi:11, vr:12}}}});
+  ['a5-wl','a5-av','a5-pos','a5-cl'].forEach(function(id){{
+    var q=document.getElementById(id+'-q'), mk=document.getElementById(id+'-mk'), ind=document.getElementById(id+'-ind');
+    function applyA5(){{
+      var rows=document.querySelectorAll('#'+id+' tbody tr');var n=0;
+      rows.forEach(function(tr){{
+        var txt=(tr.getAttribute('data-search')||'').toLowerCase();
+        var qv=(q?q.value:'').toLowerCase(), mv=mk?mk.value:'', iv=ind?ind.value:'';
+        var ok=(!qv||txt.indexOf(qv)>=0)&&(!mv||tr.getAttribute('data-market')===mv)&&(!iv||tr.getAttribute('data-industry')===iv);
+        tr.style.display=ok?'':'none';if(ok)n++;
+      }});
+      var cnt=document.getElementById(id+'-count');
+      if(cnt)cnt.textContent='显示 '+n+' / '+rows.length+' 只';
+    }}
+    if(q)q.addEventListener('input',applyA5);
+    if(mk)mk.addEventListener('change',applyA5);
+    if(ind)ind.addEventListener('change',applyA5);
+  }});
   /* 统一联动：搜索 + 板块/行业/档位筛选 → 表格行 + 详情卡片同步；排序后卡片重排 */
   ['tbl-v9','tbl-short'].forEach(function(id){{
     var q=document.getElementById(id+'-q'), mk=document.getElementById(id+'-mk');
