@@ -1,0 +1,48 @@
+{
+  "event_name": "workflow_dispatch",
+  "runner": "Linux",
+  "ts_utc": "2026-08-28T10:28:27.344180+00:00",
+  "tests": {
+    "qt_quote": {
+      "ok": true,
+      "sec": 1.3,
+      "code": "sh600000",
+      "name": "�ַ�����",
+      "px": 9.0,
+      "len": 516
+    },
+    "tx_kline": {
+      "ok": true,
+      "sec": 1.5,
+      "rows": 6,
+      "last": [
+        "2026-08-28",
+        "9.01",
+        "9.00",
+        "9.04",
+        "8.95",
+        "587868"
+      ]
+    },
+    "ak_sina_spot": {
+      "ok": true,
+      "sec": 57.4,
+      "rows": 5550,
+      "cols": [
+        "代码",
+        "名称",
+        "最新价",
+        "涨跌额",
+        "涨跌幅",
+        "买入"
+      ]
+    },
+    "ak_tx_hist": {
+      "ok": true,
+      "sec": 2.9,
+      "rows": 7,
+      "last_date": "2026-08-28",
+      "last_close": 9.0
+    }
+  }
+}
