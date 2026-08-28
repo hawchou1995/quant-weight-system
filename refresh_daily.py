@@ -6,7 +6,7 @@
 2. 基金净值更新（可选 --fund；东财全量 19359 只很慢，默认跳过）
 3. 全市场短线信号 Top 池重算（build_short_pool.py：股票反转10剔ST + ETF动量10 + 基金动量10）
 4. A5 打板实验扫描 + 数据桥 + 复盘（paper_daban_a5.py 每日推进 → build_a5_pool.py → a5_pool.js；build_a5_review.py → review/review_a5.md + a5_review.json；2026-08-28 接入，扫描器 2026-08-28 补入管道）
-5. 监控看板重建（build_dual_system.py，内联 A5 视图 + 复盘区块）
+5. 市场情绪晴雨表静态精算（build_market_breadth.py → market_breadth.js，niuone 口径）+ 监控看板重建（build_dual_system.py，内联 A5 视图 + 复盘区块 + 晴雨表）
 6. 历史快照归档 + 月度报告（build_snapshots.py / build_monitor_reports.py）
 7. 当日复盘（review_daily.py 三池信号复盘 + build_log_pages.py）
 用法：python refresh_daily.py [--fund] [--skip-fetch]
@@ -84,7 +84,10 @@ def main():
     run([PY, str(BASE / "build_a5_pool.py")])
     run([PY, str(BASE / "build_a5_review.py")])
 
-    print("== 5/7 监控看板重建 ==", flush=True)
+    print("== 5/7 市场情绪晴雨表静态精算 + 监控看板重建 ==", flush=True)
+    # 2026-08-29 接入：晴雨表静态数据（红绿平/涨跌停炸板/量能，腾讯批量接口全市场采样，niuone 口径）。
+    # ⚠ 必须在 build_dual_system.py 之前：看板 build 引用 market_breadth.js。
+    run([PY, str(BASE / "build_market_breadth.py"), "--output", str(BASE / "market_breadth.js")])
     run([PY, str(BASE / "build_dual_system.py")])
 
     print("== 6/7 快照归档 + 月度报告 ==", flush=True)
