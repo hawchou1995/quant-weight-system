@@ -6,6 +6,9 @@ on:
   schedule:
     - cron: '*/15 * * * *'   # 探针期 15 分钟一次（验证 schedule 触发链；生产期改为 30 7 * * 1-5）
 
+permissions:
+  contents: write   # gh-pages push 需要（默认 read，probe 首跑 403 修复）
+
 jobs:
   probe:
     runs-on: ubuntu-latest
