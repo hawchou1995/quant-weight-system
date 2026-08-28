@@ -83,7 +83,11 @@
       .then(function (arr) {
         var sh = arr[0], sz = arr[1];
         if (sh && sz && isFinite(Number(sh.f104)) && isFinite(Number(sz.f104))) {
-          return { red: Number(sh.f104) + Number(sz.f104), green: Number(sh.f105) + Number(sz.f105), flat: Number(sh.f106) + Number(sz.f106), src: 'eastmoney' };
+          var red = Number(sh.f104) + Number(sz.f104);
+          var green = Number(sh.f105) + Number(sz.f105);
+          var flat = Number(sh.f106) + Number(sz.f106);
+          // 合理性闸：全市场红绿平总数应 ≥3000（防接口非交易时段返回占位值覆盖精算数据）
+          if (red + green + flat >= 3000) return { red: red, green: green, flat: flat, src: 'eastmoney' };
         }
         if (MB && MB.latest) return { red: MB.latest.red, green: MB.latest.green, flat: MB.latest.flat, src: 'static' };
         return null;
@@ -107,8 +111,11 @@
     saveLocalTimeline();
     render();
   }
+  var _everPolled = false;
   function poll() {
-    if (!isTrading()) { render(); return; }
+    // 首次加载必拉一次（非交易时段也定格最新收盘值）；之后仅交易时段 30s 轮询
+    if (!isTrading() && _everPolled) { render(); return; }
+    _everPolled = true;
     Promise.all([
       fetchIndices().then(function (v) { state.idx = v; }),
       Promise.all([fetchPool('zt'), fetchPool('dt'), fetchPool('zb')]).then(function (v) {
