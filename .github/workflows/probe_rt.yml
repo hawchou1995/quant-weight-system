@@ -1,0 +1,31 @@
+name: probe-rt
+# GitHub Actions 实时化可行性探针（2026-08-28）
+# 链路：qt 行情 HTTP / 腾讯 K 线 HTTP / akshare(新浪+腾讯) / schedule / gh-pages 部署
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/15 * * * *'   # 探针期 15 分钟一次（验证 schedule 触发链；生产期改为 30 7 * * 1-5）
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install deps
+        run: pip install -q akshare requests pandas
+
+      - name: Run probe
+        run: python .github/probe/probe.py
+
+      - name: Deploy probe page (gh-pages-probe branch, 不动正式 gh-pages)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .github/probe/out
+          publish_branch: gh-pages-probe
+          keep_files: true
