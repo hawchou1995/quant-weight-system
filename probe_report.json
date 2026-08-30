@@ -1,7 +1,7 @@
 {
   "event_name": "schedule",
   "runner": "Linux",
-  "ts_utc": "2026-08-30T01:00:23.450448+00:00",
+  "ts_utc": "2026-08-30T06:23:16.462496+00:00",
   "tests": {
     "qt_quote": {
       "ok": true,
@@ -26,7 +26,7 @@
     },
     "ak_sina_spot": {
       "ok": true,
-      "sec": 57.4,
+      "sec": 74.7,
       "rows": 5550,
       "cols": [
         "代码",
@@ -39,7 +39,7 @@
     },
     "ak_tx_hist": {
       "ok": true,
-      "sec": 2.3,
+      "sec": 1.9,
       "rows": 7,
       "last_date": "2026-08-28",
       "last_close": 9.0
