@@ -1,14 +1,14 @@
 {
- "ts_utc": "2026-08-31T07:18:39+00:00",
+ "ts_utc": "2026-08-31T14:15:22+00:00",
  "dry_run": false,
  "ok": true,
- "warn": "",
+ "warn": "stale: 行情时间 16:15 滞后>90min，仍如实 patch",
  "patched": {
   "enh": 30,
-  "short": 30,
-  "a5": 13
+  "short": 19,
+  "a5": 8
  },
- "n_quotes": 73,
- "n_codes": 86,
- "quote_ts_cn": "2026-08-31 15:18:38"
+ "n_quotes": 57,
+ "n_codes": 70,
+ "quote_ts_cn": "2026-08-31 16:15:00"
 }
