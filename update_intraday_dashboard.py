@@ -46,7 +46,7 @@ def patch_js_file(path, snap_items, today, note_tag, snap_date, quotes=None, ts=
       时写入 details[code].gap，看板据此渲染「⚠ 高开规避」（>3% 当日不追）
     """
     src = Path(path).read_text(encoding="utf-8")
-    m = re.search(r"window\.(\w+) = (.*);\s*$", src, re.S)
+    m = re.search(r"window\.(\w+) = (.*?);?\s*$", src, re.S)  # 2026-08-31 修复：兼容 rt-snapshot bot 无分号结尾格式
     if not m:
         print(f"❌ 无法解析 {path}")
         return False
@@ -144,7 +144,7 @@ def patch_a5_pool(quotes, ts, snap_date=None):
         print("  ↳ a5_pool.js 不存在，跳过 A5 patch")
         return 0
     src = path.read_text(encoding="utf-8")
-    m = re.search(r"window\.(\w+) = (.*);\s*$", src, re.S)
+    m = re.search(r"window\.(\w+) = (.*?);?\s*$", src, re.S)  # 2026-08-31 修复：兼容 rt-snapshot bot 无分号结尾格式
     if not m:
         print(f"  ↳ 无法解析 {path}，跳过 A5 patch")
         return 0
