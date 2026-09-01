@@ -305,11 +305,15 @@ for g, label, v9f, _sf in _STK_GROUPS:
         stk_tag[g] = (tag or label) + " · Aroon强趋势过滤(A80_M78)"
     else:
         stk_tag[g] = (tag or label) + (" · 含20bps滑点" if "滑点" not in (tag or "") else "")
-# 短线分层 summary
+# 短线分层 summary（8/31 审计：旧 shortsplit_* 含未来函数作废；修正引擎无分层口径，
+# 统一展示一体修正版 -41.67% 并如实标注「分层旧数字作废」）
 ss_stk = {}
 ss_stk_tag = {}
 for g, label, _v9f, sf in _STK_GROUPS:
-    s, lbl, tag = _load_summary(sf + "_summary.json")
+    if g == "all":
+        s, lbl, tag = _load_summary(sf + "_summary.json")
+    else:
+        s, lbl, tag = {}, "", ""   # 分层不再展示旧口径
     ss_stk[g] = s
     ss_stk_tag[g] = tag or label
 
@@ -342,6 +346,7 @@ def bt_all_html():
             '<h2>📊 回测参考 <span class="badge badge-auto">中/长线 · 股票按权限分层</span></h2>\n'
             '<div class="sub">股票 = 绝对规则筛池 Top3 · 月轮动 · 按权限<b>互斥分层</b>（一体/纯主板/纯创业板/纯科创板，各池独立回测）｜ 基金 = 净值动量轮动 —— 各池严格分开（2026-08-17 去 ETF）</div>\n'
             '<div class="sub" style="color:var(--sub)">💧 <b>滑点敏感性</b>（每边，sweep_ml_slip.py 扫描）：中长线换手低、影响显著小于短线 —— 股票 20bps 收益 -23%（夏普 1.58→1.43）、30bps -31% ｜ 历史固定池（已去除）20bps -13%、30bps -18% —— 实盘 10-20bps 区间内中长线策略稳健</div>\n'
+            '<div class="sub" style="color:#d97706">🐻 <b>9/1 牛熊独立权重验证（修正引擎 T+1 · regime=沪深300&gt;MA200 同口径）</b>：生产口径 A（牛开熊清 + 固定权重 0.35/0.25/0.20/0.20）收益 +28.3%/夏普 0.229/回撤 -27.15% 仍最优；牛攻熊守双权重 B/C/D/E 变体（熊市开仓）全面恶化（-25.9%~-65.0%）→ <b>中长期维持「牛开熊清」，熊市开仓不可行</b>（与短线基金相反：基金熊市防守开仓 +398pp 因选到避险型基金）</div>\n'
             '<div class="bt-grid">' + cards + '</div>\n</div>')
 
 
@@ -355,9 +360,10 @@ def bt_short_html():
         bt_card("bt-short-fund", "🔵 短线 基金", ss_fund_tag, ss_fund, "curve-short-fund", color="#3b82f6"),
     ])
     return ('<div class="card" id="bt-short">\n'
-            '<h2>⚡ 短线回测参考 <span class="badge badge-auto">全量池短线 · 股票按权限分层</span></h2>\n'
-            '<div class="sub">短线 = 动量30/量价25/通道25/波动20（A 股个股反转版）+ <b>MA5 生命线每日止损</b> + 强势市门控 · 股票按权限<b>互斥分层</b>（各池独立回测）｜ 基金 = 动量短线 —— 与中长线独立，监控表「⚡ 全量池短线」视图对应此池（2026-08-17 去 ETF）</div>\n'
-            '<div class="sub" style="color:var(--sub)">💧 <b>滑点敏感性</b>（每边，sweep_slip.py 扫描）：股票 10bps→+462%/夏普1.99、20bps→+331%/1.69、30bps→+231%/1.39 ｜ 基金 30bps 申赎费下 +273%→+11% 归零 —— <b>基金短线必须 C 类份额</b>（0 申赎费）</div>\n'
+            '<h2>⚡ 短线回测参考 <span class="badge badge-auto">全量池短线 · 修正引擎 T+1 · 8/31 审计后口径</span></h2>\n'
+            '<div class="sub">⚠ <b>8/31 审计</b>：旧短线引擎（short_engine/run_squeeze）出场路径含未来函数（T 日收盘触发→T 日开盘成交），<b>历史回测数字全部作废</b>；修正引擎 T+1 重验：<b>短线股票 72 组网格仅 1 组正收益（+23.42%，不达投产门槛），带 MA5/动量全负 → 无可投产配置</b>；分层旧数字（+356.96% 等）已下架。唯一幸存 = <b>基金动量 +243.47%</b>（净值型纯轮动，无风控，内部对照证明修复精准）</div>\n'
+            '<div class="sub" style="color:#d97706">💧 短线股票（T10/H10/S55 反转+MA5 slip20）修正重验：<b>+315.72% → -41.67%</b>（-0.664 夏普/26.1% 胜率/996 笔）—— 原 edge 全部来自未来函数；看板短线股票池现仅作<b>观察/跟踪展示</b>（非买入指令），买入参考以基金动量为准</div>\n'
+            '<div class="sub" style="color:#7c3aed">🧪 <b>9/1 熊市三策略吸收验证（用户框架规则化 · 修正引擎 T+1）</b>：S1 超跌反弹（ret5≤-6%+缩量<75%+RSI<20）单笔 +0.48%/胜率 52.6% 但<b>几何均值 -1.73%</b>、S3 右侧追涨（行业5日跌>8%转涨+个股强）单笔 +2.79%/胜率 69.2% 但<b>组合复利 -92.9%</b>、S2 抗跌强势负期望 —— <b>三策略全部 FAIL 组合级四闸</b>（单笔正但收益左偏 P5≈-30%，负偏尾吞掉正收益）。根因=熊市做多天然逆势，与用户判断一致：AI 高回撤来自缺择时+止损不够狠+单策略依赖。结论：<b>熊市入场过滤救不了逆势，唯一可行=熊市空仓/极端轻仓</b></div>\n'
             '<div class="bt-grid">' + cards + '</div>\n</div>')
 perm_stat = ''   # 2026-08-21 固定池已去除
 
@@ -394,6 +400,7 @@ def bt_a5_html():
             f'<h2>🎯 打板实验回测参考 <span class="badge badge-auto">A5_tp8t2 · 实验形态 · 模拟盘验证中</span></h2>\n'
             f'<div class="sub">首板次日低开 2-5% + 日内冲高 +8% 止盈 + T+2 收盘兜底（止盈+T+2）· 回测 2016-01~2026-08 全量 4444 只 · 口径与 spec_A5_tp8t2.md 逐位一致</div>\n'
             f'<div class="sub" style="color:#d97706">⚠ <b>负期望实验系统</b>：单笔算术期望为正（组合信号 +0.11%），但组合复利 <b>-72.2%</b> —— <b>验证通过前只允许模拟盘（单笔≤1-2%），禁止实盘</b>；验证门 30 信号/3 个月，均值&lt;-1% 立即停止</div>\n'
+            f'<div class="sub">📈 <b>9/1 融合优化 A/B（修正引擎 T+1 · 熊市 G2_M3_X1 基线）</b>：缩量60%（5日均量比&lt;60%）为稳健增量 —— 基线 mean +1.03%/wr 50.4% → 缩量60% mean +1.25%/wr 56.2%/段链 +128.9%；<b>C2 缩量60+回踩MA5±5% mean +1.79%/wr 56.4%/段链 +138.4%</b> 最优；A2长下影（n&lt;30）、RSI/BIAS 超卖（n 极小）淘汰。已登记增强候选，验证门通过前不改生产权重</div>\n'
             f'<div class="bt-grid">{c1}{c2}{c3}</div>\n</div>')
 
 

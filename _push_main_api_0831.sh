@@ -5,7 +5,7 @@ set -euo pipefail
 cd "D:/Documents/Workbuddy/股票基金/quant-weight-system"
 OWNER="hawchou1995"; REPO="quant-weight-system"; BRANCH="main"
 API="repos/$OWNER/$REPO"
-BASE="3a0adc9"          # 共同祖先（本地有）
+BASE=$(git rev-parse HEAD~1 2>/dev/null || echo "3a0adc9")   # 本地上一提交（已在远端）
 LOCAL=$(git rev-parse HEAD)   # a4d3d8f
 REMOTE=$(gh api "$API/git/ref/heads/$BRANCH" --jq '.object.sha')  # 1b797e9
 echo "base=$BASE local=$LOCAL remote=$REMOTE"

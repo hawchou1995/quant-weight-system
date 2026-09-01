@@ -25,12 +25,21 @@ JS = open(BASE / "enhanced_data.js", encoding="utf-8").read()
 ENH = json.loads(JS[len("window.ENH = "):-1])
 EXIST = ENH["details"]
 
-# 基金名（akshare）
+# 基金名（akshare；2026-08-31 修复：akshare 拉取失败时回退本地 fund_list.csv 缓存）
 def fund_names():
     try:
         import akshare as ak
         df = ak.fund_name_em()
         return dict(zip(df["基金代码"], df["基金简称"]))
+    except Exception:
+        pass
+    try:
+        import csv
+        d = {}
+        with open(BASE / "fund_list.csv", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                d[row["基金代码"]] = row["基金简称"]
+        return d
     except Exception:
         return {}
 
@@ -186,11 +195,47 @@ def tier_of(sc):
     if sc >= 30: return "减至半仓"
     return "清仓"
 
-def buy_tier(sc):
-    """短线买入口径（信号池专用）：回测 score≥50 即买 → 两态买入档"""
+def buy_tier(sc, board=None):
+    """短线买入口径（信号池专用）：基金 S30 / 股票 S55 即买 → 两态买入档
+    2026-08-31 生产接入：门槛随资产类型（基金 S30 / 股票 S55），避免分 30-49 基金入池却显示「不买」"""
     if sc >= 60: return "强买入"
-    if sc >= 50: return "买入"
-    return "不买"
+    if board == "基金":
+        return "买入" if sc >= FUND_SCORE_MIN else "不买"
+    return "买入" if sc >= STOCK_SCORE_MIN else "不买"
+
+# ⚠ 2026-08-31 生产接入（修正引擎 T+1 口径最优配置）：
+#   基金 = pathA T10/H10/S30 slip5（唯一过四闸，+241.2%/夏普0.872/胜率55.4%）→ 门槛 S50→S30
+#   股票 = T10/H15/S55 反转纯轮动（72 组唯一正收益 +23.42%，实验口径未过四闸）→ 门槛 S50→S55
+STOCK_SCORE_MIN = 55
+FUND_SCORE_MIN = 30
+
+# ⚠ 2026-09-01 生产接入 v2（regime 感知，修正引擎 T+1 口径网格最优）：
+#   股票 H6 三态（强弱阈值 0.02）：强牛=基线权重 S55 / 弱牛=防守权重(20,20,30,30) S55 / 熊=清仓
+#     → 夏普 0.406→0.641、收益 73.86%→149.27%、回撤 -40.03%→-28.29%、胜率 45.8%→52.1%
+#   基金 FB3 牛熊（熊市极防守 T3S45 低波开仓，非清仓）：
+#     牛=动量重(40,0,30,30) S30 Top10 / 熊=低波重(25,0,30,45) S45 Top3
+#     → 夏普 0.867→1.247（破 1.0 达成用户目标）、收益 243.84%→642.13%、胜率 55.0%→56.4%、9/11 年正
+#   ⚠ 基金熊市开仓与股票相反（股票熊市开仓 -64% 回撤灾难，基金熊市防守开仓 +398pp 增益）——
+#     机制：基金池熊市 T3S45 低波选中的是避险型基金（债/红利/货币），吃到避险行情
+STOCK_SCORE_MIN = 55
+FUND_SCORE_MIN = 30
+# H6 三态：沪深300 20d 动量 > 0.02 = 强牛（进攻权重），≤ 0.02 且 >MA20 = 弱牛（防守权重）
+IDX_MOM20_STRONG = 0.02
+ENABLE_F3 = False  # 9/1 裁决：F3 缩量企稳为增强候选，验证门前默认关闭（恢复双创信号可比性）
+STOCK_W_STRONG = (30, 25, 25, 20)   # 强牛：基线权重
+STOCK_W_WEAK = (20, 20, 30, 30)     # 弱牛：防守权重（回撤 -30.7% vs 基线 -40.03%，胜率 +6.1pp）
+# FB3 基金牛熊：牛=动量重(40,0,30,30) / 熊=低波重(25,0,30,45)
+FUND_W_BULL = (40, 0, 30, 30)       # 牛：动量重（量价退化，0 权重）
+FUND_W_BEAR = (25, 0, 30, 45)       # 熊：低波重（避险型基金优先）
+FUND_S_BEAR = 45                    # 熊：更严门槛 S45
+FUND_TOP_BEAR = 3                   # 熊：更少标的 Top3
+
+def _buyable(d):
+    """可买入判定（跟踪池/回溯/历史补偿共用）：股票 S55 / 基金 S30（2026-08-31 对齐最优配置）"""
+    sc = d.get("short_score") or 0
+    if d.get("board") == "基金":
+        return sc >= FUND_SCORE_MIN
+    return sc >= STOCK_SCORE_MIN
 
 def rsi14(close):
     d = close.diff()
@@ -228,6 +273,32 @@ def calc_signals(as_of=None):
     # 看板显示旧价格误导。load_stock_pool 的 10 自然日阈值只挡「死数据」，挡不住短期停牌股。
     _mkt_max = max(df.index[-1] for df in stock_pool.values()) if stock_pool else None
     rows_by_board = {"主板": [], "创业板": [], "科创板": []}
+    def _is_suspended(_ddf, _r):
+        """停牌判定（2026-09-01 修复）：除「日期落后 >1 自然日」外，补「最新行零成交/零价」判定。
+        背景：002274 华昌化工 08-26 起停牌，但 data_full/sz002274.csv 被塞了一行假的 08-31 全零行
+        （open/high/low/volume 全为 0，close=6.47 复用旧收盘），导致其 index[-1]=08-31 与 _mkt_max 相等、
+        diff_days=0 → 旧的「>1 天新鲜度」判定永不触发，华昌该标停牌却漏标。零行（无成交量、开盘=0）
+        即代表当日无成交、处于停牌/未复牌状态，须标记 suspended。
+        注意：不能只用 close<=0 判定——停牌序列常见「close 沿用上一交易日」，故以 volume==0 为主判据，
+        辅以 open/low/high==0 兜底（部分源数据缺失成交量时用价格方判）。"""
+        try:
+            _last = _ddf.iloc[-1]
+            _vol = _last.get("volume")
+            _opn = _last.get("open")
+            _lohi = _last.get("high", _last.get("low"))
+            # 零成交量（primary）或 开/高/低 全为 0（辅）→ 当日无实质成交
+            if _vol is not None and float(_vol) == 0:
+                return True
+            if _opn is not None and float(_opn) == 0:
+                return True
+            if _lohi is not None and float(_lohi) == 0:
+                return True
+        except Exception:
+            pass
+        # 日期落后全市场最新交易日 >1 自然日（原逻辑保留）
+        if _mkt_max is not None and (_mkt_max - _ddf.index[-1]).days > 1:
+            return True
+        return False
     def _susp_sig(_code, _ddf, _r):
         """停牌股信号数据（suspended 标记，供跟踪池渲染；不参与买入信号池）。
         2026-08-27 用户反馈：持仓股（如 002274 华昌化工）停牌期间仍需跟踪卖出信号，
@@ -235,7 +306,7 @@ def calc_signals(as_of=None):
         _nm = NAMES.get(_code, _code[-6:])
         if "ST" in _nm or _nm.startswith("S") or "退" in _nm or _r["close"] <= 1.5:
             return
-        _sc = S.short_score(_r, reversal=True)
+        _sc = S.short_score(_r, reversal=True, weights=STOCK_W_WEAK, mask=(1, 1, 1, 1))
         if pd.isna(_sc):
             return
         sig_stock[_code[-6:]] = {"name": _nm, "px": round(float(_r["close"]), 2),
@@ -244,13 +315,22 @@ def calc_signals(as_of=None):
                                   "ma5_above": None, "suspended": True,
                                   "suspend_since": str(_ddf.index[-1].date())}
 
+    # 2026-09-01 H6 三态：沪深300 20d 动量 > 0.02 = 强牛（进攻权重）/ ≤0.02 且 >MA20 = 弱牛（防守权重）
+    # 回测（修正引擎 T+1，F3 过滤）：夏普 0.406→0.641、收益 73.86%→149.27%、回撤 -40.03%→-28.29%、胜率 45.8%→52.1%
+    _idx_m20 = float(_idx.loc[:_gate_day]["close"].iloc[-1] / _idx.loc[:_gate_day]["close"].iloc[-21] - 1) \
+        if len(_idx.loc[:_gate_day]) >= 21 else 0.0
+    _stk_strong = _in_mkt and _idx_m20 > IDX_MOM20_STRONG
+    _stk_w = STOCK_W_STRONG if _stk_strong else STOCK_W_WEAK
+    print(f"股票 regime: {'强牛' if _stk_strong else ('弱牛' if _in_mkt else '熊市清仓')} (idx mom20={_idx_m20*100:.1f}%) 权重{_stk_w}", flush=True)
+
     for code, ddf in stock_pool.items():
         if as_of is not None:
             if as_of not in ddf.index:
                 # 2026-08-27 修复：as_of 分支停牌股同样保留信号数据（供跟踪池渲染）。
                 # 002274 华昌化工 08-26 起停牌，as_of=08-27 时无当日数据被 continue 跳过，
                 # 但持仓股停牌期间仍需跟踪卖出信号 → 标记 suspended 供前端显示「停牌·复牌后跟踪」。
-                if _mkt_max is not None and (_mkt_max - ddf.index[-1]).days > 1:
+                # 2026-09-01 修复：改用 _is_suspended（日期落后 OR 零量/零价），避免零量假行漏标。
+                if _is_suspended(ddf, ddf.iloc[-1]):
                     _susp_sig(code, ddf, ddf.iloc[-1])
                 continue
             r = ddf.loc[as_of]
@@ -258,7 +338,8 @@ def calc_signals(as_of=None):
             r = ddf.iloc[-1]
             # 2026-08-27 修复：停牌股新鲜度校验——数据日期落后全市场最新交易日 >1 自然日则跳过
             # （停牌股不可交易，短线信号无意义；正常标的当日回填滞后 ≤1 日不受影响）
-            if _mkt_max is not None and (_mkt_max - ddf.index[-1]).days > 1:
+            # 2026-09-01 修复：改用 _is_suspended（日期落后 OR 零量/零价），零量假行（002274 08-31）不漏标。
+            if _is_suspended(ddf, r):
                 _susp_sig(code, ddf, r)
                 continue
         if pd.isna(r["close"]) or r["close"] <= 0 or pd.isna(r["mom20"]):
@@ -274,7 +355,19 @@ def calc_signals(as_of=None):
         # 单日放量冲榜但平时流动性差的标的（如 605158 amt20 仅 141 万）不再入池。
         if pd.isna(r.get("amt20", np.nan)) or r["amt20"] < 3e7:
             continue
-        sc = S.short_score(r, reversal=True)
+        # 2026-08-31 剪藏因子 F3 缩量企稳（Obsidian 剪藏「李韩薇短线低吸」+「龙回头」提炼）：
+        #   V < MA(V,5) 且 MA(V,5) < MA(V,10) —— 缩量企稳后放量启动
+        #   回测 A/B（修正引擎 T+1）：股票反转基线 +23.42%/夏普0.216 → F3 +129.02%/夏普0.57/回撤-29.22%
+        #   ⚠ 实验口径：年化 8.12% 未达四闸 10% 门槛，登记增强候选，模拟盘验证门通过前不改生产权重
+        #   ⚠ 9/1 归因裁决：硬编码生产路径导致创业板 8→0 / 科创板 1→0 信号清零（线上对照 10/10/10），
+        #     与注释「验证门前不改生产」意图冲突 → 改为 ENABLE_F3=False 默认关闭（恢复双创可比性）；
+        #     验证门通过后置 True 重新启用。8/31 审计：修正引擎下短线股票整体无正收益配置，
+        #     双创清零会进一步剥夺观察样本，关闭 F3 不影响已过闸结论（该结论本身即负）。
+        if ENABLE_F3:
+            if pd.isna(r.get("vma5", np.nan)) or pd.isna(r.get("vma10", np.nan)) \
+               or not (r["volume"] < r["vma5"] and r["vma5"] < r["vma10"]):
+                continue
+        sc = S.short_score(r, reversal=True, weights=_stk_w, mask=(1, 1, 1, 1))
         if pd.isna(sc):
             continue
         bd = board_of(code)
@@ -291,8 +384,9 @@ def calc_signals(as_of=None):
         # 2026-08-17 用户决策：只保留买入信号（分≥50），不足 10 只不凑数；超 10 只封顶 Top10
         # 2026-08-20 用户决策：市况门控改为「仅提醒」——门控关闭不再清空股票池，
         #   权重分≥50 照常入池展示（仅供参考，非买入指令），由前端标题横幅提醒。
-        rows_by_board[bd] = [kv for kv in rows_by_board[bd] if kv[1] >= 50][:10]
-        print(f"股票[{bd}] 买入信号 {len(rows_by_board[bd])} 只（分≥50，不凑数）({time.time()-t0:.0f}s)", flush=True)
+        # 2026-08-31 生产接入：门槛 S50→S55（对齐修正引擎唯一正收益配置 T10/H15/S55 反转）
+        rows_by_board[bd] = [kv for kv in rows_by_board[bd] if kv[1] >= STOCK_SCORE_MIN][:10]
+        print(f"股票[{bd}] 买入信号 {len(rows_by_board[bd])} 只（分≥{STOCK_SCORE_MIN}，不凑数）({time.time()-t0:.0f}s)", flush=True)
     stock_top_main = rows_by_board["主板"]
     stock_top_gem  = rows_by_board["创业板"]
     stock_top_star = rows_by_board["科创板"]
@@ -301,9 +395,13 @@ def calc_signals(as_of=None):
     # 2) ETF 动量 Top10（2026-08-17 用户决策移除：ETF 表现不佳，短线池去 ETF）
     etf_top = []
 
-    # 3) 基金动量 Top10
+    # 3) 基金动量 Top10（2026-09-01 FB3 牛熊 regime：牛=动量重 S30 Top10 / 熊=低波重 S45 Top3）
+    # 回测（修正引擎 T+1，slip5）：牛动量+熊极防守 → 夏普 1.247（破 1.0）/收益 642.13%/胜率 56.4%/9/11 年正
+    #   vs 生产基线（熊清仓）夏普 0.867/243.84% —— 基金熊市防守开仓 +398pp 增益（股票相反，熊市清仓）
     fund_pool = S.load_fund_pool(3000)
     frows = []
+    _fw = FUND_W_BULL if _in_mkt else FUND_W_BEAR
+    _fsmin = FUND_SCORE_MIN if _in_mkt else FUND_S_BEAR
     for code, ddf in fund_pool.items():
         if as_of is not None:
             # 2026-08-27 修复：基金净值 T+1 公布（as_of=最新交易日时净值只到 T-1），
@@ -316,7 +414,7 @@ def calc_signals(as_of=None):
             r = ddf.iloc[-1]
         if pd.isna(r["close"]) or r["close"] <= 0 or pd.isna(r["mom20"]):
             continue
-        sc = S.short_score(r, reversal=False)
+        sc = S.short_score(r, reversal=False, weights=_fw, mask=(1, 1, 1, 1))
         if pd.isna(sc):
             continue
         frows.append((code, float(sc), r, ddf))
@@ -327,8 +425,11 @@ def calc_signals(as_of=None):
                                "ma5_above": bool(not pd.isna(r.get("ma5", np.nan)) and r["close"] > r["ma5"])}
     frows.sort(key=lambda kv: -kv[1])
     # 2026-08-17 用户决策：基金同样只保留买入信号（分≥50），不凑数
-    fund_top = [kv for kv in frows if kv[1] >= 50][:10]
-    print(f"基金池 买入信号 {len(fund_top)} 只（分≥50，不凑数）({time.time()-t0:.0f}s)", flush=True)
+    # 2026-08-31 生产接入：门槛 S50→S30（对齐 pathA 最优 T10/H10/S30 slip5，唯一过四闸）
+    # 2026-09-01 FB3：牛市 S30 Top10 / 熊市 S45 Top3（极防守，低波重）
+    _ftop = FUND_TOP_BEAR if not _in_mkt else 10
+    fund_top = [kv for kv in frows if kv[1] >= _fsmin][:_ftop]
+    print(f"基金池 买入信号 {len(fund_top)} 只（{'牛' if _in_mkt else '熊'}: 分≥{_fsmin} Top{_ftop}，权重{_fw}，不凑数）({time.time()-t0:.0f}s)", flush=True)
 
     # 详情构建
     details = {}
@@ -365,8 +466,8 @@ def calc_signals(as_of=None):
             "px": round(px, 2), "chg": round(chg, 2) if chg is not None else None,
             "ret_1y": round(ret_1y, 1) if ret_1y is not None else None,
             "score": round(sc, 1), "score_prev": None,
-            "tier": buy_tier(sc), "tier_prev": None,
-            "short_score": round(sc, 1), "short_tier": buy_tier(sc),
+            "tier": buy_tier(sc, board), "tier_prev": None,
+            "short_score": round(sc, 1), "short_tier": buy_tier(sc, board),
             "factors": {"mom": round(r.get("mom20", 0) * 100, 1) if not pd.isna(r.get("mom20", np.nan)) else None,
                         "vr": round(float(r.get("vr5", 1)), 2) if not pd.isna(r.get("vr5", np.nan)) else None,
                         "trend": comp["trend"], "volume": comp["volume"],
@@ -425,19 +526,19 @@ def build(as_of=None):
             _rec["type"] = "fund" if _rec.get("pool") == "基金" else "stock"
     _old_tiers = _old_full.get("tiers", {}) or {}
     _old_codes = {_c for _cs in _old_tiers.values() for _c in _cs}
-    _today_codes = {c for c, d in out["details"].items() if (d.get("short_score") or 0) >= 50}
+    _today_codes = {c for c, d in out["details"].items() if _buyable(d)}
     # ① 回溯上次构建的池：昨天在池且可买入、今天掉出的标的，按上次 as_of 补录正式池（用户场景：8/14 第一位 8/17 掉出仍可跟踪）
     for _bd, _codes in _old_tiers.items():
         for _c in _codes:
             if _c not in track and _c not in pending:
                 _od = (_old_full.get("details", {}) or {}).get(_c, {})
-                if (_od.get("short_score") or 0) >= 50:
+                if _buyable(_od):
                     _e0 = _old_full.get("as_of") or today
                     track[_c] = {"entry": _e0, "last_seen": _e0, "exit": _exit(_e0), "status": "active",
                                  "pool": _bd, "type": "fund" if _bd == "基金" else "stock"}
     # ② 当前池可买入标的
     for code, d in out["details"].items():
-        if (d.get("short_score") or 0) < 50:
+        if not _buyable(d):
             continue
         _bd = d.get("board", "")
         _snap = {"name": d.get("name"), "px": d.get("px"), "chg": d.get("chg"),
@@ -488,7 +589,7 @@ def build(as_of=None):
         try:
             _hist_out, _, _, _ = calc_signals(as_of="2026-08-14")
             for _c, _d in _hist_out["details"].items():
-                if (_d.get("short_score") or 0) >= 50 and _c not in track:
+                if _buyable(_d) and _c not in track:
                     track[_c] = {"entry": "2026-08-14", "last_seen": "2026-08-14", "exit": _exit("2026-08-14"), "status": "active",
                                  "pool": _d.get("board", ""), "type": "fund" if _d.get("board") == "基金" else "stock"}
             out["_backfilled_0814"] = True
@@ -536,7 +637,7 @@ def build(as_of=None):
         _old_last = _rec.get("last") or {}
         return {"name": NAMES.get(_k, _old_last.get("name") or _c),
                 "px": round(_px, 2), "chg": round(_chg, 2) if _chg is not None else None,
-                "score": round(_sc, 1), "tier": buy_tier(_sc),
+                "score": round(_sc, 1), "tier": buy_tier(_sc, _rec.get("pool")),
                 "pool": _rec.get("pool"), "type": "fund" if _is_fund else "stock",
                 "date": str(_df.index[-1].date())}
     _refreshed = 0
