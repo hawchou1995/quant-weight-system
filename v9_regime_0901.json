@@ -1,0 +1,122 @@
+{
+ "A_生产口径_牛开熊清": {
+  "summary": {
+   "total_return_pct": 28.3,
+   "annual_return_pct": 2.37,
+   "max_drawdown_pct": -27.15,
+   "sharpe": 0.229,
+   "win_rate_pct": 46.3,
+   "total_trades": 849
+  },
+  "regime": {
+   "bull": {
+    "n": 751,
+    "chain_ret": -99.74501034740926,
+    "mean_pnl": 0.7184820239680425,
+    "win_rate": 0.4567243675099867
+   },
+   "bear": {
+    "n": 98,
+    "chain_ret": 244.56979750364547,
+    "mean_pnl": 2.754081632653062,
+    "win_rate": 0.5408163265306123
+   }
+  }
+ },
+ "B_牛攻熊守_双权重": {
+  "summary": {
+   "total_return_pct": -36.92,
+   "annual_return_pct": -4.25,
+   "max_drawdown_pct": -64.21,
+   "sharpe": -0.066,
+   "win_rate_pct": 42.2,
+   "total_trades": 1489
+  },
+  "regime": {
+   "bull": {
+    "n": 776,
+    "chain_ret": -98.23818238918517,
+    "mean_pnl": 1.016314432989691,
+    "win_rate": 0.46005154639175255
+   },
+   "bear": {
+    "n": 713,
+    "chain_ret": -99.9999999773142,
+    "mean_pnl": -1.6422720897615708,
+    "win_rate": 0.3870967741935484
+   }
+  }
+ },
+ "C_牛攻熊守+熊止损12%": {
+  "summary": {
+   "total_return_pct": -64.99,
+   "annual_return_pct": -9.41,
+   "max_drawdown_pct": -68.47,
+   "sharpe": -0.375,
+   "win_rate_pct": 39.3,
+   "total_trades": 1523
+  },
+  "regime": {
+   "bull": {
+    "n": 777,
+    "chain_ret": -99.99485279601255,
+    "mean_pnl": 0.30974259974259977,
+    "win_rate": 0.444015444015444
+   },
+   "bear": {
+    "n": 746,
+    "chain_ret": -99.99999999990698,
+    "mean_pnl": -2.4931903485254687,
+    "win_rate": 0.34584450402144773
+   }
+  }
+ },
+ "D_牛攻熊守+熊降仓": {
+  "summary": {
+   "total_return_pct": -25.91,
+   "annual_return_pct": -2.79,
+   "max_drawdown_pct": -59.44,
+   "sharpe": -0.037,
+   "win_rate_pct": 42.2,
+   "total_trades": 1494
+  },
+  "regime": {
+   "bull": {
+    "n": 777,
+    "chain_ret": -98.30599632458282,
+    "mean_pnl": 1.0094337194337197,
+    "win_rate": 0.46074646074646075
+   },
+   "bear": {
+    "n": 717,
+    "chain_ret": -99.99999997505516,
+    "mean_pnl": -1.6246025104602513,
+    "win_rate": 0.38633193863319387
+   }
+  }
+ },
+ "E_熊趋势极重": {
+  "summary": {
+   "total_return_pct": -35.55,
+   "annual_return_pct": -4.05,
+   "max_drawdown_pct": -62.79,
+   "sharpe": -0.055,
+   "win_rate_pct": 42.2,
+   "total_trades": 1471
+  },
+  "regime": {
+   "bull": {
+    "n": 770,
+    "chain_ret": -93.16447776104117,
+    "mean_pnl": 1.1815584415584417,
+    "win_rate": 0.4688311688311688
+   },
+   "bear": {
+    "n": 701,
+    "chain_ret": -99.99999999442004,
+    "mean_pnl": -1.7631954350927246,
+    "win_rate": 0.37660485021398005
+   }
+  }
+ }
+}

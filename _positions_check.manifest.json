@@ -1,0 +1,79 @@
+{
+  "manifest_version": "v1",
+  "format": "ndjson",
+  "base_token": "KngobWii8aE93eshdQJct5Rsnob",
+  "table_id": "tblF4LQUjxT5LuYn",
+  "rev": 82,
+  "timezone": "Asia/Shanghai",
+  "query_context": {
+    "field_scope": "selected_fields",
+    "record_scope": "all_records"
+  },
+  "requested_limit": 2000,
+  "records_count": 22,
+  "page_count": 1,
+  "has_more": false,
+  "record_file": "D:\\Documents\\Workbuddy\\股票基金\\quant-weight-system\\_positions_check.ndjson",
+  "record_file_size_bytes": 2412,
+  "manifest_file": "D:\\Documents\\Workbuddy\\股票基金\\quant-weight-system\\_positions_check.manifest.json",
+  "columns": {
+    "record_id": {
+      "physical_type": "string",
+      "stats": {
+        "max_length": 14
+      },
+      "example": "recvrX5GGpObWe"
+    },
+    "代码": {
+      "field_id": "flduM5ZnHg",
+      "field_type": "text",
+      "physical_type": "string|null",
+      "stats": {
+        "null_count": 0,
+        "max_length": 6
+      },
+      "example": "159516"
+    },
+    "名称": {
+      "field_id": "fldpCfjw3C",
+      "field_type": "text",
+      "physical_type": "string|null",
+      "stats": {
+        "null_count": 0,
+        "max_length": 12
+      },
+      "example": "獐子岛"
+    },
+    "成本价": {
+      "field_id": "fldkGmrNju",
+      "field_type": "number",
+      "physical_type": "number|null",
+      "stats": {
+        "null_count": 0,
+        "min": 0.671,
+        "max": 121.21,
+        "avg": 18.938463636363636
+      },
+      "example": 0.863
+    },
+    "现价": {
+      "field_id": "fldmeER6TO",
+      "field_type": "number",
+      "physical_type": "number|null",
+      "stats": {
+        "null_count": 0,
+        "min": 0.716,
+        "max": 113.82,
+        "avg": 17.17672272727273
+      },
+      "example": 6.47
+    }
+  },
+  "ignored_fields": [
+    {
+      "id": "持仓数量",
+      "name": "持仓数量",
+      "reason": "NOT_FOUND: selected field does not exist in this table."
+    }
+  ]
+}

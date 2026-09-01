@@ -3,11 +3,11 @@
   "params": "T10/H10/S55 · 动量+MA5+止盈12%",
   "slippage_bps": 0,
   "summary": {
-    "total_return_pct": 243.76,
-    "annual_return_pct": 12.34,
-    "max_drawdown_pct": -9.25,
-    "sharpe": 1.753,
-    "win_rate_pct": 54.8,
-    "total_trades": 1198
+    "total_return_pct": -19.08,
+    "annual_return_pct": -1.97,
+    "max_drawdown_pct": -28.75,
+    "sharpe": -0.31,
+    "win_rate_pct": 30.6,
+    "total_trades": 634
   }
 }

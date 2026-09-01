@@ -1,13 +1,13 @@
 {
-  "strategy": "short_v3_etf",
-  "params": "T10/H10/S55 · 动量+MA5+止盈12% · 含20bps滑点 · qfq复权",
+  "strategy": "short_v3_etf_slip20",
+  "params": "T10/H10/S55 · 动量+MA5+止盈12%",
   "slippage_bps": 20,
   "summary": {
-    "total_return_pct": 84.09,
-    "annual_return_pct": 5.92,
-    "max_drawdown_pct": -11.78,
-    "sharpe": 0.848,
-    "win_rate_pct": 44.6,
-    "total_trades": 1012
+    "total_return_pct": -44.9,
+    "annual_return_pct": -5.46,
+    "max_drawdown_pct": -45.94,
+    "sharpe": -0.918,
+    "win_rate_pct": 21.7,
+    "total_trades": 632
   }
 }
