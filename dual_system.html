@@ -2,7 +2,7 @@
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2016'%3E%3Crect%20width='16'%20height='16'%20rx='3'%20fill='%232563eb'/%3E%3Cpath%20d='M3%2012V8h2v4zM6%2012V4h2v8zM9%2012V6h2v6zM12%2012V2h2v10z'%20fill='%23fff'/%3E%3C/svg%3E">
-<title>标的监控看板（数据截至 2026-09-02 · 构建 2026-09-02 23:42）</title>
+<title>标的监控看板（数据截至 2026-09-02 · 构建 2026-09-03 00:12）</title>
 <style>
 :root{
   --bg:#f3f4f6; --card:#ffffff; --card2:#f9fafb; --border:#e5e7eb; --line:#f0f1f3;
@@ -326,19 +326,19 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div></div>
 </div>
 <div class="card" id="bt-short">
-<h2>⚡ 短线回测参考 <span class="badge badge-auto">全量池短线 · 修正引擎 T+1 · 8/31 审计后口径</span></h2>
-<div class="sub">⚠ <b>8/31 审计</b>：旧短线引擎（short_engine/run_squeeze）出场路径含未来函数（T 日收盘触发→T 日开盘成交），<b>历史回测数字全部作废</b>；修正引擎 T+1 重验：<b>短线股票 72 组网格仅 1 组正收益（+23.42%，不达投产门槛），带 MA5/动量全负 → 无可投产配置</b>；分层旧数字（+356.96% 等）已下架（分层 3 卡一体现为「已下架」）。唯一幸存 = <b>基金动量 +243.47%</b>（净值型纯轮动，无风控，内部对照证明修复精准）</div>
-<div class="sub" style="color:#d97706">💧 短线股票（T10/H10/S55 反转+MA5 slip20）修正重验：<b>+315.72% → -41.67%</b>（-0.664 夏普/26.1% 胜率/996 笔）—— 原 edge 全部来自未来函数；看板短线股票池现仅作<b>观察/跟踪展示</b>（非买入指令），买入参考以基金动量为准</div>
-<div class="sub" style="color:#7c3aed">🧪 <b>9/1 熊市三策略吸收验证（用户框架规则化 · 修正引擎 T+1）</b>：S1 超跌反弹（ret5≤-6%+缩量<75%+RSI<20）单笔 +0.48%/胜率 52.6% 但<b>几何均值 -1.73%</b>、S3 右侧追涨（行业5日跌>8%转涨+个股强）单笔 +2.79%/胜率 69.2% 但<b>组合复利 -92.9%</b>、S2 抗跌强势负期望 —— <b>三策略全部 FAIL 组合级四闸</b>（单笔正但收益左偏 P5≈-30%，负偏尾吞掉正收益）。根因=熊市做多天然逆势，与用户判断一致：AI 高回撤来自缺择时+止损不够狠+单策略依赖。结论：<b>熊市入场过滤救不了逆势，唯一可行=熊市空仓/极端轻仓</b></div>
+<h2>⚡ 短线回测参考 <span class="badge badge-auto">生产主信号=KHunter · 修正引擎 T+1 · 2026-09-02 口径</span></h2>
+<div class="sub">📊 <b>生产主信号（纯主板）</b> = KHunter 15 策略信号 + RSI&lt;35 超卖择时（全窗口·牛熊均开仓·无门控）——回测 ob75/osl35/none：<b>n=653 · 胜率 62.5% · 中位 +5.82% · 超额(中位基准) +9.77%</b>，四闸 PASS；卖出信号 RSI&gt;75 独立触发。与旧战法（反转打分）完全独立，旧战法已全量弃用</div>
+<div class="sub" style="color:var(--sub)">💧 <b>口径说明</b>：一体=旧战法修正版 T+1（<b>-41.67%</b>，8/31 审计后唯一可信，仅作对照）；创业板/科创板=用户仅可买主板，KHunter 未按两板回测（说明卡）。买卖均为 T 日收盘确认 → T+1 开盘执行</div>
+<div class="sub" style="color:#7c3aed">🧪 <b>9/1 熊市三策略吸收验证（用户框架规则化 · 修正引擎 T+1）</b>：S1 超跌反弹单笔 +0.48%/胜率 52.6% 但<b>几何均值 -1.73%</b>、S3 右侧追涨单笔 +2.79%/胜率 69.2% 但<b>组合复利 -92.9%</b>、S2 抗跌强势负期望 —— <b>三策略全部 FAIL 组合级四闸</b>。结论：<b>熊市入场过滤救不了逆势，唯一可行=熊市空仓/极端轻仓</b>（例外：KHunter 主信号自身承担风险过滤，熊市开仓全窗口实测过闸）</div>
 <div class="bt-grid"><div class="bt-card" id="bt-short-stock-all">
-<div class="bt-head"><b>📈 短线 股票 一体</b><span class="bt-tag">T10/H10/S55 · 反转+MA5 · 含20bps滑点</span></div>
+<div class="bt-head"><b>📈 短线 股票 一体</b><span class="bt-tag">T10/H10/S55 · 反转+MA5 · 含20bps滑点 · 旧战法已弃用(8/31审计)</span></div>
 <div class="kpis">
 <div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#f59e0b">-41.7%</div><div class="s">2016-01~2026-08</div></div>
 <div class="kpi"><div class="l">年化</div><div class="v">-5.0%</div><div class="s">胜率 26%</div></div>
 <div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">-50.3%</div><div class="s">夏普 -0.66 · 996 笔</div></div>
 </div>
 <div class="bt-curve" id="curve-short-stock-all"></div>
-</div><div class="bt-card" id="bt-short-stock-main" style="border-color:rgba(120,113,108,.3)"><div class="bt-head"><b>📈 短线 纯主板</b><span class="bt-tag">纯主板 · 无修正口径已下架</span></div><div class="kpis"><div class="kpi"><div class="l">回测收益</div><div class="v" style="color:var(--faint)">已下架</div><div class="s">8/31 审计：旧分层口径含未来函数作废；修正引擎无分层口径</div></div><div class="kpi"><div class="l">说明</div><div class="v" style="font-size:15px;color:var(--faint)">—</div><div class="s">以一体修正版 -41.67% 为准</div></div></div></div><div class="bt-card" id="bt-short-stock-gem" style="border-color:rgba(120,113,108,.3)"><div class="bt-head"><b>📈 短线 纯创业板</b><span class="bt-tag">纯创业板 · 无修正口径已下架</span></div><div class="kpis"><div class="kpi"><div class="l">回测收益</div><div class="v" style="color:var(--faint)">已下架</div><div class="s">8/31 审计：旧分层口径含未来函数作废；修正引擎无分层口径</div></div><div class="kpi"><div class="l">说明</div><div class="v" style="font-size:15px;color:var(--faint)">—</div><div class="s">以一体修正版 -41.67% 为准</div></div></div></div><div class="bt-card" id="bt-short-stock-star" style="border-color:rgba(120,113,108,.3)"><div class="bt-head"><b>📈 短线 纯科创板</b><span class="bt-tag">纯科创板 · 无修正口径已下架</span></div><div class="kpis"><div class="kpi"><div class="l">回测收益</div><div class="v" style="color:var(--faint)">已下架</div><div class="s">8/31 审计：旧分层口径含未来函数作废；修正引擎无分层口径</div></div><div class="kpi"><div class="l">说明</div><div class="v" style="font-size:15px;color:var(--faint)">—</div><div class="s">以一体修正版 -41.67% 为准</div></div></div></div><div class="bt-card" id="bt-short-fund">
+</div><div class="bt-card" id="bt-short-stock-main"><div class="bt-head"><b>📈 短线 纯主板（KHunter 主信号）</b><span class="bt-tag">KHunter 主信号 · 全窗口(牛熊) · 无门控</span></div><div class="kpis"><div class="kpi"><div class="l">回测收益</div><div class="v" style="color:var(--up)">+5.8%</div><div class="s">中位数口径 · n=653</div></div><div class="kpi"><div class="l">胜率</div><div class="v">62.5%</div><div class="s">均值 +3.04%</div></div><div class="kpi"><div class="l">超额(中位基准)</div><div class="v" style="color:var(--up)">+9.77%</div><div class="s">夏普 0.29 · PF 0.87 · 持有 56 天</div></div></div></div><div class="bt-card" id="bt-short-stock-gem" style="border-color:rgba(120,113,108,.3)"><div class="bt-head"><b>📈 短线 纯创业板</b><span class="bt-tag">纯创业板 · 用户仅主板可买 · KHunter 未回测</span></div><div class="kpis"><div class="kpi"><div class="l">回测收益</div><div class="v" style="color:var(--faint)">未回测</div><div class="s">用户仅可买主板；KHunter 主信号仅按主板回测</div></div><div class="kpi"><div class="l">说明</div><div class="v" style="font-size:15px;color:var(--faint)">—</div><div class="s">主板卡以 KHunter 全窗口回测为准</div></div></div></div><div class="bt-card" id="bt-short-stock-star" style="border-color:rgba(120,113,108,.3)"><div class="bt-head"><b>📈 短线 纯科创板</b><span class="bt-tag">纯科创板 · 用户仅主板可买 · KHunter 未回测</span></div><div class="kpis"><div class="kpi"><div class="l">回测收益</div><div class="v" style="color:var(--faint)">未回测</div><div class="s">用户仅可买主板；KHunter 主信号仅按主板回测</div></div><div class="kpi"><div class="l">说明</div><div class="v" style="font-size:15px;color:var(--faint)">—</div><div class="s">主板卡以 KHunter 全窗口回测为准</div></div></div></div><div class="bt-card" id="bt-short-fund">
 <div class="bt-head"><b>🔵 短线 基金</b><span class="bt-tag">T5/H10/S40 · 动量（C类份额；换手减半抗申赎费） · 含5bps滑点</span></div>
 <div class="kpis">
 <div class="kpi"><div class="l">回测收益</div><div class="v" style="color:#3b82f6">+243.5%</div><div class="s">2016-01~2026-08</div></div>
@@ -3211,7 +3211,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 
 </div>
-<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-09-02 23:42 · 版本 v5.12.0（+🌦市场晴雨表） · 数据截至 2026-09-02 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-09-03 00:12 · 版本 v5.12.0（+🌦市场晴雨表） · 数据截至 2026-09-02 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
@@ -3250,8 +3250,8 @@ window.ENH.sub_curves = {
 /* 渲染 基金回测净值曲线（各自容器、各自对数坐标轴） */
 function renderOneCurve(elId, vals, color, label, totalPct){
   var el=document.getElementById(elId);if(!el)return;
-  if(!vals||!vals.length){ /* 已下架/无修正口径：画占位文字 */
-    el.innerHTML='<svg viewBox="0 0 1400 240" style="width:100%;height:auto"><text x="700" y="120" font-size="15" fill="#9ca3af" text-anchor="middle">已下架 · 旧口径含未来函数作废 · 无修正版</text></svg>';
+  if(!vals||!vals.length){ /* 未回测/无修正口径：画占位文字 */
+    el.innerHTML='<svg viewBox="0 0 1400 240" style="width:100%;height:auto"><text x="700" y="120" font-size="15" fill="#9ca3af" text-anchor="middle">未回测 · 用户仅可买主板（KHunter 主信号按主板回测，见卡片 KPI）</text></svg>';
     return;
   }
   var n=vals.length,W=1400,H=240,PAD_L=70,PAD_R=20,PAD_T=22,PAD_B=28;
@@ -3282,9 +3282,9 @@ function renderSubCurve(){
   renderOneCurve('curve-chart-stock-star', C.stk_star, '#8b5cf6', '纯科创板', '+'+95);
   renderOneCurve('curve-chart-fund', C.fund, '#3b82f6', '基金池', '+'+184);
   renderOneCurve('curve-short-stock-all', C.short_stock, '#f59e0b', '短线 股票 一体', '-42');
-  renderOneCurve('curve-short-stock-main', [], '#ea580c', '短线 纯主板', '已下架');
-  renderOneCurve('curve-short-stock-gem', [], '#22c55e', '短线 纯创业板', '已下架');
-  renderOneCurve('curve-short-stock-star', [], '#8b5cf6', '短线 纯科创板', '已下架');
+  renderOneCurve('curve-short-stock-main', [], '#ea580c', '短线 纯主板（KHunter）', '无净值曲线');
+  renderOneCurve('curve-short-stock-gem', [], '#22c55e', '短线 纯创业板', '未回测');
+  renderOneCurve('curve-short-stock-star', [], '#8b5cf6', '短线 纯科创板', '未回测');
   renderOneCurve('curve-short-fund', C.short_fund, '#3b82f6', '基金短线', '+243');
 }
 /* 视图切换（hash 驱动：切换时更新 location.hash，加载/前进后退时按 hash 定位） */
