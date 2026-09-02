@@ -219,6 +219,14 @@ FUND_SCORE_MIN = 30
 #     机制：基金池熊市 T3S45 低波选中的是避险型基金（债/红利/货币），吃到避险行情
 STOCK_SCORE_MIN = 55
 FUND_SCORE_MIN = 30
+# ⚠ 2026-09-01 多策略命中回避（用户拍板「做回避」）：
+#   回测（backtest/multi_strategy_resonance_0901.py，20 策略 M1-M20，成本 1.15% 已扣）：
+#     命中数≥3 组收益单调恶化（H10 hit1 均值 -0.59% → hit9 -1.63%），多策略共振过度 = 反向信号
+#   → 生产引擎：股票命中≥3 剔除出买入池（不参与 Top10 排序）。默认开启，可置 False 关闭。
+#   注：仅作用于股票买入池；基金（净值数据）与跟踪池卖出信号不受影响。
+ENABLE_HIT_AVOID = True
+HIT_AVOID_THRESHOLD = 3
+
 # H6 三态：沪深300 20d 动量 > 0.02 = 强牛（进攻权重），≤ 0.02 且 >MA20 = 弱牛（防守权重）
 IDX_MOM20_STRONG = 0.02
 ENABLE_F3 = False  # 9/1 裁决：F3 缩量企稳为增强候选，验证门前默认关闭（恢复双创信号可比性）
@@ -243,6 +251,109 @@ def rsi14(close):
     dn = (-d.clip(upper=0)).rolling(14).mean()
     rs = up / dn.replace(0, np.nan)
     return 100 - 100 / (1 + rs)
+
+def _hit_count(ddf, as_of=None, mkt_med_pct=None):
+    """单只股票在信号日的 20 策略命中数（2026-09-01 命中回避用）。
+    信号定义复刻 backtest/multi_strategy_resonance_0901.py（M1-M20，逐条一致）；
+    该文件是模块级执行脚本（import 即跑全量回测），不能 import，故在此内联。
+    mkt_med_pct = 信号日全市场涨跌幅中位数（S1 跨截面条件；None 时该条件视为不满足）。
+    命中≥3 = 多策略共振过度（回测收益单调恶化）→ 生产引擎反向过滤（回避）。"""
+    df = ddf.loc[:as_of] if as_of is not None else ddf
+    if len(df) < 60:
+        return 0
+    close = df["close"]; openp = df["open"]; high = df["high"]; low = df["low"]
+    volume = df["volume"]; amount = df["amount"]
+    def _ma(x, n): return x.rolling(n, min_periods=n).mean()
+    ma5 = _ma(close, 5); ma10 = _ma(close, 10); ma20 = _ma(close, 20)
+    ma30 = _ma(close, 30); ma40 = _ma(close, 40); ma60 = _ma(close, 60)
+    vol_ma5 = _ma(volume, 5); vol_ma20 = _ma(volume, 20)
+    vol_ratio = volume / vol_ma5
+    pct = close.pct_change() * 100
+    amplitude = (high - low) / close.shift(1) * 100
+    atr10 = pct.abs().rolling(10, min_periods=10).mean()
+    high60 = high.rolling(60, min_periods=60).max()
+    low60 = low.rolling(60, min_periods=60).min()
+    high10 = high.rolling(10, min_periods=10).max()
+    low10 = low.rolling(10, min_periods=10).min()
+    drawdown60 = (close - high60) / high60 * 100
+    def _rsi(x, n=6):
+        diff = x.diff()
+        gain = diff.clip(lower=0); loss = -diff.clip(upper=0)
+        ag = gain.rolling(n, min_periods=n).mean(); al = loss.rolling(n, min_periods=n).mean()
+        rs = ag / al.replace(0, np.nan)
+        return (100 - 100 / (1 + rs)).fillna(100)
+    rsi6 = _rsi(close, 6)
+    def _ema(x, n): return x.ewm(span=n, adjust=False).mean()
+    ema12 = _ema(close, 12); ema26 = _ema(close, 26)
+    dif = ema12 - ema26; dea = _ema(dif, 9)
+    low9 = low.rolling(9, min_periods=9).min(); high9 = high.rolling(9, min_periods=9).max()
+    rsv = (close - low9) / (high9 - low9).replace(0, np.nan) * 100
+    k = rsv.ewm(com=2, adjust=False).mean(); d = k.ewm(com=2, adjust=False).mean(); j = 3 * k - 2 * d
+    boll_mid = _ma(close, 20); boll_std = close.rolling(20, min_periods=20).std()
+    boll_up = boll_mid + 2 * boll_std; boll_low = boll_mid - 2 * boll_std
+    ret5 = close.pct_change(5) * 100; ret60 = close.pct_change(60) * 100
+    amt_2e = amount >= 2e8
+    listed_days = close.notna().cumsum()
+    i = -1
+    def _v(s):
+        v = s.iloc[i]
+        return bool(v) if not pd.isna(v) else False
+    hits = 0
+    # M1 海龟60日新高
+    if _v(close >= high60): hits += 1
+    # M2 平台突破
+    breakthrough = (close >= ma60) & (ma60 > openp) & (pct >= 2) & (close > openp) & (vol_ratio >= 2) & amt_2e
+    breakthrough_any = breakthrough.rolling(60, min_periods=1).max().astype(bool)
+    dev = (ma60 - close) / ma60
+    dev_ok = (dev > -0.05) & (dev < 0.20)
+    dev_ok_60 = dev_ok.rolling(60, min_periods=1).min().astype(bool)
+    if _v(breakthrough_any & dev_ok_60): hits += 1
+    # M3 持续上涨
+    ma30_0 = ma30.shift(30); ma30_10 = ma30.shift(20); ma30_20 = ma30.shift(10)
+    if _v((ma30_0 < ma30_20) & (ma30_20 < ma30_10) & (ma30_10 < ma30) & (ma30 > 1.2 * ma30_0)): hits += 1
+    # M4 低ATR成长
+    if _v((listed_days >= 250) & (high10 / low10 > 1.1) & (atr10 <= 10)): hits += 1
+    # M5 放量跌停
+    if _v((pct <= -9.5) & amt_2e & (vol_ratio >= 4)): hits += 1
+    # M6 放量上涨
+    if _v((pct >= 2) & (close > openp) & amt_2e & (vol_ratio >= 2)): hits += 1
+    # S1 8步选股法简化
+    vol_ladder = (volume.shift(4) <= volume.shift(3)) & (volume.shift(3) <= volume.shift(2)) & (volume.shift(2) <= volume.shift(1)) & (volume.shift(1) <= volume)
+    ma_rising = (ma5 > ma5.shift(1)) & (ma10 > ma10.shift(1)) & (ma20 > ma20.shift(1))
+    ma_bull = (ma5 > ma10) & (ma10 > ma20) & (close > ma20)
+    _med_ok = (pct > mkt_med_pct) if mkt_med_pct is not None else False
+    if _v((pct >= 3) & (pct <= 5) & (vol_ratio > 1) & vol_ladder & ma_bull & ma_rising & _med_ok): hits += 1
+    # Y2 高成长动量简化
+    if _v((pct >= 2) & (pct <= 9.9) & (vol_ratio >= 1.5)): hits += 1
+    # Y5 放量突破
+    if _v((vol_ratio >= 2.0) & (pct >= 1) & (pct <= 7) & (amplitude >= 3)): hits += 1
+    # Q3 60日箱体突破
+    box_range = (high60 - low60) / low60 * 100
+    box_pos = (close - low60) / (high60 - low60).replace(0, np.nan)
+    if _v((box_range <= 25) & (box_pos >= 0.90) & (vol_ratio >= 1.8) & (close > ma20) & (ret5 <= 15)): hits += 1
+    # Q4 大跌回撤磨底反转
+    vol5 = volume.rolling(5, min_periods=5).mean()
+    vol_5_20 = vol5 / vol_ma20
+    dist_ma20 = (close - ma20) / ma20 * 100
+    if _v((drawdown60 <= -25) & (amplitude.rolling(5, min_periods=5).mean() <= 3.5) & (vol_5_20 <= 0.7) & (dist_ma20.abs() <= 5) & (pct >= 1) & (pct <= 5) & (vol_ratio >= 1.2) & (vol_ratio <= 3.0)): hits += 1
+    # Q5 主力悄悄吸筹简化
+    ma_not_aligned = ~((ma20 > ma40) & (ma40 > ma60))
+    if _v((ret5 >= -4) & (ret5 <= 4) & (vol_ratio >= 0.6) & (vol_ratio <= 1.8) & (pct >= -3) & (pct <= 4) & (dist_ma20.abs() <= 6) & ma_not_aligned): hits += 1
+    # D1 MA金叉
+    if _v((ma5 > ma10) & (ma5.shift(1) <= ma10.shift(1))): hits += 1
+    # D2 MACD金叉
+    if _v((dif > dea) & (dif.shift(1) <= dea.shift(1))): hits += 1
+    # D3 RSI超卖
+    if _v((rsi6 < 30) & (rsi6.shift(1) >= 30)): hits += 1
+    # D4 放量突破
+    if _v((vol_ratio > 2.0) & (pct > 3)): hits += 1
+    # D5 布林反弹
+    if _v((low <= boll_low) & (close > boll_low)): hits += 1
+    # D6 KDJ金叉
+    if _v((j > k) & (j.shift(1) <= k.shift(1))): hits += 1
+    # D7 多指标共振
+    if _v((ma5 > ma10) & (dif > dea) & (vol_ratio > 1.2) & (pct > 0)): hits += 1
+    return hits
 
 def calc_signals(as_of=None):
     """计算短线信号池（as_of=指定信号日，默认最新交易日）；返回 (out, sigs)，不写文件"""
@@ -323,6 +434,25 @@ def calc_signals(as_of=None):
     _stk_w = STOCK_W_STRONG if _stk_strong else STOCK_W_WEAK
     print(f"股票 regime: {'强牛' if _stk_strong else ('弱牛' if _in_mkt else '熊市清仓')} (idx mom20={_idx_m20*100:.1f}%) 权重{_stk_w}", flush=True)
 
+    # 2026-09-01 多策略命中回避：S1 需信号日全市场涨跌幅中位数（跨截面，与回测 market_med 口径一致）
+    _mkt_med_pct = None
+    if ENABLE_HIT_AVOID:
+        _pct_list = []
+        for _c, _ddf in stock_pool.items():
+            if len(_ddf) < 2:
+                continue
+            if as_of is not None:
+                _sub = _ddf.loc[:as_of]
+                if len(_sub) < 2:
+                    continue
+                _pct_list.append(float(_sub["close"].iloc[-1] / _sub["close"].iloc[-2] - 1) * 100)
+            else:
+                _pct_list.append(float(_ddf["close"].iloc[-1] / _ddf["close"].iloc[-2] - 1) * 100)
+        _mkt_med_pct = float(np.median(_pct_list)) if _pct_list else None
+        print(f"命中回避: 信号日全市场涨跌幅中位数 {_mkt_med_pct:.2f}% (n={len(_pct_list)})", flush=True)
+
+    _hit_avoided = 0
+
     for code, ddf in stock_pool.items():
         if as_of is not None:
             if as_of not in ddf.index:
@@ -373,6 +503,13 @@ def calc_signals(as_of=None):
         bd = board_of(code)
         if bd not in rows_by_board:
             continue
+        # 2026-09-01 多策略命中回避：命中≥3 剔除（回测：命中数≥3 收益单调恶化，共振过度=反向信号）。
+        # 仅对 sc≥55 候选计算（sc<55 本就不入池，避免全市场 5000+ 只的指标计算开销）。
+        if ENABLE_HIT_AVOID and float(sc) >= STOCK_SCORE_MIN:
+            _hc = _hit_count(ddf, as_of, _mkt_med_pct)
+            if _hc >= HIT_AVOID_THRESHOLD:
+                _hit_avoided += 1
+                continue
         rows_by_board[bd].append((code, float(sc), r, ddf))
         _tail2 = ddf.loc[:as_of] if as_of is not None else ddf
         sig_stock[code[-6:]] = {"name": nm, "px": round(float(r["close"]), 2),
@@ -387,6 +524,8 @@ def calc_signals(as_of=None):
         # 2026-08-31 生产接入：门槛 S50→S55（对齐修正引擎唯一正收益配置 T10/H15/S55 反转）
         rows_by_board[bd] = [kv for kv in rows_by_board[bd] if kv[1] >= STOCK_SCORE_MIN][:10]
         print(f"股票[{bd}] 买入信号 {len(rows_by_board[bd])} 只（分≥{STOCK_SCORE_MIN}，不凑数）({time.time()-t0:.0f}s)", flush=True)
+    if ENABLE_HIT_AVOID and _hit_avoided:
+        print(f"命中回避: 剔除命中≥{HIT_AVOID_THRESHOLD} 的股票 {_hit_avoided} 只（多策略共振过度，反向过滤）", flush=True)
     stock_top_main = rows_by_board["主板"]
     stock_top_gem  = rows_by_board["创业板"]
     stock_top_star = rows_by_board["科创板"]
