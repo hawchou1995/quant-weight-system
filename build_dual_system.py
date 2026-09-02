@@ -54,19 +54,35 @@ try:
                 _row["is_short"] = True
                 _sp_items.append(_row)
     v9_short_items = _sp_items
-    v9_short_items.sort(key=lambda d: -d["score"])   # 全局权重分（短线分）降序，与其他表一致
+    # 2026-09-02 点2改造：主信号 top4 置顶 + 行级标签（主信号/候选·仅参考）
+    _sel_meta = SHORT_POOL.get("sel_meta") or {}
+    _top4_set = set(_sel_meta.get("top4", []))
+    v9_short_items.sort(key=lambda d: (d.get("code") not in _top4_set, -d["score"]))
+    SHORT_POOL_NOTE = _sel_meta.get("note", "")
+    # 2026-09-02 KHunter 今日统计徽章（主信号/信号观察/卖出数——0 只主信号时前端仍有迹可循）
+    _kh_meta = (_sel_meta.get("khunter") or {})
+    _kh_note = ""
+    if _kh_meta.get("sig"):
+        _kh_str = f'{_kh_meta.get("buy_n", 0)} 只主信号 · {_kh_meta.get("watch_n", 0)} 只信号观察 · {len(_kh_meta.get("sell", []))} 只卖出(RSI&gt;75)'
+    else:
+        _kh_str = "信号层未启用"
+    SHORT_KHUNTER_BADGE = (f'<span class="badge" style="background:rgba(37,99,235,.14);color:#60a5fa;" '
+                           f'title="KHunter 15 策略命中 + 信号日 RSI&lt;35 超卖 = 主信号（事件独立，有信号即买）；'
+                           f'信号观察 = 已命中但 RSI≥35 未触发；卖出 = RSI&gt;75 独立信号">'
+                           f'KHunter 今日: {_kh_str}</span>')
     SHORT_POOL_ASOF = SHORT_POOL.get("as_of", "—")
     _mg = SHORT_POOL.get("market_gate") or {}
     if _mg.get("open"):
         SHORT_POOL_GATE = f'<span class="badge badge-auto" style="background:#1f8a4c;color:#fff">市况门控 ✅ 开（{_mg.get("idx_close")} &gt; MA20 {_mg.get("idx_ma20")}）</span>'
     else:
         # 2026-08-20 用户决策：门控改为「仅提醒」——股票池分≥50 照常入池展示（供参考），不做买入指令
-        SHORT_POOL_GATE = f'<span class="badge badge-auto" style="background:#d97706;color:#fff">市况门控 ⚠ 关 · 仅提醒（沪深300 {_mg.get("idx_close")} &lt; MA20 {_mg.get("idx_ma20")}，股票池照常展示，仅供参考）</span>'
+        # 2026-09-02 豁免：KHunter 主信号不受门控（回测全窗口证据：熊市开仓四闸过）→ 徽章注明
+        SHORT_POOL_GATE = f'<span class="badge badge-auto" style="background:#d97706;color:#fff">市况门控 ⚠ 关 · 仅提醒（沪深300 {_mg.get("idx_close")} &lt; MA20 {_mg.get("idx_ma20")}；KHunter 主信号豁免·照常可买，其余仅参考）</span>'
     SHORT_POOL_INTRADAY = SHORT_POOL.get("intraday_note") or ""
     SHORT_POOL_ASOF_MIN = SHORT_POOL.get("intraday_ts") or "15:00"
     # 运行时精简池数据（tiers/track 供「全量池短线跟踪」渲染；HTML 不加载 short_pool.js）
     SHORT_POOL_SLIM = json.dumps(
-        {k: SHORT_POOL.get(k) for k in ("as_of", "fund_as_of", "tiers", "track", "track_pending_short", "market_gate")},
+        {k: SHORT_POOL.get(k) for k in ("as_of", "fund_as_of", "tiers", "track", "track_pending_short", "market_gate", "sel_meta")},
         ensure_ascii=False)
 except Exception as _e:
     print("short_pool 加载失败:", _e)
@@ -76,6 +92,7 @@ except Exception as _e:
     SHORT_POOL_ASOF_MIN = "15:00"
     SHORT_POOL_SLIM = '{}'
     SHORT_POOL_GATE = ''
+    SHORT_POOL_NOTE = ''
 # A5_tp8t2 打板实验系统（第三个系统，2026-08-28 接入；数据由 build_a5_pool.py 生成）
 try:
     _a5_js = open(BASE / "a5_pool.js", encoding="utf-8").read()
@@ -175,9 +192,15 @@ def rows_html_for(items):
         if d.get("gate_closed"):
             gate_tag = ('<span class="badge" style="background:rgba(217,119,6,.18);color:#fbbf24;" '
                         f'title="市况门控关闭：权重分≥50 照常入池仅供参考，非买入指令；不追高，持仓走跟踪池等卖出信号">仅提醒·非买入</span>')
-        rows += f'''<tr data-code="{d["code"]}" data-search="{d["name"]} {d["code"]} {d["industry"]} {board}" data-board="{d["perm"]}" data-market="{board}" data-industry="{d["industry"]}" data-tier="{d["tier"]}">
+        # 2026-09-02 用户拍板：主信号=KHunter 主板信号（+RSI<35）；旧战法候选已全量删除（弃用）
+        pick_tag = ""
+        if d.get("pick") == "top4":
+            pick_tag = ('<span class="badge" style="background:rgba(37,99,235,.16);color:#60a5fa;" '
+                        f'title="KHunter 主信号：15 策略命中 + 信号日 RSI&lt;35 超卖（主板限定，事件独立，有信号即买）">'
+                        f'🎯 KHunter 主信号</span>')
+        rows += f'''<tr data-code="{d["code"]}" data-search="{d["name"]} {d["code"]} {d["industry"]} {board}" data-board="{d["perm"]}" data-market="{board}" data-industry="{d["industry"]}" data-tier="{d["tier"]}" data-pick="{d.get("pick") or ""}">
 <td style="text-align:center">{rank}</td>
-<td><b>{d["name"]}</b><br><span style="color:var(--faint);font-size:11px">{d["code"]}</span></td>
+<td><b>{d["name"]}</b>{pick_tag}<br><span style="color:var(--faint);font-size:11px">{d["code"]}</span></td>
 <td><span class="board-tag">{board}</span></td>
 <td><span class="board-tag">{d["industry"]}</span></td>
 <td style="text-align:right" data-v="{d["px"]}">{d["px"]:.2f}</td>
@@ -215,10 +238,10 @@ def cards_html_for(items):
             else:
                 ma200_txt = (f'<span style="color:var(--faint)" title="现价在 MA200(年线) 上方">'
                              f'年线上方 {_dev:+.1f}%</span>')
-        cards += f'''<div class="stock-card" id="card-{d["code"]}" data-code="{d["code"]}" data-search="{d["name"]} {d["code"]} {d["industry"]} {board}" data-market="{board}" data-industry="{d["industry"]}" data-tier="{d["tier"]}">
+        cards += f'''<div class="stock-card" id="card-{d["code"]}" data-code="{d["code"]}" data-search="{d["name"]} {d["code"]} {d["industry"]} {board}" data-market="{board}" data-industry="{d["industry"]}" data-tier="{d["tier"]}" data-pick="{d.get("pick") or ""}">
 <div class="radar-wrap">{radar}</div>
 <div class="body">
-<h3>{d["name"]} <span class="sub">{d["code"]}</span> <span class="board-tag">{board}</span> <span class="board-tag">{d["industry"]}</span></h3>
+<h3>{d["name"]} <span class="sub">{d["code"]}</span> <span class="board-tag">{board}</span> <span class="board-tag">{d["industry"]}</span>{"🎯 KHunter 主信号" if d.get("pick")=="top4" else ("候选·仅观察" if d.get("pick")=="cand" else "")}</h3>
 <p class="meta">现价 <b>{d["px"]:.2f}</b>（<span class="{"up" if (d["chg"] or 0)>0 else "down"}">{f"{d['chg']:+.2f}%" if d["chg"] is not None else "—"}</span>）｜ 近一年 <span class="{"up" if (d["ret_1y"] or 0)>0 else "down"}">{f"{d['ret_1y']:+.0f}%" if d["ret_1y"] is not None else "—"}</span> ｜ RSI {d["rsi"]:.0f}</p>
 <p class="meta">权重 <b>{d["score"]:.1f} 分</b> → {tier_pill(d["tier"])} ｜ 建议：{action_for(d)} ｜ {ma200_txt}</p>
 <p class="meta">六类：趋势 {comp.get("trend",0):.0f}｜动能 {comp.get("momentum",0):.0f}｜量能 {comp.get("volume",0):.0f}｜超买 {comp.get("osc",0):.0f}｜风控 {comp.get("risk",0):.0f}｜研报 0.0</p>
@@ -305,17 +328,52 @@ for g, label, v9f, _sf in _STK_GROUPS:
         stk_tag[g] = (tag or label) + " · Aroon强趋势过滤(A80_M78)"
     else:
         stk_tag[g] = (tag or label) + (" · 含20bps滑点" if "滑点" not in (tag or "") else "")
-# 短线分层 summary（8/31 审计：旧 shortsplit_* 含未来函数作废；修正引擎无分层口径，
-# 统一展示一体修正版 -41.67% 并如实标注「分层旧数字作废」）
+# 短线分层 summary（8/31 审计：旧 shortsplit_* 含未来函数作废；修正引擎无分层口径）
+# 2026-09-02 晚修复：旧战法（反转打分）已全量弃用 → 分层「已下架」占位卡下线，
+# 改接生产主信号 = KHunter 15 信号 + RSI<35 择时 的全窗口回测（主板限定 · S1B_BOARD=main）
+# 数据源：backtest/khunter_timing_out/fusion_s1b_bear_main_allwindow.csv
+#   取 ob=75/osl=35/gate=none（无门控 = 熊市豁免生产口径）· 四闸 PASS
+#   n=653 · wr 62.5% · 中位 +5.82% · 均值 +3.04% · 超额(中位基准) +9.77%
+def _load_kh_bt():
+    """读 KHunter 主信号全窗口回测（ob75/osl35/gate none/breadth 0），返回 dict 或 None"""
+    import pandas as pd
+    f = BASE / "backtest" / "khunter_timing_out" / "fusion_s1b_bear_main_allwindow.csv"
+    if not f.exists():
+        return None
+    try:
+        df = pd.read_csv(f)
+        row = df[(df["ob"] == 75) & (df["oversold"] == 35) & (df["gate"] == "none") & (df["breadth"] == 0.0)]
+        if row.empty:
+            return None
+        r = row.iloc[0]
+        return {
+            "n": int(r["n"]), "wr": float(r["wr"]), "med": float(r["med"]),
+            "mean": float(r["mean"]), "ex_m": float(r["ex_m"]), "ex_b": float(r["ex_b"]),
+            "ann": float(r["ann"]), "sharpe": float(r["sharpe"]), "pf": float(r["pf"]),
+            "hold": float(r["hold"]),
+            "h1_n": int(r["h1_n"]), "h1_wr": float(r["h1_wr"]), "h1_med": float(r["h1_med"]), "h1_ex": float(r["h1_ex"]),
+            "h2_n": int(r["h2_n"]), "h2_wr": float(r["h2_wr"]), "h2_med": float(r["h2_med"]), "h2_ex": float(r["h2_ex"]),
+        }
+    except Exception:
+        return None
+
+KH_BT = _load_kh_bt()
+
 ss_stk = {}
 ss_stk_tag = {}
-for g, label, _v9f, sf in _STK_GROUPS:
+for g, label, _v9f, _sf in _STK_GROUPS:
     if g == "all":
-        s, lbl, tag = _load_summary(sf + "_summary.json")
+        # 一体=旧战法修正版口径（-41.67%）：如实标注「旧战法已弃用」
+        ss_stk[g] = json.loads(json.dumps(ss_stock))
+        ss_stk_tag[g] = ss_stock_tag + " · 旧战法已弃用(8/31审计)"
+    elif g == "main":
+        # 纯主板：生产主信号 = KHunter 全窗口回测（用户唯一可买主板）
+        ss_stk[g] = KH_BT if KH_BT else {}
+        ss_stk_tag[g] = "KHunter 主信号 · 全窗口(牛熊) · 无门控" if KH_BT else f"{label} · 暂无回测"
     else:
-        s, lbl, tag = {}, "", ""   # 分层不再展示旧口径
-    ss_stk[g] = s
-    ss_stk_tag[g] = tag or label
+        # 创业板/科创板：用户仅主板可买，KHunter 仅主板回测 → 明确说明卡
+        ss_stk[g] = {}
+        ss_stk_tag[g] = f"{label} · 用户仅主板可买 · KHunter 未回测"
 
 
 def bt_card(cid, title, tag, s, curve_id, color="#f59e0b", sub="2016-01~2026-08"):
@@ -325,7 +383,7 @@ def bt_card(cid, title, tag, s, curve_id, color="#f59e0b", sub="2016-01~2026-08"
     return f'''<div class="bt-card" id="{cid}">
 <div class="bt-head"><b>{title}</b><span class="bt-tag">{tag}</span></div>
 <div class="kpis">
-<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:{color}">+{s["total_return_pct"]:.1f}%</div><div class="s">{sub}</div></div>
+<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:{color}">{s["total_return_pct"]:+.1f}%</div><div class="s">{sub}</div></div>
 <div class="kpi"><div class="l">年化</div><div class="v">{s["annual_return_pct"]:.1f}%</div><div class="s">胜率 {s.get("win_rate_pct",0):.0f}%</div></div>
 <div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">{s["max_drawdown_pct"]:.1f}%</div><div class="s">夏普 {s["sharpe"]:.2f} · {s.get("total_trades",0)} 笔</div></div>
 </div>
@@ -351,19 +409,41 @@ def bt_all_html():
 
 
 def bt_short_html():
-    """短线回测参考 5 卡（股票分层 4 + 基金；2026-08-17 去 ETF）"""
+    """短线回测参考 5 卡
+    2026-09-02 晚修复：旧战法弃用 → 纯主板卡改接 KHunter 主信号回测（全窗口无门控 · 四闸 PASS）；
+    一体卡=旧战法修正版 -41.67%（标注弃用）；创业板/科创板=用户不可买，明确说明卡"""
+    def _card(cid, title, tag, s, curve_id, color="#f59e0b"):
+        if not s:
+            # 说明卡（创业板/科创板未回测等）
+            return (f'<div class="bt-card" id="{cid}" style="border-color:rgba(120,113,108,.3)">'
+                    f'<div class="bt-head"><b>{title}</b><span class="bt-tag">{tag}</span></div>'
+                    f'<div class="kpis"><div class="kpi"><div class="l">回测收益</div>'
+                    f'<div class="v" style="color:var(--faint)">未回测</div>'
+                    f'<div class="s">用户仅可买主板；KHunter 主信号仅按主板回测</div></div>'
+                    f'<div class="kpi"><div class="l">说明</div><div class="v" style="font-size:15px;color:var(--faint)">—</div>'
+                    f'<div class="s">主板卡以 KHunter 全窗口回测为准</div></div></div></div>')
+        # KHunter 卡是自定义结构（dict 字段与 summary 不同），单独渲染
+        if "ex_m" in s:
+            return (f'<div class="bt-card" id="{cid}">'
+                    f'<div class="bt-head"><b>{title}</b><span class="bt-tag">{tag}</span></div>'
+                    f'<div class="kpis">'
+                    f'<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:var(--up)">{s["med"]:+.1f}%</div><div class="s">中位数口径 · n={s["n"]}</div></div>'
+                    f'<div class="kpi"><div class="l">胜率</div><div class="v">{s["wr"]:.1f}%</div><div class="s">均值 {s["mean"]:+.2f}%</div></div>'
+                    f'<div class="kpi"><div class="l">超额(中位基准)</div><div class="v" style="color:var(--up)">{s["ex_m"]:+.2f}%</div><div class="s">夏普 {s["sharpe"]:.2f} · PF {s["pf"]:.2f} · 持有 {s["hold"]:.0f} 天</div></div>'
+                    f'</div></div>')
+        return bt_card(cid, title, tag, s, curve_id, color=color)
     cards = "".join([
-        bt_card("bt-short-stock-all", "📈 短线 股票 一体", ss_stk_tag["all"], ss_stk["all"], "curve-short-stock-all"),
-        bt_card("bt-short-stock-main", "📈 短线 纯主板", ss_stk_tag["main"], ss_stk["main"], "curve-short-stock-main"),
-        bt_card("bt-short-stock-gem", "📈 短线 纯创业板", ss_stk_tag["gem"], ss_stk["gem"], "curve-short-stock-gem"),
-        bt_card("bt-short-stock-star", "📈 短线 纯科创板", ss_stk_tag["star"], ss_stk["star"], "curve-short-stock-star"),
+        _card("bt-short-stock-all", "📈 短线 股票 一体", ss_stk_tag["all"], ss_stk["all"], "curve-short-stock-all"),
+        _card("bt-short-stock-main", "📈 短线 纯主板（KHunter 主信号）", ss_stk_tag["main"], ss_stk["main"], "curve-short-stock-main", color="#ea580c"),
+        _card("bt-short-stock-gem", "📈 短线 纯创业板", ss_stk_tag["gem"], ss_stk["gem"], "curve-short-stock-gem"),
+        _card("bt-short-stock-star", "📈 短线 纯科创板", ss_stk_tag["star"], ss_stk["star"], "curve-short-stock-star"),
         bt_card("bt-short-fund", "🔵 短线 基金", ss_fund_tag, ss_fund, "curve-short-fund", color="#3b82f6"),
     ])
     return ('<div class="card" id="bt-short">\n'
-            '<h2>⚡ 短线回测参考 <span class="badge badge-auto">全量池短线 · 修正引擎 T+1 · 8/31 审计后口径</span></h2>\n'
-            '<div class="sub">⚠ <b>8/31 审计</b>：旧短线引擎（short_engine/run_squeeze）出场路径含未来函数（T 日收盘触发→T 日开盘成交），<b>历史回测数字全部作废</b>；修正引擎 T+1 重验：<b>短线股票 72 组网格仅 1 组正收益（+23.42%，不达投产门槛），带 MA5/动量全负 → 无可投产配置</b>；分层旧数字（+356.96% 等）已下架。唯一幸存 = <b>基金动量 +243.47%</b>（净值型纯轮动，无风控，内部对照证明修复精准）</div>\n'
-            '<div class="sub" style="color:#d97706">💧 短线股票（T10/H10/S55 反转+MA5 slip20）修正重验：<b>+315.72% → -41.67%</b>（-0.664 夏普/26.1% 胜率/996 笔）—— 原 edge 全部来自未来函数；看板短线股票池现仅作<b>观察/跟踪展示</b>（非买入指令），买入参考以基金动量为准</div>\n'
-            '<div class="sub" style="color:#7c3aed">🧪 <b>9/1 熊市三策略吸收验证（用户框架规则化 · 修正引擎 T+1）</b>：S1 超跌反弹（ret5≤-6%+缩量<75%+RSI<20）单笔 +0.48%/胜率 52.6% 但<b>几何均值 -1.73%</b>、S3 右侧追涨（行业5日跌>8%转涨+个股强）单笔 +2.79%/胜率 69.2% 但<b>组合复利 -92.9%</b>、S2 抗跌强势负期望 —— <b>三策略全部 FAIL 组合级四闸</b>（单笔正但收益左偏 P5≈-30%，负偏尾吞掉正收益）。根因=熊市做多天然逆势，与用户判断一致：AI 高回撤来自缺择时+止损不够狠+单策略依赖。结论：<b>熊市入场过滤救不了逆势，唯一可行=熊市空仓/极端轻仓</b></div>\n'
+            '<h2>⚡ 短线回测参考 <span class="badge badge-auto">生产主信号=KHunter · 修正引擎 T+1 · 2026-09-02 口径</span></h2>\n'
+            '<div class="sub">📊 <b>生产主信号（纯主板）</b> = KHunter 15 策略信号 + RSI&lt;35 超卖择时（全窗口·牛熊均开仓·无门控）——回测 ob75/osl35/none：<b>n=653 · 胜率 62.5% · 中位 +5.82% · 超额(中位基准) +9.77%</b>，四闸 PASS；卖出信号 RSI&gt;75 独立触发。与旧战法（反转打分）完全独立，旧战法已全量弃用</div>\n'
+            '<div class="sub" style="color:var(--sub)">💧 <b>口径说明</b>：一体=旧战法修正版 T+1（<b>-41.67%</b>，8/31 审计后唯一可信，仅作对照）；创业板/科创板=用户仅可买主板，KHunter 未按两板回测（说明卡）。买卖均为 T 日收盘确认 → T+1 开盘执行</div>\n'
+            '<div class="sub" style="color:#7c3aed">🧪 <b>9/1 熊市三策略吸收验证（用户框架规则化 · 修正引擎 T+1）</b>：S1 超跌反弹单笔 +0.48%/胜率 52.6% 但<b>几何均值 -1.73%</b>、S3 右侧追涨单笔 +2.79%/胜率 69.2% 但<b>组合复利 -92.9%</b>、S2 抗跌强势负期望 —— <b>三策略全部 FAIL 组合级四闸</b>。结论：<b>熊市入场过滤救不了逆势，唯一可行=熊市空仓/极端轻仓</b>（例外：KHunter 主信号自身承担风险过滤，熊市开仓全窗口实测过闸）</div>\n'
             '<div class="bt-grid">' + cards + '</div>\n</div>')
 perm_stat = ''   # 2026-08-21 固定池已去除
 
@@ -1014,13 +1094,13 @@ html = f"""<!doctype html>
   "view-short", "sys-short",
   "⚡ 全量池短线", "auto", "全市场短线信号 Top 池",
   v9_short_items, "tbl-short", "card-tbl-short",
-  "信号池 = 回测买入清单：分数≥50 的 TopN 在轮动日全部买入 · 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览 · 基金行现价为 T-1 净值（场外基金净值次日公布）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：不追高，可等盘中回落至 3% 以内再考虑买入（9:30 盘中起生效）</b>",
+  "信号池 = 回测买入清单：KHunter 15 策略信号+RSI<35 超卖（主板限定）所有命中即买入（事件独立）· 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览 · 基金行现价为 T-1 净值（场外基金净值次日公布）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：不追高，可等盘中回落至 3% 以内再考虑买入（9:30 盘中起生效）</b>",
   extra_card=WATCH_CARD, score_sub="动量/量价/通道/波动",
-  head_tags=[SHORT_POOL_GATE,
-             '<span class="badge badge-auto">股票 = 反转信号按权限分层 · 仅买入（分≥50），各 ≤10 不凑数，剔ST</span>',
+  head_tags=[SHORT_POOL_GATE, SHORT_KHUNTER_BADGE,
+             '<span class="badge badge-auto">股票 = KHunter 15 策略信号 + RSI<35 超卖（主板限定 · 弃用旧战法）</span>',
              '<span class="badge badge-auto">基金 = 动量（分≥50 才入池）</span>',
-             '<span class="badge badge-auto">短线分 = 动量30/量价25/通道25/波动20</span>'],
-  head_note="<b>市况门控仅提醒：沪深300 &gt; MA20 才开新仓；门控关闭时股票池照常入池展示，仅作参考（⚠ 非买入指令，不追高）；持仓卖出信号走「全量池短线跟踪」</b> · 回测参考见「监控总览」",
+             '<span class="badge badge-auto">KHunter 信号密集期每日可能有几只，稀疏期 0 只属正常（事件驱动）</span>'],
+  head_note=f"<b>🎯 KHunter 主信号（蓝标）= 主板 15 策略信号命中 + 信号日 RSI&lt;35 超卖</b>（回测全窗口 ob75/osl35：n=653 wr 62.5% med +5.82% ex_m +9.77%，四闸 PASS；事件独立·有信号即买）｜ <b>旧战法（反转分）已全量弃用</b>（主板 -35.65% / 全市场 -41.67% 均负期望，不再展示）· 卖出信号 = RSI&gt;75 超卖（独立于选股信号，持仓股触发提示）· 市况门控仅提醒：沪深300 &gt; MA20 才开新仓；门控关闭时 <b>KHunter 主信号豁免照常可买</b>（回测全窗口证据：熊市开仓四闸过），其余股票参考不追高；持仓卖出信号走「全量池短线跟踪」 · 回测参考见「监控总览」· 备注：{SHORT_POOL_NOTE}",
   as_of=SHORT_POOL_ASOF, intraday_note=SHORT_POOL_INTRADAY,
   as_of_min=SHORT_POOL.get("intraday_ts") or SHORT_POOL_ASOF_MIN,
   tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=())}
@@ -1108,6 +1188,10 @@ window.ENH.sub_curves = {{
 /* 渲染 基金回测净值曲线（各自容器、各自对数坐标轴） */
 function renderOneCurve(elId, vals, color, label, totalPct){{
   var el=document.getElementById(elId);if(!el)return;
+  if(!vals||!vals.length){{ /* 未回测/无修正口径：画占位文字 */
+    el.innerHTML='<svg viewBox="0 0 1400 240" style="width:100%;height:auto"><text x="700" y="120" font-size="15" fill="#9ca3af" text-anchor="middle">未回测 · 用户仅可买主板（KHunter 主信号按主板回测，见卡片 KPI）</text></svg>';
+    return;
+  }}
   var n=vals.length,W=1400,H=240,PAD_L=70,PAD_R=20,PAD_T=22,PAD_B=28;
   var x=function(i){{return PAD_L+(W-PAD_L-PAD_R)*i/Math.max(1,n-1);}};
   var lo=Math.max(50,Math.min.apply(null,vals)*0.9), hi=Math.max(200,Math.max.apply(null,vals));
@@ -1135,11 +1219,11 @@ function renderSubCurve(){{
   renderOneCurve('curve-chart-stock-gem', C.stk_gem, '#22c55e', '纯创业板', '+'+{round(s_stk["gem"].get("total_return_pct") or 0):.0f});
   renderOneCurve('curve-chart-stock-star', C.stk_star, '#8b5cf6', '纯科创板', '+'+{round(s_stk["star"].get("total_return_pct") or 0):.0f});
   renderOneCurve('curve-chart-fund', C.fund, '#3b82f6', '基金池', '+'+{s_fund["total_return_pct"]:.0f});
-  renderOneCurve('curve-short-stock-all', C.sstk_all, '#f59e0b', '短线 股票 一体', '+'+{round(ss_stk["all"].get("total_return_pct") or 0):.0f});
-  renderOneCurve('curve-short-stock-main', C.sstk_main, '#ea580c', '短线 纯主板', '+'+{round(ss_stk["main"].get("total_return_pct") or 0):.0f});
-  renderOneCurve('curve-short-stock-gem', C.sstk_gem, '#22c55e', '短线 纯创业板', '+'+{round(ss_stk["gem"].get("total_return_pct") or 0):.0f});
-  renderOneCurve('curve-short-stock-star', C.sstk_star, '#8b5cf6', '短线 纯科创板', '+'+{round(ss_stk["star"].get("total_return_pct") or 0):.0f});
-  renderOneCurve('curve-short-fund', C.short_fund, '#3b82f6', '基金短线', '+'+{ss_fund["total_return_pct"]:.0f});
+  renderOneCurve('curve-short-stock-all', C.short_stock, '#f59e0b', '短线 股票 一体', '{(ss_stk["all"].get("total_return_pct") or 0):+.0f}');
+  renderOneCurve('curve-short-stock-main', [], '#ea580c', '短线 纯主板（KHunter）', '无净值曲线');
+  renderOneCurve('curve-short-stock-gem', [], '#22c55e', '短线 纯创业板', '未回测');
+  renderOneCurve('curve-short-stock-star', [], '#8b5cf6', '短线 纯科创板', '未回测');
+  renderOneCurve('curve-short-fund', C.short_fund, '#3b82f6', '基金短线', '{ss_fund["total_return_pct"]:+.0f}');
 }}
 /* 视图切换（hash 驱动：切换时更新 location.hash，加载/前进后退时按 hash 定位） */
 var VIEW_MAP={{'overview':'view-overview','sys-auto':'view-auto','short':'view-short','a5':'view-a5','review':'view-review','changelog':'view-changelog','comment':'view-comment'}};

@@ -230,7 +230,83 @@ HIT_AVOID_THRESHOLD = 3
 # H6 三态：沪深300 20d 动量 > 0.02 = 强牛（进攻权重），≤ 0.02 且 >MA20 = 弱牛（防守权重）
 IDX_MOM20_STRONG = 0.02
 ENABLE_F3 = False  # 9/1 裁决：F3 缩量企稳为增强候选，验证门前默认关闭（恢复双创信号可比性）
-STOCK_W_STRONG = (30, 25, 25, 20)   # 强牛：基线权重
+# 2026-09-02 用户拍板：短线战法全量池选股改用 KHunter 信号 + RSI 择时（主板限定，全窗口），弃用旧战法（反转打分）
+# 回测证据：KHunter 信号 + RSI_T-1<35 超卖买 + RSI_T-1>75 卖 + 主板限定 + 全窗口（牛熊一致开仓）
+#   = 四闸(ex_m)过 26 格：ob75/osl35/none n=653 wr62.5% med+5.82% ex_m+9.77%；ob75/osl40/none n=1639 ex_m+9.08%
+#   = 信号稀疏（每18天1只）→ 事件独立口径（有信号就买，无需 top4 组合）
+# 弃用旧战法证据：反转打分(S55)修正后主板 -35.65%/全市场 -41.67% 均负期望
+ENABLE_KHUNTER = True
+KHUNTER_RSI_BUY = 35    # RSI_T-1 < 35 超卖买入（回测最优 ob75/osl35）
+KHUNTER_RSI_SELL = 75   # RSI_T-1 > 75 超买卖出
+
+def _khunter_sig(ddf, as_of=None):
+    """KHunter 信号计算（2026-09-02 用户拍板）：生产在「今日 T 收盘后」运行，明日 T+1 开盘执行。
+    回测口径精确对齐（khunter_fusion_s1b_bear.py, 修正引擎 T+1 铁律）：
+      回测语义：执行日 T 开盘 ⟺ 确认日「T-1 信号命中 AND T-1 RSI<35」同天成立；
+      生产映射：执行日 = 明天 T+1 → 确认日 = 今日 T → 检查今日 sig_any[T] + 今日 RSI
+    ddf = short_engine 的因子 df（含 date index）；as_of=历史回溯日（as_of 当日即「今日 T」）；
+    返回字典：{hit: 确认日信号命中, rsi_now: 确认日 RSI（买入/卖出判定）, rsi_t1: T-1 RSI(展示),
+               sell1: 确认日 RSI>75, hits: 确认日命中信号名单}"""
+    try:
+        import sys as _sys
+        if str(BASE / "backtest") not in _sys.path:
+            _sys.path.insert(0, str(BASE / "backtest"))
+        import khunter_all_strategies_backtest as _K
+        import khunter_timing_backtest as _T
+        d = ddf[['open', 'high', 'low', 'close', 'volume']].copy()
+        d.index.name = None
+        d['date'] = d.index
+        d = d.sort_values('date').reset_index(drop=True)
+        # as_of 截断：只用到 as_of 当日的全部数据（与主循环 r = ddf.loc[as_of] 口径一致）
+        if as_of is not None:
+            _cut = pd.Timestamp(as_of)
+            d = d[d['date'] <= _cut].reset_index(drop=True)
+            if len(d) < 2:
+                return {"hit": False, "rsi_t1": None, "rsi_now": None, "sell1": False, "hits": []}
+        r = _T.prep(d)
+        sig_any = np.zeros(len(d), dtype=bool)
+        for _name, _fn in _K.SIGNALS.items():
+            try:
+                _sv = _fn(r)
+                if _sv.any():
+                    sig_any |= _sv.values
+            except Exception:
+                continue
+        # 今日 T 视角（生产：今日收盘确认 → 明日开盘执行 = 回测「执行日=确认日+1」）
+        i = len(d) - 1
+        if i < 1:
+            return {"hit": False, "rsi_t1": None, "rsi_now": None, "sell1": False, "hits": []}
+        rsi_now = r['rsi'].iloc[i]      # 确认日 T RSI（买入判定 rsi_now<35；卖出判定 rsi_now>75）
+        rsi_t1 = r['rsi'].iloc[i - 1]   # T-1 RSI（仅展示参考）
+        hit_now = bool(sig_any[i])      # 确认日 T 信号命中
+        hit_names = []
+        if hit_now:
+            for _name, _fn in _K.SIGNALS.items():
+                try:
+                    _sv = _fn(r)
+                    if bool(_sv.iloc[i]):
+                        hit_names.append(_name)
+                except Exception:
+                    continue
+        return {"hit": hit_now,
+                "rsi_t1": (float(rsi_t1) if not pd.isna(rsi_t1) else None),
+                "rsi_now": (float(rsi_now) if not pd.isna(rsi_now) else None),
+                "sell1": (bool(rsi_now > KHUNTER_RSI_SELL) if not pd.isna(rsi_now) else False),
+                "hits": hit_names}
+    except Exception:
+        return {"hit": False, "rsi_t1": None, "rsi_now": None, "sell1": False, "hits": []}
+# ⚠ 2026-09-02 生产接入 v3（牛熊独立配置网格 shortpool_bull_grid_0902 最优，用户指令「牛市用牛市参数」）：
+#   牛市子集四闸 PASS 配置 = S2_t4_h15_s50：权重(25,20,25,30) + 关动量 mask(0,1,1,1) + 门槛 S50
+#     → 牛市 med -0.10%(基线) → +0.23%(PASS)，mean +1.41%、超额 +1.14%、n=225（全市场 top4 口径）
+#   ⚠ 口径差异（17:00 补跑 shortpool_board_engine_0902 每板配额验证）：
+#     网格 PASS 是「全市场自由选 top4」的精选效应；生产每板 Top10 结构穷举 56 配置全 fail
+#     （最好 med -0.16%）→ 生产结构下短线股票牛市无过闸配置（与修正引擎「短线股票无可投产配置」一致）
+#     → 本接入定位 = 方向性改善 + 观察项（每板口径 med -0.64%→-0.33%、mean +1.15%→+3.02%、双创信号恢复满额）
+#   熊市 24 配置全 fail（最好 med -0.14%）→ 短线引擎熊市无 edge，维持清仓（生产现状正确）
+#   市值因子：牛市 <1亿 小票 PASS（med +0.83%），量级单调递减；熊市全量级 fail → 小票偏好列观察项
+STOCK_W_STRONG = (25, 20, 25, 30)   # 强牛：网格牛市最优权重（原基线 (30,25,25,20)）
+STOCK_MASK_STRONG = (0, 1, 1, 1)    # 强牛：关动量（网格牛市最优掩码；量价+通道+低波）
+STOCK_SCORE_MIN_STRONG = 50         # 强牛：S50（网格 S50>S55>S60 单调）
 STOCK_W_WEAK = (20, 20, 30, 30)     # 弱牛：防守权重（回撤 -30.7% vs 基线 -40.03%，胜率 +6.1pp）
 # FB3 基金牛熊：牛=动量重(40,0,30,30) / 熊=低波重(25,0,30,45)
 FUND_W_BULL = (40, 0, 30, 30)       # 牛：动量重（量价退化，0 权重）
@@ -239,11 +315,17 @@ FUND_S_BEAR = 45                    # 熊：更严门槛 S45
 FUND_TOP_BEAR = 3                   # 熊：更少标的 Top3
 
 def _buyable(d):
-    """可买入判定（跟踪池/回溯/历史补偿共用）：股票 S55 / 基金 S30（2026-08-31 对齐最优配置）"""
+    """可买入判定（跟踪池/回溯/历史补偿共用）：
+    2026-09-02 用户拍板：KHunter 主信号（主板信号+RSI<35）= 唯一股票买入来源；
+    旧战法（反转打分 S55）已全量弃用（负期望）→ 不再构成买入依据；基金 S30 不受影响"""
+    # KHunter 信号命中 + RSI<35 → 可买入（主信号，事件独立），不受旧战法分数门槛约束
+    _kh = d.get("khunter") or {}
+    if _kh.get("sig") and _kh.get("buy"):
+        return True
     sc = d.get("short_score") or 0
     if d.get("board") == "基金":
         return sc >= FUND_SCORE_MIN
-    return sc >= STOCK_SCORE_MIN
+    return False   # 股票旧战法已弃用：非 KHunter 主信号不可买入
 
 def rsi14(close):
     d = close.diff()
@@ -432,7 +514,10 @@ def calc_signals(as_of=None):
         if len(_idx.loc[:_gate_day]) >= 21 else 0.0
     _stk_strong = _in_mkt and _idx_m20 > IDX_MOM20_STRONG
     _stk_w = STOCK_W_STRONG if _stk_strong else STOCK_W_WEAK
-    print(f"股票 regime: {'强牛' if _stk_strong else ('弱牛' if _in_mkt else '熊市清仓')} (idx mom20={_idx_m20*100:.1f}%) 权重{_stk_w}", flush=True)
+    # 2026-09-02 生产接入 v3：强牛用网格牛市最优（关动量 mask + S50 门槛），弱牛保持全 mask + S55
+    _stk_mask = STOCK_MASK_STRONG if _stk_strong else (1, 1, 1, 1)
+    _stk_smin = STOCK_SCORE_MIN_STRONG if _stk_strong else STOCK_SCORE_MIN
+    print(f"股票 regime: {'强牛' if _stk_strong else ('弱牛' if _in_mkt else '熊市清仓')} (idx mom20={_idx_m20*100:.1f}%) 权重{_stk_w} mask{_stk_mask} 门槛{_stk_smin}", flush=True)
 
     # 2026-09-01 多策略命中回避：S1 需信号日全市场涨跌幅中位数（跨截面，与回测 market_med 口径一致）
     _mkt_med_pct = None
@@ -452,6 +537,9 @@ def calc_signals(as_of=None):
         print(f"命中回避: 信号日全市场涨跌幅中位数 {_mkt_med_pct:.2f}% (n={len(_pct_list)})", flush=True)
 
     _hit_avoided = 0
+    # 2026-09-02 用户拍板：KHunter 事件收集（主板限定；主信号=信号+RSI<35，卖出=RSI>75 独立）
+    khunter_buy = []      # (code, info)：信号命中（含 buy_ok 判定）
+    khunter_sell = []     # code：RSI>75 独立卖出信号（回测 event_days = entry_ok | sell_vec）
 
     for code, ddf in stock_pool.items():
         if as_of is not None:
@@ -497,15 +585,15 @@ def calc_signals(as_of=None):
             if pd.isna(r.get("vma5", np.nan)) or pd.isna(r.get("vma10", np.nan)) \
                or not (r["volume"] < r["vma5"] and r["vma5"] < r["vma10"]):
                 continue
-        sc = S.short_score(r, reversal=True, weights=_stk_w, mask=(1, 1, 1, 1))
+        sc = S.short_score(r, reversal=True, weights=_stk_w, mask=_stk_mask)
         if pd.isna(sc):
             continue
         bd = board_of(code)
         if bd not in rows_by_board:
             continue
         # 2026-09-01 多策略命中回避：命中≥3 剔除（回测：命中数≥3 收益单调恶化，共振过度=反向信号）。
-        # 仅对 sc≥55 候选计算（sc<55 本就不入池，避免全市场 5000+ 只的指标计算开销）。
-        if ENABLE_HIT_AVOID and float(sc) >= STOCK_SCORE_MIN:
+        # 仅对 sc≥门槛 候选计算（sc<门槛 本就不入池，避免全市场 5000+ 只的指标计算开销）。
+        if ENABLE_HIT_AVOID and float(sc) >= _stk_smin:
             _hc = _hit_count(ddf, as_of, _mkt_med_pct)
             if _hc >= HIT_AVOID_THRESHOLD:
                 _hit_avoided += 1
@@ -516,20 +604,72 @@ def calc_signals(as_of=None):
                                 "chg": round(float(r["close"] / (_tail2["close"].iloc[-2] if as_of else ddf["close"].iloc[-2]) - 1) * 100, 2),
                                 "score": round(float(sc), 1), "tier": tier_of(float(sc)),
                                 "ma5_above": bool(not pd.isna(r.get("ma5", np.nan)) and r["close"] > r["ma5"])}
-    for bd in ("主板", "创业板", "科创板"):
-        rows_by_board[bd].sort(key=lambda kv: -kv[1])
-        # 2026-08-17 用户决策：只保留买入信号（分≥50），不足 10 只不凑数；超 10 只封顶 Top10
-        # 2026-08-20 用户决策：市况门控改为「仅提醒」——门控关闭不再清空股票池，
-        #   权重分≥50 照常入池展示（仅供参考，非买入指令），由前端标题横幅提醒。
-        # 2026-08-31 生产接入：门槛 S50→S55（对齐修正引擎唯一正收益配置 T10/H15/S55 反转）
-        rows_by_board[bd] = [kv for kv in rows_by_board[bd] if kv[1] >= STOCK_SCORE_MIN][:10]
-        print(f"股票[{bd}] 买入信号 {len(rows_by_board[bd])} 只（分≥{STOCK_SCORE_MIN}，不凑数）({time.time()-t0:.0f}s)", flush=True)
+        # 2026-09-02 用户拍板：KHunter 信号层（主板限定+RSI 超卖择时，弃用旧战法）
+        # 注意：KHunter 信号计算较重（15 个信号函数），只对主板 bd 计算（产品只能买主板）
+        # 主信号口径=回测 ortho：T 日信号命中 + 信号日 RSI<35 → 明日开盘买入（事件独立，稀疏）
+        # 卖出 = RSI>75 独立信号（回测 event_days = entry_ok | sell_vec：买卖事件各自独立）
+        if ENABLE_KHUNTER and bd == "主板":
+            _kinfo = _khunter_sig(ddf, as_of)
+            if _kinfo["hit"]:
+                sig_stock[code[-6:]]["khunter"] = {
+                    "sig": True,
+                    "rsi_t1": _kinfo["rsi_t1"],
+                    "rsi_now": _kinfo["rsi_now"],
+                    "buy": (_kinfo["rsi_now"] is not None and _kinfo["rsi_now"] < KHUNTER_RSI_BUY),
+                    "sell": _kinfo["sell1"],
+                    "hits": _kinfo["hits"],
+                }
+                # 事件收集（主信号判定：信号日 RSI<35 → 买入；RSI≥35 → 观察）
+                _buy_ok = _kinfo["rsi_now"] is not None and _kinfo["rsi_now"] < KHUNTER_RSI_BUY
+                khunter_buy.append((code, _kinfo, bool(_buy_ok), float(sc), r, ddf))
+            if _kinfo["sell1"]:
+                # RSI>75 卖出信号：独立于选股信号（回测 event_days = entry_ok | sell_vec）
+                sig_stock[code[-6:]]["khunter"] = {
+                    "sig": bool(_kinfo["hit"]), "rsi_t1": _kinfo["rsi_t1"], "rsi_now": _kinfo["rsi_now"],
+                    "buy": False, "sell": True, "hits": _kinfo["hits"],
+                    "note": "RSI>75 超买卖出（独立信号）",
+                }
+                khunter_sell.append(code)
+    # 按板块列表初始化（2026-09-02 用户拍板：KHunter 主信号 + 弃用旧战法）
+    # 主信号 = 主板 KHunter 15 信号命中 + 信号日 RSI<35（超卖买入，回测 ob75/osl35 全窗口最优）
+    # 信号观察 = 主板 KHunter 命中但 RSI≥35（未触发买入，等待后续信号日）
+    # 旧战法（反转打分）已弃用：主板 -35.65% / 全市场 -41.67% 均负期望（四闸铁律）→ 全部删除，不再展示
+    # ⚠ 2026-09-02 用户拍板「旧战法全剔」：候选/仅观察（旧战法分数 Top10）不再计算展示；
+    #   rows_by_board 旧战法分数仅保留 KHunter 命中股票的 score 参考字段，排序筛选不再入池。
     if ENABLE_HIT_AVOID and _hit_avoided:
         print(f"命中回避: 剔除命中≥{HIT_AVOID_THRESHOLD} 的股票 {_hit_avoided} 只（多策略共振过度，反向过滤）", flush=True)
-    stock_top_main = rows_by_board["主板"]
-    stock_top_gem  = rows_by_board["创业板"]
-    stock_top_star = rows_by_board["科创板"]
-    stock_top = stock_top_main + stock_top_gem + stock_top_star
+
+    # ════ 2026-09-02 用户拍板：KHunter 主信号（弃用旧战法；事件独立口径）════
+    # 回测（khunter_fusion_s1b_bear.py, S1B_BOARD=main, S1B_BEAR=0 全窗口修正引擎 T+1）：
+    #   ob75/osl35/none n=653 wr62.5% med+5.82% ex_m+9.77%（四闸过）；ob75/osl40 n=1639 ex_m+9.08%
+    #   vs 旧战法反转打分：主板 -35.65% / 全市场 -41.67% → 弃用
+    # 口径：T 日收盘信号确认 + 信号日 RSI<35 → T+1 开盘买入；信号稀疏（~1/18天）→ 事件独立（有信号就买）
+    kh_main = []      # 主信号（可买入）：hit & 信号日 RSI<35（主板）
+    kh_watch = []     # 信号观察：hit & RSI≥35（信号已确认，未达超卖，不触发买入）
+    for _kf in sorted(khunter_buy, key=lambda kv: (kv[1].get("rsi_now") or 99)):
+        _code, _info, _buy_ok, _sc, _r, _ddf = _kf
+        if _buy_ok:
+            kh_main.append((_code, _sc, _r, _ddf))
+        else:
+            kh_watch.append((_code, _sc, _r, _ddf))
+    print(f"KHunter 主信号（主板·信号日RSI<35）: {len(kh_main)} 只 → {'、'.join(c[0] for c in kh_main) or '（今日无信号——事件驱动，稀疏性预期内）'}", flush=True)
+    print(f"KHunter 信号观察（已命中·RSI≥35 未触发）: {len(kh_watch)} 只 → {'、'.join(c[0] for c in kh_watch) or '—'}", flush=True)
+
+    # ════ 2026-09-02 用户拍板：旧战法全剔（不含任何观察/候选展示）════
+    # 主信号 = KHunter 买入信号（事件独立口径，无 top4 排序——信号即买，稀缺即稀缺）
+    # 旧战法候选/每板块 Top10 全部删除：rows_by_board 与 cand_by_board 不再用于展示。
+    stock_top4 = kh_main  # 主信号 = KHunter 主板买入信号（替代旧全市场 top4）
+    print(f"主信号 KHunter: {len(stock_top4)} 只（主板·信号日RSI<35，事件独立）({time.time()-t0:.0f}s)", flush=True)
+
+    # 候选/观察（旧战法）全部清空——用户拍板「旧战法全剔」
+    cand_by_board = {"主板": [], "创业板": [], "科创板": []}
+    # stock_top_main = KHunter 主信号（不再并入旧战法候选）
+    stock_top_main = list(stock_top4)
+    stock_top_gem  = []
+    stock_top_star = []
+    # 主信号 = KHunter 主板买入信号（覆盖原三板块合并列表；无候选）
+    stock_top = stock_top4
+    print(f"主板展示（主信号 {len(stock_top4)} 只，无旧战法候选）: {'、'.join(c[0] for c in stock_top_main) or '—'} ({time.time()-t0:.0f}s)", flush=True)
 
     # 2) ETF 动量 Top10（2026-08-17 用户决策移除：ETF 表现不佳，短线池去 ETF）
     etf_top = []
@@ -570,9 +710,14 @@ def calc_signals(as_of=None):
     fund_top = [kv for kv in frows if kv[1] >= _fsmin][:_ftop]
     print(f"基金池 买入信号 {len(fund_top)} 只（{'牛' if _in_mkt else '熊'}: 分≥{_fsmin} Top{_ftop}，权重{_fw}，不凑数）({time.time()-t0:.0f}s)", flush=True)
 
-    # 详情构建
+    # 详情构建（2026-09-02 用户拍板：主信号 KHunter + 基金池，旧战法候选全剔）
     details = {}
-    for code, sc, r, ddf in stock_top + etf_top + fund_top:
+    _all_disp = stock_top + etf_top + fund_top
+    _top4_codes_set = {c for c, _, _, _ in stock_top4}
+    # 旧战法候选已全剔 → 不再需要 _cand_codes 收集（无额外详情）
+    _cand_codes = []
+    _all_disp = _all_disp + _cand_codes
+    for code, sc, r, ddf in _all_disp:
         bare = code[-6:]
         board = board_of(code)
         key = code
@@ -614,25 +759,66 @@ def calc_signals(as_of=None):
             "comp": comp, "radar_svg": radar,
             "rsi": round(rsi, 1) if rsi is not None else None,
             "kline": [], "factor_hist": [], "trades": {"v9_auto": [], "v8_lite": []},
+            # 2026-09-02 用户拍板：主信号=KHunter 主板信号（事件独立），旧战法候选全剔
+            # 主信号 details 附带 khunter 信号信息（hits/rsi/buy/sell）供前端渲染
+            "pick": "top4" if code in _top4_codes_set else None,
+            "khunter": (sig_stock.get(bare, {}) or {}).get("khunter"),
         }
+        # 2026-09-02 KHunter 主信号档位覆盖（用户拍板「弃用旧战法」）：
+        # 主信号（sig+buy）判定口径 = 信号命中 + 信号日 RSI<35（回测 ob75/osl35 事件独立，无强度区分），
+        # 与旧战法反转分 tier 无关 —— 旧战法分低（<55）时 buy_tier 会显示「不买」，与主信号 badge 自相矛盾。
+        # 统一覆盖为「买入」：score 字段保留旧战法分供参考，但档位/建议动作走 KHunter 主信号语义。
+        _kh_d = details[bare].get("khunter")
+        if _kh_d and _kh_d.get("sig") and _kh_d.get("buy"):
+            details[bare]["tier"] = "买入"
+            details[bare]["short_tier"] = "买入"
     order = {"主板": [c[-6:] for c, _, _, _ in stock_top_main],
              "创业板": [c[-6:] for c, _, _, _ in stock_top_gem],
              "科创板": [c[-6:] for c, _, _, _ in stock_top_star],
              "基金": [c[-6:] for c, _, _, _ in fund_top]}
+    # 2026-09-02 用户拍板：主信号结构输出（供前端标签与备注渲染）
+    _top4_list = [c[-6:] for c, _, _, _ in stock_top4]
+    _cand_list = {"主板": [], "创业板": [], "科创板": []}   # 旧战法候选已全剔
+    _kmeta = {
+        "sig": True,
+        "buy": len(kh_main) > 0,
+        "sell": khunter_sell,
+        "buy_n": len(kh_main),
+        "watch_n": len(kh_watch),
+        "watch": [c[-6:] for c, _, _, _ in kh_watch],
+        "note_sell": "RSI>75 超买卖出（独立信号，不计入买入）",
+    }
+    _sel_meta = {
+        "top4": _top4_list,
+        "candidates": _cand_list,
+        "khunter": _kmeta,
+        "note": "主信号=KHunter 15 策略信号+信号日RSI<35（主板限定，事件独立·有信号即买）；旧战法反转分已全量弃用（负期望：主板 -35.65%/全市场 -41.67%），不再展示",
+        "label": {"top4": "🎯 KHunter 主信号"},
+    }
     # 2026-08-20 用户决策：市况门控改为「仅提醒」——门控关闭不再清空股票池。
     # 股票标的分≥50 照常入池展示（供参考，非买入指令），打 gate_closed 标记供前端标题/行级提醒；
     # 基金不受门控（不加标记）。跟踪池安全口径「不开新仓·仅跟踪」由下方 ⑤ 保持。
+    # 2026-09-02 豁免：KHunter 主信号不受门控（用户拍板「熊市选股同样考虑全主板」；
+    #   回测 khunter_fusion_s1b_bear.py S1B_BEAR=0 全窗口 ob75/osl35/none n=653 wr62.5% med+5.82% ex_m+9.77% 四闸过，
+    #   none 组 26 格全过——RSI<35 超卖择时自身承担风险过滤，熊市开仓反而更优 n+45%）；
+    #   旧战法候选/跟踪池非 KHunter 成员仍按「仅提醒」处理。
+    _kh_main_set = {c[-6:] for c, _, _, _ in kh_main}
     if not _in_mkt:
+        _gated = 0
         for _c in [c[-6:] for c, _, _, _ in stock_top]:
             if _c in details:
+                if _c in _kh_main_set:
+                    continue              # KHunter 主信号豁免（回测全窗口证据）
                 details[_c]["gate_closed"] = True
-        print(f"市况门控关闭：短线股票池 {len(stock_top)} 只标 gate_closed=仅提醒（照常入池供参考，非买入指令；跟踪池走安全口径）", flush=True)
+                _gated += 1
+        print(f"市况门控关闭：短线股票池 {_gated} 只标 gate_closed=仅提醒（KHunter 主信号 {len(_kh_main_set)} 只豁免·回测全窗口过闸；照常入池供参考，非买入指令；跟踪池走安全口径）", flush=True)
     # 2026-08-17 修复：as_of 取股票数据最新交易日（主口径），基金净值 T-1 单独标注
     _stock_tail = max((ddf.index[-1] for ddf in stock_pool.values() if len(ddf)), default=None)
     _fund_tail = max((ddf.index[-1] for ddf in fund_pool.values() if len(ddf)), default=None)
     _eff = as_of if as_of is not None else (str(_stock_tail.date()) if _stock_tail is not None else "—")
     out = {"as_of": _eff, "fund_as_of": str(_fund_tail.date()) if _fund_tail is not None else _eff,
-           "details": details, "tiers": order, "market_gate": market_gate}
+           "details": details, "tiers": order, "market_gate": market_gate,
+           "sel_meta": _sel_meta}
     sigs = {"as_of": out["as_of"], "stock": sig_stock, "etf": sig_etf, "fund": sig_fund}
     return out, sigs, stock_pool, fund_pool
 
@@ -809,16 +995,21 @@ def build(as_of=None):
         print(f"短线跟踪池剔除死数据/退市成员 {_dropped_dead} 只", flush=True)
     # ⑤ 市况门控关闭口径统一（2026-08-19 修复：门控关闭后跟踪池股票档位不得显示「买入」
     #    误导可追——已入池标的仅保留卖出信号跟踪，档位改写「不开新仓·仅跟踪」，score 保留）
+    # 2026-09-02 豁免：KHunter 主信号成员同样免于改写（回测全窗口证据：熊市开仓四闸过）。
+    # 豁免集 = sel_meta.top4（= stock_top4 = kh_main，主信号 codes，跨函数可用）。
     if not out.get("market_gate", {}).get("open", True):
-        for _rec in list(track.values()) + list(pending.values()):
+        _kh_gate_exempt = set(out.get("sel_meta", {}).get("top4", []))
+        for _c, _rec in list(track.items()) + list(pending.items()):
             if _rec.get("type") != "stock":
+                continue
+            if _c in _kh_gate_exempt:
                 continue
             _last = _rec.get("last")
             if isinstance(_last, dict) and _last.get("tier"):
                 _last["tier"] = "不开新仓·仅跟踪"
                 _last["gate_closed"] = True
             _rec["gate_closed"] = True
-        print(f"市况门控关闭：跟踪池股票档位改写「不开新仓·仅跟踪」（{sum(1 for r in track.values() if r.get('type')=='stock')} 只正式 + {sum(1 for r in pending.values() if r.get('type')=='stock')} 只待确认）", flush=True)
+        print(f"市况门控关闭：跟踪池股票档位改写「不开新仓·仅跟踪」（{sum(1 for r in track.values() if r.get('type')=='stock')} 只正式 + {sum(1 for r in pending.values() if r.get('type')=='stock')} 只待确认；KHunter 主信号豁免 {len(_kh_gate_exempt)} 只）", flush=True)
     out["track"] = track
     out["track_pending_short"] = pending
     json.dump(out, open(BASE / "short_pool.json", "w", encoding="utf-8"), ensure_ascii=False, indent=2)
