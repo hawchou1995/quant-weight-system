@@ -152,7 +152,8 @@
     "open": false,
     "as_of": "2026-09-02",
     "idx_close": 4547.96,
-    "idx_ma20": 4637.24
+    "idx_ma20": 4637.24,
+    "bear60": true
   },
   "sel_meta": {
     "top4": [],
@@ -2706,6 +2707,7 @@
       "top4": "🎯 KHunter 主信号"
     }
   },
+  "_backfilled_0814": true,
   "track": {
     "601952": {
       "entry": "2026-08-17",
