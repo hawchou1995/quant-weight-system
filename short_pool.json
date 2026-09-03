@@ -53,6 +53,7 @@
         "sell": false,
         "c_sell": false,
         "low_ok": true,
+        "regime": "bear",
         "hits": [
           "morning_star"
         ]
@@ -2780,13 +2781,17 @@
       ],
       "ver": {
         "buy_rsi": 35,
+        "buy_rsi_bull": 30,
         "sell_a": 55,
+        "sell_a_bull": 75,
         "sell_c": 50,
-        "low": 3.0
+        "low": 3.0,
+        "low_bull": null
       },
-      "note_sell": "卖出=A版 RSI>55 / C版参考 RSI>50（独立信号，不计入买入）"
+      "note_sell": "卖出=A版分域（熊 RSI>55 / 牛 RSI>75）/ C版参考 RSI>50（独立信号，不计入买入）",
+      "hybrid": true
     },
-    "note": "主信号=KHunter 15 策略信号+信号日RSI<35（主板限定，事件独立·有信号即买）；旧战法反转分已全量弃用（负期望：主板 -35.65%/全市场 -41.67%），不再展示",
+    "note": "主信号=KHunter 15 策略信号+信号日分域RSI（🐻熊市<35+低价≥3元+ob55 / 🌞牛市(>MA20)<30+无低价+ob75；Phase 10 HYBRIDv2 定稿 total+68.5% 牛熊独立双过闸）；旧战法反转分已全量弃用（负期望：主板 -35.65%/全市场 -41.67%），不再展示",
     "label": {
       "top4": "🎯 KHunter 主信号"
     }
@@ -3280,13 +3285,13 @@
       "type": "fund",
       "last": {
         "name": "中金瑞安混合发起C",
-        "px": 1.86,
-        "chg": 0.34,
-        "score": 48.6,
-        "tier": "买入",
+        "px": 1.79,
+        "chg": -1.86,
+        "score": 11.3,
+        "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-02"
       }
     },
     "000314": {
@@ -8313,14 +8318,15 @@
         "gate_closed": true
       },
       "gate_closed": true
-    }
-  },
-  "track_pending_short": {
+    },
     "002364": {
-      "entry_candidate": "2026-09-03",
-      "first_seen": "2026-09-03",
+      "entry": "2026-09-03",
+      "last_seen": "2026-09-03",
+      "exit": "2026-10-03",
+      "status": "active",
       "pool": "主板",
       "type": "stock",
+      "first_seen": "2026-09-03",
       "last": {
         "name": "中恒电气",
         "px": 37.9,
@@ -8332,5 +8338,6 @@
         "date": "2026-09-03"
       }
     }
-  }
+  },
+  "track_pending_short": {}
 }
