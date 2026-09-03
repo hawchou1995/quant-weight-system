@@ -1,3 +1,17 @@
+## v5.13.0 - 2026-09-03（KHunter 生产切换：A 版卖出 RSI>55 主信号 + C 版 RSI>50 参考 + 低价过滤 ≥3 元 · 双版本部署）
+
+**背景**：9/2 生产为「主板 KHunter 15 信号 + RSI<35 买 + RSI>75 卖」。9/3 全网格补跑（khunter_three_ver_opt_20260903.py：A/B/C × {无/2元/3元}，回归门与 v8 原值逐位一致）后用户拍板「直接切换，两版都部署」：
+- A 版（OB55 卖出）是 9/2 已验证主信号向更优参数的收敛（disaster 网格 low3 最优：每笔年化 63.5%/夏普 1.184/PF 1.07/2024 灾年转正）
+- C 版（OB50 卖出）参考并行：每笔年化 81.4%/夏普 1.430/PF 1.20/2024 +2.47%（短持有高周转口径优；资金池 N5 口径与 A 接近：年化 4.98% vs 5.54%、回撤 19.45% vs 19.90%）
+- B 版（30% 止损）三档全灭（资金池年化 -4.28%→+0.27%）剔除；时间止损（tstop20）2024 更差否决
+
+**改动**
+- build_short_pool.py：KHUNTER_RSI_SELL 75→55（A 主卖出）+ 新增 KHUNTER_RSI_SELL_C=50（C 参考，sell_c 全量收集 RSI>50）+ 新增 KHUNTER_LOW_PRICE=3.0（买入判定加确认日收盘≥3 元，L618/623）；sel_meta.khunter 新增 ver{buy_rsi/sell_a/sell_c/low} 与 sell_c 列表
+- build_dual_system.py：KHunter 徽章双版本（A55 卖 X/C50 卖 Y）；短线回测参考纯主板卡改接 9 格网格（A 版主卡 + C 版参考卡，资金池 N5 回撤/年化/夏普上卡），B 版不入卡；副标题口径 2026-09-03
+- 模拟盘双轨：khunter_paper_20260903.py 多轨化（--state/--rsi-sell/--low），A 轨（RSI_SELL=55）+ C 轨（RSI_SELL=50）各 ¥10 万前向对决，验证后定稿单一生产卖出阈值
+
+**证据**：9 格全指标 `backtest/khunter_timing_out/khunter_three_ver_opt_20260903.csv`；补丁文档 `backtest/khunter_prod_switch_20260903.md`（修订版）
+
 ## 复盘登记 - 2026-08-21（无版本变更 · 门控关·仅参考口径 · 数据修正版）
 
 **收盘复盘缺陷登记（review/2026-08-21_sig2026-08-20.md）**

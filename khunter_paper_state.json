@@ -1,0 +1,18 @@
+{
+  "cash": 100000.0,
+  "positions": [],
+  "pending_buys": [],
+  "pending_sells": [],
+  "nav_history": [
+    {
+      "date": "2026-09-02",
+      "nav": 100000.0,
+      "cash": 100000.0,
+      "pos_val": 0,
+      "n_pos": 0,
+      "bear": true
+    }
+  ],
+  "trades": [],
+  "start": "2026-09-02"
+}

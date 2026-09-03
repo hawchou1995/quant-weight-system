@@ -1,0 +1,14 @@
+{
+  "strategy": "short_v3_stock_main_slip20",
+  "params": "T10/H10/S55 · 反转+MA5 · 主板限定",
+  "slippage_bps": 20,
+  "pool_size": 3138,
+  "summary": {
+    "total_return_pct": -35.65,
+    "annual_return_pct": -4.07,
+    "max_drawdown_pct": -44.15,
+    "sharpe": -0.542,
+    "win_rate_pct": 25.5,
+    "total_trades": 995
+  }
+}
