@@ -73,17 +73,22 @@ try:
     else:
         _kh_str = "信号层未启用"
     SHORT_KHUNTER_BADGE = (f'<span class="badge" style="background:rgba(37,99,235,.14);color:#60a5fa;" '
-                           f'title="KHunter 15 策略命中 + 信号日 RSI&lt;35 + 收盘≥{_kh_ver.get("low", 3)}元 = 主信号（事件独立，有信号即买）；'
-                           f'信号观察 = 已命中但 RSI≥35 未触发；卖出 = A 版 RSI&gt;{_kh_ver.get("sell_a", 55)} 主信号 / C 版 RSI&gt;{_kh_ver.get("sell_c", 50)} 参考（2026-09-03 双版本部署）">'
+                           f'title="KHunter 15 策略命中 + 信号日 RSI&lt;35 + 收盘≥{_kh_ver.get("low", 3)}元 + 熊市(MA60) = 主信号（事件独立，有信号即买）；'
+                           f'信号观察 = 已命中但 RSI≥35 或非熊市未触发；卖出 = A 版 RSI&gt;{_kh_ver.get("sell_a", 55)} 主信号 / C 版 RSI&gt;{_kh_ver.get("sell_c", 50)} 参考（2026-09-03 双版本部署 + B1 熊市限定）">'
                            f'KHunter 今日: {_kh_str}</span>')
     SHORT_POOL_ASOF = SHORT_POOL.get("as_of", "—")
     _mg = SHORT_POOL.get("market_gate") or {}
+    _bear60 = bool(_mg.get("bear60"))
+    # 2026-09-03 B1：KHunter 熊市限定徽章（hs300<MA60 才可买；38 组牛市扫描 0 过门）
+    SHORT_KHUNTER_BEAR = (f'<span class="badge badge-auto" style="background:{("#1f8a4c" if _bear60 else "#d97706")};color:#fff">'
+                          f'KHunter 熊市门控 {"🐻 熊市（MA60 下 · 可买入）" if _bear60 else "🌞 非熊（MA60 上 · 不开新仓，仅观察/卖出）"}'
+                          f'</span>')
     if _mg.get("open"):
         SHORT_POOL_GATE = f'<span class="badge badge-auto" style="background:#1f8a4c;color:#fff">市况门控 ✅ 开（{_mg.get("idx_close")} &gt; MA20 {_mg.get("idx_ma20")}）</span>'
     else:
         # 2026-08-20 用户决策：门控改为「仅提醒」——股票池分≥50 照常入池展示（供参考），不做买入指令
-        # 2026-09-02 豁免：KHunter 主信号不受门控（回测全窗口证据：熊市开仓四闸过）→ 徽章注明
-        SHORT_POOL_GATE = f'<span class="badge badge-auto" style="background:#d97706;color:#fff">市况门控 ⚠ 关 · 仅提醒（沪深300 {_mg.get("idx_close")} &lt; MA20 {_mg.get("idx_ma20")}；KHunter 主信号豁免·照常可买，其余仅参考）</span>'
+        # 2026-09-02 豁免：KHunter 主信号不受 MA20 门控（回测全窗口证据）→ 2026-09-03 B1 收紧为独立 MA60 熊市门控
+        SHORT_POOL_GATE = f'<span class="badge badge-auto" style="background:#d97706;color:#fff">市况门控 ⚠ 关 · 仅提醒（沪深300 {_mg.get("idx_close")} &lt; MA20 {_mg.get("idx_ma20")}；KHunter 由独立熊市门控裁决，其余仅参考）</span>'
     SHORT_POOL_INTRADAY = SHORT_POOL.get("intraday_note") or ""
     SHORT_POOL_ASOF_MIN = SHORT_POOL.get("intraday_ts") or "15:00"
     # 运行时精简池数据（tiers/track 供「全量池短线跟踪」渲染；HTML 不加载 short_pool.js）
@@ -101,6 +106,7 @@ except Exception as _e:
     SHORT_POOL_SLIM = '{}'
     SHORT_POOL_GATE = ''
     SHORT_POOL_NOTE = ''
+    SHORT_KHUNTER_BEAR = ''
 # A5_tp8t2 打板实验系统（第三个系统，2026-08-28 接入；数据由 build_a5_pool.py 生成）
 try:
     _a5_js = open(BASE / "a5_pool.js", encoding="utf-8").read()
@@ -1007,10 +1013,10 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
   v9_short_stock, "tbl-short-stk", "card-short-stk",
   "信号池 = 回测买入清单：KHunter 15 策略信号 + 信号日 RSI<35 超卖 + 收盘≥3元（主板限定·事件独立·有信号即买）· 卖出 = <b>逐股独立</b>：持仓股自身 RSI 确认日 &gt; A55 阈值 → T+1 开盘卖（C50 为参考线，标注但<i>不执行</i>，A/C 判定归模拟盘双轨）· 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：不追高，可等盘中回落至 3% 以内再考虑买入（9:30 盘中起生效）</b>",
   extra_card="", score_sub="动量/量价/通道/波动",
-  head_tags=[SHORT_POOL_GATE, SHORT_KHUNTER_BADGE,
-             '<span class="badge badge-auto">股票 = KHunter 15 策略信号 + RSI<35 超卖（主板限定 · 弃用旧战法）</span>',
+  head_tags=[SHORT_POOL_GATE, SHORT_KHUNTER_BEAR, SHORT_KHUNTER_BADGE,
+             '<span class="badge badge-auto">股票 = KHunter 15 策略信号 + RSI<35 超卖 + 熊市MA60（主板限定 · 弃用旧战法）</span>',
              '<span class="badge badge-auto">KHunter 信号密集期每日可能有几只，稀疏期 0 只属正常（事件驱动）</span>'],
-  head_note=f"<b>🎯 KHunter 主信号（蓝标）= 主板 15 策略信号命中 + 信号日 RSI&lt;35 超卖 + 收盘≥3元</b>（2026-09-03 生产切换 v5.13.0：A 版卖出 RSI&gt;55 主执行 / C 版 RSI&gt;50 参考展示；入场两版相同）· 回测：A+low3 n=408 资金池(N5)年化 5.54%/回撤 19.90%/夏普 0.372，C+low3 4.98%/19.45%/0.352（每笔口径 C 更锐：81.4%/1.430）· <b>旧战法（反转分）已全量弃用</b>（主板 -35.65% / 全市场 -41.67% 均负期望，不再展示）· 市况门控仅提醒：沪深300 &gt; MA20 才开新仓；门控关闭时 <b>KHunter 主信号豁免照常可买</b>，其余股票参考不追高；卖出逐股独立走「全量池短线跟踪」· 回测参考见「监控总览」",
+  head_note=f"<b>🎯 KHunter 主信号（蓝标）= 主板 15 策略信号命中 + 信号日 RSI&lt;35 超卖 + 收盘≥3元 + 熊市(沪深300&lt;MA60)</b>（2026-09-03 生产切换 v5.14.0：B1 熊市限定——38 组牛市扫描 0 过门后收紧；A 版卖出 RSI&gt;55 主执行 / C 版 RSI&gt;50 参考展示；入场两版相同）· 回测：A+low3（熊市限定）n=408 资金池(N5)年化 5.54%/回撤 19.90%/夏普 0.372，C+low3 4.98%/19.45%/0.352（每笔口径 C 更锐：81.4%/1.430）；牛市子集 4 方向×38 组 0 过门→不开新仓，牛市收益由基金动量池承担· <b>旧战法（反转分）已全量弃用</b>（主板 -35.65% / 全市场 -41.67% 均负期望，不再展示）· 市况门控仅提醒：沪深300 &gt; MA20 才开新仓；KHunter 买入由独立 <b>MA60 熊市门控</b>裁决（非熊→不开新仓仅观察/卖出）· 卖出逐股独立走「全量池短线跟踪」· 回测参考见「监控总览」",
   as_of=SHORT_POOL_ASOF, intraday_note=SHORT_POOL_INTRADAY,
   as_of_min=SHORT_POOL.get("intraday_ts") or SHORT_POOL_ASOF_MIN,
   tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=(), inline=True)}

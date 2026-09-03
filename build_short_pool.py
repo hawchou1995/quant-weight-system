@@ -469,6 +469,15 @@ def calc_signals(as_of=None):
                    "idx_close": round(_gate_close, 2) if _gate_close else None,
                    "idx_ma20": round(_gate_ma, 2) if _gate_ma else None}
     print(f"市况门控(沪深300>MA20): {'✅ 开' if _in_mkt else '❌ 关（不开新仓，池内走卖出信号）'} 收盘{_gate_close:.0f} vs MA20 {_gate_ma:.0f} ({time.time()-t0:.0f}s)", flush=True)
+    # ⚠ 2026-09-03 B1 熊市限定（用户拍板 + 38 组牛市扫描证伪后应用）：KHunter 主信号加 _bear60 硬门控
+    # 回测口径：熊市 = hs300 < MA60（T 收盘确认，3ver/disaster 全网格）；与 _in_mkt（MA20）不是一回事
+    # 证据：牛市子集 38 组配置 0 过门（khunter_bull_sweep_delivery_20260903.md）；熊市 445 笔 +4.76%/夏普 0.47 唯一真 edge
+    # 豁免逻辑（9/2）保留不动：_buy_ok 已含 _bear60 → 弱牛/强牛自然无 kh_main，豁免集为空，无冲突
+    _idx60 = S.V.load_index(60)
+    _idx60 = _idx60.set_index("date")
+    _bear60 = bool(not _idx60.loc[:_gate_day]["in_market"].iloc[-1]) if _gate_day in _idx60.index else False
+    market_gate["bear60"] = _bear60
+    print(f"熊市限定(hs300<MA60, 回测口径): {'🐻 熊市（KHunter 可买入）' if _bear60 else '🌞 非熊（KHunter 不开新仓）'} ({time.time()-t0:.0f}s)", flush=True)
 
     # 1) 股票反转：按权限分层各取 Top10（主板/创业板/科创板，2026-08-17 用户决策）
     stock_pool = S.load_stock_pool()
@@ -618,9 +627,10 @@ def calc_signals(as_of=None):
                                 "ma5_above": bool(not pd.isna(r.get("ma5", np.nan)) and r["close"] > r["ma5"])}
         # 2026-09-02 用户拍板：KHunter 信号层（主板限定+RSI 超卖择时，弃用旧战法）
         # ⚠ 2026-09-03 生产切换（用户拍板）：A 版卖出 RSI>55 + 低价过滤确认日收盘≥3元；C 版卖出 RSI>50 参考并行
+        # ⚠ 2026-09-03 B1 熊市限定：买入另加 _bear60（hs300<MA60）——牛市子集 38 组扫描 0 过门证伪后应用
         # 注意：KHunter 信号计算较重（15 个信号函数），只对主板 bd 计算（产品只能买主板）
-        # 主信号口径=回测 ortho：T 日信号命中 + 信号日 RSI<35 + 收盘≥3元 → 明日开盘买入（事件独立，稀疏）
-        # 卖出 = A 版 RSI>55 主卖出 / C 版 RSI>50 参考卖出（独立信号，买卖事件各自独立）
+        # 主信号口径=回测 ortho：T 日信号命中 + 信号日 RSI<35 + 收盘≥3元 + 熊市(MA60) → 明日开盘买入（事件独立，稀疏）
+        # 卖出 = A 版 RSI>55 主卖出 / C 版 RSI>50 参考卖出（独立信号，买卖事件各自独立；卖出不受熊市限定）
         if ENABLE_KHUNTER and bd == "主板":
             _kinfo = _khunter_sig(ddf, as_of)
             if _kinfo["hit"]:
@@ -629,15 +639,15 @@ def calc_signals(as_of=None):
                     "rsi_t1": _kinfo["rsi_t1"],
                     "rsi_now": _kinfo["rsi_now"],
                     "buy": (_kinfo["rsi_now"] is not None and _kinfo["rsi_now"] < KHUNTER_RSI_BUY
-                            and r["close"] >= KHUNTER_LOW_PRICE),
+                            and r["close"] >= KHUNTER_LOW_PRICE and _bear60),
                     "sell": _kinfo["sell1"],
                     "c_sell": _kinfo["c_sell"],
                     "low_ok": bool(r["close"] >= KHUNTER_LOW_PRICE),
                     "hits": _kinfo["hits"],
                 }
-                # 事件收集（主信号判定：信号日 RSI<35 → 买入；RSI≥35 → 观察；低价过滤：收盘≥3元）
+                # 事件收集（主信号判定：信号日 RSI<35 → 买入；RSI≥35 → 观察；低价过滤：收盘≥3元；熊市限定：MA60）
                 _buy_ok = (_kinfo["rsi_now"] is not None and _kinfo["rsi_now"] < KHUNTER_RSI_BUY
-                           and r["close"] >= KHUNTER_LOW_PRICE)
+                           and r["close"] >= KHUNTER_LOW_PRICE and _bear60)
                 khunter_buy.append((code, _kinfo, bool(_buy_ok), float(sc), r, ddf))
             if _kinfo["sell1"]:
                 # A 版 RSI>55 卖出信号：独立于选股信号（回测 event_days = entry_ok | sell_vec）
