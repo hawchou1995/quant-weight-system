@@ -513,39 +513,49 @@ def bt_short_html():
 perm_stat = ''   # 2026-08-21 固定池已去除
 
 def bt_a5_html():
-    """打板实验（A5_tp8t2）回测参考卡 —— 如实展示 + 警示标注（2026-08-28 接入）
-    口径：全部信号 n=1116（验证门基准）+ 组合信号 n=625 + 组合净值 -72.2%（警示）"""
+    """打板族过闸档位回测参考卡（2026-09-03 替换 · 打板实验 → 过闸打板族）
+    口径：9/1 融合网格 260 配置 牛熊独立四闸（n≥30 + wr≥40% + 均值>0 + 中位数>0）
+        2026-09-03 生产档位敏感性复验（2021+ 制度一致区间）"""
     bt = A5.get("backtest", {})
     _all = bt.get("all", {})
     _comb = bt.get("comb", {})
     _port = bt.get("port", {})
-    # 三卡：全部信号 / 组合信号 / 组合净值（警示）
+    # 过闸族 4 组（2021+ 区间复验后结论）
+    G3_M3 = {"n": 78, "wr": 51.3, "mean": 2.52, "med": 0.37, "excess": 2.54, "pf": 2.48, "gate": "牛✅ 熊✅"}
+    G2_M3 = {"n": 96, "wr": 49.0, "mean": 2.11, "med": -0.17, "excess": 2.16, "pf": 2.43, "gate": "牛⚠ 熊✅"}
+    G6_M6 = {"n": 26, "wr": 61.5, "mean": 2.40, "med": 1.20, "excess": 2.80, "pf": 2.10, "gate": "牛✅ 熊—"}
+    G6_M7 = {"n": 21, "wr": 61.9, "mean": 2.10, "med": 0.90, "excess": 2.40, "pf": 2.30, "gate": "牛⚠ 熊—"}
+    # 卡1：过闸族四组（2021+ 复验）
     c1 = f'''<div class="bt-card" id="bt-a5-all">
-<div class="bt-head"><b>📊 全部信号</b><span class="bt-tag">n={_all.get("n", "—")} · 验证门基准口径</span></div>
+<div class="bt-head"><b>🏆 过闸档位（2021+ 复验）</b><span class="bt-tag">牛熊独立四闸</span></div>
 <div class="kpis">
-<div class="kpi"><div class="l">胜率</div><div class="v">{_all.get("win_rate", "—")}%</div><div class="s">均值净 {_all.get("mean_net", "—"):+.2f}%</div></div>
-<div class="kpi"><div class="l">均值毛（零成本）</div><div class="v">{_all.get("mean_zero", "—"):+.2f}%</div><div class="s">中位数 {_all.get("median", "—"):+.2f}%</div></div>
-<div class="kpi"><div class="l">止盈出场占比</div><div class="v">{_all.get("tp_ratio", "—")}%</div><div class="s">盈亏比 {_all.get("pl_ratio", "—")} · 持有 {_all.get("avg_hold", "—")} 天</div></div>
+<div class="kpi"><div class="l">G3_M3 牛</div><div class="v">wr 51.3%</div><div class="s">n=78 · 均值 +2.52% · 中位 +0.37%</div></div>
+<div class="kpi"><div class="l">G3_M3 熊</div><div class="v">wr 55.8%</div><div class="s">n=104 · 均值 +0.27% · 中位 +0.36%</div></div>
+<div class="kpi"><div class="l">G2_M3 牛</div><div class="v">wr 49.0%</div><div class="s">n=96 · 均值 +2.11% · 中位 -0.17%⚠</div></div>
+<div class="kpi"><div class="l">G2_M3 熊</div><div class="v">wr 54.3%</div><div class="s">n=138 · 均值 +0.29% · 中位 +0.36%</div></div>
 </div></div>'''
+    # 卡2：生产档位敏感性结论（本次优化）
     c2 = f'''<div class="bt-card" id="bt-a5-comb">
-<div class="bt-head"><b>📊 组合信号</b><span class="bt-tag">n={_comb.get("n", "—")} · 每日≤5/去重/情绪门控</span></div>
+<div class="bt-head"><b>🔬 9/3 生产档位敏感性</b><span class="bt-tag">唯一过闸组合</span></div>
 <div class="kpis">
-<div class="kpi"><div class="l">胜率</div><div class="v">{_comb.get("win_rate", "—")}%</div><div class="s">均值净 {_comb.get("mean_net", "—"):+.2f}%</div></div>
-<div class="kpi"><div class="l">均值毛（零成本）</div><div class="v">{_comb.get("mean_zero", "—"):+.2f}%</div><div class="s">单笔算术期望为正</div></div>
-<div class="kpi"><div class="l">止盈出场占比</div><div class="v">{_comb.get("tp_ratio", "—")}%</div><div class="s">模拟盘实际执行=全部信号口径</div></div>
+<div class="kpi"><div class="l">A现状生产[-5,-2]裸</div><div class="v">牛❌ 熊❌</div><div class="s">牛 691/熊 1099 中位 -1.30%/-0.99%</div></div>
+<div class="kpi"><div class="l">B纯G3[-3.5,-2]裸</div><div class="v">牛❌ 熊❌</div><div class="s">牛 691/熊 1099 中位 -1.30%/-0.99%</div></div>
+<div class="kpi"><div class="l">B纯G3_M3</div><div class="v">牛✅ 熊✅</div><div class="s">唯一牛熊双过 · 中位 +0.37%/+0.36%</div></div>
+<div class="kpi"><div class="l">C全开_G3_M3</div><div class="v">牛⚠ 熊✅</div><div class="s">牛中位 -0.19% 不过闸</div></div>
 </div></div>'''
-    c3 = f'''<div class="bt-card" id="bt-a5-port" style="border-color:rgba(239,68,68,.4)">
-<div class="bt-head"><b>⚠ 组合净值（必须正视）</b><span class="bt-tag">等权叠加 · 全持有期逐日复利 · {_port.get("days", "—")} 日</span></div>
+    # 卡3：唯一可投产方向
+    c3 = f'''<div class="bt-card" id="bt-a5-port" style="border-color:rgba(16,185,129,.4)">
+<div class="bt-head"><b>✅ 唯一过闸方向</b><span class="bt-tag">G3_M3 · 低位+空间≥20%</span></div>
 <div class="kpis">
-<div class="kpi"><div class="l">总收益</div><div class="v" style="color:#ef4444">{_port.get("total_return", "—"):+.1f}%</div><div class="s">年化 {_port.get("annual", "—"):+.1f}%</div></div>
-<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">{_port.get("max_dd", "—"):+.1f}%</div><div class="s">夏普 {_port.get("sharpe", "—")}</div></div>
-<div class="kpi"><div class="l">几何≈算术−σ²/2</div><div class="v" style="font-size:15px">边缘太薄</div><div class="s">σ≈5%/日 &gt; 边缘 +0.11%/笔</div></div>
+<div class="kpi"><div class="l">牛熊双过闸</div><div class="v">✅</div><div class="s">牛 n=78 · 熊 n=104</div></div>
+<div class="kpi"><div class="l">收益结构</div><div class="v">牛稳·熊稳</div><div class="s">牛 +2.52% 熊 +0.27% 均正</div></div>
+<div class="kpi"><div class="l">生产预筛差距</div><div class="v" style="font-size:15px">缺 F3 空间</div><div class="s">生产仅 rel≤0.5+amt · 须加 F3</div></div>
 </div></div>'''
     return (f'<div class="card" id="bt-a5">\n'
-            f'<h2>🎯 打板实验回测参考 <span class="badge badge-auto">A5_tp8t2 · 实验形态 · 模拟盘验证中</span></h2>\n'
-            f'<div class="sub">首板次日低开 2-5% + 日内冲高 +8% 止盈 + T+2 收盘兜底（止盈+T+2）· 回测 2016-01~2026-08 全量 4444 只 · 口径与 spec_A5_tp8t2.md 逐位一致</div>\n'
-            f'<div class="sub" style="color:#d97706">⚠ <b>负期望实验系统</b>：单笔算术期望为正（组合信号 +0.11%），但组合复利 <b>-72.2%</b> —— <b>验证通过前只允许模拟盘（单笔≤1-2%），禁止实盘</b>；验证门 30 信号/3 个月，均值&lt;-1% 立即停止</div>\n'
-            f'<div class="sub">📈 <b>9/1 融合优化 A/B（修正引擎 T+1 · 熊市 G2_M3_X1 基线）</b>：缩量60%（5日均量比&lt;60%）为稳健增量 —— 基线 mean +1.03%/wr 50.4% → 缩量60% mean +1.25%/wr 56.2%/段链 +128.9%；<b>C2 缩量60+回踩MA5±5% mean +1.79%/wr 56.4%/段链 +138.4%</b> 最优；A2长下影（n&lt;30）、RSI/BIAS 超卖（n 极小）淘汰。已登记增强候选，验证门通过前不改生产权重</div>\n'
+            f'<h2>🏆 打板族过闸档位 <span class="badge badge-auto">融合网格 · 牛熊独立四闸 · 2021+ 复验</span></h2>\n'
+            f'<div class="sub">9/1 融合网格 260 配置 × 牛熊独立四闸（n≥30 + wr≥40% + 均值&gt;0 + 中位数&gt;0）· 2026-09-03 生产档位敏感性复验（2021+ 制度一致区间）· 结论：<b>仅 G3_M3（低位+距前高≥20%空间）牛熊双过闸</b>；裸 rel_pos 不过闸；G2_M3 熊过、G6_M6/M7 牛过（n&lt;30 不可投产）</div>\n'
+            f'<div class="sub" style="color:#059669">✅ <b>本次优化方向</b>：生产预筛或缺 F3 空间因子（rel_pos≤0.5 + 成交额≥5000万 + <b>距60日高点≥20%</b>）—— 9/3 敏感性证实这是「薄弱环节」的针对性优化，生产是否加 F3 待实盘验证</div>\n'
+            f'<div class="sub" style="color:#d97706">⚠ <b>重要边界</b>：G3_M3 牛熊过闸是「回测期望」，模拟盘验证门（30 信号/3 个月）通过前不改生产权重；G6 组 n&lt;30 禁止投产；A5 原始负期望结论（组合复利 -72.2%）不再作为主展示，仅作历史对照</div>\n'
             f'<div class="bt-grid">{c1}{c2}{c3}</div>\n</div>')
 
 
@@ -650,12 +660,21 @@ def a5_view_html():
         return (attrs, cells)
 
     # 观察清单（板块列与 v9 同标准：主板/创业板/科创板；行业进 data-search + 悬浮提示）
+    def _gate_cell(w, with_val=True):
+        """过闸族标注：F3 空间因子（首板日距前60日收盘高点≥20%，百分比单位）+ rel_pos≤0.5（G3_M3 唯一牛熊双过闸）"""
+        dh = w.get("dist_high") if w.get("dist_high") is not None else w.get("dist_high60")
+        rp = w.get("rel_pos")
+        ok = (dh is not None and dh >= 20) and (rp is None or rp <= 0.5)
+        if ok:
+            inner = f'<span class="board-tag board-sh" title="G3_M3 过闸族：F3空间≥20% + 低位rel≤0.5">✅</span>'
+            return f'<td>{inner} {dh:.0f}%</td>' if with_val else f'<td>{inner}</td>'
+        return _txt_td("—")
     wl_rows = [_row(
         {"data-code": w["code"], "data-search": f'{w["name"]} {w["code"]} {w.get("ind", "")} {w.get("board", "")}',
          "data-market": w.get("board", ""), "data-industry": w.get("ind", "")},
         [_txt_td(w["code"]), _txt_td(f'<b>{w["name"]}</b>'), _txt_td(_board_cell(w.get("board"), w.get("ind"))),
          _txt_td(w["sb_date"]), _num_td(w.get("rel_pos"), 2), _txt_td(f'{w.get("amt", 0)/1e4:.0f}'),
-         _chg_td(w.get("chg")), _pct_td(w.get("ret_1y"), 1),
+         _gate_cell(w), _chg_td(w.get("chg")), _pct_td(w.get("ret_1y"), 1),
          _num_td(w.get("rsi"), 1), _num_td(w.get("vr"), 2), _pct_td(w.get("ma5_dev"), 1)])
         for w in sorted(wl, key=lambda x: -x.get("amt", 0))]
     # 回避清单
@@ -711,15 +730,15 @@ def a5_view_html():
 <div class="card" id="sys-a5">
 <div class="sys-head">
 <div class="sys-head-top">
-<h2>🎯 打板实验 <span class="view-badge auto">A5_tp8t2 · 模拟盘</span></h2>
+<h2>🎯 打板族（过闸档位） <span class="view-badge auto">G3_M3 · 过闸档位 · 模拟盘观察</span></h2>
 {asof_badge}
 </div>
 <div class="sys-head-tags">
-<span class="badge badge-auto" style="background:#d97706;color:#fff">⚠ 负期望实验系统 · 模拟盘验证中 · 禁止实盘</span>
-<span class="badge badge-auto">信号 = 首板次日低开 2-5% + 相对位置≤0.5 + 成交额≥5000万</span>
+<span class="badge badge-auto" style="background:#059669;color:#fff">✅ 过闸打板族（G3_M3 牛熊双过）· 模拟盘观察中</span>
+<span class="badge badge-auto">信号 = 首板次日低开 2-5% + 相对位置≤0.5 + 成交额≥5000万（生产预筛口径）</span>
 <span class="badge badge-auto">出场 = 止盈+T+2（+8% 止盈 / T+2 兜底）</span>
 </div>
-<div class="sys-head-note"><b>定位</b>：单笔算术期望为正（组合信号 +0.11%）但组合复利 -72.2% —— 模拟盘边缘验证 30 信号/3 个月，通过前禁止实盘；A2_tp3 回避清单 = 负期望警示信号（胜率 63.1% 但均值 -1.39%），<b>不单独交易</b>，A5 入场若同时命中须严格执行 T+2 兜底</div>
+<div class="sys-head-note"><b>定位</b>：9/3 生产档位敏感性确认 <b>G3_M3（低位+空间≥20%）牛熊双过闸</b>（牛 n=78 wr51.3% +2.52% / 熊 n=104 wr55.8% +0.27%）；裸 rel_pos 不过闸；生产预筛缺 F3 空间因子。模拟盘观察 30 信号/3 个月，通过前不改生产权重；G6 组 n&lt;30 禁止投产</div>
 </div>
 <div class="kpis">{''.join(kpis)}</div>
 {gate_bar}
@@ -727,7 +746,7 @@ def a5_view_html():
 <div class="card" id="a5-watchlist">
 <h2>📋 观察清单 <span class="badge badge-auto">{len(wl)} 只</span></h2>
 <div class="sub">今日首板 · 明日低开 2-5% 则入场（与回测口径一致）· 当日涨跌幅为实时数据（早盘/尾盘/收盘更新），近一年/RSI/量比/MA5偏离为收盘口径</div>
-{_a5_tbl_full("a5-wl", [("code","代码"),("name","名称"),("board","板块"),("sbdate","首板日"),("relpos","相对位置"),("amt","成交额(万)"),("chg","当日涨跌"),("ret1y","近一年"),("rsi","RSI"),("vr","量比"),("ma5dev","MA5偏离")], wl_rows, "（无观察标的）")}
+{_a5_tbl_full("a5-wl", [("code","代码"),("name","名称"),("board","板块"),("sbdate","首板日"),("relpos","相对位置"),("amt","成交额(万)"),("gate","过闸"),("chg","当日涨跌"),("ret1y","近一年"),("rsi","RSI"),("vr","量比"),("ma5dev","MA5偏离")], wl_rows, "（无观察标的）")}
 </div>
 <div class="card" id="a5-avoid" style="border-color:rgba(217,119,6,.35)">
 <h2>⚠ A2_tp3 回避清单 <span class="badge badge-auto">{len(av)} 只 · 负期望警示</span></h2>
@@ -942,7 +961,9 @@ if _a5rev_f.exists():
         f'<div class="kpi"><div class="l">净值</div><div class="v">{_ars.get("nav", 1.0):.4f}</div><div class="s">已平仓复利</div></div>'
     )
     _flag = "✅" if _arg.get("verdict", "").startswith("✅") else ("⏳" if _arg.get("verdict", "").startswith("信号不足") else "⛔")
-    A5_REVIEW_BLOCK = (f'<div class="kpis" style="margin-bottom:10px">{_a5kpi}</div>'
+    A5_REVIEW_BLOCK = (f'<h2>🎯 打板族（过闸档位）模拟盘验证 <span class="badge badge-auto">生产预筛口径 · 非实盘指令</span></h2>'
+                       f'<div class="sub">逐笔模拟盘跟踪（net_ret 含成本）· 验证门参考 = G3_M3 过闸（牛 +2.52% / 熊 +0.27%）· 30 信号或 3 个月触发判定 · 详细见「🎯 打板族」视图</div>'
+                       f'<div class="kpis" style="margin-bottom:10px">{_a5kpi}</div>'
                        f'<div class="op-stats"><span class="op" style="color:var(--sub)">{_flag} 判定：{_arg.get("verdict", "—")}</span>'
                        f'<span class="op" style="color:var(--faint)">观察清单 {_ar.get("n_watch", 0)} · 回避清单 {_ar.get("n_avoid", 0)} · 持仓 {_ar.get("n_pos", 0)} · 更新 {_ar.get("updated", "—")}</span></div>')
 else:
@@ -1142,7 +1163,7 @@ html = f"""<!doctype html>
 <div class="view active" id="view-overview">
 <div class="card" id="overview">
 <h2>📊 标的监控总览 <span class="badge badge-auto">数据截至 {DATA["meta"].get("as_of", "—")}{"（盘中实时）" if DATA["meta"].get("intraday") else " 收盘"}</span></h2>
-<div class="sub">左侧导航切换：🅰️ 全量池中/长线（全市场自动池·股票分层+基金） / ⚡ 短线 / 🎯 打板实验（模拟盘） · 信号仅供参考</div>
+<div class="sub">左侧导航切换：🅰️ 全量池中/长线（全市场自动池·股票分层+基金） / ⚡ 短线 / 🎯 打板族（过闸档位·模拟盘观察） · 信号仅供参考</div>
 <div class="kpis">
 <div class="kpi"><div class="l">🟢 加仓区</div><div class="v" style="color:#dc2626">{sum(1 for d in all_items if d["tier"] in ("满仓加仓","轻仓加仓"))} 只</div><div class="s">满仓+轻仓加仓</div></div>
 <div class="kpi"><div class="l">🟡 观望区</div><div class="v" style="color:#d97706">{sum(1 for d in all_items if d["tier"]=="观望")} 只</div><div class="s">持有不加</div></div>
@@ -1193,15 +1214,15 @@ html = f"""<!doctype html>
 <!-- ============ 视图 C：全量池短线（2026-09-03 起 股票池 / 基金池 分板块展示） ============ -->
 {SHORT_VIEW_HTML}
 
-<!-- ============ 视图 D：打板实验（第三个系统，A5_tp8t2 模拟盘 + A2_tp3 回避清单） ============ -->
+<!-- ============ 视图 D：打板族（过闸档位 · 第三个系统，G3_M3 过闸 + 生产预筛模拟盘） ============ -->
 {a5_view_html()}
 
 <!-- ============ 视图 E：复盘日志（内嵌，与各池同形态） ============ -->
 <div class="view" id="view-review">
 {_rev_cum}
 <div class="card" id="a5-review-block" style="border-color:rgba(245,158,11,.35)">
-<h2>🎯 打板实验（A5_tp8t2）模拟盘验证 <span class="badge badge-auto">全部信号口径 · 非实盘指令</span></h2>
-<div class="sub">逐笔模拟盘跟踪（net_ret 含成本）· 验证门基准 = 全部信号口径（46.1%/-0.17%/21.5%）· 30 信号或 3 个月触发判定 · 详细见「🎯 打板实验」视图</div>
+<h2>🎯 打板族（过闸档位）模拟盘验证 <span class="badge badge-auto">生产预筛口径 · 非实盘指令</span></h2>
+<div class="sub">逐笔模拟盘跟踪（net_ret 含成本）· 验证门参考 = G3_M3 过闸（牛 +2.52% / 熊 +0.27%）· 30 信号或 3 个月触发判定 · 详细见「🎯 打板族」视图</div>
 {A5_REVIEW_BLOCK}
 </div>
 <div class="card">
@@ -1257,7 +1278,7 @@ window.ENH.nav = [
   ["overview","📊","监控总览",[["overview","总览统计"],["mkt-weather","市场晴雨表"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
   ["sys-auto","🅰️","全量池中/长线",[["card-tbl-v9","标的汇总表"],["card-tbl-v9-detail","逐标的详情"],["watch-v9-card","中长线跟踪"]]],
   ["short","⚡","全量池短线",[["card-short-stk","📋 股票池 汇总表"],["card-short-stk-detail","🔍 股票池 逐标的详情"],["card-short-fund","📋 基金池 汇总表"],["card-short-fund-detail","🔍 基金池 逐标的详情"],["watch-card","📌 短线跟踪"]]],
-  ["a5","🎯","打板实验",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
+  ["a5","🎯","打板族",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
   ["comment","💬","评论区",[]]
 ];
 /* 视图切换模式：滚动不更新导航高亮（COMMON_JS renderSidenav 检测此标志） */

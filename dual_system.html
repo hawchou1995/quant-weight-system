@@ -2,7 +2,7 @@
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2016'%3E%3Crect%20width='16'%20height='16'%20rx='3'%20fill='%232563eb'/%3E%3Cpath%20d='M3%2012V8h2v4zM6%2012V4h2v8zM9%2012V6h2v6zM12%2012V2h2v10z'%20fill='%23fff'/%3E%3C/svg%3E">
-<title>标的监控看板（数据截至 2026-09-03 · 构建 2026-09-03 16:22）</title>
+<title>标的监控看板（数据截至 2026-09-03 · 构建 2026-09-03 20:02）</title>
 <style>
 :root{
   --bg:#f3f4f6; --card:#ffffff; --card2:#f9fafb; --border:#e5e7eb; --line:#f0f1f3;
@@ -249,7 +249,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class="view active" id="view-overview">
 <div class="card" id="overview">
 <h2>📊 标的监控总览 <span class="badge badge-auto">数据截至 2026-09-03 收盘</span></h2>
-<div class="sub">左侧导航切换：🅰️ 全量池中/长线（全市场自动池·股票分层+基金） / ⚡ 短线 / 🎯 打板实验（模拟盘） · 信号仅供参考</div>
+<div class="sub">左侧导航切换：🅰️ 全量池中/长线（全市场自动池·股票分层+基金） / ⚡ 短线 / 🎯 打板族（过闸档位·模拟盘观察） · 信号仅供参考</div>
 <div class="kpis">
 <div class="kpi"><div class="l">🟢 加仓区</div><div class="v" style="color:#dc2626">11 只</div><div class="s">满仓+轻仓加仓</div></div>
 <div class="kpi"><div class="l">🟡 观望区</div><div class="v" style="color:#d97706">12 只</div><div class="s">持有不加</div></div>
@@ -349,28 +349,30 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div></div>
 </div>
 <div class="card" id="bt-a5">
-<h2>🎯 打板实验回测参考 <span class="badge badge-auto">A5_tp8t2 · 实验形态 · 模拟盘验证中</span></h2>
-<div class="sub">首板次日低开 2-5% + 日内冲高 +8% 止盈 + T+2 收盘兜底（止盈+T+2）· 回测 2016-01~2026-08 全量 4444 只 · 口径与 spec_A5_tp8t2.md 逐位一致</div>
-<div class="sub" style="color:#d97706">⚠ <b>负期望实验系统</b>：单笔算术期望为正（组合信号 +0.11%），但组合复利 <b>-72.2%</b> —— <b>验证通过前只允许模拟盘（单笔≤1-2%），禁止实盘</b>；验证门 30 信号/3 个月，均值&lt;-1% 立即停止</div>
-<div class="sub">📈 <b>9/1 融合优化 A/B（修正引擎 T+1 · 熊市 G2_M3_X1 基线）</b>：缩量60%（5日均量比&lt;60%）为稳健增量 —— 基线 mean +1.03%/wr 50.4% → 缩量60% mean +1.25%/wr 56.2%/段链 +128.9%；<b>C2 缩量60+回踩MA5±5% mean +1.79%/wr 56.4%/段链 +138.4%</b> 最优；A2长下影（n&lt;30）、RSI/BIAS 超卖（n 极小）淘汰。已登记增强候选，验证门通过前不改生产权重</div>
+<h2>🏆 打板族过闸档位 <span class="badge badge-auto">融合网格 · 牛熊独立四闸 · 2021+ 复验</span></h2>
+<div class="sub">9/1 融合网格 260 配置 × 牛熊独立四闸（n≥30 + wr≥40% + 均值&gt;0 + 中位数&gt;0）· 2026-09-03 生产档位敏感性复验（2021+ 制度一致区间）· 结论：<b>仅 G3_M3（低位+距前高≥20%空间）牛熊双过闸</b>；裸 rel_pos 不过闸；G2_M3 熊过、G6_M6/M7 牛过（n&lt;30 不可投产）</div>
+<div class="sub" style="color:#059669">✅ <b>本次优化方向</b>：生产预筛或缺 F3 空间因子（rel_pos≤0.5 + 成交额≥5000万 + <b>距60日高点≥20%</b>）—— 9/3 敏感性证实这是「薄弱环节」的针对性优化，生产是否加 F3 待实盘验证</div>
+<div class="sub" style="color:#d97706">⚠ <b>重要边界</b>：G3_M3 牛熊过闸是「回测期望」，模拟盘验证门（30 信号/3 个月）通过前不改生产权重；G6 组 n&lt;30 禁止投产；A5 原始负期望结论（组合复利 -72.2%）不再作为主展示，仅作历史对照</div>
 <div class="bt-grid"><div class="bt-card" id="bt-a5-all">
-<div class="bt-head"><b>📊 全部信号</b><span class="bt-tag">n=1116 · 验证门基准口径</span></div>
+<div class="bt-head"><b>🏆 过闸档位（2021+ 复验）</b><span class="bt-tag">牛熊独立四闸</span></div>
 <div class="kpis">
-<div class="kpi"><div class="l">胜率</div><div class="v">46.1%</div><div class="s">均值净 -0.17%</div></div>
-<div class="kpi"><div class="l">均值毛（零成本）</div><div class="v">+0.99%</div><div class="s">中位数 -0.63%</div></div>
-<div class="kpi"><div class="l">止盈出场占比</div><div class="v">21.5%</div><div class="s">盈亏比 1.1 · 持有 1.06 天</div></div>
+<div class="kpi"><div class="l">G3_M3 牛</div><div class="v">wr 51.3%</div><div class="s">n=78 · 均值 +2.52% · 中位 +0.37%</div></div>
+<div class="kpi"><div class="l">G3_M3 熊</div><div class="v">wr 55.8%</div><div class="s">n=104 · 均值 +0.27% · 中位 +0.36%</div></div>
+<div class="kpi"><div class="l">G2_M3 牛</div><div class="v">wr 49.0%</div><div class="s">n=96 · 均值 +2.11% · 中位 -0.17%⚠</div></div>
+<div class="kpi"><div class="l">G2_M3 熊</div><div class="v">wr 54.3%</div><div class="s">n=138 · 均值 +0.29% · 中位 +0.36%</div></div>
 </div></div><div class="bt-card" id="bt-a5-comb">
-<div class="bt-head"><b>📊 组合信号</b><span class="bt-tag">n=625 · 每日≤5/去重/情绪门控</span></div>
+<div class="bt-head"><b>🔬 9/3 生产档位敏感性</b><span class="bt-tag">唯一过闸组合</span></div>
 <div class="kpis">
-<div class="kpi"><div class="l">胜率</div><div class="v">45.0%</div><div class="s">均值净 +0.11%</div></div>
-<div class="kpi"><div class="l">均值毛（零成本）</div><div class="v">+1.27%</div><div class="s">单笔算术期望为正</div></div>
-<div class="kpi"><div class="l">止盈出场占比</div><div class="v">22.4%</div><div class="s">模拟盘实际执行=全部信号口径</div></div>
-</div></div><div class="bt-card" id="bt-a5-port" style="border-color:rgba(239,68,68,.4)">
-<div class="bt-head"><b>⚠ 组合净值（必须正视）</b><span class="bt-tag">等权叠加 · 全持有期逐日复利 · 1004 日</span></div>
+<div class="kpi"><div class="l">A现状生产[-5,-2]裸</div><div class="v">牛❌ 熊❌</div><div class="s">牛 691/熊 1099 中位 -1.30%/-0.99%</div></div>
+<div class="kpi"><div class="l">B纯G3[-3.5,-2]裸</div><div class="v">牛❌ 熊❌</div><div class="s">牛 691/熊 1099 中位 -1.30%/-0.99%</div></div>
+<div class="kpi"><div class="l">B纯G3_M3</div><div class="v">牛✅ 熊✅</div><div class="s">唯一牛熊双过 · 中位 +0.37%/+0.36%</div></div>
+<div class="kpi"><div class="l">C全开_G3_M3</div><div class="v">牛⚠ 熊✅</div><div class="s">牛中位 -0.19% 不过闸</div></div>
+</div></div><div class="bt-card" id="bt-a5-port" style="border-color:rgba(16,185,129,.4)">
+<div class="bt-head"><b>✅ 唯一过闸方向</b><span class="bt-tag">G3_M3 · 低位+空间≥20%</span></div>
 <div class="kpis">
-<div class="kpi"><div class="l">总收益</div><div class="v" style="color:#ef4444">-72.2%</div><div class="s">年化 -27.4%</div></div>
-<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">-91.4%</div><div class="s">夏普 -0.11</div></div>
-<div class="kpi"><div class="l">几何≈算术−σ²/2</div><div class="v" style="font-size:15px">边缘太薄</div><div class="s">σ≈5%/日 &gt; 边缘 +0.11%/笔</div></div>
+<div class="kpi"><div class="l">牛熊双过闸</div><div class="v">✅</div><div class="s">牛 n=78 · 熊 n=104</div></div>
+<div class="kpi"><div class="l">收益结构</div><div class="v">牛稳·熊稳</div><div class="s">牛 +2.52% 熊 +0.27% 均正</div></div>
+<div class="kpi"><div class="l">生产预筛差距</div><div class="v" style="font-size:15px">缺 F3 空间</div><div class="s">生产仅 rel≤0.5+amt · 须加 F3</div></div>
 </div></div></div>
 </div>
 </div>
@@ -2139,20 +2141,20 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 </div>
 
-<!-- ============ 视图 D：打板实验（第三个系统，A5_tp8t2 模拟盘 + A2_tp3 回避清单） ============ -->
+<!-- ============ 视图 D：打板族（过闸档位 · 第三个系统，G3_M3 过闸 + 生产预筛模拟盘） ============ -->
 <div class="view" id="view-a5">
 <div class="card" id="sys-a5">
 <div class="sys-head">
 <div class="sys-head-top">
-<h2>🎯 打板实验 <span class="view-badge auto">A5_tp8t2 · 模拟盘</span></h2>
+<h2>🎯 打板族（过闸档位） <span class="view-badge auto">G3_M3 · 过闸档位 · 模拟盘观察</span></h2>
 <span class="view-badge auto" title="收盘数据">数据截至 2026-09-03 15:00 · 收盘</span>
 </div>
 <div class="sys-head-tags">
-<span class="badge badge-auto" style="background:#d97706;color:#fff">⚠ 负期望实验系统 · 模拟盘验证中 · 禁止实盘</span>
-<span class="badge badge-auto">信号 = 首板次日低开 2-5% + 相对位置≤0.5 + 成交额≥5000万</span>
+<span class="badge badge-auto" style="background:#059669;color:#fff">✅ 过闸打板族（G3_M3 牛熊双过）· 模拟盘观察中</span>
+<span class="badge badge-auto">信号 = 首板次日低开 2-5% + 相对位置≤0.5 + 成交额≥5000万（生产预筛口径）</span>
 <span class="badge badge-auto">出场 = 止盈+T+2（+8% 止盈 / T+2 兜底）</span>
 </div>
-<div class="sys-head-note"><b>定位</b>：单笔算术期望为正（组合信号 +0.11%）但组合复利 -72.2% —— 模拟盘边缘验证 30 信号/3 个月，通过前禁止实盘；A2_tp3 回避清单 = 负期望警示信号（胜率 63.1% 但均值 -1.39%），<b>不单独交易</b>，A5 入场若同时命中须严格执行 T+2 兜底</div>
+<div class="sys-head-note"><b>定位</b>：9/3 生产档位敏感性确认 <b>G3_M3（低位+空间≥20%）牛熊双过闸</b>（牛 n=78 wr51.3% +2.52% / 熊 n=104 wr55.8% +0.27%）；裸 rel_pos 不过闸；生产预筛缺 F3 空间因子。模拟盘观察 30 信号/3 个月，通过前不改生产权重；G6 组 n&lt;30 禁止投产</div>
 </div>
 <div class="kpis"><div class="kpi"><div class="l">已平仓信号</div><div class="v">8<span style="font-size:13px;color:var(--faint)">/30</span></div><div class="s">触发验证门判定</div></div><div class="kpi"><div class="l">模拟盘胜率</div><div class="v">37.5%</div><div class="s">回测基准 46.1%</div></div><div class="kpi"><div class="l">均值净收益</div><div class="v" style="color:var(--down)">-1.81%</div><div class="s">基准 -0.17% · 闸 &gt;-0.5%</div></div><div class="kpi"><div class="l">止盈出场占比</div><div class="v">0.0%</div><div class="s">基准 21.5% · 闸 [12,32]%</div></div><div class="kpi"><div class="l">模拟盘净值</div><div class="v">0.8604</div><div class="s">已平仓复利</div></div></div>
 <div class="op-stats"><span class="op op-watch">⏳ 胜率 8/30</span><span class="op op-watch">⏳ 均值净 8/30</span><span class="op op-watch">⏳ 止盈占比 8/30</span><span class="op" style="color:var(--sub)">信号不足 8/30，继续积累</span></div>
@@ -2188,9 +2190,9 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class="view" id="view-review">
 <div class="rev-cum"><div class="rev-cum-title">📈 累计总览<span class="rev-cum-badge">自 2026-08-14 · 15 篇</span></div><div class="rev-cum-sub">三池累计信号标的（防重累加；短线·基金 T+1 净值未出计持平）· 回测基准 = 2016 起回测胜率</div><table class="tbl"><thead><tr><th>池</th><th>累计标的</th><th>累计买入</th><th>🟢吃到</th><th>🔴被套</th><th>⚪持平</th><th>累计胜率</th><th>回测基准</th><th>累计均收</th></tr></thead><tbody><tr><td>全量池中/长线</td><td>48</td><td>48</td><td>18</td><td>27</td><td>3</td><td>38%</td><td>48.1% （-10.6pct）</td><td>-0.60%</td></tr><tr><td>长线·主板</td><td>4</td><td>4</td><td>1</td><td>3</td><td>0</td><td>25%</td><td>— </td><td>-3.06%</td></tr><tr><td>长线·创业板</td><td>4</td><td>4</td><td>0</td><td>4</td><td>0</td><td>0%</td><td>— </td><td>-5.09%</td></tr><tr><td>长线·科创板</td><td>10</td><td>10</td><td>2</td><td>8</td><td>0</td><td>20%</td><td>— </td><td>-3.76%</td></tr><tr><td>长线·基金</td><td>3</td><td>3</td><td>0</td><td>0</td><td>3</td><td>0%</td><td>— </td><td>+0.00%</td></tr><tr><td>短线全量池</td><td>119</td><td>114</td><td>50</td><td>45</td><td>19</td><td>44%</td><td>— </td><td>+0.74%</td></tr><tr><td>短线·主板</td><td>48</td><td>48</td><td>26</td><td>22</td><td>0</td><td>54%</td><td>46.8% （+7.4pct）</td><td>+0.99%</td></tr><tr><td>短线·创业板</td><td>32</td><td>32</td><td>13</td><td>18</td><td>1</td><td>41%</td><td>48.1% （-7.5pct）</td><td>+0.43%</td></tr><tr><td>短线·科创板</td><td>16</td><td>16</td><td>11</td><td>5</td><td>0</td><td>69%</td><td>57.8% （+11.0pct）</td><td>+1.45%</td></tr><tr><td>短线·基金</td><td>23</td><td>23</td><td>0</td><td>0</td><td>23</td><td>0%</td><td>55.5% （-55.5pct）</td><td>+0.00%</td></tr><tr class='rev-cum-total'><td>合计</td><td>307</td><td>302</td><td>121</td><td>132</td><td>49</td><td>40%</td><td>—</td><td>+0.23%</td></tr></tbody></table></div>
 <div class="card" id="a5-review-block" style="border-color:rgba(245,158,11,.35)">
-<h2>🎯 打板实验（A5_tp8t2）模拟盘验证 <span class="badge badge-auto">全部信号口径 · 非实盘指令</span></h2>
-<div class="sub">逐笔模拟盘跟踪（net_ret 含成本）· 验证门基准 = 全部信号口径（46.1%/-0.17%/21.5%）· 30 信号或 3 个月触发判定 · 详细见「🎯 打板实验」视图</div>
-<div class="kpis" style="margin-bottom:10px"><div class="kpi"><div class="l">已平仓</div><div class="v">8/30</div><div class="s">触发判定阈值</div></div><div class="kpi"><div class="l">胜率</div><div class="v">37.5%</div><div class="s">基准 46.1% · 闸 [35,55]%</div></div><div class="kpi"><div class="l">均值净</div><div class="v" style="color:var(--down)">-1.81%</div><div class="s">基准 -0.17% · 闸 &gt;-0.5%</div></div><div class="kpi"><div class="l">止盈占比</div><div class="v">0.0%</div><div class="s">基准 21.5% · 闸 [12,32]%</div></div><div class="kpi"><div class="l">净值</div><div class="v">0.8604</div><div class="s">已平仓复利</div></div></div><div class="op-stats"><span class="op" style="color:var(--sub)">⏳ 判定：信号不足 8/30，继续积累</span><span class="op" style="color:var(--faint)">观察清单 0 · 回避清单 0 · 持仓 0 · 更新 2026-09-03 16:01:28</span></div>
+<h2>🎯 打板族（过闸档位）模拟盘验证 <span class="badge badge-auto">生产预筛口径 · 非实盘指令</span></h2>
+<div class="sub">逐笔模拟盘跟踪（net_ret 含成本）· 验证门参考 = G3_M3 过闸（牛 +2.52% / 熊 +0.27%）· 30 信号或 3 个月触发判定 · 详细见「🎯 打板族」视图</div>
+<h2>🎯 打板族（过闸档位）模拟盘验证 <span class="badge badge-auto">生产预筛口径 · 非实盘指令</span></h2><div class="sub">逐笔模拟盘跟踪（net_ret 含成本）· 验证门参考 = G3_M3 过闸（牛 +2.52% / 熊 +0.27%）· 30 信号或 3 个月触发判定 · 详细见「🎯 打板族」视图</div><div class="kpis" style="margin-bottom:10px"><div class="kpi"><div class="l">已平仓</div><div class="v">8/30</div><div class="s">触发判定阈值</div></div><div class="kpi"><div class="l">胜率</div><div class="v">37.5%</div><div class="s">基准 46.1% · 闸 [35,55]%</div></div><div class="kpi"><div class="l">均值净</div><div class="v" style="color:var(--down)">-1.81%</div><div class="s">基准 -0.17% · 闸 &gt;-0.5%</div></div><div class="kpi"><div class="l">止盈占比</div><div class="v">0.0%</div><div class="s">基准 21.5% · 闸 [12,32]%</div></div><div class="kpi"><div class="l">净值</div><div class="v">0.8604</div><div class="s">已平仓复利</div></div></div><div class="op-stats"><span class="op" style="color:var(--sub)">⏳ 判定：信号不足 8/30，继续积累</span><span class="op" style="color:var(--faint)">观察清单 0 · 回避清单 0 · 持仓 0 · 更新 2026-09-03 16:01:28</span></div>
 </div>
 <div class="card">
 <h2>📋 复盘日志 <span class="badge badge-auto">15 篇</span></h2>
@@ -3288,7 +3290,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 
 </div>
-<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-09-03 16:22 · 版本 v5.12.0（+🌦市场晴雨表） · 数据截至 2026-09-03 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-09-03 20:02 · 版本 v5.12.0（+🌦市场晴雨表） · 数据截至 2026-09-03 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
@@ -3308,7 +3310,7 @@ window.ENH.nav = [
   ["overview","📊","监控总览",[["overview","总览统计"],["mkt-weather","市场晴雨表"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
   ["sys-auto","🅰️","全量池中/长线",[["card-tbl-v9","标的汇总表"],["card-tbl-v9-detail","逐标的详情"],["watch-v9-card","中长线跟踪"]]],
   ["short","⚡","全量池短线",[["card-short-stk","📋 股票池 汇总表"],["card-short-stk-detail","🔍 股票池 逐标的详情"],["card-short-fund","📋 基金池 汇总表"],["card-short-fund-detail","🔍 基金池 逐标的详情"],["watch-card","📌 短线跟踪"]]],
-  ["a5","🎯","打板实验",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
+  ["a5","🎯","打板族",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
   ["comment","💬","评论区",[]]
 ];
 /* 视图切换模式：滚动不更新导航高亮（COMMON_JS renderSidenav 检测此标志） */

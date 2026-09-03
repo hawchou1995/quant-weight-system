@@ -65,6 +65,12 @@ def tech_indicators(code):
             out["vr"] = None
         ma5 = float(close.iloc[-5:].mean()) if len(close) >= 5 else None
         out["ma5_dev"] = round((float(close.iloc[-1]) / ma5 - 1) * 100, 1) if ma5 else None
+        # F3 空间因子（9/3 过闸族）：距 60 日最高收盘的空间%（回测口径 (hi-close)/hi≥0.2 → ≥20）
+        if len(close) >= 60:
+            hi60 = float(close.iloc[-60:].max())
+            out["dist_high60"] = round((hi60 - float(close.iloc[-1])) / hi60 * 100, 1) if hi60 > 0 else None
+        else:
+            out["dist_high60"] = None
         return out
     except Exception:
         return None
