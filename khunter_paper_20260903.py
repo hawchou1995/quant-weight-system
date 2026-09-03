@@ -264,7 +264,7 @@ def main():
                                 "entry_px": round(px, 4), "shares": shares,
                                 "rsi_entry": b["rsi"], "hold_days": 0})
         st["trades"].append({"code": code, "side": "buy", "date": str(today.date()),
-                             "px": round(px, 4), "reason": f"khunter_hit_rsi{b['regime']}"})
+                             "px": round(px, 4), "reason": f"khunter_hit_rsi{b.get('regime', 'bear')}"})
         log(f"  ✅ 买入 {code} @ {px:.3f} × {shares} 股（¥{shares*px:,.0f}）")
     st["pending_buys"] = []
 
@@ -293,7 +293,8 @@ def main():
     for c in held_sells:
         r = "持有上限" if c in st.get("hold_over_codes", []) else f"RSI>{RSI_SELL:.0f}"
         log(f"  📉 卖出候选 {c} ({r})")
-    st["pending_buys"] = [{"code": b["code"], "rsi": b["rsi"], "close": b["close"]} for b in buys]
+    st["pending_buys"] = [{"code": b["code"], "rsi": b["rsi"], "close": b["close"],
+                           "regime": b.get("regime", "bear")} for b in buys]
     st["pending_sells"] = held_sells
 
     # ===== 4) 净值 =====
