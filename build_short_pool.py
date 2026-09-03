@@ -231,13 +231,22 @@ HIT_AVOID_THRESHOLD = 3
 IDX_MOM20_STRONG = 0.02
 ENABLE_F3 = False  # 9/1 裁决：F3 缩量企稳为增强候选，验证门前默认关闭（恢复双创信号可比性）
 # 2026-09-02 用户拍板：短线战法全量池选股改用 KHunter 信号 + RSI 择时（主板限定，全窗口），弃用旧战法（反转打分）
-# 回测证据：KHunter 信号 + RSI_T-1<35 超卖买 + RSI_T-1>75 卖 + 主板限定 + 全窗口（牛熊一致开仓）
+# 回测证据：KHunter 信号 + RSI_T-1<35 超卖买 + 主板限定 + 全窗口（牛熊一致开仓）
 #   = 四闸(ex_m)过 26 格：ob75/osl35/none n=653 wr62.5% med+5.82% ex_m+9.77%；ob75/osl40/none n=1639 ex_m+9.08%
 #   = 信号稀疏（每18天1只）→ 事件独立口径（有信号就买，无需 top4 组合）
+# ⚠ 2026-09-03 生产切换（用户拍板「直接切换，两版都部署」）：ob75 → A 版 ob55 + C 版参考 ob50 + 低价过滤 ≥3 元
+#   回测证据（khunter_three_ver_opt_20260903.py，9 格 = A/B/C × {无/2元/3元}，回归门与 v8 原值逐位一致）：
+#     A_ob55+low3: n=408 wr65.9 每笔年化63.5% 夏普1.184 pf1.07 | 资金池N5 年化5.54% 回撤19.90% 夏普0.372 | 2024 +1.33%
+#     C_ob50+low3: n=408 wr63.5 每笔年化81.4% 夏普1.430 pf1.20 | 资金池N5 年化4.98% 回撤19.45% 夏普0.352 | 2024 +2.47%
+#     B(+30%止损)+low3 全灭（池年化 0.27%）→ 剔除；时间止损同样否决（tstop20 2024 更差）
+#   部署语义：入场规则唯一（信号+RSI<35+熊市+收盘≥3元，A/C 同入口）；A 版 RSI>55 为主卖出；
+#   C 版 RSI>50 作并行参考卖出（sell_c 字段/看板双版本展示），模拟盘 A/C 双轨前向对决后定稿
 # 弃用旧战法证据：反转打分(S55)修正后主板 -35.65%/全市场 -41.67% 均负期望
 ENABLE_KHUNTER = True
-KHUNTER_RSI_BUY = 35    # RSI_T-1 < 35 超卖买入（回测最优 ob75/osl35）
-KHUNTER_RSI_SELL = 75   # RSI_T-1 > 75 超买卖出
+KHUNTER_RSI_BUY = 35     # RSI_T-1 < 35 超卖买入（回测最优 ob75/osl35）
+KHUNTER_RSI_SELL = 55    # A 版卖出：RSI_T-1 > 55（2026-09-03 切换，原 75 → 55，disaster/网格最优）
+KHUNTER_RSI_SELL_C = 50  # C 版卖出参考：RSI_T-1 > 50（激进 OB50，双版本并行部署，sell_c 展示）
+KHUNTER_LOW_PRICE = 3.0  # 低价过滤：确认日收盘 ≥ 3 元（2026-09-03 接入；low3 回测：夏普 0.727→1.184、2024 灾年转正）
 
 def _khunter_sig(ddf, as_of=None):
     """KHunter 信号计算（2026-09-02 用户拍板）：生产在「今日 T 收盘后」运行，明日 T+1 开盘执行。
@@ -246,7 +255,8 @@ def _khunter_sig(ddf, as_of=None):
       生产映射：执行日 = 明天 T+1 → 确认日 = 今日 T → 检查今日 sig_any[T] + 今日 RSI
     ddf = short_engine 的因子 df（含 date index）；as_of=历史回溯日（as_of 当日即「今日 T」）；
     返回字典：{hit: 确认日信号命中, rsi_now: 确认日 RSI（买入/卖出判定）, rsi_t1: T-1 RSI(展示),
-               sell1: 确认日 RSI>75, hits: 确认日命中信号名单}"""
+               sell1: 确认日 RSI>KHUNTER_RSI_SELL(A55), c_sell: 确认日 RSI>KHUNTER_RSI_SELL_C(C50),
+               hits: 确认日命中信号名单}"""
     try:
         import sys as _sys
         if str(BASE / "backtest") not in _sys.path:
@@ -262,7 +272,7 @@ def _khunter_sig(ddf, as_of=None):
             _cut = pd.Timestamp(as_of)
             d = d[d['date'] <= _cut].reset_index(drop=True)
             if len(d) < 2:
-                return {"hit": False, "rsi_t1": None, "rsi_now": None, "sell1": False, "hits": []}
+                return {"hit": False, "rsi_t1": None, "rsi_now": None, "sell1": False, "c_sell": False, "hits": []}
         r = _T.prep(d)
         sig_any = np.zeros(len(d), dtype=bool)
         for _name, _fn in _K.SIGNALS.items():
@@ -275,7 +285,7 @@ def _khunter_sig(ddf, as_of=None):
         # 今日 T 视角（生产：今日收盘确认 → 明日开盘执行 = 回测「执行日=确认日+1」）
         i = len(d) - 1
         if i < 1:
-            return {"hit": False, "rsi_t1": None, "rsi_now": None, "sell1": False, "hits": []}
+            return {"hit": False, "rsi_t1": None, "rsi_now": None, "sell1": False, "c_sell": False, "hits": []}
         rsi_now = r['rsi'].iloc[i]      # 确认日 T RSI（买入判定 rsi_now<35；卖出判定 rsi_now>75）
         rsi_t1 = r['rsi'].iloc[i - 1]   # T-1 RSI（仅展示参考）
         hit_now = bool(sig_any[i])      # 确认日 T 信号命中
@@ -292,9 +302,10 @@ def _khunter_sig(ddf, as_of=None):
                 "rsi_t1": (float(rsi_t1) if not pd.isna(rsi_t1) else None),
                 "rsi_now": (float(rsi_now) if not pd.isna(rsi_now) else None),
                 "sell1": (bool(rsi_now > KHUNTER_RSI_SELL) if not pd.isna(rsi_now) else False),
+                "c_sell": (bool(rsi_now > KHUNTER_RSI_SELL_C) if not pd.isna(rsi_now) else False),
                 "hits": hit_names}
     except Exception:
-        return {"hit": False, "rsi_t1": None, "rsi_now": None, "sell1": False, "hits": []}
+        return {"hit": False, "rsi_t1": None, "rsi_now": None, "sell1": False, "c_sell": False, "hits": []}
 # ⚠ 2026-09-02 生产接入 v3（牛熊独立配置网格 shortpool_bull_grid_0902 最优，用户指令「牛市用牛市参数」）：
 #   牛市子集四闸 PASS 配置 = S2_t4_h15_s50：权重(25,20,25,30) + 关动量 mask(0,1,1,1) + 门槛 S50
 #     → 牛市 med -0.10%(基线) → +0.23%(PASS)，mean +1.41%、超额 +1.14%、n=225（全市场 top4 口径）
@@ -537,9 +548,10 @@ def calc_signals(as_of=None):
         print(f"命中回避: 信号日全市场涨跌幅中位数 {_mkt_med_pct:.2f}% (n={len(_pct_list)})", flush=True)
 
     _hit_avoided = 0
-    # 2026-09-02 用户拍板：KHunter 事件收集（主板限定；主信号=信号+RSI<35，卖出=RSI>75 独立）
+    # 2026-09-03 生产切换：KHunter 事件收集（主板限定；主信号=信号+RSI<35+收盘≥3元，卖出=A55 主/C50 参考）
     khunter_buy = []      # (code, info)：信号命中（含 buy_ok 判定）
-    khunter_sell = []     # code：RSI>75 独立卖出信号（回测 event_days = entry_ok | sell_vec）
+    khunter_sell = []     # code：A 版 RSI>55 独立卖出信号（回测 event_days = entry_ok | sell_vec）
+    khunter_sell_c = []   # code：C 版 RSI>50 参考卖出（2026-09-03 双版本部署）
 
     for code, ddf in stock_pool.items():
         if as_of is not None:
@@ -605,9 +617,10 @@ def calc_signals(as_of=None):
                                 "score": round(float(sc), 1), "tier": tier_of(float(sc)),
                                 "ma5_above": bool(not pd.isna(r.get("ma5", np.nan)) and r["close"] > r["ma5"])}
         # 2026-09-02 用户拍板：KHunter 信号层（主板限定+RSI 超卖择时，弃用旧战法）
+        # ⚠ 2026-09-03 生产切换（用户拍板）：A 版卖出 RSI>55 + 低价过滤确认日收盘≥3元；C 版卖出 RSI>50 参考并行
         # 注意：KHunter 信号计算较重（15 个信号函数），只对主板 bd 计算（产品只能买主板）
-        # 主信号口径=回测 ortho：T 日信号命中 + 信号日 RSI<35 → 明日开盘买入（事件独立，稀疏）
-        # 卖出 = RSI>75 独立信号（回测 event_days = entry_ok | sell_vec：买卖事件各自独立）
+        # 主信号口径=回测 ortho：T 日信号命中 + 信号日 RSI<35 + 收盘≥3元 → 明日开盘买入（事件独立，稀疏）
+        # 卖出 = A 版 RSI>55 主卖出 / C 版 RSI>50 参考卖出（独立信号，买卖事件各自独立）
         if ENABLE_KHUNTER and bd == "主板":
             _kinfo = _khunter_sig(ddf, as_of)
             if _kinfo["hit"]:
@@ -615,21 +628,37 @@ def calc_signals(as_of=None):
                     "sig": True,
                     "rsi_t1": _kinfo["rsi_t1"],
                     "rsi_now": _kinfo["rsi_now"],
-                    "buy": (_kinfo["rsi_now"] is not None and _kinfo["rsi_now"] < KHUNTER_RSI_BUY),
+                    "buy": (_kinfo["rsi_now"] is not None and _kinfo["rsi_now"] < KHUNTER_RSI_BUY
+                            and r["close"] >= KHUNTER_LOW_PRICE),
                     "sell": _kinfo["sell1"],
+                    "c_sell": _kinfo["c_sell"],
+                    "low_ok": bool(r["close"] >= KHUNTER_LOW_PRICE),
                     "hits": _kinfo["hits"],
                 }
-                # 事件收集（主信号判定：信号日 RSI<35 → 买入；RSI≥35 → 观察）
-                _buy_ok = _kinfo["rsi_now"] is not None and _kinfo["rsi_now"] < KHUNTER_RSI_BUY
+                # 事件收集（主信号判定：信号日 RSI<35 → 买入；RSI≥35 → 观察；低价过滤：收盘≥3元）
+                _buy_ok = (_kinfo["rsi_now"] is not None and _kinfo["rsi_now"] < KHUNTER_RSI_BUY
+                           and r["close"] >= KHUNTER_LOW_PRICE)
                 khunter_buy.append((code, _kinfo, bool(_buy_ok), float(sc), r, ddf))
             if _kinfo["sell1"]:
-                # RSI>75 卖出信号：独立于选股信号（回测 event_days = entry_ok | sell_vec）
+                # A 版 RSI>55 卖出信号：独立于选股信号（回测 event_days = entry_ok | sell_vec）
                 sig_stock[code[-6:]]["khunter"] = {
                     "sig": bool(_kinfo["hit"]), "rsi_t1": _kinfo["rsi_t1"], "rsi_now": _kinfo["rsi_now"],
-                    "buy": False, "sell": True, "hits": _kinfo["hits"],
-                    "note": "RSI>75 超买卖出（独立信号）",
+                    "buy": False, "sell": True, "c_sell": _kinfo["c_sell"],
+                    "hits": _kinfo["hits"],
+                    "note": f"RSI>{KHUNTER_RSI_SELL} 超买卖出（A 版独立信号）",
                 }
                 khunter_sell.append(code)
+            # C 版 RSI>50 卖出集 = 完整超集（RSI>50 全收，非 A 未触发窄带）；
+            # sig_stock 记录仅当 A55 未写时补（A 记录已含 c_sell 字段）
+            if _kinfo["c_sell"] and not ((sig_stock.get(code[-6:]) or {}).get("khunter") or {}).get("sell"):
+                sig_stock[code[-6:]]["khunter"] = {
+                    "sig": bool(_kinfo["hit"]), "rsi_t1": _kinfo["rsi_t1"], "rsi_now": _kinfo["rsi_now"],
+                    "buy": False, "sell": False, "c_sell": True,
+                    "hits": _kinfo["hits"],
+                    "note": f"RSI>{KHUNTER_RSI_SELL_C} 参考卖出（C 版，A55 未触发）",
+                }
+            if _kinfo["c_sell"]:
+                khunter_sell_c.append(code)
     # 按板块列表初始化（2026-09-02 用户拍板：KHunter 主信号 + 弃用旧战法）
     # 主信号 = 主板 KHunter 15 信号命中 + 信号日 RSI<35（超卖买入，回测 ob75/osl35 全窗口最优）
     # 信号观察 = 主板 KHunter 命中但 RSI≥35（未触发买入，等待后续信号日）
@@ -783,10 +812,13 @@ def calc_signals(as_of=None):
         "sig": True,
         "buy": len(kh_main) > 0,
         "sell": khunter_sell,
+        "sell_c": khunter_sell_c,
         "buy_n": len(kh_main),
         "watch_n": len(kh_watch),
         "watch": [c[-6:] for c, _, _, _ in kh_watch],
-        "note_sell": "RSI>75 超买卖出（独立信号，不计入买入）",
+        "ver": {"buy_rsi": KHUNTER_RSI_BUY, "sell_a": KHUNTER_RSI_SELL, "sell_c": KHUNTER_RSI_SELL_C,
+                "low": KHUNTER_LOW_PRICE},
+        "note_sell": f"卖出=A版 RSI>{KHUNTER_RSI_SELL} / C版参考 RSI>{KHUNTER_RSI_SELL_C}（独立信号，不计入买入）",
     }
     _sel_meta = {
         "top4": _top4_list,

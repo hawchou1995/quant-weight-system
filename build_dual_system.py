@@ -60,15 +60,18 @@ try:
     v9_short_items.sort(key=lambda d: (d.get("code") not in _top4_set, -d["score"]))
     SHORT_POOL_NOTE = _sel_meta.get("note", "")
     # 2026-09-02 KHunter 今日统计徽章（主信号/信号观察/卖出数——0 只主信号时前端仍有迹可循）
+    # ⚠ 2026-09-03 双版本部署：A55 主卖出 + C50 参考卖出 并行展示（ver 字段来自 sel_meta.khunter）
     _kh_meta = (_sel_meta.get("khunter") or {})
+    _kh_ver = _kh_meta.get("ver") or {}
     _kh_note = ""
     if _kh_meta.get("sig"):
-        _kh_str = f'{_kh_meta.get("buy_n", 0)} 只主信号 · {_kh_meta.get("watch_n", 0)} 只信号观察 · {len(_kh_meta.get("sell", []))} 只卖出(RSI&gt;75)'
+        _kh_str = (f'{_kh_meta.get("buy_n", 0)} 只主信号 · {_kh_meta.get("watch_n", 0)} 只观察 · '
+                   f'卖出 A{_kh_ver.get("sell_a", 55)} {len(_kh_meta.get("sell", []))}/C{_kh_ver.get("sell_c", 50)} {len(_kh_meta.get("sell_c", []))}')
     else:
         _kh_str = "信号层未启用"
     SHORT_KHUNTER_BADGE = (f'<span class="badge" style="background:rgba(37,99,235,.14);color:#60a5fa;" '
-                           f'title="KHunter 15 策略命中 + 信号日 RSI&lt;35 超卖 = 主信号（事件独立，有信号即买）；'
-                           f'信号观察 = 已命中但 RSI≥35 未触发；卖出 = RSI&gt;75 独立信号">'
+                           f'title="KHunter 15 策略命中 + 信号日 RSI&lt;35 + 收盘≥{_kh_ver.get("low", 3)}元 = 主信号（事件独立，有信号即买）；'
+                           f'信号观察 = 已命中但 RSI≥35 未触发；卖出 = A 版 RSI&gt;{_kh_ver.get("sell_a", 55)} 主信号 / C 版 RSI&gt;{_kh_ver.get("sell_c", 50)} 参考（2026-09-03 双版本部署）">'
                            f'KHunter 今日: {_kh_str}</span>')
     SHORT_POOL_ASOF = SHORT_POOL.get("as_of", "—")
     _mg = SHORT_POOL.get("market_gate") or {}
@@ -331,11 +334,37 @@ for g, label, v9f, _sf in _STK_GROUPS:
 # 短线分层 summary（8/31 审计：旧 shortsplit_* 含未来函数作废；修正引擎无分层口径）
 # 2026-09-02 晚修复：旧战法（反转打分）已全量弃用 → 分层「已下架」占位卡下线，
 # 改接生产主信号 = KHunter 15 信号 + RSI<35 择时 的全窗口回测（主板限定 · S1B_BOARD=main）
-# 数据源：backtest/khunter_timing_out/fusion_s1b_bear_main_allwindow.csv
-#   取 ob=75/osl=35/gate=none（无门控 = 熊市豁免生产口径）· 四闸 PASS
-#   n=653 · wr 62.5% · 中位 +5.82% · 均值 +3.04% · 超额(中位基准) +9.77%
+# 2026-09-03 生产切换（用户拍板「直接切换，两版部署」）：主源 = 9 格网格 khunter_three_ver_opt_20260903.csv
+#   A_x3（ob55+low3）= 生产主卖出配置；C_x3（ob50+low3）= 并行参考配置；B_x3（30%止损）已否决
+#   旧源 fusion_s1b_bear_main_allwindow.csv（ob75/osl35）仅作文件缺失回退
+def _load_kh_prod():
+    """读生产双版本回测（9 格网格 CSV），返回 (A_dict, C_dict|None) 或 (None, None)"""
+    import pandas as pd
+    f = BASE / "backtest" / "khunter_timing_out" / "khunter_three_ver_opt_20260903.csv"
+    if not f.exists():
+        return None, None
+    try:
+        df = pd.read_csv(f)
+    except Exception:
+        return None, None
+    def _pick(tag):
+        row = df[df["cfg"] == tag]
+        if row.empty:
+            return None
+        r = row.iloc[0]
+        def _g(c):
+            v = r[c]
+            return float(v) if pd.notna(v) else None
+        return {"n": int(r["n"]), "wr": float(r["wr"]), "med": float(r["med"]),
+                "mean": float(r["mean"]), "ex_m": float(r["ex_m"]),
+                "sharpe": float(r["sharpe_trade"]), "pf": float(r["pf"]), "hold": float(r["hold"]),
+                "pool_ann": _g("pool_ann"), "pool_mdd": _g("pool_mdd"),
+                "pool_sharpe": _g("pool_sharpe"), "pool_final": _g("pool_final"),
+                "y2023": _g("y2023"), "y2024": _g("y2024")}
+    return _pick("A_x3"), _pick("C_x3")
+
 def _load_kh_bt():
-    """读 KHunter 主信号全窗口回测（ob75/osl35/gate none/breadth 0），返回 dict 或 None"""
+    """回退源：KHunter 全窗口回测（旧 ob75/osl35/gate none/breadth 0）"""
     import pandas as pd
     f = BASE / "backtest" / "khunter_timing_out" / "fusion_s1b_bear_main_allwindow.csv"
     if not f.exists():
@@ -357,7 +386,12 @@ def _load_kh_bt():
     except Exception:
         return None
 
-KH_BT = _load_kh_bt()
+_KH_A, _KH_C = _load_kh_prod()
+_KH_LEGACY = _KH_A is None
+if _KH_A is None:
+    _KH_A = _load_kh_bt()
+KH_BT = _KH_A
+KH_BT_C = _KH_C
 
 ss_stk = {}
 ss_stk_tag = {}
@@ -367,13 +401,17 @@ for g, label, _v9f, _sf in _STK_GROUPS:
         ss_stk[g] = json.loads(json.dumps(ss_stock))
         ss_stk_tag[g] = ss_stock_tag + " · 旧战法已弃用(8/31审计)"
     elif g == "main":
-        # 纯主板：生产主信号 = KHunter 全窗口回测（用户唯一可买主板）
+        # 纯主板：生产主信号 = KHunter（2026-09-03 起 A 版 ob55+低价3元；用户唯一可买主板）
         ss_stk[g] = KH_BT if KH_BT else {}
-        ss_stk_tag[g] = "KHunter 主信号 · 全窗口(牛熊) · 无门控" if KH_BT else f"{label} · 暂无回测"
+        ss_stk_tag[g] = ("KHunter A 版主卖出 RSI>55 · 低价≥3元 · 全窗口" if not _KH_LEGACY
+                         else ("KHunter 主信号 · 全窗口(牛熊) · 无门控" if KH_BT else f"{label} · 暂无回测"))
     else:
         # 创业板/科创板：用户仅主板可买，KHunter 仅主板回测 → 明确说明卡
         ss_stk[g] = {}
         ss_stk_tag[g] = f"{label} · 用户仅主板可买 · KHunter 未回测"
+# C 版参考卡（9 格网格存在时）
+ss_stk["main_c"] = KH_BT_C if KH_BT_C else {}
+ss_stk_tag["main_c"] = "KHunter C 版参考卖出 RSI>50 · 低价≥3元 · 双版本并行" if KH_BT_C else ""
 
 
 def bt_card(cid, title, tag, s, curve_id, color="#f59e0b", sub="2016-01~2026-08"):
@@ -409,9 +447,11 @@ def bt_all_html():
 
 
 def bt_short_html():
-    """短线回测参考 5 卡
+    """短线回测参考 5+1 卡
     2026-09-02 晚修复：旧战法弃用 → 纯主板卡改接 KHunter 主信号回测（全窗口无门控 · 四闸 PASS）；
-    一体卡=旧战法修正版 -41.67%（标注弃用）；创业板/科创板=用户不可买，明确说明卡"""
+    一体卡=旧战法修正版 -41.67%（标注弃用）；创业板/科创板=用户不可买，明确说明卡
+    2026-09-03 生产切换：纯主板卡= A 版 ob55+低价3元（主卖出）+ C 版 ob50（参考卖出）双卡（资金池口径含回撤）；
+    B 版(30%止损)已否决不入卡"""
     def _card(cid, title, tag, s, curve_id, color="#f59e0b"):
         if not s:
             # 说明卡（创业板/科创板未回测等）
@@ -424,25 +464,39 @@ def bt_short_html():
                     f'<div class="s">主板卡以 KHunter 全窗口回测为准</div></div></div></div>')
         # KHunter 卡是自定义结构（dict 字段与 summary 不同），单独渲染
         if "ex_m" in s:
+            _pool = s.get("pool_mdd") is not None
+            if _pool:
+                _kpi3 = (f'<div class="kpi"><div class="l">资金池(N5) 回撤</div>'
+                         f'<div class="v" style="color:#ef4444">{s["pool_mdd"]:.1f}%</div>'
+                         f'<div class="s">资金池(N5) 年化 {s["pool_ann"]:+.2f}% · 夏普 {s["pool_sharpe"]:.2f}</div></div>')
+                _kpi2s = f'2024 灾年 {s["y2024"]:+.2f}%' if s.get("y2024") is not None else f'均值 {s["mean"]:+.2f}%'
+            else:
+                _kpi3 = (f'<div class="kpi"><div class="l">超额(中位基准)</div>'
+                         f'<div class="v" style="color:var(--up)">{s["ex_m"]:+.2f}%</div>'
+                         f'<div class="s">夏普 {s["sharpe"]:.2f} · PF {s["pf"]:.2f} · 持有 {s["hold"]:.0f} 天</div></div>')
+                _kpi2s = f'均值 {s["mean"]:+.2f}%'
             return (f'<div class="bt-card" id="{cid}">'
                     f'<div class="bt-head"><b>{title}</b><span class="bt-tag">{tag}</span></div>'
                     f'<div class="kpis">'
-                    f'<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:var(--up)">{s["med"]:+.1f}%</div><div class="s">中位数口径 · n={s["n"]}</div></div>'
-                    f'<div class="kpi"><div class="l">胜率</div><div class="v">{s["wr"]:.1f}%</div><div class="s">均值 {s["mean"]:+.2f}%</div></div>'
-                    f'<div class="kpi"><div class="l">超额(中位基准)</div><div class="v" style="color:var(--up)">{s["ex_m"]:+.2f}%</div><div class="s">夏普 {s["sharpe"]:.2f} · PF {s["pf"]:.2f} · 持有 {s["hold"]:.0f} 天</div></div>'
+                    f'<div class="kpi"><div class="l">交易口径 中位</div><div class="v" style="color:var(--up)">{s["med"]:+.1f}%</div><div class="s">n={s["n"]} · 均值 {s["mean"]:+.2f}%</div></div>'
+                    f'<div class="kpi"><div class="l">胜率</div><div class="v">{s["wr"]:.1f}%</div><div class="s">{_kpi2s}</div></div>'
+                    f'{_kpi3}'
                     f'</div></div>')
         return bt_card(cid, title, tag, s, curve_id, color=color)
+    _c_cards = (f'{_card("bt-short-stock-main-c", "📈 短线 纯主板 · C 版(OB50 参考)", ss_stk_tag["main_c"], ss_stk["main_c"], "curve-short-stock-main-c", color="#7c3aed")}'
+                if KH_BT_C else "")
     cards = "".join([
         _card("bt-short-stock-all", "📈 短线 股票 一体", ss_stk_tag["all"], ss_stk["all"], "curve-short-stock-all"),
-        _card("bt-short-stock-main", "📈 短线 纯主板（KHunter 主信号）", ss_stk_tag["main"], ss_stk["main"], "curve-short-stock-main", color="#ea580c"),
+        _card("bt-short-stock-main", "📈 短线 纯主板 · A 版(主卖出 RSI>55)", ss_stk_tag["main"], ss_stk["main"], "curve-short-stock-main", color="#ea580c"),
+        _c_cards,
         _card("bt-short-stock-gem", "📈 短线 纯创业板", ss_stk_tag["gem"], ss_stk["gem"], "curve-short-stock-gem"),
         _card("bt-short-stock-star", "📈 短线 纯科创板", ss_stk_tag["star"], ss_stk["star"], "curve-short-stock-star"),
         bt_card("bt-short-fund", "🔵 短线 基金", ss_fund_tag, ss_fund, "curve-short-fund", color="#3b82f6"),
     ])
     return ('<div class="card" id="bt-short">\n'
-            '<h2>⚡ 短线回测参考 <span class="badge badge-auto">生产主信号=KHunter · 修正引擎 T+1 · 2026-09-02 口径</span></h2>\n'
-            '<div class="sub">📊 <b>生产主信号（纯主板）</b> = KHunter 15 策略信号 + RSI&lt;35 超卖择时（全窗口·牛熊均开仓·无门控）——回测 ob75/osl35/none：<b>n=653 · 胜率 62.5% · 中位 +5.82% · 超额(中位基准) +9.77%</b>，四闸 PASS；卖出信号 RSI&gt;75 独立触发。与旧战法（反转打分）完全独立，旧战法已全量弃用</div>\n'
-            '<div class="sub" style="color:var(--sub)">💧 <b>口径说明</b>：一体=旧战法修正版 T+1（<b>-41.67%</b>，8/31 审计后唯一可信，仅作对照）；创业板/科创板=用户仅可买主板，KHunter 未按两板回测（说明卡）。买卖均为 T 日收盘确认 → T+1 开盘执行</div>\n'
+            '<h2>⚡ 短线回测参考 <span class="badge badge-auto">生产主信号=KHunter · 修正引擎 T+1 · 2026-09-03 双版本(A55/C50)+低价≥3元</span></h2>\n'
+            '<div class="sub">📊 <b>生产主信号（纯主板）</b> = KHunter 15 策略信号 + RSI&lt;35 超卖 + 收盘≥3元（全窗口·牛熊均开仓·无门控）——2026-09-03 切换：<b>A 版</b>（卖出 RSI&gt;55）n=408 · 胜率 65.9% · 交易中位 +2.58% · 资金池(N5) 年化 5.54%/回撤 19.90%；<b>C 版</b>（卖出 RSI&gt;50 参考）n=408 · 胜率 63.5% · 交易年化 81.4%（短持有高周转）· 资金池(N5) 年化 4.98%/回撤 19.45%；两版买入规则相同，模拟盘 A/C 双轨前向对决后定稿；B 版(30%止损)三档全灭已剔除。与旧战法（反转打分）完全独立，旧战法已全量弃用</div>\n'
+            '<div class="sub" style="color:var(--sub)">💧 <b>口径说明</b>：一体=旧战法修正版 T+1（<b>-41.67%</b>，8/31 审计后唯一可信，仅作对照）；创业板/科创板=用户仅可买主板，KHunter 未按两板回测（说明卡）。买卖均为 T 日收盘确认 → T+1 开盘执行；回撤=资金池固定 5 仓等权 NAV（非串行上界，串行 mdd 60-85% 仅供悲观参考）</div>\n'
             '<div class="sub" style="color:#7c3aed">🧪 <b>9/1 熊市三策略吸收验证（用户框架规则化 · 修正引擎 T+1）</b>：S1 超跌反弹单笔 +0.48%/胜率 52.6% 但<b>几何均值 -1.73%</b>、S3 右侧追涨单笔 +2.79%/胜率 69.2% 但<b>组合复利 -92.9%</b>、S2 抗跌强势负期望 —— <b>三策略全部 FAIL 组合级四闸</b>。结论：<b>熊市入场过滤救不了逆势，唯一可行=熊市空仓/极端轻仓</b>（例外：KHunter 主信号自身承担风险过滤，熊市开仓全窗口实测过闸）</div>\n'
             '<div class="bt-grid">' + cards + '</div>\n</div>')
 perm_stat = ''   # 2026-08-21 固定池已去除
