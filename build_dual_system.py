@@ -58,6 +58,9 @@ try:
     _sel_meta = SHORT_POOL.get("sel_meta") or {}
     _top4_set = set(_sel_meta.get("top4", []))
     v9_short_items.sort(key=lambda d: (d.get("code") not in _top4_set, -d["score"]))
+    # 2026-09-03 用户需求：短线池股票/基金分板块展示（基金 board=「基金」，股票=主板/创业板/科创板）
+    v9_short_stock = [d for d in v9_short_items if d.get("board") != "基金"]
+    v9_short_fund = [d for d in v9_short_items if d.get("board") == "基金"]
     SHORT_POOL_NOTE = _sel_meta.get("note", "")
     # 2026-09-02 KHunter 今日统计徽章（主信号/信号观察/卖出数——0 只主信号时前端仍有迹可循）
     # ⚠ 2026-09-03 双版本部署：A55 主卖出 + C50 参考卖出 并行展示（ver 字段来自 sel_meta.khunter）
@@ -90,6 +93,8 @@ try:
 except Exception as _e:
     print("short_pool 加载失败:", _e)
     v9_short_items = []
+    v9_short_stock = []
+    v9_short_fund = []
     SHORT_POOL_ASOF = "—"
     SHORT_POOL_INTRADAY = ""
     SHORT_POOL_ASOF_MIN = "15:00"
@@ -740,7 +745,7 @@ def a5_view_html():
 </div>
 </div>'''
 
-def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extra_stat=None, extra_card="", score_sub="趋势/动量/量能/超买/风控", as_of=None, intraday_note=None, as_of_min=None, tier_opts=None, tier_add=None, tier_watch=None, tier_cut=None, head_tags=None, head_note=""):
+def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extra_stat=None, extra_card="", score_sub="趋势/动量/量能/超买/风控", as_of=None, intraday_note=None, as_of_min=None, tier_opts=None, tier_add=None, tier_watch=None, tier_cut=None, head_tags=None, head_note="", inline=False):
     """每个系统的完整区块：系统头（标题+说明）+ 操作统计条 + 汇总表 + 详情卡片
     回测参考统一放总览视图，这里只保留监控主体。extra_card=视图末尾追加卡片（如持仓跟踪）
     as_of / intraday_note / as_of_min：三池数据更新时间徽章（2026-08-17 升级：精确到分钟，
@@ -748,7 +753,8 @@ def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extr
     head_tags：标题下方的标签行（徽章 HTML 列表，门控徽章放第一位）；head_note：标签行下说明文字
     （2026-08-21：标题与更新时间一左一右，指标/门控标签独立一行，不再堆进 h2）
     tier_opts/tier_add/tier_watch/tier_cut：档位筛选与统计条口径（短线池=强买入/买入/不买，
-    与中长线池不同，2026-08-17 修复）"""
+    与中长线池不同，2026-08-17 修复）
+    inline=True：不包 .view 外壳（2026-09-03 短线股票/基金分板块：同视图内叠两个系统块）"""
     tier_opts = tier_opts or ["满仓加仓", "轻仓加仓", "观望", "减至半仓", "清仓"]
     tier_add = tier_add or ("满仓加仓", "轻仓加仓")
     tier_watch = tier_watch or ("观望",)
@@ -773,8 +779,7 @@ def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extr
         _head_extra += f'<div class="sys-head-tags">{_tags_html}</div>'
     if head_note:
         _head_extra += f'<div class="sys-head-note">{head_note}</div>'
-    return f'''<div class="view" id="{vid}">
-<div class="card" id="{sid}">
+    _body = f'''<div class="card" id="{sid}">
 <div class="sys-head">
 <div class="sys-head-top">
 <h2>{title} <span class="view-badge {badge}">{sub}</span></h2>
@@ -810,7 +815,11 @@ def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extr
 <div class="sub">六角雷达 = 趋势/动能/量能/超买/风控/研报 六类打分 · 与上方表格搜索/筛选/排序联动</div>
 <div class="stock-cards" id="{tbl_id}-cards">{cards_html_for(items)}</div>
 </div>
-{extra_card}
+{extra_card}'''
+    if inline:
+        return _body
+    return f'''<div class="view" id="{vid}">
+{_body}
 </div>'''
 
 
@@ -988,6 +997,38 @@ if _cf.exists():
                       f'<div class="rel-body">{md_to_html(_body)}</div></details>')
     CHANGELOG_HTML = "\n".join(_cards)
 
+# ════ 视图 C 内容：短线 股票池 / 基金池 分板块（2026-09-03 用户需求）════
+# 股票池含 A/C 双版本（入场同信号，A55 主卖出 + C50 参考标注）；基金池=场外基金动量；
+# 跟踪池统一放底部（股票+基金同一 watch 卡，类型筛选），不做 A/C 双跟踪池（A/C 卖出判定归模拟盘双轨）
+SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
+{system_block(
+  "view-short-stk", "sys-short-stk",
+  "⚡ 短线 · 股票池", "auto", "主板 KHunter 主信号 · A55 主卖出 / C50 参考 · 低价≥3元",
+  v9_short_stock, "tbl-short-stk", "card-short-stk",
+  "信号池 = 回测买入清单：KHunter 15 策略信号 + 信号日 RSI<35 超卖 + 收盘≥3元（主板限定·事件独立·有信号即买）· 卖出 = <b>逐股独立</b>：持仓股自身 RSI 确认日 &gt; A55 阈值 → T+1 开盘卖（C50 为参考线，标注但<i>不执行</i>，A/C 判定归模拟盘双轨）· 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：不追高，可等盘中回落至 3% 以内再考虑买入（9:30 盘中起生效）</b>",
+  extra_card="", score_sub="动量/量价/通道/波动",
+  head_tags=[SHORT_POOL_GATE, SHORT_KHUNTER_BADGE,
+             '<span class="badge badge-auto">股票 = KHunter 15 策略信号 + RSI<35 超卖（主板限定 · 弃用旧战法）</span>',
+             '<span class="badge badge-auto">KHunter 信号密集期每日可能有几只，稀疏期 0 只属正常（事件驱动）</span>'],
+  head_note=f"<b>🎯 KHunter 主信号（蓝标）= 主板 15 策略信号命中 + 信号日 RSI&lt;35 超卖 + 收盘≥3元</b>（2026-09-03 生产切换 v5.13.0：A 版卖出 RSI&gt;55 主执行 / C 版 RSI&gt;50 参考展示；入场两版相同）· 回测：A+low3 n=408 资金池(N5)年化 5.54%/回撤 19.90%/夏普 0.372，C+low3 4.98%/19.45%/0.352（每笔口径 C 更锐：81.4%/1.430）· <b>旧战法（反转分）已全量弃用</b>（主板 -35.65% / 全市场 -41.67% 均负期望，不再展示）· 市况门控仅提醒：沪深300 &gt; MA20 才开新仓；门控关闭时 <b>KHunter 主信号豁免照常可买</b>，其余股票参考不追高；卖出逐股独立走「全量池短线跟踪」· 回测参考见「监控总览」",
+  as_of=SHORT_POOL_ASOF, intraday_note=SHORT_POOL_INTRADAY,
+  as_of_min=SHORT_POOL.get("intraday_ts") or SHORT_POOL_ASOF_MIN,
+  tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=(), inline=True)}
+{system_block(
+  "view-short-fund", "sys-short-fund",
+  "🔵 短线 · 基金池", "auto", "场外基金动量（分≥50 才入池）",
+  v9_short_fund, "tbl-short-fund", "card-short-fund",
+  "基金池 = 场外基金动量选股（与股票完全独立，资产类别不同）· 现价 = T-1 净值（场外基金净值次日公布）· 基金买入按短线分（≥50）· 与股票池分开展示（2026-09-03 起）",
+  extra_card="", score_sub="动量/趋势",
+  head_tags=['<span class="badge badge-auto">🔵 场外基金动量（分≥50）</span>',
+             '<span class="badge badge-auto">现价 = T-1 净值 · 次日公布</span>'],
+  head_note="基金池与股票池（KHunter 主板信号）完全独立：基金=净值动量轮动，股票=KHunter 事件信号；档位口径同为短线买入口径（强买入/买入）",
+  as_of=SHORT_POOL.get("fund_as_of", SHORT_POOL_ASOF), intraday_note="",
+  as_of_min="20:00",
+  tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=(), inline=True)}
+{WATCH_CARD}
+</div>'''
+
 html = f"""<!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1143,21 +1184,8 @@ html = f"""<!doctype html>
   as_of=DATA["meta"].get("as_of", "—"), intraday_note=DATA["meta"].get("intraday"),
   as_of_min=DATA["meta"].get("intraday_ts") or DATA["meta"].get("as_of_min"))}
 
-<!-- ============ 视图 C：全量池短线（与中长线同结构：统计条+表格+雷达卡） ============ -->
-{system_block(
-  "view-short", "sys-short",
-  "⚡ 全量池短线", "auto", "全市场短线信号 Top 池",
-  v9_short_items, "tbl-short", "card-tbl-short",
-  "信号池 = 回测买入清单：KHunter 15 策略信号+RSI<35 超卖（主板限定）所有命中即买入（事件独立）· 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览 · 基金行现价为 T-1 净值（场外基金净值次日公布）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：不追高，可等盘中回落至 3% 以内再考虑买入（9:30 盘中起生效）</b>",
-  extra_card=WATCH_CARD, score_sub="动量/量价/通道/波动",
-  head_tags=[SHORT_POOL_GATE, SHORT_KHUNTER_BADGE,
-             '<span class="badge badge-auto">股票 = KHunter 15 策略信号 + RSI<35 超卖（主板限定 · 弃用旧战法）</span>',
-             '<span class="badge badge-auto">基金 = 动量（分≥50 才入池）</span>',
-             '<span class="badge badge-auto">KHunter 信号密集期每日可能有几只，稀疏期 0 只属正常（事件驱动）</span>'],
-  head_note=f"<b>🎯 KHunter 主信号（蓝标）= 主板 15 策略信号命中 + 信号日 RSI&lt;35 超卖</b>（回测全窗口 ob75/osl35：n=653 wr 62.5% med +5.82% ex_m +9.77%，四闸 PASS；事件独立·有信号即买）｜ <b>旧战法（反转分）已全量弃用</b>（主板 -35.65% / 全市场 -41.67% 均负期望，不再展示）· 卖出信号 = RSI&gt;75 超卖（独立于选股信号，持仓股触发提示）· 市况门控仅提醒：沪深300 &gt; MA20 才开新仓；门控关闭时 <b>KHunter 主信号豁免照常可买</b>（回测全窗口证据：熊市开仓四闸过），其余股票参考不追高；持仓卖出信号走「全量池短线跟踪」 · 回测参考见「监控总览」· 备注：{SHORT_POOL_NOTE}",
-  as_of=SHORT_POOL_ASOF, intraday_note=SHORT_POOL_INTRADAY,
-  as_of_min=SHORT_POOL.get("intraday_ts") or SHORT_POOL_ASOF_MIN,
-  tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=())}
+<!-- ============ 视图 C：全量池短线（2026-09-03 起 股票池 / 基金池 分板块展示） ============ -->
+{SHORT_VIEW_HTML}
 
 <!-- ============ 视图 D：打板实验（第三个系统，A5_tp8t2 模拟盘 + A2_tp3 回避清单） ============ -->
 {a5_view_html()}
@@ -1222,7 +1250,7 @@ html = f"""<!doctype html>
 window.ENH.nav = [
   ["overview","📊","监控总览",[["overview","总览统计"],["mkt-weather","市场晴雨表"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
   ["sys-auto","🅰️","全量池中/长线",[["card-tbl-v9","标的汇总表"],["card-tbl-v9-detail","逐标的详情"],["watch-v9-card","中长线跟踪"]]],
-  ["short","⚡","全量池短线",[["card-tbl-short","标的汇总表"],["watch-card","短线跟踪"],["card-tbl-short-detail","逐标的详情"]]],
+  ["short","⚡","全量池短线",[["card-short-stk","📋 股票池 汇总表"],["card-short-stk-detail","🔍 股票池 逐标的详情"],["card-short-fund","📋 基金池 汇总表"],["card-short-fund-detail","🔍 基金池 逐标的详情"],["watch-card","📌 短线跟踪"]]],
   ["a5","🎯","打板实验",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
   ["comment","💬","评论区",[]]
 ];
@@ -1580,7 +1608,8 @@ document.addEventListener('DOMContentLoaded',function(){{
         var pm=document.querySelector('#sidenav a[data-anchor="'+t+'"]:not([data-sub])');
         if(pm)pm.classList.add('active');}}}});}});
   initTable('tbl-v9', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});
-  initTable('tbl-short', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});
+  initTable('tbl-short-stk', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});
+  initTable('tbl-short-fund', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});
   /* A5 打板实验四表：与 v9/短线池同标准——表头排序 + 搜索 + 板块/行业筛选（2026-08-28） */
   initTable('a5-wl', {{columns: {{code:0, name:1, board:2, sbdate:3, relpos:4, amt:5, chg:6, ret1y:7, rsi:8, vr:9, ma5dev:10}}}});
   initTable('a5-av', {{columns: {{code:0, name:1, board:2, sbdate:3, gap:4, relpos:5, amt:6, chg:7, ret1y:8, rsi:9, vr:10, ma5dev:11}}}});
@@ -1604,7 +1633,7 @@ document.addEventListener('DOMContentLoaded',function(){{
     if(ind)ind.addEventListener('change',applyA5);
   }});
   /* 统一联动：搜索 + 板块/行业/档位筛选 → 表格行 + 详情卡片同步；排序后卡片重排 */
-  ['tbl-v9','tbl-short'].forEach(function(id){{
+  ['tbl-v9','tbl-short-stk','tbl-short-fund'].forEach(function(id){{
     var q=document.getElementById(id+'-q'), mk=document.getElementById(id+'-mk');
     var ind=document.getElementById(id+'-ind'), tier=document.getElementById(id+'-tier');
     var buyonly=document.getElementById(id+'-buyonly');

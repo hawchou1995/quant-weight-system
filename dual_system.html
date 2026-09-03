@@ -2,7 +2,7 @@
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2016'%3E%3Crect%20width='16'%20height='16'%20rx='3'%20fill='%232563eb'/%3E%3Cpath%20d='M3%2012V8h2v4zM6%2012V4h2v8zM9%2012V6h2v6zM12%2012V2h2v10z'%20fill='%23fff'/%3E%3C/svg%3E">
-<title>标的监控看板（数据截至 2026-09-03 · 构建 2026-09-03 12:51）</title>
+<title>标的监控看板（数据截至 2026-09-03 · 构建 2026-09-03 13:23）</title>
 <style>
 :root{
   --bg:#f3f4f6; --card:#ffffff; --card2:#f9fafb; --border:#e5e7eb; --line:#f0f1f3;
@@ -1950,15 +1950,56 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 </div>
 
-<!-- ============ 视图 C：全量池短线（与中长线同结构：统计条+表格+雷达卡） ============ -->
+<!-- ============ 视图 C：全量池短线（2026-09-03 起 股票池 / 基金池 分板块展示） ============ -->
 <div class="view" id="view-short">
-<div class="card" id="sys-short">
+<div class="card" id="sys-short-stk">
 <div class="sys-head">
 <div class="sys-head-top">
-<h2>⚡ 全量池短线 <span class="view-badge auto">全市场短线信号 Top 池</span></h2>
+<h2>⚡ 短线 · 股票池 <span class="view-badge auto">主板 KHunter 主信号 · A55 主卖出 / C50 参考 · 低价≥3元</span></h2>
 <span class="view-badge auto" title="收盘数据">数据截至 2026-09-02 15:00 · 收盘</span>
 </div>
-<div class="sys-head-tags"><span class="badge badge-auto" style="background:#d97706;color:#fff">市况门控 ⚠ 关 · 仅提醒（沪深300 4547.96 &lt; MA20 4637.24；KHunter 主信号豁免·照常可买，其余仅参考）</span><span class="badge" style="background:rgba(37,99,235,.14);color:#60a5fa;" title="KHunter 15 策略命中 + 信号日 RSI&lt;35 + 收盘≥3.0元 = 主信号（事件独立，有信号即买）；信号观察 = 已命中但 RSI≥35 未触发；卖出 = A 版 RSI&gt;55 主信号 / C 版 RSI&gt;50 参考（2026-09-03 双版本部署）">KHunter 今日: 0 只主信号 · 92 只观察 · 卖出 A55 1041/C50 1388</span><span class="badge badge-auto">股票 = KHunter 15 策略信号 + RSI<35 超卖（主板限定 · 弃用旧战法）</span><span class="badge badge-auto">基金 = 动量（分≥50 才入池）</span><span class="badge badge-auto">KHunter 信号密集期每日可能有几只，稀疏期 0 只属正常（事件驱动）</span></div><div class="sys-head-note"><b>🎯 KHunter 主信号（蓝标）= 主板 15 策略信号命中 + 信号日 RSI&lt;35 超卖</b>（回测全窗口 ob75/osl35：n=653 wr 62.5% med +5.82% ex_m +9.77%，四闸 PASS；事件独立·有信号即买）｜ <b>旧战法（反转分）已全量弃用</b>（主板 -35.65% / 全市场 -41.67% 均负期望，不再展示）· 卖出信号 = RSI&gt;75 超卖（独立于选股信号，持仓股触发提示）· 市况门控仅提醒：沪深300 &gt; MA20 才开新仓；门控关闭时 <b>KHunter 主信号豁免照常可买</b>（回测全窗口证据：熊市开仓四闸过），其余股票参考不追高；持仓卖出信号走「全量池短线跟踪」 · 回测参考见「监控总览」· 备注：主信号=KHunter 15 策略信号+信号日RSI<35（主板限定，事件独立·有信号即买）；旧战法反转分已全量弃用（负期望：主板 -35.65%/全市场 -41.67%），不再展示</div>
+<div class="sys-head-tags"><span class="badge badge-auto" style="background:#d97706;color:#fff">市况门控 ⚠ 关 · 仅提醒（沪深300 4547.96 &lt; MA20 4637.24；KHunter 主信号豁免·照常可买，其余仅参考）</span><span class="badge" style="background:rgba(37,99,235,.14);color:#60a5fa;" title="KHunter 15 策略命中 + 信号日 RSI&lt;35 + 收盘≥3.0元 = 主信号（事件独立，有信号即买）；信号观察 = 已命中但 RSI≥35 未触发；卖出 = A 版 RSI&gt;55 主信号 / C 版 RSI&gt;50 参考（2026-09-03 双版本部署）">KHunter 今日: 0 只主信号 · 92 只观察 · 卖出 A55 1041/C50 1388</span><span class="badge badge-auto">股票 = KHunter 15 策略信号 + RSI<35 超卖（主板限定 · 弃用旧战法）</span><span class="badge badge-auto">KHunter 信号密集期每日可能有几只，稀疏期 0 只属正常（事件驱动）</span></div><div class="sys-head-note"><b>🎯 KHunter 主信号（蓝标）= 主板 15 策略信号命中 + 信号日 RSI&lt;35 超卖 + 收盘≥3元</b>（2026-09-03 生产切换 v5.13.0：A 版卖出 RSI&gt;55 主执行 / C 版 RSI&gt;50 参考展示；入场两版相同）· 回测：A+low3 n=408 资金池(N5)年化 5.54%/回撤 19.90%/夏普 0.372，C+low3 4.98%/19.45%/0.352（每笔口径 C 更锐：81.4%/1.430）· <b>旧战法（反转分）已全量弃用</b>（主板 -35.65% / 全市场 -41.67% 均负期望，不再展示）· 市况门控仅提醒：沪深300 &gt; MA20 才开新仓；门控关闭时 <b>KHunter 主信号豁免照常可买</b>，其余股票参考不追高；卖出逐股独立走「全量池短线跟踪」· 回测参考见「监控总览」</div>
+</div>
+<div class="op-stats">
+<span class="op op-add">🟢 加仓区 <b>0</b> 只</span>
+<span class="op op-watch">🟡 观望 <b>0</b> 只</span>
+<span class="op op-cut">🔴 减/清仓区 <b>0</b> 只</span>
+</div>
+</div>
+<div class="card" id="card-short-stk">
+<h2>📋 标的汇总表 <span class="badge auto">0 行</span></h2>
+<div class="sub">今日信号：加仓区 0 ｜ 减/清仓区 0 · 搜索/筛选/排序联动下方详情卡片 · 表头点击排序</div>
+<div class="toolbar">
+<input type="text" id="tbl-short-stk-q" placeholder="🔍 搜索名称 / 代码 / 行业…">
+<select id="tbl-short-stk-mk" class="flt" title="板块筛选"><option value="">全部板块</option></select>
+<select id="tbl-short-stk-ind" class="flt" title="行业筛选"><option value="">全部行业</option></select>
+<select id="tbl-short-stk-tier" class="flt" title="档位筛选"><option value="">全部档位</option><option>强买入</option><option>买入</option><option>不买</option></select>
+<span class="count" id="tbl-short-stk-count"></span>
+<button id="tbl-short-stk-buyonly" class="flt" title="只看买入候选（剔除减半/清仓）" style="cursor:pointer;padding:7px 12px">🔍 只看可买信号</button>
+</div>
+<table class="tbl" id="tbl-short-stk">
+<thead><tr>
+<th data-key="rank" style="text-align:center">#</th><th data-key="name">标的</th><th data-key="board">板块</th><th data-key="industry">行业</th><th data-key="px" style="text-align:right">现价</th>
+<th data-key="chg" style="text-align:right">涨跌幅</th><th data-key="ret1y" style="text-align:right">近一年</th><th data-key="score" style="text-align:center">权重分<div class="th-sub">动量/量价/通道/波动</div></th><th data-key="rsi" style="text-align:center">RSI</th><th data-key="vp" style="text-align:center">量能</th>
+<th data-key="conf" style="text-align:center">置信度</th><th data-key="tier" style="text-align:center">档位</th><th data-key="tierchg" style="text-align:center">档位变化</th><th data-key="action" style="text-align:center">建议动作</th>
+</tr></thead>
+<tbody></tbody>
+</table>
+<div class="note">信号池 = 回测买入清单：KHunter 15 策略信号 + 信号日 RSI<35 超卖 + 收盘≥3元（主板限定·事件独立·有信号即买）· 卖出 = <b>逐股独立</b>：持仓股自身 RSI 确认日 &gt; A55 阈值 → T+1 开盘卖（C50 为参考线，标注但<i>不执行</i>，A/C 判定归模拟盘双轨）· 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：不追高，可等盘中回落至 3% 以内再考虑买入（9:30 盘中起生效）</b></div>
+</div>
+<div class="card" id="card-short-stk-detail">
+<h2>🔍 逐标的详情（雷达图） <span class="count" id="tbl-short-stk-cardcount" style="font-size:12px"></span></h2>
+<div class="sub">六角雷达 = 趋势/动能/量能/超买/风控/研报 六类打分 · 与上方表格搜索/筛选/排序联动</div>
+<div class="stock-cards" id="tbl-short-stk-cards"></div>
+</div>
+
+<div class="card" id="sys-short-fund">
+<div class="sys-head">
+<div class="sys-head-top">
+<h2>🔵 短线 · 基金池 <span class="view-badge auto">场外基金动量（分≥50 才入池）</span></h2>
+<span class="view-badge auto" title="收盘数据">数据截至 2026-09-01 20:00 · 收盘</span>
+</div>
+<div class="sys-head-tags"><span class="badge badge-auto">🔵 场外基金动量（分≥50）</span><span class="badge badge-auto">现价 = T-1 净值 · 次日公布</span></div><div class="sys-head-note">基金池与股票池（KHunter 主板信号）完全独立：基金=净值动量轮动，股票=KHunter 事件信号；档位口径同为短线买入口径（强买入/买入）</div>
 </div>
 <div class="op-stats">
 <span class="op op-add">🟢 加仓区 <b>3</b> 只</span>
@@ -1966,21 +2007,21 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <span class="op op-cut">🔴 减/清仓区 <b>0</b> 只</span>
 </div>
 </div>
-<div class="card" id="card-tbl-short">
+<div class="card" id="card-short-fund">
 <h2>📋 标的汇总表 <span class="badge auto">3 行</span></h2>
 <div class="sub">今日信号：加仓区 3 ｜ 减/清仓区 0 · 搜索/筛选/排序联动下方详情卡片 · 表头点击排序</div>
 <div class="toolbar">
-<input type="text" id="tbl-short-q" placeholder="🔍 搜索名称 / 代码 / 行业…">
-<select id="tbl-short-mk" class="flt" title="板块筛选"><option value="">全部板块</option><option>基金</option></select>
-<select id="tbl-short-ind" class="flt" title="行业筛选"><option value="">全部行业</option><option>均衡配置</option><option>海外科技</option><option>海外股票</option></select>
-<select id="tbl-short-tier" class="flt" title="档位筛选"><option value="">全部档位</option><option>强买入</option><option>买入</option><option>不买</option></select>
-<span class="count" id="tbl-short-count"></span>
-<button id="tbl-short-buyonly" class="flt" title="只看买入候选（剔除减半/清仓）" style="cursor:pointer;padding:7px 12px">🔍 只看可买信号</button>
+<input type="text" id="tbl-short-fund-q" placeholder="🔍 搜索名称 / 代码 / 行业…">
+<select id="tbl-short-fund-mk" class="flt" title="板块筛选"><option value="">全部板块</option><option>基金</option></select>
+<select id="tbl-short-fund-ind" class="flt" title="行业筛选"><option value="">全部行业</option><option>均衡配置</option><option>海外科技</option><option>海外股票</option></select>
+<select id="tbl-short-fund-tier" class="flt" title="档位筛选"><option value="">全部档位</option><option>强买入</option><option>买入</option><option>不买</option></select>
+<span class="count" id="tbl-short-fund-count"></span>
+<button id="tbl-short-fund-buyonly" class="flt" title="只看买入候选（剔除减半/清仓）" style="cursor:pointer;padding:7px 12px">🔍 只看可买信号</button>
 </div>
-<table class="tbl" id="tbl-short">
+<table class="tbl" id="tbl-short-fund">
 <thead><tr>
 <th data-key="rank" style="text-align:center">#</th><th data-key="name">标的</th><th data-key="board">板块</th><th data-key="industry">行业</th><th data-key="px" style="text-align:right">现价</th>
-<th data-key="chg" style="text-align:right">涨跌幅</th><th data-key="ret1y" style="text-align:right">近一年</th><th data-key="score" style="text-align:center">权重分<div class="th-sub">动量/量价/通道/波动</div></th><th data-key="rsi" style="text-align:center">RSI</th><th data-key="vp" style="text-align:center">量能</th>
+<th data-key="chg" style="text-align:right">涨跌幅</th><th data-key="ret1y" style="text-align:right">近一年</th><th data-key="score" style="text-align:center">权重分<div class="th-sub">动量/趋势</div></th><th data-key="rsi" style="text-align:center">RSI</th><th data-key="vp" style="text-align:center">量能</th>
 <th data-key="conf" style="text-align:center">置信度</th><th data-key="tier" style="text-align:center">档位</th><th data-key="tierchg" style="text-align:center">档位变化</th><th data-key="action" style="text-align:center">建议动作</th>
 </tr></thead>
 <tbody><tr data-code="003719" data-search="易方达标普医疗保健美元汇A 003719 海外科技 基金" data-board="short" data-market="基金" data-industry="海外科技" data-tier="强买入" data-pick="">
@@ -2027,12 +2068,12 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <td style="text-align:center" data-v="0"><span style="color:var(--faint)">—</span></td>
 <td style="text-align:center;font-size:12px;color:var(--sub)">买入（强信号）</td></tr></tbody>
 </table>
-<div class="note">信号池 = 回测买入清单：KHunter 15 策略信号+RSI<35 超卖（主板限定）所有命中即买入（事件独立）· 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· 板块筛选下拉可选「科创板」单独查看 · 回测参考在监控总览 · 基金行现价为 T-1 净值（场外基金净值次日公布）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：不追高，可等盘中回落至 3% 以内再考虑买入（9:30 盘中起生效）</b></div>
+<div class="note">基金池 = 场外基金动量选股（与股票完全独立，资产类别不同）· 现价 = T-1 净值（场外基金净值次日公布）· 基金买入按短线分（≥50）· 与股票池分开展示（2026-09-03 起）</div>
 </div>
-<div class="card" id="card-tbl-short-detail">
-<h2>🔍 逐标的详情（雷达图） <span class="count" id="tbl-short-cardcount" style="font-size:12px"></span></h2>
+<div class="card" id="card-short-fund-detail">
+<h2>🔍 逐标的详情（雷达图） <span class="count" id="tbl-short-fund-cardcount" style="font-size:12px"></span></h2>
 <div class="sub">六角雷达 = 趋势/动能/量能/超买/风控/研报 六类打分 · 与上方表格搜索/筛选/排序联动</div>
-<div class="stock-cards" id="tbl-short-cards"><div class="stock-card" id="card-003719" data-code="003719" data-search="易方达标普医疗保健美元汇A 003719 海外科技 基金" data-market="基金" data-industry="海外科技" data-tier="强买入" data-pick="">
+<div class="stock-cards" id="tbl-short-fund-cards"><div class="stock-card" id="card-003719" data-code="003719" data-search="易方达标普医疗保健美元汇A 003719 海外科技 基金" data-market="基金" data-industry="海外科技" data-tier="强买入" data-pick="">
 <div class="radar-wrap"><svg viewBox="0 0 120 120" width="120" height="120" style="flex:0 0 auto"><polygon points="60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4" fill="none" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="60.0" y2="16.8" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="97.4" y2="38.4" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="97.4" y2="81.6" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="60.0" y2="103.2" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="22.6" y2="81.6" style="stroke:var(--radar-ring)" stroke-width="1"/><line x1="60.0" y1="60.0" x2="22.6" y2="38.4" style="stroke:var(--radar-ring)" stroke-width="1"/><polygon points="60.0,16.8 93.8,40.5 78.7,70.8 60.0,81.6 29.4,77.6 58.9,59.4" fill="var(--radar-good)" fill-opacity="0.18" stroke="var(--radar-good)" stroke-width="1.5"/><circle cx="60.0" cy="16.8" r="2.5" fill="var(--radar-good)"/><text x="60.0" y="2.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">趋势</text><circle cx="93.8" cy="40.5" r="2.5" fill="var(--radar-good)"/><text x="113.1" y="32.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">动能</text><circle cx="78.7" cy="70.8" r="2.5" fill="var(--radar-good)"/><text x="113.1" y="93.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">量能</text><circle cx="60.0" cy="81.6" r="2.5" fill="var(--radar-good)"/><text x="60.0" y="119.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">超买</text><circle cx="29.4" cy="77.6" r="2.5" fill="var(--radar-good)"/><text x="6.9" y="93.7" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">风控</text><circle cx="58.9" cy="59.4" r="2.5" fill="var(--radar-good)"/><text x="6.9" y="32.3" style="fill:var(--radar-label)" font-size="9" text-anchor="middle" font-weight="600">研报</text><text x="60.0" y="64.0" style="fill:var(--radar-good)" font-size="15" font-weight="700" text-anchor="middle">89</text></svg></div>
 <div class="body">
 <h3>易方达标普医疗保健美元汇A <span class="sub">003719</span> <span class="board-tag">基金</span> <span class="board-tag">海外科技</span></h3>
@@ -2058,6 +2099,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <p class="meta" style="color:var(--faint)">—</p>
 </div></div></div>
 </div>
+
 <div class="card" id="watch-card">
 <h2>📌 全量池短线跟踪 <span class="badge badge-auto">自动 · 保留 30 天</span></h2>
 <div class="sub">上方短线表<b>可买入标的（强买入/买入）</b>上榜次日收盘确认后自动加入跟踪，30 天自动移除（<b>2026-08-18 起新上榜先入「待确认」隔日入池</b>，隔离当日收盘信号）· 卖出规则（与回测一致）：<b>收盘跌破 MA5 → 次日开盘卖出</b> ｜ 掉出信号池 → 下次轮动换出 ｜ 档位减半/清仓 → 按档位操作 · 每次重新上榜刷新【入池/跟踪/出池】时间 · 数据截至 2026-09-02（基金净值 T-1：2026-09-01）</div>
@@ -3187,7 +3229,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 </div>
 
 </div>
-<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-09-03 12:51 · 版本 v5.12.0（+🌦市场晴雨表） · 数据截至 2026-09-03 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 2026-09-03 13:23 · 版本 v5.12.0（+🌦市场晴雨表） · 数据截至 2026-09-03 · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
@@ -3206,7 +3248,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 window.ENH.nav = [
   ["overview","📊","监控总览",[["overview","总览统计"],["mkt-weather","市场晴雨表"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
   ["sys-auto","🅰️","全量池中/长线",[["card-tbl-v9","标的汇总表"],["card-tbl-v9-detail","逐标的详情"],["watch-v9-card","中长线跟踪"]]],
-  ["short","⚡","全量池短线",[["card-tbl-short","标的汇总表"],["watch-card","短线跟踪"],["card-tbl-short-detail","逐标的详情"]]],
+  ["short","⚡","全量池短线",[["card-short-stk","📋 股票池 汇总表"],["card-short-stk-detail","🔍 股票池 逐标的详情"],["card-short-fund","📋 基金池 汇总表"],["card-short-fund-detail","🔍 基金池 逐标的详情"],["watch-card","📌 短线跟踪"]]],
   ["a5","🎯","打板实验",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
   ["comment","💬","评论区",[]]
 ];
@@ -3865,7 +3907,8 @@ document.addEventListener('DOMContentLoaded',function(){
         var pm=document.querySelector('#sidenav a[data-anchor="'+t+'"]:not([data-sub])');
         if(pm)pm.classList.add('active');}});});
   initTable('tbl-v9', {columns: {rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}});
-  initTable('tbl-short', {columns: {rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}});
+  initTable('tbl-short-stk', {columns: {rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}});
+  initTable('tbl-short-fund', {columns: {rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}});
   /* A5 打板实验四表：与 v9/短线池同标准——表头排序 + 搜索 + 板块/行业筛选（2026-08-28） */
   initTable('a5-wl', {columns: {code:0, name:1, board:2, sbdate:3, relpos:4, amt:5, chg:6, ret1y:7, rsi:8, vr:9, ma5dev:10}});
   initTable('a5-av', {columns: {code:0, name:1, board:2, sbdate:3, gap:4, relpos:5, amt:6, chg:7, ret1y:8, rsi:9, vr:10, ma5dev:11}});
@@ -3889,7 +3932,7 @@ document.addEventListener('DOMContentLoaded',function(){
     if(ind)ind.addEventListener('change',applyA5);
   });
   /* 统一联动：搜索 + 板块/行业/档位筛选 → 表格行 + 详情卡片同步；排序后卡片重排 */
-  ['tbl-v9','tbl-short'].forEach(function(id){
+  ['tbl-v9','tbl-short-stk','tbl-short-fund'].forEach(function(id){
     var q=document.getElementById(id+'-q'), mk=document.getElementById(id+'-mk');
     var ind=document.getElementById(id+'-ind'), tier=document.getElementById(id+'-tier');
     var buyonly=document.getElementById(id+'-buyonly');
