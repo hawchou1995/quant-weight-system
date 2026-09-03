@@ -310,7 +310,7 @@ def _khunter_sig(ddf, as_of=None, regime=None):
         return {"hit": hit_now,
                 "rsi_t1": (float(rsi_t1) if not pd.isna(rsi_t1) else None),
                 "rsi_now": (float(rsi_now) if not pd.isna(rsi_now) else None),
-                "sell1": (bool(rsi_now > (KHUNTER_RSI_SELL_BULL if regime == "bull" else KHUNTER_RSI_SELL)) if not pd.isna(rsi_now) else False),
+                "sell1": (bool(rsi_now > (KHUNTER_RSI_SELL_BULL if regime in ("bull", "weak_bull") else KHUNTER_RSI_SELL)) if not pd.isna(rsi_now) else False),
                 "c_sell": (bool(rsi_now > KHUNTER_RSI_SELL_C) if not pd.isna(rsi_now) else False),
                 "hits": hit_names}
     except Exception:

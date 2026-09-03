@@ -150,8 +150,8 @@ def scan_today(idx, today):
         if sig['hit'] and sig['rsi'] is not None and osl is not None and sig['rsi'] < osl:
             if low is None or sig['close'] >= low:
                 buys.append({'code': code, 'rsi': sig['rsi'], 'close': sig['close'], 'regime': 'bear' if bear_t else 'bull'})
-        # 出场分域：熊 rsi>55 / 牛 rsi>75
-        sell_thr = RSI_SELL if bear_t else (RSI_SELL_BULL if bull_t else RSI_SELL)
+        # 出场分域：熊 rsi>55 / 非熊(牛+弱牛回调) rsi>75（与回测 ob_eff = ob_bull if not is_bear 严格对齐）
+        sell_thr = RSI_SELL if bear_t else RSI_SELL_BULL
         if sig['rsi'] is not None and sig['rsi'] > sell_thr:
             sells.append(code)
     return buys, sells, bear_t, bull_t, n_stock
