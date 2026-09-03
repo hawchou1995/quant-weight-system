@@ -509,7 +509,7 @@ def bt_short_html():
 <div class="kpi"><div class="l">组合总收益</div><div class="v" style="color:var(--up)">+68.5%</div><div class="s">n=296 · 胜率 61.2%</div></div>
 <div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">-22.45%</div><div class="s">夏普 0.397 · 均值 +1.90%/笔</div></div>
 <div class="kpi"><div class="l">牛(>MA20)</div><div class="v" style="color:var(--up)">med +3.20%</div><div class="s">n=39 · wr 61.5% · 独立过闸</div></div>
-<div class="kpi"><div class="l">熊(<MA60)</div><div class="v" style="color:var(--up)">med +2.41%</div><div class="s">n=257 · wr 61.1% · 单调增强</div></div>
+<div class="kpi"><div class="l">熊(&lt;MA60)</div><div class="v" style="color:var(--up)">med +2.41%</div><div class="s">n=257 · wr 61.1% · 单调增强</div></div>
 </div></div>''')
     cards = "".join([
         _card("bt-short-stock-all", "📈 短线 股票 一体", ss_stk_tag["all"], ss_stk["all"], "curve-short-stock-all"),
@@ -1748,4 +1748,28 @@ document.addEventListener('DOMContentLoaded',function(){{
 out = BASE / "dual_system.html"
 out.write_text(html, encoding="utf-8")
 print(f"监控看板已生成: {out} ({out.stat().st_size/1024:.0f} KB)")
+
+# --- 防御性 HTML 校验（2026-09-04 新增：防未转义尖括号破坏 DOM）---
+import re as _re
+_bad = []
+for _m in _re.finditer(r'<(?![a-zA-Z/!]|!DOCTYPE|!--)([^>\n]{0,40})', html):
+    _seg = _m.group(0)
+    # HTML 文本中 < 后跟字母/数字但非标签开头（如 <MA60) → 未转义风险）
+    _after = html[_m.start()+1:_m.start()+12]
+    if _after and _after[0].isalnum() and not _re.match(r'^[a-zA-Z][a-zA-Z0-9-]*[\s/>]', _after):
+        _bad.append(f"@{_m.start()}: {_seg!r}")
+if _bad:
+    print(f"⚠ 警告：检测到 {len(_bad)} 处疑似未转义 '<'（可能破坏 HTML 结构）：")
+    for _b in _bad[:10]:
+        print(f"  {_b}")
+else:
+    print("✅ HTML 转义校验通过：无未转义 '<'")
+# 终局 div 平衡粗校验
+_dep = 0
+for _m in _re.finditer(r'<div\b[^>]*>|</div\s*>', html):
+    _dep += -1 if _m.group(0).startswith('</') else 1
+    if _dep < 0:
+        print("⚠ div 深度变负（嵌套错位）！")
+        break
+print(f"✅ div 平衡校验: 终局深度 {_dep}")
 print(f"  普适版表: {len(v9_items)} 行（{ {k:len(v) for k,v in v9_tiers.items()} }） | 中长线跟踪池: {track_v9_len} 只")
