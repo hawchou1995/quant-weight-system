@@ -701,6 +701,17 @@ def calc_signals(as_of=None):
                 }
             if _kinfo["c_sell"]:
                 khunter_sell_c.append(code)
+        # ⚠ 2026-09-04 修复（用户反馈：002364 激进版档位/建议空白）：
+        #   若 khunter 三大写入分支（信号命中 / A55 卖出 / C50 卖出）都未进入，则 khunter 字段整体缺失，
+        #   前端 renderWatch 的 C 版判定 kh.c_sell===false 对 undefined 无效 → 激进版显示「—」。
+        #   修复：主板池内每只候选都兜底写入 khunter 字段（hit/RSI/卖出全 False），保证前端双版本始终可判定。
+        if ("khunter" not in (sig_stock.get(code[-6:]) or {})):
+            sig_stock[code[-6:]]["khunter"] = {
+                "sig": False, "rsi_t1": _kinfo["rsi_t1"], "rsi_now": _kinfo["rsi_now"],
+                "buy": False, "sell": False, "c_sell": False,
+                "hits": [],
+                "note": "无信号（KHunter 未见命中/RSI 未超卖）",
+            }
     # 按板块列表初始化（2026-09-02 用户拍板：KHunter 主信号 + 弃用旧战法）
     # 主信号 = 主板 KHunter 15 信号命中 + 信号日 RSI<35（超卖买入，回测 ob75/osl35 全窗口最优）
     # 信号观察 = 主板 KHunter 命中但 RSI≥35（未触发买入，等待后续信号日）
