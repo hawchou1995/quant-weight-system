@@ -134,11 +134,13 @@ def build_sig_cache(cache, board_only=None, cache_file=None, st_skip=True):
 def run_khunter_port(sigs, state_prev, ob, osl, gate='none', dd=None, env='uniform',
                      mom_thr=0.02, env_delta=5, max_hold=MAX_HOLD, board_only=None,
                      stop_loss=None, hold_max=None, low_price=None,
-                     ob_bull=None, osl_bull=None, low_bull=None, util_track=False):
+                     ob_bull=None, osl_bull=None, low_bull=None, util_track=False,
+                     ob_weak=None, osl_weak=None, low_weak=None, hold_weak=None):
     """util_track: True 时 nav_series 每项追加 'invested'/'npos'（当日已投入市值/持仓数）供资金利用率统计"""
     """组合化 KHunter 主信号回测（单配置）：
-    gate: 'none'/'ma20'/'ma40'/'ma60'/'bear60'/'tristate'/'hybrid'
-          （hybrid=牛熊分域：牛市需 MA20 上方才开仓，熊市全开——对齐 9/1 铁律「牛熊权重向量完全独立」）
+    gate: 'none'/'ma20'/'ma40'/'ma60'/'bear60'/'tristate'/'hybrid'/'hybrid_wb'
+          （hybrid=牛熊分域：牛市需 MA20 上方才开仓，熊市全开——对齐 9/1 铁律「牛熊权重向量完全独立」
+           hybrid_wb=牛熊分域+弱牛回调：真熊全开 + 牛(>MA20)开 + 弱牛回调(MA60上/MA20下)开（2026-09-04 弱牛域专项）
     dd: None / 0.10 / 0.15 / 0.20（组合回撤熔断）
     env: 'uniform'（牛熊统一阈值）/ 'split'（牛熊分域买点：熊市 osl+env_delta 放宽）
     mom_thr: 三态动量阈值（强牛>mom_thr）
@@ -146,10 +148,15 @@ def run_khunter_port(sigs, state_prev, ob, osl, gate='none', dd=None, env='unifo
     hold_max: None / N（持有上限：超过 N 个交易日 → 次日开盘卖出）
     low_price: None / 3.0（低价过滤：确认日收盘 ≥ low_price，与生产 KHUNTER_LOW_PRICE 同口径）
     ob_bull/osl_bull/low_bull: 牛市分域覆盖（None=用统一值）；熊市用 ob/osl/low_price
+    ob_weak/osl_weak/low_weak/hold_weak: 弱牛回调分域覆盖（None=用熊市值；仅 gate='hybrid_wb' 时生效）
     """
     ob_bull = ob_bull if ob_bull is not None else ob
     osl_bull = osl_bull if osl_bull is not None else osl
     low_bull = low_bull if low_bull is not None else low_price
+    ob_weak = ob_weak if ob_weak is not None else ob
+    osl_weak = osl_weak if osl_weak is not None else osl
+    low_weak = low_weak if low_weak is not None else low_price
+    hold_weak = hold_weak if hold_weak is not None else hold_max
     all_dates = sorted({pd.Timestamp(dt) for s in sigs.values() for dt in s['dates']})
     all_dates = [d for d in all_dates if BACKTEST_START <= d]
     # 状态对齐
@@ -213,7 +220,7 @@ def run_khunter_port(sigs, state_prev, ob, osl, gate='none', dd=None, env='unifo
                             trade_log.append({'code': code, 'entry': str(hh['entry_dt'].date()), 'exit': str(d.date()),
                                               'ret': ret, 'reason': f'stop{int(stop_loss*100)}'})
         # ② 持有上限到期（次日开盘卖出）
-        if hold_max is not None:
+        if hold_max is not None or (gate == 'hybrid_wb' and hold_weak is not None):
             for code, h in list(holdings.items()):
                 if h.get('hold_over'):
                     s = sigs[code]
@@ -225,10 +232,13 @@ def run_khunter_port(sigs, state_prev, ob, osl, gate='none', dd=None, env='unifo
                             ret = px * (1 - COST_SELL) / hh['entry_px'] - 1
                             cash += hh['shares'] * px * (1 - COST_SELL)
                             trade_log.append({'code': code, 'entry': str(hh['entry_dt'].date()), 'exit': str(d.date()),
-                                              'ret': ret, 'reason': f'hold{hold_max}'})
+                                              'ret': ret, 'reason': f'hold{hh.get("hold_eff", hold_max)}'})
         # ③ 主卖出信号（RSI > ob，T-1 确认 → T 开盘卖出；牛熊分域用各自 ob）
         if sells.get(d):
             ob_eff = ob_bull if not st_d['is_bear'] else ob
+            # 2026-09-04 弱牛域扩展：gate='hybrid_wb' 时弱牛回调用 weak 卖出阈值（默认=熊 ob）
+            if gate == 'hybrid_wb' and not st_d['is_bear'] and not st_d['bull_ma20']:
+                ob_eff = ob_weak
             for code, rsi1 in sells[d]:
                 if code not in holdings:
                     continue
@@ -257,6 +267,10 @@ def run_khunter_port(sigs, state_prev, ob, osl, gate='none', dd=None, env='unifo
             elif gate == 'hybrid':
                 # 牛熊分域：牛市需 MA20 上方才开仓；熊市全开（MA60 下方 == 熊）
                 g_ok = (not st_d['is_bear'] and st_d['bull_ma20']) or st_d['is_bear']
+            elif gate == 'hybrid_wb':
+                # 牛熊分域 + 弱牛回调全开（2026-09-04 弱牛域专项）：
+                # 真熊(<MA60)=开；牛(>MA20)=开；弱牛回调(MA60上/MA20下)=开（用 weak 独立参数）
+                g_ok = True
             elif gate == 'tristate':
                 # 三态：强牛(mom20>thr 且 >MA20)=满仓；弱牛(>MA20 但动量不足)=减半仓；熊市=不开
                 if st_d['bull_ma20']:
@@ -272,10 +286,15 @@ def run_khunter_port(sigs, state_prev, ob, osl, gate='none', dd=None, env='unifo
                     if code in holdings:
                         continue
                     # 牛熊分域买点：牛市 osl_bull（+低价 low_bull），熊市 osl 或 env=split 放宽 osl+delta（+低价 low_price）
+                    # 2026-09-04 弱牛域扩展：gate='hybrid_wb' 时弱牛回调(MA60上/MA20下)用 weak 独立参数
                     is_bear = st_d['is_bear']
+                    is_wb = (gate == 'hybrid_wb') and (not st_d['is_bear']) and (not st_d['bull_ma20'])
                     if is_bear:
                         lim = osl if rsi1 < osl else (osl + env_delta if env == 'split' else None)
                         lp = low_price
+                    elif is_wb:
+                        lim = osl_weak if rsi1 < osl_weak else None
+                        lp = low_weak
                     else:
                         lim = osl_bull if rsi1 < osl_bull else None
                         lp = low_bull
@@ -293,7 +312,8 @@ def run_khunter_port(sigs, state_prev, ob, osl, gate='none', dd=None, env='unifo
                         if cash >= cost:
                             shares = size_target / px
                             holdings[code] = {'shares': shares, 'entry_px': px * (1 + COST_BUY), 'entry_dt': d,
-                                              'entry_i': i[0]}
+                                              'entry_i': i[0],
+                                              'hold_eff': hold_weak if is_wb else hold_max}
                             cash -= cost
                     if len(holdings) >= max_hold:
                         break
@@ -313,8 +333,9 @@ def run_khunter_port(sigs, state_prev, ob, osl, gate='none', dd=None, env='unifo
                         drawdown = px / h['entry_px'] - 1
                         if drawdown <= -stop_loss:
                             h['stop_flg'] = True
-                    # 收盘检查：持有上限到期（距 entry_i ≥ hold_max 个交易日）
-                    if hold_max is not None and (i[0] - h['entry_i']) >= hold_max:
+                    # 收盘检查：持有上限到期（距 entry_i ≥ 各仓有效上限）
+                    h_eff = h.get('hold_eff', hold_max)
+                    if h_eff is not None and (i[0] - h['entry_i']) >= h_eff:
                         h['hold_over'] = True
         last_nav = nav
         if util_track:

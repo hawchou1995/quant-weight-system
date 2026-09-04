@@ -41,10 +41,13 @@ AMT20_MIN = 3e7   # 生产流动性硬过滤：20日均成交额 ≥ 3000万
 # ⚠ 2026-09-03 牛熊分域投产（Phase 10 HYBRIDv2 定稿）：入场阈值按 regime 分域
 RSI_BUY = 35          # 熊市入场：RSI_T < 35（生产现状）
 RSI_BUY_BULL = 30     # 牛市入场：RSI_T < 30（定稿式 osl30）
+RSI_BUY_WEAK = 32     # 弱牛回调入场：RSI_T < 32（2026-09-04 弱牛域专项 OSL32，回测组合 total 68.49%→79.96%）
 RSI_SELL = 55         # 熊市出场：RSI_T > 55（A 版）
 RSI_SELL_BULL = 75    # 牛市出场：RSI_T > 75（定稿式 ob75）
+RSI_SELL_WEAK = 80    # 弱牛回调出场：RSI_T > 80（2026-09-04 弱牛域 ob80 同批定稿）
 LOW_PRICE = 3.0       # 低价过滤（仅熊市）：确认日收盘 ≥ 3 元
 LOW_PRICE_BULL = None # 牛市无低价过滤
+LOW_PRICE_WEAK = None # 弱牛回调无低价过滤（2026-09-04 OSL32 定稿，与牛市同口径）
 N_SLOTS = 5           # 最多 5 仓
 POS_SIZE = 20000.0    # 每仓 ¥20,000
 INIT_CAP = 100000.0   # 初始资金 ¥100,000
@@ -94,10 +97,10 @@ def khunter_sig(ddf, as_of):
 
 def scan_today(idx, today):
     """扫描今日 T 信号：入场候选（hit & 分域 RSI & 分域低价 & 分域门控）与持仓出场（分域 RSI）
-    分域（Phase 10 HYBRIDv2）：
+    分域（Phase 10 HYBRIDv2 + 2026-09-04 弱牛域专项）：
       🐻 熊市(hs300<MA60)：rsi<35 + close≥3 + 可买
       🌞 牛市(hs300>MA20)：rsi<30 + 无低价 + 可买
-      🌙 弱牛回调(MA20下/MA60上)：不开仓（仅观察/卖出）
+      🌙 弱牛回调(MA20下/MA60上)：rsi<32 + 无低价 + 可买（2026-09-04 投产；出场 rsi>80）
     宇宙过滤镜像生产 build_short_pool：主板 + 剔ST/退市 + 剔停牌 + 20日均成交额≥3000万"""
     idx = idx.sort_values('date').reset_index(drop=True)
     d_today = idx.loc[idx['date'] == today]
@@ -150,12 +153,13 @@ def scan_today(idx, today):
         elif bull_t:
             osl, low = RSI_BUY_BULL, LOW_PRICE_BULL
         else:
-            osl, low = None, None  # 弱牛回调：不开仓
+            osl, low = RSI_BUY_WEAK, LOW_PRICE_WEAK  # 弱牛回调：osl32+无低价（2026-09-04 弱牛域专项投产）
         if sig['hit'] and sig['rsi'] is not None and osl is not None and sig['rsi'] < osl:
             if low is None or sig['close'] >= low:
-                buys.append({'code': code, 'rsi': sig['rsi'], 'close': sig['close'], 'regime': 'bear' if bear_t else 'bull'})
-        # 出场分域：熊 rsi>55 / 非熊(牛+弱牛回调) rsi>75（与回测 ob_eff = ob_bull if not is_bear 严格对齐）
-        sell_thr = RSI_SELL if bear_t else RSI_SELL_BULL
+                buys.append({'code': code, 'rsi': sig['rsi'], 'close': sig['close'],
+                             'regime': 'bear' if bear_t else ('bull' if bull_t else 'weak_bull')})
+        # 出场分域：熊 rsi>55 / 牛 rsi>75 / 弱牛 rsi>80（2026-09-04 弱牛域 ob80 定稿，与回测 ob_eff 严格对齐）
+        sell_thr = RSI_SELL if bear_t else (RSI_SELL_BULL if bull_t else RSI_SELL_WEAK)
         if sig['rsi'] is not None and sig['rsi'] > sell_thr:
             sells.append(code)
     return buys, sells, bear_t, bull_t, n_stock

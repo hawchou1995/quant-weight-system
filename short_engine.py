@@ -92,6 +92,9 @@ def fix_amount_units(df):
         v24 = post["volume"].median()
         mult = 100 if (v23 <= 0 or v24 / v23 < 0.1) else 1
     idx = post.index[m]
+    # 2026-09-04 修复：先转 float64 再赋值（pandas 3.0 LossySetitemError——int64 amount 列赋 float 值先崩）
+    if df["amount"].dtype.kind in "iu":
+        df["amount"] = df["amount"].astype("float64")
     df.loc[idx, "amount"] = post.loc[m, "volume"] * post.loc[m, "close"] * mult
     return df
 

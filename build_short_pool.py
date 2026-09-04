@@ -250,11 +250,14 @@ ENABLE_F3 = False  # 9/1 裁决：F3 缩量企稳为增强候选，验证门前�
 ENABLE_KHUNTER = True
 KHUNTER_RSI_BUY = 35     # 熊市买入：RSI_T-1 < 35（生产现状保留）
 KHUNTER_RSI_BUY_BULL = 30  # 牛市买入：RSI_T-1 < 30（定稿式 osl30，2026-09-03 牛熊分域投产）
+KHUNTER_RSI_BUY_WEAK = 32  # 弱牛回调买入：RSI_T-1 < 32（2026-09-04 弱牛域专项 OSL32 投产，回测组合 total 68.49%→79.96%）
 KHUNTER_RSI_SELL = 55    # 熊市 A 版卖出：RSI_T-1 > 55（生产现状保留）
 KHUNTER_RSI_SELL_BULL = 75  # 牛市 A 版卖出：RSI_T-1 > 75（定稿式 ob75，2026-09-03 牛熊分域投产）
+KHUNTER_RSI_SELL_WEAK = 80  # 弱牛回调 A 版卖出：RSI_T-1 > 80（2026-09-04 弱牛域专项 ob80 投产，与 OSL32 同批定稿）
 KHUNTER_RSI_SELL_C = 50  # C 版卖出参考：RSI_T-1 > 50（牛熊统一，激进 OB50，双版本并行部署，sell_c 展示）
 KHUNTER_LOW_PRICE = 3.0  # 低价过滤（仅熊市）：确认日收盘 ≥ 3 元（2026-09-03 接入；low3 回测：夏普 0.727→1.184、2024 灾年转正）
 KHUNTER_LOW_PRICE_BULL = None  # 牛市低价过滤：无（定稿式 low3 伤后半 med +0.85%→-0.31% 破线）
+KHUNTER_LOW_PRICE_WEAK = None  # 弱牛回调低价过滤：无（2026-09-04 OSL32 定稿：弱牛域开不设低价，与牛市同口径）
 
 def _khunter_sig(ddf, as_of=None, regime=None):
     """KHunter 信号计算（2026-09-02 用户拍板）：生产在「今日 T 收盘后」运行，明日 T+1 开盘执行。
@@ -310,7 +313,7 @@ def _khunter_sig(ddf, as_of=None, regime=None):
         return {"hit": hit_now,
                 "rsi_t1": (float(rsi_t1) if not pd.isna(rsi_t1) else None),
                 "rsi_now": (float(rsi_now) if not pd.isna(rsi_now) else None),
-                "sell1": (bool(rsi_now > (KHUNTER_RSI_SELL_BULL if regime in ("bull", "weak_bull") else KHUNTER_RSI_SELL)) if not pd.isna(rsi_now) else False),
+                "sell1": (bool(rsi_now > (KHUNTER_RSI_SELL_WEAK if regime == "weak_bull" else (KHUNTER_RSI_SELL_BULL if regime in ("bull", "weak_bull") else KHUNTER_RSI_SELL))) if not pd.isna(rsi_now) else False),
                 "c_sell": (bool(rsi_now > KHUNTER_RSI_SELL_C) if not pd.isna(rsi_now) else False),
                 "hits": hit_names}
     except Exception:
@@ -644,22 +647,26 @@ def calc_signals(as_of=None):
         # ⚠ 2026-09-03 23:15 牛熊分域投产（HYBRIDv2 定稿 · total+68.5% 牛熊独立双过闸）：
         #   🐻 熊市（hs300<MA60）：osl35+low3+ob55(A)/ob50(C) —— 生产现状参数
         #   🌞 牛市（>MA20 且非熊）：osl30+无low+ob75(A)/ob50(C) —— 定稿式参数
-        #   🌙 弱牛回调（MA20 下/MA60 上）：不开仓（仅观察/卖出）—— hybrid gate
+        #   🌙 弱牛回调（MA20 下/MA60 上）：⚠ 2026-09-04 弱牛域专项投产 → osl32+无low+ob80(A)/ob50(C)+hold15
+        #     （用户拍板「直接上 OSL32」；回测组合 total 68.49%→79.96% dd -22.45% 不变 夏普 0.397→0.435；
+        #      弱牛 n=28 wr57% med+2.95%，近四闸（n<30），年度集中 2022 +80.9% 主要贡献，2026 -1.9% 警示——样本小，观察）
         # 注意：KHunter 信号计算较重（15 个信号函数），只对主板 bd 计算（产品只能买主板）
         # 主信号口径=回测 ortho：T 日信号命中 + 信号日 RSI<阈值 + [熊市低价] + [牛熊分域] → 明日开盘买入（事件独立，稀疏）
-        # 卖出 = 分域 A 版主卖出（熊 RS>55/牛 RS>75） / C 版 RSI>50 参考（独立信号，买卖事件各自独立；卖出不受牛熊限定）
+        # 卖出 = 分域 A 版主卖出（熊 RS>55/牛 RS>75/弱牛 RS>80） / C 版 RSI>50 参考（独立信号，买卖事件各自独立；卖出不受牛熊限定）
         if ENABLE_KHUNTER and bd == "主板":
             # ---- 牛熊分域判定（Phase 10 HYBRIDv2）----（先判定 regime，再传入信号函数）
             _kh_is_bear = bool(_bear60)          # hs300<MA60
             _kh_is_bull_mkt = bool(_in_mkt)      # hs300>MA20（弱牛/强牛）
             _kh_regime = "bear" if _kh_is_bear else ("bull" if _kh_is_bull_mkt else "weak_bull")
             _kinfo = _khunter_sig(ddf, as_of, regime=_kh_regime)
-            _kh_osl = KHUNTER_RSI_BUY if _kh_is_bear else (KHUNTER_RSI_BUY_BULL if _kh_is_bull_mkt else None)
-            _kh_low = KHUNTER_LOW_PRICE if _kh_is_bear else (KHUNTER_LOW_PRICE_BULL if _kh_is_bull_mkt else None)
+            _kh_osl = KHUNTER_RSI_BUY if _kh_is_bear else (
+                KHUNTER_RSI_BUY_BULL if _kh_is_bull_mkt else KHUNTER_RSI_BUY_WEAK)
+            _kh_low = KHUNTER_LOW_PRICE if _kh_is_bear else (
+                KHUNTER_LOW_PRICE_BULL if _kh_is_bull_mkt else KHUNTER_LOW_PRICE_WEAK)
             _kh_ok_buy = (_kh_osl is not None and _kinfo["rsi_now"] is not None
                           and _kinfo["rsi_now"] < _kh_osl
                           and (_kh_low is None or r["close"] >= _kh_low)
-                          and (_kh_is_bear or _kh_is_bull_mkt))  # 都开（熊市全开、牛市需>MA20；MA20下/MA60上=不开）
+                          and True)  # 2026-09-04 弱牛域投产：三态全开（熊 B35 / 牛 B30 / 弱牛 W32），去掉 (_kh_is_bear or _kh_is_bull_mkt) 限制
             if _kinfo["hit"]:
                 sig_stock[code[-6:]]["khunter"] = {
                     "sig": True,
@@ -682,12 +689,15 @@ def calc_signals(as_of=None):
                 _buy_ok = bool(_kh_ok_buy)
                 khunter_buy.append((code, _kinfo, _buy_ok, float(sc), r, ddf))
             if _kinfo["sell1"]:
-                # A 版分域卖出信号：熊 RSI>55 / 牛 RSI>75（独立于选股信号；回测 event_days = entry_ok | sell_vec）
+                # A 版分域卖出信号：熊 RSI>55 / 牛 RSI>75 / 弱牛 RSI>80（独立于选股信号；回测 event_days = entry_ok | sell_vec）
+                _sell_note = (f"RSI>{KHUNTER_RSI_SELL_WEAK} 弱牛超买卖出（A 版独立信号）" if _kh_regime == "weak_bull"
+                              else (f"RSI>{KHUNTER_RSI_SELL_BULL} 牛超买卖出（A 版独立信号）" if _kh_regime == "bull"
+                                    else f"RSI>{KHUNTER_RSI_SELL} 熊超买卖出（A 版独立信号）"))
                 sig_stock[code[-6:]]["khunter"] = {
                     "sig": bool(_kinfo["hit"]), "rsi_t1": _kinfo["rsi_t1"], "rsi_now": _kinfo["rsi_now"],
                     "buy": False, "sell": True, "c_sell": _kinfo["c_sell"],
                     "hits": _kinfo["hits"],
-                    "note": f"RSI>{KHUNTER_RSI_SELL} 超买卖出（A 版独立信号）",
+                    "note": _sell_note,
                 }
                 khunter_sell.append(code)
             # C 版 RSI>50 卖出集 = 完整超集（RSI>50 全收，非 A 未触发窄带）；
@@ -870,17 +880,19 @@ def calc_signals(as_of=None):
         "watch_n": len(kh_watch),
         "watch": [c[-6:] for c, _, _, _ in kh_watch],
         "ver": {"buy_rsi": KHUNTER_RSI_BUY, "buy_rsi_bull": KHUNTER_RSI_BUY_BULL,
+                "buy_rsi_weak": KHUNTER_RSI_BUY_WEAK,
                 "sell_a": KHUNTER_RSI_SELL, "sell_a_bull": KHUNTER_RSI_SELL_BULL,
+                "sell_a_weak": KHUNTER_RSI_SELL_WEAK,
                 "sell_c": KHUNTER_RSI_SELL_C, "low": KHUNTER_LOW_PRICE,
-                "low_bull": KHUNTER_LOW_PRICE_BULL},
-        "note_sell": f"卖出=A版分域（熊 RSI>{KHUNTER_RSI_SELL} / 牛 RSI>{KHUNTER_RSI_SELL_BULL}）/ C版参考 RSI>{KHUNTER_RSI_SELL_C}（独立信号，不计入买入）",
+                "low_bull": KHUNTER_LOW_PRICE_BULL, "low_weak": KHUNTER_LOW_PRICE_WEAK},
+        "note_sell": f"卖出=A版分域（熊 RSI>{KHUNTER_RSI_SELL} / 牛 RSI>{KHUNTER_RSI_SELL_BULL} / 弱牛 RSI>{KHUNTER_RSI_SELL_WEAK}）/ C版参考 RSI>{KHUNTER_RSI_SELL_C}（独立信号，不计入买入）",
         "hybrid": True,
     }
     _sel_meta = {
         "top4": _top4_list,
         "candidates": _cand_list,
         "khunter": _kmeta,
-        "note": "主信号=KHunter 15 策略信号+信号日分域RSI（🐻熊市&lt;35+低价≥3元+ob55 / 🌞牛市(&gt;MA20)&lt;30+无低价+ob75；Phase 10 HYBRIDv2 定稿 total+68.5% 牛熊独立双过闸）；旧战法反转分已全量弃用（负期望：主板 -35.65%/全市场 -41.67%），不再展示",
+        "note": "主信号=KHunter 15 策略信号+信号日分域RSI（🐻熊市&lt;35+低价≥3元+ob55 / 🌞牛市(&gt;MA20)&lt;30+无低价+ob75 / 🌙弱牛回调(MA20下/MA60上)&lt;32+无低价+ob80；HYBRIDv2+弱牛域 2026-09-04 定稿）；旧战法反转分已全量弃用（负期望：主板 -35.65%/全市场 -41.67%），不再展示",
         "label": {"top4": "🎯 KHunter 主信号"},
     }
     # 2026-08-20 用户决策：市况门控改为「仅提醒」——门控关闭不再清空股票池。
