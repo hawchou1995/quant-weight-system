@@ -74,7 +74,7 @@ try:
         _kh_str = "信号层未启用"
     SHORT_KHUNTER_BADGE = (f'<span class="badge" style="background:rgba(37,99,235,.14);color:#60a5fa;" '
                            f'title="KHunter 15 策略命中 + 信号日 RSI&lt;分域阈值 + 收盘≥低价过滤(仅熊市) + 牛熊分域 = 主信号（事件独立，有信号即买）；'
-                           f'信号观察 = 已命中但未触发；卖出 = A 版分域（熊 RSI&gt;{_kh_ver.get("sell_a", 55)} / 牛 RSI&gt;{_kh_ver.get("sell_a_bull", 75)}）主信号 / C 版 RSI&gt;{_kh_ver.get("sell_c", 50)} 参考（2026-09-03 双版本部署 + 牛熊分域 HYBRIDv2：total+68.5% 牛熊独立双过闸）">'
+                           f'信号观察 = 已命中但未触发；卖出 = 标准版(A)分域（熊 RSI&gt;{_kh_ver.get("sell_a", 55)} / 牛 RSI&gt;{_kh_ver.get("sell_a_bull", 75)}）主信号 / 激进版(C) RSI&gt;{_kh_ver.get("sell_c", 50)} 参考（2026-09-03 双版本部署 + 牛熊分域 HYBRIDv2：total+68.5% 牛熊独立双过闸）">'
                            f'KHunter 今日: {_kh_str}</span>')
     SHORT_POOL_ASOF = SHORT_POOL.get("as_of", "—")
     _mg = SHORT_POOL.get("market_gate") or {}
@@ -1053,7 +1053,7 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
   head_tags=[SHORT_POOL_GATE, SHORT_KHUNTER_BEAR, SHORT_KHUNTER_BADGE,
              '<span class="badge badge-auto">股票 = KHunter 15 策略信号 + RSI&lt;35 超卖 + 熊市MA60（主板限定 · 弃用旧战法）</span>',
              '<span class="badge badge-auto">KHunter 信号密集期每日可能有几只，稀疏期 0 只属正常（事件驱动）</span>'],
-  head_note=f"<b>🎯 KHunter 主信号（蓝标）= 主板 15 策略信号命中 + 信号日 RSI&lt;35 超卖 + 收盘≥3元 + 熊市(沪深300&lt;MA60)</b>（2026-09-03 生产切换 v5.14.0：B1 熊市限定——38 组牛市扫描 0 过门后收紧；A 版卖出 RSI&gt;55 主执行 / C 版 RSI&gt;50 参考展示；入场两版相同）· 回测：A+low3（熊市限定）n=408 资金池(N5)年化 5.54%/回撤 19.90%/夏普 0.372，C+low3 4.98%/19.45%/0.352（每笔口径 C 更锐：81.4%/1.430）；牛市子集 4 方向×38 组 0 过门→不开新仓，牛市收益由基金动量池承担· <b>旧战法（反转分）已全量弃用</b>（主板 -35.65% / 全市场 -41.67% 均负期望，不再展示）· 市况门控仅提醒：沪深300 &gt; MA20 才开新仓；KHunter 买入由独立 <b>MA60 熊市门控</b>裁决（非熊→不开新仓仅观察/卖出）· 卖出逐股独立走「全量池短线跟踪」· 回测参考见「监控总览」",
+  head_note=f"<b>🎯 KHunter 主信号（蓝标）= 主板 15 策略信号命中 + 信号日 RSI&lt;35 超卖 + 收盘≥3元 + 熊市(沪深300&lt;MA60)</b>（2026-09-03 生产切换 v5.14.0：B1 熊市限定——38 组牛市扫描 0 过门后收紧；<b>标准版(A)</b> 卖出 RSI&gt;55 主执行 / <b>激进版(C)</b> RSI&gt;50 参考展示；入场两版相同）· 回测：A+low3（熊市限定）n=408 资金池(N5)年化 5.54%/回撤 19.90%/夏普 0.372，C+low3 4.98%/19.45%/0.352（每笔口径 C 更锐：81.4%/1.430）；牛市子集 4 方向×38 组 0 过门→不开新仓，牛市收益由基金动量池承担· <b>旧战法（反转分）已全量弃用</b>（主板 -35.65% / 全市场 -41.67% 均负期望，不再展示）· 市况门控仅提醒：沪深300 &gt; MA20 才开新仓；KHunter 买入由独立 <b>MA60 熊市门控</b>裁决（非熊→不开新仓仅观察/卖出）· 卖出逐股独立走「全量池短线跟踪」· 回测参考见「监控总览」",
   as_of=SHORT_POOL_ASOF, intraday_note=SHORT_POOL_INTRADAY,
   as_of_min=SHORT_POOL.get("intraday_ts") or SHORT_POOL_ASOF_MIN,
   tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=(), inline=True)}
@@ -1468,10 +1468,10 @@ document.addEventListener('DOMContentLoaded',function(){{
       // A 版档位/动作沿用现有语义；C 版=KHunter RSI>50 参考卖出（c_sell，与 A 版独立）
       var kh=rec.khunter||{{}};
       var tierC='—',actC='—',actCCls='';
-      if(kh.c_sell){{tierC='C:卖出';actC='🔴 C 版卖出';actCCls='down';}}
-      else if(kh.sell){{tierC='C:卖出';actC='🔴 C 版卖出';actCCls='down';}}
-      else if(kh.buy){{tierC='C:持有';actC='🟢 C:持有/跟踪';actCCls='up';}}
-      else if(kh.c_sell===false||kh.sell===false){{tierC='C:持有';actC='🟢 C:持有/跟踪';actCCls='up';}}
+      if(kh.c_sell){{tierC='激进:卖出';actC='🔴 激进版·卖出';actCCls='down';}}
+      else if(kh.sell){{tierC='激进:卖出';actC='🔴 激进版·卖出';actCCls='down';}}
+      else if(kh.buy){{tierC='激进:持有';actC='🟢 激进版·持有/跟踪';actCCls='up';}}
+      else if(kh.c_sell===false||kh.sell===false){{tierC='激进:持有';actC='🟢 激进版·持有/跟踪';actCCls='up';}}
       // 2026-08-27 修复：停牌股（suspended）——持仓股停牌期间仍需跟踪卖出信号，显示「停牌·复牌后跟踪」
       if(rec.suspended){{act='⏸ 停牌·复牌后跟踪';actCls='warn';tierDisp='停牌';}}
       // 2026-08-26 修复：破MA5（收盘价<MA5）为硬性退出规则，档位同步改写「破MA5·卖出」，避免与建议动作「次日卖出」展示冲突
@@ -1522,8 +1522,8 @@ document.addEventListener('DOMContentLoaded',function(){{
     var cnt=document.getElementById('watch-count');
     if(cnt)cnt.textContent='筛选 '+filtered.length+' / 共 '+rows.length+' 只';
     if(!filtered.length){{box.innerHTML='<div class="sub" style="color:var(--faint)">无匹配标的 —— 调整搜索/筛选条件后重试</div>';return;}}
-    var h='<div class="sub" style="margin-bottom:6px;color:var(--sub)">🧭 <b>A 标准版</b>=生产主信号（牛熊分域 RSI 阈值卖出）；<b>C 激进版</b>=RSI&gt;50 参考卖出（更早止盈，双版本并行对决）—— 卖出信号为独立信号，不含买入含义</div>'
-          +'<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>类型</th><th style="text-align:center">入池日期</th><th style="text-align:center">出池日期</th><th style="text-align:center">已跟踪</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">短线分</th><th style="text-align:center">档位(A)</th><th style="text-align:center">建议(A)</th><th style="text-align:center">档位(C)</th><th style="text-align:center">建议(C)</th><th style="text-align:center">MA5</th></tr></thead><tbody>';
+    var h='<div class="sub" style="margin-bottom:6px;color:var(--sub)">🧭 版本说明（A=标准版 · C=激进版）：<b>标准版</b>=生产主信号（熊市卖出 RSI&gt;55 / 牛市卖出 RSI&gt;75）；<b>激进版</b>=参考线（RSI&gt;50 卖出，更早止盈高周转）—— 双版本并行对决；卖出为独立信号，不含买入含义</div>'
+          +'<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>类型</th><th style="text-align:center">入池日期</th><th style="text-align:center">出池日期</th><th style="text-align:center">已跟踪</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">短线分</th><th style="text-align:center">档位(标准版)</th><th style="text-align:center">建议(标准版)</th><th style="text-align:center">档位(激进版)</th><th style="text-align:center">建议(激进版)</th><th style="text-align:center">MA5</th></tr></thead><tbody>';
     filtered.forEach(function(r){{
       var rec=r.rec;
       var ageS=r.age===null?'—':(r.age+' 天 / 剩 '+(30-r.age)+' 天');
