@@ -550,14 +550,14 @@ def bt_a5_html():
 <div class="kpi"><div class="l">G2_M3 牛</div><div class="v">wr 49.0%</div><div class="s">n=96 · 均值 +2.11% · 中位 -0.17%⚠</div></div>
 <div class="kpi"><div class="l">G2_M3 熊</div><div class="v">wr 54.3%</div><div class="s">n=138 · 均值 +0.29% · 中位 +0.36%</div></div>
 </div></div>'''
-    # 卡2：生产档位敏感性结论（本次优化）
+    # 卡2：9/4 放宽扫描结论（14 配置 · 权威数据 daban_loosen_sweep_20260904.csv）
     c2 = f'''<div class="bt-card" id="bt-a5-comb">
-<div class="bt-head"><b>🔬 9/3 生产档位敏感性</b><span class="bt-tag">唯一过闸组合</span></div>
+<div class="bt-head"><b>🔬 9/4 放宽扫描（14 配置）</b><span class="bt-tag">生产档=唯一全维最优</span></div>
 <div class="kpis">
-<div class="kpi"><div class="l">A现状生产[-5,-2]裸</div><div class="v">牛❌ 熊❌</div><div class="s">牛 691/熊 1099 中位 -1.30%/-0.99%</div></div>
-<div class="kpi"><div class="l">B纯G3[-3.5,-2]裸</div><div class="v">牛❌ 熊❌</div><div class="s">牛 691/熊 1099 中位 -1.30%/-0.99%</div></div>
-<div class="kpi"><div class="l">B纯G3_M3</div><div class="v">牛✅ 熊✅</div><div class="s">唯一牛熊双过 · 中位 +0.37%/+0.36%</div></div>
-<div class="kpi"><div class="l">C全开_G3_M3</div><div class="v">牛⚠ 熊✅</div><div class="s">牛中位 -0.19% 不过闸</div></div>
+<div class="kpi"><div class="l">BASE 生产档</div><div class="v">✅ 四闸</div><div class="s">n=358 · wr 51.1% · 中位 +0.13% · 累计 +26.2% · mdd -15.8%</div></div>
+<div class="kpi"><div class="l">放宽 rel→0.6/0.8/1.0</div><div class="v">❌ 全灭</div><div class="s">中位 -0.19%/-0.22%/-0.22% · 累计 15.5/10.7/10.7</div></div>
+<div class="kpi"><div class="l">降 amt→3e7/2e7/1e7</div><div class="v">⚠ 过闸但劣化</div><div class="s">中位 +0.07/+0.06/+0.07 · 累计 25.4/25.2/24.7</div></div>
+<div class="kpi"><div class="l">降 room→0.15/0.10/0.00</div><div class="v">⚠/❌ 劣化</div><div class="s">0.15 过闸中位 +0.09 · 0.10/0.00 中位 -0.17%/-0.19%</div></div>
 </div></div>'''
     # 卡3：唯一可投产方向
     c3 = f'''<div class="bt-card" id="bt-a5-port" style="border-color:rgba(16,185,129,.4)">
@@ -568,9 +568,9 @@ def bt_a5_html():
 <div class="kpi"><div class="l">生产预筛差距</div><div class="v" style="font-size:15px">已闭合 ✅</div><div class="s">F3 已接入（ROOM_MIN=0.20）</div></div>
 </div></div>'''
     return (f'<div class="card" id="bt-a5">\n'
-            f'<h2>🏆 打板族过闸档位 <span class="badge badge-auto">融合网格 · 牛熊独立四闸 · 2021+ 复验</span></h2>\n'
-            f'<div class="sub">9/1 融合网格 260 配置 × 牛熊独立四闸（n≥30 + wr≥40% + 均值&gt;0 + 中位数&gt;0）· 2026-09-03 生产档位敏感性复验（2021+ 制度一致区间）· 结论：<b>仅 G3_M3（低位+距前高≥20%空间）牛熊双过闸</b>；裸 rel_pos 不过闸；G2_M3 熊过、G6_M6/M7 牛过（n&lt;30 不可投产）</div>\n'
-            f'<div class="sub" style="color:#059669">✅ <b>本次优化方向（已落地）</b>：生产预筛已补 F3 空间因子（rel_pos≤0.5 + 成交额≥5000万 + <b>距60日高点≥20%</b>，ROOM_MIN=0.20 阶段1 过滤）—— 生产预筛 = G3_M3 过闸族；模拟盘验证门通过前不改生产权重</div>\n'
+            f'<h2>🏆 打板族过闸档位 <span class="badge badge-auto">融合网格 · 牛熊独立四闸 · 2021+ 复验 · 9/4 放宽扫描最优=生产档</span></h2>\n'
+            f'<div class="sub">9/1 融合网格 260 配置 × 牛熊独立四闸（n≥30 + wr≥40% + 均值&gt;0 + 中位数&gt;0）· 2026-09-03 生产档位敏感性复验（2021+ 制度一致区间）· <b>2026-09-04 放宽扫描（14 配置）</b>：BASE 生产档（rel_pos≤0.5 + amt≥5e7 + room≥0.20）四闸通过且中位/累计/mdd 全部维度最优 —— <b>放宽 rel_pos 或降 amt/room 任一档均无改善</b>，生产参数维持不变</div>\n'
+            f'<div class="sub" style="color:#059669">✅ <b>生产预筛已接入 F3 空间因子</b>：rel_pos≤0.5 + 成交额≥5000万 + 距60日高点≥20%（ROOM_MIN=0.20 阶段1 过滤）—— 生产预筛 = G3_M3 过闸族；9/4 放宽扫描证实该档为唯一全维最优，模拟盘验证门通过前不改生产权重</div>\n'
             f'<div class="sub" style="color:#d97706">⚠ <b>重要边界</b>：G3_M3 牛熊过闸是「回测期望」，模拟盘验证门（30 信号/3 个月）通过前不改生产权重；G6 组 n&lt;30 禁止投产；A5 原始负期望结论（组合复利 -72.2%）不再作为主展示，仅作历史对照</div>\n'
             f'<div class="bt-grid">{c1}{c2}{c3}</div>\n</div>')
 
