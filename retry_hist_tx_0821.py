@@ -14,7 +14,7 @@ sys.path.insert(0, str(BASE))
 import update_daily as U
 import fetch_full_universe as F
 
-TARGET = "2026-08-24"
+TARGET = "2026-09-04"
 workers = 6
 if "--workers" in sys.argv:
     workers = int(sys.argv[sys.argv.index("--workers") + 1])
@@ -44,7 +44,7 @@ def job(sym):
             old = pd.read_csv(f, dtype={"date": str})
             if len(old):
                 start = old["date"].iloc[-1].replace("-", "")
-        df = ak.stock_zh_a_hist_tx(symbol=sym, start_date=start, end_date="20260824", adjust="qfq")
+        df = ak.stock_zh_a_hist_tx(symbol=sym, start_date=start, end_date="20260904", adjust="qfq")
         if df is None or len(df) == 0:
             return (sym, False, "empty")
         df = df.rename(columns={"close": "close"})

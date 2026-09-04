@@ -29,6 +29,7 @@ BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(BASE / "backtest"))
 import khunter_all_strategies_backtest as K
 import khunter_timing_backtest as T
+import short_engine as SE
 
 STATE = BASE / "khunter_paper_state.json"
 DATA_DIR = BASE / "data_full"
@@ -123,6 +124,9 @@ def scan_today(idx, today):
             continue
         df['date'] = pd.to_datetime(df['date'])
         df = df.sort_values('date').reset_index(drop=True)
+        # 2026-09-04 修复：data_full 2024+ amount 大面积=0（腾讯源缺成交额），
+        # 按股票自锚定代理（与生产 short_engine.fix_amount_units 同判据），保证 amt20 过滤口径一致
+        df = SE.fix_amount_units(df)
         # 停牌判定（镜像 _is_suspended）：最新行零成交/零价，或日期落后 >1 自然日
         _last = df.iloc[-1]
         if float(_last.get("volume", 0) or 0) == 0 or float(_last.get("open", 0) or 0) == 0 \

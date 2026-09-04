@@ -53,6 +53,49 @@ def short_factors(df):
     return d
 
 
+def fix_amount_units(df):
+    """2026-09-04 修复 data_full amount 缺陷（2024-01-01 起全市场 amount 大面积=0）。
+
+    诊断（4987 只样本）：
+    - 4272 只 volume 在 2023-12/2024-01 同步缩 ~100 倍（沪主板/深主板/创业板）→ 单位从「股」切「手」，
+      amt=vol×close 低估 100 倍；2023 年 amount/vol≈close 确认 2023 单位=股。
+    - 888 只无切换（84% 科创板，全程「股」单位）；2024+ 新上市（无 2023 锚点）单位=手。
+    - 少数股票（如 sz000001）amount 全程真实、volume 后期才切手 → 真实 amount 行绝不覆盖。
+    规则（按股票自锚定，不按板块）：
+    1) 2024+ 且 amount>0 的行：保留真实值（不代理）。
+    2) 2024+ 且 amount<=0 且 volume>0 的行：代理 = vol×close×mult；
+       mult 优先取 2024+ amount>0 锚点行判定（amount/vol > close×50 → 手 ×100，否则 ×1），
+       无锚点回退 volume 比值（2024+ 中位 / 2023 中位 < 0.1 或无 2023 数据 → ×100，否则 ×1）。
+    3) volume==0（真无成交）保持 amount=0 不动。
+    后果修复：amt20 过滤（build_short_pool:609 的 3e7 硬过滤）与 _hit_count 的
+    amount>=2e8 不再失真，KHunter 主信号恢复全市场覆盖，与回测口径一致。
+    """
+    df = df.copy()
+    if "amount" not in df.columns or "volume" not in df.columns:
+        return df
+    _d = df["date"].astype(str)
+    post = df[_d >= "2024-01-01"]
+    if len(post) == 0:
+        return df
+    m = (post["amount"].fillna(0) <= 0) & (post["volume"] > 0)
+    if not m.any():
+        return df
+    pos = post[post["amount"] > 0]
+    if len(pos) > 0:
+        # 锚点判据：amount/vol 与 close 比较（手单位下 amount/vol≈close×100）
+        _r = pos["amount"] / pos["volume"].replace(0, np.nan)
+        _c = pos["close"]
+        mult = 100 if (_r / _c).median() > 50 else 1
+    else:
+        pre = df[_d < "2024-01-01"]
+        v23 = pre["volume"].median() if len(pre) > 0 else 0
+        v24 = post["volume"].median()
+        mult = 100 if (v23 <= 0 or v24 / v23 < 0.1) else 1
+    idx = post.index[m]
+    df.loc[idx, "amount"] = post.loc[m, "volume"] * post.loc[m, "close"] * mult
+    return df
+
+
 def build_squeeze_events(pool, bw_th=0.02, vol_ratio=1.2, ma2_ok=True, min_px=1.0, min_amt=2e6):
     """布林收窄事件倒排索引：{date: [(code, vr5)]}
     事件条件（蜗牛量化策略 + BigQuant 铁律强化）：
@@ -264,6 +307,10 @@ def load_stock_pool():
             df = df.sort_values("date").reset_index(drop=True)
             if len(df) < 400:
                 continue
+            # 2026-09-04 修复：data_full 的 amount 在 2024-01-01 起全市场大面积缺失(=0)，
+            # volume 单位切换不统一（主板/创业板 股→手，科创板保持股）→ 用 fix_amount_units
+            # 按股票自锚定代理（详见函数 docstring），保证 amt20 过滤与回测口径一致。
+            df = fix_amount_units(df)
             pool[code] = short_factors(df).set_index("date")
         except Exception:
             continue
