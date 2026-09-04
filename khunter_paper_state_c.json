@@ -1,11 +1,26 @@
 {
   "cash": 100000.0,
   "positions": [],
-  "pending_buys": [],
+  "pending_buys": [
+    {
+      "code": "sz002364",
+      "rsi": 29.920814479637997,
+      "close": 37.9,
+      "regime": "bear"
+    }
+  ],
   "pending_sells": [],
   "nav_history": [
     {
       "date": "2026-09-02",
+      "nav": 100000.0,
+      "cash": 100000.0,
+      "pos_val": 0,
+      "n_pos": 0,
+      "bear": true
+    },
+    {
+      "date": "2026-09-03",
       "nav": 100000.0,
       "cash": 100000.0,
       "pos_val": 0,

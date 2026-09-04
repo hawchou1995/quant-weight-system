@@ -1,0 +1,224 @@
+{
+  "manifest_version": "v1",
+  "format": "ndjson",
+  "base_token": "KngobWii8aE93eshdQJct5Rsnob",
+  "table_id": "tblF4LQUjxT5LuYn",
+  "rev": 86,
+  "timezone": "Asia/Shanghai",
+  "query_context": {
+    "field_scope": "all_fields",
+    "record_scope": "all_records",
+    "search_scope": "fldpCfjw3C(名称)"
+  },
+  "requested_limit": 2000,
+  "records_count": 1,
+  "page_count": 1,
+  "has_more": false,
+  "record_file": "D:\\Documents\\Workbuddy\\股票基金\\quant-weight-system\\_positions_hanshen_check.ndjson",
+  "record_file_size_bytes": 466,
+  "manifest_file": "D:\\Documents\\Workbuddy\\股票基金\\quant-weight-system\\_positions_hanshen_check.manifest.json",
+  "columns": {
+    "record_id": {
+      "physical_type": "string",
+      "stats": {
+        "max_length": 14
+      },
+      "example": "recvtzI6loQ437"
+    },
+    "仓位占比": {
+      "field_id": "fldXM1IGEH",
+      "field_type": "number",
+      "physical_type": "number|null",
+      "stats": {
+        "null_count": 1
+      },
+      "hint": "All values are empty; type inference may be ambiguous. Avoid analyzing this column unless required."
+    },
+    "代码": {
+      "field_id": "flduM5ZnHg",
+      "field_type": "text",
+      "physical_type": "string|null",
+      "stats": {
+        "null_count": 0,
+        "max_length": 6
+      },
+      "example": "002412"
+    },
+    "名称": {
+      "field_id": "fldpCfjw3C",
+      "field_type": "text",
+      "physical_type": "string|null",
+      "stats": {
+        "null_count": 0,
+        "max_length": 4
+      },
+      "example": "汉森制药"
+    },
+    "处理策略": {
+      "field_id": "fldHxT2z8A",
+      "field_type": "select",
+      "physical_type": "array<string>",
+      "stats": {
+        "empty_count": 0,
+        "max_length": 1,
+        "avg_length": 1
+      },
+      "example": [
+        "按系统"
+      ]
+    },
+    "备注": {
+      "field_id": "fldUfJlZOu",
+      "field_type": "text",
+      "physical_type": "string|null",
+      "stats": {
+        "null_count": 0,
+        "max_length": 31
+      },
+      "example": "2026-08-31 用户清仓（原 600 股@13.658）"
+    },
+    "复盘状态": {
+      "field_id": "fld4F83QFw",
+      "field_type": "select",
+      "physical_type": "array<string>",
+      "stats": {
+        "empty_count": 0,
+        "max_length": 1,
+        "avg_length": 1
+      },
+      "example": [
+        "已清仓离场"
+      ]
+    },
+    "市值": {
+      "field_id": "fldE7jg0eU",
+      "field_type": "number",
+      "physical_type": "number|null",
+      "stats": {
+        "null_count": 0,
+        "min": 0,
+        "max": 0,
+        "avg": 0
+      },
+      "example": 0
+    },
+    "当日盈亏": {
+      "field_id": "fldyg6c1Om",
+      "field_type": "number",
+      "physical_type": "number|null",
+      "stats": {
+        "null_count": 1
+      },
+      "hint": "All values are empty; type inference may be ambiguous. Avoid analyzing this column unless required."
+    },
+    "成本价": {
+      "field_id": "fldkGmrNju",
+      "field_type": "number",
+      "physical_type": "number|null",
+      "stats": {
+        "null_count": 0,
+        "min": 13.658,
+        "max": 13.658,
+        "avg": 13.658
+      },
+      "example": 13.658
+    },
+    "持仓份额": {
+      "field_id": "fldyIl58lY",
+      "field_type": "number",
+      "physical_type": "number|null",
+      "stats": {
+        "null_count": 0,
+        "min": 0,
+        "max": 0,
+        "avg": 0
+      },
+      "example": 0
+    },
+    "更新日期": {
+      "field_id": "fldbCL3ozi",
+      "field_type": "datetime",
+      "physical_type": "string|null",
+      "stats": {
+        "null_count": 0,
+        "min": "2026-08-31T00:00:00.000+08:00",
+        "max": "2026-08-31T00:00:00.000+08:00"
+      },
+      "example": "2026-08-31T00:00:00.000+08:00"
+    },
+    "止盈目标%": {
+      "field_id": "fldksWvXqD",
+      "field_type": "number",
+      "physical_type": "number|null",
+      "stats": {
+        "null_count": 1
+      },
+      "hint": "All values are empty; type inference may be ambiguous. Avoid analyzing this column unless required."
+    },
+    "浮动盈亏": {
+      "field_id": "fldoDeFUrG",
+      "field_type": "number",
+      "physical_type": "number|null",
+      "stats": {
+        "null_count": 0,
+        "min": 0,
+        "max": 0,
+        "avg": 0
+      },
+      "example": 0
+    },
+    "现价": {
+      "field_id": "fldmeER6TO",
+      "field_type": "number",
+      "physical_type": "number|null",
+      "stats": {
+        "null_count": 0,
+        "min": 11.82,
+        "max": 11.82,
+        "avg": 11.82
+      },
+      "example": 11.82
+    },
+    "目标占比%": {
+      "field_id": "fldClaQTJy",
+      "field_type": "number",
+      "physical_type": "number|null",
+      "stats": {
+        "null_count": 1
+      },
+      "hint": "All values are empty; type inference may be ambiguous. Avoid analyzing this column unless required."
+    },
+    "类型": {
+      "field_id": "fldr1EeBUE",
+      "field_type": "select",
+      "physical_type": "array<string>",
+      "stats": {
+        "empty_count": 0,
+        "max_length": 1,
+        "avg_length": 1
+      },
+      "example": [
+        "股票"
+      ]
+    },
+    "行业": {
+      "field_id": "fldbvJfEWz",
+      "field_type": "text",
+      "physical_type": "string|null",
+      "stats": {
+        "null_count": 0,
+        "max_length": 4
+      },
+      "example": "医药生物"
+    },
+    "距回本%": {
+      "field_id": "fldzW4pWpJ",
+      "field_type": "number",
+      "physical_type": "number|null",
+      "stats": {
+        "null_count": 1
+      },
+      "hint": "All values are empty; type inference may be ambiguous. Avoid analyzing this column unless required."
+    }
+  }
+}
