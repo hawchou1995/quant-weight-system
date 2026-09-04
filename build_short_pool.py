@@ -672,6 +672,12 @@ def calc_signals(as_of=None):
                     "regime": "bear" if _kh_is_bear else ("bull" if _kh_is_bull_mkt else "weak_bull"),
                     "hits": _kinfo["hits"],
                 }
+                # ⚠ 2026-09-04 修复（grill Q1）：KHunter 主信号 tier 覆盖必须同步到 sig_stock（short_signals.js 数据源）
+                # 原缺陷：覆盖只做了 details（838 行），sig_stock 仍按旧战法 tier_of(score) →
+                # 跟踪池 renderWatch 读 SHORT_SIGNALS 显示「清仓」，与池子「买入」矛盾。
+                # 语义与 details 一致：sig + buy → tier=「买入」（score 保留旧战法分仅参考）。
+                if _kh_ok_buy:
+                    sig_stock[code[-6:]]["tier"] = "买入"
                 # 事件收集（主信号判定：分域 RSI 阈值 + 分域低价 + 分域门控）
                 _buy_ok = bool(_kh_ok_buy)
                 khunter_buy.append((code, _kinfo, _buy_ok, float(sc), r, ddf))
@@ -863,7 +869,7 @@ def calc_signals(as_of=None):
         "top4": _top4_list,
         "candidates": _cand_list,
         "khunter": _kmeta,
-        "note": "主信号=KHunter 15 策略信号+信号日分域RSI（🐻熊市<35+低价≥3元+ob55 / 🌞牛市(>MA20)<30+无低价+ob75；Phase 10 HYBRIDv2 定稿 total+68.5% 牛熊独立双过闸）；旧战法反转分已全量弃用（负期望：主板 -35.65%/全市场 -41.67%），不再展示",
+        "note": "主信号=KHunter 15 策略信号+信号日分域RSI（🐻熊市&lt;35+低价≥3元+ob55 / 🌞牛市(&gt;MA20)&lt;30+无低价+ob75；Phase 10 HYBRIDv2 定稿 total+68.5% 牛熊独立双过闸）；旧战法反转分已全量弃用（负期望：主板 -35.65%/全市场 -41.67%），不再展示",
         "label": {"top4": "🎯 KHunter 主信号"},
     }
     # 2026-08-20 用户决策：市况门控改为「仅提醒」——门控关闭不再清空股票池。

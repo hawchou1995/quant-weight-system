@@ -5,7 +5,8 @@
     {
       "code": "sz002364",
       "rsi": 29.920814479637997,
-      "close": 37.9
+      "close": 37.9,
+      "regime": "bear"
     }
   ],
   "pending_sells": [],

@@ -565,12 +565,12 @@ def bt_a5_html():
 <div class="kpis">
 <div class="kpi"><div class="l">牛熊双过闸</div><div class="v">✅</div><div class="s">牛 n=78 · 熊 n=104</div></div>
 <div class="kpi"><div class="l">收益结构</div><div class="v">牛稳·熊稳</div><div class="s">牛 +2.52% 熊 +0.27% 均正</div></div>
-<div class="kpi"><div class="l">生产预筛差距</div><div class="v" style="font-size:15px">缺 F3 空间</div><div class="s">生产仅 rel≤0.5+amt · 须加 F3</div></div>
+<div class="kpi"><div class="l">生产预筛差距</div><div class="v" style="font-size:15px">已闭合 ✅</div><div class="s">F3 已接入（ROOM_MIN=0.20）</div></div>
 </div></div>'''
     return (f'<div class="card" id="bt-a5">\n'
             f'<h2>🏆 打板族过闸档位 <span class="badge badge-auto">融合网格 · 牛熊独立四闸 · 2021+ 复验</span></h2>\n'
             f'<div class="sub">9/1 融合网格 260 配置 × 牛熊独立四闸（n≥30 + wr≥40% + 均值&gt;0 + 中位数&gt;0）· 2026-09-03 生产档位敏感性复验（2021+ 制度一致区间）· 结论：<b>仅 G3_M3（低位+距前高≥20%空间）牛熊双过闸</b>；裸 rel_pos 不过闸；G2_M3 熊过、G6_M6/M7 牛过（n&lt;30 不可投产）</div>\n'
-            f'<div class="sub" style="color:#059669">✅ <b>本次优化方向</b>：生产预筛或缺 F3 空间因子（rel_pos≤0.5 + 成交额≥5000万 + <b>距60日高点≥20%</b>）—— 9/3 敏感性证实这是「薄弱环节」的针对性优化，生产是否加 F3 待实盘验证</div>\n'
+            f'<div class="sub" style="color:#059669">✅ <b>本次优化方向（已落地）</b>：生产预筛已补 F3 空间因子（rel_pos≤0.5 + 成交额≥5000万 + <b>距60日高点≥20%</b>，ROOM_MIN=0.20 阶段1 过滤）—— 生产预筛 = G3_M3 过闸族；模拟盘验证门通过前不改生产权重</div>\n'
             f'<div class="sub" style="color:#d97706">⚠ <b>重要边界</b>：G3_M3 牛熊过闸是「回测期望」，模拟盘验证门（30 信号/3 个月）通过前不改生产权重；G6 组 n&lt;30 禁止投产；A5 原始负期望结论（组合复利 -72.2%）不再作为主展示，仅作历史对照</div>\n'
             f'<div class="bt-grid">{c1}{c2}{c3}</div>\n</div>')
 
@@ -754,7 +754,7 @@ def a5_view_html():
 <span class="badge badge-auto">信号 = 首板次日低开 2-5% + 相对位置≤0.5 + 成交额≥5000万（生产预筛口径）</span>
 <span class="badge badge-auto">出场 = 止盈+T+2（+8% 止盈 / T+2 兜底）</span>
 </div>
-<div class="sys-head-note"><b>定位</b>：9/3 生产档位敏感性确认 <b>G3_M3（低位+空间≥20%）牛熊双过闸</b>（牛 n=78 wr51.3% +2.52% / 熊 n=104 wr55.8% +0.27%）；裸 rel_pos 不过闸；生产预筛缺 F3 空间因子。模拟盘观察 30 信号/3 个月，通过前不改生产权重；G6 组 n&lt;30 禁止投产</div>
+<div class="sys-head-note"><b>定位</b>：9/3 生产档位敏感性确认 <b>G3_M3（低位+空间≥20%）牛熊双过闸</b>（牛 n=78 wr51.3% +2.52% / 熊 n=104 wr55.8% +0.27%）；裸 rel_pos 不过闸；<b>生产预筛已接入 G3_M3 过闸族</b>（阶段1 = 首板 + rel_pos≤0.5 + <b>F3 空间因子 dist_high≥20%（ROOM_MIN=0.20）</b> + 成交额≥5000万 → 仅过闸族入观察清单）。模拟盘观察 30 信号/3 个月，通过前不改生产权重；G6 组 n&lt;30 禁止投产</div>
 </div>
 <div class="kpis">{''.join(kpis)}</div>
 {gate_bar}
@@ -1048,10 +1048,10 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
   "view-short-stk", "sys-short-stk",
   "⚡ 短线 · 股票池", "auto", "主板 KHunter 主信号 · A55 主卖出 / C50 参考 · 低价≥3元",
   v9_short_stock, "tbl-short-stk", "card-short-stk",
-  "信号池 = 回测买入清单：KHunter 15 策略信号 + 信号日 RSI<35 超卖 + 收盘≥3元（主板限定·事件独立·有信号即买）· 卖出 = <b>逐股独立</b>：持仓股自身 RSI 确认日 &gt; A55 阈值 → T+1 开盘卖（C50 为参考线，标注但<i>不执行</i>，A/C 判定归模拟盘双轨）· 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：不追高，可等盘中回落至 3% 以内再考虑买入（9:30 盘中起生效）</b>",
+  "信号池 = 回测买入清单：KHunter 15 策略信号 + 信号日 RSI&lt;35 超卖 + 收盘≥3元（主板限定·事件独立·有信号即买）· 卖出 = <b>逐股独立</b>：持仓股自身 RSI 确认日 &gt; A55 阈值 → T+1 开盘卖（C50 为参考线，标注但<i>不执行</i>，A/C 判定归模拟盘双轨）· 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：不追高，可等盘中回落至 3% 以内再考虑买入（9:30 盘中起生效）</b>",
   extra_card="", score_sub="动量/量价/通道/波动",
   head_tags=[SHORT_POOL_GATE, SHORT_KHUNTER_BEAR, SHORT_KHUNTER_BADGE,
-             '<span class="badge badge-auto">股票 = KHunter 15 策略信号 + RSI<35 超卖 + 熊市MA60（主板限定 · 弃用旧战法）</span>',
+             '<span class="badge badge-auto">股票 = KHunter 15 策略信号 + RSI&lt;35 超卖 + 熊市MA60（主板限定 · 弃用旧战法）</span>',
              '<span class="badge badge-auto">KHunter 信号密集期每日可能有几只，稀疏期 0 只属正常（事件驱动）</span>'],
   head_note=f"<b>🎯 KHunter 主信号（蓝标）= 主板 15 策略信号命中 + 信号日 RSI&lt;35 超卖 + 收盘≥3元 + 熊市(沪深300&lt;MA60)</b>（2026-09-03 生产切换 v5.14.0：B1 熊市限定——38 组牛市扫描 0 过门后收紧；A 版卖出 RSI&gt;55 主执行 / C 版 RSI&gt;50 参考展示；入场两版相同）· 回测：A+low3（熊市限定）n=408 资金池(N5)年化 5.54%/回撤 19.90%/夏普 0.372，C+low3 4.98%/19.45%/0.352（每笔口径 C 更锐：81.4%/1.430）；牛市子集 4 方向×38 组 0 过门→不开新仓，牛市收益由基金动量池承担· <b>旧战法（反转分）已全量弃用</b>（主板 -35.65% / 全市场 -41.67% 均负期望，不再展示）· 市况门控仅提醒：沪深300 &gt; MA20 才开新仓；KHunter 买入由独立 <b>MA60 熊市门控</b>裁决（非熊→不开新仓仅观察/卖出）· 卖出逐股独立走「全量池短线跟踪」· 回测参考见「监控总览」",
   as_of=SHORT_POOL_ASOF, intraday_note=SHORT_POOL_INTRADAY,
@@ -1464,17 +1464,28 @@ document.addEventListener('DOMContentLoaded',function(){{
       if(!rec&&S.fund&&S.fund[code]){{rec=S.fund[code];grp='fund';}}
       if(!rec){{rows.push({{code:code,entry:r.entry,exit:r.exit||'—',age:r.age,grp:grp,typeName:r.pool||'股票',rec:null,inPool:0}});return;}}
       var act,actCls,tierDisp=rec.tier;
+      // 2026-09-04 新增（grill Q1-2/Q2-1）：标准版(A)/激进版(C) 双档位判定
+      // A 版档位/动作沿用现有语义；C 版=KHunter RSI>50 参考卖出（c_sell，与 A 版独立）
+      var kh=rec.khunter||{{}};
+      var tierC='—',actC='—',actCCls='';
+      if(kh.c_sell){{tierC='C:卖出';actC='🔴 C 版卖出';actCCls='down';}}
+      else if(kh.sell){{tierC='C:卖出';actC='🔴 C 版卖出';actCCls='down';}}
+      else if(kh.buy){{tierC='C:持有';actC='🟢 C:持有/跟踪';actCCls='up';}}
+      else if(kh.c_sell===false||kh.sell===false){{tierC='C:持有';actC='🟢 C:持有/跟踪';actCCls='up';}}
       // 2026-08-27 修复：停牌股（suspended）——持仓股停牌期间仍需跟踪卖出信号，显示「停牌·复牌后跟踪」
       if(rec.suspended){{act='⏸ 停牌·复牌后跟踪';actCls='warn';tierDisp='停牌';}}
       // 2026-08-26 修复：破MA5（收盘价<MA5）为硬性退出规则，档位同步改写「破MA5·卖出」，避免与建议动作「次日卖出」展示冲突
       else if(rec.ma5_above===false){{act='⚠️ 次日卖出（破MA5）';actCls='down';tierDisp='破MA5·卖出';}}
       else if(rec.tier==='清仓'){{act='🔴 清仓';actCls='down';}}
       else if(rec.tier==='减至半仓'){{act='🔴 减至半仓';actCls='down';}}
+      // 2026-09-04 修复（grill Q1）：KHunter 主信号买入档必须显示为买入信号（原落进「观望」兜底）
+      else if(rec.tier==='强买入'){{act='🟢 强买入信号（KHunter）';actCls='up';}}
+      else if(rec.tier==='买入'){{act='🟢 买入信号（KHunter）';actCls='up';}}
       else if(!topSet[code]){{act='🔄 下次轮动换出';actCls='warn';}}
       else if(rec.tier==='轻仓加仓'||rec.tier==='满仓加仓'){{act='✅ 继续持有';actCls='up';}}
       else {{act='🟡 观望（不补不加）';actCls='warn';}}
       var typeName=(grp==='fund'||r.type==='fund')?'基金':(r.pool||'股票');   // 2026-08-18 用户需求：股票类型按权限细分（主板/创业板/科创板）
-      rows.push({{code:code,entry:r.entry,exit:r.exit||'—',age:r.age,grp:grp,typeName:typeName,pool:r.pool,rec:rec,act:act,actCls:actCls,inPool:topSet[code]?1:0,tierDisp:tierDisp}});
+      rows.push({{code:code,entry:r.entry,exit:r.exit||'—',age:r.age,grp:grp,typeName:typeName,pool:r.pool,rec:rec,act:act,actCls:actCls,inPool:topSet[code]?1:0,tierDisp:tierDisp,tierC:tierC,actC:actC,actCCls:actCCls}});
     }});
     if(bar){{bar.style.display=rows.length?'':'none';}}
     if(!rows.length){{box.innerHTML='<div class="sub" style="color:var(--faint)">暂无跟踪 —— 短线表出现可买入标的（强买入/买入）后自动加入，保留 30 天</div>';return;}}
@@ -1511,7 +1522,8 @@ document.addEventListener('DOMContentLoaded',function(){{
     var cnt=document.getElementById('watch-count');
     if(cnt)cnt.textContent='筛选 '+filtered.length+' / 共 '+rows.length+' 只';
     if(!filtered.length){{box.innerHTML='<div class="sub" style="color:var(--faint)">无匹配标的 —— 调整搜索/筛选条件后重试</div>';return;}}
-    var h='<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>类型</th><th style="text-align:center">入池日期</th><th style="text-align:center">出池日期</th><th style="text-align:center">已跟踪</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">短线分</th><th style="text-align:center">档位</th><th style="text-align:center">MA5</th><th style="text-align:center">建议动作</th></tr></thead><tbody>';
+    var h='<div class="sub" style="margin-bottom:6px;color:var(--sub)">🧭 <b>A 标准版</b>=生产主信号（牛熊分域 RSI 阈值卖出）；<b>C 激进版</b>=RSI&gt;50 参考卖出（更早止盈，双版本并行对决）—— 卖出信号为独立信号，不含买入含义</div>'
+          +'<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>类型</th><th style="text-align:center">入池日期</th><th style="text-align:center">出池日期</th><th style="text-align:center">已跟踪</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">短线分</th><th style="text-align:center">档位(A)</th><th style="text-align:center">建议(A)</th><th style="text-align:center">档位(C)</th><th style="text-align:center">建议(C)</th><th style="text-align:center">MA5</th></tr></thead><tbody>';
     filtered.forEach(function(r){{
       var rec=r.rec;
       var ageS=r.age===null?'—':(r.age+' 天 / 剩 '+(30-r.age)+' 天');
@@ -1521,7 +1533,9 @@ document.addEventListener('DOMContentLoaded',function(){{
       var chgDisp=susp?'停牌':((rec.chg>0?'+':'')+rec.chg+'%');
       var chgCls=susp?'':(rec.chg>0?'up':'down');
       var ma5Disp=susp?'—':(rec.ma5_above?'✅ 上方':'⚠️ 下方');
-      h+='<tr><td>'+r.code+'</td><td>'+nameDisp+'</td><td>'+r.typeName+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+(r.exit||'—')+'</td><td style="text-align:center">'+ageS+'</td><td style="text-align:right">'+rec.px+'</td><td style="text-align:right" class="'+chgCls+'">'+chgDisp+'</td><td style="text-align:center">'+rec.score+'</td><td style="text-align:center">'+r.tierDisp+'</td><td style="text-align:center">'+ma5Disp+'</td><td style="text-align:center" class="'+r.actCls+'">'+r.act+'</td></tr>';
+      // 2026-09-04（grill Q2-1）：A/C 双列（C 列对非 KHunter 标的显示 —）
+      var tierCDisp=r.tierC||'—'; var actCDisp=r.actC||'—'; var actCCls=r.actCCls||'';
+      h+='<tr><td>'+r.code+'</td><td>'+nameDisp+'</td><td>'+r.typeName+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+(r.exit||'—')+'</td><td style="text-align:center">'+ageS+'</td><td style="text-align:right">'+rec.px+'</td><td style="text-align:right" class="'+chgCls+'">'+chgDisp+'</td><td style="text-align:center">'+rec.score+'</td><td style="text-align:center">'+r.tierDisp+'</td><td style="text-align:center" class="'+r.actCls+'">'+r.act+'</td><td style="text-align:center">'+tierCDisp+'</td><td style="text-align:center" class="'+actCCls+'">'+actCDisp+'</td><td style="text-align:center">'+ma5Disp+'</td></tr>';
     }});
     h+='</tbody></table>';
     box.innerHTML=h;
@@ -1751,11 +1765,13 @@ print(f"监控看板已生成: {out} ({out.stat().st_size/1024:.0f} KB)")
 
 # --- 防御性 HTML 校验（2026-09-04 新增：防未转义尖括号破坏 DOM）---
 import re as _re
+# 先剔除 <script>...</script> 块（块内 JS 比较符 < 合法，不参与 HTML 文本校验）
+_text_only = _re.sub(r'<script\b[^>]*>.*?</script\s*>', '', html, flags=_re.S)
 _bad = []
-for _m in _re.finditer(r'<(?![a-zA-Z/!]|!DOCTYPE|!--)([^>\n]{0,40})', html):
+for _m in _re.finditer(r'<(?![a-zA-Z/!]|!DOCTYPE|!--)([^>\n]{0,40})', _text_only):
     _seg = _m.group(0)
     # HTML 文本中 < 后跟字母/数字但非标签开头（如 <MA60) → 未转义风险）
-    _after = html[_m.start()+1:_m.start()+12]
+    _after = _text_only[_m.start()+1:_m.start()+12]
     if _after and _after[0].isalnum() and not _re.match(r'^[a-zA-Z][a-zA-Z0-9-]*[\s/>]', _after):
         _bad.append(f"@{_m.start()}: {_seg!r}")
 if _bad:
@@ -1763,7 +1779,7 @@ if _bad:
     for _b in _bad[:10]:
         print(f"  {_b}")
 else:
-    print("✅ HTML 转义校验通过：无未转义 '<'")
+    print("✅ HTML 转义校验通过：无未转义 '<'（已豁免 <script> 块内 JS 比较符）")
 # 终局 div 平衡粗校验
 _dep = 0
 for _m in _re.finditer(r'<div\b[^>]*>|</div\s*>', html):
