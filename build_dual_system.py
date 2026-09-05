@@ -114,6 +114,41 @@ except Exception as _e:
     SHORT_POOL_GATE = ''
     SHORT_POOL_NOTE = ''
     SHORT_KHUNTER_BEAR = ''
+    SHORT_POOL = {}
+# 2026-09-05 用户需求：短线命中策略一览 + 跟踪池行业列 —— 全市场板块/行业紧凑映射（内联 window.STOCK_META）
+# 数据源：short_signals.js 全量股票代码 + stock_industry.json（申万一级，7511 只全市场覆盖）
+try:
+    _ind_map = json.loads(open(BASE / "stock_industry.json", encoding="utf-8").read())["map"]
+except Exception:
+    _ind_map = {}
+def _board_of6(c):
+    """6 位代码 → 板块（与 build_short_pool.board_of 同口径）"""
+    if c.startswith(("688", "689")):
+        return "科创板"
+    if c.startswith("30"):
+        return "创业板"
+    if c.startswith(("8", "4", "92")):
+        return "北交所"
+    return "主板"
+STOCK_META = {}
+try:
+    _sig_js = open(BASE / "short_signals.js", encoding="utf-8").read()
+    _sig_data = json.loads(_sig_js[len("window.SHORT_SIGNALS = "):-1])
+    for _c in _sig_data.get("stock", {}):
+        STOCK_META[_c] = [_board_of6(_c), _ind_map.get(_c, "—")]
+    # 基金（短线跟踪池含基金行）：short_pool.json details 自带行业
+    for _c, _d in SHORT_POOL.get("details", {}).items():
+        STOCK_META[_c] = [_d.get("board", "基金"), _d.get("industry", "—")]
+    # 跟踪池基金补全：track/pending 中未覆盖的基金代码 → 按基金名识别主题（industry_pool.fund_industry）
+    import industry_pool as _IP
+    for _c in set(SHORT_POOL.get("track", {})) | set(SHORT_POOL.get("track_pending_short", {})):
+        if _c in STOCK_META:
+            continue
+        _fname = (_sig_data.get("fund", {}).get(_c) or {}).get("name", "")
+        STOCK_META[_c] = ["基金", _IP.fund_industry(_fname)]
+except Exception as _e:
+    print("stock_meta 构建失败:", _e)
+STOCK_META_JS = json.dumps(STOCK_META, ensure_ascii=False, separators=(",", ":"))
 # A5_tp8t2 打板实验系统（第三个系统，2026-08-28 接入；数据由 build_a5_pool.py 生成）
 try:
     _a5_js = open(BASE / "a5_pool.js", encoding="utf-8").read()
@@ -1095,6 +1130,27 @@ if _cf.exists():
 # ════ 视图 C 内容：短线 股票池 / 基金池 分板块（2026-09-03 用户需求）════
 # 股票池含 标准/激进 双版本（入场同信号，标准版 A55 主卖出 + 激进版 C50 参考标注）；基金池=场外基金动量；
 # 跟踪池统一放底部（股票+基金同一 watch 卡，类型筛选），不做 标准/激进 双跟踪池（买入同一、卖出判定归模拟盘双轨）
+# 2026-09-05 用户需求：新增「KHunter 命中策略一览」卡（命中 15 策略全展示，按 RSI 升序，档位/建议区分）
+KH_HITS_CARD = f'''<div class="card" id="card-kh-hits">
+<h2>🎯 KHunter 命中策略一览 <span class="badge badge-auto">自动 · 按 RSI 升序</span></h2>
+<div class="sub">全量池短线股票中<b>命中 KHunter 15 策略</b>的标的（含未达买入阈值者，事件驱动）· 按当前 RSI 升序（超卖优先）· 档位/建议 = 牛熊分域裁决：<b>买入</b> = RSI 低于分域阈值（熊&lt;35 / 牛&lt;30 / 弱牛&lt;32）· <b>卖出</b> = RSI 高于分域阈值（熊&gt;55 / 牛&gt;75，激进版参考线 &gt;50）· 命中但未达阈值 = 观望（仅观察，不构成操作）· 数据截至 {SHORT_POOL_ASOF}</div>
+<div class="toolbar" id="kh-hits-bar">
+<input type="text" id="kh-hits-q" placeholder="🔍 搜索代码 / 名称 / 策略…" autocomplete="off" spellcheck="false">
+<select id="kh-hits-f-tier" class="flt" title="档位筛选"><option value="">全部档位</option><option>买入</option><option>卖出</option><option>激进:卖出</option><option>观望</option></select>
+<select id="kh-hits-f-board" class="flt" title="板块筛选"><option value="">全部板块</option><option>主板</option><option>创业板</option><option>科创板</option><option>北交所</option></select>
+<span class="count" id="kh-hits-count"></span>
+</div>
+<table class="tbl" id="kh-hits-table">
+<thead><tr>
+<th style="text-align:center">#</th><th>代码</th><th>名称</th><th>板块</th><th>权限</th><th>行业</th>
+<th style="text-align:right">现价</th><th style="text-align:right">涨跌</th>
+<th style="text-align:center">RSI 今</th><th style="text-align:center">RSI T-1</th><th style="text-align:center">分域</th>
+<th>命中策略</th><th style="text-align:center">档位</th><th style="text-align:center">建议</th>
+</tr></thead>
+<tbody></tbody>
+</table>
+</div>'''
+
 SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
 {system_block(
   "view-short-stk", "sys-short-stk",
@@ -1109,6 +1165,7 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
   as_of=SHORT_POOL_ASOF, intraday_note=SHORT_POOL_INTRADAY,
   as_of_min=SHORT_POOL.get("intraday_ts") or SHORT_POOL_ASOF_MIN,
   tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=(), inline=True)}
+{KH_HITS_CARD}
 {system_block(
   "view-short-fund", "sys-short-fund",
   "🔵 短线 · 基金池", "auto", "场外基金动量（分≥50 才入池）",
@@ -1340,12 +1397,13 @@ html = f"""<!doctype html>
 <link rel="stylesheet" href="https://unpkg.com/artalk@2/dist/Artalk.css">
 <script src="https://unpkg.com/artalk@2/dist/Artalk.js"></script>
 <script>window.SHORT_POOL = {SHORT_POOL_SLIM};</script>
+<script>window.STOCK_META = {STOCK_META_JS};</script>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
 window.ENH.nav = [
   ["overview","📊","监控总览",[["overview","总览统计"],["mkt-weather","市场晴雨表"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
   ["sys-auto","🅰️","全量池中/长线",[["card-tbl-v9","标的汇总表"],["card-tbl-v9-detail","逐标的详情"],["watch-v9-card","中长线跟踪"]]],
-  ["short","⚡","全量池短线",[["card-short-stk","📋 股票池 汇总表"],["card-short-stk-detail","🔍 股票池 逐标的详情"],["card-short-fund","📋 基金池 汇总表"],["card-short-fund-detail","🔍 基金池 逐标的详情"],["watch-card","📌 短线跟踪"]]],
+  ["short","⚡","全量池短线",[["card-short-stk","📋 股票池 汇总表"],["card-short-stk-detail","🔍 股票池 逐标的详情"],["card-kh-hits","🎯 KHunter 命中策略一览"],["card-short-fund","📋 基金池 汇总表"],["card-short-fund-detail","🔍 基金池 逐标的详情"],["watch-card","📌 短线跟踪"]]],
   ["a5","🎯","打板族",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
   ["comment","💬","评论区",[]]
 ];
@@ -1469,6 +1527,14 @@ document.addEventListener('DOMContentLoaded',function(){{
   function boardCell(v){{
     var cls={{'主板':'board-sh','创业板':'board-cy','科创板':'board-kc','北交所':'board-bj'}}[v]||'';
     return v?'<span class="board-tag '+cls+'">'+v+'</span>':'—';
+  }}
+  /* 2026-09-05：板块/行业统一查找 —— 优先 window.STOCK_META（全市场紧凑映射，内联），回退 ENH.details（v9 池） */
+  function stockMeta(code){{
+    var m=window.STOCK_META||{{}};
+    var e=m[code];
+    if(e)return {{board:e[0]||'—',industry:e[1]||'—'}};
+    var det=(window.ENH&&window.ENH.details&&window.ENH.details[code])||{{}};
+    return {{board:det.board||'—',industry:det.industry||'—'}};
   }}
   function fillTierOptions(selId,tiers){{
     var sel=document.getElementById(selId);if(!sel)return;
@@ -1598,7 +1664,8 @@ document.addEventListener('DOMContentLoaded',function(){{
       var chgCls=susp?'':(rec.chg>0?'up':'down');
       var ma5Disp=susp?'—':(rec.ma5_above?'✅ 上方':'⚠️ 下方');
       // 2026-09-05 用户需求：跟踪池统一格式（权限/行业列）
-      var ind=(window.SHORT_POOL&&window.SHORT_POOL.details&&window.SHORT_POOL.details[r.code])?(window.SHORT_POOL.details[r.code].industry||'—'):'—';
+      // 2026-09-05 修复：SHORT_POOL_SLIM 不含 details → 走 stockMeta（STOCK_META 全市场映射，回退 ENH.details）
+      var ind=stockMeta(r.code).industry;
       // 2026-09-04（grill Q2-1）：标准/激进双列（激进列对非 KHunter 标的显示 —）
       var tierCDisp=r.tierC||'—'; var actCDisp=r.actC||'—'; var actCCls=r.actCCls||'';
       h+='<tr><td>'+r.code+'</td><td>'+nameDisp+'</td><td>'+r.typeName+'</td><td>'+permOf(r.code)+'</td><td>'+ind+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+(r.exit||'—')+'</td><td style="text-align:center">'+ageS+'</td><td style="text-align:right">'+rec.px+'</td><td style="text-align:right" class="'+chgCls+'">'+chgDisp+'</td><td style="text-align:center">'+rec.score+'</td><td style="text-align:center">'+r.tierDisp+'</td><td style="text-align:center" class="'+r.actCls+'">'+r.act+'</td><td style="text-align:center">'+tierCDisp+'</td><td style="text-align:center" class="'+actCCls+'">'+actCDisp+'</td><td style="text-align:center">'+ma5Disp+'</td></tr>';
@@ -1613,6 +1680,63 @@ document.addEventListener('DOMContentLoaded',function(){{
     el.addEventListener(id==='watch-q'?'input':'change',renderWatch);
   }});
   renderWatch();
+  /* 2026-09-05 用户需求：短线选股池命中策略一览 —— 命中 KHunter 15 策略全展示，按 RSI 升序，档位/建议区分 */
+  var KH_STRAT_CN={{'trend_resonance':'趋势共振','trend_start':'趋势起点','immortal_guidance':'仙人指路','multi_golden_cross':'多金叉共振','limit_up_pullback':'涨停回马枪','strong_wash':'强势洗盘','golden_cross_not_green':'金叉不绿','morning_star':'启明星','strategy_2560':'2560战法','golden_triangle':'黄金三角','limit_up_sideways':'涨停横盘','multi_party_cannon':'多方炮','resistance_breakout':'突破压力','trend_acceleration':'趋势加速','w_bottom':'W底'}};
+  var KH_REGIME_CN={{'bear':'🐻 熊市','bull':'🌞 牛市','weak_bull':'🌙 弱牛'}};
+  function khTierAdvice(kh){{
+    if(kh.buy)return {{tier:'买入',act:kh.note||'🟢 买入信号 · T+1 开盘买入',cls:'up'}};
+    if(kh.sell)return {{tier:'卖出',act:kh.note||'🔴 卖出信号 · T+1 开盘卖',cls:'down'}};
+    if(kh.c_sell)return {{tier:'激进:卖出',act:kh.note||'🔴 激进版参考卖出（RSI>50）',cls:'down'}};
+    return {{tier:'观望',act:'🟡 命中但 RSI 未达买入阈值（熊<35/牛<30/弱牛<32）· 仅观察',cls:'warn'}};
+  }}
+  function renderKhHits(){{
+    var box=document.getElementById('kh-hits-table');if(!box)return;
+    var S=window.SHORT_SIGNALS;if(!S||!S.stock){{box.innerHTML='<tbody><tr><td colspan="14" class="sub">信号数据未加载（缺 short_signals.js）</td></tr></tbody>';return;}}
+    var E=window.ENH||{{}};
+    var rows=[];
+    Object.keys(S.stock).forEach(function(code){{
+      var rec=S.stock[code];var kh=rec.khunter||{{}};
+      if(!kh.sig)return;
+      var meta=stockMeta(code);
+      var ta=khTierAdvice(kh);
+      rows.push({{code:code,name:rec.name||code,board:meta.board,industry:meta.industry,px:rec.px,chg:rec.chg,
+        rsi:kh.rsi_now,rsi1:kh.rsi_t1,regime:kh.regime||'?',hits:kh.hits||[],tier:ta.tier,act:ta.act,cls:ta.cls}});
+    }});
+    rows.sort(function(a,b){{return (a.rsi==null?999:a.rsi)-(b.rsi==null?999:b.rsi);}});   // RSI 升序
+    var q=(document.getElementById('kh-hits-q').value||'').trim().toLowerCase();
+    var ft=document.getElementById('kh-hits-f-tier').value;
+    var fb=document.getElementById('kh-hits-f-board').value;
+    var filtered=rows.filter(function(r){{
+      if(q){{var txt=(r.code+' '+r.name+' '+r.hits.join(' ')+' '+r.industry).toLowerCase();if(txt.indexOf(q)<0)return false;}}
+      if(ft&&r.tier!==ft)return false;
+      if(fb&&r.board!==fb)return false;
+      return true;
+    }});
+    var cnt=document.getElementById('kh-hits-count');
+    if(cnt)cnt.textContent='命中 '+rows.length+' 只 · 筛选 '+filtered.length+' 只';
+    if(!filtered.length){{box.innerHTML='<tbody><tr><td colspan="14" class="sub" style="color:var(--faint)">今日无命中 —— KHunter 信号稀疏期 0 只属正常（事件驱动）</td></tr></tbody>';return;}}
+    var h='<tbody>';
+    filtered.forEach(function(r,i){{
+      var strat=r.hits.map(function(s){{return KH_STRAT_CN[s]||s;}}).join('、');
+      var chgCls=r.chg>0?'up':(r.chg<0?'down':'');
+      var chgDisp=(r.chg==null)?'—':((r.chg>0?'+':'')+r.chg.toFixed(2)+'%');
+      var pxDisp=(r.px==null)?'—':r.px.toFixed(2);
+      var rsiDisp=(r.rsi==null)?'—':r.rsi.toFixed(1);
+      var rsi1Disp=(r.rsi1==null)?'—':r.rsi1.toFixed(1);
+      var regDisp=KH_REGIME_CN[r.regime]||r.regime;
+      h+='<tr><td style="text-align:center">'+(i+1)+'</td><td>'+r.code+'</td><td><b>'+r.name+'</b></td><td>'+boardCell(r.board)+'</td><td>'+permOf(r.code)+'</td><td>'+r.industry+'</td>'
+        +'<td style="text-align:right">'+pxDisp+'</td><td style="text-align:right" class="'+chgCls+'">'+chgDisp+'</td>'
+        +'<td style="text-align:center"><b>'+rsiDisp+'</b></td><td style="text-align:center">'+rsi1Disp+'</td><td style="text-align:center">'+regDisp+'</td>'
+        +'<td>'+strat+'</td><td style="text-align:center">'+r.tier+'</td><td style="text-align:center" class="'+r.cls+'">'+r.act+'</td></tr>';
+    }});
+    h+='</tbody>';
+    box.innerHTML=h;
+  }}
+  ['kh-hits-q','kh-hits-f-tier','kh-hits-f-board'].forEach(function(id){{
+    var el=document.getElementById(id);if(!el)return;
+    el.addEventListener(id==='kh-hits-q'?'input':'change',renderKhHits);
+  }});
+  renderKhHits();
   /* 全量池中/长线年跟踪池（2026-08-17 用户需求：上榜 1 年，再上榜 +1 年；数据由 build_enhanced_data.py 维护） */
   function renderV9Watch(){{
     var box=document.getElementById('watch-v9-table');if(!box)return;
