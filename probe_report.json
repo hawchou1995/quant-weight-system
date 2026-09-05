@@ -1,7 +1,7 @@
 {
   "event_name": "schedule",
   "runner": "Linux",
-  "ts_utc": "2026-09-05T17:40:20.563245+00:00",
+  "ts_utc": "2026-09-05T19:29:21.903348+00:00",
   "tests": {
     "qt_quote": {
       "ok": true,
@@ -13,7 +13,7 @@
     },
     "tx_kline": {
       "ok": true,
-      "sec": 1.2,
+      "sec": 1.8,
       "rows": 5,
       "last": [
         "2026-09-04",
@@ -26,7 +26,7 @@
     },
     "ak_sina_spot": {
       "ok": true,
-      "sec": 61.1,
+      "sec": 72.5,
       "rows": 5555,
       "cols": [
         "代码",
@@ -39,7 +39,7 @@
     },
     "ak_tx_hist": {
       "ok": true,
-      "sec": 2.4,
+      "sec": 2.6,
       "rows": 7,
       "last_date": "2026-08-28",
       "last_close": 9.0
