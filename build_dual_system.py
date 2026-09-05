@@ -1133,10 +1133,10 @@ if _cf.exists():
 # 2026-09-05 用户需求：新增「KHunter 命中策略一览」卡（命中 15 策略全展示，按 RSI 升序，档位/建议区分）
 KH_HITS_CARD = f'''<div class="card" id="card-kh-hits">
 <h2>🎯 KHunter 命中策略一览 <span class="badge badge-auto">自动 · 按 RSI 升序</span></h2>
-<div class="sub">全量池短线股票中<b>命中 KHunter 15 策略</b>的标的（含未达买入阈值者，事件驱动）· 按当前 RSI 升序（超卖优先）· 档位/建议 = 牛熊分域裁决：<b>买入</b> = RSI 低于分域阈值（熊&lt;35 / 牛&lt;30 / 弱牛&lt;32）· <b>卖出</b> = RSI 高于分域阈值（熊&gt;55 / 牛&gt;75，激进版参考线 &gt;50）· 命中但未达阈值 = 观望（仅观察，不构成操作）· 数据截至 {SHORT_POOL_ASOF}</div>
+<div class="sub">全量池短线股票中<b>命中 KHunter 15 策略</b>的标的（含未达买入阈值者，事件驱动）· 按当前 RSI 升序（超卖优先）· 档位/建议 = 牛熊分域裁决，<b>标准版（A55 主卖出）</b>与<b>激进版（C50 参考线）</b>分四列独立展示：<b>买入</b> = RSI 低于分域阈值（熊&lt;35 / 牛&lt;30 / 弱牛&lt;32）· <b>卖出</b> = 标准版 RSI&gt;55/75/80、激进版 RSI&gt;50 · 命中但未达阈值 = 观望（仅观察，不构成操作）· 数据截至 {SHORT_POOL_ASOF}</div>
 <div class="toolbar" id="kh-hits-bar">
 <input type="text" id="kh-hits-q" placeholder="🔍 搜索代码 / 名称 / 策略…" autocomplete="off" spellcheck="false">
-<select id="kh-hits-f-tier" class="flt" title="档位筛选"><option value="">全部档位</option><option>买入</option><option>卖出</option><option>激进:卖出</option><option>观望</option></select>
+<select id="kh-hits-f-tier" class="flt" title="标准版档位筛选"><option value="">全部档位</option><option>买入</option><option>卖出</option><option>观望</option></select>
 <select id="kh-hits-f-board" class="flt" title="板块筛选"><option value="">全部板块</option><option>主板</option><option>创业板</option><option>科创板</option><option>北交所</option></select>
 <span class="count" id="kh-hits-count"></span>
 </div>
@@ -1145,7 +1145,9 @@ KH_HITS_CARD = f'''<div class="card" id="card-kh-hits">
 <th style="text-align:center">#</th><th>代码</th><th>名称</th><th>板块</th><th>权限</th><th>行业</th>
 <th style="text-align:right">现价</th><th style="text-align:right">涨跌</th>
 <th style="text-align:center">RSI 今</th><th style="text-align:center">RSI T-1</th><th style="text-align:center">分域</th>
-<th>命中策略</th><th style="text-align:center">档位</th><th style="text-align:center">建议</th>
+<th>命中策略</th>
+<th style="text-align:center">档位(标准)</th><th style="text-align:center">建议(标准)</th>
+<th style="text-align:center">档位(激进)</th><th style="text-align:center">建议(激进)</th>
 </tr></thead>
 <tbody></tbody>
 </table>
@@ -1681,26 +1683,35 @@ document.addEventListener('DOMContentLoaded',function(){{
   }});
   renderWatch();
   /* 2026-09-05 用户需求：短线选股池命中策略一览 —— 命中 KHunter 15 策略全展示，按 RSI 升序，档位/建议区分 */
+  /* 2026-09-05 修复（用户反馈）：①表头被 innerHTML 整体替换删除 → 只替换 tbody；②分域问号 = 数据缺 regime → 兜底显示 —；
+     ③标准版(A55)/激进版(C50) 混一列打架 → 拆四列独立展示 */
   var KH_STRAT_CN={{'trend_resonance':'趋势共振','trend_start':'趋势起点','immortal_guidance':'仙人指路','multi_golden_cross':'多金叉共振','limit_up_pullback':'涨停回马枪','strong_wash':'强势洗盘','golden_cross_not_green':'金叉不绿','morning_star':'启明星','strategy_2560':'2560战法','golden_triangle':'黄金三角','limit_up_sideways':'涨停横盘','multi_party_cannon':'多方炮','resistance_breakout':'突破压力','trend_acceleration':'趋势加速','w_bottom':'W底'}};
   var KH_REGIME_CN={{'bear':'🐻 熊市','bull':'🌞 牛市','weak_bull':'🌙 弱牛'}};
-  function khTierAdvice(kh){{
-    if(kh.buy)return {{tier:'买入',act:kh.note||'🟢 买入信号 · T+1 开盘买入',cls:'up'}};
+  /* 标准版（A55 主卖出）：buy→买入 / sell→卖出（note 为 A 版文案）/ 否则观望 */
+  function khStd(kh){{
+    if(kh.buy)return {{tier:'买入',act:'🟢 买入信号 · T+1 开盘买入',cls:'up'}};
     if(kh.sell)return {{tier:'卖出',act:kh.note||'🔴 卖出信号 · T+1 开盘卖',cls:'down'}};
-    if(kh.c_sell)return {{tier:'激进:卖出',act:kh.note||'🔴 激进版参考卖出（RSI>50）',cls:'down'}};
-    return {{tier:'观望',act:'🟡 命中但 RSI 未达买入阈值（熊<35/牛<30/弱牛<32）· 仅观察',cls:'warn'}};
+    return {{tier:'观望',act:'🟡 未达买入/卖出阈值 · 仅观察',cls:'warn'}};
+  }}
+  /* 激进版（C50 参考线）：buy→买入 / c_sell→卖出 / 否则观望（与标准版独立，不打架） */
+  function khAgg(kh){{
+    if(kh.buy)return {{tier:'买入',act:'🟢 买入信号 · T+1 开盘买入',cls:'up'}};
+    if(kh.c_sell)return {{tier:'卖出',act:'🔴 激进版参考卖出（RSI>50）· T+1 开盘卖',cls:'down'}};
+    return {{tier:'观望',act:'🟡 未达买入/卖出阈值 · 仅观察',cls:'warn'}};
   }}
   function renderKhHits(){{
     var box=document.getElementById('kh-hits-table');if(!box)return;
-    var S=window.SHORT_SIGNALS;if(!S||!S.stock){{box.innerHTML='<tbody><tr><td colspan="14" class="sub">信号数据未加载（缺 short_signals.js）</td></tr></tbody>';return;}}
-    var E=window.ENH||{{}};
+    var tb=box.querySelector('tbody');if(!tb)return;
+    var S=window.SHORT_SIGNALS;if(!S||!S.stock){{tb.innerHTML='<tr><td colspan="16" class="sub">信号数据未加载（缺 short_signals.js）</td></tr>';return;}}
     var rows=[];
     Object.keys(S.stock).forEach(function(code){{
       var rec=S.stock[code];var kh=rec.khunter||{{}};
       if(!kh.sig)return;
       var meta=stockMeta(code);
-      var ta=khTierAdvice(kh);
+      var st=khStd(kh),ag=khAgg(kh);
       rows.push({{code:code,name:rec.name||code,board:meta.board,industry:meta.industry,px:rec.px,chg:rec.chg,
-        rsi:kh.rsi_now,rsi1:kh.rsi_t1,regime:kh.regime||'?',hits:kh.hits||[],tier:ta.tier,act:ta.act,cls:ta.cls}});
+        rsi:kh.rsi_now,rsi1:kh.rsi_t1,regime:kh.regime||'—',hits:kh.hits||[],
+        stTier:st.tier,stAct:st.act,stCls:st.cls,agTier:ag.tier,agAct:ag.act,agCls:ag.cls}});
     }});
     rows.sort(function(a,b){{return (a.rsi==null?999:a.rsi)-(b.rsi==null?999:b.rsi);}});   // RSI 升序
     var q=(document.getElementById('kh-hits-q').value||'').trim().toLowerCase();
@@ -1708,14 +1719,14 @@ document.addEventListener('DOMContentLoaded',function(){{
     var fb=document.getElementById('kh-hits-f-board').value;
     var filtered=rows.filter(function(r){{
       if(q){{var txt=(r.code+' '+r.name+' '+r.hits.join(' ')+' '+r.industry).toLowerCase();if(txt.indexOf(q)<0)return false;}}
-      if(ft&&r.tier!==ft)return false;
+      if(ft&&r.stTier!==ft)return false;
       if(fb&&r.board!==fb)return false;
       return true;
     }});
     var cnt=document.getElementById('kh-hits-count');
     if(cnt)cnt.textContent='命中 '+rows.length+' 只 · 筛选 '+filtered.length+' 只';
-    if(!filtered.length){{box.innerHTML='<tbody><tr><td colspan="14" class="sub" style="color:var(--faint)">今日无命中 —— KHunter 信号稀疏期 0 只属正常（事件驱动）</td></tr></tbody>';return;}}
-    var h='<tbody>';
+    if(!filtered.length){{tb.innerHTML='<tr><td colspan="16" class="sub" style="color:var(--faint)">今日无命中 —— KHunter 信号稀疏期 0 只属正常（事件驱动）</td></tr>';return;}}
+    var h='';
     filtered.forEach(function(r,i){{
       var strat=r.hits.map(function(s){{return KH_STRAT_CN[s]||s;}}).join('、');
       var chgCls=r.chg>0?'up':(r.chg<0?'down':'');
@@ -1727,10 +1738,11 @@ document.addEventListener('DOMContentLoaded',function(){{
       h+='<tr><td style="text-align:center">'+(i+1)+'</td><td>'+r.code+'</td><td><b>'+r.name+'</b></td><td>'+boardCell(r.board)+'</td><td>'+permOf(r.code)+'</td><td>'+r.industry+'</td>'
         +'<td style="text-align:right">'+pxDisp+'</td><td style="text-align:right" class="'+chgCls+'">'+chgDisp+'</td>'
         +'<td style="text-align:center"><b>'+rsiDisp+'</b></td><td style="text-align:center">'+rsi1Disp+'</td><td style="text-align:center">'+regDisp+'</td>'
-        +'<td>'+strat+'</td><td style="text-align:center">'+r.tier+'</td><td style="text-align:center" class="'+r.cls+'">'+r.act+'</td></tr>';
+        +'<td>'+strat+'</td>'
+        +'<td style="text-align:center">'+r.stTier+'</td><td style="text-align:center" class="'+r.stCls+'">'+r.stAct+'</td>'
+        +'<td style="text-align:center">'+r.agTier+'</td><td style="text-align:center" class="'+r.agCls+'">'+r.agAct+'</td></tr>';
     }});
-    h+='</tbody>';
-    box.innerHTML=h;
+    tb.innerHTML=h;
   }}
   ['kh-hits-q','kh-hits-f-tier','kh-hits-f-board'].forEach(function(id){{
     var el=document.getElementById(id);if(!el)return;

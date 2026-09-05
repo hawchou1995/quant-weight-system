@@ -705,6 +705,7 @@ def calc_signals(as_of=None):
                 sig_stock[code[-6:]]["khunter"] = {
                     "sig": bool(_kinfo["hit"]), "rsi_t1": _kinfo["rsi_t1"], "rsi_now": _kinfo["rsi_now"],
                     "buy": False, "sell": True, "c_sell": _kinfo["c_sell"],
+                    "regime": _kh_regime,
                     "hits": _kinfo["hits"],
                     "note": _sell_note,
                 }
@@ -715,6 +716,7 @@ def calc_signals(as_of=None):
                 sig_stock[code[-6:]]["khunter"] = {
                     "sig": bool(_kinfo["hit"]), "rsi_t1": _kinfo["rsi_t1"], "rsi_now": _kinfo["rsi_now"],
                     "buy": False, "sell": False, "c_sell": True,
+                    "regime": _kh_regime,
                     "hits": _kinfo["hits"],
                     "note": f"RSI>{KHUNTER_RSI_SELL_C} 参考卖出（C 版，A55 未触发）",
                 }
@@ -728,6 +730,7 @@ def calc_signals(as_of=None):
             sig_stock[code[-6:]]["khunter"] = {
                 "sig": False, "rsi_t1": _kinfo["rsi_t1"], "rsi_now": _kinfo["rsi_now"],
                 "buy": False, "sell": False, "c_sell": False,
+                "regime": _kh_regime,
                 "hits": [],
                 "note": "无信号（KHunter 未见命中/RSI 未超卖）",
             }
