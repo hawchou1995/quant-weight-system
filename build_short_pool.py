@@ -496,6 +496,15 @@ def calc_signals(as_of=None):
     market_gate["bear60"] = _bear60
     print(f"熊市限定(hs300<MA60, 回测口径): {'🐻 熊市（KHunter 可买入）' if _bear60 else '🌞 非熊（KHunter 不开新仓）'} ({time.time()-t0:.0f}s)", flush=True)
 
+    # ② 市场情绪只读元数据（2026-09-05 接入）：从 market_breadth.js 透传涨停封单强度等特征，
+    #    advisory-only —— 仅供观察，不参与 1100 行门控判定。
+    try:
+        _mb = json.loads(re.search(r"window\.MARKET_BREADTH\s*=\s*(\{.*?\});", (BASE/"market_breadth.js").read_text(encoding="utf-8"), re.S).group(1))
+        _sent = _mb.get("sentiment") or {}
+        market_gate["sentiment"] = {"zone": _sent.get("sentiment_zone", _sent.get("zone", "—")), "zt_ratio": _sent.get("zt_ratio"), "broken_rate": _sent.get("broken_rate"), "seal_yi": _sent.get("total_seal_yi"), "lianban_max": _sent.get("lianban_max", 0), "note": "advisory-only（不参与门控判定，仅供观察）"}
+    except Exception:
+        market_gate["sentiment"] = {"note": "market_breadth.js 缺失/解析失败", "source": "unavailable"}
+
     # 1) 股票反转：按权限分层各取 Top10（主板/创业板/科创板，2026-08-17 用户决策）
     stock_pool = S.load_stock_pool()
     # 2026-08-27 修复：全市场最新交易日基准（停牌股新鲜度校验用）。

@@ -21,10 +21,20 @@ OUT_DIR = BASE / "data_full"
 OUT_DIR.mkdir(exist_ok=True)
 FAIL_FILE = BASE / "data_full_fail_list.csv"
 START_DATE = "20160101"
-END_DATE = "20260814"
+# ⚠ END_DATE 必须取「未来」而非某固定日：2026-09-05 发现其曾硬编码为 "20260814"，
+# 导致 F.fetch_sina_daily 只返回到 08-14，而本地 data_full 已到 09-04。
+# run_rebase_check 用 F.fetch_sina_daily 全量覆盖漂移文件时，会据此把本地文件
+# 截断回 08-14 → 丢失近 3 周真实行情。改为远未来日期，新浪源才返回最新数据，
+# 全量覆盖才安全（统一到新浪 qfq 基准、不丢近期行）。
+END_DATE = "20301231"
 UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
 
 HEADERS = ["date", "open", "high", "low", "close", "volume", "amount"]
+
+
+def _backoff(attempt: int, base: float = 1.5, cap: float = 8.0):
+    """指数退避：1.5s → 3.0s → 6.0s（封顶 8s；2026-09-05 借鉴 Rockyzsu 限流容错规范）"""
+    time.sleep(min(base * 2 ** (attempt - 1), cap))
 
 
 # ---------------- 列表获取 ----------------
@@ -87,13 +97,13 @@ def fetch_sina_daily(sym: str, retries: int = 3):
             df = ak.stock_zh_a_daily(symbol=sym, start_date=START_DATE,
                                      end_date=END_DATE, adjust="qfq")
             if df is None or df.empty:
-                time.sleep(1.5)
+                _backoff(attempt)
                 continue
             df["date"] = pd.to_datetime(df["date"]).dt.strftime("%Y-%m-%d")
             df = df[HEADERS].drop_duplicates(subset="date").sort_values("date")
             return df
-        except Exception as e:
-            time.sleep(2.0)
+        except Exception:
+            _backoff(attempt)
     return None
 
 
@@ -103,15 +113,15 @@ def fetch_sina_etf(sym: str, retries: int = 3):
         try:
             df = ak.fund_etf_hist_sina(symbol=sym)
             if df is None or df.empty:
-                time.sleep(1.5)
+                _backoff(attempt)
                 continue
             df["date"] = pd.to_datetime(df["date"]).dt.strftime("%Y-%m-%d")
             df = df[HEADERS].drop_duplicates(subset="date").sort_values("date")
             # 只保留 2016 之后
             df = df[df["date"] >= "2016-01-01"]
             return df
-        except Exception as e:
-            time.sleep(2.0)
+        except Exception:
+            _backoff(attempt)
     return None
 
 
@@ -129,7 +139,7 @@ def fetch_tx_delist(sym: str, retries: int = 3):
             else:
                 kl = []
             if not kl:
-                time.sleep(1.5)
+                _backoff(attempt)
                 continue
             out = []
             for row in kl:
@@ -145,8 +155,8 @@ def fetch_tx_delist(sym: str, retries: int = 3):
                 })
             df = pd.DataFrame(out, columns=HEADERS)
             return df if len(df) > 0 else None
-        except Exception as e:
-            time.sleep(2.0)
+        except Exception:
+            _backoff(attempt)
     return None
 
 

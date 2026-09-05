@@ -1,0 +1,5 @@
+F._backoff: True
+F.fetch_sina_daily: True
+  复权基准检测：候选 400 只（≥5.0% 跳变未放量）→ 重拉验证
+  复权基准检测完成：候选 400 / 确认漂移修复 0 只
+REBASE_FIXED_COUNT: 0

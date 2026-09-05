@@ -122,7 +122,9 @@
     };
     // 量能：静态精算的当日累计成交额（直连无两市聚合成交额接口时用静态）
     if (MB && MB.latest && MB.latest.turnover_yi) s.turnover_yi = MB.latest.turnover_yi;
-    state.ts = { t: t, pools: pools, breadth: b, idx: idx };
+    // 情绪：透传静态精算的 sentiment（涨停封单强度等）；缺失则 undefined
+    if (MB && MB.latest && MB.latest.sentiment) s.sentiment = MB.latest.sentiment;
+    state.ts = { t: t, pools: pools, breadth: b, idx: idx, sentiment: s.sentiment };
     // 仅交易时段写入曲线点（非交易时段采样点会污染时间轴/造成直线）
     if (isTrading()) { state.live.push(s); saveLocalTimeline(); }
     render();
@@ -173,6 +175,13 @@
     var zb = (pools.broken_limit > 0) ? pools.broken_limit : (stat ? stat.broken_limit : 0);
     var tz = stat ? stat.turnover_yi : null;
     var sl = sentimentLevel(red, green, zt);
+    // 情绪特征：涨停封单强度（取自静态精算 MB.latest.sentiment / MB.sentiment）
+    var sent = (stat && stat.sentiment) ? stat.sentiment : (MB && MB.sentiment ? MB.sentiment : null);
+    var sZone = sent ? (sent.zone || sent.sentiment_zone) : null;
+    var sZt = sent ? sent.zt_ratio : null;
+    var sBr = sent ? sent.broken_rate : null;
+    var sSeal = sent ? sent.total_seal_yi : null;
+    var sLb = sent ? sent.lianban_max : null;
     var html = '<span class="mw-big" style="color:' + sl.color + '">情绪 ' + sl.lv + '</span>' +
       '<span class="mw-item">红盘 <b style="color:#dc2626">' + red + '</b></span>' +
       '<span class="mw-item">绿盘 <b style="color:#16a34a">' + green + '</b></span>' +
@@ -182,6 +191,12 @@
       '<span class="mw-item">炸板 ' + zb + '</span>' +
       (tz != null ? '<span class="mw-item">量能 <b>' + fmtYi(tz) + '</b></span>' : '') +
       '<span class="mw-item mw-note">' + (src.src ? (src.src === 'eastmoney' ? '东财实时' : '静态精算') : '精算') + ' · 仅展示非信号</span>';
+    // 情绪统计条（数值型变量，缺失显示 —；无 HTML 注入面）
+    html += '<br><span class="mw-item">情绪分区 <b>' + (sZone || '—') + '</b></span>' +
+      '<span class="mw-item">涨停比 ' + (sZt != null ? fmtNum(sZt, 2) : '—') + '%</span>' +
+      '<span class="mw-item">炸板率 ' + (sBr != null ? fmtNum(sBr, 2) : '—') + '%</span>' +
+      '<span class="mw-item">封单 ' + (sSeal != null ? fmtNum(sSeal, 2) : '—') + '亿</span>' +
+      '<span class="mw-item">连板高度 ' + (sLb != null ? sLb : '—') + '板</span>';
     b.innerHTML = html;
   }
   function renderIndices() {

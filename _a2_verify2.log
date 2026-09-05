@@ -1,0 +1,3 @@
+F._backoff: True
+F.fetch_sina_daily: True
+  复权基准检测：候选 400 只（≥5.0% 跳变未放量）→ 重拉验证

@@ -25,6 +25,7 @@ import datetime as dt
 import json
 import os
 import re
+import statistics
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -124,6 +125,10 @@ def parse_quote_body(body: str) -> list[dict]:
         turnover_amount_wan = _finite_float(fields[37])
         if turnover_amount_wan is not None and turnover_amount_wan < 0:
             turnover_amount_wan = None
+        # 买一价/买一量（腾讯行情体标准索引：fields[9]=买一价, fields[10]=买一量(手)）
+        # 实证确认见 _verify_bid_fields.py（sh600000 / 涨停股对照）。
+        bid1_price = _finite_float(fields[9])
+        bid1_vol = _finite_float(fields[10])
         rows.append({
             "symbol": ("sh" if code.startswith("6") else "sz") + code,
             "code": code,
@@ -137,6 +142,8 @@ def parse_quote_body(body: str) -> list[dict]:
             "lower_limit": lower_limit,
             "quote_ts": _quote_timestamp(fields[30]),
             "turnover_amount_wan": turnover_amount_wan,
+            "bid1_price": bid1_price,
+            "bid1_vol": bid1_vol,
         })
     return rows
 
@@ -150,6 +157,10 @@ def summarize_market_breadth(rows: list[dict]) -> dict:
     turnover_amount_count = 0
     turnover_amount_wan = 0.0
     latest_quote_ts = 0
+    # 情绪聚合（对 limit_up 行）：封单强度
+    seal_wans = []
+    seal_ratios = []
+    total_seal_wan = 0.0
     for row in quotes:
         pct = _finite_float(row.get("pct"))
         if pct is not None and pct > 0:
@@ -168,6 +179,16 @@ def summarize_market_breadth(rows: list[dict]) -> dict:
             limit_price_count += 1
             if price >= upper_limit:
                 limit_up += 1
+                # 封单强度：买一价 × 买一量(手) × 100(股/手) → 元 → /1e4 → 万元/只
+                bp = _finite_float(row.get("bid1_price"))
+                bv = _finite_float(row.get("bid1_vol"))
+                ta = _finite_float(row.get("turnover_amount_wan"))
+                if bp is not None and bv is not None and bv > 0:
+                    seal_wan = bp * bv * 100 / 1e4
+                    total_seal_wan += seal_wan
+                    seal_wans.append(seal_wan)
+                    if ta is not None:
+                        seal_ratios.append(seal_wan / max(1, ta))
             elif high >= upper_limit:
                 broken_limit += 1
             if price <= lower_limit:
@@ -181,6 +202,32 @@ def summarize_market_breadth(rows: list[dict]) -> dict:
     generated = (dt.datetime.fromtimestamp(latest_quote_ts, tz=CN_TZ)
                  if latest_quote_ts > 0 else dt.datetime.now(CN_TZ))
     actual_turnover_yi = round(turnover_amount_wan / 10_000, 2)
+    # ---- 情绪聚合（涨停封单强度作为市场情绪特征）----
+    total_seal_yi = round(total_seal_wan / 1e4, 2)
+    median_seal_ratio = round(statistics.median(seal_ratios), 2) if seal_ratios else 0.0
+    zt_ratio = round(limit_up / max(1, limit_price_count) * 100, 2)
+    broken_rate = round(broken_limit / max(1, limit_up + broken_limit) * 100, 2)
+    if zt_ratio >= 1.2:
+        sentiment_zone = "亢奋"
+    elif zt_ratio >= 0.7:
+        sentiment_zone = "活跃"
+    elif zt_ratio >= 0.35:
+        sentiment_zone = "中性"
+    elif zt_ratio >= 0.15:
+        sentiment_zone = "低迷"
+    else:
+        sentiment_zone = "冰点"
+    sentiment = {
+        "zone": sentiment_zone,
+        "zt_ratio": zt_ratio,
+        "broken_rate": broken_rate,
+        "total_seal_yi": total_seal_yi,
+        "median_seal_ratio": median_seal_ratio,
+        # 连板高度盘中不计算（收盘由 compute_lianban 填充），缺省 0
+        "lianban_max": 0,
+        "lianban_count": 0,
+        "lianban_top": [],
+    }
     return {
         "schema_version": 1,
         "source": SOURCE_NAME,
@@ -197,7 +244,101 @@ def summarize_market_breadth(rows: list[dict]) -> dict:
         "limit_up": limit_up,
         "limit_down": limit_down,
         "broken_limit": broken_limit,
+        "sentiment": sentiment,
     }
+
+
+def _tail_rows_lianban(path: Path, n: int = 11) -> list[dict]:
+    """快速读 data_full/*.csv 尾部 n 行（date,open,high,low,close,volume,amount）。
+
+    参照 update_daily.py 的 _tail_rows：open 后 seek 末尾读几 KB，避免全文件加载。
+    返回最后 n 个交易日的 dict 列表（含列名映射）；不足则有多少返多少。
+    """
+    try:
+        with open(path, "rb") as fh:
+            fh.seek(0, 2)
+            size = fh.tell()
+            fh.seek(max(0, size - 4096))
+            tail = fh.read().decode("utf-8", errors="ignore")
+    except Exception:
+        return []
+    lines = [ln for ln in tail.strip().splitlines() if ln.strip()]
+    # 首行可能是表头（含 'date'）；若是则从第二行起作为数据
+    if lines and lines[0].strip().lower().startswith("date"):
+        lines = lines[1:]
+    out = []
+    for ln in lines[-n:]:
+        p = ln.split(",")
+        if len(p) < 7:
+            continue
+        try:
+            out.append({
+                "date": p[0].strip(),
+                "open": float(p[1]), "high": float(p[2]),
+                "low": float(p[3]), "close": float(p[4]),
+                "volume": float(p[5]), "amount": float(p[6]),
+            })
+        except ValueError:
+            continue
+    return out
+
+
+def _is_limit_up_day(code: str, row: dict, prev_close: float) -> bool:
+    """单日是否涨停（连板判定用）：收盘价≈最高价 且 涨幅达阈值 且 有成交量。"""
+    if prev_close <= 0 or row.get("volume", 0) <= 0:
+        return False
+    if not (row.get("close", 0) >= row.get("high", 0) * 0.9999):
+        return False
+    pct = row["close"] / prev_close - 1
+    # sh60/sz00 → ≥9.8%；sz30/sh68 → ≥19.8%（创业板/科创板 20% 涨跌幅）
+    if code.startswith("30") or code.startswith("68"):
+        return pct >= 0.198
+    return pct >= 0.098
+
+
+def compute_lianban(today: str, top: int = 5) -> dict:
+    """计算连板高度（收盘用）。
+
+    读 data_full/*.csv 仅尾部 10 行：从尾行向前数连续涨停行数即连板数。
+    只统计尾行日期 == today（以市场快照 quote_ts 的日期为准）的股票，否则该股连板记 0（防陈旧数据）。
+    返回 {lianban_max, lianban_count, lianban_top:[{code,streak} 最多 top 条]}。
+    """
+    data_dir = BASE_DIR / "data_full"
+    if not data_dir.exists():
+        return {"lianban_max": 0, "lianban_count": 0, "lianban_top": []}
+    results = []
+    for path in data_dir.glob("*.csv"):
+        stem = path.stem
+        # 文件名形如 sh600000.csv / sz300001.csv（带 sh/sz 前缀），归一为 6 位代码
+        m = re.match(r"^(?:sh|sz)?(\d{6})$", stem)
+        if not m:
+            continue
+        code = m.group(1)
+        if not re.fullmatch(r"(?:60|68|00|30)\d{4}", code):
+            continue
+        rows = _tail_rows_lianban(path, n=11)
+        if not rows:
+            continue
+        # 尾行（最新交易日）日期必须与快照日期一致，否则视为陈旧数据，连板记 0
+        if rows[-1].get("date") != today:
+            continue
+        # 评估 rows[1:]（每行用前一行的 close 作 prev_close），从尾行向前连续计涨停
+        evaluable = rows[1:]
+        streak = 0
+        for i in range(len(evaluable) - 1, -1, -1):
+            r = evaluable[i]
+            prev = evaluable[i - 1]["close"] if i > 0 else rows[0]["close"]
+            if _is_limit_up_day(code, r, prev):
+                streak += 1
+            else:
+                break
+        if streak >= 2:
+            results.append((code, streak))
+    results.sort(key=lambda x: (-x[1], x[0]))
+    lianban_max = max((s for _, s in results), default=0)
+    lianban_count = len(results)
+    lianban_top = [{"code": c, "streak": s} for c, s in results[:top]]
+    return {"lianban_max": lianban_max, "lianban_count": lianban_count, "lianban_top": lianban_top}
 
 
 def fetch_breadth_snapshot(min_rows: int = DEFAULT_MIN_ROWS,
@@ -238,6 +379,7 @@ def is_trading_session(now: dt.datetime | None = None) -> bool:
 
 
 def timeline_entry(summary: dict, now: dt.datetime) -> dict:
+    sent = summary.get("sentiment") or {}
     return {
         "t": now.strftime("%H:%M"),
         "red": summary.get("red", 0),
@@ -248,6 +390,10 @@ def timeline_entry(summary: dict, now: dt.datetime) -> dict:
         "broken_limit": summary.get("broken_limit", 0),
         "turnover_yi": summary.get("actual_turnover_yi", 0),
         "quote_count": summary.get("quote_count", 0),
+        # 情绪（盘中可得）
+        "seal_yi": sent.get("total_seal_yi", 0),
+        "zt_ratio": sent.get("zt_ratio", 0),
+        "broken_rate": sent.get("broken_rate", 0),
     }
 
 
@@ -272,6 +418,17 @@ def write_js(path: Path, payload: dict) -> None:
 def run_once(output: Path, append: bool, ts_label: str | None = None, quiet: bool = False) -> dict:
     now = dt.datetime.now(CN_TZ)
     summary = fetch_breadth_snapshot()
+    # 收盘/非交易时段：填充连板高度（盘中不计算，保持 0）
+    if not is_trading_session(now):
+        today = (summary.get("generated_at") or "")[:10] or now.strftime("%Y-%m-%d")
+        try:
+            lb = compute_lianban(today)
+            sent = summary.setdefault("sentiment", {})
+            sent["lianban_max"] = lb["lianban_max"]
+            sent["lianban_count"] = lb["lianban_count"]
+            sent["lianban_top"] = lb["lianban_top"]
+        except Exception:
+            pass
     entry = timeline_entry(summary, now)
     if ts_label:
         entry["t"] = ts_label
@@ -297,7 +454,9 @@ def run_once(output: Path, append: bool, ts_label: str | None = None, quiet: boo
             "turnover_yi": summary.get("actual_turnover_yi", 0),
             "quote_count": summary.get("quote_count", 0),
             "generated_at": summary.get("generated_at", ""),
+            "sentiment": summary.get("sentiment", {}),
         },
+        "sentiment": summary.get("sentiment", {}),
     })
     timeline = payload.get("timeline", [])
     timeline = [e for e in timeline if e.get("t") != entry["t"]]
