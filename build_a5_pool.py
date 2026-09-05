@@ -230,6 +230,8 @@ def build():
         "stats": stats,
         "gate": gate,
         "equity": state.get("equity", []),
+        # 今日涨停全景（2026-09-05 用户需求：≥9.5%/封板一览 + A5 命中标记，纯观察）
+        "zt_panorama": state.get("zt_panorama", {"date": None, "stocks": []}),
         # 盘中 patch 标记（2026-08-28）：update_intraday_dashboard.py 盘中重写 a5_pool.js 时置 intraday=True
         "intraday": False,
     }

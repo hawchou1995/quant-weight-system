@@ -722,6 +722,43 @@ def a5_view_html():
     else:
         asof_badge = f'<span class="view-badge auto" title="收盘数据">数据截至 {A5_ASOF} 15:00 · 收盘</span>'
 
+    # 今日涨停全景（2026-09-05 用户需求：≥9.5%/封板一览 + A5 命中标记，纯观察）
+    zp = A5.get("zt_panorama", {})
+    zp_date = zp.get("date") or A5_ASOF
+    zp_stocks = zp.get("stocks", [])
+    zp_hits = [s for s in zp_stocks if s.get("hit")]
+    zp_rows = []
+    for s in sorted(zp_stocks, key=lambda x: (-x.get("hit", False), -x.get("pct", 0))):
+        hit = s.get("hit", False)
+        sealed = s.get("sealed", False)
+        yz = s.get("yz", False)
+        fb = s.get("first_board", False)
+        if hit:
+            tag = '<span class="badge" style="background:rgba(5,150,105,.18);color:#34d399">✅ A5命中</span>'
+        elif sealed:
+            tag = '<span class="badge" style="background:rgba(217,119,6,.15);color:#fbbf24">封板</span>'
+        else:
+            tag = '<span class="badge" style="background:rgba(107,114,128,.15);color:#9ca3af">未封</span>'
+        st = []
+        if yz:
+            st.append('<span class="badge" style="background:rgba(239,68,68,.14);color:#f87171">一字</span>')
+        elif fb:
+            st.append('<span class="badge" style="background:rgba(37,99,235,.14);color:#60a5fa">首板</span>')
+        elif sealed:
+            st.append('<span class="badge" style="background:rgba(37,99,235,.14);color:#60a5fa">连板</span>')
+        st_html = "".join(st) or '<span style="color:var(--faint)">—</span>'
+        zp_rows.append(_row(
+            {"data-code": s["code"], "data-search": f'{s["name"]} {s["code"]} {s.get("ind", "")} {s.get("board", "")}',
+             "data-market": s.get("board", ""), "data-industry": s.get("ind", "")},
+            [_txt_td(s["code"]), _txt_td(f'<b>{s["name"]}</b>'), _txt_td(_board_cell(s.get("board"), s.get("ind"))),
+             _txt_td(s.get("ind", "—")), _chg_td(s.get("pct")), _txt_td(st_html),
+             _txt_td(f'{s.get("amt", 0)/1e8:.2f}'), _num_td(s.get("rel_pos"), 2),
+             _pct_td(s.get("dist_high"), 1), _txt_td(tag)]))
+    zp_html = f'''<div class="card" id="a5-zt" style="border-color:rgba(5,150,105,.35)">
+<h2>🔥 今日涨停全景 <span class="badge badge-auto">{len(zp_stocks)} 只 · 命中 {len(zp_hits)} 只</span></h2>
+<div class="sub">收盘涨幅 ≥9.5% 或封板标的（{zp_date} 收盘口径）· <b>✅ A5命中</b> = 首板 + 非一字 + rel_pos≤0.5 + F3空间≥20% + 成交额≥5000万（G3_M3 过闸族，明日低开 2-5% 则入场）· 纯观察，不构成交易信号</div>
+{_a5_tbl_full("a5-zt", [("code","代码"),("name","名称"),("board","板块"),("ind","行业"),("pct","涨幅"),("status","状态"),("amt","成交额(亿)"),("relpos","相对位置"),("dist","空间%"),("hit","命中")], zp_rows, "（今日无 ≥9.5% 标的）")}
+</div>'''
     return f'''<div class="view" id="view-a5">
 <div class="card" id="sys-a5">
 <div class="sys-head">
@@ -739,6 +776,7 @@ def a5_view_html():
 <div class="kpis">{''.join(kpis)}</div>
 {gate_bar}
 </div>
+{zp_html}
 <div class="card" id="a5-watchlist">
 <h2>📋 观察清单 <span class="badge badge-auto">{len(wl)} 只</span></h2>
 <div class="sub">今日首板 · 明日低开 2-5% 则入场（与回测口径一致）· 当日涨跌幅为实时数据（早盘/尾盘/收盘更新），近一年/RSI/量比/MA5偏离为收盘口径</div>
