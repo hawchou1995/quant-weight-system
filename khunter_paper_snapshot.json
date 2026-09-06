@@ -1,0 +1,224 @@
+{
+  "config": {
+    "rsi_buy": 35,
+    "rsi_buy_bull": 30,
+    "rsi_buy_weak": 32,
+    "low_price": 3.0,
+    "n_slots": 5,
+    "pos_size": 20000.0,
+    "hold_max": 25,
+    "cost": 0.00575,
+    "init_cap": 100000.0
+  },
+  "tracks": {
+    "A": {
+      "track": "A",
+      "nav": 99163.19,
+      "cum": -0.84,
+      "px_chg": -0.837,
+      "last_date": "2026-09-04",
+      "start": "2026-09-02",
+      "positions": [
+        {
+          "code": "sz002364",
+          "name": "中恒电气",
+          "shares": 500,
+          "entry_px": 39.1136,
+          "last_close": 37.44,
+          "entry_date": "2026-09-04",
+          "hold_days": 1,
+          "rsi_entry": 29.920814479637997,
+          "pl_pct": -4.28
+        }
+      ],
+      "cash": 80443.19,
+      "pending_buys": [],
+      "pending_sells": [],
+      "n_trades": 1,
+      "trades": [
+        {
+          "code": "sz002364",
+          "side": "buy",
+          "date": "2026-09-04",
+          "px": 39.1136,
+          "reason": "khunter_hit_rsibear"
+        }
+      ],
+      "note": "熊市出场 RSI>55 · 沪深300<MA60 熊市限定 · RSI<35 超卖买入 · 收盘≥3元 · 最多5仓×¥20,000",
+      "hold_over_codes": []
+    },
+    "C": {
+      "track": "C",
+      "nav": 100000.0,
+      "cum": 0.0,
+      "px_chg": 0.0,
+      "last_date": "2026-09-03",
+      "start": "2026-09-02",
+      "positions": [],
+      "cash": 100000.0,
+      "pending_buys": [
+        {
+          "code": "sz002364",
+          "rsi": 29.920814479637997,
+          "close": 37.9,
+          "regime": "bear"
+        }
+      ],
+      "pending_sells": [],
+      "n_trades": 0,
+      "trades": [],
+      "note": "熊市出场 RSI>50（较 A 版早离场）· 其余与 A 轨相同",
+      "hold_over_codes": []
+    }
+  },
+  "bt": {
+    "n_strategies": 15,
+    "rows": [
+      {
+        "strategy": "golden_cross_not_green",
+        "hold": 5,
+        "n": 3736,
+        "win_rate": 38.87,
+        "mean": -1.031,
+        "median": -1.506,
+        "excess_mean": -1.273,
+        "sharpe": -0.121,
+        "pass": "False"
+      },
+      {
+        "strategy": "golden_triangle",
+        "hold": 5,
+        "n": 7182,
+        "win_rate": 35.07,
+        "mean": -1.43,
+        "median": -2.327,
+        "excess_mean": -1.641,
+        "sharpe": -0.14,
+        "pass": "False"
+      },
+      {
+        "strategy": "immortal_guidance",
+        "hold": 5,
+        "n": 39711,
+        "win_rate": 35.42,
+        "mean": -1.631,
+        "median": -2.928,
+        "excess_mean": -1.985,
+        "sharpe": -0.145,
+        "pass": "False"
+      },
+      {
+        "strategy": "limit_up_pullback",
+        "hold": 5,
+        "n": 24880,
+        "win_rate": 37.68,
+        "mean": -0.911,
+        "median": -1.578,
+        "excess_mean": -1.128,
+        "sharpe": -0.122,
+        "pass": "False"
+      },
+      {
+        "strategy": "limit_up_sideways",
+        "hold": 5,
+        "n": 147,
+        "win_rate": 40.82,
+        "mean": -0.359,
+        "median": -1.609,
+        "excess_mean": -0.505,
+        "sharpe": -0.037,
+        "pass": "False"
+      },
+      {
+        "strategy": "morning_star",
+        "hold": 20,
+        "n": 10999,
+        "win_rate": 42.16,
+        "mean": -0.495,
+        "median": -2.812,
+        "excess_mean": -1.677,
+        "sharpe": -0.027,
+        "pass": "False"
+      },
+      {
+        "strategy": "multi_golden_cross",
+        "hold": 5,
+        "n": 58599,
+        "win_rate": 38.34,
+        "mean": -0.939,
+        "median": -1.524,
+        "excess_mean": -1.233,
+        "sharpe": -0.113,
+        "pass": "False"
+      },
+      {
+        "strategy": "multi_party_cannon",
+        "hold": 10,
+        "n": 5535,
+        "win_rate": 39.75,
+        "mean": -1.216,
+        "median": -2.45,
+        "excess_mean": -1.726,
+        "sharpe": -0.098,
+        "pass": "False"
+      },
+      {
+        "strategy": "strategy_2560",
+        "hold": 5,
+        "n": 21382,
+        "win_rate": 39.18,
+        "mean": -0.813,
+        "median": -1.665,
+        "excess_mean": -1.267,
+        "sharpe": -0.089,
+        "pass": "False"
+      },
+      {
+        "strategy": "strong_wash",
+        "hold": 20,
+        "n": 7730,
+        "win_rate": 37.02,
+        "mean": -1.141,
+        "median": -3.782,
+        "excess_mean": -2.189,
+        "sharpe": -0.063,
+        "pass": "False"
+      },
+      {
+        "strategy": "trend_acceleration",
+        "hold": 5,
+        "n": 4884,
+        "win_rate": 34.58,
+        "mean": -1.184,
+        "median": -2.019,
+        "excess_mean": -1.53,
+        "sharpe": -0.138,
+        "pass": "False"
+      },
+      {
+        "strategy": "trend_resonance",
+        "hold": 20,
+        "n": 95384,
+        "win_rate": 42.04,
+        "mean": -0.678,
+        "median": -2.219,
+        "excess_mean": -1.823,
+        "sharpe": -0.041,
+        "pass": "False"
+      },
+      {
+        "strategy": "trend_start",
+        "hold": 5,
+        "n": 17021,
+        "win_rate": 37.45,
+        "mean": -1.069,
+        "median": -1.646,
+        "excess_mean": -1.307,
+        "sharpe": -0.131,
+        "pass": "False"
+      }
+    ],
+    "note": "各策略=自身最优持有期；mean>0 且 sharpe>0 才为 PASS（四闸口径）"
+  },
+  "generated_at": "2026-09-06 20:14:43.344453"
+}
