@@ -987,31 +987,39 @@ def _etf_paper_card():
     _empty = _sig.get("empty")
     _note = _sig.get("note", "")
 
-    # 名称查表
+    # 名称查表 + 板块映射（2026-09-06 用户需求：区分板块 → 宽基股票/商品/债券）
     _names = {"sh510300": "沪深300ETF", "sh510500": "中证500ETF", "sh510050": "上证50ETF",
               "sz159915": "创业板ETF", "sh518880": "黄金ETF", "sh511260": "国债ETF"}
+    _sects = {"sh510300": "宽基股票", "sh510500": "宽基股票", "sh510050": "宽基股票",
+              "sz159915": "宽基股票", "sh518880": "商品", "sh511260": "债券"}
+
+    def _nm_cell(_c, extra=""):
+        """名称+代码同格（2026-09-06 对齐全站标准：粗体名称 + 换行淡色六位代码）"""
+        _nm = _names.get(_c, _c)
+        return f'<td><b>{_nm}</b>{extra}<br><span style="color:var(--faint);font-size:11px">{_bare(_c)}</span></td>'
 
     # 信号行（6 只 ETF 的 20 日动量排序，动静标注）
     _rows = []
     for i, r in enumerate(_sig.get("rank", [])):
-        _c = r.get("code"); _nm = _names.get(_c, r.get("name", _c))
+        _c = r.get("code")
         _mom = r.get("mom", 0)
         _cls = "up" if _mom >= 0 else "down"
         _tag = ""
-        if _c == _top1: _tag = "🏆 Top1"
-        elif _c == _top2: _tag = "🥈 Top2"
+        if _c == _top1: _tag = " 🏆 Top1"
+        elif _c == _top2: _tag = " 🥈 Top2"
         _w = _sig.get("weights", {}).get(_c)
         _wtxt = f"{_w*100:.1f}%" if _w else ("—" if _empty else "—")
-        _rows.append(f"<tr><td>#{i+1}</td><td>{_nm}<span class='etf-code'>{_c}</span> {_tag}</td>"
+        _rows.append(f"<tr><td>#{i+1}</td>{_nm_cell(_c, _tag)}"
+                     f"<td style='text-align:center'>{_sects.get(_c, '—')}</td>"
                      f"<td class='{'up' if _mom>=0 else 'down'}'>{_mom:+.2f}%</td>"
                      f"<td>{_wtxt}</td></tr>")
 
     # 模拟盘持仓行
     _prows = []
     for p in _pp.get("positions", []):
-        _nm = _names.get(p.get("code"), p.get("name", p.get("code")))
         _px = p.get("last_close") or p.get("entry_px") or 0
-        _prows.append(f"<tr><td>{_nm}<span class='etf-code'>{p.get('code')}</span></td>"
+        _prows.append(f"<tr>{_nm_cell(p.get('code'))}"
+                      f"<td style='text-align:center'>{_sects.get(p.get('code'), '—')}</td>"
                       f"<td>{p.get('shares')} 份</td><td>{_px:.3f}</td>"
                       f"<td>{p.get('weight', 0):.1f}%</td></tr>")
 
@@ -1046,12 +1054,12 @@ def _etf_paper_card():
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px">
 <div>
 <div class="etf-sec">🎯 当前信号（20 日动量排名，数据截至 {_as_of}）</div>
-<table class="tbl"><thead><tr><th>#</th><th>标的</th><th style="text-align:right">20日动量</th><th style="text-align:right">目标权重</th></tr></thead>
+<table class="tbl"><thead><tr><th>#</th><th>标的</th><th style="text-align:center">板块</th><th style="text-align:right">20日动量</th><th style="text-align:right">目标权重</th></tr></thead>
 <tbody>{"".join(_rows)}</tbody></table>
 </div>
 <div>
 <div class="etf-sec">💼 模拟盘持仓 <span class="badge badge-auto">¥100,000 起点 · 9/3 初始化 @ {_pdate}</span></div>
-<table class="tbl"><thead><tr><th>标的</th><th>份额</th><th style="text-align:right">最新价</th><th style="text-align:right">权重</th></tr></thead>
+<table class="tbl"><thead><tr><th>标的</th><th style="text-align:center">板块</th><th>份额</th><th style="text-align:right">最新价</th><th style="text-align:right">权重</th></tr></thead>
 <tbody>{"".join(_prows)}</tbody></table>
 <div class="sub" style="margin-top:8px">NAV ¥{_nav:,.0f}（{_cum:+.2f}% 累计 · 当日 {_pchg:+.2f}%）· 现金 ¥{_pp.get('cash', 0):,.0f} · {_pend_txt} · 下次调仓信号 9/30 月末（T+1 执行）</div>
 </div>
@@ -1508,7 +1516,7 @@ html = f"""<!doctype html>
 window.ENH.nav = [
   ["overview","📊","监控总览",[["overview","总览统计"],["mkt-weather","市场晴雨表"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
   ["sys-auto","🅰️","全量池中/长线",[["card-tbl-v9","标的汇总表"],["card-tbl-v9-detail","逐标的详情"],["watch-v9-card","中长线跟踪"]]],
-  ["short","⚡","全量池短线",[["card-short-stk","📋 股票池 汇总表"],["card-short-stk-detail","🔍 股票池 逐标的详情"],["card-kh-hits","🎯 KHunter 命中策略一览"],["card-short-fund","📋 基金池 汇总表"],["card-short-fund-detail","🔍 基金池 逐标的详情"],["watch-card","📌 短线跟踪"]]],
+  ["short","⚡","全量池短线",[["card-short-stk","📋 股票池 汇总表"],["card-short-stk-detail","🔍 股票池 逐标的详情"],["card-kh-hits","🎯 KHunter 命中策略一览"],["card-etf-paper","📈 ETF 动量轮动"],["card-short-fund","📋 基金池 汇总表"],["card-short-fund-detail","🔍 基金池 逐标的详情"],["watch-card","📌 短线跟踪"]]],
   ["a5","🎯","打板族",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
   ["comment","💬","评论区",[]]
 ];
