@@ -233,19 +233,6 @@ def _board_cell(v, ind=None):
     return f'<span class="board-tag {cls}"{tip}>{v}</span>'
 
 
-def _perm_cell(code):
-    """交易权限徽章（2026-09-05 用户需求：区分权限=开通门槛）：
-    主板无门槛 / 创业板 2年+10万 / 科创板 2年+50万 / 北交所 2年+50万"""
-    c = _bare(code)
-    if c.startswith("688"):
-        return '<span class="board-tag board-kc" title="科创板：需 2 年交易经验 + 50 万资产">2年+50万</span>'
-    if c.startswith("30"):
-        return '<span class="board-tag board-cy" title="创业板：需 2 年交易经验 + 10 万资产">2年+10万</span>'
-    if c.startswith(("8", "4", "92")):
-        return '<span class="board-tag board-bj" title="北交所：需 2 年交易经验 + 50 万资产">2年+50万</span>'
-    return '<span class="board-tag board-sh" title="主板/ETF/基金：无开通门槛">无门槛</span>'
-
-
 def rows_html_for(items):
     """模板式汇总表行：标的 | 板块 | 行业 | 现价 | 涨跌幅 | 近一年 | 权重分+六类构成 | 超买分解 | 量能分解 | 置信度 | 档位 | 档位变化"""
     rows = ""
@@ -286,7 +273,6 @@ def rows_html_for(items):
 <td style="text-align:center">{rank}</td>
 <td><b>{d["name"]}</b>{pick_tag}<br><span style="color:var(--faint);font-size:11px">{_bare(d["code"])}</span></td>
 <td>{_board_cell(board, d.get("industry"))}</td>
-<td>{_perm_cell(d["code"])}</td>
 <td><span class="board-tag">{d["industry"]}</span></td>
 <td style="text-align:right" data-v="{d["px"]}">{d["px"]:.2f}</td>
 <td style="text-align:right" class="{chg_cls}" data-v="{d["chg"] or 0}">{chg_txt}</td>
@@ -726,7 +712,7 @@ def a5_view_html():
         {"data-code": w["code"], "data-search": f'{w["name"]} {_bare(w["code"])} {w.get("ind", "")} {w.get("board", "")}',
          "data-market": w.get("board", ""), "data-industry": w.get("ind", "")},
         [_txt_td(_bare(w["code"])), _txt_td(f'<b>{w["name"]}</b>'), _txt_td(_board_cell(w.get("board"), w.get("ind"))),
-         _txt_td(_perm_cell(w["code"])), _txt_td(w.get("ind", "—")),
+         _txt_td(w.get("ind", "—")),
          _txt_td(w["sb_date"]), _num_td(w.get("rel_pos"), 2), _txt_td(f'{w.get("amt", 0)/1e4:.0f}'),
          _gate_cell(w), _chg_td(w.get("chg")), _pct_td(w.get("ret_1y"), 1),
          _num_td(w.get("rsi"), 1), _num_td(w.get("vr"), 2), _pct_td(w.get("ma5_dev"), 1)])
@@ -736,7 +722,7 @@ def a5_view_html():
         {"data-code": a["code"], "data-search": f'{a["name"]} {_bare(a["code"])} {a.get("ind", "")} {a.get("board", "")}',
          "data-market": a.get("board", ""), "data-industry": a.get("ind", "")},
         [_txt_td(_bare(a["code"])), _txt_td(f'<b>{a["name"]}</b>'), _txt_td(_board_cell(a.get("board"), a.get("ind"))),
-         _txt_td(_perm_cell(a["code"])), _txt_td(a.get("ind", "—")),
+         _txt_td(a.get("ind", "—")),
          _txt_td(a["sb_date"]), _pct_td(a.get("gap")*100, 2), _num_td(a.get("rel_pos"), 2),
          _txt_td(f'{a.get("amt", 0)/1e4:.0f}'), _chg_td(a.get("chg")), _pct_td(a.get("ret_1y"), 1),
          _num_td(a.get("rsi"), 1), _num_td(a.get("vr"), 2), _pct_td(a.get("ma5_dev"), 1)])
@@ -746,7 +732,7 @@ def a5_view_html():
         {"data-code": p["code"], "data-search": f'{p["name"]} {_bare(p["code"])} {p.get("ind", "")} {p.get("board", "")}',
          "data-market": p.get("board", ""), "data-industry": p.get("ind", "")},
         [_txt_td(_bare(p["code"])), _txt_td(f'<b>{p["name"]}</b>'), _txt_td(_board_cell(p.get("board"), p.get("ind"))),
-         _txt_td(_perm_cell(p["code"])), _txt_td(p.get("ind", "—")),
+         _txt_td(p.get("ind", "—")),
          _txt_td(p["entry_date"]), _num_td(p["entry_px"], 2), _pct_td(p.get("gap")*100, 2),
          _txt_td(f'T+{p.get("exit_stage", 1)}'), _chg_td(p.get("chg")), _pct_td(p.get("ret_1y"), 1),
          _num_td(p.get("rsi"), 1), _num_td(p.get("vr"), 2), _pct_td(p.get("ma5_dev"), 1)])
@@ -757,7 +743,7 @@ def a5_view_html():
         {"data-code": p["code"], "data-search": f'{p["name"]} {_bare(p["code"])} {p.get("ind", "")} {p.get("board", "")}',
          "data-market": p.get("board", ""), "data-industry": p.get("ind", "")},
         [_txt_td(_bare(p["code"])), _txt_td(f'<b>{p["name"]}</b>'), _txt_td(_board_cell(p.get("board"), p.get("ind"))),
-         _txt_td(_perm_cell(p["code"])), _txt_td(p.get("ind", "—")),
+         _txt_td(p.get("ind", "—")),
          _txt_td(p["entry_date"]), _txt_td(p["exit_date"]), _num_td(p["entry_px"], 2), _num_td(p["exit_px"], 2),
          _txt_td(REASON_CN.get(p["exit_reason"], p["exit_reason"] or "—")),
          _pct_td(p.get("net_ret", 0)*100, 2), _chg_td(p.get("chg")), _pct_td(p.get("ret_1y"), 1),
@@ -819,14 +805,14 @@ def a5_view_html():
             {"data-code": s["code"], "data-search": f'{s["name"]} {_bare(s["code"])} {s.get("ind", "")} {s.get("board", "")}',
              "data-market": s.get("board", ""), "data-industry": s.get("ind", "")},
             [_txt_td(_bare(s["code"])), _txt_td(f'<b>{s["name"]}</b>'), _txt_td(_board_cell(s.get("board"), s.get("ind"))),
-             _txt_td(_perm_cell(s["code"])), _txt_td(s.get("ind", "—")), _chg_td(s.get("pct")), _txt_td(st_html),
+             _txt_td(s.get("ind", "—")), _chg_td(s.get("pct")), _txt_td(st_html),
              _txt_td(f'{s.get("amt", 0)/1e8:.2f}'), _num_td(s.get("rel_pos"), 2),
              _pct_td(s.get("dist_high"), 1), _txt_td(tag), _txt_td(tier_badge),
              _txt_td(f'<span style="color:var(--sub);font-size:12px">{advice}</span>')]))
     zp_html = f'''<div class="card" id="a5-zt" style="border-color:rgba(5,150,105,.35)">
 <h2>🔥 今日涨停全景 <span class="badge badge-auto">{len(zp_stocks)} 只 · 命中 {len(zp_hits)} 只</span></h2>
 <div class="sub">收盘涨幅 ≥9.5% 或封板标的（{zp_date} 收盘口径）· <b>✅ A5命中</b> = 首板 + 非一字 + rel_pos≤0.5 + F3空间≥20% + 成交额≥5000万（G3_M3 过闸族，明日低开 2-5% 则入场）· 纯观察，不构成交易信号</div>
-{_a5_tbl_full("a5-zt", [("code","代码"),("name","名称"),("board","板块"),("perm","权限"),("ind","行业"),("pct","涨幅"),("status","状态"),("amt","成交额(亿)"),("relpos","相对位置"),("dist","空间%"),("hit","命中"),("tier","档位"),("advice","建议")], zp_rows, "（今日无 ≥9.5% 标的）")}
+{_a5_tbl_full("a5-zt", [("code","代码"),("name","名称"),("board","板块"),("ind","行业"),("pct","涨幅"),("status","状态"),("amt","成交额(亿)"),("relpos","相对位置"),("dist","空间%"),("hit","命中"),("tier","档位"),("advice","建议")], zp_rows, "（今日无 ≥9.5% 标的）")}
 </div>'''
     return f'''<div class="view" id="view-a5">
 <div class="card" id="sys-a5">
@@ -849,22 +835,22 @@ def a5_view_html():
 <div class="card" id="a5-watchlist">
 <h2>📋 观察清单 <span class="badge badge-auto">{len(wl)} 只</span></h2>
 <div class="sub">今日首板 · 明日低开 2-5% 则入场（与回测口径一致）· 当日涨跌幅为实时数据（早盘/尾盘/收盘更新），近一年/RSI/量比/MA5偏离为收盘口径</div>
-{_a5_tbl_full("a5-wl", [("code","代码"),("name","名称"),("board","板块"),("perm","权限"),("ind","行业"),("sbdate","首板日"),("relpos","相对位置"),("amt","成交额(万)"),("gate","过闸"),("chg","当日涨跌"),("ret1y","近一年"),("rsi","RSI"),("vr","量比"),("ma5dev","MA5偏离")], wl_rows, "（无观察标的）")}
+{_a5_tbl_full("a5-wl", [("code","代码"),("name","名称"),("board","板块"),("ind","行业"),("sbdate","首板日"),("relpos","相对位置"),("amt","成交额(万)"),("gate","过闸"),("chg","当日涨跌"),("ret1y","近一年"),("rsi","RSI"),("vr","量比"),("ma5dev","MA5偏离")], wl_rows, "（无观察标的）")}
 </div>
 <div class="card" id="a5-avoid" style="border-color:rgba(217,119,6,.35)">
 <h2>⚠ A2_tp3 回避清单 <span class="badge badge-auto">{len(av)} 只 · 负期望警示</span></h2>
 <div class="sub">今日满足 A2_tp3 信号（首板次日低开 2-6% + 相对位置≤0.7 + 成交额≥5000万）· 回测胜率 63.1% 但单笔均值 -1.39%（盈亏比 0.29）→ <b>信号出现时回避或减仓，不追高</b></div>
-{_a5_tbl_full("a5-av", [("code","代码"),("name","名称"),("board","板块"),("perm","权限"),("ind","行业"),("sbdate","首板日"),("gap","今日低开"),("relpos","相对位置"),("amt","成交额(万)"),("chg","当日涨跌"),("ret1y","近一年"),("rsi","RSI"),("vr","量比"),("ma5dev","MA5偏离")], av_rows, "（无）")}
+{_a5_tbl_full("a5-av", [("code","代码"),("name","名称"),("board","板块"),("ind","行业"),("sbdate","首板日"),("gap","今日低开"),("relpos","相对位置"),("amt","成交额(万)"),("chg","当日涨跌"),("ret1y","近一年"),("rsi","RSI"),("vr","量比"),("ma5dev","MA5偏离")], av_rows, "（无）")}
 </div>
 <div class="card" id="a5-positions">
 <h2>💼 模拟盘持仓 <span class="badge badge-auto">{len(pos)} 只</span></h2>
 <div class="sub">入场 = 开盘价低开确认 · 出场 T+1/T+2 冲高≥入场×1.08 止盈，否则收盘卖；涨停顺延/强平</div>
-{_a5_tbl_full("a5-pos", [("code","代码"),("name","名称"),("board","板块"),("perm","权限"),("ind","行业"),("entrydate","入场日"),("entrypx","入场价"),("gap","低开"),("stage","出场阶段"),("chg","当日涨跌"),("ret1y","近一年"),("rsi","RSI"),("vr","量比"),("ma5dev","MA5偏离")], pos_rows, "（无持仓）")}
+{_a5_tbl_full("a5-pos", [("code","代码"),("name","名称"),("board","板块"),("ind","行业"),("entrydate","入场日"),("entrypx","入场价"),("gap","低开"),("stage","出场阶段"),("chg","当日涨跌"),("ret1y","近一年"),("rsi","RSI"),("vr","量比"),("ma5dev","MA5偏离")], pos_rows, "（无持仓）")}
 </div>
 <div class="card" id="a5-closed">
 <h2>📜 已平仓（累计） <span class="badge badge-auto">{len(closed)} 笔</span></h2>
 <div class="sub">模拟盘逐笔净收益（含成本买 0.525%/卖 0.625%）· 累计 ≥30 笔触发验证门判定</div>
-{_a5_tbl_full("a5-cl", [("code","代码"),("name","名称"),("board","板块"),("perm","权限"),("ind","行业"),("entrydate","入场日"),("exitdate","出场日"),("entrypx","入场价"),("exitpx","出场价"),("reason","原因"),("netret","净收益"),("chg","当日涨跌"),("ret1y","近一年"),("rsi","RSI"),("vr","量比")], closed_rows, "（尚无平仓记录）")}
+{_a5_tbl_full("a5-cl", [("code","代码"),("name","名称"),("board","板块"),("ind","行业"),("entrydate","入场日"),("exitdate","出场日"),("entrypx","入场价"),("exitpx","出场价"),("reason","原因"),("netret","净收益"),("chg","当日涨跌"),("ret1y","近一年"),("rsi","RSI"),("vr","量比")], closed_rows, "（尚无平仓记录）")}
 </div>
 <div class="card" id="a5-curve">
 <h2>📈 模拟盘净值曲线 <span class="badge badge-auto">已平仓复利</span></h2>
@@ -930,7 +916,7 @@ def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extr
 </div>
 <table class="tbl" id="{tbl_id}">
 <thead><tr>
-<th data-key="rank" style="text-align:center">#</th><th data-key="name">标的</th><th data-key="board">板块</th><th data-key="perm">权限</th><th data-key="industry">行业</th><th data-key="px" style="text-align:right">现价</th>
+<th data-key="rank" style="text-align:center">#</th><th data-key="name">标的</th><th data-key="board">板块</th><th data-key="industry">行业</th><th data-key="px" style="text-align:right">现价</th>
 <th data-key="chg" style="text-align:right">涨跌幅</th><th data-key="ret1y" style="text-align:right">近一年</th><th data-key="score" style="text-align:center">权重分<div class="th-sub">{score_sub}</div></th><th data-key="rsi" style="text-align:center">RSI</th><th data-key="vp" style="text-align:center">量能</th>
 <th data-key="conf" style="text-align:center">置信度</th><th data-key="tier" style="text-align:center">档位</th><th data-key="tierchg" style="text-align:center">档位变化</th><th data-key="action" style="text-align:center">建议动作</th>
 </tr></thead>
@@ -958,7 +944,7 @@ WATCH_CARD = f'''<div class="card" id="watch-card">
 <div id="watch-gate"></div>
 <div class="toolbar" id="watch-bar">
 <input type="text" id="watch-q" name="watch-q" placeholder="🔍 搜索代码 / 名称…" autocomplete="off" spellcheck="false" aria-label="搜索跟踪标的（代码或名称）">
-<select id="watch-f-type" class="flt" title="类型/权限筛选" aria-label="按类型或权限筛选"><option value="">全部类型</option></select>
+<select id="watch-f-type" class="flt" title="类型筛选" aria-label="按类型筛选"><option value="">全部类型</option></select>
 <select id="watch-f-inpool" class="flt" title="在池状态筛选" aria-label="按在池状态筛选"><option value="">全部状态</option><option value="1">在池</option><option value="0">已掉出（待轮动换出）</option></select>
 <select id="watch-f-tier" class="flt" title="档位筛选" aria-label="按档位筛选"><option value="">全部档位</option></select>
 <select id="watch-sort" class="flt" title="排序方式" aria-label="排序方式"><option value="entry">加入时间 ↓</option><option value="chg">涨跌 ↓</option><option value="score">短线分 ↓</option><option value="name">名称 ↑</option><option value="left">剩余天数 ↑</option></select>
@@ -1142,7 +1128,7 @@ KH_HITS_CARD = f'''<div class="card" id="card-kh-hits">
 </div>
 <table class="tbl" id="kh-hits-table">
 <thead><tr>
-<th style="text-align:center">#</th><th>代码</th><th>名称</th><th>板块</th><th>权限</th><th>行业</th>
+<th style="text-align:center">#</th><th>代码</th><th>名称</th><th>板块</th><th>行业</th>
 <th style="text-align:right">现价</th><th style="text-align:right">涨跌</th>
 <th style="text-align:center">RSI 今</th><th style="text-align:center">RSI T-1</th><th style="text-align:center">分域</th>
 <th>命中策略</th>
@@ -1518,14 +1504,6 @@ document.addEventListener('DOMContentLoaded',function(){{
   applyHash();   // 按 URL hash 定位视图（历史页跳转 dual_system.html#sys-auto 直接显示普适版）
   renderSubCurve();   // 基金回测净值曲线
   /* 全量池短线跟踪：自动跟踪池（SHORT_POOL.track，可买入标的 30 天）+ 可选手动补充（localStorage） */
-  /* 2026-09-05 用户需求：交易权限徽章（主板无门槛/创业板 2年+10万/科创板 2年+50万/北交所 2年+50万） */
-  function permOf(code){{
-    code=String(code||'');if(code.length>6)code=code.slice(-6);
-    if(code.indexOf('688')===0)return '<span class="board-tag board-kc" title="科创板：需 2 年交易经验 + 50 万资产">2年+50万</span>';
-    if(code.indexOf('30')===0)return '<span class="board-tag board-cy" title="创业板：需 2 年交易经验 + 10 万资产">2年+10万</span>';
-    if(code.indexOf('8')===0||code.indexOf('4')===0||code.indexOf('92')===0)return '<span class="board-tag board-bj" title="北交所：需 2 年交易经验 + 50 万资产">2年+50万</span>';
-    return '<span class="board-tag board-sh" title="主板/ETF/基金：无开通门槛">无门槛</span>';
-  }}
   function boardCell(v){{
     var cls={{'主板':'board-sh','创业板':'board-cy','科创板':'board-kc','北交所':'board-bj'}}[v]||'';
     return v?'<span class="board-tag '+cls+'">'+v+'</span>':'—';
@@ -1655,7 +1633,7 @@ document.addEventListener('DOMContentLoaded',function(){{
     if(cnt)cnt.textContent='筛选 '+filtered.length+' / 共 '+rows.length+' 只';
     if(!filtered.length){{box.innerHTML='<div class="sub" style="color:var(--faint)">无匹配标的 —— 调整搜索/筛选条件后重试</div>';return;}}
     var h='<div class="sub" style="margin-bottom:6px;color:var(--sub)">🧭 版本说明：<b>标准版</b>=生产主信号（熊市卖出 RSI&gt;55 / 牛市卖出 RSI&gt;75）；<b>激进版</b>=参考线（RSI&gt;50 卖出，更早止盈高周转）—— 双版本并行对决；卖出为独立信号，不含买入含义</div>'
-          +'<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>类型</th><th>权限</th><th>行业</th><th style="text-align:center">入池日期</th><th style="text-align:center">出池日期</th><th style="text-align:center">已跟踪</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">短线分</th><th style="text-align:center">档位(标准版)</th><th style="text-align:center">建议(标准版)</th><th style="text-align:center">档位(激进版)</th><th style="text-align:center">建议(激进版)</th><th style="text-align:center">MA5</th></tr></thead><tbody>';
+          +'<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>类型</th><th>行业</th><th style="text-align:center">入池日期</th><th style="text-align:center">出池日期</th><th style="text-align:center">已跟踪</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">短线分</th><th style="text-align:center">档位(标准版)</th><th style="text-align:center">建议(标准版)</th><th style="text-align:center">档位(激进版)</th><th style="text-align:center">建议(激进版)</th><th style="text-align:center">MA5</th></tr></thead><tbody>';
     filtered.forEach(function(r){{
       var rec=r.rec;
       var ageS=r.age===null?'—':(r.age+' 天 / 剩 '+(30-r.age)+' 天');
@@ -1665,12 +1643,12 @@ document.addEventListener('DOMContentLoaded',function(){{
       var chgDisp=susp?'停牌':((rec.chg>0?'+':'')+rec.chg+'%');
       var chgCls=susp?'':(rec.chg>0?'up':'down');
       var ma5Disp=susp?'—':(rec.ma5_above?'✅ 上方':'⚠️ 下方');
-      // 2026-09-05 用户需求：跟踪池统一格式（权限/行业列）
+      // 2026-09-05 用户需求：跟踪池统一格式（板块/行业列）
       // 2026-09-05 修复：SHORT_POOL_SLIM 不含 details → 走 stockMeta（STOCK_META 全市场映射，回退 ENH.details）
       var ind=stockMeta(r.code).industry;
       // 2026-09-04（grill Q2-1）：标准/激进双列（激进列对非 KHunter 标的显示 —）
       var tierCDisp=r.tierC||'—'; var actCDisp=r.actC||'—'; var actCCls=r.actCCls||'';
-      h+='<tr><td>'+r.code+'</td><td>'+nameDisp+'</td><td>'+r.typeName+'</td><td>'+permOf(r.code)+'</td><td>'+ind+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+(r.exit||'—')+'</td><td style="text-align:center">'+ageS+'</td><td style="text-align:right">'+rec.px+'</td><td style="text-align:right" class="'+chgCls+'">'+chgDisp+'</td><td style="text-align:center">'+rec.score+'</td><td style="text-align:center">'+r.tierDisp+'</td><td style="text-align:center" class="'+r.actCls+'">'+r.act+'</td><td style="text-align:center">'+tierCDisp+'</td><td style="text-align:center" class="'+actCCls+'">'+actCDisp+'</td><td style="text-align:center">'+ma5Disp+'</td></tr>';
+      h+='<tr><td>'+r.code+'</td><td>'+nameDisp+'</td><td>'+r.typeName+'</td><td>'+ind+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+(r.exit||'—')+'</td><td style="text-align:center">'+ageS+'</td><td style="text-align:right">'+rec.px+'</td><td style="text-align:right" class="'+chgCls+'">'+chgDisp+'</td><td style="text-align:center">'+rec.score+'</td><td style="text-align:center">'+r.tierDisp+'</td><td style="text-align:center" class="'+r.actCls+'">'+r.act+'</td><td style="text-align:center">'+tierCDisp+'</td><td style="text-align:center" class="'+actCCls+'">'+actCDisp+'</td><td style="text-align:center">'+ma5Disp+'</td></tr>';
     }});
     h+='</tbody></table>';
     box.innerHTML=h;
@@ -1702,7 +1680,7 @@ document.addEventListener('DOMContentLoaded',function(){{
   function renderKhHits(){{
     var box=document.getElementById('kh-hits-table');if(!box)return;
     var tb=box.querySelector('tbody');if(!tb)return;
-    var S=window.SHORT_SIGNALS;if(!S||!S.stock){{tb.innerHTML='<tr><td colspan="16" class="sub">信号数据未加载（缺 short_signals.js）</td></tr>';return;}}
+    var S=window.SHORT_SIGNALS;if(!S||!S.stock){{tb.innerHTML='<tr><td colspan="15" class="sub">信号数据未加载（缺 short_signals.js）</td></tr>';return;}}
     var rows=[];
     Object.keys(S.stock).forEach(function(code){{
       var rec=S.stock[code];var kh=rec.khunter||{{}};
@@ -1725,7 +1703,7 @@ document.addEventListener('DOMContentLoaded',function(){{
     }});
     var cnt=document.getElementById('kh-hits-count');
     if(cnt)cnt.textContent='命中 '+rows.length+' 只 · 筛选 '+filtered.length+' 只';
-    if(!filtered.length){{tb.innerHTML='<tr><td colspan="16" class="sub" style="color:var(--faint)">今日无命中 —— KHunter 信号稀疏期 0 只属正常（事件驱动）</td></tr>';return;}}
+    if(!filtered.length){{tb.innerHTML='<tr><td colspan="15" class="sub" style="color:var(--faint)">今日无命中 —— KHunter 信号稀疏期 0 只属正常（事件驱动）</td></tr>';return;}}
     var h='';
     filtered.forEach(function(r,i){{
       var strat=r.hits.map(function(s){{return KH_STRAT_CN[s]||s;}}).join('、');
@@ -1735,7 +1713,7 @@ document.addEventListener('DOMContentLoaded',function(){{
       var rsiDisp=(r.rsi==null)?'—':r.rsi.toFixed(1);
       var rsi1Disp=(r.rsi1==null)?'—':r.rsi1.toFixed(1);
       var regDisp=KH_REGIME_CN[r.regime]||r.regime;
-      h+='<tr><td style="text-align:center">'+(i+1)+'</td><td>'+r.code+'</td><td><b>'+r.name+'</b></td><td>'+boardCell(r.board)+'</td><td>'+permOf(r.code)+'</td><td>'+r.industry+'</td>'
+      h+='<tr><td style="text-align:center">'+(i+1)+'</td><td>'+r.code+'</td><td><b>'+r.name+'</b></td><td>'+boardCell(r.board)+'</td><td>'+r.industry+'</td>'
         +'<td style="text-align:right">'+pxDisp+'</td><td style="text-align:right" class="'+chgCls+'">'+chgDisp+'</td>'
         +'<td style="text-align:center"><b>'+rsiDisp+'</b></td><td style="text-align:center">'+rsi1Disp+'</td><td style="text-align:center">'+regDisp+'</td>'
         +'<td>'+strat+'</td>'
@@ -1821,15 +1799,15 @@ document.addEventListener('DOMContentLoaded',function(){{
     var cnt=document.getElementById('watch-v9-count');
     if(cnt)cnt.textContent='筛选 '+filtered.length+' / 共 '+rows.length+' 只';
     if(!filtered.length){{box.innerHTML='<div class="sub" style="color:var(--faint)">无匹配标的 —— 调整搜索/筛选条件后重试</div>';return;}}
-    var h='<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>板块</th><th>权限</th><th>行业</th><th style="text-align:center">入池日期</th><th style="text-align:center">出池日期</th><th style="text-align:center">已跟踪</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">权重分</th><th style="text-align:center">档位</th><th style="text-align:center">状态</th></tr></thead><tbody>';
+    var h='<table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>板块</th><th>行业</th><th style="text-align:center">入池日期</th><th style="text-align:center">出池日期</th><th style="text-align:center">已跟踪</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">权重分</th><th style="text-align:center">档位</th><th style="text-align:center">状态</th></tr></thead><tbody>';
     filtered.forEach(function(r){{
       var rec=r.rec;var px=(rec.px!==undefined&&rec.px!==null)?rec.px:null;
       var ageS=r.age+' 天 / 剩 '+(365-r.age)+' 天';
       var exitT=r.exit||'—';
       var status=r.inPool?'<span style="color:#dc2626;font-weight:600">在池</span>':'<span style="color:var(--faint)">已掉出池（观察）</span>';
-      // 2026-09-05 用户需求：跟踪池统一格式（权限/行业列）
+      // 2026-09-05 用户需求：跟踪池统一格式（板块/行业列）
       var ind=(E.details&&E.details[r.code])?(E.details[r.code].industry||'—'):'—';
-      h+='<tr><td>'+r.code+'</td><td>'+(rec.name||'—')+'</td><td>'+boardCell(r.pool)+'</td><td>'+permOf(r.code)+'</td><td>'+ind+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+exitT+'</td><td style="text-align:center">'+ageS+'</td>'+
+      h+='<tr><td>'+r.code+'</td><td>'+(rec.name||'—')+'</td><td>'+boardCell(r.pool)+'</td><td>'+ind+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+exitT+'</td><td style="text-align:center">'+ageS+'</td>'+
          '<td style="text-align:right">'+(px===null?'—':px.toFixed(2))+'</td>'+
          '<td style="text-align:right" class="'+(r.chg===null?'':(r.chg>0?'up':'down'))+'">'+(r.chg===null?'—':(r.chg>0?'+':'')+r.chg.toFixed(2)+'%')+'</td>'+
          '<td style="text-align:center">'+(r.score===null?'—':r.score.toFixed(1))+'</td>'+
