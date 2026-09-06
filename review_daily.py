@@ -495,8 +495,8 @@ def review(as_of=None, calc=None):
             continue
         _g_open = gates.get(grp, True)
         md_lines.append(f"#### {grp}（{len(rs)} 只 · 信号 {as_of}{' · 门控关·仅参考' if not _g_open else ''}）")
-        md_lines.append("| 代码 | 名称 | 权限 | 信号分 | 档位 | 操作 | 买入价 | 现价 | 收益 | MA5 | 判定 |")
-        md_lines.append("|---|---|---|---|---|---|---|---|---|---|---|")
+        md_lines.append("| 标的 | 信号分 | 档位 | 操作 | 买入价 | 现价 | 收益 | MA5 | 判定 |")
+        md_lines.append("|---|---|---|---|---|---|---|---|---|")
         for r in sorted(rs, key=lambda x: -(x["pct"] if x["pct"] is not None else -999)):
             if r["buy_sig"]:
                 act = "参考" if not _g_open else ("买入" if r["tier"] in ("满仓加仓", "轻仓加仓", "强买入", "买入") else "买入(弱)")
@@ -506,7 +506,7 @@ def review(as_of=None, calc=None):
             else:
                 act = {"观望": "观望", "减至半仓": "卖出信号", "清仓": "卖出信号", "不买": "不买"}.get(r["tier"], "未触发")
                 pct_s, ma_s, st = "—", "—", "未买入"
-            md_lines.append(f"| {r['code']} | {r['name']} | {PERM_ZH.get(r['perm'], r['perm'])} | {r['score']:.0f} | {r['tier']} | {act} | "
+            md_lines.append(f"| {r['name']} {r['code']} | {r['score']:.0f} | {r['tier']} | {act} | "
                             f"{r['buy_px'] if r['buy_px'] else '—'} | {r['cur_px']} | {pct_s} | {ma_s} | {st} |")
         md_lines.append("")
     md_lines.append("---")

@@ -77,10 +77,10 @@ def build():
     md.append("## 💼 当前持仓")
     md.append("")
     if A["positions"]:
-        md.append("| 代码 | 名称 | 入场日 | 入场价 | gap | 出场阶段 |")
-        md.append("|---|---|---|---|---|---|")
+        md.append("| 标的 | 入场日 | 入场价 | gap | 出场阶段 |")
+        md.append("|---|---|---|---|---|")
         for p in sorted(A["positions"], key=lambda x: x.get("entry_date", "")):
-            md.append(f"| {p['code']} | {p['name']} | {p['entry_date']} | {p['entry_px']:.2f} | "
+            md.append(f"| {p['name']} {p['code']} | {p['entry_date']} | {p['entry_px']:.2f} | "
                       f"{p['gap']*100:+.2f}% | T+{p.get('exit_stage',1)} |")
     else:
         md.append("（无）")
@@ -88,10 +88,10 @@ def build():
     md.append("## 📜 已平仓（累计）")
     md.append("")
     if A["closed"]:
-        md.append("| 代码 | 名称 | 入场日 | 出场日 | 入场价 | 出场价 | 原因 | 净收益 |")
-        md.append("|---|---|---|---|---|---|---|---|")
+        md.append("| 标的 | 入场日 | 出场日 | 入场价 | 出场价 | 原因 | 净收益 |")
+        md.append("|---|---|---|---|---|---|---|")
         for p in A["closed"]:
-            md.append(f"| {p['code']} | {p['name']} | {p['entry_date']} | {p['exit_date']} | "
+            md.append(f"| {p['name']} {p['code']} | {p['entry_date']} | {p['exit_date']} | "
                       f"{p['entry_px']:.2f} | {p['exit_px']:.2f} | {p['exit_reason']} | {pct(p['net_ret'])} |")
     else:
         md.append("（尚无平仓记录）")
@@ -99,10 +99,10 @@ def build():
     md.append("## 📋 观察清单（今日首板，明日低开 2-5% 则入场）")
     md.append("")
     if A["watchlist"]:
-        md.append("| 代码 | 名称 | 行业 | 首板日 | rel_pos | 成交额(万) |")
-        md.append("|---|---|---|---|---|---|")
+        md.append("| 标的 | 行业 | 首板日 | rel_pos | 成交额(万) |")
+        md.append("|---|---|---|---|---|")
         for w in sorted(A["watchlist"], key=lambda x: -x.get("amt", 0)):
-            md.append(f"| {w['code']} | {w['name']} | {w['ind']} | {w['sb_date']} | "
+            md.append(f"| {w['name']} {w['code']} | {w['ind']} | {w['sb_date']} | "
                       f"{w['rel_pos']:.2f} | {w['amt']/1e4:.0f} |")
     else:
         md.append("（无）")
@@ -112,10 +112,10 @@ def build():
     md.append("今日满足 A2_tp3 信号（首板次日低开 2-6% + rel_pos≤0.7 + 成交额≥5000万）。回测胜率 63.1% 但单笔均值 -1.39%（负期望）→ 信号出现时回避或减仓，不追高。")
     md.append("")
     if A["avoid"]:
-        md.append("| 代码 | 名称 | 行业 | 首板日 | 今日gap | rel_pos | 成交额(万) |")
-        md.append("|---|---|---|---|---|---|---|")
+        md.append("| 标的 | 行业 | 首板日 | 今日gap | rel_pos | 成交额(万) |")
+        md.append("|---|---|---|---|---|---|")
         for a in sorted(A["avoid"], key=lambda x: -x.get("amt", 0)):
-            md.append(f"| {a['code']} | {a['name']} | {a['ind']} | {a['sb_date']} | "
+            md.append(f"| {a['name']} {a['code']} | {a['ind']} | {a['sb_date']} | "
                       f"{a['gap']*100:+.2f}% | {a['rel_pos']:.2f} | {a['amt']/1e4:.0f} |")
     else:
         md.append("（无）")
