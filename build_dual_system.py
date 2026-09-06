@@ -1071,6 +1071,112 @@ def _etf_paper_card():
 ETF_SNAP_JS = json.dumps(ETF_SNAP, ensure_ascii=False, separators=(",", ":"))
 ETF_PAPER_CARD = _etf_paper_card()
 
+# ════════════════════════════════════════════════════════════════════
+# KHunter 模拟盘（A/C 双轨）卡片 —— 2026-09-06 用户需求：模拟盘接看板
+# 数据源：khunter_paper_snapshot.py 生成的 dist/khunter_paper_snapshot.json
+# 模拟口径与 khunter_paper_20260903.py 生产一致（分域 RSI/低价/主板/5仓×2万）
+# ════════════════════════════════════════════════════════════════════
+KH_SNAP = {}
+_kh_snap_f = (BASE / "dist" / "khunter_paper_snapshot.json")
+if _kh_snap_f.exists():
+    try:
+        KH_SNAP = json.loads(_kh_snap_f.read_text(encoding="utf-8"))
+    except Exception as _e:
+        print("KHunter 快照加载失败:", _e)
+        KH_SNAP = {}
+
+def _kh_paper_card():
+    """KHunter 优化配置模拟盘卡片：A/C 双轨状态 + 持仓明细 + 回测证据"""
+    if not KH_SNAP:
+        return ('<div class="card" id="card-kh-paper">'
+                '<h2>🐺 KHunter 模拟盘 <span class="badge badge-auto">待数据</span></h2>'
+                '<div class="sub">先运行 <code>python khunter_paper_snapshot.py</code> 生成快照</div></div>')
+    _cfg = KH_SNAP.get("config", {})
+    _trk = KH_SNAP.get("tracks", {})
+    _bt = KH_SNAP.get("bt", {})
+    _tA = _trk.get("A", {})
+    _tC = _trk.get("C", {})
+
+    def _track_sec(_t, _title):
+        """单个轨道的 KPI + 持仓表"""
+        _pos = _t.get("positions", [])
+        _nav = _t.get("nav")
+        _cum = _t.get("cum")
+        _chg = _t.get("px_chg")
+        _pdate = _t.get("last_date", "—")
+        _n_pos = len(_pos)
+        _rows = []
+        for p in _pos:
+            _pl = p.get("pl_pct")
+            _pl_cls = "up" if (_pl or 0) >= 0 else "down"
+            _rows.append(
+                f"<tr><td><b>{p.get('name','—')}</b><br>"
+                f"<span style='color:var(--faint);font-size:11px'>{_bare(p.get('code',''))}</span></td>"
+                f"<td>{p.get('shares')} 股</td>"
+                f"<td style='text-align:right'>{p.get('entry_px'):.3f}</td>"
+                f"<td style='text-align:right'>{p.get('last_close') or 0:.3f}</td>"
+                f"<td class='{_pl_cls}' style='text-align:right'>{_pl:+.2f}%</td>"
+                f"<td style='text-align:center'>{p.get('hold_days',0)}d</td></tr>")
+        _kpi = (
+            f'<div class="kpi"><div class="l">NAV</div><div class="v">¥{_nav:,.0f}</div>'
+            f'<div class="s">{_pdate}</div></div>'
+            f'<div class="kpi"><div class="l">累计</div>'
+            f'<div class="v" style="color:{"var(--up)" if (_cum or 0) >= 0 else "var(--down)"}">{_cum:+.2f}%</div>'
+            f'<div class="s">初始 ¥100,000</div></div>'
+            f'<div class="kpi"><div class="l">当日</div>'
+            f'<div class="v" style="color:{"var(--up)" if (_chg or 0) >= 0 else "var(--down)"}">{_chg:+.3f}%</div>'
+            f'<div class="s">9/2 起</div></div>'
+            f'<div class="kpi"><div class="l">仓位</div>'
+            f'<div class="v">{_n_pos}/5</div>'
+            f'<div class="s">每仓 ¥20,000</div></div>'
+        )
+        _pos_txt = '<div class="sub" style="margin-top:6px">无持仓（空仓等待信号）</div>' if not _rows else (
+            '<table class="tbl"><thead><tr>'
+            '<th>标的</th><th>份额</th><th style="text-align:right">入场价</th>'
+            '<th style="text-align:right">最新价</th><th style="text-align:right">浮盈</th>'
+            '<th style="text-align:center">持有</th>'
+            '</tr></thead><tbody>' + "".join(_rows) + '</tbody></table>'
+            f'<div class="sub" style="margin-top:6px">现金 ¥{_t.get("cash", 0):,.0f} · 交易 {_t.get("n_trades", 0)} 笔'
+            f'{(" · 持有上限提醒: " + ", ".join(_t.get("hold_over_codes", []))) if _t.get("hold_over_codes") else ""}</div>'
+        )
+        return f'<div><div class="kpis" style="margin:6px 0">{_kpi}</div>{_pos_txt}</div>'
+
+    _bt_rows = ""
+    if _bt.get("rows"):
+        _arr = sorted(_bt["rows"], key=lambda r: -r.get("mean", -99))
+        # 策略英文名 → 中文名（映射自 backtest/khunter_all_strategies_backtest.py SIGNALS）
+        _bt_names = {"golden_cross_not_green": "金叉不绿", "golden_triangle": "金三角",
+                     "immortal_guidance": "不死鸟", "limit_up_pullback": "涨停回调",
+                     "limit_up_sideways": "涨停横盘", "morning_star": "晨星",
+                     "multi_golden_cross": "多金叉", "multi_party_cannon": "多方炮",
+                     "resistance_breakout": "阻力突破", "strategy_2560": "2560战法",
+                     "strong_wash": "强洗反转", "trend_acceleration": "趋势加速",
+                     "trend_resonance": "趋势共振", "trend_start": "启动拐点",
+                     "w_bottom": "W底"}
+        _bt_rows = "<tr><td colspan='4'>—</td></tr>" if not _arr else "".join(
+            f'<tr><td>{_bt_names.get(r.get("strategy",""), r.get("strategy",""))}</td>'
+            f'<td style="text-align:center">{r.get("hold")}d</td>'
+            f'<td style="text-align:right">{r.get("mean", 0):+.2f}%</td>'
+            f'<td style="text-align:right">{r.get("win_rate", 0):.1f}%</td></tr>' for r in _arr[:10])
+
+    return f'''<div class="card" id="card-kh-paper">
+<div class="card-h"><h2>🐺 KHunter 模拟盘（A/C 双轨） <span class="badge badge-auto">自动 · 前向验证</span></h2><span class="fold-arrow">▾</span></div>
+<div class="body" style="padding:0 16px 16px">
+<div class="sub" style="margin-top:8px"><b>模拟什么</b>：KHunter 优化配置（2026-09-03 定稿）在<b>真实时间线前向验证</b>——入场=15 策略信号命中 + 分域 RSI（熊&lt;35/牛&lt;30/弱牛&lt;32）+ 熊市限定(沪深300&lt;MA60) + 主板 + 收盘≥3元 + 20日均额≥3000万；出场=分域 RSI（熊&gt;55/牛&gt;75/弱牛&gt;80）T+1 开盘执行 + 25 交易日持有上限；仓位=5仓×¥20,000 · 成本 0.575% × 2 边。</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px">
+{_track_sec(_tA, "🅰️ A 轨（标准版 · 出场 RSI&gt;55）")}
+{_track_sec(_tC, "🆑 C 轨（激进版 · 出场 RSI&gt;50）")}
+</div>
+<div class="etf-sec" style="margin-top:14px">📊 15 策略基础信号回测（各策略最优持有期 · 事件口径） <span class="badge badge-auto">未过滤 · 负值=原始信号期望</span></div>
+<table class="tbl"><thead><tr><th>策略</th><th style="text-align:center">持有</th><th style="text-align:right">均值</th><th style="text-align:right">胜率</th></tr></thead><tbody>{_bt_rows}</tbody></table>
+<div class="sub" style="margin-top:6px;color:var(--faint)">⚠ 上方为 15 策略<b>原始信号</b>（无过滤）事件口径：均值普遍为负（胜率~40% 但右尾不足）——<b>不含</b>分域 RSI 过滤，<b>不是</b>投产组合；投产组合 = 15 策略信号 + 熊市分域 RSI&lt;35 超卖 + 低价≥3元 + 主板（见 KHunter 命中策略一览与监控总览回测）。</div>
+<div class="sub" style="margin-top:8px;color:var(--faint)">模拟盘 = 前向验证 KHunter 优化配置在生产上的现实信号频率与损耗；与 ETF 模拟盘（动量轮动）/基金池完全独立 · 数据生成：python khunter_paper_snapshot.py</div>
+</div></div>'''
+
+# 让前端可用
+KH_SNAP_JS = json.dumps(KH_SNAP, ensure_ascii=False, separators=(",", ":"))
+KH_PAPER_CARD = _kh_paper_card()
+
 # 全量池中/长线年跟踪池（2026-08-17 用户需求：上榜跟踪 1 年，再上榜 +1 年；track_v9 由 build_enhanced_data.py 维护）
 WATCH_V9_CARD = f'''<div class="card" id="watch-v9-card">
 <h2>📌 全量池中/长线跟踪 <span class="badge badge-auto">上榜跟踪 1 年 · 再上榜 +1 年</span> </h2>
@@ -1273,6 +1379,7 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
   tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=(), inline=True)}
 {KH_HITS_CARD}
 {ETF_PAPER_CARD}
+{KH_PAPER_CARD}
 {system_block(
   "view-short-fund", "sys-short-fund",
   "🔵 短线 · 基金池", "auto", "场外基金动量（分≥50 才入池）",
@@ -1392,6 +1499,7 @@ html = f"""<!doctype html>
 .etf-sec{{font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px}}
 #card-etf-paper .tbl{{margin-bottom:0}}
 #card-etf-paper .kpis{{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}}
+#card-kh-paper .kpis{{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}}
 </style></head><body>
 {NAV_HTML}
 <div class="container">
@@ -1510,13 +1618,14 @@ html = f"""<!doctype html>
 <script src="https://unpkg.com/artalk@2/dist/Artalk.js"></script>
 <script>window.SHORT_POOL = {SHORT_POOL_SLIM};</script>
 <script>window.ETF_SNAP = {ETF_SNAP_JS};</script>
+<script>window.KH_SNAP = {KH_SNAP_JS};</script>
 <script>window.STOCK_META = {STOCK_META_JS};</script>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
 window.ENH.nav = [
   ["overview","📊","监控总览",[["overview","总览统计"],["mkt-weather","市场晴雨表"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
   ["sys-auto","🅰️","全量池中/长线",[["card-tbl-v9","标的汇总表"],["card-tbl-v9-detail","逐标的详情"],["watch-v9-card","中长线跟踪"]]],
-  ["short","⚡","全量池短线",[["card-short-stk","📋 股票池 汇总表"],["card-short-stk-detail","🔍 股票池 逐标的详情"],["card-kh-hits","🎯 KHunter 命中策略一览"],["card-etf-paper","📈 ETF 动量轮动"],["card-short-fund","📋 基金池 汇总表"],["card-short-fund-detail","🔍 基金池 逐标的详情"],["watch-card","📌 短线跟踪"]]],
+  ["short","⚡","全量池短线",[["card-short-stk","📋 股票池 汇总表"],["card-short-stk-detail","🔍 股票池 逐标的详情"],["card-kh-hits","🎯 KHunter 命中策略一览"],["card-etf-paper","📈 ETF 动量轮动"],["card-kh-paper","🐺 KHunter 模拟盘"],["card-short-fund","📋 基金池 汇总表"],["card-short-fund-detail","🔍 基金池 逐标的详情"],["watch-card","📌 短线跟踪"]]],
   ["a5","🎯","打板族",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
   ["comment","💬","评论区",[]]
 ];
