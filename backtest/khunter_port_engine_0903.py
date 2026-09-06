@@ -135,7 +135,8 @@ def run_khunter_port(sigs, state_prev, ob, osl, gate='none', dd=None, env='unifo
                      mom_thr=0.02, env_delta=5, max_hold=MAX_HOLD, board_only=None,
                      stop_loss=None, hold_max=None, low_price=None,
                      ob_bull=None, osl_bull=None, low_bull=None, util_track=False,
-                     ob_weak=None, osl_weak=None, low_weak=None, hold_weak=None):
+                     ob_weak=None, osl_weak=None, low_weak=None, hold_weak=None,
+                     weak_filter=None):
     """util_track: True 时 nav_series 每项追加 'invested'/'npos'（当日已投入市值/持仓数）供资金利用率统计"""
     """组合化 KHunter 主信号回测（单配置）：
     gate: 'none'/'ma20'/'ma40'/'ma60'/'bear60'/'tristate'/'hybrid'/'hybrid_wb'
@@ -157,6 +158,11 @@ def run_khunter_port(sigs, state_prev, ob, osl, gate='none', dd=None, env='unifo
     osl_weak = osl_weak if osl_weak is not None else osl
     low_weak = low_weak if low_weak is not None else low_price
     hold_weak = hold_weak if hold_weak is not None else hold_max
+    # weak_filter: 研究钩子（2026-09-05 四维归因，默认 None=零行为变更）
+    # 形如 {code: {'ma60_slope': bool[...], 'atr_dev': float[...], 'vr': float[...],
+    #              'rsi_up': bool[...], 'lol10': bool[...]}} —— 与 s['dates'] 等长
+    # weak_filter_pick(code, i) -> bool: 决定弱牛域是否允许该笔买入（True=通过）
+    weak_pick = (weak_filter.get('pick', None) if weak_filter else None)
     all_dates = sorted({pd.Timestamp(dt) for s in sigs.values() for dt in s['dates']})
     all_dates = [d for d in all_dates if BACKTEST_START <= d]
     # 状态对齐
@@ -305,6 +311,12 @@ def run_khunter_port(sigs, state_prev, ob, osl, gate='none', dd=None, env='unifo
                     s = sigs[code]
                     i = np.where(s['dates'] == d)[0]
                     if len(i) == 0:
+                        continue
+                    # 研究钩子：弱牛域四维过滤（弱牛域专用，False=该笔不买）
+                    # 契约：weak_pick(code, conf_i) —— conf_i = 信号确认日索引 = 执行日 i[0]-1
+                    # 滤波数组与 s['dates'] 等长，conf_i 位置上存的是确认日形态
+                    # （确认日 = cand[i] 的 i-1 + rsi1 的 shift(1)，与事件流构建口径一致）
+                    if is_wb and weak_pick is not None and i[0] - 1 >= 0 and not weak_pick(code, i[0] - 1):
                         continue
                     px = s['open'][i[0]]
                     if px > 0:
