@@ -75,7 +75,7 @@ def main():
     # 1. A/C 双轨状态
     a = _load_track(BASE / "khunter_paper_state.json")
     a["track"] = "A"
-    a["note"] = "熊市出场 RSI>55 · 沪深300<MA60 熊市限定 · RSI<35 超卖买入 · 收盘≥3元 · 最多5仓×¥20,000"
+    a["note"] = "熊市出场 RSI>59 · 沪深300<MA250 熊市限定 · RSI<35 超卖买入 · 收盘≥3元 · 最多5仓×¥20,000"
     c = _load_track(BASE / "khunter_paper_state_c.json")
     c["track"] = "C"
     c["note"] = "熊市出场 RSI>50（较 A 版早离场）· 其余与 A 轨相同"

@@ -79,14 +79,14 @@ try:
     SHORT_POOL_ASOF = SHORT_POOL.get("as_of", "—")
     _mg = SHORT_POOL.get("market_gate") or {}
     _bear60 = bool(_mg.get("bear60"))
-    # 2026-09-03 牛熊分域投产（HYBRIDv2 定稿）+ 2026-09-04 弱牛域专项投产：三态 regime 全开仓
-    #   🐻 熊市(<MA60, osl35+low3+ob55) / 🌞 牛市(>MA20, osl30+无low+ob75) / 🌙 弱牛回调(MA20下/MA60上, osl32+无low+ob80)
+    # 2026-09-07 牛熊分域 MA250 投产（Phase 11 定稿 · 用户拍板方案 2）+ 09-04 弱牛域 + 22:45 ob59 升级：
+    #   🐻 熊市(<MA250, osl35+low3+ob59) / 🌞 牛市(>MA20, osl32+无low+ob75) / 🌙 弱牛回调(MA20下/MA250上, osl32+无low+ob80)
     if _bear60:
-        _kh_regime_txt, _kh_regime_color = "🐻 熊市（MA60 下 · osl35+low3+ob55 · 可买入）", "#1f8a4c"
+        _kh_regime_txt, _kh_regime_color = "🐻 熊市（MA250 下 · osl35+low3+ob59 · 可买入）", "#1f8a4c"
     elif _mg.get("open"):
-        _kh_regime_txt, _kh_regime_color = "🌞 牛市（MA20 上 · osl30+无low+ob75 · 可买入）", "#1f8a4c"
+        _kh_regime_txt, _kh_regime_color = "🌞 牛市（MA20 上 · osl32+无low+ob75 · 可买入）", "#1f8a4c"
     else:
-        _kh_regime_txt, _kh_regime_color = "🌙 弱牛回调（MA20 下/MA60 上 · osl32+无low+ob80 · 可买入）", "#b45309"
+        _kh_regime_txt, _kh_regime_color = "🌙 弱牛回调（MA20 下/MA250 上 · osl32+无low+ob80 · 可买入）", "#b45309"
     SHORT_KHUNTER_BEAR = (f'<span class="badge badge-auto" style="background:{_kh_regime_color};color:#fff">'
                           f'KHunter 牛熊分域：{_kh_regime_txt}'
                           f'</span>')
@@ -403,7 +403,7 @@ for g, label, v9f, _sf in _STK_GROUPS:
 # 2026-09-02 晚修复：旧战法（反转打分）已全量弃用 → 分层「已下架」占位卡下线，
 # 改接生产主信号 = KHunter 15 信号 + RSI<35 择时 的全窗口回测（主板限定 · S1B_BOARD=main）
 # 2026-09-03 生产切换（用户拍板「直接切换，两版部署」）：主源 = 9 格网格 khunter_three_ver_opt_20260903.csv
-#   A_x3（ob55+low3）= 生产主卖出配置；C_x3（ob50+low3）= 并行参考配置；B_x3（30%止损）已否决
+#   A_x3（ob55+low3）= 旧生产主卖出配置（已升级）；C_x3（ob50+low3）= 并行参考配置；B_x3（30%止损）已否决
 #   旧源 fusion_s1b_bear_main_allwindow.csv（ob75/osl35）仅作文件缺失回退
 def _load_kh_prod():
     """读生产双版本回测（9 格网格 CSV），返回 (A_dict, C_dict|None) 或 (None, None)"""
@@ -469,9 +469,9 @@ for g, label, _v9f, _sf in _STK_GROUPS:
         ss_stk[g] = json.loads(json.dumps(ss_stock))
         ss_stk_tag[g] = ss_stock_tag + " · 旧战法已弃用(8/31审计)"
     elif g == "main":
-        # 纯主板：生产主信号 = KHunter（2026-09-03 起 标准版(主卖出) ob55+低价3元；用户唯一可买主板）
+        # 纯主板：生产主信号 = KHunter（2026-09-07 起 标准版(主卖出) ob59+低价3元；用户唯一可买主板）
         ss_stk[g] = KH_BT if KH_BT else {}
-        ss_stk_tag[g] = ("KHunter 标准版主卖出 RSI>55 · 全窗口对比口径（生产=HYBRIDv2 卡）" if not _KH_LEGACY
+        ss_stk_tag[g] = ("KHunter 标准版主卖出 RSI>59 · 全窗口对比口径（生产=MA250 分域卡）" if not _KH_LEGACY
                          else ("KHunter 主信号 · 全窗口(牛熊) · 无门控" if KH_BT else f"{label} · 暂无回测"))
     else:
         # 创业板/科创板：用户仅主板可买，KHunter 仅主板回测 → 明确说明卡
@@ -479,7 +479,7 @@ for g, label, _v9f, _sf in _STK_GROUPS:
         ss_stk_tag[g] = f"{label} · 用户仅主板可买 · KHunter 未回测"
 # 激进版参考卡（9 格网格存在时）
 ss_stk["main_c"] = KH_BT_C if KH_BT_C else {}
-ss_stk_tag["main_c"] = "KHunter 激进版参考卖出 RSI>50 · 全窗口对比口径（生产=HYBRIDv2 卡）" if KH_BT_C else ""
+ss_stk_tag["main_c"] = "KHunter 激进版参考卖出 RSI>50 · 全窗口对比口径（生产=MA250 卡）" if KH_BT_C else ""
 
 
 def bt_card(cid, title, tag, s, curve_id, color="#f59e0b", sub="2016-01~2026-08"):
@@ -519,6 +519,7 @@ def bt_short_html():
     2026-09-02 晚修复：旧战法弃用 → 纯主板卡改接 KHunter 主信号回测（全窗口无门控 · 四闸 PASS）；
     一体卡=旧战法修正版 -41.67%（标注弃用）；创业板/科创板=用户不可买，明确说明卡
     2026-09-03 生产切换：纯主板卡= 标准版 ob55+低价3元（主卖出）+ 激进版 ob50（参考卖出）双卡（资金池口径含回撤）；
+    2026-09-07 MA250 分域投产（ob58→ob59 升级）：生产=MA250 分域卡（熊 MA250 下 osl35+low3+ob59 / 牛 MA20 上 osl32+ob75）；
     B 版(30%止损)已否决不入卡"""
     def _card(cid, title, tag, s, curve_id, color="#f59e0b"):
         if not s:
@@ -553,22 +554,22 @@ def bt_short_html():
         return bt_card(cid, title, tag, s, curve_id, color=color)
     _c_cards = (f'{_card("bt-short-stock-main-c", "📈 短线 纯主板 · 激进版(OB50 参考)", ss_stk_tag["main_c"], ss_stk["main_c"], "curve-short-stock-main-c", color="#7c3aed")}'
                 if KH_BT_C else "")
-    # 🌟 HYBRIDv2 牛熊分域总卡（生产口径 · 组合化资金 · Phase 10 · 2026-09-03 投产终局 · 09-04 弱牛域投产）
+    # 🌟 MA250 牛熊分域总卡（生产口径 · 组合化资金 · Phase 11 · 2026-09-07 投产 · ob59 最终版）
     _hybrid_card = ('''<div class="bt-card" id="bt-short-stock-hybrid" style="border-color:rgba(37,99,235,.5)">
-<div class="bt-head"><b>🌟 生产口径：牛熊分域 HYBRIDv2 总卡</b><span class="bt-tag">组合化资金 · 正在用的就是它</span></div>
+<div class="bt-head"><b>🌟 生产口径：牛熊分域 MA250 总卡（ob59）</b><span class="bt-tag">组合化资金 · 正在用的就是它</span></div>
 <div class="kpis">
-<div class="kpi"><div class="l">组合总收益</div><div class="v" style="color:var(--up)">+68.5%</div><div class="s">n=296 · 胜率 61.2% · 弱牛域未开</div></div>
-<div class="kpi"><div class="l">弱牛域开(OSL32)</div><div class="v" style="color:var(--up)">+80.0%</div><div class="s">回测 2026-09-04 定稿 · n=313 · 夏普 0.435</div></div>
-<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">-22.45%</div><div class="s">夏普 0.397 → 0.435 · 均值 +1.90%/笔</div></div>
-<div class="kpi"><div class="l">牛(>MA20)</div><div class="v" style="color:var(--up)">med +3.20%</div><div class="s">n=39 · wr 61.5% · 独立过闸</div></div>
+<div class="kpi"><div class="l">组合总收益</div><div class="v" style="color:var(--up)">+119.4%</div><div class="s">n=266 · 胜率 62.4% · ob59 定稿</div></div>
+<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">-20.91%</div><div class="s">夏普 0.648 · 均值 +3.08%/笔 · 满窗验证</div></div>
+<div class="kpi"><div class="l">牛(>MA20)</div><div class="v" style="color:var(--up)">med +4.67%</div><div class="s">n=65 · wr 62% · 独立过闸</div></div>
+<div class="kpi"><div class="l">熊(&lt;MA250)</div><div class="v" style="color:var(--up)">med +2.78%</div><div class="s">n=201 · wr 62% · 独立过闸</div></div>
 </div>
 <div class="kpis">
-<div class="kpi"><div class="l">熊(&lt;MA60)</div><div class="v" style="color:var(--up)">med +2.41%</div><div class="s">n=257 → 254 · wr 61.1%</div></div>
-<div class="kpi"><div class="l">弱牛回调(MA20下/MA60上)</div><div class="v" style="color:var(--up)">med +2.95%</div><div class="s">n=28 · wr 57.1% · 近四闸(n&lt;30) · 2026-09-04 投产</div></div>
+<div class="kpi"><div class="l">前后半双过</div><div class="v" style="color:var(--up)">med +2.93/+2.92</div><div class="s">h1/h2 · 11 年 8 正 3 负</div></div>
+<div class="kpi"><div class="l">弱牛回调(MA20下/MA250上)</div><div class="v" style="color:var(--up)">med +2.95%</div><div class="s">n=28 · wr 57.1% · 近四闸(n&lt;30) · 2026-09-04 投产</div></div>
 </div></div>''')
     cards = "".join([
         _card("bt-short-stock-all", "📈 短线 股票 一体", ss_stk_tag["all"], ss_stk["all"], "curve-short-stock-all"),
-        _card("bt-short-stock-main", "📈 短线 纯主板 · 标准版(主卖出 RSI>55)", ss_stk_tag["main"], ss_stk["main"], "curve-short-stock-main", color="#ea580c"),
+        _card("bt-short-stock-main", "📈 短线 纯主板 · 标准版(主卖出 RSI>59)", ss_stk_tag["main"], ss_stk["main"], "curve-short-stock-main", color="#ea580c"),
         _c_cards,
         _hybrid_card,
         _card("bt-short-stock-gem", "📈 短线 纯创业板", ss_stk_tag["gem"], ss_stk["gem"], "curve-short-stock-gem"),
@@ -576,12 +577,12 @@ def bt_short_html():
         bt_card("bt-short-fund", "🔵 短线 基金", ss_fund_tag, ss_fund, "curve-short-fund", color="#3b82f6"),
     ])
     return ('<div class="card" id="bt-short">\n'
-            '<h2>⚡ 短线回测参考 <span class="badge badge-auto">生产主信号=KHunter · 修正引擎 T+1 · 2026-09-03 牛熊分域(HYBRIDv2) + 09-04 弱牛域</span></h2>\n'
+            '<h2>⚡ 短线回测参考 <span class="badge badge-auto">生产主信号=KHunter · 修正引擎 T+1 · 2026-09-07 牛熊分域(MA250) + 09-04 弱牛域</span></h2>\n'
             '''<div class="sub">📊 <b>短线「在用什么」= 牛熊分域(进场) + 标准版/激进版(卖出线)，外加 H6 动量强弱切换(打分)</b>——三个独立维度，别混：
-① <b>牛熊分域（HYBRIDv2 买入框架 + 09-04 弱牛域）</b>：🐻 熊市(沪深300&lt;MA60)：KHunter 信号+RSI&lt;35+收盘≥3元 → 可买；🌞 牛市(&gt;MA20)：信号+RSI&lt;30+无低价 → 可买；🌙 弱牛回调(MA20 下/MA60 上)：<b>RSI&lt;32+无低价 → 可买</b>（2026-09-04 专项投产，回测总收益 68.49%→79.96%）。
-② <b>标准版/激进版（卖出参考线）</b>：标准版=主执行（熊市 RSI&gt;55 / 牛市 RSI&gt;75 / 弱牛 RSI&gt;80）；激进版=参考（RSI&gt;50 更早止盈）。<b>两版买入规则完全相同</b>，只有卖出线不同。
+① <b>牛熊分域（MA250 买入框架 + 09-04 弱牛域）</b>：🐻 熊市(沪深300&lt;MA250)：KHunter 信号+RSI&lt;35+收盘≥3元 → 可买；🌞 牛市(&gt;MA20)：信号+RSI&lt;32+无低价 → 可买；🌙 弱牛回调(MA20 下/MA250 上)：<b>RSI&lt;32+无低价 → 可买</b>（2026-09-04 专项投产，2026-09-07 MA250 定稿总收益 +119.4%）。
+② <b>标准版/激进版（卖出参考线）</b>：标准版=主执行（熊市 RSI&gt;59 / 牛市 RSI&gt;75 / 弱牛 RSI&gt;80）；激进版=参考（RSI&gt;50 更早止盈）。<b>两版买入规则完全相同</b>，只有卖出线不同。
 ③ <b>H6 三态（短线打分权重）</b>：沪深300 20d 动量&gt;2% = 强牛（进攻权重+关动量 mask+S50 门槛）／≤2% 且&gt;MA20 = 弱牛（防守权重+全 mask+S55）／不满足 = 熊市清仓。这个决定「入选池怎么打分」，与开仓/卖出无关。<b>模拟盘标准/激进前向对决后定稿</b></div>\n'''
-            '<div class="sub" style="color:var(--sub)">💧 <b>回撤就看一张卡</b>：正在用的 = <b>生产口径 HYBRIDv2 卡（回撤 -22.45%）</b>——牛熊分域入场 + 标准版卖出，组合化资金计算。标准版/激进版两张卡是<b>全窗口单笔口径</b>（n=408，回撤 19.90%/19.45%），用于两版对比（买相同、卖不同），<b>不是</b>生产真实回撤。买卖均为 T 日收盘确认 → T+1 开盘执行；回撤=资金池固定 5 仓等权 NAV。<b>旧战法（反转打分）已弃用</b>（-41.67% 仅对照）</div>\n'
+            '<div class="sub" style="color:var(--sub)">💧 <b>回撤就看一张卡</b>：正在用的 = <b>生产口径 MA250 卡（回撤 -20.91%）</b>——牛熊分域入场 + 标准版 ob59 卖出，组合化资金计算。标准版/激进版两张卡是<b>全窗口单笔口径</b>（n=266，2026-09-07 ob59 定稿），用于两版对比（买相同、卖不同），<b>不是</b>生产真实回撤。买卖均为 T 日收盘确认 → T+1 开盘执行；回撤=资金池固定 5 仓等权 NAV。<b>旧战法（反转打分）已弃用</b>（-41.67% 仅对照）</div>\n'
             '<div class="sub" style="color:#7c3aed">🧪 <b>9/1 熊市三策略吸收验证（用户框架规则化 · 修正引擎 T+1）</b>：S1 超跌反弹单笔 +0.48%/胜率 52.6% 但<b>几何均值 -1.73%</b>、S3 右侧追涨单笔 +2.79%/胜率 69.2% 但<b>组合复利 -92.9%</b>、S2 抗跌强势负期望 —— <b>三策略全部 FAIL 组合级四闸</b>。结论：<b>熊市入场过滤救不了逆势，唯一可行=熊市空仓/极端轻仓</b>（例外：KHunter 主信号自身承担风险过滤，熊市开仓全窗口实测过闸）</div>\n'
             '<div class="bt-grid">' + cards + '</div>\n</div>')
 perm_stat = ''   # 2026-08-21 固定池已去除
@@ -1162,9 +1163,9 @@ def _kh_paper_card():
     return f'''<div class="card" id="card-kh-paper">
 <div class="card-h"><h2>🐺 KHunter 模拟盘（A/C 双轨） <span class="badge badge-auto">自动 · 前向验证</span></h2><span class="fold-arrow">▾</span></div>
 <div class="body" style="padding:0 16px 16px">
-<div class="sub" style="margin-top:8px"><b>模拟什么</b>：KHunter 优化配置（2026-09-03 定稿）在<b>真实时间线前向验证</b>——入场=15 策略信号命中 + 分域 RSI（熊&lt;35/牛&lt;30/弱牛&lt;32）+ 熊市限定(沪深300&lt;MA60) + 主板 + 收盘≥3元 + 20日均额≥3000万；出场=分域 RSI（熊&gt;55/牛&gt;75/弱牛&gt;80）T+1 开盘执行 + 25 交易日持有上限；仓位=5仓×¥20,000 · 成本 0.575% × 2 边。</div>
+<div class="sub" style="margin-top:8px"><b>模拟什么</b>：KHunter 优化配置（2026-09-07 MA250 定稿）在<b>真实时间线前向验证</b>——入场=15 策略信号命中 + 分域 RSI（熊&lt;35/牛&lt;32/弱牛&lt;32）+ 熊市判定(沪深300&lt;MA250) + 主板 + 收盘≥3元 + 20日均额≥3000万；出场=分域 RSI（熊&gt;59/牛&gt;75/弱牛&gt;80）T+1 开盘执行 + 25 交易日持有上限；仓位=5仓×¥20,000 · 成本 0.575% × 2 边。</div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px">
-{_track_sec(_tA, "🅰️ A 轨（标准版 · 出场 RSI&gt;55）")}
+{_track_sec(_tA, "🅰️ A 轨（标准版 · 出场 RSI&gt;59）")}
 {_track_sec(_tC, "🆑 C 轨（激进版 · 出场 RSI&gt;50）")}
 </div>
 <div class="etf-sec" style="margin-top:14px">📊 15 策略基础信号回测（各策略最优持有期 · 事件口径） <span class="badge badge-auto">未过滤 · 负值=原始信号期望</span></div>
@@ -1338,12 +1339,12 @@ if _cf.exists():
     CHANGELOG_HTML = "\n".join(_cards)
 
 # ════ 视图 C 内容：短线 股票池 / 基金池 分板块（2026-09-03 用户需求）════
-# 股票池含 标准/激进 双版本（入场同信号，标准版 A55 主卖出 + 激进版 C50 参考标注）；基金池=场外基金动量；
+# 股票池含 标准/激进 双版本（入场同信号，标准版 A59 主卖出 + 激进版 C50 参考标注）；基金池=场外基金动量；
 # 跟踪池统一放底部（股票+基金同一 watch 卡，类型筛选），不做 标准/激进 双跟踪池（买入同一、卖出判定归模拟盘双轨）
 # 2026-09-05 用户需求：新增「KHunter 命中策略一览」卡（命中 15 策略全展示，按 RSI 升序，档位/建议区分）
 KH_HITS_CARD = f'''<div class="card" id="card-kh-hits">
 <h2>🎯 KHunter 命中策略一览 <span class="badge badge-auto">自动 · 按 RSI 升序</span></h2>
-<div class="sub">全量池短线股票中<b>命中 KHunter 15 策略</b>的标的（含未达买入阈值者，事件驱动）· 按当前 RSI 升序（超卖优先）· 档位/建议 = 牛熊分域裁决，<b>标准版（A55 主卖出）</b>与<b>激进版（C50 参考线）</b>分四列独立展示：<b>买入</b> = RSI 低于分域阈值（熊&lt;35 / 牛&lt;30 / 弱牛&lt;32）· <b>卖出</b> = 标准版 RSI&gt;55/75/80、激进版 RSI&gt;50 · 命中但未达阈值 = 观望（仅观察，不构成操作）· 数据截至 {SHORT_POOL_ASOF}</div>
+<div class="sub">全量池短线股票中<b>命中 KHunter 15 策略</b>的标的（含未达买入阈值者，事件驱动）· 按当前 RSI 升序（超卖优先）· 档位/建议 = 牛熊分域裁决，<b>标准版（A59 主卖出）</b>与<b>激进版（C50 参考线）</b>分四列独立展示：<b>买入</b> = RSI 低于分域阈值（熊&lt;35 / 牛&lt;32 / 弱牛&lt;32）· <b>卖出</b> = 标准版 RSI&gt;59/75/80、激进版 RSI&gt;50 · 命中但未达阈值 = 观望（仅观察，不构成操作）· 数据截至 {SHORT_POOL_ASOF}</div>
 <div class="toolbar" id="kh-hits-bar">
 <input type="text" id="kh-hits-q" placeholder="🔍 搜索代码 / 名称 / 策略…" autocomplete="off" spellcheck="false">
 <select id="kh-hits-f-tier" class="flt" title="标准版档位筛选"><option value="">全部档位</option><option>买入</option><option>卖出</option><option>观望</option></select>
@@ -1366,14 +1367,14 @@ KH_HITS_CARD = f'''<div class="card" id="card-kh-hits">
 SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
 {system_block(
   "view-short-stk", "sys-short-stk",
-  "⚡ 短线 · 股票池", "auto", "主板 KHunter 主信号 · A55 主卖出 / C50 参考 · 低价≥3元",
+  "⚡ 短线 · 股票池", "auto", "主板 KHunter 主信号 · A59 主卖出 / C50 参考 · 低价≥3元",
   v9_short_stock, "tbl-short-stk", "card-short-stk",
-  "信号池 = 回测买入清单：KHunter 15 策略信号 + 信号日 RSI&lt;35 超卖 + 收盘≥3元（主板限定·事件独立·有信号即买）· 卖出 = <b>逐股独立</b>：持仓股自身 RSI 确认日 &gt; 标准版阈值（熊 55/牛 75） → T+1 开盘卖（RSI&gt;50 为激进版参考线，标注但<i>不执行</i>，标准/激进判定归模拟盘双轨）· 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：不追高，可等盘中回落至 3% 以内再考虑买入（9:30 盘中起生效）</b>",
+  "信号池 = 回测买入清单：KHunter 15 策略信号 + 信号日 RSI&lt;35 超卖 + 收盘≥3元（主板限定·事件独立·有信号即买）· 卖出 = <b>逐股独立</b>：持仓股自身 RSI 确认日 &gt; 标准版阈值（熊 59/牛 75） → T+1 开盘卖（RSI&gt;50 为激进版参考线，标注但<i>不执行</i>，标准/激进判定归模拟盘双轨）· 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：不追高，可等盘中回落至 3% 以内再考虑买入（9:30 盘中起生效）</b>",
   extra_card="", score_sub="动量/量价/通道/波动",
   head_tags=[SHORT_POOL_GATE, SHORT_KHUNTER_BEAR, SHORT_KHUNTER_BADGE,
-             '<span class="badge badge-auto">股票 = KHunter 15 策略信号 + RSI&lt;35 超卖 + 熊市MA60（主板限定 · 弃用旧战法）</span>',
+             '<span class="badge badge-auto">股票 = KHunter 15 策略信号 + RSI&lt;35 超卖 + 熊市MA250（主板限定 · 弃用旧战法）</span>',
              '<span class="badge badge-auto">KHunter 信号密集期每日可能有几只，稀疏期 0 只属正常（事件驱动）</span>'],
-  head_note=f"<b>🎯 KHunter 主信号（蓝标）= 主板 15 策略信号命中 + 信号日 RSI&lt;35 超卖 + 收盘≥3元 + 熊市(沪深300&lt;MA60)</b>（2026-09-03 生产切换 v5.14.0：B1 熊市限定——38 组牛市扫描 0 过门后收紧；<b>标准版</b> 卖出 RSI&gt;55 主执行 / <b>激进版</b> RSI&gt;50 参考展示；入场两版相同）· 回测：标准版+低价（熊市限定）n=408 资金池(N5)年化 5.54%/回撤 19.90%/夏普 0.372，激进版+低价 4.98%/19.45%/0.352（每笔口径激进版更锐：81.4%/1.430）；牛市子集 4 方向×38 组 0 过门→不开新仓，牛市收益由基金动量池承担· <b>旧战法（反转分）已全量弃用</b>（主板 -35.65% / 全市场 -41.67% 均负期望，不再展示）· 市况门控仅提醒：沪深300 &gt; MA20 才开新仓；KHunter 买入由独立 <b>MA60 熊市门控</b>裁决（非熊→不开新仓仅观察/卖出）· 卖出逐股独立走「全量池短线跟踪」· 回测参考见「监控总览」",
+  head_note=f"<b>🎯 KHunter 主信号（蓝标）= 主板 15 策略信号命中 + 信号日 RSI&lt;35 超卖 + 收盘≥3元 + 熊市(沪深300&lt;MA250)</b>（2026-09-07 牛熊线 MA250 投产 + ob59 升级：MA60→MA250 回测 total 68.49→75.06%、ob 55→58→59 组合 total 110.15→119.44%/夏普 0.621→0.648；<b>标准版</b> 卖出 RSI&gt;59 主执行 / <b>激进版</b> RSI&gt;50 参考展示；入场两版相同）· 回测：MA250_ob59_oslb32 n=266 资金池(N5)年化 7.96%/回撤 20.91%/夏普 0.648（满窗验证 105.77%/0.660 稳健）· 分年度 11 年 8 正 3 负（2023 -1.92/2026 -0.91 为小样本）· <b>旧战法（反转分）已全量弃用</b>（主板 -35.65% / 全市场 -41.67% 均负期望，不再展示）· 市况门控仅提醒：沪深300 &gt; MA20 才开新仓；KHunter 买入由 <b>MA250 熊市门控</b>裁决（非熊→不开新仓仅观察/卖出，弱牛域 OSL32 开仓）· 卖出逐股独立走「全量池短线跟踪」· 回测参考见「监控总览」",
   as_of=SHORT_POOL_ASOF, intraday_note=SHORT_POOL_INTRADAY,
   as_of_min=SHORT_POOL.get("intraday_ts") or SHORT_POOL_ASOF_MIN,
   tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=(), inline=True)}
@@ -1882,7 +1883,7 @@ document.addEventListener('DOMContentLoaded',function(){{
     var cnt=document.getElementById('watch-count');
     if(cnt)cnt.textContent='筛选 '+filtered.length+' / 共 '+rows.length+' 只';
     if(!filtered.length){{box.innerHTML='<div class="sub" style="color:var(--faint)">无匹配标的 —— 调整搜索/筛选条件后重试</div>';return;}}
-    var h='<div class="sub" style="margin-bottom:6px;color:var(--sub)">🧭 版本说明：<b>标准版</b>=生产主信号（熊市卖出 RSI&gt;55 / 牛市卖出 RSI&gt;75）；<b>激进版</b>=参考线（RSI&gt;50 卖出，更早止盈高周转）—— 双版本并行对决；卖出为独立信号，不含买入含义</div>'
+    var h='<div class="sub" style="margin-bottom:6px;color:var(--sub)">🧭 版本说明：<b>标准版</b>=生产主信号（熊市卖出 RSI&gt;59 / 牛市卖出 RSI&gt;75）；<b>激进版</b>=参考线（RSI&gt;50 卖出，更早止盈高周转）—— 双版本并行对决；卖出为独立信号，不含买入含义</div>'
           +'<table class="tbl"><thead><tr><th>标的</th><th>类型</th><th>行业</th><th style="text-align:center">入池日期</th><th style="text-align:center">出池日期</th><th style="text-align:center">已跟踪</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">短线分</th><th style="text-align:center">档位(标准版)</th><th style="text-align:center">建议(标准版)</th><th style="text-align:center">档位(激进版)</th><th style="text-align:center">建议(激进版)</th><th style="text-align:center">MA5</th></tr></thead><tbody>';
     filtered.forEach(function(r){{
       var rec=r.rec;
@@ -1911,10 +1912,10 @@ document.addEventListener('DOMContentLoaded',function(){{
   renderWatch();
   /* 2026-09-05 用户需求：短线选股池命中策略一览 —— 命中 KHunter 15 策略全展示，按 RSI 升序，档位/建议区分 */
   /* 2026-09-05 修复（用户反馈）：①表头被 innerHTML 整体替换删除 → 只替换 tbody；②分域问号 = 数据缺 regime → 兜底显示 —；
-     ③标准版(A55)/激进版(C50) 混一列打架 → 拆四列独立展示 */
+     ③标准版(A59)/激进版(C50) 混一列打架 → 拆四列独立展示 */
   var KH_STRAT_CN={{'trend_resonance':'趋势共振','trend_start':'趋势起点','immortal_guidance':'仙人指路','multi_golden_cross':'多金叉共振','limit_up_pullback':'涨停回马枪','strong_wash':'强势洗盘','golden_cross_not_green':'金叉不绿','morning_star':'启明星','strategy_2560':'2560战法','golden_triangle':'黄金三角','limit_up_sideways':'涨停横盘','multi_party_cannon':'多方炮','resistance_breakout':'突破压力','trend_acceleration':'趋势加速','w_bottom':'W底'}};
   var KH_REGIME_CN={{'bear':'🐻 熊市','bull':'🌞 牛市','weak_bull':'🌙 弱牛'}};
-  /* 标准版（A55 主卖出）：buy→买入 / sell→卖出（note 为 A 版文案）/ 否则观望 */
+  /* 标准版（A59 主卖出）：buy→买入 / sell→卖出（note 为 A 版文案）/ 否则观望 */
   function khStd(kh){{
     if(kh.buy)return {{tier:'买入',act:'🟢 买入信号 · T+1 开盘买入',cls:'up'}};
     if(kh.sell)return {{tier:'卖出',act:kh.note||'🔴 卖出信号 · T+1 开盘卖',cls:'down'}};
