@@ -1524,6 +1524,7 @@ html = f"""<!doctype html>
 <div class="sub">全市场情绪广度 = 红/绿盘家数 + 涨停/跌停/炸板 + 量能（照抄 niuone 口径 · 腾讯行情批量接口精算）· 交易时段每 30s 实时更新，收盘后定格静态精算 · <b>仅客观展示，不构成任何交易信号</b></div>
 <div id="mw-summary" class="mw-summary">等待数据…</div>
 <div id="mw-idx" class="mw-idx"></div>
+<div id="mw-jiandi" class="mw-summary" style="border-top:1px dashed var(--border,#e2e8f0);padding-top:8px;margin-top:8px;font-size:12px;color:var(--sub)"><span>🕐 见底信号·市场级恐慌观察（advisory-only）…</span></div>
 <div id="mw-chart" class="mw-chart"></div>
 <style>
 .mw-summary{{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;padding:6px 0 10px;font-size:13px}}
@@ -1737,6 +1738,21 @@ switchView=function(key){{
 document.addEventListener('DOMContentLoaded',function(){{
   applyHash();   // 按 URL hash 定位视图（历史页跳转 dual_system.html#sys-auto 直接显示普适版）
   renderSubCurve();   // 基金回测净值曲线
+  /* 2026-09-06 见底信号市场级恐慌观察指标（advisory-only）：读 SHORT_POOL.market_gate.jiandi_panic */
+  function renderJiandiPanic(){{
+    var box=document.getElementById('mw-jiandi');if(!box)return;
+    var mg=(window.SHORT_POOL&&window.SHORT_POOL.market_gate)||{{}};
+    var jp=mg.jiandi_panic||null;
+    if(!jp){{box.innerHTML='<span>🕐 见底信号·市场级恐慌观察：暂无数据（jiandi_panic.json 未生成/未接入）</span>';return;}}
+    var c=jp.counts||{{}};
+    var lv=jp.level_name||'—';
+    var lvColor={{'无恐慌':'#16a34a','轻微':'#d97706','市场级恐慌':'#dc2626','极恐慌':'#b91c1c'}}[lv]||'#16a34a';
+    box.innerHTML='<span class="mw-item">🕐 见底信号(主板) 入市 <b>'+ (c.rushi!=null?c.rushi:'—') +'</b> / 机会 <b>'+ (c.jihui!=null?c.jihui:'—') +'</b> / 见底 <b>'+ (c.jiandi!=null?c.jiandi:'—') +'</b></span>'+
+      '<span class="mw-item">恐慌级别 <b style="color:'+lvColor+'">'+lv+'</b>('+ (jp.panic_level!=null?jp.panic_level:'—') +')</span>'+
+      '<span class="mw-item">日期 '+ (jp.date||'—') +'</span>'+
+      '<span class="mw-note">advisory-only · 不参与门控 · 2026-09-06 投产（见底信号回测 alpha 观察）</span>';
+  }}
+  try{{renderJiandiPanic();}}catch(e){{console.warn('renderJiandiPanic',e);}}
   /* 全量池短线跟踪：自动跟踪池（SHORT_POOL.track，可买入标的 30 天）+ 可选手动补充（localStorage） */
   function boardCell(v){{
     var cls={{'主板':'board-sh','创业板':'board-cy','科创板':'board-kc','北交所':'board-bj'}}[v]||'';

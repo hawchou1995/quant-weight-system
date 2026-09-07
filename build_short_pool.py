@@ -259,6 +259,41 @@ KHUNTER_LOW_PRICE = 3.0  # 低价过滤（仅熊市）：确认日收盘 ≥ 3 �
 KHUNTER_LOW_PRICE_BULL = None  # 牛市低价过滤：无（定稿式 low3 伤后半 med +0.85%→-0.31% 破线）
 KHUNTER_LOW_PRICE_WEAK = None  # 弱牛回调低价过滤：无（2026-09-04 OSL32 定稿：弱牛域开不设低价，与牛市同口径）
 
+# ════════════════════════════════════════════════════════════════════
+# 生产参数 YAML 热更新（2026-09-06 用户需求：KHunter 网页「我的选股」改参数 → 无缝更新）
+# 若存在 config/production_select.yaml（KHunter 网页保存），用 YAML 值覆盖上方硬编码默认；
+# 不存在则用硬编码（向后兼容）。网页保存路径 = BASE/config/production_select.yaml（单一权威源）。
+# ════════════════════════════════════════════════════════════════════
+def _load_prod_select_yaml():
+    """读取生产选股参数 YAML（KHunter 网页「我的选股」页保存），失败/缺失则返回 None"""
+    _f = BASE / "config" / "production_select.yaml"
+    if not _f.exists():
+        return None
+    try:
+        import yaml as _y
+        _cfg = _y.safe_load(_f.read_text(encoding="utf-8")) or {}
+        return _cfg
+    except Exception as _e:
+        print(f"⚠ production_select.yaml 解析失败（用硬编码默认）: {_e}")
+        return None
+
+_PROD_SEL = _load_prod_select_yaml()
+if _PROD_SEL:
+    _flt = _PROD_SEL.get("filters", {})
+    _flt = {k: v for k, v in _flt.items() if v is not None}
+    _pop = {"rsi_buy_bear": "KHUNTER_RSI_BUY", "rsi_buy_bull": "KHUNTER_RSI_BUY_BULL",
+            "rsi_buy_weak": "KHUNTER_RSI_BUY_WEAK", "rsi_sell_bear": "KHUNTER_RSI_SELL",
+            "rsi_sell_bull": "KHUNTER_RSI_SELL_BULL", "rsi_sell_weak": "KHUNTER_RSI_SELL_WEAK",
+            "rsi_sell_c": "KHUNTER_RSI_SELL_C", "low_price_bear": "KHUNTER_LOW_PRICE",
+            "low_price_bull": "KHUNTER_LOW_PRICE_BULL", "low_price_weak": "KHUNTER_LOW_PRICE_WEAK"}
+    for _ky, _attr in _pop.items():
+        if _ky in _flt:
+            globals()[_attr] = _flt[_ky]
+    if _PROD_SEL.get("enabled") is not None:
+        ENABLE_KHUNTER = bool(_PROD_SEL.get("enabled", True))
+    print(f"✅ production_select.yaml 已加载：RSI 买 {KHUNTER_RSI_BUY}/{KHUNTER_RSI_BUY_BULL}/{KHUNTER_RSI_BUY_WEAK} "
+          f"卖 {KHUNTER_RSI_SELL}/{KHUNTER_RSI_SELL_BULL}/{KHUNTER_RSI_SELL_WEAK} C {KHUNTER_RSI_SELL_C} 低价 {KHUNTER_LOW_PRICE}")
+
 def _khunter_sig(ddf, as_of=None, regime=None):
     """KHunter 信号计算（2026-09-02 用户拍板）：生产在「今日 T 收盘后」运行，明日 T+1 开盘执行。
     回测口径精确对齐（khunter_fusion_s1b_bear.py, 修正引擎 T+1 铁律）：
@@ -504,6 +539,23 @@ def calc_signals(as_of=None):
         market_gate["sentiment"] = {"zone": _sent.get("sentiment_zone", _sent.get("zone", "—")), "zt_ratio": _sent.get("zt_ratio"), "broken_rate": _sent.get("broken_rate"), "seal_yi": _sent.get("total_seal_yi"), "lianban_max": _sent.get("lianban_max", 0), "note": "advisory-only（不参与门控判定，仅供观察）"}
     except Exception:
         market_gate["sentiment"] = {"note": "market_breadth.js 缺失/解析失败", "source": "unavailable"}
+
+    # ② 见底信号市场级恐慌观察指标（2026-09-06 投产）：从 dist/jiandi_panic.json 透传
+    #    见底信号数（入市<-30/机会[-30,-25]/见底[-25,-20]档当日主板触发数）+ 市场级恐慌级别。
+    #    ⚠ advisory-only —— 仅供观察，不参与 1100 行门控判定（信号有 alpha 但组合回撤过大，
+    #    修正信号逻辑后夏普<1，不可投产交易，仅作恐慌监测参考）。
+    try:
+        _jp = json.loads((BASE / "dist" / "jiandi_panic.json").read_text(encoding="utf-8"))
+        market_gate["jiandi_panic"] = {
+            "date": _jp.get("date"),
+            "counts": _jp.get("counts", {}),
+            "total": _jp.get("total", 0),
+            "panic_level": _jp.get("panic_level", 0),
+            "level_name": _jp.get("level_name", "—"),
+            "note": "advisory-only（见底信号·市场级恐慌观察，不参与门控判定，仅供观察）",
+        }
+    except Exception:
+        market_gate["jiandi_panic"] = {"note": "jiandi_panic.json 缺失/解析失败", "source": "unavailable"}
 
     # 1) 股票反转：按权限分层各取 Top10（主板/创业板/科创板，2026-08-17 用户决策）
     stock_pool = S.load_stock_pool()
