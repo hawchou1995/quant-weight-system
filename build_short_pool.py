@@ -241,17 +241,17 @@ ENABLE_F3 = False  # 9/1 裁决：F3 缩量企稳为增强候选，验证门前�
 #     B(+30%止损)+low3 全灭（池年化 0.27%）→ 剔除；时间止损同样否决（tstop20 2024 更差）
 #   部署语义：入场规则唯一（信号+RSI<35+熊市+收盘≥3元，A/C 同入口）；A 版 RSI>55 为主卖出；
 #   C 版 RSI>50 作并行参考卖出（sell_c 字段/看板双版本展示），模拟盘 A/C 双轨前向对决后定稿
-# ⚠ 2026-09-03 23:15 牛熊分域投产（Phase 10 HYBRIDv2 定稿 · total+68.5% 牛熊独立双过闸）：
-#   🐻 熊市（hs300<MA60）：osl35 / low3 / ob55(A 主) / ob50(C 参考) / hold25 = 生产现状 + hold25
-#   🌞 牛市（>MA20 且非熊）：osl30 / 无低价 / ob75(A 主) / ob50(C 参考) / hold25 = 定稿式参数
+# ⚠ 2026-09-07 牛熊线 MA250 投产（Phase 11 定稿 · 用户拍板方案 2，替代 Phase 10 MA60 分域）：
+#   🐻 熊市（hs300<MA250）：osl35 / low3 / ob59(A 主) / ob50(C 参考) / hold25（ob58→59 grill 邻域优化：total 110.15→119.44
+#   🌞 牛市（>MA20 且非熊）：osl32 / 无低价 / ob75(A 主) / ob50(C 参考) / hold25（osl_bull 30→32 敏感性提升）
 #   ⚠ 回测铁律（Phase 10 v1 失败教训）：熊市绝不 split 放宽（osl40 → n 520 低质量信号 total -11.1%）
-#   改回「牛市也开仓」依据：8/9/3 Phase 10 HYBRIDv2 = n=296 wr61% med+2.46% total+68.5% 牛熊独立过闸；「牛市 38 组扫描全灭」已废止（原为含 ST + 单一 osl35 口径）
+#   改回「牛市也开仓」依据：Phase 11 MA250_ob58_oslb32 = n=266 wr62% med+2.84% total+110.15% 夏普0.621 牛熊独立过闸；「牛市 38 组扫描全灭」已废止（原为含 ST + 单一 osl35 口径）
 # 弃用旧战法证据：反转打分(S55)修正后主板 -35.65%/全市场 -41.67% 均负期望
 ENABLE_KHUNTER = True
 KHUNTER_RSI_BUY = 35     # 熊市买入：RSI_T-1 < 35（生产现状保留）
-KHUNTER_RSI_BUY_BULL = 30  # 牛市买入：RSI_T-1 < 30（定稿式 osl30，2026-09-03 牛熊分域投产）
+KHUNTER_RSI_BUY_BULL = 32  # 牛市买入：RSI_T-1 < 32（2026-09-07 Phase 11 敏感性：osl_bull 30→32 显著提升 total 75→94.8/夏普 0.502→0.576，已投产）
 KHUNTER_RSI_BUY_WEAK = 32  # 弱牛回调买入：RSI_T-1 < 32（2026-09-04 弱牛域专项 OSL32 投产，回测组合 total 68.49%→79.96%）
-KHUNTER_RSI_SELL = 55    # 熊市 A 版卖出：RSI_T-1 > 55（生产现状保留）
+KHUNTER_RSI_SELL = 59    # 熊市 A 版卖出：RSI_T-1 > 59（2026-09-07 grill 审查 C 疑点：ob59 total 119.44%/夏普 0.648 > ob58 110.15%/0.621，用户拍板升级）
 KHUNTER_RSI_SELL_BULL = 75  # 牛市 A 版卖出：RSI_T-1 > 75（定稿式 ob75，2026-09-03 牛熊分域投产）
 KHUNTER_RSI_SELL_WEAK = 80  # 弱牛回调 A 版卖出：RSI_T-1 > 80（2026-09-04 弱牛域专项 ob80 投产，与 OSL32 同批定稿）
 KHUNTER_RSI_SELL_C = 50  # C 版卖出参考：RSI_T-1 > 50（牛熊统一，激进 OB50，双版本并行部署，sell_c 展示）
@@ -516,20 +516,24 @@ def calc_signals(as_of=None):
                    "idx_close": round(_gate_close, 2) if _gate_close else None,
                    "idx_ma20": round(_gate_ma, 2) if _gate_ma else None}
     print(f"市况门控(沪深300>MA20): {'✅ 开' if _in_mkt else '❌ 关（不开新仓，池内走卖出信号）'} 收盘{_gate_close:.0f} vs MA20 {_gate_ma:.0f} ({time.time()-t0:.0f}s)", flush=True)
-    # ⚠ 2026-09-03 23:15 牛熊分域投产（Phase 10 HYBRIDv2 定稿 · total+68.5% 牛熊独立双过闸）：
-    #   原 B1「熊市限定（hs300<MA60 才可买）」→ 升级为「牛熊分域」：
-    #     🐻 熊市（<MA60）：osl35+low3+ob55（=原生产现状参数）
-    #     🌞 牛市（>MA20）：osl30+无low+ob75（=定稿式参数）
-    #     🌙 弱牛回调（MA20 下/MA60 上）：不开仓
-    #   依据：Phase 10 HYBRIDv2 n=296 wr61% med+2.46% total+68.5% 牛熊独立双过闸 + 周一验 8 正年；
+    # ⚠ 2026-09-07 牛熊线 MA250 投产（Phase 11 定稿 · 用户拍板方案 2，替代 Phase 10 MA60 分域）：
+    #   原 B1「熊市限定（hs300<MA60 才可买）」→ MA60 → MA250（回测 total 68.49→75.06%、夏普 0.397→0.502）：
+    #     🐻 熊市（<MA250）：osl35+low3+ob59（ob58→59 grill 邻域优化）
+    #     🌞 牛市（>MA20）：osl32+无low+ob75（osl_bull 30→32 敏感性提升）
+    #     🌙 弱牛回调（MA20 下/MA250 上）：不开仓（弱牛域 OSL32 冻结观察，9/5 裁决无稳定 Alpha）
+    #   依据：Phase 11 MA250_ob58_oslb32 n=266 wr62% med+2.84% total+110.15% 夏普0.621 牛熊独立双过闸 + 11 年 8 正 3 负（负年全小样本）；
     #   原「38 组牛市扫描 0 过门」（khunter_bull_sweep_delivery_20260903.md）已废止——含 ST + 单一 osl35 口径下得出，
-    #   剔 ST + 分域 osl30 后牛市子集 n=39 wr61.5% med+3.20% 过闸（Phase 10）
+    #   剔 ST + 分域 osl32 后牛市子集 n=65 wr62% med+4.67% 过闸（Phase 11）
     # 豁免逻辑（9/2）保留不动：_buy_ok 含牛熊分域门控 → 弱牛/强牛按分域处理，豁免集为空，无冲突
-    _idx60 = S.V.load_index(60)
+    # ⚠ 2026-09-07 牛熊线 MA250 投产（Phase 11 定稿 · 用户拍板方案 2）：
+    #   熊市判定线 MA60 → MA250（回测：total 68.49→75.06%、夏普 0.397→0.502、maxdd -22.45→-20.29%、9正2负）
+    #   参数同步：熊 ob 55→58、牛 osl_bull 30→32（组合 total 110.15%、夏普 0.621）
+    #   键名 bear60 保留（build_dual_system.py 依赖），语义=「hs300<MA250 熊市」
+    _idx60 = S.V.load_index(250)
     _idx60 = _idx60.set_index("date")
     _bear60 = bool(not _idx60.loc[:_gate_day]["in_market"].iloc[-1]) if _gate_day in _idx60.index else False
     market_gate["bear60"] = _bear60
-    print(f"熊市限定(hs300<MA60, 回测口径): {'🐻 熊市（KHunter 可买入）' if _bear60 else '🌞 非熊（KHunter 不开新仓）'} ({time.time()-t0:.0f}s)", flush=True)
+    print(f"熊市限定(hs300<MA250, 回测口径): {'🐻 熊市（KHunter 可买入）' if _bear60 else '🌞 非熊（KHunter 不开新仓）'} ({time.time()-t0:.0f}s)", flush=True)
 
     # ② 市场情绪只读元数据（2026-09-05 接入）：从 market_breadth.js 透传涨停封单强度等特征，
     #    advisory-only —— 仅供观察，不参与 1100 行门控判定。
@@ -705,10 +709,10 @@ def calc_signals(as_of=None):
                                 "ma5_above": bool(not pd.isna(r.get("ma5", np.nan)) and r["close"] > r["ma5"])}
         # 2026-09-02 用户拍板：KHunter 信号层（主板限定+RSI 超卖择时，弃用旧战法）
         # ⚠ 2026-09-03 生产切换（用户拍板）：A 版卖出 RSI>55 + 低价过滤确认日收盘≥3元；C 版卖出 RSI>50 参考并行
-        # ⚠ 2026-09-03 23:15 牛熊分域投产（HYBRIDv2 定稿 · total+68.5% 牛熊独立双过闸）：
-        #   🐻 熊市（hs300<MA60）：osl35+low3+ob55(A)/ob50(C) —— 生产现状参数
-        #   🌞 牛市（>MA20 且非熊）：osl30+无low+ob75(A)/ob50(C) —— 定稿式参数
-        #   🌙 弱牛回调（MA20 下/MA60 上）：⚠ 2026-09-04 弱牛域专项投产 → osl32+无low+ob80(A)/ob50(C)+hold15
+        # ⚠ 2026-09-07 牛熊线 MA250 投产（Phase 11 定稿 · 用户拍板方案 2）：
+        #   🐻 熊市（hs300<MA250）：osl35+low3+ob59(A)/ob50(C) —— ob58→59 grill 邻域优化（total 110.15→119.44）
+        #   🌞 牛市（>MA20 且非熊）：osl32+无low+ob75(A)/ob50(C) —— osl_bull 30→32 敏感性提升
+        #   🌙 弱牛回调（MA20 下/MA250 上）：⚠ 2026-09-04 弱牛域专项投产 → osl32+无low+ob80(A)/ob50(C)+hold15
         #     （用户拍板「直接上 OSL32」；回测组合 total 68.49%→79.96% dd -22.45% 不变 夏普 0.397→0.435；
         #      弱牛 n=28 wr57% med+2.95%，近四闸（n<30），年度集中 2022 +80.9% 主要贡献，2026 -1.9% 警示——样本小，观察）
         # 注意：KHunter 信号计算较重（15 个信号函数），只对主板 bd 计算（产品只能买主板）
@@ -716,7 +720,7 @@ def calc_signals(as_of=None):
         # 卖出 = 分域 A 版主卖出（熊 RS>55/牛 RS>75/弱牛 RS>80） / C 版 RSI>50 参考（独立信号，买卖事件各自独立；卖出不受牛熊限定）
         if ENABLE_KHUNTER and bd == "主板":
             # ---- 牛熊分域判定（Phase 10 HYBRIDv2）----（先判定 regime，再传入信号函数）
-            _kh_is_bear = bool(_bear60)          # hs300<MA60
+            _kh_is_bear = bool(_bear60)          # hs300<MA250（2026-09-07 牛熊线 MA250 投产）
             _kh_is_bull_mkt = bool(_in_mkt)      # hs300>MA20（弱牛/强牛）
             _kh_regime = "bear" if _kh_is_bear else ("bull" if _kh_is_bull_mkt else "weak_bull")
             _kinfo = _khunter_sig(ddf, as_of, regime=_kh_regime)

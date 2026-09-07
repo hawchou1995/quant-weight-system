@@ -37,12 +37,12 @@ IDX_CSV = BASE / "index_000300.csv"
 NAMES = json.load(open(BASE / "data_full_names.json", encoding="utf-8"))
 AMT20_MIN = 3e7   # 生产流动性硬过滤：20日均成交额 ≥ 3000万
 
-# ===== 配置（新优化配置，待生产切换拍板）=====
-# ⚠ 2026-09-03 牛熊分域投产（Phase 10 HYBRIDv2 定稿）：入场阈值按 regime 分域
+# ===== 配置（2026-09-07 牛熊线 MA250 投产 · 用户拍板方案 2，与生产 build_short_pool 同步）=====
+# ⚠ 2026-09-07 Phase 11 定稿：熊市判定线 MA60→MA250；熊 ob 58→59、牛 osl_bull 30→32
 RSI_BUY = 35          # 熊市入场：RSI_T < 35（生产现状）
-RSI_BUY_BULL = 30     # 牛市入场：RSI_T < 30（定稿式 osl30）
+RSI_BUY_BULL = 32     # 牛市入场：RSI_T < 32（2026-09-07 osl_bull 30→32 敏感性提升，已投产）
 RSI_BUY_WEAK = 32     # 弱牛回调入场：RSI_T < 32（2026-09-04 弱牛域专项 OSL32，回测组合 total 68.49%→79.96%）
-RSI_SELL = 55         # 熊市出场：RSI_T > 55（A 版）
+RSI_SELL = 59         # 熊市出场：RSI_T > 59（A 版，2026-09-07 grill 审查 ob59 > ob58：119.44%/0.648 vs 110.15%/0.621，用户拍板升级）
 RSI_SELL_BULL = 75    # 牛市出场：RSI_T > 75（定稿式 ob75）
 RSI_SELL_WEAK = 80    # 弱牛回调出场：RSI_T > 80（2026-09-04 弱牛域 ob80 同批定稿）
 LOW_PRICE = 3.0       # 低价过滤（仅熊市）：确认日收盘 ≥ 3 元
@@ -62,8 +62,8 @@ def load_index():
     idx['date'] = pd.to_datetime(idx['date'])
     idx = idx.sort_values('date').reset_index(drop=True)
     idx['ma20'] = idx['close'].rolling(20, min_periods=1).mean()
-    idx['ma60'] = idx['close'].rolling(60, min_periods=1).mean()
-    idx['is_bear'] = (idx['close'] < idx['ma60']).values
+    idx['ma250'] = idx['close'].rolling(250, min_periods=1).mean()
+    idx['is_bear'] = (idx['close'] < idx['ma250']).values
     idx['bull_ma20'] = (idx['close'] > idx['ma20']).values
     return idx
 
@@ -97,10 +97,10 @@ def khunter_sig(ddf, as_of):
 
 def scan_today(idx, today):
     """扫描今日 T 信号：入场候选（hit & 分域 RSI & 分域低价 & 分域门控）与持仓出场（分域 RSI）
-    分域（Phase 10 HYBRIDv2 + 2026-09-04 弱牛域专项）：
-      🐻 熊市(hs300<MA60)：rsi<35 + close≥3 + 可买
-      🌞 牛市(hs300>MA20)：rsi<30 + 无低价 + 可买
-      🌙 弱牛回调(MA20下/MA60上)：rsi<32 + 无低价 + 可买（2026-09-04 投产；出场 rsi>80）
+    分域（Phase 11 MA250 定稿 + 2026-09-04 弱牛域专项）：
+      🐻 熊市(hs300<MA250)：rsi<35 + close≥3 + 可买
+      🌞 牛市(hs300>MA20)：rsi<32 + 无低价 + 可买
+      🌙 弱牛回调(MA20下/MA250上)：rsi<32 + 无低价 + 可买（2026-09-04 投产；出场 rsi>80）
     宇宙过滤镜像生产 build_short_pool：主板 + 剔ST/退市 + 剔停牌 + 20日均成交额≥3000万"""
     idx = idx.sort_values('date').reset_index(drop=True)
     d_today = idx.loc[idx['date'] == today]
@@ -217,7 +217,7 @@ def main():
     today = idx['date'].iloc[-1]
     _bt = bool(idx['is_bear'].iloc[-1]); _bl = bool(idx['bull_ma20'].iloc[-1])
     _regime = "🐻 熊市" if _bt else ("🌞 牛市" if _bl else "🌙 弱牛回调")
-    log(f"确认日 T = {today.date()}  regime = {_regime}（熊MA60={_bt}, 牛MA20={_bl}）")
+    log(f"确认日 T = {today.date()}  regime = {_regime}（熊MA250={_bt}, 牛MA20={_bl}）")
 
     st = load_state()
     if reset:

@@ -1,0 +1,28 @@
+enabled: true
+filters:
+  amount20_min: 30000000
+  hold_max: 25
+  low_price_bear: 3
+  rsi_buy_bear: 35
+  rsi_buy_bull: 32
+  rsi_buy_weak: 32
+  rsi_sell_bear: 59
+  rsi_sell_bull: 75
+  rsi_sell_c: 50
+  rsi_sell_weak: 80
+strategies:
+- golden_cross_not_green
+- golden_triangle
+- immortal_guidance
+- limit_up_pullback
+- limit_up_sideways
+- morning_star
+- multi_golden_cross
+- multi_party_cannon
+- resistance_breakout
+- strategy_2560
+- strong_wash
+- trend_acceleration
+- trend_resonance
+- trend_start
+- w_bottom
