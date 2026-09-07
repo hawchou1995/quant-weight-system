@@ -13,10 +13,10 @@
   "tracks": {
     "A": {
       "track": "A",
-      "nav": 99163.19,
-      "cum": -0.84,
-      "px_chg": -0.837,
-      "last_date": "2026-09-04",
+      "nav": 99618.19,
+      "cum": -0.38,
+      "px_chg": 0.459,
+      "last_date": "2026-09-07",
       "start": "2026-09-02",
       "positions": [
         {
@@ -24,11 +24,11 @@
           "name": "中恒电气",
           "shares": 500,
           "entry_px": 39.1136,
-          "last_close": 37.44,
+          "last_close": 38.35,
           "entry_date": "2026-09-04",
-          "hold_days": 1,
+          "hold_days": 2,
           "rsi_entry": 29.920814479637997,
-          "pl_pct": -4.28
+          "pl_pct": -1.95
         }
       ],
       "cash": 80443.19,
@@ -49,24 +49,37 @@
     },
     "C": {
       "track": "C",
-      "nav": 100000.0,
-      "cum": 0.0,
-      "px_chg": 0.0,
-      "last_date": "2026-09-03",
+      "nav": 99879.69,
+      "cum": -0.12,
+      "px_chg": -0.12,
+      "last_date": "2026-09-07",
       "start": "2026-09-02",
-      "positions": [],
-      "cash": 100000.0,
-      "pending_buys": [
+      "positions": [
         {
           "code": "sz002364",
-          "rsi": 29.920814479637997,
-          "close": 37.9,
-          "regime": "bear"
+          "name": "中恒电气",
+          "shares": 500,
+          "entry_px": 38.5906,
+          "last_close": 38.35,
+          "entry_date": "2026-09-07",
+          "hold_days": 1,
+          "rsi_entry": 29.920814479637997,
+          "pl_pct": -0.62
         }
       ],
+      "cash": 80704.69,
+      "pending_buys": [],
       "pending_sells": [],
-      "n_trades": 0,
-      "trades": [],
+      "n_trades": 1,
+      "trades": [
+        {
+          "code": "sz002364",
+          "side": "buy",
+          "date": "2026-09-07",
+          "px": 38.5906,
+          "reason": "khunter_hit_rsibear"
+        }
+      ],
       "note": "熊市出场 RSI>50（较 A 版早离场）· 其余与 A 轨相同",
       "hold_over_codes": []
     }
@@ -220,5 +233,5 @@
     ],
     "note": "各策略=自身最优持有期；mean>0 且 sharpe>0 才为 PASS（四闸口径）"
   },
-  "generated_at": "2026-09-06 20:14:43.344453"
+  "generated_at": "2026-09-07 17:53:14.648729"
 }
