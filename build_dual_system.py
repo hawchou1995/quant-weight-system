@@ -480,7 +480,10 @@ for g, label, v9f, _sf in _STK_GROUPS:
         s, lbl, tag = _load_summary(v9f + "_summary.json")
     s_stk[g] = s
     if is_a80:
-        stk_tag[g] = (tag or label) + " · Aroon强趋势过滤(A80_M78)"
+        # 2026-09-08 修复：summary 的 params 已含 "Aroon强趋势过滤(A80_M78)"，
+        # 旧代码无脑追加导致标签重复（"…(A80_M78) · Aroon强趋势过滤(A80_M78)"）
+        _base_tag = (tag or label)
+        stk_tag[g] = _base_tag if "A80_M78" in _base_tag else (_base_tag + " · Aroon强趋势过滤(A80_M78)")
     else:
         stk_tag[g] = (tag or label) + (" · 含20bps滑点" if "滑点" not in (tag or "") else "")
 # 短线分层 summary（8/31 审计：旧 shortsplit_* 含未来函数作废；修正引擎无分层口径）
