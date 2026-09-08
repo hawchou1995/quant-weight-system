@@ -179,6 +179,35 @@ except Exception as _e:
     print("MA200 门控徽章计算失败:", _e)
     LT_GATE_BADGE = ''
 
+# 选池再平衡倒计时徽章（2026-09-08 Q1C 用户拍板）：
+# 语义 = 月度再平衡（21 交易日），未到期维持现榜 → 让用户一眼看懂「为何榜单标的还是上次选的那批」。
+# 数据源 = enhanced_data.js meta.pool_rebalance（由 build_enhanced_data.py 的
+# V.pool_rebalance_state() 状态机写入，与选池共用同一真相源，不重复计算）。
+POOL_REBAL_BADGE = ""
+POOL_REBAL_NOTE = ""
+try:
+    _pr = (DATA.get("meta", {}) or {}).get("pool_rebalance") or {}
+    if _pr:
+        _ls = _pr.get("last_select", "—")
+        _dtn = int(_pr.get("days_to_next") or 0)
+        _ds = int(_pr.get("days_since") or 0)
+        _every = int(_pr.get("every") or 21)
+        if _pr.get("due"):
+            POOL_REBAL_BADGE = (f'<span class="badge badge-auto" style="background:#1f8a4c;color:#fff" '
+                                f'title="距上次选池已满 {_every} 个交易日 → 本次已触发换榜">'
+                                f'🔄 选池已到期 · 本次换榜</span>')
+            POOL_REBAL_NOTE = f"榜单为最新交易日（{_pr.get('select_day','—')}）重新选出的 Top10。"
+        else:
+            POOL_REBAL_BADGE = (f'<span class="badge badge-auto" '
+                                f'title="月度再平衡：距上次选池 {_ds} 个交易日，满 {_every} 个交易日才换榜；'
+                                f'未到期维持现榜（中长线持有定位，避免跑一次管道就整体换血）">'
+                                f'🗓 距下次再平衡 {_dtn} 个交易日</span>')
+            POOL_REBAL_NOTE = (f"榜单为 {_ls} 选出的 Top10（月度再平衡，未到期维持现榜）；"
+                               f"距下次再平衡 {_dtn} 个交易日 · 标的一旦权重分跌破入池门槛会打「⚠ 低于入池门槛」软标记，"
+                               f"但<b>不自动剔除</b>（中长线持有定位）。")
+except Exception as _e:
+    print("选池再平衡徽章计算失败:", _e)
+
 # 布林带宽观察指标（2026-09-08 Q2C：大财师兄 9/8「布林线定位置」——带宽收窄=选方向、张开=方向已出；
 # 仅做看板观察，不参与任何门控/信号。口径：沪深300 日线 BOLL(20,2)，带宽=(上轨-下轨)/中轨，
 # 与 60 日均带宽比较判收窄/张开）
@@ -306,6 +335,17 @@ def rows_html_for(items):
         if d.get("gate_closed"):
             gate_tag = ('<span class="badge" style="background:rgba(217,119,6,.18);color:#fbbf24;" '
                         f'title="市况门控关闭：权重分≥50 照常入池仅供参考，非买入指令；不追高，持仓走跟踪池等卖出信号">仅提醒·非买入</span>')
+        # 2026-09-08 Q2B 用户拍板：低于入池门槛软标记 —— 解释「为何不达标的标的还在池里」。
+        # 语义 = 纯提示，**不改变交易语义**：榜是上次再平衡日选的（月度换榜），权重分随行情回落属正常；
+        # 清仓走 score<50 的 exit_signal 路径（跟踪池），与入池门槛无关。
+        below_tag = ""
+        if d.get("below_entry"):
+            _emin = d.get("entry_min") or 65
+            below_tag = (f'<span class="badge" style="background:rgba(148,163,184,.18);color:#94a3b8;" '
+                         f'title="权重分 {d["score"]:.1f} 已跌破入池门槛 {_emin} 分：本标的为上次再平衡日（'
+                         f'{DATA.get("meta",{}).get("pool_rebalance",{}).get("last_select","—")}）的达标标的，'
+                         f'权重分随行情回落属正常；软标记仅提示，不改变交易语义（买入看档位/择时，'
+                         f'清仓看 score&lt;50 的跟踪池信号）">⚠ 低于入池门槛 {_emin}</span>')
         # 2026-09-02 用户拍板：主信号=KHunter 主板信号（+RSI<35）；旧战法候选已全量删除（弃用）
         pick_tag = ""
         if d.get("pick") == "top4":
@@ -314,7 +354,7 @@ def rows_html_for(items):
                         f'🎯 KHunter 主信号</span>')
         rows += f'''<tr data-code="{d["code"]}" data-search="{d["name"]} {_bare(d["code"])} {d["industry"]} {board}" data-board="{d["perm"]}" data-market="{board}" data-industry="{d["industry"]}" data-tier="{d["tier"]}" data-pick="{d.get("pick") or ""}">
 <td style="text-align:center">{rank}</td>
-<td><b>{d["name"]}</b>{pick_tag}<br><span style="color:var(--faint);font-size:11px">{_bare(d["code"])}</span></td>
+<td><b>{d["name"]}</b>{pick_tag}{below_tag}<br><span style="color:var(--faint);font-size:11px">{_bare(d["code"])}</span></td>
 <td>{_board_cell(board, d.get("industry"))}</td>
 <td><span class="board-tag">{d["industry"]}</span></td>
 <td style="text-align:right" data-v="{d["px"]}">{d["px"]:.2f}</td>
@@ -358,6 +398,7 @@ def cards_html_for(items):
 <h3>{d["name"]} <span class="sub">{d["code"]}</span> <span class="board-tag">{board}</span> <span class="board-tag">{d["industry"]}</span>{"🎯 KHunter 主信号" if d.get("pick")=="top4" else ("候选·仅观察" if d.get("pick")=="cand" else "")}</h3>
 <p class="meta">现价 <b>{d["px"]:.2f}</b>（<span class="{"up" if (d["chg"] or 0)>0 else "down"}">{f"{d['chg']:+.2f}%" if d["chg"] is not None else "—"}</span>）｜ 近一年 <span class="{"up" if (d["ret_1y"] or 0)>0 else "down"}">{f"{d['ret_1y']:+.0f}%" if d["ret_1y"] is not None else "—"}</span> ｜ RSI {d["rsi"]:.0f}</p>
 <p class="meta">权重 <b>{d["score"]:.1f} 分</b> → {tier_pill(d["tier"])} ｜ 建议：{action_for(d)} ｜ {ma200_txt}</p>
+{f'<p class="meta" style="color:#94a3b8">⚠ 低于入池门槛 {d.get("entry_min") or 65} 分（软标记 · 不改变交易语义）</p>' if d.get("below_entry") else ""}
 <p class="meta">六类：趋势 {comp.get("trend",0):.0f}｜动能 {comp.get("momentum",0):.0f}｜量能 {comp.get("volume",0):.0f}｜超买 {comp.get("osc",0):.0f}｜风控 {comp.get("risk",0):.0f}｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">{d.get("biz", "—")}</p>
 </div></div>'''
@@ -1223,8 +1264,8 @@ KH_PAPER_CARD = _kh_paper_card()
 
 # 全量池中/长线年跟踪池（2026-08-17 用户需求：上榜跟踪 1 年，再上榜 +1 年；track_v9 由 build_enhanced_data.py 维护）
 WATCH_V9_CARD = f'''<div class="card" id="watch-v9-card">
-<h2>📌 全量池中/长线跟踪 <span class="badge badge-auto">上榜跟踪 1 年 · 再上榜 +1 年</span> </h2>
-<div class="sub">上方全量池表<b>上榜标的</b>（v9_tiers：main/gem/star/fund）上榜次日收盘确认后自动加入跟踪，持续 1 年（365 天）；<b>2026-08-18 起新上榜先入「待确认」隔日入池</b>（隔离当日收盘信号）；每次重新上榜刷新【入池/跟踪/出池】时间 · 数据截至 {DATA["meta"].get("as_of", "—")}（收盘）</div>
+<h2>📌 全量池中/长线跟踪 <span class="badge badge-auto">上榜跟踪 · 清仓信号后 21 交易日剔除</span> </h2>
+<div class="sub">上方全量池表<b>上榜标的</b>（v9_tiers：main/gem/star/fund）上榜次日收盘确认后自动加入跟踪；<b>2026-08-18 起新上榜先入「待确认」隔日入池</b>（隔离当日收盘信号）；每次重新上榜刷新【入池/跟踪/出池】时间 · <b>清仓信号</b>（连续 5 日掉榜 / 权重分跌破 50）后 <b>21 交易日倒计时</b>剔除出池，倒计时中重新上榜即解除 · 数据截至 {DATA["meta"].get("as_of", "—")}（收盘）</div>
 <div id="watch-v9-pending"></div>
 <div class="toolbar" id="watch-v9-bar">
 <input type="text" id="watch-v9-q" name="watch-v9-q" placeholder="🔍 搜索代码 / 名称…" autocomplete="off" spellcheck="false" aria-label="搜索跟踪标的（代码或名称）">
@@ -1594,11 +1635,11 @@ html = f"""<!doctype html>
   v9_items, "tbl-v9", "card-tbl-v9",
   "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测参考在监控总览视图",
   extra_card=WATCH_V9_CARD,
-  head_tags=[LT_GATE_BADGE,
+  head_tags=[LT_GATE_BADGE, POOL_REBAL_BADGE,
              '<span class="badge badge-auto">评分 = Aroon强趋势过滤(A80_M78)</span>',
              '<span class="badge badge-auto">筛池 = 全市场绝对规则 Top3 等权 · 月轮动</span>',
              '<span class="badge badge-auto">风控 = 移动止损4.5% · MA200择时</span>'],
-  head_note="回测参考见「监控总览」视图",
+  head_note="回测参考见「监控总览」视图 · " + POOL_REBAL_NOTE,
   as_of=DATA["meta"].get("as_of", "—"), intraday_note=DATA["meta"].get("intraday"),
   as_of_min=DATA["meta"].get("intraday_ts") or DATA["meta"].get("as_of_min"))}
 

@@ -17,12 +17,107 @@ BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = BASE / "data_full"
 INDEX_FILE = BASE / "index_000300.csv"
 START = "2016-01-04"
-END = "2026-08-17"
 
 COMMISSION = 0.00025
 SELL_TAX = 0.0005
 LOT = 100
 REBALANCE_DAYS = 21
+
+
+def resolve_end(default: str = "2026-08-17") -> str:
+    """回测/选池截止日（2026-09-08 修复：原硬编码 END 导致选池日永远停在 8/17）。
+
+    优先级：
+      1) 环境变量 V8_END（手动覆盖，用于复现历史口径）
+      2) 指数数据最后一个交易日（自动跟随最新数据）
+
+    ⚠ 语义区分：
+      - 回测（run_v8/run_etf）用「最新交易日」= 让回测包含最近数据
+      - 选池（build_enhanced_data）用「最近再平衡日」= 保持月度榜语义，
+        由调用方按 REBALANCE_DAYS 从交易日序列中取，见 rebalance_day()
+    """
+    env = os.environ.get("V8_END", "").strip()
+    if env:
+        return env
+    try:
+        idx = pd.read_csv(INDEX_FILE, dtype={"date": str}, usecols=["date"])
+        if len(idx):
+            return str(idx["date"].iloc[-1])
+    except Exception:
+        pass
+    return default
+
+
+def rebalance_day(latest: str, start: str = START, every: int = REBALANCE_DAYS) -> str:
+    """从 [start, latest] 的指数交易日序列里取「理论再平衡网格」最近一格（每 every 个交易日）。
+
+    2026-09-08 新增：仅供参照。实际选池由 pool_rebalance_state() 的状态机决定
+    （因为 2026-08-17 那次是手动选池，不在 2016-01-04 起算的网格上）。
+    """
+    try:
+        idx = pd.read_csv(INDEX_FILE, dtype={"date": str}, usecols=["date"])
+        days = [d for d in idx["date"].tolist() if start <= d <= latest]
+        if not days:
+            return latest
+        return days[::every][-1]
+    except Exception:
+        return latest
+
+
+POOL_STATE_FILE = BASE / "v9_pool_state.json"
+DEFAULT_SELECT_DAY = "2026-08-17"   # 现榜（8/17 手动选池）
+
+
+def pool_rebalance_state(latest_day: str = None, every: int = REBALANCE_DAYS):
+    """选池再平衡调度（2026-09-08 用户拍板 Q5B+Q6B）：
+
+    语义 = **月度再平衡**：距上次选池满 every(21) 个交易日才换榜，否则维持现榜。
+    这样中长线榜不会因「跑一次管道」就整体换血（与中长线持有定位一致）。
+
+    返回 dict：
+      select_day    本次选池应使用的日期（未到期=上次选池日，到期=最新交易日）
+      last_select   上次选池日（持久化于 v9_pool_state.json）
+      days_since    距上次选池已过交易日数
+      days_to_next  距下次再平衡剩余交易日数（看板展示用）
+      due           本次是否触发换榜
+    """
+    latest = latest_day or END
+    state = {}
+    if POOL_STATE_FILE.exists():
+        try:
+            state = json.loads(POOL_STATE_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            state = {}
+    last_sel = str(state.get("last_select") or DEFAULT_SELECT_DAY)
+    try:
+        idx = pd.read_csv(INDEX_FILE, dtype={"date": str}, usecols=["date"])
+        days = [d for d in idx["date"].tolist() if START <= d <= latest]
+    except Exception:
+        days = []
+    since = len([d for d in days if d > last_sel])
+    due = since >= every
+    select_day = days[-1] if (due and days) else last_sel
+    return {
+        "select_day": select_day,
+        "last_select": last_sel,
+        "days_since": since,
+        "days_to_next": max(0, every - since),
+        "due": due,
+        "latest": latest,
+    }
+
+
+def commit_pool_rebalance(select_day: str, note: str = ""):
+    """换榜后写入状态（幂等：同日重复调用不改变结果）"""
+    payload = {"last_select": select_day, "committed": time.strftime("%Y-%m-%d %H:%M:%S"), "note": note}
+    try:
+        POOL_STATE_FILE.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
+    except Exception as e:
+        print(f"⚠ 选池状态写入失败: {e}", flush=True)
+    return payload
+
+
+END = resolve_end()
 
 
 # ---------------- 指数择时 ----------------

@@ -313,7 +313,22 @@ idx = V.load_index(200).set_index('date')
 all_days = [d for d in idx.index if V.START <= str(d.date()) <= V.END]
 rebal21 = [d for d in all_days[::21]]
 prev_rebal = [d for d in rebal21 if d < all_days[-1]][-2]   # 上次完整再平衡（档位变化对比）
-last_day = all_days[-1]                                     # 08-14
+
+# ⚠ 2026-09-08 修复（用户拍板 Q5B+Q6B）：
+#   原 last_day = all_days[-1] → 每次跑管道就按「当天」整体换榜（与中长线持有定位冲突，
+#   且 V.END 硬编码时榜会永远停在旧日）。改为**月度再平衡状态机**：
+#     距上次选池 ≥21 个交易日 → 用最新交易日重选；否则维持上次选池日的榜。
+#   现榜 = 2026-08-17（手动选池），距 9/8 仅 15 个交易日 → 维持不换，等自然到期。
+_sel = V.pool_rebalance_state()
+last_day = pd.Timestamp(_sel["select_day"])
+print(f"选池调度: 上次 {_sel['last_select']} → 本次使用 {_sel['select_day']}"
+      f"（距上次 {_sel['days_since']} 个交易日，{'已到期·换榜' if _sel['due'] else f'未到期·维持现榜（距下次再平衡 {_sel['days_to_next']} 日）'}）",
+      flush=True)
+if last_day not in idx.index:
+    print(f"⚠ 选池日 {_sel['select_day']} 不在交易日序列，回退 all_days[-1]", flush=True)
+    last_day = all_days[-1]
+if _sel["due"]:
+    V.commit_pool_rebalance(_sel["select_day"], note="auto-rebalance by build_enhanced_data")
 
 # 个人版自选池（固定池）：2026-08-21 用户已清仓全部自买股票 → 彻底去除固定池（MAIN_CODES 置空）
 # 历史：曾为 15 股固定池（华天科技/立昂微/景旺电子…），2026-08-20 加回沪电/风华监控，2026-08-21 用户确认全清仓 → 移除
@@ -339,8 +354,16 @@ def _is_board(code, board):
         return code.startswith(("sh688", "sh689"))
     return False
 
-def v9_rank_board(board, top_n=10, exclude=(), mom_min=0.25, score_min=65):
+# 入池门槛（单一真相源，2026-09-08 Q2B：看板「低于入池门槛」软标记与选池共用同一常量，
+# 避免看板文案与选池阈值两处硬编码漂移；股票=65 / 基金=60 与既有生产口径一致）
+ENTRY_MIN_STOCK = 65
+ENTRY_MIN_FUND = 60
+
+
+def v9_rank_board(board, top_n=10, exclude=(), mom_min=0.25, score_min=None):
     """按板块互补取 TopN（v9 规则），exclude=已占用裸代码（去重，支持 sh600xxx 与 600xxx 混用）"""
+    if score_min is None:
+        score_min = ENTRY_MIN_STOCK
     excl = {c[-6:] for c in exclude}
     cand = []
     for code, ddf in A.pool_all.items():
@@ -403,7 +426,7 @@ if _fund_pool_f.exists():
         if c in FUNDS:
             continue
         _s = _fund_buy_score(c)
-        if _s is not None and _s >= 60:
+        if _s is not None and _s >= ENTRY_MIN_FUND:
             _fund_qual.append((c, _s))
     _fund_qual.sort(key=lambda kv: -kv[1])
     V9_FUND = [c for c, _ in _fund_qual[:10]]
@@ -536,6 +559,11 @@ for c in ALL_CODES:
     _sr = _sf.iloc[-1]
     short_sc = float(SH.short_score(_sr, reversal=(_board in ("主板", "创业板", "科创板"))))
     short_tier = tier(short_sc)
+    # 入池门槛对照（2026-09-08 Q2B 用户拍板）：软标记，仅提示「当前权重分已跌破入池门槛」，
+    # **不改变任何交易语义**（买入看档位/择时，清仓走 score<50 的 exit_signal 路径）。
+    # 用途：解释「为何这个不达标的标的还在池里」——它是上次再平衡日的达标标的，权重分随行情回落。
+    _entry_min = ENTRY_MIN_FUND if (_board == "基金") else ENTRY_MIN_STOCK
+    _below_entry = bool(sc_now < _entry_min)
     details[c] = {
         "code": c, "key": k,
         # 名称按资产类型解析（2026-08-18 彻查修复）：基金名只对真基金代码生效——002474 这类
@@ -549,6 +577,7 @@ for c in ALL_CODES:
         "ret_1y": round(ret_1y, 1) if ret_1y is not None else None,
         "score": round(sc_now, 1), "score_prev": round(sc_prev, 1) if sc_prev is not None else None,
         "tier": _tier_f(sc_now), "tier_prev": _tier_f(sc_prev) if sc_prev is not None else None,
+        "entry_min": _entry_min, "below_entry": _below_entry,
         "short_score": round(short_sc, 1), "short_tier": short_tier,
         "ma200_dev": round(ma200_dev, 1) if ma200_dev is not None else None,
         "factors": fs, "comp": comp, "radar_svg": radar_svg, "rsi": round(rsi, 1),
@@ -565,12 +594,16 @@ def load_curve(f):
 
 # ---------------- 全量池中/长线年跟踪池（2026-08-17 用户需求） ----------------
 def maintain_track_v9():
-    """上榜跟踪 1 年：v9_tiers 上榜标的自动入池。
+    """上榜跟踪：清仓信号后 1 个月（21 交易日）剔除（2026-09-08 用户拍板，替代纯 365 年跟踪）。
     规则（2026-08-18 用户拍板：昨日收盘上池标的信号隔离 + 每次重新上榜刷新入池/跟踪/出池时间；
-          2026-08-19 用户拍板：进标的池=默认全买 → 隔日无论是否仍在榜一律转正式，保证跟踪卖出信号）：
+          2026-08-19 用户拍板：进标的池=默认全买 → 隔日无论是否仍在榜一律转正式，保证跟踪卖出信号；
+          2026-09-08 用户拍板：清仓信号后 1 个月剔除出跟踪池）：
       新上榜/再上榜 → 当日先入 pending（不入正式池，不参与信号），下一个收盘无条件转正式入池；
-      持续在池 → 保持 entry，更新 last_seen/exit；掉出池保留最后快照；entry 满 365 天 → 移除；
-      每次转正式/重新上榜 → entry=确认收盘日、last_seen=今日、exit=entry+365（三个时间刷新）。
+      持续在榜 → off_days=0，清除清仓信号/倒计时（重新上榜即重置）；
+      掉榜 → off_days+1；连续 5 日不在榜 → 触发清仓信号(off_board)，开始 21 交易日倒计时；
+      score 跌破 50 → 触发清仓信号(sell_signal)，开始 21 交易日倒计时；
+      倒计时中重新上榜 → 重置（清仓信号解除）；
+      倒计时归零 → 剔除出池；365 天兜底保留（在榜满 365 天仍出池，防倒计时异常）。
     返回 (track, pending)：track 只含正式池成员（渲染直接遍历），pending 独立字段不入正式池。"""
     today = str(_as_of_day.date())
     old, old_pending, old_tiers = {}, {}, {}
@@ -618,11 +651,14 @@ def maintain_track_v9():
     from datetime import timedelta
     def _exit(e):
         return str((pd.Timestamp(e) + timedelta(days=365)).date())
-    # 迁移：旧 track 补齐 exit/status（新字段）
+    # 迁移：旧 track 补齐 exit/status/清仓信号字段（新字段）
     for code, rec in list(track.items()):
         rec.setdefault("exit", _exit(rec.get("entry", today)))
         rec.setdefault("status", "active")
         rec.setdefault("last_seen", rec.get("last_seen") or today)
+        rec.setdefault("off_days", 0)          # 2026-09-08：连续不在榜天数
+        rec.setdefault("exit_signal", None)    # 2026-09-08：清仓信号类型 off_board/sell_signal
+        rec.setdefault("countdown", None)      # 2026-09-08：21 交易日倒计时
     # 0) 固定池/基金池标的：原无条件入正式池（2026-08-21 起 MAIN_CODES=[]，此循环为空操作，固定池彻底去除）
     for code in set(MAIN_CODES) | set(ETFS) | set(FUNDS):
         d = details.get(code, {}) or {}
@@ -662,8 +698,11 @@ def maintain_track_v9():
             if not was_on and str(rec.get("last_seen", "")) < today:
                 rec["entry"] = today           # 掉榜后重新上榜 → 刷新入池时间
             rec["last_seen"] = today           # 更新跟踪时间
-            rec["exit"] = _exit(rec.get("entry", today))  # 出池时间 = entry+365
+            rec["exit"] = _exit(rec.get("entry", today))  # 出池时间 = entry+365（兜底）
             rec["status"] = "active"
+            rec["off_days"] = 0                # 2026-09-08：在榜 → 掉榜计数清零
+            rec["exit_signal"] = None          # 2026-09-08：重新上榜 → 清仓信号解除
+            rec["countdown"] = None            # 2026-09-08：倒计时重置
             if d:
                 rec["last"] = snap
             track[code] = rec
@@ -685,8 +724,22 @@ def maintain_track_v9():
                        "last": pe.get("last") or {"px": d.get("px"), "chg": d.get("chg"),
                                         "score": d.get("score"), "tier": d.get("tier"), "date": today}}
         pending.pop(code, None)
-    # 3) 正式池中今日不在榜：保留快照、不动 entry（365 自动出池）
-    # 4) 清理 entry 满 365 天（出池时间 = entry+365）与 pending 超期（7 天未确认丢弃；
+    # 3) 正式池中今日不在榜：掉榜计数 → 连续 5 日触发清仓信号 → 21 交易日倒计时剔除
+    #    （2026-09-08 用户拍板：清仓信号后 1 个月剔除出跟踪池，替代纯 365 年跟踪）
+    for code, rec in list(track.items()):
+        if code in today_codes:
+            continue
+        rec["off_days"] = int(rec.get("off_days", 0)) + 1
+        if rec.get("exit_signal") is None and rec["off_days"] >= 5:
+            rec["exit_signal"] = "off_board"
+            rec["countdown"] = 21
+            print(f"⚠ 跟踪池清仓信号(掉榜{rec['off_days']}日): {code} {rec.get('name','')} → 21交易日倒计时", flush=True)
+        elif rec.get("exit_signal") is not None:
+            rec["countdown"] = int(rec.get("countdown", 21)) - 1
+            if rec["countdown"] <= 0:
+                track.pop(code, None)
+                print(f"⏳ 跟踪池剔除(清仓信号后21交易日): {code} {rec.get('name','')}", flush=True)
+    # 4) 清理 entry 满 365 天（兜底出池时间 = entry+365）与 pending 超期（7 天未确认丢弃；
     #    ⚠ 不再因「今日不在榜」清除 pending——隔日已无条件转正式，滞留 pending 的只有今日新上榜待明日转正的）
     cutoff = pd.Timestamp(last_day.date() - timedelta(days=365))
     track = {c: r for c, r in track.items()
@@ -735,6 +788,12 @@ def maintain_track_v9():
         if _snap:
             rec["last"] = _snap
             _refreshed += 1
+            # 2026-09-08：score 跌破 50 → 清仓信号(sell_signal) → 21 交易日倒计时
+            _sc = _snap.get("score")
+            if rec.get("exit_signal") is None and _sc is not None and _sc < 50:
+                rec["exit_signal"] = "sell_signal"
+                rec["countdown"] = 21
+                print(f"⚠ 跟踪池清仓信号(score<50): {code} {rec.get('name','')} → 21交易日倒计时", flush=True)
     print(f"全量池中/长线跟踪池: {len(track)} 只（正式） + {len(pending)} 只（待确认，隔日入池），快照刷新 {_refreshed} 只", flush=True)
     return track, pending
 
@@ -756,7 +815,13 @@ _as_of_day = max(_eff_dates) if _eff_dates else last_day
 _track, _pending = maintain_track_v9()
 out = {
     "meta": {"as_of": str(_as_of_day.date()), "generated": __import__("datetime").datetime.now().strftime("%Y-%m-%d %H:%M"), "overlap": OVERLAP,
-             "v9_tiers": V9_TIERS},
+             "v9_tiers": V9_TIERS,
+             # 2026-09-08 Q1C 用户拍板：看板展示「距下次再平衡 N 个交易日」
+             # 语义 = 月度再平衡（21 交易日），未到期维持现榜 → 解释「为何榜单标的还是旧的」
+             "pool_rebalance": {"last_select": _sel["last_select"], "select_day": _sel["select_day"],
+                                "days_since": _sel["days_since"], "days_to_next": _sel["days_to_next"],
+                                "due": _sel["due"], "every": V.REBALANCE_DAYS,
+                                "entry_min_stock": ENTRY_MIN_STOCK, "entry_min_fund": ENTRY_MIN_FUND}},
     "nav": [["overview", "📊", "监控总览"], ["sys-auto", "🅰️", "全量池中/长线"], ["short", "⚡", "全量池短线"], ["table", "📋", "标的监控表"]],
     "track_v9": _track, "track_pending_v9": _pending,
     "monitor_reports": [
