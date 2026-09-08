@@ -65,6 +65,47 @@ def merge_save(sym, df, name):
         F.save_csv(sym, df, name)
 
 
+def fetch_tickflow_batch(syms):
+    """TickFlow 批量拉取（2026-09-08 投产 · 源思路来自 KHunter utils/stock_data_fetcher._fetch_stock_batch_tickflow）
+
+    一次 HTTP 拿 ≤100 只全历史前复权日线。实测 100 只/批 0.83s，7419 只约 8-10 秒
+    （对比 akshare 逐只 py_mini_racer 解码 1.79s/只 = 88 分钟）。
+    返回 {sym: DataFrame(date/open/high/low/close/volume/amount)}；失败抛异常。
+    ⚠ volume 单位=手，×100 转股；口径已对 akshare qfq 逐日验证（价格 max 相对误差 0.13%）
+    """
+    if not syms:
+        return {}
+    tf_syms = []
+    for s in syms:
+        code = s[2:]
+        tf_syms.append(code + (".SH" if s.startswith("sh") else ".SZ" if s.startswith("sz") else ".BJ"))
+    r = requests.get(
+        "https://free-api.tickflow.org/v1/klines/batch",
+        params={"symbols": ",".join(tf_syms), "period": "1d", "count": 10000, "adjust": "forward"},
+        headers=UA, timeout=max(30, 15 + len(syms) * 0.3),
+    )
+    if r.status_code != 200:
+        raise RuntimeError(f"TickFlow HTTP {r.status_code}: {r.text[:100]}")
+    data = r.json().get("data", {})
+    out = {}
+    for s in syms:
+        code = s[2:]
+        key = code + (".SH" if s.startswith("sh") else ".SZ" if s.startswith("sz") else ".BJ")
+        d = data.get(key)
+        if not d or not d.get("timestamp"):
+            continue
+        df = pd.DataFrame({
+            "date": [pd.Timestamp(t, unit="ms").strftime("%Y-%m-%d") for t in d["timestamp"]],
+            "open": d["open"], "high": d["high"], "low": d["low"], "close": d["close"],
+            "volume": [int(v) * 100 if v else 0 for v in d["volume"]],   # 手 → 股
+            "amount": d.get("amount") or [0] * len(d["timestamp"]),
+        })
+        df = df[df["date"] >= "2016-01-01"].reset_index(drop=True)
+        if len(df):
+            out[s] = df
+    return out
+
+
 def fetch_tx_qfq(sym, retries=3):
     """腾讯 fqkline 前复权（qfqday），纯 HTTP 降级源（与 sina 同口径=前复权，可无缝合并）。
     sym 形如 sh600498 / sz002185；行序 [date, open, close, high, low, volume(, amount?)]"""
@@ -305,18 +346,36 @@ def main():
     force = "--force" in args
 
     # 1. 探样 + 多源自动降级（2026-08-19 修复：新浪滞后未检测 → 20 分钟无输出卡死）
+    #    ⚠ 2026-09-08 提速：TickFlow 批量源优先（一次 100 只，7419 只约 8-10 秒 vs akshare 88 分钟）
     fetchers = {"sina": F.fetch_sina_daily, "tx": fetch_tx_qfq}
     if source == "auto":
-        sina_d = probe_date(fetchers["sina"])
+        # TickFlow 优先：单只探样即验证可用性与新鲜度
+        try:
+            _tf = fetch_tickflow_batch(["sh600000"])
+            tf_d = str(_tf["sh600000"]["date"].iloc[-1]) if _tf.get("sh600000") is not None else None
+        except Exception as _e:
+            tf_d = None
+            print(f"⚠️ TickFlow 探样异常: {str(_e)[:80]}", flush=True)
         exp = expected_trade_date()
-        if sina_d is None or (pd.Timestamp(sina_d) < exp):
-            reason = "失败" if sina_d is None else f"滞后（返回 {sina_d}，预期 ≥{str(exp.date())}）"
-            print(f"⚠️ 新浪源探样{reason} → 自动切换腾讯 qfq 降级源", flush=True)
-            source = "tx"
+        if tf_d and pd.Timestamp(tf_d) >= exp:
+            source = "tickflow"
+            print(f"✅ TickFlow 源可用（探样 {tf_d}）", flush=True)
         else:
-            source = "sina"
-    src_fetch = fetchers[source]
-    target_date = probe_date(src_fetch)
+            reason = "失败" if tf_d is None else f"滞后（返回 {tf_d}，预期 ≥{str(exp.date())}）"
+            print(f"⚠️ TickFlow 源探样{reason} → 回退新浪/腾讯", flush=True)
+            sina_d = probe_date(fetchers["sina"])
+            if sina_d is None or (pd.Timestamp(sina_d) < exp):
+                reason2 = "失败" if sina_d is None else f"滞后（返回 {sina_d}）"
+                print(f"⚠️ 新浪源探样{reason2} → 自动切换腾讯 qfq 降级源", flush=True)
+                source = "tx"
+            else:
+                source = "sina"
+    if source == "tickflow":
+        src_fetch = None
+        target_date = str(fetch_tickflow_batch(["sh600000"])["sh600000"]["date"].iloc[-1])
+    else:
+        src_fetch = fetchers[source]
+        target_date = probe_date(src_fetch)
     if target_date is None:
         print(f"❌ {source} 源无法获取最新交易日（探样失败）", flush=True)
         print("   降级指引：westock MCP data_kline 拉池内+跟踪池代码 → 写 westock_dump_<date>.json →", flush=True)
@@ -360,27 +419,85 @@ def main():
     print(f"滞后清单已存 {LAG_FILE}（含跟踪池掉榜标的——只要在 data_full 就会一并补齐）", flush=True)
     pd.DataFrame(lag, columns=["sym", "name", "src", "tail"]).to_csv(LAG_FILE, index=False)
 
-    # 3. 逐个更新
-    fails, ok = [], 0
-    for i, (sym, _n, _s, _t) in enumerate(lag, 1):
+    # 3. 更新（2026-09-08：TickFlow 批量 100 只/批 ≈ 8-10 秒；回退源走并行单只）
+    if source == "tickflow":
+        print(f"TickFlow 批量更新：{len(lag)} 只，按 100 只/批并发", flush=True)
+        _syms = [x[0] for x in lag]
+        _batches = [_syms[i:i + 100] for i in range(0, len(_syms), 100)]
+        fails, ok = [], 0
+        _done = 0
+
+        def _tf_work(batch):
+            return batch, fetch_tickflow_batch(batch)
+
+        from concurrent.futures import ThreadPoolExecutor, as_completed as _as_completed
+        with ThreadPoolExecutor(max_workers=10) as ex:
+            _futs = {ex.submit(_tf_work, b): b for b in _batches}
+            for fut in _as_completed(_futs):
+                batch = _futs[fut]
+                try:
+                    _syms_b, res = fut.result()
+                    for sym in _syms_b:
+                        df = res.get(sym)
+                        if df is not None and len(df) > 0:
+                            merge_save(sym, df, "")
+                            ok += 1
+                        else:
+                            fails.append((sym, "", "tickflow", "no data"))
+                except Exception as e:
+                    for sym in batch:
+                        fails.append((sym, "", "tickflow", str(e)[:60]))
+                _done += 1
+                if _done % 5 == 0 or _done == len(_batches):
+                    print(f"  [{_done}/{len(_batches)} 批] 成功 {ok} 失败 {len(fails)} 耗时 {time.time()-t0:.0f}s", flush=True)
+        pd.DataFrame(fails, columns=["sym", "name", "src", "err"]).to_csv(FAIL_FILE, index=False)
+        print(f"✅ 增量更新完成（源 tickflow）：成功 {ok} / 滞后 {len(lag)} / 失败 {len(fails)}，总耗时 {(time.time()-t0)/60:.1f} 分钟", flush=True)
+        run_rebase_check(target_date, source)
+        if fails:
+            print(f"失败清单: {FAIL_FILE}（前几个: {[x[0] for x in fails[:5]]}）", flush=True)
+        return
+
+    # 3b. 回退源：并行单只更新（2026-09-08 并行化：原串行 7521 只约 88 分钟 → 8 线程约 12-15 分钟；
+    #     不同 sym 写不同文件无冲突；--parallel N 可调并发，默认 8）
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    workers = 8
+    if "--parallel" in args:
+        try:
+            workers = max(1, min(32, int(args[args.index("--parallel") + 1])))
+        except Exception:
+            workers = 8
+    print(f"并行更新：{workers} 线程 × {len(lag)} 只", flush=True)
+
+    def _update_one(item):
+        sym, _n, _s, _t = item
         try:
             if source == "sina" and sym.startswith(("sh5", "sz1", "sz15", "sz16")):
                 df = F.fetch_sina_etf(sym)
             else:
                 df = src_fetch(sym)
         except Exception as e:
-            fails.append((sym, "", source, str(e)[:60]))
-            continue
+            return (sym, None, str(e)[:60])
         if df is not None and len(df) > 0:
             merge_save(sym, df, "")
-            ok += 1
-            if ok % 50 == 0 or i == len(lag):
-                print(f"  [{i}/{len(lag)}] 已更新 {ok} 只（{sym} → {df['date'].iloc[-1]}）耗时 {time.time()-t0:.0f}s", flush=True)
-        else:
-            fails.append((sym, "", source, "empty"))
-        time.sleep(0.35)
+            return (sym, str(df["date"].iloc[-1]), None)
+        return (sym, None, "empty")
+
+    fails, ok = [], 0
+    _lock = __import__("threading").Lock()
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        futs = {ex.submit(_update_one, x): x for x in lag}
+        for i, fut in enumerate(as_completed(futs), 1):
+            sym, last, err = fut.result()
+            if err:
+                with _lock:
+                    fails.append((sym, "", source, err))
+            else:
+                with _lock:
+                    ok += 1
+                if ok % 200 == 0 or i == len(lag):
+                    print(f"  [{i}/{len(lag)}] 已更新 {ok} 只（{sym} → {last}）耗时 {time.time()-t0:.0f}s", flush=True)
     pd.DataFrame(fails, columns=["sym", "name", "src", "err"]).to_csv(FAIL_FILE, index=False)
-    print(f"✅ 增量更新完成（源 {source}）：成功 {ok} / 滞后 {len(lag)} / 失败 {len(fails)}，总耗时 {(time.time()-t0)/60:.1f} 分钟", flush=True)
+    print(f"✅ 增量更新完成（源 {source} 并行{workers}）：成功 {ok} / 滞后 {len(lag)} / 失败 {len(fails)}，总耗时 {(time.time()-t0)/60:.1f} 分钟", flush=True)
     # 滞后更新完成后：复权基准漂移检测兜底（fresh 文件除权假缺口）
     run_rebase_check(target_date, source)
     if fails:

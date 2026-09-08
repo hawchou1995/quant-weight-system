@@ -55,7 +55,9 @@ def compute_factors_full(df: pd.DataFrame) -> pd.DataFrame:
     return d
 
 
-def score_row(r, w_mom=0.35, w_trend=0.25, w_aroon=0.20, w_vp=0.20):
+def score_row(r, w_mom=0.30, w_trend=0.35, w_aroon=0.20, w_vp=0.15):
+    # 2026-09-08 用户拍板投产：v9-auto 权重 35/25/20/20 → 30/35/20/15（V5 前后半双胜 +208pp/夏普+0.17）
+    # 默认值即单点真相源：v9_auto.run_auto（自动池引擎）与 score_row_v2（生产 v9/v8 中长线分）共用
     s = 0.0
     if not np.isnan(r["mom_12_1"]):
         s += w_mom * max(0.0, min(1.0, r["mom_12_1"] / 0.20)) * 100

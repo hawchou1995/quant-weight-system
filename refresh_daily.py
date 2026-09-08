@@ -31,9 +31,14 @@ def main():
     skip_fetch = "--skip-fetch" in args
     do_fund = "--fund" in args
 
-    print("== 1/7 股票/ETF 行情增量更新（扫描滞后文件 → 拉最新合并）==", flush=True)
+    print("== 1/7 股票/ETF 行情增量更新（TickFlow 批量 100 只/批 ≈ 8-10 秒）==", flush=True)
     if not skip_fetch:
-        run([PY, str(BASE / "update_daily.py")])
+        # 2026-09-08 提速：TickFlow 批量源（源思路来自 KHunter）；失败回退 update_daily.py（新浪/腾讯逐只）
+        import subprocess as _sp
+        _r = _sp.run([PY, str(BASE / "tickflow_update.py"), "--workers", "10"], cwd=str(BASE))
+        if _r.returncode != 0:
+            print("  ⚠️ TickFlow 失败 → 回退 update_daily.py", flush=True)
+            run([PY, str(BASE / "update_daily.py")])
     else:
         print("  跳过（--skip-fetch）", flush=True)
 

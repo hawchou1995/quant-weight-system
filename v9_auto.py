@@ -53,23 +53,92 @@ def board_filter(code, perm="all"):
 
 def run_auto(top_n=4, hold_days=21, pool_size=25, stop_loss=0.10, cash0=500000, slippage_bps=0, hot_filter=0.0,
              mom_min=0.15, score_min=60, use_timing=True, sell_score=0,
-             dynamic=False, rsi_max=None, ma_window=200, vol_target=None, perm="all"):
+             dynamic=False, rsi_max=None, ma_window=200, vol_target=None, perm="all", ma60_gate=False,
+             regime=False, timing=None, weak_bull_pos=1.0, weak_bull_score_min=0):
+    """v9-auto 引擎（2026-09-08 分域+择时扩展）：
+    regime=True  → 牛熊分域（与短线 KHunter 同口径，T-1 收盘确认）：
+        熊市 = hs300 close < MA250 → 不开仓（维持现状清仓语义）
+        弱牛 = MA250 上 / MA20 下 → 仓位 ×weak_bull_pos + score 门槛提升 weak_bull_score_min
+        强牛 = MA250 上 / MA20 上 → 正常
+    timing       → 市场级择时（指数层面，非个股 RSI）：
+        'ma_resonance' 指数 MA20>MA60>MA250 多头排列才开仓
+        'aroon'        指数 Aroon(25) 上行（Up>Down）才开仓
+        'volume'       指数量比<1（缩量）+ 20日波动率<60日（收缩）才开仓
+        'mom_slope'    指数 20 日动量斜率（mom20 的 5 日变化>0）才开仓
+        'ma_aroon'     MA 共振 + Aroon 双条件
+    默认 regime=False/timing=None → 与旧版行为完全一致（基线可复现）。
+    """
     idx = V.load_index(200).set_index('date')
     idx['idx_vol'] = idx['close'].pct_change().rolling(20).std() * math.sqrt(252)
     idx_vol = idx['idx_vol'].to_dict()
     idx['ma_t'] = idx['close'].rolling(ma_window).mean()
-    in_market_map = {d: bool(pd.notna(r['ma_t']) and r['close'] > r['ma_t']) for d, r in idx.iterrows()}
+    if ma60_gate:   # 2026-09-08：加 MA60 日线约束（指数需同时站上 ma_window 与 MA60 才开仓）
+        idx['ma60x'] = idx['close'].rolling(60).mean()
+        in_market_map = {d: bool(pd.notna(r['ma_t']) and r['close'] > r['ma_t']
+                                 and pd.notna(r['ma60x']) and r['close'] > r['ma60x'])
+                         for d, r in idx.iterrows()}
+    else:
+        in_market_map = {d: bool(pd.notna(r['ma_t']) and r['close'] > r['ma_t']) for d, r in idx.iterrows()}
+    # ---- 2026-09-08 分域 + 择时（默认关闭，不影响基线）----
+    regime_map, timing_map = {}, {}
+    if regime:
+        idx['ma20x'] = idx['close'].rolling(20).mean()
+        idx['ma250x'] = idx['close'].rolling(250).mean()
+        for d, r in idx.iterrows():
+            if pd.isna(r['ma250x']) or pd.isna(r['ma20x']):
+                regime_map[d] = 'bear'   # 数据不足按熊市保守处理
+            elif r['close'] < r['ma250x']:
+                regime_map[d] = 'bear'
+            elif r['close'] < r['ma20x']:
+                regime_map[d] = 'weak'
+            else:
+                regime_map[d] = 'strong'
+    if timing:
+        if timing in ('ma_resonance', 'ma_aroon'):
+            idx['ma60x'] = idx['close'].rolling(60).mean()
+            _res = (idx['ma20x'] > idx['ma60x']) & (idx['ma60x'] > idx['ma250x'])
+        if timing in ('aroon', 'ma_aroon'):
+            _hi = idx['high'].rolling(26).apply(lambda x: int(np.argmax(x)), raw=True)
+            _lo = idx['low'].rolling(26).apply(lambda x: int(np.argmin(x)), raw=True)
+            _up = 100.0 * (25 - _hi) / 25.0
+            _dn = 100.0 * (25 - _lo) / 25.0
+            _aroon_ok = _up > _dn
+        if timing == 'volume':
+            _vr = idx['volume'].rolling(5).mean() / idx['volume'].rolling(20).mean().replace(0, np.nan)
+            _v20 = idx['close'].pct_change().rolling(20).std() * math.sqrt(252)
+            _v60 = idx['close'].pct_change().rolling(60).std() * math.sqrt(252)
+            _vol_ok = (_vr < 1.0) & (_v20 < _v60)
+        if timing == 'mom_slope':
+            _m20 = idx['close'] / idx['close'].shift(20) - 1.0
+            _slope = _m20 - _m20.shift(5)
+            _mom_ok = _slope > 0
+        for d, r in idx.iterrows():
+            ok = True
+            if timing in ('ma_resonance', 'ma_aroon'):
+                ok = ok and bool(pd.notna(r['ma20x']) and pd.notna(r['ma60x']) and pd.notna(r['ma250x']) and _res.get(d, False))
+            if timing in ('aroon', 'ma_aroon'):
+                ok = ok and bool(_aroon_ok.get(d, False))
+            if timing == 'volume':
+                ok = ok and bool(_vol_ok.get(d, False))
+            if timing == 'mom_slope':
+                ok = ok and bool(_mom_ok.get(d, False))
+            timing_map[d] = ok
     all_days = [d for d in idx.index if V.START <= str(d.date()) <= V.END]
     rebal_days = set(all_days[::hold_days])
     cash = cash0
     holdings, ep, ed, peak = {}, {}, {}, {}
     eq, trades = [], []
     ps, pb = set(), []
+    pending_scale = 1.0   # 2026-09-08：弱牛域仓位缩放（决策日定，T+1 执行日生效）
     last_close = {}
     auto_pool = {}
     for di, day in enumerate(all_days):
         dstr = str(day.date())
         in_market = in_market_map.get(day, False) if use_timing else True
+        if regime:
+            in_market = in_market and regime_map.get(day, 'bear') != 'bear'
+        if timing:
+            in_market = in_market and timing_map.get(day, False)
         if holdings:
             for code in list(holdings.keys()):
                 ddf = get_ddf(auto_pool, code)
@@ -101,11 +170,11 @@ def run_auto(top_n=4, hold_days=21, pool_size=25, stop_loss=0.10, cash0=500000, 
                 port_value = cash
                 for code, sh in holdings.items():
                     if last_close.get(code): port_value += sh * last_close[code]
-                scale = 1.0
+                scale = pending_scale   # 2026-09-08：弱牛域仓位缩放（决策日已定）
                 if vol_target:
                     v = idx_vol.get(day)
                     if v is not None and not pd.isna(v) and v > 0:
-                        scale = max(0.3, min(1.0, vol_target / v))
+                        scale = scale * max(0.3, min(1.0, vol_target / v))
                 budget = port_value * scale / top_n
                 # 自动补位：按分数降序遍历完整候选，买得起就买，最多 top_n 只
                 for code, _sc in sorted(pb, key=lambda kv: -kv[1]):
@@ -132,12 +201,18 @@ def run_auto(top_n=4, hold_days=21, pool_size=25, stop_loss=0.10, cash0=500000, 
         if day in rebal_days and di < len(all_days) - 1:
             if not in_market:
                 ps = set(holdings.keys()); pb = []
+                pending_scale = 1.0
             else:
                 thresh_now = score_min
                 if dynamic:
                     v_now = idx_vol.get(day)
                     if v_now is not None and not pd.isna(v_now):
                         thresh_now = max(55.0, min(75.0, score_min + (v_now - 0.20) * 200))
+                # 2026-09-08：弱牛域 → 仓位缩放 + score 门槛提升
+                regime_now = regime_map.get(day, 'strong') if regime else 'strong'
+                pending_scale = weak_bull_pos if regime_now == 'weak' else 1.0
+                if regime_now == 'weak' and weak_bull_score_min:
+                    thresh_now = max(thresh_now, weak_bull_score_min)
                 cand = []
                 for code, ddf in pool_all.items():
                     if not board_filter(code, perm): continue

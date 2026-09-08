@@ -179,6 +179,49 @@ except Exception as _e:
     print("MA200 门控徽章计算失败:", _e)
     LT_GATE_BADGE = ''
 
+# 布林带宽观察指标（2026-09-08 Q2C：大财师兄 9/8「布林线定位置」——带宽收窄=选方向、张开=方向已出；
+# 仅做看板观察，不参与任何门控/信号。口径：沪深300 日线 BOLL(20,2)，带宽=(上轨-下轨)/中轨，
+# 与 60 日均带宽比较判收窄/张开）
+# ⚠ 2026-09-08 修复：本模块未导入 pandas（原写法 name 'pd' is not defined 静默失败），改标准库实现
+try:
+    import statistics as _stat
+    _idx_lines = []
+    with open(BASE / "index_000300.csv", encoding="utf-8") as _f:
+        for _ln in _f:
+            _ln = _ln.strip()
+            if not _ln or _ln.startswith("date"):
+                continue
+            _p = _ln.split(",")
+            if len(_p) >= 5:
+                try:
+                    _idx_lines.append(float(_p[4]))  # close
+                except ValueError:
+                    pass
+    _bw_series = []
+    for _i in range(20, len(_idx_lines) + 1):
+        _win = _idx_lines[_i - 20:_i]
+        _m = _stat.fmean(_win)
+        if _m == 0:
+            continue
+        _s = _stat.pstdev(_win)
+        _bw_series.append(4 * _s / _m)
+    if len(_bw_series) >= 61:
+        _bw_now = _bw_series[-1]
+        _bw_avg60 = _stat.fmean(_bw_series[-60:])
+        _bw_pct = _bw_now / _bw_avg60 - 1 if _bw_avg60 else 0.0
+        if _bw_pct < -0.15:
+            _bw_state, _bw_color = "收窄·选方向", "#d97706"
+        elif _bw_pct > 0.15:
+            _bw_state, _bw_color = "张开·方向已出", "#dc2626"
+        else:
+            _bw_state, _bw_color = "中性", "#6b7280"
+        BB_BW_KPI = f'<div class="kpi"><div class="l">📐 沪深300 布林带宽</div><div class="v" style="color:{_bw_color}">{_bw_state}</div><div class="s">带宽 {_bw_now*100:.1f}% vs 60日均 {_bw_avg60*100:.1f}%（{_bw_pct*100:+.0f}%）· 观察非信号</div></div>'
+    else:
+        BB_BW_KPI = ''
+except Exception as _e:
+    print("布林带宽 KPI 计算失败:", _e)
+    BB_BW_KPI = ''
+
 def tier_counts(items):
     cnt = {}
     for d in items:
@@ -1515,8 +1558,9 @@ html = f"""<!doctype html>
 <div class="kpi"><div class="l">🟡 观望区</div><div class="v" style="color:#d97706">{sum(1 for d in all_items if d["tier"]=="观望")} 只</div><div class="s">持有不加</div></div>
 <div class="kpi"><div class="l">🔴 减/清仓区</div><div class="v" style="color:#16a34a">{sum(1 for d in all_items if d["tier"] in ("减至半仓","清仓"))} 只</div><div class="s">减半或清仓</div></div>
 <div class="kpi"><div class="l">共监控</div><div class="v">{len(all_items)} 只</div><div class="s">全量池 {len(v9_items)} 行</div></div>
+{BB_BW_KPI}
 </div>
-<div class="rule-box" style="margin-bottom:0"><b>监控口径</b>：权重分 = 动量35% + 趋势25% + Aroon20% + 量价20% ｜ 档位 = ≥75 满仓加仓 / ≥60 轻仓加仓 / ≥45 观望 / ≥30 减半 / &lt;30 清仓
+<div class="rule-box" style="margin-bottom:0"><b>监控口径</b>：权重分 = 动量30% + 趋势35% + Aroon20% + 量价15%（2026-09-08 投产 V5）｜ 档位 = ≥75 满仓加仓 / ≥60 轻仓加仓 / ≥45 观望 / ≥30 减半 / &lt;30 清仓
 <br><b>卖出闸门（每日）</b>：全量池 移动止损 4.5% + 沪深300破MA150 ｜ 任何闸门先触发先生效</div>
 </div>
 <!-- 🌦 市场晴雨表（niuone 口径 · 30s 实时 · 纯展示非信号） -->
@@ -1627,7 +1671,7 @@ html = f"""<!doctype html>
 window.ENH.nav = [
   ["overview","📊","监控总览",[["overview","总览统计"],["mkt-weather","市场晴雨表"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
   ["sys-auto","🅰️","全量池中/长线",[["card-tbl-v9","标的汇总表"],["card-tbl-v9-detail","逐标的详情"],["watch-v9-card","中长线跟踪"]]],
-  ["short","⚡","全量池短线",[["card-short-stk","📋 股票池 汇总表"],["card-short-stk-detail","🔍 股票池 逐标的详情"],["card-kh-hits","🎯 KHunter 命中策略一览"],["card-etf-paper","📈 ETF 动量轮动"],["card-kh-paper","🐺 KHunter 模拟盘"],["card-short-fund","📋 基金池 汇总表"],["card-short-fund-detail","🔍 基金池 逐标的详情"],["watch-card","📌 短线跟踪"]]],
+  ["short","⚡","全量池短线",[["card-short-stk","股票池 汇总表"],["card-short-stk-detail","股票池 逐标的详情"],["card-kh-hits","KHunter 命中策略一览"],["card-etf-paper","ETF 动量轮动"],["card-kh-paper","KHunter 模拟盘"],["card-short-fund","基金池 汇总表"],["card-short-fund-detail","基金池 逐标的详情"],["watch-card","短线跟踪"]]],
   ["a5","🎯","打板族",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
   ["comment","💬","评论区",[]]
 ];
