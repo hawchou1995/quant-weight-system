@@ -3,11 +3,11 @@
   "params": "T10/H10/S55 · 反转+MA5",
   "slippage_bps": 20,
   "summary": {
-    "total_return_pct": -41.67,
-    "annual_return_pct": -4.95,
-    "max_drawdown_pct": -50.3,
-    "sharpe": -0.664,
-    "win_rate_pct": 26.1,
-    "total_trades": 996
+    "total_return_pct": -33.81,
+    "annual_return_pct": -3.79,
+    "max_drawdown_pct": -50.56,
+    "sharpe": -0.402,
+    "win_rate_pct": 28.0,
+    "total_trades": 1295
   }
 }
