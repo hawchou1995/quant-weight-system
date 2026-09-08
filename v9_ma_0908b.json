@@ -1,0 +1,176 @@
+{
+  "V1_MA200_默认权重35/25/20/20": {
+    "weights": [
+      0.35,
+      0.25,
+      0.2,
+      0.2
+    ],
+    "summary": {
+      "total_return_pct": 426.69,
+      "annual_return_pct": 16.94,
+      "max_drawdown_pct": -27.13,
+      "sharpe": 1.027,
+      "win_rate_pct": 44.3,
+      "total_trades": 194
+    },
+    "half": {
+      "h1_total_pct": 171.61,
+      "h2_total_pct": 93.92,
+      "eq_points": 2580
+    },
+    "yearly": [
+      {
+        "year": 2017,
+        "n": 33,
+        "wr": 57.6,
+        "med_pnl_pct": 1.97,
+        "ret_contrib_pct": 54.26
+      },
+      {
+        "year": 2018,
+        "n": 6,
+        "wr": 16.7,
+        "med_pnl_pct": -3.27,
+        "ret_contrib_pct": -6.85
+      },
+      {
+        "year": 2019,
+        "n": 33,
+        "wr": 36.4,
+        "med_pnl_pct": -3.21,
+        "ret_contrib_pct": 30.25
+      },
+      {
+        "year": 2020,
+        "n": 24,
+        "wr": 45.8,
+        "med_pnl_pct": -0.17,
+        "ret_contrib_pct": 93.95
+      },
+      {
+        "year": 2021,
+        "n": 21,
+        "wr": 23.8,
+        "med_pnl_pct": -3.67,
+        "ret_contrib_pct": -0.1
+      },
+      {
+        "year": 2023,
+        "n": 15,
+        "wr": 53.3,
+        "med_pnl_pct": 0.16,
+        "ret_contrib_pct": 6.35
+      },
+      {
+        "year": 2024,
+        "n": 12,
+        "wr": 50.0,
+        "med_pnl_pct": -0.2,
+        "ret_contrib_pct": 45.75
+      },
+      {
+        "year": 2025,
+        "n": 29,
+        "wr": 44.8,
+        "med_pnl_pct": -1.35,
+        "ret_contrib_pct": 111.9
+      },
+      {
+        "year": 2026,
+        "n": 21,
+        "wr": 52.4,
+        "med_pnl_pct": 0.75,
+        "ret_contrib_pct": 91.05
+      }
+    ],
+    "elapsed_s": 16.9
+  },
+  "V5_MA200_趋势重30/35/20/15": {
+    "weights": [
+      0.3,
+      0.35,
+      0.2,
+      0.15
+    ],
+    "summary": {
+      "total_return_pct": 635.23,
+      "annual_return_pct": 20.67,
+      "max_drawdown_pct": -24.79,
+      "sharpe": 1.199,
+      "win_rate_pct": 45.3,
+      "total_trades": 192
+    },
+    "half": {
+      "h1_total_pct": 243.56,
+      "h2_total_pct": 114.01,
+      "eq_points": 2580
+    },
+    "yearly": [
+      {
+        "year": 2017,
+        "n": 33,
+        "wr": 57.6,
+        "med_pnl_pct": 1.97,
+        "ret_contrib_pct": 52.36
+      },
+      {
+        "year": 2018,
+        "n": 6,
+        "wr": 16.7,
+        "med_pnl_pct": -3.27,
+        "ret_contrib_pct": -6.74
+      },
+      {
+        "year": 2019,
+        "n": 33,
+        "wr": 39.4,
+        "med_pnl_pct": -2.69,
+        "ret_contrib_pct": 83.77
+      },
+      {
+        "year": 2020,
+        "n": 24,
+        "wr": 41.7,
+        "med_pnl_pct": -0.21,
+        "ret_contrib_pct": 114.16
+      },
+      {
+        "year": 2021,
+        "n": 21,
+        "wr": 28.6,
+        "med_pnl_pct": -4.69,
+        "ret_contrib_pct": 3.34
+      },
+      {
+        "year": 2023,
+        "n": 15,
+        "wr": 53.3,
+        "med_pnl_pct": 0.16,
+        "ret_contrib_pct": 7.17
+      },
+      {
+        "year": 2024,
+        "n": 12,
+        "wr": 58.3,
+        "med_pnl_pct": 1.58,
+        "ret_contrib_pct": 85.92
+      },
+      {
+        "year": 2025,
+        "n": 28,
+        "wr": 46.4,
+        "med_pnl_pct": -0.22,
+        "ret_contrib_pct": 163.69
+      },
+      {
+        "year": 2026,
+        "n": 20,
+        "wr": 50.0,
+        "med_pnl_pct": 0.15,
+        "ret_contrib_pct": 131.36
+      }
+    ],
+    "elapsed_s": 16.5
+  }
+}

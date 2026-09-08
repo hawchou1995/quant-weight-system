@@ -1,0 +1,107 @@
+{
+  "V1_MA200门禁基线": {
+    "note": "生产门禁 MA200 + 默认权重",
+    "ma_window": 200,
+    "weights": [
+      0.35,
+      0.25,
+      0.2,
+      0.2
+    ],
+    "ma60_gate": false,
+    "perm": "main",
+    "n_codes_pool": 5333,
+    "total_return_pct": 426.69,
+    "annual_return_pct": 16.94,
+    "max_drawdown_pct": -27.13,
+    "sharpe": 1.027,
+    "win_rate_pct": 44.3,
+    "median_trade_pnl_pct": -0.81,
+    "total_trades": 194,
+    "elapsed_s": 16.6
+  },
+  "V2_MA250门禁": {
+    "note": "切换 MA250 门禁",
+    "ma_window": 250,
+    "weights": [
+      0.35,
+      0.25,
+      0.2,
+      0.2
+    ],
+    "ma60_gate": false,
+    "perm": "main",
+    "n_codes_pool": 5333,
+    "total_return_pct": 376.25,
+    "annual_return_pct": 15.84,
+    "max_drawdown_pct": -27.16,
+    "sharpe": 0.993,
+    "win_rate_pct": 43.4,
+    "median_trade_pnl_pct": -1.2,
+    "total_trades": 182,
+    "elapsed_s": 14.9
+  },
+  "V3_MA250+MA60约束": {
+    "note": "MA250 + 指数同时站上 MA60 才开仓",
+    "ma_window": 250,
+    "weights": [
+      0.35,
+      0.25,
+      0.2,
+      0.2
+    ],
+    "ma60_gate": true,
+    "perm": "main",
+    "n_codes_pool": 5333,
+    "total_return_pct": 126.14,
+    "annual_return_pct": 7.99,
+    "max_drawdown_pct": -30.41,
+    "sharpe": 0.644,
+    "win_rate_pct": 41.8,
+    "median_trade_pnl_pct": -1.62,
+    "total_trades": 134,
+    "elapsed_s": 11.2
+  },
+  "V4_MA250+权重40/30/15/15": {
+    "note": "MA250 + 动量/趋势加重的权重向量",
+    "ma_window": 250,
+    "weights": [
+      0.4,
+      0.3,
+      0.15,
+      0.15
+    ],
+    "ma60_gate": false,
+    "perm": "main",
+    "n_codes_pool": 5333,
+    "total_return_pct": 369.54,
+    "annual_return_pct": 15.68,
+    "max_drawdown_pct": -24.8,
+    "sharpe": 0.997,
+    "win_rate_pct": 43.6,
+    "median_trade_pnl_pct": -1.2,
+    "total_trades": 181,
+    "elapsed_s": 15.3
+  },
+  "V5_MA200+权重30/35/20/15": {
+    "note": "MA200 + 趋势最重的权重向量",
+    "ma_window": 200,
+    "weights": [
+      0.3,
+      0.35,
+      0.2,
+      0.15
+    ],
+    "ma60_gate": false,
+    "perm": "main",
+    "n_codes_pool": 5333,
+    "total_return_pct": 635.23,
+    "annual_return_pct": 20.67,
+    "max_drawdown_pct": -24.79,
+    "sharpe": 1.199,
+    "win_rate_pct": 45.3,
+    "median_trade_pnl_pct": -0.44,
+    "total_trades": 192,
+    "elapsed_s": 18.7
+  }
+}
