@@ -1,0 +1,482 @@
+{
+ "date": "2026-09-08",
+ "as_of": "2026-09-07",
+ "quotes_loaded": true,
+ "rows": [
+  {
+   "code": "sh600345",
+   "name": "长江通信",
+   "ind": "通信",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.355,
+   "dist_high": 29.7,
+   "amt": 761110333.0,
+   "vr_sb": 1.64,
+   "gap": 1.07,
+   "auction_open": 51.8,
+   "prev_close": 51.25,
+   "auction_vol": 5065,
+   "vol_ratio": 11.1,
+   "price_ceiling": 56.38,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sh600770",
+   "name": "综艺股份",
+   "ind": "其他",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.39,
+   "dist_high": 20.1,
+   "amt": 225266753.0,
+   "vr_sb": 2.24,
+   "gap": 2.5,
+   "auction_open": 5.73,
+   "prev_close": 5.59,
+   "auction_vol": 72005,
+   "vol_ratio": 79.32,
+   "price_ceiling": 6.15,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sh600791",
+   "name": "京能置业",
+   "ind": "房地产",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.415,
+   "dist_high": 26.7,
+   "amt": 184844814.0,
+   "vr_sb": 1.26,
+   "gap": -0.37,
+   "auction_open": 7.98,
+   "prev_close": 8.01,
+   "auction_vol": 16936,
+   "vol_ratio": 19.52,
+   "price_ceiling": 8.81,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sh603119",
+   "name": "浙江荣泰",
+   "ind": "汽车",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.276,
+   "dist_high": 31.5,
+   "amt": 641019318.0,
+   "vr_sb": 1.31,
+   "gap": 1.1,
+   "auction_open": 52.22,
+   "prev_close": 51.65,
+   "auction_vol": 11494,
+   "vol_ratio": 26.5,
+   "price_ceiling": 56.82,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sh603124",
+   "name": "江南新材",
+   "ind": "有色金属",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.283,
+   "dist_high": 37.9,
+   "amt": 1267317209.0,
+   "vr_sb": 2.08,
+   "gap": 0.28,
+   "auction_open": 131.5,
+   "prev_close": 131.13,
+   "auction_vol": 3087,
+   "vol_ratio": 11.96,
+   "price_ceiling": 144.24,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sh603311",
+   "name": "金海高科",
+   "ind": "家用电器",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.383,
+   "dist_high": 27.8,
+   "amt": 133892709.0,
+   "vr_sb": 1.34,
+   "gap": -0.03,
+   "auction_open": 29.36,
+   "prev_close": 29.37,
+   "auction_vol": 1990,
+   "vol_ratio": 15.61,
+   "price_ceiling": 32.31,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sh603823",
+   "name": "百合花",
+   "ind": "基础化工",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.329,
+   "dist_high": 32.8,
+   "amt": 777548475.0,
+   "vr_sb": 0.61,
+   "gap": 8.36,
+   "auction_open": 62.89,
+   "prev_close": 58.04,
+   "auction_vol": 23229,
+   "vol_ratio": 29.74,
+   "price_ceiling": 63.84,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sh603826",
+   "name": "坤彩科技",
+   "ind": "基础化工",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.254,
+   "dist_high": 31.0,
+   "amt": 113823699.0,
+   "vr_sb": 0.86,
+   "gap": 1.55,
+   "auction_open": 17.65,
+   "prev_close": 17.38,
+   "auction_vol": 9689,
+   "vol_ratio": 34.95,
+   "price_ceiling": 19.12,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sh603936",
+   "name": "博敏电子",
+   "ind": "电子",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.338,
+   "dist_high": 38.6,
+   "amt": 875514365.0,
+   "vr_sb": 0.91,
+   "gap": 2.39,
+   "auction_open": 18.0,
+   "prev_close": 17.58,
+   "auction_vol": 18051,
+   "vol_ratio": 11.69,
+   "price_ceiling": 19.34,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz000823",
+   "name": "超声电子",
+   "ind": "电子",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.23,
+   "dist_high": 44.0,
+   "amt": 833771189.0,
+   "vr_sb": 1.25,
+   "gap": 8.09,
+   "auction_open": 17.23,
+   "prev_close": 15.94,
+   "auction_vol": 192245,
+   "vol_ratio": 132.48,
+   "price_ceiling": 17.53,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz001267",
+   "name": "汇绿生态",
+   "ind": "通信",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.33,
+   "dist_high": 37.8,
+   "amt": 1544601449.0000002,
+   "vr_sb": 1.06,
+   "gap": -1.81,
+   "auction_open": 38.01,
+   "prev_close": 38.71,
+   "auction_vol": 16689,
+   "vol_ratio": 14.85,
+   "price_ceiling": 42.58,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz001389",
+   "name": "广合科技",
+   "ind": "电子",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.347,
+   "dist_high": 29.0,
+   "amt": 1421436891.0,
+   "vr_sb": 1.37,
+   "gap": 0.07,
+   "auction_open": 168.0,
+   "prev_close": 167.88,
+   "auction_vol": 2565,
+   "vol_ratio": 10.8,
+   "price_ceiling": 184.67,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz002138",
+   "name": "顺络电子",
+   "ind": "电子",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.296,
+   "dist_high": 34.5,
+   "amt": 2008762618.0,
+   "vr_sb": 1.37,
+   "gap": 1.25,
+   "auction_open": 49.55,
+   "prev_close": 48.94,
+   "auction_vol": 17598,
+   "vol_ratio": 15.52,
+   "price_ceiling": 53.83,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz002281",
+   "name": "光迅科技",
+   "ind": "通信",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.26,
+   "dist_high": 33.2,
+   "amt": 7691316761.0,
+   "vr_sb": 1.16,
+   "gap": 2.61,
+   "auction_open": 189.29,
+   "prev_close": 184.47,
+   "auction_vol": 22282,
+   "vol_ratio": 18.38,
+   "price_ceiling": 202.92,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz002290",
+   "name": "禾盛新材",
+   "ind": "家用电器",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.447,
+   "dist_high": 25.9,
+   "amt": 802481825.0,
+   "vr_sb": 1.82,
+   "gap": 0.47,
+   "auction_open": 68.37,
+   "prev_close": 68.05,
+   "auction_vol": 4890,
+   "vol_ratio": 19.26,
+   "price_ceiling": 74.86,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz002436",
+   "name": "兴森科技",
+   "ind": "电子",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.384,
+   "dist_high": 31.3,
+   "amt": 3954318618.0,
+   "vr_sb": 0.99,
+   "gap": 6.12,
+   "auction_open": 39.0,
+   "prev_close": 36.75,
+   "auction_vol": 245182,
+   "vol_ratio": 60.65,
+   "price_ceiling": 40.43,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz002463",
+   "name": "沪电股份",
+   "ind": "电子",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.447,
+   "dist_high": 20.9,
+   "amt": 9613926292.0,
+   "vr_sb": 1.76,
+   "gap": 2.73,
+   "auction_open": 126.0,
+   "prev_close": 122.65,
+   "auction_vol": 33630,
+   "vol_ratio": 17.09,
+   "price_ceiling": 134.92,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz002484",
+   "name": "江海股份",
+   "ind": "电子",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.141,
+   "dist_high": 44.2,
+   "amt": 3662851549.0,
+   "vr_sb": 1.26,
+   "gap": 3.5,
+   "auction_open": 64.12,
+   "prev_close": 61.95,
+   "auction_vol": 51194,
+   "vol_ratio": 23.25,
+   "price_ceiling": 68.15,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz002515",
+   "name": "金字火腿",
+   "ind": "食品饮料",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.344,
+   "dist_high": 29.7,
+   "amt": 1385520768.0,
+   "vr_sb": 1.75,
+   "gap": 0.0,
+   "auction_open": 8.16,
+   "prev_close": 8.16,
+   "auction_vol": 76577,
+   "vol_ratio": 16.28,
+   "price_ceiling": 8.98,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz002579",
+   "name": "中京电子",
+   "ind": "电子",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.405,
+   "dist_high": 31.9,
+   "amt": 1441138167.0,
+   "vr_sb": 1.4,
+   "gap": 8.96,
+   "auction_open": 16.9,
+   "prev_close": 15.51,
+   "auction_vol": 230759,
+   "vol_ratio": 87.37,
+   "price_ceiling": 17.06,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz002902",
+   "name": "铭普光磁",
+   "ind": "通信",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.433,
+   "dist_high": 26.1,
+   "amt": 458622498.0,
+   "vr_sb": 1.17,
+   "gap": -0.04,
+   "auction_open": 27.17,
+   "prev_close": 27.18,
+   "auction_vol": 9425,
+   "vol_ratio": 17.24,
+   "price_ceiling": 29.9,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz002916",
+   "name": "深南电路",
+   "ind": "电子",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.464,
+   "dist_high": 20.3,
+   "amt": 3314184036.0,
+   "vr_sb": 1.11,
+   "gap": 2.85,
+   "auction_open": 375.37,
+   "prev_close": 364.98,
+   "auction_vol": 5963,
+   "vol_ratio": 23.55,
+   "price_ceiling": 401.48,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz002957",
+   "name": "科瑞技术",
+   "ind": "机械设备",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.342,
+   "dist_high": 32.3,
+   "amt": 805040609.0,
+   "vr_sb": 1.02,
+   "gap": 1.42,
+   "auction_open": 41.5,
+   "prev_close": 40.92,
+   "auction_vol": 10189,
+   "vol_ratio": 16.68,
+   "price_ceiling": 45.01,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz002972",
+   "name": "科安达",
+   "ind": "机械设备",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.299,
+   "dist_high": 28.8,
+   "amt": 196453371.0,
+   "vr_sb": 2.34,
+   "gap": 2.15,
+   "auction_open": 14.23,
+   "prev_close": 13.93,
+   "auction_vol": 14126,
+   "vol_ratio": 39.4,
+   "price_ceiling": 15.32,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz002975",
+   "name": "博杰股份",
+   "ind": "机械设备",
+   "sb_date": "2026-09-07",
+   "rel_pos": 0.405,
+   "dist_high": 33.1,
+   "amt": 1680311668.0,
+   "vr_sb": 1.04,
+   "gap": 1.42,
+   "auction_open": 106.01,
+   "prev_close": 104.53,
+   "auction_vol": 6322,
+   "vol_ratio": 10.0,
+   "price_ceiling": 114.98,
+   "tags": [
+    "不追"
+   ]
+  }
+ ]
+}
