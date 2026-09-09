@@ -3,18 +3,18 @@
     "strategy_name": "v8 ETF 中长线看板（T8/H126/MA150/SL10）",
     "symbol": "全量 ETF 截面选股 Top8",
     "start": "2016-01-04",
-    "end": "2026-08-14",
+    "end": "2026-08-17",
     "initial_cash": 1000000.0,
     "window_start_value": 1000000.0,
-    "final_value": 1864811.66,
+    "final_value": 2081142.97,
     "market": "china_a"
   },
   "summary": {
-    "total_return_pct": 86.48,
-    "annual_return_pct": 6.05,
-    "max_drawdown_pct": -19.14,
-    "sharpe": 0.565,
-    "win_rate_pct": 62.2,
-    "total_trades": 82
+    "total_return_pct": 108.11,
+    "annual_return_pct": 7.15,
+    "max_drawdown_pct": -19.68,
+    "sharpe": 0.638,
+    "win_rate_pct": 61.2,
+    "total_trades": 85
   }
 }

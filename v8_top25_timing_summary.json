@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "strategy_name": "v8 Top25 中长线权重看板",
+    "symbol": "全量池截面选股 Top25",
+    "start": "2016-01-04",
+    "end": "2026-08-17",
+    "initial_cash": 1000000.0,
+    "window_start_value": 1000000.0,
+    "final_value": 476538.98,
+    "market": "china_a"
+  },
+  "summary": {
+    "total_return_pct": -52.35,
+    "annual_return_pct": -6.74,
+    "max_drawdown_pct": -61.84,
+    "sharpe": -0.264,
+    "win_rate_pct": 40.2,
+    "total_trades": 1163
+  }
+}

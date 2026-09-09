@@ -1,0 +1,46 @@
+{
+  "sh600596": {
+    "code": "sh600596",
+    "name": "新安股份",
+    "open": 12.26,
+    "prev_close": 12.08,
+    "price": 12.44,
+    "volume": 379673,
+    "volume_ratio": 26.54,
+    "price_ceiling": 13.29,
+    "time": "2026-09-09"
+  },
+  "sh600769": {
+    "code": "sh600769",
+    "name": "祥龙电业",
+    "open": 16.68,
+    "prev_close": 16.91,
+    "price": 16.99,
+    "volume": 31665,
+    "volume_ratio": 15.0,
+    "price_ceiling": 18.6,
+    "time": "2026-09-09"
+  },
+  "sh603163": {
+    "code": "sh603163",
+    "name": "圣晖集成",
+    "open": 85.2,
+    "prev_close": 85.61,
+    "price": 89.25,
+    "volume": 11177,
+    "volume_ratio": 22.02,
+    "price_ceiling": 94.17,
+    "time": "2026-09-09"
+  },
+  "sz002068": {
+    "code": "sz002068",
+    "name": "黑猫股份",
+    "open": 9.65,
+    "prev_close": 9.1,
+    "price": 9.4,
+    "volume": 282419,
+    "volume_ratio": 44.86,
+    "price_ceiling": 10.01,
+    "time": "2026-09-09"
+  }
+}

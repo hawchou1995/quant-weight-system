@@ -1,0 +1,83 @@
+{
+ "date": "2026-09-09",
+ "as_of": "2026-09-08",
+ "quotes_loaded": true,
+ "rows": [
+  {
+   "code": "sh600596",
+   "name": "新安股份",
+   "ind": "基础化工",
+   "sb_date": "2026-09-08",
+   "rel_pos": 0.281,
+   "dist_high": 32.1,
+   "amt": 1561505916.0,
+   "vr_sb": 3.56,
+   "gap": 1.49,
+   "auction_open": 12.26,
+   "prev_close": 12.08,
+   "auction_vol": 379673,
+   "vol_ratio": 26.54,
+   "price_ceiling": 13.29,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sh600769",
+   "name": "祥龙电业",
+   "ind": "环保",
+   "sb_date": "2026-09-08",
+   "rel_pos": 0.466,
+   "dist_high": 23.0,
+   "amt": 293374534.0,
+   "vr_sb": 1.64,
+   "gap": -1.36,
+   "auction_open": 16.68,
+   "prev_close": 16.91,
+   "auction_vol": 31665,
+   "vol_ratio": 15.0,
+   "price_ceiling": 18.6,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sh603163",
+   "name": "圣晖集成",
+   "ind": "建筑装饰",
+   "sb_date": "2026-09-08",
+   "rel_pos": 0.227,
+   "dist_high": 42.6,
+   "amt": 387918098.0,
+   "vr_sb": 1.95,
+   "gap": -0.48,
+   "auction_open": 85.2,
+   "prev_close": 85.61,
+   "auction_vol": 11177,
+   "vol_ratio": 22.02,
+   "price_ceiling": 94.17,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz002068",
+   "name": "黑猫股份",
+   "ind": "基础化工",
+   "sb_date": "2026-09-08",
+   "rel_pos": 0.225,
+   "dist_high": 40.6,
+   "amt": 478781729.0,
+   "vr_sb": 2.23,
+   "gap": 6.04,
+   "auction_open": 9.65,
+   "prev_close": 9.1,
+   "auction_vol": 282419,
+   "vol_ratio": 44.86,
+   "price_ceiling": 10.01,
+   "tags": [
+    "不追"
+   ]
+  }
+ ]
+}
