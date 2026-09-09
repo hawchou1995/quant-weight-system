@@ -162,7 +162,10 @@ def fetch_tx_delist(sym: str, retries: int = 3):
 
 def save_csv(sym, df, name):
     out = OUT_DIR / f"{sym}.csv"
-    df.to_csv(out, index=False)
+    # 原子写（2026-09-08 并行化：临时文件 + os.replace，避免并行写损坏/半截文件）
+    tmp = out.with_suffix(".csv.tmp")
+    df.to_csv(tmp, index=False)
+    os.replace(tmp, out)
     return len(df)
 
 

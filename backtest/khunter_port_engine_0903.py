@@ -226,7 +226,7 @@ def run_khunter_port(sigs, state_prev, ob, osl, gate='none', dd=None, env='unifo
                             trade_log.append({'code': code, 'entry': str(hh['entry_dt'].date()), 'exit': str(d.date()),
                                               'ret': ret, 'reason': f'stop{int(stop_loss*100)}'})
         # ② 持有上限到期（次日开盘卖出）
-        if hold_max is not None or (gate == 'hybrid_wb' and hold_weak is not None):
+        if hold_max is not None or (gate in ('hybrid_wb', 'hybrid_wb_ma60') and hold_weak is not None):
             for code, h in list(holdings.items()):
                 if h.get('hold_over'):
                     s = sigs[code]
@@ -243,7 +243,7 @@ def run_khunter_port(sigs, state_prev, ob, osl, gate='none', dd=None, env='unifo
         if sells.get(d):
             ob_eff = ob_bull if not st_d['is_bear'] else ob
             # 2026-09-04 弱牛域扩展：gate='hybrid_wb' 时弱牛回调用 weak 卖出阈值（默认=熊 ob）
-            if gate == 'hybrid_wb' and not st_d['is_bear'] and not st_d['bull_ma20']:
+            if gate in ('hybrid_wb', 'hybrid_wb_ma60') and not st_d['is_bear'] and not st_d['bull_ma20']:
                 ob_eff = ob_weak
             for code, rsi1 in sells[d]:
                 if code not in holdings:
@@ -269,6 +269,9 @@ def run_khunter_port(sigs, state_prev, ob, osl, gate='none', dd=None, env='unifo
             if gate == 'ma20': g_ok = st_d['bull_ma20']
             elif gate == 'ma40': g_ok = st_d['bull_ma40']
             elif gate == 'ma60': g_ok = not st_d['is_bear']
+            elif gate == 'ma60_above': g_ok = st_d.get('above_ma60', False)   # 2026-09-08：指数站上 MA60 才开仓（深熊过滤）
+            elif gate == 'ma250_ma60': g_ok = ((not st_d['is_bear'] and st_d['bull_ma20'])
+                                               or (st_d['is_bear'] and st_d.get('above_ma60', False)))
             elif gate == 'bear60': g_ok = st_d['is_bear']   # 生产 B1：熊市（hs300<MA60）才开仓
             elif gate == 'hybrid':
                 # 牛熊分域：牛市需 MA20 上方才开仓；熊市全开（MA60 下方 == 熊）
@@ -277,6 +280,10 @@ def run_khunter_port(sigs, state_prev, ob, osl, gate='none', dd=None, env='unifo
                 # 牛熊分域 + 弱牛回调全开（2026-09-04 弱牛域专项）：
                 # 真熊(<MA60)=开；牛(>MA20)=开；弱牛回调(MA60上/MA20下)=开（用 weak 独立参数）
                 g_ok = True
+            elif gate == 'hybrid_wb_ma60':
+                # 2026-09-08：hybrid_wb 全逻辑 + 熊市分支需指数站上 MA60 才开（深熊过滤）
+                # 牛(>MA20)/弱牛回调 照开；熊市(线下)需 above_ma60（反弹段）
+                g_ok = (not st_d['is_bear']) or st_d.get('above_ma60', False)
             elif gate == 'tristate':
                 # 三态：强牛(mom20>thr 且 >MA20)=满仓；弱牛(>MA20 但动量不足)=减半仓；熊市=不开
                 if st_d['bull_ma20']:
@@ -294,7 +301,7 @@ def run_khunter_port(sigs, state_prev, ob, osl, gate='none', dd=None, env='unifo
                     # 牛熊分域买点：牛市 osl_bull（+低价 low_bull），熊市 osl 或 env=split 放宽 osl+delta（+低价 low_price）
                     # 2026-09-04 弱牛域扩展：gate='hybrid_wb' 时弱牛回调(MA60上/MA20下)用 weak 独立参数
                     is_bear = st_d['is_bear']
-                    is_wb = (gate == 'hybrid_wb') and (not st_d['is_bear']) and (not st_d['bull_ma20'])
+                    is_wb = (gate in ('hybrid_wb', 'hybrid_wb_ma60')) and (not st_d['is_bear']) and (not st_d['bull_ma20'])
                     if is_bear:
                         lim = osl if rsi1 < osl else (osl + env_delta if env == 'split' else None)
                         lp = low_price

@@ -112,7 +112,7 @@ def fetch_tx_qfq(sym, retries=3):
     for attempt in range(1, retries + 1):
         try:
             url = (f"https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
-                   f"?param={sym},day,2016-01-01,2030-12-31,2000,qfq")
+                   f"?param={sym},day,,,2000,qfq")  # 2026-09-09: 带起止日期命中滞后缓存节点(止于前日)，无日期变体返回最新
             r = requests.get(url, timeout=20, headers=UA, proxies={"https": None, "http": None})
             j = r.json()
             data = j.get("data", {}).get(sym, {})

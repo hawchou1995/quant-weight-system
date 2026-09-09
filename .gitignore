@@ -49,3 +49,4 @@ westock_verify*.txt
 
 # 因子缓存备份（体积 GB 级，不入库）
 v8_factor_cache.pkl.bak*
+.workbuddy/
