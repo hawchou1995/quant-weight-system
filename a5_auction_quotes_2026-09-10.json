@@ -1,0 +1,46 @@
+{
+  "sh600869": {
+    "code": "sh600869",
+    "name": "远东股份",
+    "open": 24.2,
+    "prev_close": 24.93,
+    "price": 25.7,
+    "volume": 682501,
+    "volume_ratio": 8.57,
+    "price_ceiling": 27.42,
+    "time": "2026-09-10"
+  },
+  "sh603308": {
+    "code": "sh603308",
+    "name": "应流股份",
+    "open": 46.0,
+    "prev_close": 46.3,
+    "price": 44.53,
+    "volume": 64655,
+    "volume_ratio": 10.81,
+    "price_ceiling": 50.93,
+    "time": "2026-09-10"
+  },
+  "sh603650": {
+    "code": "sh603650",
+    "name": "彤程新材",
+    "open": 65.22,
+    "prev_close": 65.22,
+    "price": 64.33,
+    "volume": 41962,
+    "volume_ratio": 11.18,
+    "price_ceiling": 71.74,
+    "time": "2026-09-10"
+  },
+  "sz002077": {
+    "code": "sz002077",
+    "name": "大港股份",
+    "open": 13.77,
+    "prev_close": 13.74,
+    "price": 13.89,
+    "volume": 295674,
+    "volume_ratio": 40.25,
+    "price_ceiling": 15.11,
+    "time": "2026-09-10"
+  }
+}

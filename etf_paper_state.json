@@ -7,7 +7,7 @@
       "entry_px": 9.054,
       "shares": 3200,
       "weight": 0.2952,
-      "last_close": 9.024
+      "last_close": 9.041
     },
     {
       "code": "sh510500",
@@ -15,7 +15,7 @@
       "entry_px": 7.7988,
       "shares": 3700,
       "weight": 0.2952,
-      "last_close": 7.771
+      "last_close": 7.785
     }
   ],
   "pending": null,
@@ -39,6 +39,13 @@
       "nav": 99801.03,
       "cash": 42171.53,
       "pos_val": 57629.5,
+      "n_pos": 2
+    },
+    {
+      "date": "2026-09-09",
+      "nav": 99907.23,
+      "cash": 42171.53,
+      "pos_val": 57735.7,
       "n_pos": 2
     }
   ],

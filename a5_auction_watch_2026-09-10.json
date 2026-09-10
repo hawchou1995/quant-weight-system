@@ -1,0 +1,85 @@
+{
+ "date": "2026-09-10",
+ "as_of": "2026-09-09",
+ "quotes_loaded": true,
+ "rows": [
+  {
+   "code": "sh600869",
+   "name": "远东股份",
+   "ind": "电力设备",
+   "sb_date": "2026-09-09",
+   "rel_pos": 0.486,
+   "dist_high": 34.0,
+   "amt": 7371146996.000001,
+   "vr_sb": 0.03,
+   "gap": -2.93,
+   "auction_open": 24.2,
+   "prev_close": 24.93,
+   "auction_vol": 682501,
+   "vol_ratio": 8.57,
+   "price_ceiling": 27.42,
+   "tags": [
+    "可切入",
+    "优先区间",
+    "P6命中"
+   ]
+  },
+  {
+   "code": "sh603308",
+   "name": "应流股份",
+   "ind": "机械设备",
+   "sb_date": "2026-09-09",
+   "rel_pos": 0.174,
+   "dist_high": 33.0,
+   "amt": 1429703265.0,
+   "vr_sb": 0.03,
+   "gap": -0.65,
+   "auction_open": 46.0,
+   "prev_close": 46.3,
+   "auction_vol": 64655,
+   "vol_ratio": 10.81,
+   "price_ceiling": 50.93,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sh603650",
+   "name": "彤程新材",
+   "ind": "基础化工",
+   "sb_date": "2026-09-09",
+   "rel_pos": 0.306,
+   "dist_high": 33.4,
+   "amt": 2156858320.0,
+   "vr_sb": 0.03,
+   "gap": 0.0,
+   "auction_open": 65.22,
+   "prev_close": 65.22,
+   "auction_vol": 41962,
+   "vol_ratio": 11.18,
+   "price_ceiling": 71.74,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz002077",
+   "name": "大港股份",
+   "ind": "电子",
+   "sb_date": "2026-09-09",
+   "rel_pos": 0.28,
+   "dist_high": 31.7,
+   "amt": 1129163508.0,
+   "vr_sb": 0.06,
+   "gap": 0.22,
+   "auction_open": 13.77,
+   "prev_close": 13.74,
+   "auction_vol": 295674,
+   "vol_ratio": 40.25,
+   "price_ceiling": 15.11,
+   "tags": [
+    "不追"
+   ]
+  }
+ ]
+}
