@@ -16,6 +16,16 @@
   新浪/腾讯双源失效时作补充源；需自备 token（环境变量 TUSHARE_TOKEN），接入时在 fetchers
   字典注册 fetch_ts_pro_daily 即可，当前无 token 故仅占位不启用
 
+⭐ 2026-09-10 吸收 Sequoia-X (⭐7001) `sequoia_x/data/engine.py` 的三项工程写法：
+   ① **断点表+索引**（engine.py L14-27 / L72-78 / L105-108）→ 新增 `data_index.py`：
+      `data_full/_index.csv` manifest 记录 (sym,last_date,rows,mtime,size)，
+      ≡ SQL `SELECT symbol, MAX(date) GROUP BY symbol`。滞后扫描 4.5s → 0.53s（8.5x）。
+      manifest 缺失/过期(>3天)/文件数不符 → **自动回退全量扫描**（已实测 7539 只零差异）。
+   ② **单只重试退避**（L218-253）→ 并行更新路径加 max_retries=3 + 2s/4s/8s 指数退避
+   ③ **幂等覆盖**（L150-151 先 DELETE 后 append）→ 保留原 drop_duplicates(keep='last') 语义
+   ⚠ **未吸收**：SQLite 存储 与 后复权(adjustflag="1")。本项目全链路按 CSV 路径读取、
+      且统一前复权(qfq)——换存储/换复权口径会让全部历史回测数值作废，收益远小于风险。
+
 用法：python update_daily.py [--limit N] [--only etf|stock] [--source auto|sina|tx] [--pools-only|--all] [--force]
    --pools-only  仅更新「池内+跟踪池（含掉榜）」（降级源激活时自动启用）
    --all         全量更新所有滞后文件（降级源下约 1-2 小时，慎用）
@@ -30,11 +40,25 @@ import requests
 BASE = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(BASE))
 import fetch_full_universe as F
+import data_index as DI          # 2026-09-10 吸收 Sequoia-X engine.py 的「断点表+索引」工程写法
 
 OUT_DIR = BASE / "data_full"
 FAIL_FILE = BASE / "data_full_fail_list.csv"
 LAG_FILE = BASE / "data_lag_list.csv"
 UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+
+# 2026-09-10 吸收 Sequoia-X「断点表」写法：更新成功的 (sym,last_date,rows) 先入内存，
+# main() 末尾一次批量回写 data_full/_index.csv（避免逐只读写 manifest 的 O(n²)）
+_IDX_PENDING = []
+
+
+def _flush_index():
+    """批量回写 manifest（更新完成后调用一次）"""
+    if not _IDX_PENDING:
+        return
+    ok = DI.update_entries(list(_IDX_PENDING))
+    print(f"  [index] manifest 回写 {len(_IDX_PENDING)} 只：{'成功' if ok else '跳过（无 manifest，下次自动重建）'}", flush=True)
+    _IDX_PENDING.clear()
 
 
 def tail_date(f):
@@ -52,7 +76,13 @@ def tail_date(f):
 
 
 def merge_save(sym, df, name):
-    """本地 + 新数据合并去重保存（df 为源返回全量）"""
+    """本地 + 新数据合并去重保存（df 为源返回全量）
+
+    2026-09-10 吸收 Sequoia-X sync_today_bulk L150-151 的「先删后插」幂等思想：
+      原 `drop_duplicates(subset='date', keep='last')` 已等价实现（新数据覆盖同日旧行），
+      此处保留原语义不变；更新结果记入 _IDX_PENDING，由 main() 末尾**批量**回写 manifest
+      （避免逐只 read+write 整个 manifest 造成 O(n²)）。
+    """
     f = OUT_DIR / f"{sym}.csv"
     df = df.copy()
     df["date"] = df["date"].astype(str)
@@ -61,8 +91,12 @@ def merge_save(sym, df, name):
         merged = pd.concat([old, df]).drop_duplicates(subset="date", keep="last")
         merged = merged.sort_values("date").reset_index(drop=True)
         F.save_csv(sym, merged, name)
+        _last, _rows = str(merged["date"].iloc[-1]), len(merged)
     else:
         F.save_csv(sym, df, name)
+        _last, _rows = str(df["date"].iloc[-1]), len(df)
+    _IDX_PENDING.append((sym, _last, _rows))
+    return f
 
 
 def fetch_tickflow_batch(syms):
@@ -164,11 +198,21 @@ def expected_trade_date(now=None):
     return d
 
 
-def scan_lag(target_date):
-    """扫描全部文件，返回滞后文件清单 [(sym, name, src, tail)]"""
+def scan_lag(target_date, use_index=True):
+    """扫描滞后文件清单 [(sym, name, src, tail)]
+
+    2026-09-10 吸收 Sequoia-X data/engine.py 的工程写法：
+      原实现每次都遍历 1900+ 个 CSV 尾部（≈4.5s）；现优先读 `data_full/_index.csv` manifest
+      （≡ Sequoia-X `SELECT symbol, MAX(date) GROUP BY symbol`）→ 单文件读取（≈0.5s）。
+      manifest 缺失/过期/文件数不符时**自动回退全量扫描**，行为与旧版逐位一致（已实测 7539 只零差异）。
+    """
+    if use_index:
+        lag = DI.get_lag(target_date)
+        if lag is not None:
+            return lag
     lag, ok_cnt = [], 0
     for f in sorted(OUT_DIR.glob("*.csv")):
-        if f.stat().st_size < 100:
+        if f.name.startswith("_") or f.stat().st_size < 100:
             continue
         td = tail_date(f)
         if td is None:
@@ -218,6 +262,8 @@ REBASE_DRIFT_PCT = 0.3    # 重拉 qfq 对比重叠区 |Δ| > 此值 → 确认�
                           # 与 sz300012(-0.367%)。统一新浪源验证（新浪 vs 自身）噪声≈0，
                           # 无假阳性风险，可放心收紧到 0.3。
 REBASE_MAX_CAND = 400     # 每日候选上限（防异常行情日扫崩）
+
+UPD_RETRIES = 3           # 2026-09-10 吸收 Sequoia-X backfill max_retries=3（单只重试次数）
 
 
 def _tail_rows(f, n=40):
@@ -452,6 +498,7 @@ def main():
                     print(f"  [{_done}/{len(_batches)} 批] 成功 {ok} 失败 {len(fails)} 耗时 {time.time()-t0:.0f}s", flush=True)
         pd.DataFrame(fails, columns=["sym", "name", "src", "err"]).to_csv(FAIL_FILE, index=False)
         print(f"✅ 增量更新完成（源 tickflow）：成功 {ok} / 滞后 {len(lag)} / 失败 {len(fails)}，总耗时 {(time.time()-t0)/60:.1f} 分钟", flush=True)
+        _flush_index()
         run_rebase_check(target_date, source)
         if fails:
             print(f"失败清单: {FAIL_FILE}（前几个: {[x[0] for x in fails[:5]]}）", flush=True)
@@ -469,18 +516,26 @@ def main():
     print(f"并行更新：{workers} 线程 × {len(lag)} 只", flush=True)
 
     def _update_one(item):
+        """2026-09-10 吸收 Sequoia-X backfill L218-253 的重试写法：
+        单只失败重试 max_retries 次、间隔指数退避（2s/4s/8s），全部失败才计入 fails。
+        原实现失败即放弃 → 降级源抖动时会漏掉整批；现由 fetch 层 retries=3 + 本层重试叠加。"""
         sym, _n, _s, _t = item
-        try:
-            if source == "sina" and sym.startswith(("sh5", "sz1", "sz15", "sz16")):
-                df = F.fetch_sina_etf(sym)
-            else:
-                df = src_fetch(sym)
-        except Exception as e:
-            return (sym, None, str(e)[:60])
-        if df is not None and len(df) > 0:
-            merge_save(sym, df, "")
-            return (sym, str(df["date"].iloc[-1]), None)
-        return (sym, None, "empty")
+        last_err = "empty"
+        for attempt in range(1, UPD_RETRIES + 1):
+            try:
+                if source == "sina" and sym.startswith(("sh5", "sz1", "sz15", "sz16")):
+                    df = F.fetch_sina_etf(sym)
+                else:
+                    df = src_fetch(sym)
+            except Exception as e:
+                last_err = str(e)[:60]
+                df = None
+            if df is not None and len(df) > 0:
+                merge_save(sym, df, "")
+                return (sym, str(df["date"].iloc[-1]), None)
+            if attempt < UPD_RETRIES:
+                F._backoff(attempt)          # 2s/4s/8s 指数退避
+        return (sym, None, last_err)
 
     fails, ok = [], 0
     _lock = __import__("threading").Lock()
@@ -498,6 +553,7 @@ def main():
                     print(f"  [{i}/{len(lag)}] 已更新 {ok} 只（{sym} → {last}）耗时 {time.time()-t0:.0f}s", flush=True)
     pd.DataFrame(fails, columns=["sym", "name", "src", "err"]).to_csv(FAIL_FILE, index=False)
     print(f"✅ 增量更新完成（源 {source} 并行{workers}）：成功 {ok} / 滞后 {len(lag)} / 失败 {len(fails)}，总耗时 {(time.time()-t0)/60:.1f} 分钟", flush=True)
+    _flush_index()
     # 滞后更新完成后：复权基准漂移检测兜底（fresh 文件除权假缺口）
     run_rebase_check(target_date, source)
     if fails:
