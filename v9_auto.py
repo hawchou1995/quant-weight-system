@@ -94,6 +94,12 @@ def run_auto(top_n=4, hold_days=21, pool_size=25, stop_loss=0.10, cash0=500000, 
             else:
                 regime_map[d] = 'strong'
     if timing:
+        # ⚠ 2026-09-09 修复：ma20x/ma250x 原先只在 regime=True 分支创建，
+        #    单独开 timing（regime=False）时 KeyError → 此处按需自建（幂等，生产默认 timing=None 零影响）
+        if 'ma20x' not in idx.columns:
+            idx['ma20x'] = idx['close'].rolling(20).mean()
+        if 'ma250x' not in idx.columns:
+            idx['ma250x'] = idx['close'].rolling(250).mean()
         if timing in ('ma_resonance', 'ma_aroon'):
             idx['ma60x'] = idx['close'].rolling(60).mean()
             _res = (idx['ma20x'] > idx['ma60x']) & (idx['ma60x'] > idx['ma250x'])
@@ -132,8 +138,12 @@ def run_auto(top_n=4, hold_days=21, pool_size=25, stop_loss=0.10, cash0=500000, 
     pending_scale = 1.0   # 2026-09-08：弱牛域仓位缩放（决策日定，T+1 执行日生效）
     last_close = {}
     auto_pool = {}
+    _pending_stop = set()   # 2026-09-10 修复未来函数：T 日收盘触发 → T+1 开盘成交（原为同日 ps.add→open[T]）
     for di, day in enumerate(all_days):
         dstr = str(day.date())
+        if _pending_stop:   # >>> DEFER STOP FLUSH（与前日收盘触发的止损合并，用今日 open 成交）
+            ps |= _pending_stop
+            _pending_stop = set()
         in_market = in_market_map.get(day, False) if use_timing else True
         if regime:
             in_market = in_market and regime_map.get(day, 'bear') != 'bear'
@@ -146,7 +156,7 @@ def run_auto(top_n=4, hold_days=21, pool_size=25, stop_loss=0.10, cash0=500000, 
                 px = ddf.loc[day, 'close']
                 if pd.isna(px) or px <= 0: continue
                 if code not in peak or px > peak[code]: peak[code] = px
-                if stop_loss and px <= peak[code] * (1 - stop_loss): ps.add(code)
+                if stop_loss and px <= peak[code] * (1 - stop_loss): _pending_stop.add(code)
         if ps or pb:
             open_px = {}
             for code in list(ps) + [c for c, _ in pb]:
@@ -200,7 +210,13 @@ def run_auto(top_n=4, hold_days=21, pool_size=25, stop_loss=0.10, cash0=500000, 
             ps = set(); pb = []
         if day in rebal_days and di < len(all_days) - 1:
             if not in_market:
-                ps = set(holdings.keys()); pb = []
+                # 2026-09-09：低位稳拿（hold-only）——门控关时保留持仓、不新开仓。
+                # 依据：门控重验 H2_MA200_低位稳拿 total +315.55%/夏普 0.876/mdd -28.73%
+                #      vs 原全清仓 +218.38%/0.739/-28.72%（+97.17pp、夏普+0.137、回撤持平）；
+                #      右尾敏感性剔 top1/3/5 每档均优。亦与生产链路语义对齐
+                #      （build_enhanced_data.py / build_dual_system.py 中 in_market 不参与清仓，
+                #       卖出仅由 off_board 掉榜5日 / sell_signal score<50 驱动）。
+                ps = set(); pb = []
                 pending_scale = 1.0
             else:
                 thresh_now = score_min

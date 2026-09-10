@@ -1605,7 +1605,7 @@ html = f"""<!doctype html>
 {BB_BW_KPI}
 </div>
 <div class="rule-box" style="margin-bottom:0"><b>监控口径</b>：权重分 = 动量30% + 趋势35% + Aroon20% + 量价15%（2026-09-08 投产 V5）｜ 档位 = ≥75 满仓加仓 / ≥60 轻仓加仓 / ≥45 观望 / ≥30 减半 / &lt;30 清仓
-<br><b>卖出闸门（每日）</b>：全量池 移动止损 4.5% + 沪深300破MA150 ｜ 任何闸门先触发先生效</div>
+<br><b>卖出闸门（每日）</b>：全量池 掉榜连续5日 或 权重分&lt;50 → 清仓信号（21交易日倒计时）｜ 市况门控 沪深300 vs MA200（仅提醒，非交易指令）</div>
 </div>
 <!-- 🌦 市场晴雨表（niuone 口径 · 30s 实时 · 纯展示非信号） -->
 <div class="card" id="mkt-weather" style="margin-top:14px">
@@ -1641,7 +1641,7 @@ html = f"""<!doctype html>
   head_tags=[LT_GATE_BADGE, POOL_REBAL_BADGE,
              '<span class="badge badge-auto">评分 = Aroon强趋势过滤(A80_M78)</span>',
              '<span class="badge badge-auto">筛池 = 全市场绝对规则 Top3 等权 · 月轮动</span>',
-             '<span class="badge badge-auto">风控 = 移动止损4.5% · MA200择时</span>'],
+             '<span class="badge badge-auto">风控 = 掉榜5日/权重分&lt;50 清仓信号 · MA200门控（仅提醒）</span>'],
   head_note="回测参考见「监控总览」视图 · " + POOL_REBAL_NOTE,
   as_of=DATA["meta"].get("as_of", "—"), intraday_note=DATA["meta"].get("intraday"),
   as_of_min=DATA["meta"].get("intraday_ts") or DATA["meta"].get("as_of_min"))}

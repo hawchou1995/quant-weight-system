@@ -54,8 +54,12 @@ def run_auto_inhibit(aroon_th=None, mom_th=None, fac=0.6, cap=False, start=None,
             d = pool_all.get(code)
         return d
 
+    _pending_stop = set()   # 2026-09-10 修复未来函数：T 日收盘触发 → T+1 开盘成交
     for di, day in enumerate(all_days):
         dstr = str(day.date())
+        if _pending_stop:
+            ps |= _pending_stop
+            _pending_stop = set()
         in_market = in_market_map.get(day, False) if use_timing else True
         if holdings:
             for code in list(holdings.keys()):
@@ -64,7 +68,7 @@ def run_auto_inhibit(aroon_th=None, mom_th=None, fac=0.6, cap=False, start=None,
                 px = ddf.loc[day, 'close']
                 if pd.isna(px) or px <= 0: continue
                 if code not in peak or px > peak[code]: peak[code] = px
-                if stop_loss and px <= peak[code] * (1 - stop_loss): ps.add(code)
+                if stop_loss and px <= peak[code] * (1 - stop_loss): _pending_stop.add(code)
         if ps or pb:
             open_px = {}
             for code in list(ps) + [c for c, _ in pb]:

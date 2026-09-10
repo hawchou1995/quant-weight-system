@@ -5,11 +5,11 @@
   "aroon_th": 80,
   "mom_th": 0.78,
   "summary": {
-    "total_return_pct": 91.99,
-    "annual_return_pct": 6.3,
-    "max_drawdown_pct": -14.35,
-    "sharpe": 0.754,
-    "win_rate_pct": 47.2,
+    "total_return_pct": -43.8,
+    "annual_return_pct": -5.25,
+    "max_drawdown_pct": -47.59,
+    "sharpe": -0.479,
+    "win_rate_pct": 25.8,
     "total_trades": 89
   }
 }
