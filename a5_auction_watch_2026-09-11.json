@@ -1,0 +1,184 @@
+{
+ "date": "2026-09-11",
+ "as_of": "2026-09-10",
+ "quotes_loaded": true,
+ "rows": [
+  {
+   "code": "sh600667",
+   "name": "太极实业",
+   "ind": "建筑装饰",
+   "sb_date": "2026-09-10",
+   "rel_pos": 0.284,
+   "dist_high": 37.8,
+   "amt": 3743778504.0,
+   "vr_sb": 0.01,
+   "gap": -2.7,
+   "auction_open": 19.44,
+   "prev_close": 19.98,
+   "auction_vol": 325045,
+   "vol_ratio": 19.55,
+   "price_ceiling": 21.98,
+   "tags": [
+    "可切入",
+    "优先区间",
+    "P2命中",
+    "P5命中",
+    "P6命中"
+   ]
+  },
+  {
+   "code": "sh600876",
+   "name": "凯盛新能",
+   "ind": "建筑材料",
+   "sb_date": "2026-09-10",
+   "rel_pos": 0.456,
+   "dist_high": 20.3,
+   "amt": 65438160.0,
+   "vr_sb": 0.05,
+   "gap": 7.08,
+   "auction_open": 8.47,
+   "prev_close": 7.91,
+   "auction_vol": 106238,
+   "vol_ratio": 351.0,
+   "price_ceiling": 8.7,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sh601231",
+   "name": "环旭电子",
+   "ind": "电子",
+   "sb_date": "2026-09-10",
+   "rel_pos": 0.401,
+   "dist_high": 25.6,
+   "amt": 1025159548.0000001,
+   "vr_sb": 0.02,
+   "gap": -0.72,
+   "auction_open": 27.72,
+   "prev_close": 27.92,
+   "auction_vol": 64854,
+   "vol_ratio": 18.31,
+   "price_ceiling": 30.71,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sh603316",
+   "name": "诚邦股份",
+   "ind": "电子",
+   "sb_date": "2026-09-10",
+   "rel_pos": 0.337,
+   "dist_high": 34.7,
+   "amt": 287249280.0,
+   "vr_sb": 0.04,
+   "gap": -3.18,
+   "auction_open": 15.22,
+   "prev_close": 15.72,
+   "auction_vol": 45110,
+   "vol_ratio": 21.89,
+   "price_ceiling": 17.29,
+   "tags": [
+    "可切入",
+    "优先区间",
+    "P6命中"
+   ]
+  },
+  {
+   "code": "sh603601",
+   "name": "再升科技",
+   "ind": "建筑材料",
+   "sb_date": "2026-09-10",
+   "rel_pos": 0.318,
+   "dist_high": 33.5,
+   "amt": 1965507854.0,
+   "vr_sb": 0.06,
+   "gap": 0.0,
+   "auction_open": 9.96,
+   "prev_close": 9.96,
+   "auction_vol": 346836,
+   "vol_ratio": 35.16,
+   "price_ceiling": 10.96,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz000823",
+   "name": "超声电子",
+   "ind": "电子",
+   "sb_date": "2026-09-10",
+   "rel_pos": 0.399,
+   "dist_high": 34.3,
+   "amt": 2769778931.0,
+   "vr_sb": 0.06,
+   "gap": -0.37,
+   "auction_open": 18.63,
+   "prev_close": 18.7,
+   "auction_vol": 175467,
+   "vol_ratio": 13.66,
+   "price_ceiling": 20.57,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz002201",
+   "name": "九鼎新材",
+   "ind": "建筑材料",
+   "sb_date": "2026-09-10",
+   "rel_pos": 0.486,
+   "dist_high": 24.1,
+   "amt": 589175795.0,
+   "vr_sb": 0.08,
+   "gap": -1.09,
+   "auction_open": 9.97,
+   "prev_close": 10.08,
+   "auction_vol": 129496,
+   "vol_ratio": 18.39,
+   "price_ceiling": 11.09,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz002531",
+   "name": "天顺风能",
+   "ind": "电力设备",
+   "sb_date": "2026-09-10",
+   "rel_pos": 0.269,
+   "dist_high": 25.5,
+   "amt": 486529237.99999994,
+   "vr_sb": 0.04,
+   "gap": 3.04,
+   "auction_open": 7.12,
+   "prev_close": 6.91,
+   "auction_vol": 352749,
+   "vol_ratio": 77.01,
+   "price_ceiling": 7.6,
+   "tags": [
+    "不追"
+   ]
+  },
+  {
+   "code": "sz002636",
+   "name": "金安国纪",
+   "ind": "电子",
+   "sb_date": "2026-09-10",
+   "rel_pos": 0.401,
+   "dist_high": 36.3,
+   "amt": 4966872405.0,
+   "vr_sb": 1.21,
+   "gap": -0.59,
+   "auction_open": 76.0,
+   "prev_close": 76.45,
+   "auction_vol": 108156,
+   "vol_ratio": 15.67,
+   "price_ceiling": 84.1,
+   "tags": [
+    "不追"
+   ]
+  }
+ ]
+}
