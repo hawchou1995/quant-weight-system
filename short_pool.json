@@ -1,43 +1,43 @@
 {
   "as_of": "2026-09-11",
-  "fund_as_of": "2026-09-09",
+  "fund_as_of": "2026-09-10",
   "details": {
-    "003719": {
-      "code": "003719",
-      "key": "003719",
-      "name": "易方达标普医疗保健美元汇A",
+    "003956": {
+      "code": "003956",
+      "key": "003956",
+      "name": "南方产业智选股票A",
       "pool": "short",
       "perm": "short",
       "board": "基金",
-      "industry": "海外科技",
+      "industry": "未分类基金",
       "biz": "—",
-      "px": 0.32,
-      "chg": 5.5,
-      "ret_1y": 35.1,
-      "score": 89.2,
+      "px": 2.05,
+      "chg": 0.74,
+      "ret_1y": 4.3,
+      "score": 82.4,
       "score_prev": null,
       "tier": "强买入",
       "tier_prev": null,
-      "short_score": 89.2,
+      "short_score": 82.4,
       "short_tier": "强买入",
       "factors": {
-        "mom": 13.4,
+        "mom": 4.5,
         "vr": null,
         "trend": 100,
         "volume": 50.0,
         "osc": 50,
-        "risk": 81.7
+        "risk": 100
       },
       "comp": {
         "trend": 100,
-        "momentum": 90.3,
+        "momentum": 63.4,
         "volume": 50.0,
         "osc": 50,
-        "risk": 81.7,
+        "risk": 100,
         "news": 0.0
       },
-      "radar_svg": "<svg viewBox=\"0 0 120 120\" width=\"120\" height=\"120\" style=\"flex:0 0 auto\"><polygon points=\"60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"16.8\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"103.2\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 93.8,40.5 78.7,70.8 60.0,81.6 29.4,77.6 58.9,59.4\" fill=\"var(--radar-good)\" fill-opacity=\"0.18\" stroke=\"var(--radar-good)\" stroke-width=\"1.5\"/><circle cx=\"60.0\" cy=\"16.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"2.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">趋势</text><circle cx=\"93.8\" cy=\"40.5\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">动能</text><circle cx=\"78.7\" cy=\"70.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">量能</text><circle cx=\"60.0\" cy=\"81.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"119.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">超买</text><circle cx=\"29.4\" cy=\"77.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">风控</text><circle cx=\"58.9\" cy=\"59.4\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">研报</text><text x=\"60.0\" y=\"64.0\" style=\"fill:var(--radar-good)\" font-size=\"15\" font-weight=\"700\" text-anchor=\"middle\">89</text></svg>",
-      "rsi": 87.2,
+      "radar_svg": "<svg viewBox=\"0 0 120 120\" width=\"120\" height=\"120\" style=\"flex:0 0 auto\"><polygon points=\"60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"16.8\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"103.2\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 83.7,46.3 78.7,70.8 60.0,81.6 22.6,81.6 58.9,59.4\" fill=\"var(--radar-good)\" fill-opacity=\"0.18\" stroke=\"var(--radar-good)\" stroke-width=\"1.5\"/><circle cx=\"60.0\" cy=\"16.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"2.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">趋势</text><circle cx=\"83.7\" cy=\"46.3\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">动能</text><circle cx=\"78.7\" cy=\"70.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">量能</text><circle cx=\"60.0\" cy=\"81.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"119.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">超买</text><circle cx=\"22.6\" cy=\"81.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">风控</text><circle cx=\"58.9\" cy=\"59.4\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">研报</text><text x=\"60.0\" y=\"64.0\" style=\"fill:var(--radar-good)\" font-size=\"15\" font-weight=\"700\" text-anchor=\"middle\">82</text></svg>",
+      "rsi": 61.5,
       "kline": [],
       "factor_hist": [],
       "trades": {
@@ -47,42 +47,42 @@
       "pick": null,
       "khunter": null
     },
-    "001093": {
-      "code": "001093",
-      "key": "001093",
-      "name": "广发生物科技指数美元(QDII)A",
+    "004879": {
+      "code": "004879",
+      "key": "004879",
+      "name": "汇添富全球医疗混合(QDII)美元现钞",
       "pool": "short",
       "perm": "short",
       "board": "基金",
       "industry": "海外股票",
       "biz": "—",
-      "px": 0.26,
-      "chg": 5.98,
-      "ret_1y": 59.2,
-      "score": 83.2,
+      "px": 2.63,
+      "chg": 2.21,
+      "ret_1y": 24.5,
+      "score": 82.2,
       "score_prev": null,
       "tier": "强买入",
       "tier_prev": null,
-      "short_score": 83.2,
+      "short_score": 82.2,
       "short_tier": "强买入",
       "factors": {
-        "mom": 13.5,
+        "mom": 7.1,
         "vr": null,
         "trend": 100,
         "volume": 50.0,
         "osc": 50,
-        "risk": 68.1
+        "risk": 89.7
       },
       "comp": {
         "trend": 100,
-        "momentum": 90.6,
+        "momentum": 71.3,
         "volume": 50.0,
         "osc": 50,
-        "risk": 68.1,
+        "risk": 89.7,
         "news": 0.0
       },
-      "radar_svg": "<svg viewBox=\"0 0 120 120\" width=\"120\" height=\"120\" style=\"flex:0 0 auto\"><polygon points=\"60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"16.8\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"103.2\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 93.9,40.4 78.7,70.8 60.0,81.6 34.5,74.7 58.9,59.4\" fill=\"var(--radar-good)\" fill-opacity=\"0.18\" stroke=\"var(--radar-good)\" stroke-width=\"1.5\"/><circle cx=\"60.0\" cy=\"16.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"2.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">趋势</text><circle cx=\"93.9\" cy=\"40.4\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">动能</text><circle cx=\"78.7\" cy=\"70.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">量能</text><circle cx=\"60.0\" cy=\"81.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"119.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">超买</text><circle cx=\"34.5\" cy=\"74.7\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">风控</text><circle cx=\"58.9\" cy=\"59.4\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">研报</text><text x=\"60.0\" y=\"64.0\" style=\"fill:var(--radar-good)\" font-size=\"15\" font-weight=\"700\" text-anchor=\"middle\">83</text></svg>",
-      "rsi": 82.0,
+      "radar_svg": "<svg viewBox=\"0 0 120 120\" width=\"120\" height=\"120\" style=\"flex:0 0 auto\"><polygon points=\"60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"16.8\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"103.2\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 86.7,44.6 78.7,70.8 60.0,81.6 26.4,79.4 58.9,59.4\" fill=\"var(--radar-good)\" fill-opacity=\"0.18\" stroke=\"var(--radar-good)\" stroke-width=\"1.5\"/><circle cx=\"60.0\" cy=\"16.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"2.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">趋势</text><circle cx=\"86.7\" cy=\"44.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">动能</text><circle cx=\"78.7\" cy=\"70.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">量能</text><circle cx=\"60.0\" cy=\"81.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"119.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">超买</text><circle cx=\"26.4\" cy=\"79.4\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">风控</text><circle cx=\"58.9\" cy=\"59.4\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">研报</text><text x=\"60.0\" y=\"64.0\" style=\"fill:var(--radar-good)\" font-size=\"15\" font-weight=\"700\" text-anchor=\"middle\">82</text></svg>",
+      "rsi": 79.7,
       "kline": [],
       "factor_hist": [],
       "trades": {
@@ -92,42 +92,42 @@
       "pick": null,
       "khunter": null
     },
-    "001092": {
-      "code": "001092",
-      "key": "001092",
-      "name": "广发生物科技指数人民币(QDII)A",
+    "004878": {
+      "code": "004878",
+      "key": "004878",
+      "name": "汇添富全球医疗混合(QDII)美元现汇",
       "pool": "short",
       "perm": "short",
       "board": "基金",
       "industry": "海外股票",
       "biz": "—",
-      "px": 1.79,
-      "chg": 5.91,
-      "ret_1y": 51.2,
-      "score": 83.1,
+      "px": 2.63,
+      "chg": 2.21,
+      "ret_1y": 24.5,
+      "score": 82.2,
       "score_prev": null,
       "tier": "强买入",
       "tier_prev": null,
-      "short_score": 83.1,
+      "short_score": 82.2,
       "short_tier": "强买入",
       "factors": {
-        "mom": 13.4,
+        "mom": 7.1,
         "vr": null,
         "trend": 100,
         "volume": 50.0,
         "osc": 50,
-        "risk": 68.2
+        "risk": 89.7
       },
       "comp": {
         "trend": 100,
-        "momentum": 90.3,
+        "momentum": 71.3,
         "volume": 50.0,
         "osc": 50,
-        "risk": 68.2,
+        "risk": 89.7,
         "news": 0.0
       },
-      "radar_svg": "<svg viewBox=\"0 0 120 120\" width=\"120\" height=\"120\" style=\"flex:0 0 auto\"><polygon points=\"60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"16.8\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"103.2\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 93.8,40.5 78.7,70.8 60.0,81.6 34.5,74.7 58.9,59.4\" fill=\"var(--radar-good)\" fill-opacity=\"0.18\" stroke=\"var(--radar-good)\" stroke-width=\"1.5\"/><circle cx=\"60.0\" cy=\"16.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"2.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">趋势</text><circle cx=\"93.8\" cy=\"40.5\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">动能</text><circle cx=\"78.7\" cy=\"70.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">量能</text><circle cx=\"60.0\" cy=\"81.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"119.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">超买</text><circle cx=\"34.5\" cy=\"74.7\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">风控</text><circle cx=\"58.9\" cy=\"59.4\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">研报</text><text x=\"60.0\" y=\"64.0\" style=\"fill:var(--radar-good)\" font-size=\"15\" font-weight=\"700\" text-anchor=\"middle\">83</text></svg>",
-      "rsi": 82.2,
+      "radar_svg": "<svg viewBox=\"0 0 120 120\" width=\"120\" height=\"120\" style=\"flex:0 0 auto\"><polygon points=\"60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"16.8\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"103.2\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 86.7,44.6 78.7,70.8 60.0,81.6 26.4,79.4 58.9,59.4\" fill=\"var(--radar-good)\" fill-opacity=\"0.18\" stroke=\"var(--radar-good)\" stroke-width=\"1.5\"/><circle cx=\"60.0\" cy=\"16.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"2.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">趋势</text><circle cx=\"86.7\" cy=\"44.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">动能</text><circle cx=\"78.7\" cy=\"70.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">量能</text><circle cx=\"60.0\" cy=\"81.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"119.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">超买</text><circle cx=\"26.4\" cy=\"79.4\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">风控</text><circle cx=\"58.9\" cy=\"59.4\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">研报</text><text x=\"60.0\" y=\"64.0\" style=\"fill:var(--radar-good)\" font-size=\"15\" font-weight=\"700\" text-anchor=\"middle\">82</text></svg>",
+      "rsi": 79.7,
       "kline": [],
       "factor_hist": [],
       "trades": {
@@ -143,9 +143,9 @@
     "创业板": [],
     "科创板": [],
     "基金": [
-      "003719",
-      "001093",
-      "001092"
+      "003956",
+      "004879",
+      "004878"
     ]
   },
   "market_gate": {
@@ -155,10 +155,10 @@
     "idx_ma20": 4593.9,
     "bear60": true,
     "sentiment": {
-      "zone": "活跃",
-      "zt_ratio": 0.9,
-      "broken_rate": 34.62,
-      "seal_yi": 27.44,
+      "zone": "中性",
+      "zt_ratio": 0.69,
+      "broken_rate": 43.48,
+      "seal_yi": 29.15,
       "lianban_max": 4,
       "note": "advisory-only（不参与门控判定，仅供观察）"
     },
@@ -281,6 +281,7 @@
         "sh600468",
         "sh600470",
         "sh600482",
+        "sh600500",
         "sh600501",
         "sh600505",
         "sh600540",
@@ -320,6 +321,7 @@
         "sh600717",
         "sh600719",
         "sh600720",
+        "sh600722",
         "sh600725",
         "sh600733",
         "sh600738",
@@ -338,6 +340,7 @@
         "sh600792",
         "sh600793",
         "sh600794",
+        "sh600795",
         "sh600798",
         "sh600802",
         "sh600803",
@@ -365,6 +368,8 @@
         "sh600903",
         "sh600908",
         "sh600917",
+        "sh600919",
+        "sh600926",
         "sh600935",
         "sh600936",
         "sh600939",
@@ -392,7 +397,9 @@
         "sh601138",
         "sh601139",
         "sh601155",
+        "sh601169",
         "sh601188",
+        "sh601208",
         "sh601216",
         "sh601218",
         "sh601222",
@@ -425,11 +432,14 @@
         "sh601866",
         "sh601869",
         "sh601882",
+        "sh601890",
         "sh601929",
         "sh601939",
         "sh601949",
+        "sh601952",
         "sh601968",
         "sh601975",
+        "sh601985",
         "sh601988",
         "sh601996",
         "sh601998",
@@ -459,6 +469,7 @@
         "sh603126",
         "sh603136",
         "sh603138",
+        "sh603139",
         "sh603150",
         "sh603151",
         "sh603160",
@@ -518,6 +529,7 @@
         "sh603628",
         "sh603657",
         "sh603668",
+        "sh603678",
         "sh603679",
         "sh603685",
         "sh603686",
@@ -547,6 +559,7 @@
         "sh603991",
         "sh603999",
         "sh605003",
+        "sh605006",
         "sh605008",
         "sh605011",
         "sh605016",
@@ -564,6 +577,7 @@
         "sh605177",
         "sh605183",
         "sh605188",
+        "sh605198",
         "sh605208",
         "sh605222",
         "sh605258",
@@ -585,6 +599,7 @@
         "sz000156",
         "sz000407",
         "sz000419",
+        "sz000421",
         "sz000428",
         "sz000430",
         "sz000501",
@@ -606,6 +621,7 @@
         "sz000558",
         "sz000560",
         "sz000561",
+        "sz000564",
         "sz000565",
         "sz000572",
         "sz000576",
@@ -642,10 +658,12 @@
         "sz000728",
         "sz000731",
         "sz000733",
+        "sz000735",
         "sz000738",
         "sz000753",
         "sz000759",
         "sz000767",
+        "sz000768",
         "sz000789",
         "sz000791",
         "sz000796",
@@ -677,6 +695,7 @@
         "sz000927",
         "sz000928",
         "sz000929",
+        "sz000930",
         "sz000951",
         "sz000966",
         "sz000972",
@@ -782,6 +801,7 @@
         "sz002298",
         "sz002299",
         "sz002300",
+        "sz002303",
         "sz002307",
         "sz002309",
         "sz002310",
@@ -795,6 +815,7 @@
         "sz002343",
         "sz002344",
         "sz002347",
+        "sz002349",
         "sz002356",
         "sz002357",
         "sz002363",
@@ -1114,6 +1135,7 @@
         "sh600470",
         "sh600475",
         "sh600477",
+        "sh600479",
         "sh600481",
         "sh600482",
         "sh600483",
@@ -1123,6 +1145,7 @@
         "sh600495",
         "sh600498",
         "sh600499",
+        "sh600500",
         "sh600501",
         "sh600503",
         "sh600505",
@@ -1208,6 +1231,7 @@
         "sh600717",
         "sh600719",
         "sh600720",
+        "sh600722",
         "sh600724",
         "sh600725",
         "sh600727",
@@ -1238,6 +1262,7 @@
         "sh600792",
         "sh600793",
         "sh600794",
+        "sh600795",
         "sh600798",
         "sh600800",
         "sh600801",
@@ -1270,6 +1295,7 @@
         "sh600859",
         "sh600862",
         "sh600863",
+        "sh600864",
         "sh600865",
         "sh600866",
         "sh600868",
@@ -1290,10 +1316,13 @@
         "sh600903",
         "sh600908",
         "sh600917",
+        "sh600919",
+        "sh600926",
         "sh600935",
         "sh600936",
         "sh600938",
         "sh600939",
+        "sh600941",
         "sh600956",
         "sh600959",
         "sh600963",
@@ -1325,6 +1354,7 @@
         "sh601068",
         "sh601086",
         "sh601088",
+        "sh601099",
         "sh601106",
         "sh601107",
         "sh601113",
@@ -1336,9 +1366,11 @@
         "sh601139",
         "sh601155",
         "sh601168",
+        "sh601169",
         "sh601186",
         "sh601188",
         "sh601199",
+        "sh601208",
         "sh601216",
         "sh601218",
         "sh601222",
@@ -1393,6 +1425,7 @@
         "sh601869",
         "sh601872",
         "sh601882",
+        "sh601890",
         "sh601898",
         "sh601901",
         "sh601908",
@@ -1401,10 +1434,12 @@
         "sh601933",
         "sh601939",
         "sh601949",
+        "sh601952",
         "sh601963",
         "sh601968",
         "sh601969",
         "sh601975",
+        "sh601985",
         "sh601988",
         "sh601990",
         "sh601996",
@@ -1460,6 +1495,7 @@
         "sh603132",
         "sh603136",
         "sh603138",
+        "sh603139",
         "sh603150",
         "sh603151",
         "sh603158",
@@ -1581,6 +1617,7 @@
         "sh603657",
         "sh603665",
         "sh603668",
+        "sh603678",
         "sh603679",
         "sh603685",
         "sh603686",
@@ -1649,6 +1686,7 @@
         "sh603999",
         "sh605001",
         "sh605003",
+        "sh605006",
         "sh605008",
         "sh605011",
         "sh605016",
@@ -1673,6 +1711,7 @@
         "sh605183",
         "sh605188",
         "sh605196",
+        "sh605198",
         "sh605208",
         "sh605222",
         "sh605258",
@@ -1733,6 +1772,7 @@
         "sz000411",
         "sz000417",
         "sz000419",
+        "sz000421",
         "sz000425",
         "sz000428",
         "sz000430",
@@ -1768,6 +1808,7 @@
         "sz000558",
         "sz000560",
         "sz000561",
+        "sz000564",
         "sz000565",
         "sz000566",
         "sz000567",
@@ -1824,12 +1865,14 @@
         "sz000728",
         "sz000731",
         "sz000733",
+        "sz000735",
         "sz000736",
         "sz000738",
         "sz000753",
         "sz000759",
         "sz000766",
         "sz000767",
+        "sz000768",
         "sz000776",
         "sz000777",
         "sz000785",
@@ -1880,12 +1923,14 @@
         "sz000902",
         "sz000905",
         "sz000906",
+        "sz000912",
         "sz000917",
         "sz000921",
         "sz000923",
         "sz000927",
         "sz000928",
         "sz000929",
+        "sz000930",
         "sz000933",
         "sz000951",
         "sz000952",
@@ -2015,8 +2060,10 @@
         "sz002131",
         "sz002134",
         "sz002137",
+        "sz002138",
         "sz002139",
         "sz002140",
+        "sz002141",
         "sz002142",
         "sz002148",
         "sz002151",
@@ -2101,6 +2148,7 @@
         "sz002300",
         "sz002301",
         "sz002302",
+        "sz002303",
         "sz002307",
         "sz002309",
         "sz002310",
@@ -2121,6 +2169,7 @@
         "sz002343",
         "sz002344",
         "sz002347",
+        "sz002349",
         "sz002350",
         "sz002354",
         "sz002355",
@@ -2229,6 +2278,7 @@
         "sz002578",
         "sz002579",
         "sz002583",
+        "sz002585",
         "sz002587",
         "sz002588",
         "sz002589",
@@ -2256,6 +2306,7 @@
         "sz002642",
         "sz002644",
         "sz002646",
+        "sz002648",
         "sz002651",
         "sz002652",
         "sz002657",
@@ -2436,7 +2487,7 @@
         "sz003816"
       ],
       "buy_n": 0,
-      "watch_n": 25,
+      "watch_n": 26,
       "watch": [
         "600398",
         "600116",
@@ -2460,6 +2511,7 @@
         "600255",
         "002242",
         "600706",
+        "601890",
         "600880",
         "000978",
         "600391"
@@ -2484,7 +2536,6 @@
       "top4": "🎯 KHunter 主信号"
     }
   },
-  "_backfilled_0814": true,
   "track": {
     "300009": {
       "entry": "2026-08-21",
@@ -6361,13 +6412,13 @@
       "type": "fund",
       "last": {
         "name": "中金瑞安混合发起A",
-        "px": 1.87,
-        "chg": -0.4,
-        "score": 18.8,
+        "px": 1.86,
+        "chg": -0.81,
+        "score": 16.4,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-09"
+        "date": "2026-09-10"
       }
     },
     "005006": {
@@ -6380,12 +6431,12 @@
       "last": {
         "name": "中金瑞安混合发起C",
         "px": 1.79,
-        "chg": -1.86,
-        "score": 11.3,
+        "chg": -0.81,
+        "score": 16.4,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-02"
+        "date": "2026-09-10"
       }
     },
     "000314": {
@@ -6397,13 +6448,13 @@
       "type": "fund",
       "last": {
         "name": "招商瑞丰灵活配置混合发起式A",
-        "px": 2.3,
-        "chg": 1.95,
-        "score": 52.5,
+        "px": 2.29,
+        "chg": -0.52,
+        "score": 51.5,
         "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-09"
+        "date": "2026-09-10"
       }
     },
     "002017": {
@@ -6415,13 +6466,13 @@
       "type": "fund",
       "last": {
         "name": "东信和平",
-        "px": 1.97,
-        "chg": -0.2,
-        "score": 35.5,
+        "px": 2.17,
+        "chg": -0.5,
+        "score": 51.5,
         "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-10"
       }
     },
     "004355": {
@@ -6433,13 +6484,13 @@
       "type": "fund",
       "last": {
         "name": "嘉实丰和灵活配置混合A",
-        "px": 2.35,
-        "chg": 0.8,
-        "score": 38.9,
+        "px": 2.32,
+        "chg": -1.13,
+        "score": 35.5,
         "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-09"
+        "date": "2026-09-10"
       }
     },
     "002158": {
@@ -6451,13 +6502,13 @@
       "type": "fund",
       "last": {
         "name": "汉钟精机",
-        "px": 1.23,
-        "chg": 0.24,
-        "score": 22.2,
+        "px": 1.22,
+        "chg": -1.38,
+        "score": 17.3,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-09"
+        "date": "2026-09-10"
       }
     },
     "001796": {
@@ -6469,13 +6520,13 @@
       "type": "fund",
       "last": {
         "name": "汇添富安鑫智选混合A",
-        "px": 1.2,
-        "chg": 0.0,
-        "score": 38.9,
-        "tier": "买入",
+        "px": 1.18,
+        "chg": -1.42,
+        "score": 17.2,
+        "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-10"
       }
     },
     "002133": {
@@ -6487,13 +6538,13 @@
       "type": "fund",
       "last": {
         "name": "广宇集团",
-        "px": 3.05,
-        "chg": -0.16,
-        "score": 16.5,
+        "px": 3.02,
+        "chg": -1.05,
+        "score": 11.3,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-09"
+        "date": "2026-09-10"
       }
     },
     "002495": {
@@ -6505,13 +6556,13 @@
       "type": "fund",
       "last": {
         "name": "佳隆股份",
-        "px": 2.04,
-        "chg": -0.73,
-        "score": 35.0,
-        "tier": "买入",
+        "px": 2.0,
+        "chg": -1.87,
+        "score": 24.6,
+        "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-09"
+        "date": "2026-09-10"
       }
     },
     "002496": {
@@ -6523,13 +6574,13 @@
       "type": "fund",
       "last": {
         "name": "辉丰股份",
-        "px": 1.96,
-        "chg": 2.24,
-        "score": 44.4,
-        "tier": "买入",
+        "px": 1.95,
+        "chg": -1.86,
+        "score": 24.5,
+        "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-10"
       }
     },
     "002636": {
@@ -6642,13 +6693,13 @@
       "first_seen": "2026-08-19",
       "last": {
         "name": "中信建投轮换混合A",
-        "px": 3.41,
-        "chg": 0.04,
-        "score": 30.1,
+        "px": 3.4,
+        "chg": -0.25,
+        "score": 30.3,
         "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-09"
+        "date": "2026-09-10"
       }
     },
     "001616": {
@@ -6661,13 +6712,13 @@
       "first_seen": "2026-08-19",
       "last": {
         "name": "嘉实环保低碳股票",
-        "px": 2.7,
-        "chg": -0.18,
-        "score": 13.7,
+        "px": 2.67,
+        "chg": -1.0,
+        "score": 14.8,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-09"
+        "date": "2026-09-10"
       }
     },
     "006568": {
@@ -6680,13 +6731,13 @@
       "first_seen": "2026-08-19",
       "last": {
         "name": "国联安行业领先混合",
-        "px": 2.12,
-        "chg": 0.27,
-        "score": 34.6,
-        "tier": "买入",
+        "px": 2.09,
+        "chg": -1.35,
+        "score": 21.0,
+        "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-09"
+        "date": "2026-09-10"
       }
     },
     "001838": {
@@ -6700,12 +6751,12 @@
       "last": {
         "name": "国投瑞银国家安全混合A",
         "px": 1.26,
-        "chg": 1.52,
-        "score": 55.2,
+        "chg": 0.08,
+        "score": 57.1,
         "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-09"
+        "date": "2026-09-10"
       }
     },
     "003823": {
@@ -6718,13 +6769,13 @@
       "first_seen": "2026-08-19",
       "last": {
         "name": "中信建投轮换混合C",
-        "px": 3.27,
-        "chg": 1.21,
-        "score": 46.9,
+        "px": 3.29,
+        "chg": -0.25,
+        "score": 30.1,
         "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-10"
       }
     },
     "002989": {
@@ -6737,13 +6788,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "中天精装",
-        "px": 1.02,
-        "chg": -0.14,
-        "score": 24.7,
+        "px": 1.01,
+        "chg": -0.85,
+        "score": 20.4,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-09"
+        "date": "2026-09-10"
       }
     },
     "001148": {
@@ -6756,13 +6807,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "申万菱信多策略灵活配置混合A",
-        "px": 2.56,
-        "chg": -0.2,
-        "score": 53.1,
+        "px": 2.59,
+        "chg": -0.35,
+        "score": 40.9,
         "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-10"
       }
     },
     "001724": {
@@ -6775,13 +6826,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "申万菱信多策略灵活配置混合C",
-        "px": 2.47,
-        "chg": -0.2,
-        "score": 53.0,
+        "px": 2.5,
+        "chg": -0.36,
+        "score": 40.9,
         "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-10"
       }
     },
     "001256": {
@@ -6794,13 +6845,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "炜冈科技",
-        "px": 1.53,
-        "chg": 0.83,
-        "score": 43.2,
-        "tier": "买入",
+        "px": 1.5,
+        "chg": -0.85,
+        "score": 19.8,
+        "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-10"
       }
     },
     "002808": {
@@ -6813,13 +6864,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "恒久退",
-        "px": 1.45,
-        "chg": 0.74,
-        "score": 42.8,
-        "tier": "买入",
+        "px": 1.42,
+        "chg": -0.82,
+        "score": 20.0,
+        "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-10"
       }
     },
     "006007": {
@@ -6832,13 +6883,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "诺安积极配置混合A",
-        "px": 1.37,
-        "chg": 0.75,
-        "score": 53.4,
-        "tier": "买入",
+        "px": 1.35,
+        "chg": -0.93,
+        "score": 20.0,
+        "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-10"
       }
     },
     "006008": {
@@ -6851,13 +6902,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "诺安积极配置混合C",
-        "px": 1.31,
-        "chg": 0.75,
-        "score": 53.2,
-        "tier": "买入",
+        "px": 1.28,
+        "chg": -0.93,
+        "score": 20.0,
+        "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-10"
       }
     },
     "005421": {
@@ -6870,13 +6921,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "中欧嘉泽灵活配置混合",
-        "px": 1.85,
-        "chg": 1.38,
-        "score": 47.0,
-        "tier": "买入",
+        "px": 1.82,
+        "chg": -2.01,
+        "score": 19.4,
+        "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-10"
       }
     },
     "000816": {
@@ -7017,11 +7068,11 @@
         "name": "德邦民裕进取量化混合A",
         "px": 1.38,
         "chg": 0.0,
-        "score": 41.3,
+        "score": 42.3,
         "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-10"
       }
     },
     "005948": {
@@ -7035,12 +7086,12 @@
       "last": {
         "name": "德邦民裕进取量化混合C",
         "px": 1.33,
-        "chg": 0.0,
-        "score": 41.2,
+        "chg": -0.01,
+        "score": 42.1,
         "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-10"
       }
     },
     "006608": {
@@ -7053,13 +7104,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "泓德研究优选混合",
-        "px": 1.51,
-        "chg": 1.04,
-        "score": 43.8,
-        "tier": "买入",
+        "px": 1.47,
+        "chg": -1.1,
+        "score": 20.0,
+        "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-10"
       }
     },
     "003719": {
@@ -7129,13 +7180,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "南方大数据300A",
-        "px": 2.05,
-        "chg": 1.84,
-        "score": 64.1,
-        "tier": "强买入",
+        "px": 2.1,
+        "chg": -1.66,
+        "score": 44.0,
+        "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-10"
       }
     },
     "001426": {
@@ -7148,13 +7199,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "南方大数据300C",
-        "px": 1.96,
-        "chg": 1.84,
-        "score": 64.1,
-        "tier": "强买入",
+        "px": 2.01,
+        "chg": -1.67,
+        "score": 43.9,
+        "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-10"
       }
     },
     "003717": {
@@ -7167,13 +7218,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "中银量化精选混合A",
-        "px": 1.19,
-        "chg": 2.04,
-        "score": 63.2,
-        "tier": "强买入",
+        "px": 1.23,
+        "chg": -1.53,
+        "score": 44.4,
+        "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-10"
       }
     },
     "005109": {
@@ -7186,13 +7237,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "汇安多策略混合A",
-        "px": 1.71,
-        "chg": 1.87,
-        "score": 63.0,
-        "tier": "强买入",
+        "px": 1.73,
+        "chg": -1.32,
+        "score": 38.5,
+        "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-10"
       }
     },
     "005110": {
@@ -7205,13 +7256,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "汇安多策略混合C",
-        "px": 1.65,
-        "chg": 1.87,
-        "score": 62.9,
-        "tier": "强买入",
+        "px": 1.67,
+        "chg": -1.33,
+        "score": 38.3,
+        "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-10"
       }
     },
     "001695": {
@@ -7224,13 +7275,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "泓德泓业混合",
-        "px": 1.48,
-        "chg": 1.86,
-        "score": 62.9,
-        "tier": "强买入",
+        "px": 1.37,
+        "chg": -1.58,
+        "score": 0.0,
+        "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-10"
       }
     },
     "001414": {
@@ -7243,13 +7294,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "国联鑫起点混合C",
-        "px": 1.19,
-        "chg": 2.18,
-        "score": 62.5,
-        "tier": "强买入",
+        "px": 1.22,
+        "chg": -1.53,
+        "score": 46.3,
+        "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-08-20"
+        "date": "2026-09-10"
       }
     },
     "002753": {
@@ -8029,5 +8080,54 @@
       "gate_closed": true
     }
   },
-  "track_pending_short": {}
+  "track_pending_short": {
+    "003956": {
+      "entry_candidate": "2026-09-11",
+      "first_seen": "2026-09-11",
+      "pool": "基金",
+      "type": "fund",
+      "last": {
+        "name": "南方产业智选股票A",
+        "px": 2.05,
+        "chg": 0.74,
+        "score": 82.4,
+        "tier": "强买入",
+        "pool": "基金",
+        "type": "fund",
+        "date": "2026-09-11"
+      }
+    },
+    "004879": {
+      "entry_candidate": "2026-09-11",
+      "first_seen": "2026-09-11",
+      "pool": "基金",
+      "type": "fund",
+      "last": {
+        "name": "汇添富全球医疗混合(QDII)美元现钞",
+        "px": 2.63,
+        "chg": 2.21,
+        "score": 82.2,
+        "tier": "强买入",
+        "pool": "基金",
+        "type": "fund",
+        "date": "2026-09-11"
+      }
+    },
+    "004878": {
+      "entry_candidate": "2026-09-11",
+      "first_seen": "2026-09-11",
+      "pool": "基金",
+      "type": "fund",
+      "last": {
+        "name": "汇添富全球医疗混合(QDII)美元现汇",
+        "px": 2.63,
+        "chg": 2.21,
+        "score": 82.2,
+        "tier": "强买入",
+        "pool": "基金",
+        "type": "fund",
+        "date": "2026-09-11"
+      }
+    }
+  }
 }

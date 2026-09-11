@@ -75,6 +75,21 @@ def tail_date(f):
         return None
 
 
+def _repair_amount(df):
+    """2024+ amount<=0 行的成交额兜底（复用 short_engine.fix_amount_units 的 vol×close×自锚定 mult）。
+    2026-09-11 amount 事故修复的一部分：新增行本地无锚点，靠该函数回填。失败时原样返回。"""
+    try:
+        df = df.copy()
+        if "amount" in df.columns:
+            df["amount"] = pd.to_numeric(df["amount"], errors="coerce").fillna(0.0)
+        if "volume" in df.columns:
+            df["volume"] = pd.to_numeric(df["volume"], errors="coerce").fillna(0.0)
+        import short_engine as SH
+        return SH.fix_amount_units(df)
+    except Exception:
+        return df
+
+
 def merge_save(sym, df, name):
     """本地 + 新数据合并去重保存（df 为源返回全量）
 
@@ -82,17 +97,35 @@ def merge_save(sym, df, name):
       原 `drop_duplicates(subset='date', keep='last')` 已等价实现（新数据覆盖同日旧行），
       此处保留原语义不变；更新结果记入 _IDX_PENDING，由 main() 末尾**批量**回写 manifest
       （避免逐只 read+write 整个 manifest 造成 O(n²)）。
+
+    ⚠ 2026-09-11 amount 事故修复（必须保留）：腾讯降级源 `fetch_tx_qfq` 的 row[6] 缺失
+      → amount=0（"腾讯 day 接口不含成交额"），而 concat(keep="last") 会用这些 0 覆盖
+      本地真实成交额 —— 当日 pools_only 命中 410 只池/跟踪标的，把 2024-01-17 起成交额
+      整段打成 0 → v8_factor_cache 重建后 amt20=0 → v9_rank_board 的 `amt20<5e6` 过滤
+      把它们全部剔除 → 选池被静默改写（事故：美盈森 002303 从 v9 中长线池消失）。
+      两道防线：
+        ① 新数据 amount<=0 时沿用本地同日真实值（绝不拿 0 覆盖非 0）；
+        ② 合并后对仍为 0 的 2024+ 行做 vol×close×mult 自锚定兜底。
     """
     f = OUT_DIR / f"{sym}.csv"
     df = df.copy()
     df["date"] = df["date"].astype(str)
     if f.exists():
         old = pd.read_csv(f, dtype={"date": str})
+        if "amount" in old.columns and "amount" in df.columns:
+            _omap = dict(zip(old["date"].astype(str), pd.to_numeric(old["amount"], errors="coerce")))
+            _na = pd.to_numeric(df["amount"], errors="coerce")
+            df["amount"] = [
+                (a if (a == a and a > 0) else _omap.get(d, a))
+                for d, a in zip(df["date"].astype(str), _na)
+            ]
         merged = pd.concat([old, df]).drop_duplicates(subset="date", keep="last")
         merged = merged.sort_values("date").reset_index(drop=True)
+        merged = _repair_amount(merged)
         F.save_csv(sym, merged, name)
         _last, _rows = str(merged["date"].iloc[-1]), len(merged)
     else:
+        df = _repair_amount(df)
         F.save_csv(sym, df, name)
         _last, _rows = str(df["date"].iloc[-1]), len(df)
     _IDX_PENDING.append((sym, _last, _rows))
@@ -163,6 +196,8 @@ def fetch_tx_qfq(sym, retries=3):
                 if d < "2016-01-01":
                     continue
                 vol = float(row[5]) if len(row) > 5 and not isinstance(row[5], dict) else 0
+                # ⚠ 2026-09-11：腾讯 fqkline 的 row[6] 通常是 dict/缺失 → 此处 amount=0。
+                #   绝不可让它覆盖本地真实成交额 —— merge_save 已加两道防线（本地值沿用 + 自锚定兜底）。
                 amt = float(row[6]) if len(row) > 6 and isinstance(row[6], (int, float)) else 0.0
                 out.append({"date": d, "open": float(row[1]), "high": float(row[3]),
                             "low": float(row[4]), "close": float(row[2]),
