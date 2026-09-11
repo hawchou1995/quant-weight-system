@@ -1,13 +1,13 @@
 {
   "strategy": "short_v3_fund_slip20",
-  "params": "T5/H10/S40 · 动量（C类份额；换手减半抗申赎费）",
+  "params": "FB3-H20 牛熊 · 牛动量重Top10/S30 · 熊低波重Top3/S45（C类份额；月度级轮动）",
   "slippage_bps": 5,
   "summary": {
-    "total_return_pct": 243.47,
-    "annual_return_pct": 12.32,
-    "max_drawdown_pct": -26.21,
-    "sharpe": 0.834,
-    "win_rate_pct": 55.5,
-    "total_trades": 598
+    "total_return_pct": 436.44,
+    "annual_return_pct": 17.02,
+    "max_drawdown_pct": -36.06,
+    "sharpe": 1.07,
+    "win_rate_pct": 65.2,
+    "total_trades": 725
   }
 }

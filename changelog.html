@@ -144,6 +144,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 .rel-head{font-size:16px;font-weight:700;color:var(--accent);margin-bottom:8px}
 .rel-body table{width:100%;border-collapse:collapse;margin:8px 0;font-size:13px}
 .rel-body td{border:1px solid var(--border);padding:5px 8px;color:var(--sub)}
+.rel-body code{font-family:ui-monospace,Consolas,monospace;font-size:12px;background:rgba(127,127,127,.12);border:1px solid var(--border);border-radius:5px;padding:1px 5px;color:var(--text);word-break:break-all}
 .rel-body .lg-item{color:var(--sub);font-size:13px;padding:2px 0 2px 14px;position:relative}
 .rel-body .lg-item:before{content:'·';position:absolute;left:2px;color:var(--accent)}
 .rel-body .lg-note{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:8px 12px;color:#f59e0b;font-size:12px;margin:6px 0}
@@ -169,7 +170,34 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <h2 style="margin:0">📝 更新日志 <span class="badge badge-auto">GitHub Release 风格</span></h2>
 </div>
 <div class="sub">量化系统版本更新记录：复盘发现设计缺陷 → 启动系统更新 → 在此登记版本/日期/更新内容</div>
-<div class="rel"><div class="rel-head">v5.13.0 - 2026-09-03（KHunter 生产切换：A 版卖出 RSI>55 主信号 + C 版 RSI>50 参考 + 低价过滤 ≥3 元 · 双版本部署）</div><div class="rel-body">
+<div class="rel"><div class="rel-head">v5.13.1 - 2026-09-11（基金线升级 FB3-H20：持仓周期 10→20 日 · 月度级轮动 · 用户拍板切换生产）</div><div class="rel-body">
+
+<p><b>背景</b>：基金线是全项目唯一过八闸的幸存 edge（基金动量轮动 FB3 牛熊 regime）。9/11 长线化研究（<code>_longfund_0911.py</code> + <code>_longfund_robust_0911.py</code>）证明持仓周期由生产 10 日拉长到 20 日（≈月度再平衡）后收益/夏普/胜率三维占优，用户拍板「基金线也落实掉」→ 正式切换生产。</p>
+
+<p><b>收益对比（3000 池生产口径 · slip 5bps · 2016-01 起）</b></p>
+
+<table>
+<tr><td>口径</td><td>总收益</td><td>年化</td><td>回撤</td><td>夏普</td><td>胜率</td><td>笔数</td><td>年正</td></tr>
+<p>|---|---|---|---|---|---|---|---|</p>
+<tr><td>旧线 T5/H10/S40（退役）</td><td>243.47%</td><td>12.32%</td><td>-26.21%</td><td>0.834</td><td>55.5%</td><td>598</td><td>—</td></tr>
+<tr><td><b>新线 FB3-H20（投产）</b></td><td><b>436.44%</b></td><td><b>17.02%</b></td><td>-36.06%</td><td><b>1.07</b></td><td><b>65.2%</b></td><td><b>725</b></td><td>8/11</td></tr>
+</table>
+
+<div class='lg-item'>收益 <b>+192.97pp（+79%）</b>、夏普 <b>+0.236</b>、胜率 <b>+9.7pp</b>；回撤扩大 9.85pp（-26.21%→-36.06%），但 Calmar 9.29→12.10 <b>仍改善</b></div>
+<div class='lg-item'>同池同结构 4 线对照（<code>_fb3h20_verify_3000.py</code> → <code>out/fb3h20_verify_3000.json</code>）：FB3-H10 390.61%/1.035 vs <b>FB3-H20 436.44%/1.07</b>（H20 占优）；T5/S40-H20 对照 283.98%/0.822 → 牛熊 regime 结构贡献 > 单纯拉长持仓</div>
+<div class='lg-item'>⚠ 独立复现校验：<code>_fb3h20_verify_3000.py</code> 与 <code>finalize_short_v3.py</code> 的 H20 结果<b>逐位一致</b>（436.44%/17.02%/-36.06%/1.07/65.2%/725 笔）</div>
+
+<p><b>改动</b></p>
+
+<div class='lg-item'>finalize_short_v3.py：基金段由 <code>run_short</code>（BEST["fund"] T5/H10/S40 动量）改为 <code>run_short_regime</code> 牛熊双轨——牛=动量重(40,0,30,30) S30 Top10 / 熊=低波重(25,0,30,45) S45 Top3、<code>allow_bear_buy=True</code>（熊市防守开仓）、hold_days=20；池 <code>load_fund_pool(3000)</code> 不变（新旧线同池，apples-to-apples）</div>
+<div class='lg-item'>build_dual_system.py / build_log_pages.py / review_daily.py：基金回测基准胜率 55.5 → <b>65.2</b>（三处同源）</div>
+<div class='lg-item'>build_short_pool.py：生产选池逻辑 9/1 起即为 FB3 牛熊（S30 Top10 / S45 Top3），本次无需改动；注释补 H20 投产记录</div>
+
+<p><b>证据</b>：<code>short_v3_fund_slip20_summary.json</code>（436.44%）+ <code>short_v3_fund_slip20_equity.csv</code>（看板曲线）；4 线对照 <code>backtest/_tmp_0909_oss_research/out/fb3h20_verify_3000.json</code>；旧线备份 <code>_backup_fund_line_0911/</code></p>
+
+<p><b>披露</b>：回撤 -26.21%→-36.06%（月度轮动持有期暴露更长）；2000 池研究值（733.38%/夏普 1.316）与 3000 池生产值差异为池口径差异（生产池更宽且含 C 类份额全量）</p>
+
+</div></div><div class="rel"><div class="rel-head">v5.13.0 - 2026-09-03（KHunter 生产切换：A 版卖出 RSI>55 主信号 + C 版 RSI>50 参考 + 低价过滤 ≥3 元 · 双版本部署）</div><div class="rel-body">
 
 <div class='lg-note'>📌 <b>术语说明（2026-09-04 统一）</b>：A 版 = 标准版（主卖出，熊 55/牛 75）；C 版 = 激进版（参考卖出 RSI>50）。本历史条目保留当时「A/C」原始记法。</div>
 
@@ -183,7 +211,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class='lg-item'>build_dual_system.py：KHunter 徽章双版本（A55 卖 X/C50 卖 Y）；短线回测参考纯主板卡改接 9 格网格（A 版主卡 + C 版参考卡，资金池 N5 回撤/年化/夏普上卡），B 版不入卡；副标题口径 2026-09-03</div>
 <div class='lg-item'>模拟盘双轨：khunter_paper_20260903.py 多轨化（--state/--rsi-sell/--low），A 轨（RSI_SELL=55）+ C 轨（RSI_SELL=50）各 ¥10 万前向对决，验证后定稿单一生产卖出阈值</div>
 
-<p><b>证据</b>：9 格全指标 `backtest/khunter_timing_out/khunter_three_ver_opt_20260903.csv`；补丁文档 `backtest/khunter_prod_switch_20260903.md`（修订版）</p>
+<p><b>证据</b>：9 格全指标 <code>backtest/khunter_timing_out/khunter_three_ver_opt_20260903.csv</code>；补丁文档 <code>backtest/khunter_prod_switch_20260903.md</code>（修订版）</p>
 
 </div></div><div class="rel"><div class="rel-head">复盘登记 - 2026-08-21（无版本变更 · 门控关·仅参考口径 · 数据修正版）</div><div class="rel-body">
 
@@ -212,17 +240,17 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <p><b>改动</b></p>
 <div class='lg-item'>固定池 watchlist 17→<b>15 只</b>：移除 600498 烽火通信【已清仓】/ 600183 生益科技；沪电 002463 note=「持仓已减半（减至半仓）」、风华 000636 note=「仅一手持仓·先观望」。Obsidian 知识库权威源 + 本地 watchlist.json + GitHub MAIN_CODES 三处同步。</div>
 <div class='lg-item'><b>市况门控改「仅提醒」</b>（用户拍板）：门控不满足（短线<MA20、中长线<MA200）不再清空短线股票池，权重分≥50 照常入池展示（供参考、非买入指令）；标题徽章「⚠ 关·仅提醒」、行级「仅提醒·非买入」；跟踪池保守口径保留（不开新仓·仅跟踪）。</div>
-<div class='lg-item'>代码：build_short_pool.py（去 `_in_mkt` 清空分支，股票 details 打 gate_closed）＋ build_dual_system.py（徽章/副标题/行动作列文案）。</div>
+<div class='lg-item'>代码：build_short_pool.py（去 <code>_in_mkt</code> 清空分支，股票 details 打 gate_closed）＋ build_dual_system.py（徽章/副标题/行动作列文案）。</div>
 
 </div></div><div class="rel"><div class="rel-head">v5.11.15 - 2026-08-18（A80_M80 Aroon 强趋势过滤替换中长线评分 · 全量池+固定池）</div><div class="rel-body">
 
 <p><b>背景</b>：海川智能 8 连阳末端追高 -9.05% 暴露"表面动量高、趋势确认弱"的追高盲区。两轮回测（穷举 116 组 + 状态自适应/两方向 OOS）证明 <b>A80_M80</b>（aroon_osc<80 且 mom_12_1>0.8 → 总分×0.6）是唯一全样本 +1125%（基线 +191.9%）/ 回撤 -15.6%（-22.3%）/ 夏普 1.368（0.669）/ OOS 2/3 段双升的最优档（用户拍板：疯牛百年难遇，用平时大收益替换旧模型）。</p>
 
 <p><b>改动</b></p>
-<div class='lg-item'>`v8_selector.py`：新增 `score_row_v2(aroon_th=80, mom_th=0.8, fac=0.6)`——原四因子分 + Aroon 高位抑制（与回测 A80_M80 精确同口径）；`score_row` 保留供历史回测脚本使用</div>
-<div class='lg-item'>`build_enhanced_data.py`：v9_rank_board 选池 + details 实时/前值分 + 因子历史全部改用 `score_row_v2`（v9 普适池 + v8 个人池统一生效）</div>
-<div class='lg-item'>`review_daily.py`：全量池中/长线 + 固定池中/长线信号评分改用 `score_row_v2`（短线池 calc_signals 不受影响）</div>
-<div class='lg-item'>盘中 `update_intraday_dashboard.py` 不重算分（仅 patch 行情）→ 无需改，不会覆盖新口径</div>
+<div class='lg-item'><code>v8_selector.py</code>：新增 <code>score_row_v2(aroon_th=80, mom_th=0.8, fac=0.6)</code>——原四因子分 + Aroon 高位抑制（与回测 A80_M80 精确同口径）；<code>score_row</code> 保留供历史回测脚本使用</div>
+<div class='lg-item'><code>build_enhanced_data.py</code>：v9_rank_board 选池 + details 实时/前值分 + 因子历史全部改用 <code>score_row_v2</code>（v9 普适池 + v8 个人池统一生效）</div>
+<div class='lg-item'><code>review_daily.py</code>：全量池中/长线 + 固定池中/长线信号评分改用 <code>score_row_v2</code>（短线池 calc_signals 不受影响）</div>
+<div class='lg-item'>盘中 <code>update_intraday_dashboard.py</code> 不重算分（仅 patch 行情）→ 无需改，不会覆盖新口径</div>
 <div class='lg-item'>重建 enhanced_data.js + dual_system.html，已部署 gh-pages（1e5d393）</div>
 
 <p><b>效果（08-18 收盘口径）</b>：v9 选池大换血（旧 30 只中 26 只被趋势确认更强的标的替换），追高型高动量低 Aroon 标的被压分过滤</p>
@@ -234,7 +262,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <p><b>复盘引擎修复（review_daily.py，复盘缺陷驱动）</b></p>
 <div class='lg-item'>① 累计总览置顶：从"插在缺陷检测前"改为<b>文档顶部独立区块</b>（用户要求"顶部独立显示"）</div>
 <div class='lg-item'>② flat 计数修复：短线子池 flat 原硬编码 0 → 计真实持平（基金 T+1 净值未出的⚪持平不再计🔴被套）</div>
-<div class='lg-item'>③ 解析表隔离：累计总览置顶后 `parse_pool_rows` 误把累计表当当日表重复累加（自乘缺陷）→ 只认「| 池 | 标的 |」当日总览表</div>
+<div class='lg-item'>③ 解析表隔离：累计总览置顶后 <code>parse_pool_rows</code> 误把累计表当当日表重复累加（自乘缺陷）→ 只认「| 池 | 标的 |」当日总览表</div>
 <div class='lg-item'>④ 清理 n=0 空表存档（信号日=计算日 T+1 未到的空占位不再污染索引/累计）</div>
 <div class='lg-item'>⑤ 因子缓存重建：v8_factor_cache.pkl 停更致 08-18 复盘 T+1 无数据全跳过 → 删除重建（含 08-18）</div>
 <div class='lg-item'>补 08-18 独立复盘：信号 08-17 → 计算 08-18，69 只明细/买入 62/胜率 37%/缺陷 2（固定池信号失效预警 + 海川智能 -9.05% 深套）</div>
@@ -243,7 +271,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class='lg-item'>去 东山精密 002384 / 兆易创新 603986 / 工业富联 601138；双源（Obsidian+本地）统一 20 只（16 股 + 4 基金）；旧池 300502/300308/300476/002474 移除、补 002820/002971/603629</div>
 
 <p><b>短线池行业补全（用户反馈"综合太多"）</b></p>
-<div class='lg-item'>build_short_pool.py `STK_IND` 增 11 只（Wind 主营档案/申万一级验证）：辉隆=农林牧渔/东航物流=交通运输/太平洋=非银金融/贵航东风鹏翎=汽车/武控宇通=环保/华测=社会服务/苏垦步长=农林牧渔&医药生物；重建后短线池股票行业 <b>0 个「综合」</b></div>
+<div class='lg-item'>build_short_pool.py <code>STK_IND</code> 增 11 只（Wind 主营档案/申万一级验证）：辉隆=农林牧渔/东航物流=交通运输/太平洋=非银金融/贵航东风鹏翎=汽车/武控宇通=环保/华测=社会服务/苏垦步长=农林牧渔&医药生物；重建后短线池股票行业 <b>0 个「综合」</b></div>
 <div class='lg-item'>验证：local + 线上 gh-pages 双重确认</div>
 
 </div></div><div class="rel"><div class="rel-head">功能升级 - 2026-08-17（用户需求，无版本变更）</div><div class="rel-body">
@@ -372,12 +400,12 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <p><b>日志去重修复（用户反馈驱动）</b></p>
 <div class='lg-item'>修复：复盘日志出现多个相同日期条目——review_daily.py 每次重跑都向索引 insert 同 file 记录（重跑调试多次→3 条重复）；改为写索引前先按 file 替换（同日期复盘重跑自动覆盖），build_dual_system 渲染再加一层同 file 去重</div>
 <div class='lg-item'>修复：更新日志出现重复版本号——changelog.md 头部写入重复执行（v5.11.2/v5.11.3 各 2 段）；已清理重复段（20 个版本各一），解析层加同版本号去重兜底</div>
-<div class='lg-item'>修复：md_to_html 未转义内容中的 < >（changelog 里 `原生 <details>` 文本变成真实标签破坏 HTML 结构）——inline 先转义 & < > 再包粗体/代码标签</div>
+<div class='lg-item'>修复：md_to_html 未转义内容中的 < >（changelog 里 <code>原生 <details></code> 文本变成真实标签破坏 HTML 结构）——inline 先转义 & < > 再包粗体/代码标签</div>
 
 </div></div><div class="rel"><div class="rel-head">v5.11.3 - 2026-08-16</div><div class="rel-body">
 
 <p><b>日志折叠 + 权限中文（用户反馈驱动）</b></p>
-<div class='lg-item'>复盘日志按日期折叠：每篇一个原生 `<details>` 折叠面板（summary=日期/信号日/只数/胜率/缺陷），最新一篇默认展开、其余折叠；删除旧 JS 展开逻辑（openRev/REV_DETAILS）</div>
+<div class='lg-item'>复盘日志按日期折叠：每篇一个原生 <code><details></code> 折叠面板（summary=日期/信号日/只数/胜率/缺陷），最新一篇默认展开、其余折叠；删除旧 JS 展开逻辑（openRev/REV_DETAILS）</div>
 <div class='lg-item'>更新日志按版本折叠：每个版本一个折叠面板（summary=版本号+日期徽章），最新版本默认展开；18 个版本不再全部平铺</div>
 <div class='lg-item'>复盘权限列改板块中文名：main→主板 / gem→创业板 / star→科创板 / etf→ETF / fund→基金（与三个监控池统一口径）</div>
 
