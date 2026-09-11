@@ -1,1 +1,1 @@
-window.SNAPSHOTS = {"snapshots": [{"date": "2026-09-09", "file": "20260909_dual.html", "count": "34+0", "dual": true}], "months": [{"month": "2026-09", "items": [{"date": "2026-09-09", "file": "20260909_dual.html", "count": "34+0", "dual": true}]}]};
+window.SNAPSHOTS = {"snapshots": [{"date": "2026-09-11", "file": "20260911_dual.html", "count": "14+0", "dual": true}], "months": [{"month": "2026-09", "items": [{"date": "2026-09-11", "file": "20260911_dual.html", "count": "14+0", "dual": true}]}]};
