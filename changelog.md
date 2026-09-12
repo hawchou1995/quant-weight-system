@@ -1,3 +1,24 @@
+## v5.13.2 - 2026-09-12（数据层：volume 全库单位修复收口 · 263,837 行 ×100 + 源头 6 补丁防复发）
+
+**背景**：2026-08-31 起腾讯系降级源（腾讯 fqkline / westock / TickFlow 路径）写入 data_full 时 volume 缺 ×100（手口径），叠加 2024-01 起 321 只文件历史同类问题（TickFlow 逐行核验铁证），叠加个别个股 close 基期错位（见遗留项）。9/12 用户批准后完成全库修复。
+
+**修复（存量）**
+- `_fixvol2_apply_0912.py --apply`：**263,837 行 / 6,589 文件 vol×100**；by src = {dry 57,526 / dry+tfvA 693 / dry+tfvB 4,387 / tfvA 195,486 / cen+tfvA 5,745}；内建复检（amt>0 须 r∈[0.5,1.5]）**verify_fail=0**；备份 `_backup_volunit_0912b`（6,589 文件；close/amount 逐字节不变，仅 vol 列变更已核验）
+- 不修清单（证据不足保守保留）：small_vol 441（vol<1000 低量 ETF/BSE 行）+ cen_amt1 17 + L_verify_out 3 + sh600607 1993 行 1 + ETF 边界 11 行（r≈200 非标准签名）
+
+**源头 6 补丁（防复发）**：update_daily.fetch_tx_qfq / fetch_full_universe.fetch_tx_delist / fetch_close_westock.merge_sym / fetch_etf_qfq.save / short_engine.fix_amount_units（无锚点回退改防 100× 虚增）/ retry_hist_tx_0821 → 单元验证 6/6 PASS（`D:\Tools\tmp\srcpatch_verify.txt`）
+
+**apply 后复验**
+- `_postfix_verify_0912.py`：TF 抽样 12/12 OK（本地 vol/TF vol 中位比 ≈98.5–111.1 ≈ ×100 股东口径）
+- `_residual_probe_0912.py` 分层：**A股（策略池）recent(≥2026-08-01)/ge2024/last40 的 L 残余 = 0**；全库 L 残 4,197 行 = ETF/BSE 复核行 + 2016-2018 旧上市段怪值（10 文件）
+- `_residual_probe5_0912.py`（19 只 M 残留终审）：**4 只复权断层假跳变**（600733/000509/000670 @2026-08-31，+245.6%/+244.6%/+203.0%；600165 @2025-12-11，+161.4%）+ 其余 15 只序列连续（复权字段差，非断裂）
+
+**遗留项（待批准）**：① 4 只断裂文件 + 19 只全序列重取复核；② A股 r∈(1.5,3) 检测盲区 → 专项审计
+
+**研究登记**：均线斜率加速度命题（320 配置全网格 + 离场网格 + placebo 100 seeds）→ 零候选否决（证据 `D:\Tools\tmp\slope_scan_*.csv`）
+
+**披露**：策略逻辑零变更、修复只影响 vol 列；依赖 amount 的指标（amt20 等）未受污染；周一管道起带源头补丁写入，不再复发
+
 ## v5.13.1 - 2026-09-11（基金线升级 FB3-H20：持仓周期 10→20 日 · 月度级轮动 · 用户拍板切换生产）
 
 **背景**：基金线是全项目唯一过八闸的幸存 edge（基金动量轮动 FB3 牛熊 regime）。9/11 长线化研究（`_longfund_0911.py` + `_longfund_robust_0911.py`）证明持仓周期由生产 10 日拉长到 20 日（≈月度再平衡）后收益/夏普/胜率三维占优，用户拍板「基金线也落实掉」→ 正式切换生产。
