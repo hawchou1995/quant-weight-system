@@ -170,7 +170,43 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <h2 style="margin:0">📝 更新日志 <span class="badge badge-auto">GitHub Release 风格</span></h2>
 </div>
 <div class="sub">量化系统版本更新记录：复盘发现设计缺陷 → 启动系统更新 → 在此登记版本/日期/更新内容</div>
-<div class="rel"><div class="rel-head">v5.13.1 - 2026-09-11（基金线升级 FB3-H20：持仓周期 10→20 日 · 月度级轮动 · 用户拍板切换生产）</div><div class="rel-body">
+<div class="rel"><div class="rel-head">v5.13.3 - 2026-09-13（基金线生产池 3000 → 2000 · 用户拍板「用 2000 池 700%+ 那个」）</div><div class="rel-body">
+
+<p><b>依据（2000 池 vs 3000 池，slip 5bps 生产口径 · 2016-01 起）</b></p>
+
+<table>
+<tr><td>口径</td><td>总收益</td><td>年化</td><td>回撤</td><td>夏普</td><td>胜率</td><td>笔数</td></tr>
+<p>|---|---|---|---|---|---|---|</p>
+<tr><td><b>2000 池（新生产）</b></td><td><b>733.38%</b></td><td><b>21.95%</b></td><td><b>-27.03%</b></td><td><b>1.316</b></td><td><b>68.0%</b></td><td>741</td></tr>
+<tr><td>3000 池（旧生产，退役）</td><td>436.44%</td><td>17.02%</td><td>-36.06%</td><td>1.07</td><td>65.2%</td><td>725</td></tr>
+</table>
+
+<p>2000 池三维全面占优（收益 +296.94pp / 夏普 +0.246 / 回撤浅 9.03pp）；与 0911 研究期口径（_longfund_0911.py 733.38%/1.316）<b>分毫不差复现</b>，另理想口径（slip0）825.34%/23.15%/1.377。</p>
+
+<p><b>落盘</b>：<code>finalize_short_v3.py</code> load_fund_pool(3000→2000)；<code>short_v3_fund_summary.json</code> / <code>short_v3_fund_slip20_summary.json</code> + equity 重生成；<code>build_dual_system.py</code> 重建看板；部署 gh-pages HTTP 端到端 PASS。口径声明：基金 NAV 动量无个股前视问题（ADR-0007 信息集审计通过）。</p>
+
+</div></div><div class="rel"><div class="rel-head">v5.13.2 - 2026-09-12（数据层：volume 全库单位修复收口 · 263,837 行 ×100 + 源头 6 补丁防复发）</div><div class="rel-body">
+
+<p><b>背景</b>：2026-08-31 起腾讯系降级源（腾讯 fqkline / westock / TickFlow 路径）写入 data_full 时 volume 缺 ×100（手口径），叠加 2024-01 起 321 只文件历史同类问题（TickFlow 逐行核验铁证），叠加个别个股 close 基期错位（见遗留项）。9/12 用户批准后完成全库修复。</p>
+
+<p><b>修复（存量）</b></p>
+<div class='lg-item'><code>_fixvol2_apply_0912.py --apply</code>：<b>263,837 行 / 6,589 文件 vol×100</b>；by src = {dry 57,526 / dry+tfvA 693 / dry+tfvB 4,387 / tfvA 195,486 / cen+tfvA 5,745}；内建复检（amt>0 须 r∈[0.5,1.5]）<b>verify_fail=0</b>；备份 <code>_backup_volunit_0912b</code>（6,589 文件；close/amount 逐字节不变，仅 vol 列变更已核验）</div>
+<div class='lg-item'>不修清单（证据不足保守保留）：small_vol 441（vol<1000 低量 ETF/BSE 行）+ cen_amt1 17 + L_verify_out 3 + sh600607 1993 行 1 + ETF 边界 11 行（r≈200 非标准签名）</div>
+
+<p><b>源头 6 补丁（防复发）</b>：update_daily.fetch_tx_qfq / fetch_full_universe.fetch_tx_delist / fetch_close_westock.merge_sym / fetch_etf_qfq.save / short_engine.fix_amount_units（无锚点回退改防 100× 虚增）/ retry_hist_tx_0821 → 单元验证 6/6 PASS（<code>D:\Tools\tmp\srcpatch_verify.txt</code>）</p>
+
+<p><b>apply 后复验</b></p>
+<div class='lg-item'><code>_postfix_verify_0912.py</code>：TF 抽样 12/12 OK（本地 vol/TF vol 中位比 ≈98.5–111.1 ≈ ×100 股东口径）</div>
+<div class='lg-item'><code>_residual_probe_0912.py</code> 分层：<b>A股（策略池）recent(≥2026-08-01)/ge2024/last40 的 L 残余 = 0</b>；全库 L 残 4,197 行 = ETF/BSE 复核行 + 2016-2018 旧上市段怪值（10 文件）</div>
+<div class='lg-item'><code>_residual_probe5_0912.py</code>（19 只 M 残留终审）：<b>4 只复权断层假跳变</b>（600733/000509/000670 @2026-08-31，+245.6%/+244.6%/+203.0%；600165 @2025-12-11，+161.4%）+ 其余 15 只序列连续（复权字段差，非断裂）</div>
+
+<p><b>遗留项（待批准）</b>：① 4 只断裂文件 + 19 只全序列重取复核；② A股 r∈(1.5,3) 检测盲区 → 专项审计</p>
+
+<p><b>研究登记</b>：均线斜率加速度命题（320 配置全网格 + 离场网格 + placebo 100 seeds）→ 零候选否决（证据 <code>D:\Tools\tmp\slope_scan_*.csv</code>）</p>
+
+<p><b>披露</b>：策略逻辑零变更、修复只影响 vol 列；依赖 amount 的指标（amt20 等）未受污染；周一管道起带源头补丁写入，不再复发</p>
+
+</div></div><div class="rel"><div class="rel-head">v5.13.1 - 2026-09-11（基金线升级 FB3-H20：持仓周期 10→20 日 · 月度级轮动 · 用户拍板切换生产）</div><div class="rel-body">
 
 <p><b>背景</b>：基金线是全项目唯一过八闸的幸存 edge（基金动量轮动 FB3 牛熊 regime）。9/11 长线化研究（<code>_longfund_0911.py</code> + <code>_longfund_robust_0911.py</code>）证明持仓周期由生产 10 日拉长到 20 日（≈月度再平衡）后收益/夏普/胜率三维占优，用户拍板「基金线也落实掉」→ 正式切换生产。</p>
 
