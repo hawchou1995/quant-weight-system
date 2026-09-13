@@ -1279,6 +1279,34 @@ KH_SNAP_JS = json.dumps(KH_SNAP, ensure_ascii=False, separators=(",", ":"))
 KH_PAPER_CARD = _kh_paper_card()
 
 # 全量池中/长线年跟踪池（2026-08-17 用户需求：上榜跟踪 1 年，再上榜 +1 年；track_v9 由 build_enhanced_data.py 维护）
+# 双卫星目标持仓卡（2026-09-13：三轨拍板后并入 sys-auto 视图；数据由 backtest/build_satellite_pool.py 生成）
+try:
+    _sat = json.load(open(BASE / "backtest" / "satellite_pool.json", encoding="utf-8"))
+
+    def _sat_rows(track):
+        tr = _sat[track]
+        tds = "".join(
+            f'<tr><td><code>{r["code"]}</code></td><td class="num">{r["close"]:.2f}</td>'
+            f'<td class="num">{r["lot"]:,} 元</td>'
+            + ('<td class="num" style="color:#d97706">涨停勿追</td>' if r.get("limit_guard") else '<td class="num">—</td>')
+            + "</tr>"
+            for r in tr["rows"])
+        bt = tr["bt"]
+        nr = tr.get("next_rebal_in_days")
+        cal_note = f" · 距下次调仓约 {nr} 交易日" if nr is not None else f" · {tr.get('next_rebal', '')}"
+        return (f'<div class="sub" style="margin:6px 0"><b>{tr["name"]}</b> · 调仓：{tr["rebal"]}{cal_note}'
+                f'｜回测 +{bt["total"]}%/年化 +{bt["ann"]}%/回撤 {bt["mdd"]}%/夏普 {bt["sharpe"]}</div>'
+                f'<div class="sub" style="color:var(--faint)">{bt["note"]}</div>'
+                f'<div class="tbl-wrap"><table class="tbl"><thead><tr><th>代码</th><th>收盘</th><th>一手约</th><th>守卫</th></tr></thead><tbody>{tds}</tbody></table></div>')
+
+    SAT_CARD = (f'<div class="card" id="sat-card">\n'
+                f'<h2>🛰️ 双卫星目标持仓 <span class="badge badge-auto">三轨 60/20/20 · 数据截至 {_sat["asof"]}（收盘）</span></h2>\n'
+                f'<div class="sub">信号生成：<code>backtest/signal_satellite_0913.py</code>（每日收盘跑 → T+1 开盘清单）· 资金占比 20%+20%（FB3-H20 主仓 60%）· 目标持仓为<b>下次调仓的完整清单</b>（非增量）</div>\n'
+                f'{_sat_rows("track_a")}\n{_sat_rows("track_b")}\n</div>')
+except Exception as _e:
+    SAT_CARD = (f'<div class="card" id="sat-card"><h2>🛰️ 双卫星目标持仓</h2>'
+                f'<div class="sub">satellite_pool.json 未生成 —— 先运行 <code>python backtest/build_satellite_pool.py</code>（{_e}）</div></div>')
+
 WATCH_V9_CARD = f'''<div class="card" id="watch-v9-card">
 <h2>📌 全量池中/长线跟踪 <span class="badge badge-auto">上榜跟踪 · 清仓信号后 21 交易日剔除</span> </h2>
 <div class="sub">上方全量池表<b>上榜标的</b>（v9_tiers：main/gem/star/fund）上榜次日收盘确认后自动加入跟踪；<b>2026-08-18 起新上榜先入「待确认」隔日入池</b>（隔离当日收盘信号）；每次重新上榜刷新【入池/跟踪/出池】时间 · <b>清仓信号</b>（连续 5 日掉榜 / 权重分跌破 50）后 <b>21 交易日倒计时</b>剔除出池，倒计时中重新上榜即解除 · 数据截至 {DATA["meta"].get("as_of", "—")}（收盘）</div>
@@ -1650,7 +1678,7 @@ html = f"""<!doctype html>
   "🅰️ 全量池中/长线", "auto", "全市场自动池 · 股票分层+基金",
   v9_items, "tbl-v9", "card-tbl-v9",
   "档位变化对比上次再平衡（07-23）· 建议动作 = 当前档位下的操作指引 · 回测参考在监控总览视图",
-  extra_card=WATCH_V9_CARD,
+  extra_card=WATCH_V9_CARD + SAT_CARD,
   head_tags=[LT_GATE_BADGE, POOL_REBAL_BADGE,
              '<span class="badge badge-auto">评分 = Aroon强趋势过滤(A80_M78)</span>',
              '<span class="badge badge-auto">筛池 = 全市场绝对规则 Top3 等权 · 月轮动</span>',

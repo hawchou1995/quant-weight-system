@@ -1,0 +1,201 @@
+{
+ "asof": "2026-09-11",
+ "track_a": {
+  "name": "冷门低波 ln_amt20+atr20 Top10",
+  "rebal": "每 60 个交易日",
+  "next_rebal_in_days": 55,
+  "bt": {
+   "total": 127.4,
+   "ann": 16.2,
+   "mdd": -18.4,
+   "sharpe": 1.238,
+   "note": "安慰剂500 p=0.0000 · 与FB3相关-0.165 · slip50稳健 · ⚠ atr20 fwd语义待复核"
+  },
+  "rows": [
+   {
+    "code": "600625",
+    "close": 4.8,
+    "lot": 480
+   },
+   {
+    "code": "000730",
+    "close": 4.22,
+    "lot": 422
+   },
+   {
+    "code": "000507",
+    "close": 5.11,
+    "lot": 511
+   },
+   {
+    "code": "600168",
+    "close": 4.41,
+    "lot": 441
+   },
+   {
+    "code": "600840",
+    "close": 23.8,
+    "lot": 2380
+   },
+   {
+    "code": "000866",
+    "close": 11.91,
+    "lot": 1191
+   },
+   {
+    "code": "000881",
+    "close": 6.63,
+    "lot": 663
+   },
+   {
+    "code": "002932",
+    "close": 15.19,
+    "lot": 1519
+   },
+   {
+    "code": "000832",
+    "close": 13.84,
+    "lot": 1384
+   },
+   {
+    "code": "002191",
+    "close": 3.57,
+    "lot": 357
+   }
+  ]
+ },
+ "track_b": {
+  "name": "A4D icir6因子 Top20",
+  "rebal": "月频（次一交易日若为新月首调仓日）",
+  "next_rebal": "每月调仓窗（rebal=20 · offset 0）",
+  "bt": {
+   "total": 114.2,
+   "ann": 15.1,
+   "mdd": -18.3,
+   "sharpe": 1.074,
+   "note": "相位中位1.075 · 安慰剂500 p=0.000 · DSR 0.987 · slip50稳健"
+  },
+  "rows": [
+   {
+    "code": "000507",
+    "close": 5.11,
+    "lot": 511,
+    "limit_guard": false
+   },
+   {
+    "code": "002375",
+    "close": 3.79,
+    "lot": 379,
+    "limit_guard": false
+   },
+   {
+    "code": "001256",
+    "close": 21.08,
+    "lot": 2108,
+    "limit_guard": false
+   },
+   {
+    "code": "000090",
+    "close": 3.46,
+    "lot": 346,
+    "limit_guard": false
+   },
+   {
+    "code": "000726",
+    "close": 5.81,
+    "lot": 581,
+    "limit_guard": false
+   },
+   {
+    "code": "600628",
+    "close": 6.36,
+    "lot": 636,
+    "limit_guard": false
+   },
+   {
+    "code": "002616",
+    "close": 4.91,
+    "lot": 491,
+    "limit_guard": false
+   },
+   {
+    "code": "000910",
+    "close": 5.21,
+    "lot": 521,
+    "limit_guard": false
+   },
+   {
+    "code": "000498",
+    "close": 4.9,
+    "lot": 490,
+    "limit_guard": false
+   },
+   {
+    "code": "600739",
+    "close": 10.43,
+    "lot": 1043,
+    "limit_guard": false
+   },
+   {
+    "code": "601007",
+    "close": 7.0,
+    "lot": 700,
+    "limit_guard": false
+   },
+   {
+    "code": "603357",
+    "close": 5.97,
+    "lot": 597,
+    "limit_guard": false
+   },
+   {
+    "code": "600668",
+    "close": 7.26,
+    "lot": 726,
+    "limit_guard": false
+   },
+   {
+    "code": "603066",
+    "close": 9.2,
+    "lot": 920,
+    "limit_guard": false
+   },
+   {
+    "code": "605266",
+    "close": 15.44,
+    "lot": 1544,
+    "limit_guard": false
+   },
+   {
+    "code": "000900",
+    "close": 3.62,
+    "lot": 362,
+    "limit_guard": false
+   },
+   {
+    "code": "603788",
+    "close": 13.39,
+    "lot": 1339,
+    "limit_guard": false
+   },
+   {
+    "code": "000650",
+    "close": 5.21,
+    "lot": 521,
+    "limit_guard": false
+   },
+   {
+    "code": "603035",
+    "close": 10.32,
+    "lot": 1032,
+    "limit_guard": false
+   },
+   {
+    "code": "603199",
+    "close": 32.61,
+    "lot": 3261,
+    "limit_guard": false
+   }
+  ]
+ }
+}
