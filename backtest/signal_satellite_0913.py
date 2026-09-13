@@ -45,8 +45,8 @@ print(f"数据截至：{LAST_DAY.date()}（收盘）→ 以下操作为次一交
 def signal_ln_atr(hold):
     scores = []
     for code, d in px.items():
-        if len(d) < 80:
-            continue
+        if len(d) < 180 or d.index[-1] != LAST_DAY:
+            continue   # ⚠ 2026-09-13 修复：必须当日有行情（剔除退市死票，与回测口径一致）
         tail = d.tail(70)
         amt20 = tail["amount"].tail(20).mean()
         pc = d["close"].shift(1)

@@ -1333,22 +1333,24 @@ try:
         tr = _sat[track]
         tds = "".join(
             f'<tr><td><code>{r["code"]}</code></td><td>{r.get("name", "")}</td><td>{r.get("industry", "—")}</td><td class="num">{r["close"]:.2f}</td>'
-            f'<td class="num">{r["lot"]:,} 元</td>'
-            + ('<td class="num" style="color:#d97706">涨停勿追</td>' if r.get("limit_guard") else '<td class="num">—</td>')
+            f'<td class="num">{r["lot"]:,} 元</td><td class="num">{r.get("amount", 0):,} 元</td>'
+            f'<td title="{r.get("detail", "")}">{r.get("score_txt", "—")}</td>'
+            f'<td>{r.get("action", "—")}{" ⚠涨停勿追" if r.get("limit_guard") else ""}</td>'
             + "</tr>"
             for r in tr["rows"])
         bt = tr["bt"]
         nr = tr.get("next_rebal_in_days")
         cal_note = f" · 距下次调仓约 {nr} 交易日" if nr is not None else f" · {tr.get('next_rebal', '')}"
-        return (f'<div class="sub" style="margin:6px 0"><b>{tr["name"]}</b> · 调仓：{tr["rebal"]}{cal_note}'
+        return (f'<div class="sub" style="margin:6px 0"><b>{tr["name"]}</b> · {tr.get("ranking", "")}</div>'
+                f'<div class="sub" style="margin:6px 0">调仓：{tr["rebal"]}{cal_note}'
                 f'｜回测 +{bt["total"]}%/年化 +{bt["ann"]}%/回撤 {bt["mdd"]}%/夏普 {bt["sharpe"]}</div>'
                 f'<div class="sub" style="color:var(--faint)">{bt["note"]}</div>'
                 f'<div class="toolbar" id="sat-bar-{track}"><input type="text" class="sat-q" data-t="{track}" placeholder="🔍 搜索代码…" autocomplete="off"><select class="sat-sort" data-t="{track}"><option value="idx">清单序</option><option value="code">代码 ↑</option><option value="lot">一手成本 ↑</option></select><span class="count sat-count" data-t="{track}"></span></div>'
-                f'<div class="tbl-wrap"><table class="tbl sat-tbl" data-t="{track}"><thead><tr><th>代码</th><th>名称</th><th>行业</th><th>收盘</th><th>一手约</th><th>守卫</th></tr></thead><tbody>{tds}</tbody></table></div>')
+                f'<div class="tbl-wrap"><table class="tbl sat-tbl" data-t="{track}"><thead><tr><th>代码</th><th>名称</th><th>行业</th><th>收盘</th><th>一手约</th><th>计划金额</th><th>评分·拆解(悬浮)</th><th>操作</th></tr></thead><tbody>{tds}</tbody></table></div>')
 
     SAT_CARD = (f'<div class="card" id="sat-card">\n'
                 f'<h2>🛰️ 双卫星目标持仓 <span class="badge badge-auto">三轨 60/20/20 · 数据截至 {_sat["asof"]}（收盘）</span></h2>\n'
-                f'<div class="sub">信号生成：<code>backtest/signal_satellite_0913.py</code>（每日收盘跑 → T+1 开盘清单）· 资金占比 20%+20%（FB3-H20 主仓 60%）· 目标持仓为<b>下次调仓的完整清单</b>（非增量）</div>\n'
+                f'<div class="sub">信号生成：<code>backtest/signal_satellite_0913.py</code>（每日收盘跑 → T+1 开盘清单）· 资金占比 20%+20%（FB3-H20 主仓 60%）· 目标持仓为<b>下次调仓的完整清单</b>（非增量）· 评分列悬浮可见拆解 · 操作列=相对模拟盘当前持仓</div>\n'
                 f'{_sat_rows("track_a")}\n{_sat_rows("track_b")}\n</div>')
 except Exception as _e:
     SAT_CARD = (f'<div class="card" id="sat-card"><h2>🛰️ 双卫星目标持仓</h2>'
@@ -1357,16 +1359,24 @@ except Exception as _e:
 _sp_j = json.load(open(BASE / "short_pool.json", encoding="utf-8"))
 _fund_tier = _sp_j.get("tiers", {}).get("基金", []) or _sp_j.get("tiers", {}).get("fund", [])
 _mg = _sp_j.get("market_gate", {})
+_held_c = set()
+try:
+    _hst = json.load(open(BASE / "backtest" / "holdings_satellite.json", encoding="utf-8"))
+    _held_c = set((_hst.get("track_c", {}) or {}).get("holdings", {}).keys())
+except Exception:
+    pass
+_n_f = max(1, len(_fund_tier))
 _fund_rows = ""
 for _c in _fund_tier:
     _d = _sp_j.get("details", {}).get(_c, {})
+    _act = "持有" if _c in _held_c else "申购"
     _fund_rows += (f'<tr><td><code>{_c}</code></td><td>{_d.get("name", "")}</td>'
-                   f'<td class="num">{_d.get("score", "—")}</td><td>{_d.get("pool", "fund")}</td></tr>')
+                   f'<td class="num">{_d.get("score", "—")}</td><td class="num">{100/_n_f:.1f}%</td><td>{_act}</td></tr>')
 _gate_txt = ("🟢 开（股票可买）" if _mg.get("open") else "🟠 关（仅拦股票池；基金轨不受影响——熊市 FB3 照常买入，转 Top3 低波防守仓）") + f' · 沪深300 {_mg.get("idx_close", "—")} vs MA20 {_mg.get("idx_ma20", "—")}'
 FB3_POOL_CARD = (f'<div class="card" id="fb3-pool-card">'
                  f'<h2>🥇 主仓 FB3-H20 基金池 <span class="badge badge-auto">当前 regime 持仓 · 数据截至 {_sp_j.get("as_of", "—")}</span></h2>'
-                 f'<div class="sub">市况门控 {_gate_txt} · 60% 资金 · 牛市 Top10 动量 / 熊市 Top3 低波（C 类份额，T+1 净值申赎）</div>'
-                 f'<div class="tbl-wrap"><table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>动量分</th><th>池</th></tr></thead><tbody>{_fund_rows or "<tr><td colspan=4>空（门控关闭）</td></tr>"}</tbody></table></div></div>')
+                 f'<div class="sub">排序=基金动量分降序 · 市况门控 {_gate_txt} · 60% 资金 · 牛市 Top10 动量 / 熊市 Top3 低波（C 类份额，T+1 净值申赎）· 操作=相对模拟盘当前持仓</div>'
+                 f'<div class="tbl-wrap"><table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>动量分</th><th>权重</th><th>操作</th></tr></thead><tbody>{_fund_rows or "<tr><td colspan=4>空（门控关闭；基金轨熊市照买 Top3）</td></tr>"}</tbody></table></div></div>')
 
 WATCH_V9_CARD = ('<div class="card" id="watch-v9-card"><h2>📌 历史跟踪池（已退役）</h2>'
                  '<div class="sub" style="color:#ef4444">⛔ v9 跟踪池展示已于 2026-09-13 移除（战法退役，十重证伪）。数据文件保留于 enhanced_data.js 供回溯。</div></div>')

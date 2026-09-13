@@ -1,0 +1,128 @@
+{
+ "_prevalence_2022ish": 0.911,
+ "_phase": {
+  "offsets": [
+   0,
+   10,
+   20,
+   30,
+   40,
+   50
+  ],
+  "base": [
+   {
+    "total": 173.7,
+    "ann": 20.17,
+    "mdd": -19.4,
+    "sharpe": 1.335,
+    "n_trades": 99,
+    "avg_pos": 9.4
+   },
+   {
+    "total": 94.3,
+    "ann": 12.89,
+    "mdd": -17.8,
+    "sharpe": 1.046,
+    "n_trades": 92,
+    "avg_pos": 9.3
+   },
+   {
+    "total": 24.3,
+    "ann": 4.05,
+    "mdd": -22.5,
+    "sharpe": 0.353,
+    "n_trades": 96,
+    "avg_pos": 9.4
+   },
+   {
+    "total": 93.9,
+    "ann": 12.84,
+    "mdd": -28.3,
+    "sharpe": 0.957,
+    "n_trades": 96,
+    "avg_pos": 9.5
+   },
+   {
+    "total": 93.7,
+    "ann": 12.83,
+    "mdd": -19.7,
+    "sharpe": 0.817,
+    "n_trades": 82,
+    "avg_pos": 9.2
+   },
+   {
+    "total": 118.7,
+    "ann": 15.35,
+    "mdd": -18.1,
+    "sharpe": 1.103,
+    "n_trades": 86,
+    "avg_pos": 8.6
+   }
+  ],
+  "mbull": [
+   {
+    "total": 198.4,
+    "ann": 22.08,
+    "mdd": -13.7,
+    "sharpe": 1.419,
+    "n_trades": 99,
+    "avg_pos": 9.7
+   },
+   {
+    "total": 151.7,
+    "ann": 18.34,
+    "mdd": -16.8,
+    "sharpe": 1.102,
+    "n_trades": 100,
+    "avg_pos": 9.6
+   },
+   {
+    "total": 72.8,
+    "ann": 10.5,
+    "mdd": -18.0,
+    "sharpe": 0.834,
+    "n_trades": 100,
+    "avg_pos": 9.4
+   },
+   {
+    "total": 66.4,
+    "ann": 9.74,
+    "mdd": -28.1,
+    "sharpe": 0.776,
+    "n_trades": 90,
+    "avg_pos": 9.4
+   },
+   {
+    "total": 58.8,
+    "ann": 8.8,
+    "mdd": -23.4,
+    "sharpe": 0.682,
+    "n_trades": 92,
+    "avg_pos": 9.4
+   },
+   {
+    "total": 174.2,
+    "ann": 20.21,
+    "mdd": -10.6,
+    "sharpe": 1.451,
+    "n_trades": 98,
+    "avg_pos": 9.5
+   }
+  ],
+  "base_med_total": 94.1,
+  "mbull_med_total": 112.2,
+  "base_med_sharpe": 1.002,
+  "mbull_med_sharpe": 0.968
+ },
+ "_placebo": {
+  "n": 100,
+  "sharpe_med": 1.324,
+  "sharpe_p95": 1.5,
+  "total_med": 168.9,
+  "total_p95": 211.4,
+  "target_total": 198.4,
+  "target_sharpe": 1.419,
+  "p_sharpe": 0.15,
+  "p_total": 0.1
+ }
+}

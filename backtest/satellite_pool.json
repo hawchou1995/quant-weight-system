@@ -2,6 +2,7 @@
  "asof": "2026-09-11",
  "track_a": {
   "name": "冷门低波 ln_amt20+atr20 Top10",
+  "ranking": "排序=双低合分降序（低成交额分位+低波动分位各半，0-100）",
   "rebal": "每 60 个交易日",
   "next_rebal_in_days": 55,
   "bt": {
@@ -9,65 +10,136 @@
    "ann": 16.2,
    "mdd": -18.4,
    "sharpe": 1.238,
-   "note": "安慰剂500 p=0.0000 · 与FB3相关-0.165 · slip50稳健 · ⚠ atr20 fwd语义待复核"
+   "note": "安慰剂500 p=0.0000 · 与FB3相关-0.165 · slip50稳健 · fwd段制交叉验证方向一致"
   },
   "rows": [
    {
-    "code": "600625",
-    "close": 4.8,
-    "lot": 480
-   },
-   {
-    "code": "000730",
-    "close": 4.22,
-    "lot": 422
-   },
-   {
     "code": "000507",
+    "name": "珠海港",
+    "industry": "公用事业",
     "close": 5.11,
-    "lot": 511
+    "lot": 511,
+    "score_txt": "98",
+    "score": 98.3,
+    "detail": "额分位99%·波分位98%（双低合分越高越冷门低波）",
+    "amount": 3400,
+    "action": "新建仓"
    },
    {
     "code": "600168",
+    "name": "武汉控股",
+    "industry": "环保",
     "close": 4.41,
-    "lot": 441
-   },
-   {
-    "code": "600840",
-    "close": 23.8,
-    "lot": 2380
-   },
-   {
-    "code": "000866",
-    "close": 11.91,
-    "lot": 1191
+    "lot": 441,
+    "score_txt": "98",
+    "score": 97.8,
+    "detail": "额分位100%·波分位96%（双低合分越高越冷门低波）",
+    "amount": 3400,
+    "action": "新建仓"
    },
    {
     "code": "000881",
+    "name": "中广核技",
+    "industry": "基础化工",
     "close": 6.63,
-    "lot": 663
+    "lot": 663,
+    "score_txt": "97",
+    "score": 97.1,
+    "detail": "额分位99%·波分位95%（双低合分越高越冷门低波）",
+    "amount": 3400,
+    "action": "新建仓"
    },
    {
     "code": "002932",
+    "name": "*ST明德",
+    "industry": "医药生物",
     "close": 15.19,
-    "lot": 1519
-   },
-   {
-    "code": "000832",
-    "close": 13.84,
-    "lot": 1384
+    "lot": 1519,
+    "score_txt": "97",
+    "score": 97.0,
+    "detail": "额分位96%·波分位98%（双低合分越高越冷门低波）",
+    "amount": 3400,
+    "action": "新建仓"
    },
    {
     "code": "002191",
+    "name": "劲嘉股份",
+    "industry": "轻工制造",
     "close": 3.57,
-    "lot": 357
+    "lot": 357,
+    "score_txt": "97",
+    "score": 96.8,
+    "detail": "额分位99%·波分位94%（双低合分越高越冷门低波）",
+    "amount": 3400,
+    "action": "新建仓"
+   },
+   {
+    "code": "000598",
+    "name": "兴蓉环境",
+    "industry": "环保",
+    "close": 7.08,
+    "lot": 708,
+    "score_txt": "97",
+    "score": 96.8,
+    "detail": "额分位97%·波分位96%（双低合分越高越冷门低波）",
+    "amount": 3400,
+    "action": "新建仓"
+   },
+   {
+    "code": "601368",
+    "name": "绿城水务",
+    "industry": "环保",
+    "close": 4.51,
+    "lot": 451,
+    "score_txt": "96",
+    "score": 96.5,
+    "detail": "额分位100%·波分位93%（双低合分越高越冷门低波）",
+    "amount": 3400,
+    "action": "新建仓"
+   },
+   {
+    "code": "600642",
+    "name": "申能股份",
+    "industry": "公用事业",
+    "close": 8.58,
+    "lot": 858,
+    "score_txt": "96",
+    "score": 96.4,
+    "detail": "额分位97%·波分位95%（双低合分越高越冷门低波）",
+    "amount": 3400,
+    "action": "新建仓"
+   },
+   {
+    "code": "601838",
+    "name": "成都银行",
+    "industry": "银行",
+    "close": 20.05,
+    "lot": 2005,
+    "score_txt": "96",
+    "score": 96.4,
+    "detail": "额分位95%·波分位97%（双低合分越高越冷门低波）",
+    "amount": 3400,
+    "action": "新建仓"
+   },
+   {
+    "code": "002926",
+    "name": "华西证券",
+    "industry": "非银金融",
+    "close": 8.26,
+    "lot": 826,
+    "score_txt": "96",
+    "score": 96.1,
+    "detail": "额分位97%·波分位95%（双低合分越高越冷门低波）",
+    "amount": 3400,
+    "action": "新建仓"
    }
   ]
  },
  "track_b": {
   "name": "A4D icir6因子 Top20",
-  "rebal": "月频（次一交易日若为新月首调仓日）",
-  "next_rebal": "每月调仓窗（rebal=20 · offset 0）",
+  "ranking": "排序=icir 加权复合分降序（amount20/size_rev/amp20/ret60/bp/size_ep，权重=ICIR 归一，符号=IC 方向）",
+  "rebal": "月频（rebal=20 · offset 0）",
+  "next_rebal": "每月调仓窗",
   "bt": {
    "total": 114.2,
    "ann": 15.1,
@@ -78,123 +150,296 @@
   "rows": [
    {
     "code": "000507",
+    "name": "珠海港",
+    "industry": "公用事业",
     "close": 5.11,
     "lot": 511,
+    "score_txt": "1.75",
+    "score": 1.75,
+    "detail": "icir复合分（z·权重前三：amount20 +0.84｜bp +0.49｜amp20 +0.24）",
+    "amount": 1700,
+    "action": "新建仓",
     "limit_guard": false
    },
    {
     "code": "002375",
+    "name": "亚厦股份",
+    "industry": "建筑装饰",
     "close": 3.79,
     "lot": 379,
+    "score_txt": "1.55",
+    "score": 1.55,
+    "detail": "icir复合分（z·权重前三：amount20 +0.84｜bp +0.41｜size_ep +0.13）",
+    "amount": 1700,
+    "action": "新建仓",
     "limit_guard": false
    },
    {
     "code": "001256",
+    "name": "炜冈科技",
+    "industry": "机械设备",
     "close": 21.08,
     "lot": 2108,
+    "score_txt": "1.41",
+    "score": 1.41,
+    "detail": "icir复合分（z·权重前三：amount20 +0.83｜size_rev +0.39｜size_ep +0.22）",
+    "amount": 1700,
+    "action": "新建仓",
     "limit_guard": false
    },
    {
     "code": "000090",
+    "name": "天健集团",
+    "industry": "房地产",
     "close": 3.46,
     "lot": 346,
+    "score_txt": "1.40",
+    "score": 1.4,
+    "detail": "icir复合分（z·权重前三：amount20 +0.81｜bp +0.44｜amp20 +0.06）",
+    "amount": 1700,
+    "action": "新建仓",
     "limit_guard": false
    },
    {
     "code": "000726",
+    "name": "鲁 泰Ａ",
+    "industry": "纺织服饰",
     "close": 5.81,
     "lot": 581,
+    "score_txt": "1.38",
+    "score": 1.38,
+    "detail": "icir复合分（z·权重前三：bp +0.50｜amount20 +0.35｜amp20 +0.25）",
+    "amount": 1700,
+    "action": "新建仓",
     "limit_guard": false
    },
    {
     "code": "600628",
+    "name": "XD新世界",
+    "industry": "商贸零售",
     "close": 6.36,
     "lot": 636,
+    "score_txt": "1.37",
+    "score": 1.37,
+    "detail": "icir复合分（z·权重前三：amount20 +0.82｜bp +0.19｜amp20 +0.16）",
+    "amount": 1700,
+    "action": "新建仓",
     "limit_guard": false
    },
    {
     "code": "002616",
+    "name": "长青集团",
+    "industry": "公用事业",
     "close": 4.91,
     "lot": 491,
+    "score_txt": "1.36",
+    "score": 1.36,
+    "detail": "icir复合分（z·权重前三：amount20 +0.81｜amp20 +0.20｜size_ep +0.17）",
+    "amount": 1700,
+    "action": "新建仓",
     "limit_guard": false
    },
    {
     "code": "000910",
+    "name": "大亚圣象",
+    "industry": "轻工制造",
     "close": 5.21,
     "lot": 521,
+    "score_txt": "1.31",
+    "score": 1.31,
+    "detail": "icir复合分（z·权重前三：bp +0.50｜amount20 +0.40｜size_rev +0.19）",
+    "amount": 1700,
+    "action": "新建仓",
     "limit_guard": false
    },
    {
     "code": "000498",
+    "name": "山东路桥",
+    "industry": "建筑装饰",
     "close": 4.9,
     "lot": 490,
+    "score_txt": "1.30",
+    "score": 1.3,
+    "detail": "icir复合分（z·权重前三：bp +0.50｜amp20 +0.26｜amount20 +0.25）",
+    "amount": 1700,
+    "action": "新建仓",
     "limit_guard": false
    },
    {
     "code": "600739",
+    "name": "辽宁成大",
+    "industry": "医药生物",
     "close": 10.43,
     "lot": 1043,
+    "score_txt": "1.28",
+    "score": 1.28,
+    "detail": "icir复合分（z·权重前三：amount20 +0.61｜bp +0.50｜amp20 +0.19）",
+    "amount": 1700,
+    "action": "新建仓",
     "limit_guard": false
    },
    {
     "code": "601007",
+    "name": "金陵饭店",
+    "industry": "社会服务",
     "close": 7.0,
     "lot": 700,
+    "score_txt": "1.26",
+    "score": 1.26,
+    "detail": "icir复合分（z·权重前三：amount20 +0.82｜size_ep +0.18｜amp20 +0.13）",
+    "amount": 1700,
+    "action": "新建仓",
     "limit_guard": false
    },
    {
     "code": "603357",
+    "name": "设计总院",
+    "industry": "建筑装饰",
     "close": 5.97,
     "lot": 597,
+    "score_txt": "1.25",
+    "score": 1.25,
+    "detail": "icir复合分（z·权重前三：amount20 +0.44｜amp20 +0.25｜bp +0.23）",
+    "amount": 1700,
+    "action": "新建仓",
     "limit_guard": false
    },
    {
     "code": "600668",
+    "name": "尖峰集团",
+    "industry": "建筑材料",
     "close": 7.26,
     "lot": 726,
+    "score_txt": "1.24",
+    "score": 1.24,
+    "detail": "icir复合分（z·权重前三：bp +0.48｜amount20 +0.31｜size_rev +0.19）",
+    "amount": 1700,
+    "action": "新建仓",
     "limit_guard": false
    },
    {
     "code": "603066",
+    "name": "音飞储存",
+    "industry": "交通运输",
     "close": 9.2,
     "lot": 920,
+    "score_txt": "1.23",
+    "score": 1.23,
+    "detail": "icir复合分（z·权重前三：amount20 +0.73｜size_ep +0.20｜size_rev +0.16）",
+    "amount": 1700,
+    "action": "新建仓",
     "limit_guard": false
    },
    {
     "code": "605266",
+    "name": "健之佳",
+    "industry": "医药生物",
     "close": 15.44,
     "lot": 1544,
+    "score_txt": "1.20",
+    "score": 1.2,
+    "detail": "icir复合分（z·权重前三：amount20 +0.35｜size_rev +0.28｜size_ep +0.23）",
+    "amount": 1700,
+    "action": "新建仓",
     "limit_guard": false
    },
    {
     "code": "000900",
+    "name": "现代投资",
+    "industry": "交通运输",
     "close": 3.62,
     "lot": 362,
+    "score_txt": "1.20",
+    "score": 1.2,
+    "detail": "icir复合分（z·权重前三：bp +0.50｜amount20 +0.25｜amp20 +0.24）",
+    "amount": 1700,
+    "action": "新建仓",
     "limit_guard": false
    },
    {
     "code": "603788",
+    "name": "宁波高发",
+    "industry": "汽车",
     "close": 13.39,
     "lot": 1339,
+    "score_txt": "1.19",
+    "score": 1.19,
+    "detail": "icir复合分（z·权重前三：amount20 +0.50｜amp20 +0.23｜size_ep +0.21）",
+    "amount": 1700,
+    "action": "新建仓",
     "limit_guard": false
    },
    {
     "code": "000650",
+    "name": "仁和药业",
+    "industry": "医药生物",
     "close": 5.21,
     "lot": 521,
+    "score_txt": "1.19",
+    "score": 1.19,
+    "detail": "icir复合分（z·权重前三：amount20 +0.73｜amp20 +0.16｜bp +0.13）",
+    "amount": 1700,
+    "action": "新建仓",
     "limit_guard": false
    },
    {
     "code": "603035",
+    "name": "常熟汽饰",
+    "industry": "汽车",
     "close": 10.32,
     "lot": 1032,
+    "score_txt": "1.19",
+    "score": 1.19,
+    "detail": "icir复合分（z·权重前三：bp +0.33｜amount20 +0.28｜amp20 +0.21）",
+    "amount": 1700,
+    "action": "新建仓",
     "limit_guard": false
    },
    {
     "code": "603199",
+    "name": "九华旅游",
+    "industry": "社会服务",
     "close": 32.61,
     "lot": 3261,
+    "score_txt": "1.17",
+    "score": 1.17,
+    "detail": "icir复合分（z·权重前三：amount20 +0.76｜size_ep +0.18｜size_rev +0.14）",
+    "amount": 1700,
+    "action": "新建仓",
     "limit_guard": false
+   }
+  ]
+ },
+ "track_c": {
+  "name": "FB3-H20 基金主仓",
+  "ranking": "排序=基金动量分降序（牛市 Top10 动量 / 熊市 Top3 低波，生产口径 build_short_pool）",
+  "regime": "熊市 Top3 低波防守",
+  "asof": "2026-09-11",
+  "gate": false,
+  "rows": [
+   {
+    "code": "003956",
+    "name": "南方产业智选股票A",
+    "score_txt": "82.4",
+    "weight_pct": 33.3,
+    "amount": 34000,
+    "action": "申购"
+   },
+   {
+    "code": "004879",
+    "name": "汇添富全球医疗混合(QDII)美元现钞",
+    "score_txt": "82.2",
+    "weight_pct": 33.3,
+    "amount": 34000,
+    "action": "申购"
+   },
+   {
+    "code": "004878",
+    "name": "汇添富全球医疗混合(QDII)美元现汇",
+    "score_txt": "82.2",
+    "weight_pct": 33.3,
+    "amount": 34000,
+    "action": "申购"
    }
   ]
  }
