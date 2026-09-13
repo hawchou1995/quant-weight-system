@@ -1721,8 +1721,25 @@ html = f"""<!doctype html>
 {bt_short_html()}
 {bt_a5_html()}
 </div>
-<!-- ============ 视图 A：全量池中/长线 ============ -->
-<div class="card" id="v9-retired-card"><h2>🗂️ v9 全量池（已退役）</h2><div class="sub" style="color:#ef4444">⛔ v9 股票分层战法与 197 只跟踪池已于 2026-09-13 退役并移除展示——十重证伪确认负期望（ADR-0006/0007）。历史回测明细见「📝 更新日志」v5.9~v5.11.15 与 <code>backtest/</code> 报告存档。</div><div class="sub"><b>三轨退出规则</b>：① 主仓 FB3-H20 = 20 个交易日月度轮动 + 牛熊 regime 切换（沪深300&lt;MA200 转 Top3 低波防守仓）——<b>无个股止盈止损</b>（基金 NAV 无涨跌停，止盈变体回测全部减值）；② 冷门低波 = 60 个交易日到期换仓，持有期无中途操作；③ A4D = 月频调仓 + 中证1000&lt;MA20 组合半仓闸。三轨均为「定期换仓制」，不设固定目标位止盈。</div></div>
+<!-- ============ 视图 A：三轨中长线（2026-09-13 起） ============ -->
+<div class="view" id="view-auto">
+<div class="card" id="sys-auto">
+<div class="sys-head">
+<div class="sys-head-top">
+<h2>🛰️ 三轨中长线 <span class="view-badge auto">FB3-H20 主仓 + 冷门低波 / A4D 双卫星 · 资金 60/20/20</span></h2>
+</div>
+<div class="sys-head-tags">
+<span class="badge badge-auto">v9 股票分层战法已退役（十重证伪 · ADR-0006/0007）</span>
+<span class="badge badge-auto">三轨信号 = backtest/signal_satellite_0913.py · 每日收盘跑</span>
+<span class="badge badge-auto">退出 = 定期换仓制（详见下方说明）</span>
+</div>
+</div>
+</div>
+{SAT_CARD}
+{SAT_PAPER_CARD}
+{FB3_POOL_CARD}
+<div class="card" id="v9-retired-card"><h2>🗂️ v9 全量池（已退役）</h2><div class="sub" style="color:#ef4444">⛔ v9 股票分层战法与 197 只跟踪池已于 2026-09-13 退役并移除展示——十重证伪确认负期望（ADR-0006/0007）。历史回测明细见「📝 更新日志」v5.9~v5.11.15 与 <code>backtest/</code> 报告存档。</div><div class="sub"><b>三轨退出规则</b>：① 主仓 FB3-H20 = 20 交易日月度轮动 + 牛熊 regime 切换（沪深300&lt;MA200 转 Top3 低波防守仓）——<b>无个股止盈止损</b>（基金 NAV 无涨跌停，止盈变体回测全部减值）；② 冷门低波 = 60 交易日到期换仓，持有期无中途操作；③ A4D = 月频调仓 + 中证1000&lt;MA20 组合半仓闸。</div></div>
+</div>
 
 <!-- ============ 视图 C：全量池短线（2026-09-03 起 股票池 / 基金池 分板块展示） ============ -->
 {SHORT_VIEW_HTML}
@@ -1860,6 +1877,28 @@ function switchView(key){{
   window.scrollTo(0,0);
   if(location.hash!=='#'+key)try{{history.replaceState(null,'','#'+key)}}catch(e){{}}
 }}
+function initSatTables(){{  /* 双卫星表搜索/排序 */
+  var tables=document.querySelectorAll('table.sat-tbl');if(!tables.length)return;
+  Array.prototype.forEach.call(tables,function(tbl){{
+    var t=tbl.getAttribute('data-t');
+    var q=document.querySelector('.sat-q[data-t="'+t+'"]');
+    var srt=document.querySelector('.sat-sort[data-t="'+t+'"]');
+    var cnt=document.querySelector('.sat-count[data-t="'+t+'"]');
+    function apply(){{
+      var rows=Array.prototype.slice.call(tbl.querySelectorAll('tbody tr'));
+      var qv=((q&&q.value)||'').trim().toLowerCase();
+      rows.forEach(function(r){{r.style.display=(!qv||r.cells[0].textContent.toLowerCase().indexOf(qv)>=0)?'':'none';}});
+      var tb=tbl.querySelector('tbody');
+      if(srt&&srt.value==='code'){{rows.sort(function(a,b){{return a.cells[0].textContent.localeCompare(b.cells[0].textContent);}});rows.forEach(function(r){{tb.appendChild(r);}});}}
+      if(srt&&srt.value==='lot'){{rows.sort(function(a,b){{return (parseFloat(a.cells[4].textContent.replace(/[^0-9.]/g,''))||0)-(parseFloat(b.cells[4].textContent.replace(/[^0-9.]/g,''))||0);}});rows.forEach(function(r){{tb.appendChild(r);}});}}
+      var shown=rows.filter(function(r){{return r.style.display!=='none';}}).length;
+      if(cnt)cnt.textContent=shown+' / '+rows.length+' 只';
+    }}
+    if(q)q.addEventListener('input',apply);
+    if(srt)srt.addEventListener('change',apply);
+    apply();
+  }});
+}}
 function applyHash(){{
   var k=(location.hash||'').replace('#','');
   if(VIEW_MAP[k])switchView(k);
@@ -1906,6 +1945,7 @@ switchView=function(key){{
 document.addEventListener('DOMContentLoaded',function(){{
   applyHash();   // 按 URL hash 定位视图（历史页跳转 dual_system.html#sys-auto 直接显示普适版）
   renderSubCurve();   // 基金回测净值曲线
+  initSatTables();   // 双卫星表搜索/排序
   /* 2026-09-06 见底信号市场级恐慌观察指标（advisory-only）：读 SHORT_POOL.market_gate.jiandi_panic */
   function renderJiandiPanic(){{
     var box=document.getElementById('mw-jiandi');if(!box)return;
