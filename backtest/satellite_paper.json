@@ -1,0 +1,17 @@
+{
+ "meta": {
+  "strategy": "双卫星模拟盘（轨A 冷门低波 Top10 + 轨B A4D Top20）",
+  "started": "2026-09-14",
+  "initial_cash": 68000,
+  "cash_a": 34000,
+  "cash_b": 34000,
+  "cost_model": "佣金 2.5bp(最低5元) + 印税 10bp(卖出) + 滑点按成交",
+  "note": "轨A 60 交易日调仓 / 轨B 月频；成交后回填 fills，脚本自动更新净值"
+ },
+ "fills": [],
+ "positions": {"track_a": {}, "track_b": {}},
+ "nav_history": [],
+ "events": [
+  {"date": "2026-09-13", "event": "模拟盘建档：待 09-14（周一）开盘按 satellite_pool.json 目标清单建仓"}
+ ]
+}

@@ -115,6 +115,30 @@ except Exception as _e:
     SHORT_POOL_NOTE = ''
     SHORT_KHUNTER_BEAR = ''
     SHORT_POOL = {}
+
+_pap_f = BASE / "backtest" / "satellite_paper.json"
+try:
+    _pap = json.load(open(_pap_f, encoding="utf-8"))
+    _pm = _pap.get("meta", {})
+    _nh = _pap.get("nav_history", [])
+    _npos = sum(len(v) for v in _pap.get("positions", {}).values())
+    _nav = _nh[-1][1] if _nh else 1.0
+    _ret = (_nav - 1) * 100
+    SAT_PAPER_CARD = (f'<div class="card" id="sat-paper-card">'
+                      f'<h2>🧪 双卫星模拟盘 <span class="badge badge-auto">起始 {_pm.get("started", "—")} · 6.8 万（轨A 3.4万+轨B 3.4万）</span></h2>'
+                      f'<div class="kpis">'
+                      f'<div class="kpi"><div class="l">模拟净值</div><div class="v">{_nav:.4f}</div><div class="s">期初 1.0</div></div>'
+                      f'<div class="kpi"><div class="l">累计收益</div><div class="v" style="color:{ "#10b981" if _ret >= 0 else "#ef4444" }">{_ret:+.2f}%</div><div class="s">含成本口径</div></div>'
+                      f'<div class="kpi"><div class="l">持仓标的</div><div class="v">{_npos}</div><div class="s">目标 30</div></div>'
+                      f'<div class="kpi"><div class="l">状态</div><div class="v">{"运行中" if _nh else "待建仓"}</div><div class="s">{(_nh[-1][0] if _nh else _pap.get("events", [{}])[-1].get("date", "—"))}</div></div>'
+                      f'</div>'
+                      f'<div class="sub">成交回填：<code>holdings_satellite.json</code> + <code>satellite_paper.json</code>（fills/positions/nav_history）· 每日收盘跑 <code>signal_satellite_0913.py</code> 自动对账</div>'
+                      f'<div class="sub" style="color:var(--faint)">{(_pap.get("events", [{}])[-1].get("event", ""))}</div>'
+                      f'</div>')
+except Exception as _e2:
+    SAT_PAPER_CARD = (f'<div class="card" id="sat-paper-card"><h2>🧪 双卫星模拟盘</h2>'
+                      f'<div class="sub">satellite_paper.json 未生成（{_e2}）</div></div>')
+
 # 2026-09-05 用户需求：短线命中策略一览 + 跟踪池行业列 —— 全市场板块/行业紧凑映射（内联 window.STOCK_META）
 # 数据源：short_signals.js 全量股票代码 + stock_industry.json（申万一级，7511 只全市场覆盖）
 try:
@@ -436,7 +460,7 @@ v_fund = load_curve_norm("short_v3_fund_slip20_equity.csv")  # 2026-09-13 切 FB
 # 双卫星数据源（2026-09-13 三轨拍板）
 s_ln = json.load(open(BASE / "backtest" / "lnatr_summary_0913.json", encoding="utf-8")) if (BASE / "backtest" / "lnatr_summary_0913.json").exists() else {}
 LN_TAG = "冷门低波 ln_amt20+atr20 · Top10 · 60日调仓（主板含退市 · 2021起 · 20bps滑点）"
-LN_TAG += " · 安慰剂500 p=0.0000 · 与FB3相关-0.165 · slip50稳健 · ⚠ atr20 fwd语义待复核"
+LN_TAG += " · 安慰剂500 p=0.0000 · 与FB3相关-0.165 · slip50稳健 · fwd段制交叉验证方向一致(+29.1%/夏普0.44，段制全换 vs 调仓制增量)"
 v_ln = load_curve_norm("backtest/lnatr_equity_0913.csv")
 
 _a4d = json.load(open(BASE / "backtest" / "factorlab_0913" / "blend_r6c_a4d_0913.json", encoding="utf-8")) if (BASE / "backtest" / "factorlab_0913" / "blend_r6c_a4d_0913.json").exists() else {}
@@ -1319,7 +1343,8 @@ try:
         return (f'<div class="sub" style="margin:6px 0"><b>{tr["name"]}</b> · 调仓：{tr["rebal"]}{cal_note}'
                 f'｜回测 +{bt["total"]}%/年化 +{bt["ann"]}%/回撤 {bt["mdd"]}%/夏普 {bt["sharpe"]}</div>'
                 f'<div class="sub" style="color:var(--faint)">{bt["note"]}</div>'
-                f'<div class="tbl-wrap"><table class="tbl"><thead><tr><th>代码</th><th>收盘</th><th>一手约</th><th>守卫</th></tr></thead><tbody>{tds}</tbody></table></div>')
+                f'<div class="toolbar" id="sat-bar-{track}"><input type="text" class="sat-q" data-t="{track}" placeholder="🔍 搜索代码…" autocomplete="off"><select class="sat-sort" data-t="{track}"><option value="idx">清单序</option><option value="code">代码 ↑</option><option value="lot">一手成本 ↑</option></select><span class="count sat-count" data-t="{track}"></span></div>'
+                f'<div class="tbl-wrap"><table class="tbl sat-tbl" data-t="{track}"><thead><tr><th>代码</th><th>收盘</th><th>一手约</th><th>守卫</th></tr></thead><tbody>{tds}</tbody></table></div>')
 
     SAT_CARD = (f'<div class="card" id="sat-card">\n'
                 f'<h2>🛰️ 双卫星目标持仓 <span class="badge badge-auto">三轨 60/20/20 · 数据截至 {_sat["asof"]}（收盘）</span></h2>\n'
@@ -1712,12 +1737,13 @@ html = f"""<!doctype html>
 {system_block(
   "view-auto", "sys-auto",
   "🛰️ 三轨中长线", "auto", "FB3-H20 主仓 + 冷门低波/A4D 双卫星（v9 战法已退役，下表仅历史留档）",
-  v9_items, "tbl-v9", "card-tbl-v9",
+  [], "tbl-v9", "card-tbl-v9",
   "⛔ 下方 v9 表为已退役战法的历史留档（2026-09-13 十重证伪），现行三轨体系见上方双卫星卡与 FB3 基金池卡",
-  extra_card=SAT_CARD + FB3_POOL_CARD + WATCH_V9_CARD,
+  extra_card=SAT_CARD + SAT_PAPER_CARD + FB3_POOL_CARD,
   head_tags=[LT_GATE_BADGE, POOL_REBAL_BADGE,
              '<span class="badge badge-auto">评分 = Aroon强趋势过滤(A80_M78)</span>',
              '<span class="badge badge-auto">筛池 = 全市场绝对规则 Top3 等权 · 月轮动</span>',
+             '<span class="badge" style="background:#ef4444;color:#fff">⛔ 已退役 · 历史数据已清除（2026-09-13 十重证伪）</span>',
              '<span class="badge badge-auto">风控 = 掉榜5日/权重分&lt;50 清仓信号 · MA200门控（仅提醒）</span>'],
   head_note="回测参考见「监控总览」视图 · " + POOL_REBAL_NOTE,
   as_of=DATA["meta"].get("as_of", "—"), intraday_note=DATA["meta"].get("intraday"),

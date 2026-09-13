@@ -85,6 +85,21 @@ def signal_a4d_orig(hold):
         _A4D_CACHE["asof"] = str(gg["cal"][-1])
     return [c for c, _, _ in _A4D_CACHE["top"]], _A4D_CACHE
 
+# ---------- 轨 C：FB3-H20 主仓（基金 NAV 动量，build_short_pool 生产口径）----------
+def signal_fb3():
+    sp = json.load(open(BASE / "short_pool.json", encoding="utf-8"))
+    tier = sp.get("tiers", {}).get("基金", []) or sp.get("tiers", {}).get("fund", [])
+    mg = sp.get("market_gate", {})
+    det = sp.get("details", {})
+    rows = []
+    for c in tier:
+        d = det.get(c, {})
+        rows.append({"code": c, "name": d.get("name", ""), "score": d.get("score"),
+                     "pool": d.get("pool", "fund")})
+    return {"rows": rows, "gate": mg, "asof": sp.get("as_of"),
+            "regime": "牛市 Top10 动量" if mg.get("open") else "熊市 Top3 低波防守"}
+
+
 # ---------- 主流程 ----------
 def main():
     if STATE.exists():
@@ -99,6 +114,15 @@ def main():
     print(f"交易日序号：{di_last}（自 2021-01-04）\n")
     ln_top, _ = signal_ln_atr(st["ln_atr"]["holdings"])
     a4_top, a4d_meta = signal_a4d_orig(st["a4d"]["holdings"])
+    fb3 = signal_fb3()
+    _held_c = list(st.get("track_c", {"holdings": {}}).get("holdings", {}).keys())
+    _tgt_c = [r["code"] for r in fb3["rows"]]
+    print(f"===== 轨C FB3-H20 主仓（{fb3['regime']} · as_of {fb3['asof']}）=====")
+    print(f"  卖出（T+1 净值赎回）：{[c for c in _held_c if c not in _tgt_c] or '无'}")
+    print(f"  买入（T+1 净值申购）：{[c for c in _tgt_c if c not in _held_c] or '无'}")
+    for r in fb3["rows"]:
+        print(f"    {r['code']} {r['name']} 动量分 {r['score']}")
+    print(f"  市况门控：{'开' if fb3['gate'].get('open') else '关（熊市防守）'}\n")
     for track, top, reb, last_r in (("轨A 冷门低波 Top10/60d", ln_top, REBAL_LN, st["ln_atr"]["last_rebal"]),
                                     ("轨B A4D Top20/月频", a4_top, 20, st["a4d"]["last_rebal"])):
         held = list(st[track.split()[1]]["holdings"].keys()) if False else list(st["ln_atr" if "冷门" in track else "a4d"]["holdings"].keys())
