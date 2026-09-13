@@ -1332,7 +1332,7 @@ try:
     def _sat_rows(track):
         tr = _sat[track]
         tds = "".join(
-            f'<tr><td><code>{r["code"]}</code></td><td class="num">{r["close"]:.2f}</td>'
+            f'<tr><td><code>{r["code"]}</code></td><td>{r.get("name", "")}</td><td>{r.get("industry", "—")}</td><td class="num">{r["close"]:.2f}</td>'
             f'<td class="num">{r["lot"]:,} 元</td>'
             + ('<td class="num" style="color:#d97706">涨停勿追</td>' if r.get("limit_guard") else '<td class="num">—</td>')
             + "</tr>"
@@ -1344,7 +1344,7 @@ try:
                 f'｜回测 +{bt["total"]}%/年化 +{bt["ann"]}%/回撤 {bt["mdd"]}%/夏普 {bt["sharpe"]}</div>'
                 f'<div class="sub" style="color:var(--faint)">{bt["note"]}</div>'
                 f'<div class="toolbar" id="sat-bar-{track}"><input type="text" class="sat-q" data-t="{track}" placeholder="🔍 搜索代码…" autocomplete="off"><select class="sat-sort" data-t="{track}"><option value="idx">清单序</option><option value="code">代码 ↑</option><option value="lot">一手成本 ↑</option></select><span class="count sat-count" data-t="{track}"></span></div>'
-                f'<div class="tbl-wrap"><table class="tbl sat-tbl" data-t="{track}"><thead><tr><th>代码</th><th>收盘</th><th>一手约</th><th>守卫</th></tr></thead><tbody>{tds}</tbody></table></div>')
+                f'<div class="tbl-wrap"><table class="tbl sat-tbl" data-t="{track}"><thead><tr><th>代码</th><th>名称</th><th>行业</th><th>收盘</th><th>一手约</th><th>守卫</th></tr></thead><tbody>{tds}</tbody></table></div>')
 
     SAT_CARD = (f'<div class="card" id="sat-card">\n'
                 f'<h2>🛰️ 双卫星目标持仓 <span class="badge badge-auto">三轨 60/20/20 · 数据截至 {_sat["asof"]}（收盘）</span></h2>\n'
@@ -1355,33 +1355,21 @@ except Exception as _e:
                 f'<div class="sub">satellite_pool.json 未生成 —— 先运行 <code>python backtest/build_satellite_pool.py</code>（{_e}）</div></div>')
 
 _sp_j = json.load(open(BASE / "short_pool.json", encoding="utf-8"))
-_fund_tier = _sp_j.get("tiers", {}).get("fund", [])
+_fund_tier = _sp_j.get("tiers", {}).get("基金", []) or _sp_j.get("tiers", {}).get("fund", [])
 _mg = _sp_j.get("market_gate", {})
 _fund_rows = ""
 for _c in _fund_tier:
     _d = _sp_j.get("details", {}).get(_c, {})
     _fund_rows += (f'<tr><td><code>{_c}</code></td><td>{_d.get("name", "")}</td>'
                    f'<td class="num">{_d.get("score", "—")}</td><td>{_d.get("pool", "fund")}</td></tr>')
-_gate_txt = ("🟢 开" if _mg.get("open") else "🔴 关（熊市防守：FB3 转 Top3 低波仓）") + f' · 沪深300 {_mg.get("idx_close", "—")} vs MA20 {_mg.get("idx_ma20", "—")}'
+_gate_txt = ("🟢 开（股票可买）" if _mg.get("open") else "🟠 关（仅拦股票池；基金轨不受影响——熊市 FB3 照常买入，转 Top3 低波防守仓）") + f' · 沪深300 {_mg.get("idx_close", "—")} vs MA20 {_mg.get("idx_ma20", "—")}'
 FB3_POOL_CARD = (f'<div class="card" id="fb3-pool-card">'
                  f'<h2>🥇 主仓 FB3-H20 基金池 <span class="badge badge-auto">当前 regime 持仓 · 数据截至 {_sp_j.get("as_of", "—")}</span></h2>'
                  f'<div class="sub">市况门控 {_gate_txt} · 60% 资金 · 牛市 Top10 动量 / 熊市 Top3 低波（C 类份额，T+1 净值申赎）</div>'
                  f'<div class="tbl-wrap"><table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>动量分</th><th>池</th></tr></thead><tbody>{_fund_rows or "<tr><td colspan=4>空（门控关闭）</td></tr>"}</tbody></table></div></div>')
 
-WATCH_V9_CARD = f'''<div class="card" id="watch-v9-card">
-<h2>📌 全量池中/长线跟踪 <span class="badge badge-auto">上榜跟踪 · 清仓信号后 21 交易日剔除</span> </h2>
-<div class="sub">上方全量池表<b>上榜标的</b>（v9_tiers：main/gem/star/fund）上榜次日收盘确认后自动加入跟踪；<b>2026-08-18 起新上榜先入「待确认」隔日入池</b>（隔离当日收盘信号）；每次重新上榜刷新【入池/跟踪/出池】时间 · <b>清仓信号</b>（连续 5 日掉榜 / 权重分跌破 50）后 <b>21 交易日倒计时</b>剔除出池，倒计时中重新上榜即解除 · 数据截至 {DATA["meta"].get("as_of", "—")}（收盘）</div>
-<div id="watch-v9-pending"></div>
-<div class="toolbar" id="watch-v9-bar">
-<input type="text" id="watch-v9-q" name="watch-v9-q" placeholder="🔍 搜索代码 / 名称…" autocomplete="off" spellcheck="false" aria-label="搜索跟踪标的（代码或名称）">
-<select id="watch-v9-f-pool" class="flt" title="板块筛选" aria-label="按板块筛选"><option value="">全部板块</option></select>
-<select id="watch-v9-f-status" class="flt" title="状态筛选" aria-label="按状态筛选"><option value="">全部状态</option><option value="1">在池</option><option value="0">已掉出池（观察）</option></select>
-<select id="watch-v9-f-tier" class="flt" title="档位筛选" aria-label="按档位筛选"><option value="">全部档位</option></select>
-<select id="watch-v9-sort" class="flt" title="排序方式" aria-label="排序方式"><option value="entry">加入时间 ↓</option><option value="chg">涨跌 ↓</option><option value="score">权重分 ↓</option><option value="name">名称 ↑</option><option value="left">剩余天数 ↑</option></select>
-<span class="count" id="watch-v9-count"></span>
-</div>
-<div id="watch-v9-table"></div>
-</div>'''
+WATCH_V9_CARD = ('<div class="card" id="watch-v9-card"><h2>📌 历史跟踪池（已退役）</h2>'
+                 '<div class="sub" style="color:#ef4444">⛔ v9 跟踪池展示已于 2026-09-13 移除（战法退役，十重证伪）。数据文件保留于 enhanced_data.js 供回溯。</div></div>')
 
 # ---- 复盘日志 + 更新日志（v5.11.1 内嵌视图：与各池同形态，导航内切换）----
 def md_to_html(md):
@@ -1734,20 +1722,7 @@ html = f"""<!doctype html>
 {bt_a5_html()}
 </div>
 <!-- ============ 视图 A：全量池中/长线 ============ -->
-{system_block(
-  "view-auto", "sys-auto",
-  "🛰️ 三轨中长线", "auto", "FB3-H20 主仓 + 冷门低波/A4D 双卫星（v9 战法已退役，下表仅历史留档）",
-  [], "tbl-v9", "card-tbl-v9",
-  "⛔ 下方 v9 表为已退役战法的历史留档（2026-09-13 十重证伪），现行三轨体系见上方双卫星卡与 FB3 基金池卡",
-  extra_card=SAT_CARD + SAT_PAPER_CARD + FB3_POOL_CARD,
-  head_tags=[LT_GATE_BADGE, POOL_REBAL_BADGE,
-             '<span class="badge badge-auto">评分 = Aroon强趋势过滤(A80_M78)</span>',
-             '<span class="badge badge-auto">筛池 = 全市场绝对规则 Top3 等权 · 月轮动</span>',
-             '<span class="badge" style="background:#ef4444;color:#fff">⛔ 已退役 · 历史数据已清除（2026-09-13 十重证伪）</span>',
-             '<span class="badge badge-auto">风控 = 掉榜5日/权重分&lt;50 清仓信号 · MA200门控（仅提醒）</span>'],
-  head_note="回测参考见「监控总览」视图 · " + POOL_REBAL_NOTE,
-  as_of=DATA["meta"].get("as_of", "—"), intraday_note=DATA["meta"].get("intraday"),
-  as_of_min=DATA["meta"].get("intraday_ts") or DATA["meta"].get("as_of_min"))}
+<div class="card" id="v9-retired-card"><h2>🗂️ v9 全量池（已退役）</h2><div class="sub" style="color:#ef4444">⛔ v9 股票分层战法与 197 只跟踪池已于 2026-09-13 退役并移除展示——十重证伪确认负期望（ADR-0006/0007）。历史回测明细见「📝 更新日志」v5.9~v5.11.15 与 <code>backtest/</code> 报告存档。</div><div class="sub"><b>三轨退出规则</b>：① 主仓 FB3-H20 = 20 个交易日月度轮动 + 牛熊 regime 切换（沪深300&lt;MA200 转 Top3 低波防守仓）——<b>无个股止盈止损</b>（基金 NAV 无涨跌停，止盈变体回测全部减值）；② 冷门低波 = 60 个交易日到期换仓，持有期无中途操作；③ A4D = 月频调仓 + 中证1000&lt;MA20 组合半仓闸。三轨均为「定期换仓制」，不设固定目标位止盈。</div></div>
 
 <!-- ============ 视图 C：全量池短线（2026-09-03 起 股票池 / 基金池 分板块展示） ============ -->
 {SHORT_VIEW_HTML}
@@ -1817,7 +1792,7 @@ html = f"""<!doctype html>
 /* 三视图导航（覆盖默认 4 项） */
 window.ENH.nav = [
   ["overview","📊","监控总览",[["overview","总览统计"],["mkt-weather","市场晴雨表"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
-  ["sys-auto","🛰️","三轨中长线",[["sat-card","双卫星目标持仓"],["fb3-pool-card","FB3 基金池"],["card-tbl-v9","v9 历史池(退役)"],["watch-v9-card","历史跟踪(退役)"]]],
+  ["sys-auto","🛰️","三轨中长线",[["sat-card","双卫星目标持仓"],["sat-paper-card","模拟盘"],["fb3-pool-card","FB3 基金池"]]],
   ["short","⚡","全量池短线",[["card-short-stk","股票池 汇总表"],["card-short-stk-detail","股票池 逐标的详情"],["card-kh-hits","KHunter 命中策略一览"],["card-etf-paper","ETF 动量轮动"],["card-kh-paper","KHunter 模拟盘"],["card-short-fund","基金池 汇总表"],["card-short-fund-detail","基金池 逐标的详情"],["watch-card","短线跟踪"]]],
   ["a5","🎯","打板族",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
   ["comment","💬","评论区",[]]
