@@ -1334,7 +1334,7 @@ try:
         tds = "".join(
             f'<tr><td><code>{r["code"]}</code></td><td>{r.get("name", "")}</td><td>{r.get("industry", "—")}</td><td class="num">{r["close"]:.2f}</td>'
             f'<td class="num">{r["lot"]:,} 元</td><td class="num">{r.get("amount", 0):,} 元</td>'
-            f'<td title="{r.get("detail", "")}">{r.get("score_txt", "—")}</td>'
+            f'<td title="{r.get("detail", "")}"><b>{r.get("score_txt", "—")}</b><div style="font-size:10.5px;color:#94a3b8;line-height:1.35;white-space:normal;max-width:190px">{r.get("parts", "")}</div></td>'
             f'<td>{r.get("action", "—")}{" ⚠涨停勿追" if r.get("limit_guard") else ""}</td>'
             + "</tr>"
             for r in tr["rows"])
@@ -1346,7 +1346,7 @@ try:
                 f'｜回测 +{bt["total"]}%/年化 +{bt["ann"]}%/回撤 {bt["mdd"]}%/夏普 {bt["sharpe"]}</div>'
                 f'<div class="sub" style="color:var(--faint)">{bt["note"]}</div>'
                 f'<div class="toolbar" id="sat-bar-{track}"><input type="text" class="sat-q" data-t="{track}" placeholder="🔍 搜索代码…" autocomplete="off"><select class="sat-sort" data-t="{track}"><option value="idx">清单序</option><option value="code">代码 ↑</option><option value="lot">一手成本 ↑</option></select><span class="count sat-count" data-t="{track}"></span></div>'
-                f'<div class="tbl-wrap"><table class="tbl sat-tbl" data-t="{track}"><thead><tr><th>代码</th><th>名称</th><th>行业</th><th>收盘</th><th>一手约</th><th>计划金额</th><th>评分·拆解(悬浮)</th><th>操作</th></tr></thead><tbody>{tds}</tbody></table></div>')
+                f'<div class="tbl-wrap"><table class="tbl sat-tbl" data-t="{track}"><thead><tr><th>代码</th><th>名称</th><th>行业</th><th>收盘</th><th>一手约</th><th>计划金额</th><th>评分 = 总分 + 子项</th><th>操作</th></tr></thead><tbody>{tds}</tbody></table></div>')
 
     SAT_CARD = (f'<div class="card" id="sat-card">\n'
                 f'<h2>🛰️ 双卫星目标持仓 <span class="badge badge-auto">三轨 60/20/20 · 数据截至 {_sat["asof"]}（收盘）</span></h2>\n'

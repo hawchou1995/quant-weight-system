@@ -39,6 +39,13 @@ for f in sorted((BASE / "data_full").glob("*.csv")):
     days_all.append(d["date"].max())
     px[code] = d.set_index("date").sort_index()
 LAST_DAY = max(days_all)
+
+# 风险名称过滤（2026-09-13 落地）：轨A 仅排"退"；轨B 排 ST/*ST/退（回测依据见 st_filter_0913.json）
+_nh = pd.read_csv(BASE / "data_fundamental" / "name_hist.csv", dtype={"code": str})
+_nh = _nh.sort_values("TRADE_DATE").groupby("code").tail(1)
+_name = _nh.set_index("code")["SECURITY_NAME_ABBR"].astype(str)
+TUI_SET = set(_name[_name.str.contains("退")].index)
+ST_SET = set(_name[_name.str.contains("ST")].index)
 print(f"数据截至：{LAST_DAY.date()}（收盘）→ 以下操作为次一交易日开盘执行")
 
 # ---------- 轨 A：冷门低波 ln_amt20+atr20 ----------
@@ -47,6 +54,8 @@ def signal_ln_atr(hold):
     for code, d in px.items():
         if len(d) < 180 or d.index[-1] != LAST_DAY:
             continue   # ⚠ 2026-09-13 修复：必须当日有行情（剔除退市死票，与回测口径一致）
+        if code in TUI_SET:
+            continue   # 退市整理期排除（回测零成本）
         tail = d.tail(70)
         amt20 = tail["amount"].tail(20).mean()
         pc = d["close"].shift(1)
@@ -77,7 +86,8 @@ def signal_a4d_orig(hold):
         di = gg["ND"] - 1
         sc = gg["COMP_A4"][di]
         ok = np.where(np.isfinite(sc) & gg["ELIG_A4"][di])[0]
-        ok = sorted(ok, key=lambda j: -sc[j])[:20]
+        ok = sorted(ok, key=lambda j: -sc[j])
+        ok = [j for j in ok if gg["codes"][j] not in ST_SET and gg["codes"][j] not in TUI_SET][:20]   # ST/退过滤（回测 +3.2pp/回撤-2.5pp）
         prev = gg["close_m"][di - 1]
         _A4D_CACHE["top"] = [(gg["codes"][j], float(gg["close_m"][di, j]),
                               "涨停勿追" if np.isfinite(prev[j]) and gg["close_m"][di, j] >= prev[j] * 1.098 else "")

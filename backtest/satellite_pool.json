@@ -10,7 +10,7 @@
    "ann": 16.2,
    "mdd": -18.4,
    "sharpe": 1.238,
-   "note": "安慰剂500 p=0.0000 · 与FB3相关-0.165 · slip50稳健 · fwd段制交叉验证方向一致"
+   "note": "安慰剂500 p=0.0000 · 与FB3相关-0.165 · slip50稳健 · 已排除退市整理期\"退\"（回测零成本；全排ST减收益7.3pp故保留ST）"
   },
   "rows": [
    {
@@ -21,6 +21,7 @@
     "lot": 511,
     "score_txt": "98",
     "score": 98.3,
+    "parts": "额 50 · 波 49（各 0-50）",
     "detail": "额分位99%·波分位98%（双低合分越高越冷门低波）",
     "amount": 3400,
     "action": "新建仓"
@@ -32,7 +33,8 @@
     "close": 4.41,
     "lot": 441,
     "score_txt": "98",
-    "score": 97.8,
+    "score": 97.7,
+    "parts": "额 50 · 波 48（各 0-50）",
     "detail": "额分位100%·波分位96%（双低合分越高越冷门低波）",
     "amount": 3400,
     "action": "新建仓"
@@ -45,6 +47,7 @@
     "lot": 663,
     "score_txt": "97",
     "score": 97.1,
+    "parts": "额 50 · 波 47（各 0-50）",
     "detail": "额分位99%·波分位95%（双低合分越高越冷门低波）",
     "amount": 3400,
     "action": "新建仓"
@@ -57,6 +60,7 @@
     "lot": 1519,
     "score_txt": "97",
     "score": 97.0,
+    "parts": "额 48 · 波 49（各 0-50）",
     "detail": "额分位96%·波分位98%（双低合分越高越冷门低波）",
     "amount": 3400,
     "action": "新建仓"
@@ -69,6 +73,7 @@
     "lot": 357,
     "score_txt": "97",
     "score": 96.8,
+    "parts": "额 50 · 波 47（各 0-50）",
     "detail": "额分位99%·波分位94%（双低合分越高越冷门低波）",
     "amount": 3400,
     "action": "新建仓"
@@ -80,7 +85,8 @@
     "close": 7.08,
     "lot": 708,
     "score_txt": "97",
-    "score": 96.8,
+    "score": 96.7,
+    "parts": "额 49 · 波 48（各 0-50）",
     "detail": "额分位97%·波分位96%（双低合分越高越冷门低波）",
     "amount": 3400,
     "action": "新建仓"
@@ -93,6 +99,7 @@
     "lot": 451,
     "score_txt": "96",
     "score": 96.5,
+    "parts": "额 50 · 波 46（各 0-50）",
     "detail": "额分位100%·波分位93%（双低合分越高越冷门低波）",
     "amount": 3400,
     "action": "新建仓"
@@ -105,6 +112,7 @@
     "lot": 858,
     "score_txt": "96",
     "score": 96.4,
+    "parts": "额 49 · 波 48（各 0-50）",
     "detail": "额分位97%·波分位95%（双低合分越高越冷门低波）",
     "amount": 3400,
     "action": "新建仓"
@@ -117,6 +125,7 @@
     "lot": 2005,
     "score_txt": "96",
     "score": 96.4,
+    "parts": "额 48 · 波 49（各 0-50）",
     "detail": "额分位95%·波分位97%（双低合分越高越冷门低波）",
     "amount": 3400,
     "action": "新建仓"
@@ -129,6 +138,7 @@
     "lot": 826,
     "score_txt": "96",
     "score": 96.1,
+    "parts": "额 49 · 波 48（各 0-50）",
     "detail": "额分位97%·波分位95%（双低合分越高越冷门低波）",
     "amount": 3400,
     "action": "新建仓"
@@ -145,7 +155,7 @@
    "ann": 15.1,
    "mdd": -18.3,
    "sharpe": 1.074,
-   "note": "相位中位1.075 · 安慰剂500 p=0.000 · DSR 0.987 · slip50稳健"
+   "note": "相位中位1.075 · 安慰剂500 p=0.000 · DSR 0.987 · 已过滤 ST/*ST/退（回测 +3.2pp/回撤 -2.5pp/相位一致改善）"
   },
   "rows": [
    {
@@ -156,7 +166,8 @@
     "lot": 511,
     "score_txt": "1.75",
     "score": 1.75,
-    "detail": "icir复合分（z·权重前三：amount20 +0.84｜bp +0.49｜amp20 +0.24）",
+    "parts": "额 +0.84 · BP +0.49 · 振 +0.24 · EP +0.13 · 市反 +0.06 · 动60 -0.00",
+    "detail": "icir复合分（z·权重：amount20 +0.84｜bp +0.49｜amp20 +0.24…）",
     "amount": 1700,
     "action": "新建仓",
     "limit_guard": false
@@ -169,7 +180,8 @@
     "lot": 379,
     "score_txt": "1.55",
     "score": 1.55,
-    "detail": "icir复合分（z·权重前三：amount20 +0.84｜bp +0.41｜size_ep +0.13）",
+    "parts": "额 +0.84 · BP +0.41 · EP +0.13 · 振 +0.12 · 市反 +0.04 · 动60 -0.00",
+    "detail": "icir复合分（z·权重：amount20 +0.84｜bp +0.41｜size_ep +0.13…）",
     "amount": 1700,
     "action": "新建仓",
     "limit_guard": false
@@ -182,7 +194,8 @@
     "lot": 2108,
     "score_txt": "1.41",
     "score": 1.41,
-    "detail": "icir复合分（z·权重前三：amount20 +0.83｜size_rev +0.39｜size_ep +0.22）",
+    "parts": "额 +0.83 · 市反 +0.39 · EP +0.22 · BP -0.04 · 振 +0.01 · 动60 +0.00",
+    "detail": "icir复合分（z·权重：amount20 +0.83｜size_rev +0.39｜size_ep +0.22…）",
     "amount": 1700,
     "action": "新建仓",
     "limit_guard": false
@@ -195,7 +208,8 @@
     "lot": 346,
     "score_txt": "1.40",
     "score": 1.4,
-    "detail": "icir复合分（z·权重前三：amount20 +0.81｜bp +0.44｜amp20 +0.06）",
+    "parts": "额 +0.81 · BP +0.44 · 振 +0.06 · 市反 +0.06 · EP +0.02 · 动60 -0.00",
+    "detail": "icir复合分（z·权重：amount20 +0.81｜bp +0.44｜amp20 +0.06…）",
     "amount": 1700,
     "action": "新建仓",
     "limit_guard": false
@@ -208,7 +222,8 @@
     "lot": 581,
     "score_txt": "1.38",
     "score": 1.38,
-    "detail": "icir复合分（z·权重前三：bp +0.50｜amount20 +0.35｜amp20 +0.25）",
+    "parts": "BP +0.50 · 额 +0.35 · 振 +0.25 · EP +0.18 · 市反 +0.11 · 动60 -0.00",
+    "detail": "icir复合分（z·权重：bp +0.50｜amount20 +0.35｜amp20 +0.25…）",
     "amount": 1700,
     "action": "新建仓",
     "limit_guard": false
@@ -221,7 +236,8 @@
     "lot": 636,
     "score_txt": "1.37",
     "score": 1.37,
-    "detail": "icir复合分（z·权重前三：amount20 +0.82｜bp +0.19｜amp20 +0.16）",
+    "parts": "额 +0.82 · BP +0.19 · 振 +0.16 · EP +0.12 · 市反 +0.09 · 动60 -0.00",
+    "detail": "icir复合分（z·权重：amount20 +0.82｜bp +0.19｜amp20 +0.16…）",
     "amount": 1700,
     "action": "新建仓",
     "limit_guard": false
@@ -234,7 +250,8 @@
     "lot": 491,
     "score_txt": "1.36",
     "score": 1.36,
-    "detail": "icir复合分（z·权重前三：amount20 +0.81｜amp20 +0.20｜size_ep +0.17）",
+    "parts": "额 +0.81 · 振 +0.20 · EP +0.17 · BP +0.11 · 市反 +0.08 · 动60 -0.00",
+    "detail": "icir复合分（z·权重：amount20 +0.81｜amp20 +0.20｜size_ep +0.17…）",
     "amount": 1700,
     "action": "新建仓",
     "limit_guard": false
@@ -247,7 +264,8 @@
     "lot": 521,
     "score_txt": "1.31",
     "score": 1.31,
-    "detail": "icir复合分（z·权重前三：bp +0.50｜amount20 +0.40｜size_rev +0.19）",
+    "parts": "BP +0.50 · 额 +0.40 · 市反 +0.19 · 振 +0.13 · EP +0.09 · 动60 +0.00",
+    "detail": "icir复合分（z·权重：bp +0.50｜amount20 +0.40｜size_rev +0.19…）",
     "amount": 1700,
     "action": "新建仓",
     "limit_guard": false
@@ -260,7 +278,8 @@
     "lot": 490,
     "score_txt": "1.30",
     "score": 1.3,
-    "detail": "icir复合分（z·权重前三：bp +0.50｜amp20 +0.26｜amount20 +0.25）",
+    "parts": "BP +0.50 · 振 +0.26 · 额 +0.25 · EP +0.25 · 市反 +0.04 · 动60 -0.00",
+    "detail": "icir复合分（z·权重：bp +0.50｜amp20 +0.26｜amount20 +0.25…）",
     "amount": 1700,
     "action": "新建仓",
     "limit_guard": false
@@ -273,7 +292,8 @@
     "lot": 1043,
     "score_txt": "1.28",
     "score": 1.28,
-    "detail": "icir复合分（z·权重前三：amount20 +0.61｜bp +0.50｜amp20 +0.19）",
+    "parts": "额 +0.61 · BP +0.50 · 振 +0.19 · 市反 -0.04 · EP +0.01 · 动60 -0.00",
+    "detail": "icir复合分（z·权重：amount20 +0.61｜bp +0.50｜amp20 +0.19…）",
     "amount": 1700,
     "action": "新建仓",
     "limit_guard": false
@@ -286,7 +306,8 @@
     "lot": 700,
     "score_txt": "1.26",
     "score": 1.26,
-    "detail": "icir复合分（z·权重前三：amount20 +0.82｜size_ep +0.18｜amp20 +0.13）",
+    "parts": "额 +0.82 · EP +0.18 · 振 +0.13 · 市反 +0.12 · BP +0.01 · 动60 -0.00",
+    "detail": "icir复合分（z·权重：amount20 +0.82｜size_ep +0.18｜amp20 +0.13…）",
     "amount": 1700,
     "action": "新建仓",
     "limit_guard": false
@@ -299,7 +320,8 @@
     "lot": 597,
     "score_txt": "1.25",
     "score": 1.25,
-    "detail": "icir复合分（z·权重前三：amount20 +0.44｜amp20 +0.25｜bp +0.23）",
+    "parts": "额 +0.44 · 振 +0.25 · BP +0.23 · EP +0.17 · 市反 +0.15 · 动60 +0.00",
+    "detail": "icir复合分（z·权重：amount20 +0.44｜amp20 +0.25｜bp +0.23…）",
     "amount": 1700,
     "action": "新建仓",
     "limit_guard": false
@@ -312,7 +334,8 @@
     "lot": 726,
     "score_txt": "1.24",
     "score": 1.24,
-    "detail": "icir复合分（z·权重前三：bp +0.48｜amount20 +0.31｜size_rev +0.19）",
+    "parts": "BP +0.48 · 额 +0.31 · 市反 +0.19 · 振 +0.17 · EP +0.08 · 动60 -0.00",
+    "detail": "icir复合分（z·权重：bp +0.48｜amount20 +0.31｜size_rev +0.19…）",
     "amount": 1700,
     "action": "新建仓",
     "limit_guard": false
@@ -325,7 +348,8 @@
     "lot": 920,
     "score_txt": "1.23",
     "score": 1.23,
-    "detail": "icir复合分（z·权重前三：amount20 +0.73｜size_ep +0.20｜size_rev +0.16）",
+    "parts": "额 +0.73 · EP +0.20 · 市反 +0.16 · 振 +0.13 · BP +0.00 · 动60 +0.00",
+    "detail": "icir复合分（z·权重：amount20 +0.73｜size_ep +0.20｜size_rev +0.16…）",
     "amount": 1700,
     "action": "新建仓",
     "limit_guard": false
@@ -338,7 +362,8 @@
     "lot": 1544,
     "score_txt": "1.20",
     "score": 1.2,
-    "detail": "icir复合分（z·权重前三：amount20 +0.35｜size_rev +0.28｜size_ep +0.23）",
+    "parts": "额 +0.35 · 市反 +0.28 · EP +0.23 · BP +0.20 · 振 +0.15 · 动60 -0.00",
+    "detail": "icir复合分（z·权重：amount20 +0.35｜size_rev +0.28｜size_ep +0.23…）",
     "amount": 1700,
     "action": "新建仓",
     "limit_guard": false
@@ -351,7 +376,8 @@
     "lot": 362,
     "score_txt": "1.20",
     "score": 1.2,
-    "detail": "icir复合分（z·权重前三：bp +0.50｜amount20 +0.25｜amp20 +0.24）",
+    "parts": "BP +0.50 · 额 +0.25 · 振 +0.24 · EP +0.12 · 市反 +0.09 · 动60 -0.00",
+    "detail": "icir复合分（z·权重：bp +0.50｜amount20 +0.25｜amp20 +0.24…）",
     "amount": 1700,
     "action": "新建仓",
     "limit_guard": false
@@ -364,7 +390,8 @@
     "lot": 1339,
     "score_txt": "1.19",
     "score": 1.19,
-    "detail": "icir复合分（z·权重前三：amount20 +0.50｜amp20 +0.23｜size_ep +0.21）",
+    "parts": "额 +0.50 · 振 +0.23 · EP +0.21 · 市反 +0.21 · BP +0.05 · 动60 +0.00",
+    "detail": "icir复合分（z·权重：amount20 +0.50｜amp20 +0.23｜size_ep +0.21…）",
     "amount": 1700,
     "action": "新建仓",
     "limit_guard": false
@@ -377,7 +404,8 @@
     "lot": 521,
     "score_txt": "1.19",
     "score": 1.19,
-    "detail": "icir复合分（z·权重前三：amount20 +0.73｜amp20 +0.16｜bp +0.13）",
+    "parts": "额 +0.73 · 振 +0.16 · BP +0.13 · 市反 +0.09 · EP +0.07 · 动60 -0.00",
+    "detail": "icir复合分（z·权重：amount20 +0.73｜amp20 +0.16｜bp +0.13…）",
     "amount": 1700,
     "action": "新建仓",
     "limit_guard": false
@@ -390,7 +418,8 @@
     "lot": 1032,
     "score_txt": "1.19",
     "score": 1.19,
-    "detail": "icir复合分（z·权重前三：bp +0.33｜amount20 +0.28｜amp20 +0.21）",
+    "parts": "BP +0.33 · 额 +0.28 · 振 +0.21 · 市反 +0.20 · EP +0.17 · 动60 +0.00",
+    "detail": "icir复合分（z·权重：bp +0.33｜amount20 +0.28｜amp20 +0.21…）",
     "amount": 1700,
     "action": "新建仓",
     "limit_guard": false
@@ -403,7 +432,8 @@
     "lot": 3261,
     "score_txt": "1.17",
     "score": 1.17,
-    "detail": "icir复合分（z·权重前三：amount20 +0.76｜size_ep +0.18｜size_rev +0.14）",
+    "parts": "额 +0.76 · EP +0.18 · 市反 +0.14 · 振 +0.12 · BP -0.03 · 动60 -0.00",
+    "detail": "icir复合分（z·权重：amount20 +0.76｜size_ep +0.18｜size_rev +0.14…）",
     "amount": 1700,
     "action": "新建仓",
     "limit_guard": false
