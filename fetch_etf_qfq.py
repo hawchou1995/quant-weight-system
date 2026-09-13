@@ -64,6 +64,8 @@ def save(code, rows):
         df.columns = ["date", "open", "close", "high", "low", "volume"]
     for c in ["open", "close", "high", "low", "volume"]:
         df[c] = pd.to_numeric(df[c], errors="coerce")
+    # ⚠ 2026-09-12：腾讯 ETF 日线 volume=手 → ×100 转股（单位铁律；amount 随之=股×close）
+    df["volume"] = (df["volume"] * 100).fillna(0).astype("int64")
     df["amount"] = (df["volume"] * df["close"]).round(2)
     df = df[["date", "open", "high", "low", "close", "volume", "amount"]]
     df.to_csv(OUT / f"{code}.csv", index=False)

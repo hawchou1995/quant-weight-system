@@ -31,6 +31,8 @@ def merge_sym(sym, rows):
     df = pd.DataFrame(rows, columns=WESTOCK_COLS)
     df = df.rename(columns={"last": "close"})
     df["date"] = df["date"].astype(str)
+    # ⚠ 2026-09-12：westock volume=手 → ×100 转股（全库单位铁律；dump 实测 r=(amt/vol)/close≈103）
+    df["volume"] = (pd.to_numeric(df["volume"], errors="coerce").fillna(0) * 100).astype("int64")
     f = OUT / f"{sym}.csv"
     if not f.exists():
         print(f"  ⚠ {sym} 本地无文件，跳过（新标的请走 fetch_full_universe 全量建库）", flush=True)

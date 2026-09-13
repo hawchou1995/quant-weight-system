@@ -1,0 +1,60 @@
+{
+  "E0_slip30": {
+    "arm": "E0滑点30bps",
+    "total_pct": 93.14,
+    "ann_pct": 12.76,
+    "mdd_pct": -29.5,
+    "sharpe": 0.677,
+    "n_trades": 311,
+    "win_rate": 33.1,
+    "payoff": 3.59,
+    "reasons": {
+      "MA20破位": 297,
+      "硬止损-8%": 14
+    }
+  },
+  "E0_slip40": {
+    "arm": "E0滑点40bps",
+    "total_pct": 71.75,
+    "ann_pct": 10.37,
+    "mdd_pct": -32.2,
+    "sharpe": 0.575,
+    "n_trades": 311,
+    "win_rate": 31.2,
+    "payoff": 3.59,
+    "reasons": {
+      "MA20破位": 295,
+      "硬止损-8%": 16
+    }
+  },
+  "E0_slip20": {
+    "arm": "E0_base_for_yearly",
+    "total_pct": 121.05,
+    "ann_pct": 15.57,
+    "mdd_pct": -29.4,
+    "sharpe": 0.791,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.43,
+    "reasons": {
+      "MA20破位": 297,
+      "硬止损-8%": 14
+    }
+  },
+  "E0_yearly_pct": {
+    "2021": -12.6,
+    "2022": -3.91,
+    "2023": 11.89,
+    "2024": 10.48,
+    "2025": 56.99,
+    "2026": 37.08
+  },
+  "M7_placebo": {
+    "n": 500,
+    "sharpe_median": 0.69,
+    "sharpe_p95": 0.899,
+    "total_median": 90.3,
+    "p_sharpe": 0.02,
+    "p_total": 0.01
+  }
+}

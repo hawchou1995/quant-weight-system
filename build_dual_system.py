@@ -415,8 +415,14 @@ def _ml(f, b):
     except Exception:
         return {}, b
 
-s_fund, _ftag = _ml("v8_fund_summary.json", "Top10主仓+6卫星 · MA100")
-FUND_TAG = _ftag + " · 申赎费敏感度：30bps≈-10%（90笔/10年半年轮动，影响小）"
+# ⚠ 2026-09-13 用户拍板：中长线基金卡切换 FB3-H20 2000 池口径（v8 混合版 +184.3%/10.3% 退役）。
+#    优先读 FB3-H20 含滑点主显口径（short_v3_fund_slip20_summary.json），曲线同步切 short_v3_fund_slip20_equity.csv。
+s_fund, _ftag = _ml("short_v3_fund_slip20_summary.json", "FB3-H20 牛熊 regime · 2000 池")
+if not s_fund:
+    s_fund, _ftag = _ml("v8_fund_summary.json", "Top10主仓+6卫星 · MA100")
+    FUND_TAG = _ftag + " · 申赎费敏感度：30bps≈-10%（90笔/10年半年轮动，影响小）"
+else:
+    FUND_TAG = _ftag + "（2000 池 · 含5bps滑点） · v8 混合版（+184.3%/年化10.3%）已退役，历史见更新日志 v5.11.9/v5.13.3"
 
 def load_curve_norm(f):
     try:
@@ -426,7 +432,7 @@ def load_curve_norm(f):
     except Exception:
         return []
 
-v_fund = load_curve_norm("v8_fund_equity.csv")
+v_fund = load_curve_norm("short_v3_fund_slip20_equity.csv")  # 2026-09-13 切 FB3-H20 2000 池曲线（原 v8_fund_equity.csv 退役）
 # 短线净值曲线（短线体系 v3 最优；2026-08-17 去 ETF）
 v_short_fund = load_curve_norm("short_v3_fund_slip20_equity.csv")
 v_short_stock = load_curve_norm("short_v3_stock_slip20_equity.csv")
@@ -1378,7 +1384,7 @@ if _cum_f.exists():
     if _cdata.get("pools"):
         _CBENCH = {
             "全量池中/长线": 48.1,
-            "短线·主板": 46.8, "短线·创业板": 48.1, "短线·科创板": 57.8, "短线·基金": 55.5,
+            "短线·主板": 46.8, "短线·创业板": 48.1, "短线·科创板": 57.8, "短线·基金": 65.2,  # 2026-09-11 FB3-H20 投产：55.5（T5/H10/S40 退役）→ 65.2
         }
         _crows = []
         _CT = {"n": 0, "buy": 0, "wins": 0, "losses": 0, "flat": 0, "sum_pct": 0.0}

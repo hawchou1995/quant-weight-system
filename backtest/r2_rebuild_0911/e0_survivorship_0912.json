@@ -1,0 +1,35 @@
+{
+  "full_universe_E0": {
+    "total_pct": 121.05,
+    "ann_pct": 15.57,
+    "mdd_pct": -29.4,
+    "sharpe": 0.791,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.43,
+    "reasons": {
+      "MA20破位": 297,
+      "硬止损-8%": 14
+    },
+    "variant": "E0基线"
+  },
+  "survivor_only_E0": {
+    "total_pct": 121.05,
+    "ann_pct": 15.57,
+    "mdd_pct": -29.4,
+    "sharpe": 0.791,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.43
+  },
+  "survivor_minus_full": {
+    "total_pct": 0.0,
+    "ann_pct": 0.0,
+    "mdd_pct": 0.0,
+    "sharpe": 0.0,
+    "n_trades": 0,
+    "win_rate": 0.0,
+    "payoff": 0.0
+  },
+  "stale_codes_n": 274
+}

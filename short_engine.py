@@ -87,10 +87,12 @@ def fix_amount_units(df):
         _c = pos["close"]
         mult = 100 if (_r / _c).median() > 50 else 1
     else:
+        # 2026-09-12：全库 volume 已统一「股」口径（263,837 行 ×100 修复 + 源头补丁）→
+        #   无锚点新上市股 mult=1；旧 `v23<=0→×100` 的「2024+ 新上市=手」前提已消除。
         pre = df[_d < "2024-01-01"]
         v23 = pre["volume"].median() if len(pre) > 0 else 0
         v24 = post["volume"].median()
-        mult = 100 if (v23 <= 0 or v24 / v23 < 0.1) else 1
+        mult = 100 if (v23 > 0 and v24 / v23 < 0.1) else 1
     idx = post.index[m]
     # 2026-09-04 修复：先转 float64 再赋值（pandas 3.0 LossySetitemError——int64 amount 列赋 float 值先崩）
     if df["amount"].dtype.kind in "iu":

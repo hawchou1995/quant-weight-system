@@ -50,6 +50,8 @@ def job(sym):
         df = df.rename(columns={"close": "close"})
         # hist_tx 列序 [date, open, close, high, low, volume, turnover, amount] → HEADERS [date, open, high, low, close, volume, amount]
         df = df[["date", "open", "high", "low", "close", "volume", "amount"]]
+        # ⚠ 2026-09-12：akshare hist_tx(腾讯) volume=手 → ×100 转股（全库单位铁律；防重跑再污染）
+        df["volume"] = pd.to_numeric(df["volume"], errors="coerce").fillna(0) * 100
         df = df[F.HEADERS].drop_duplicates(subset="date").sort_values("date")
         if str(df["date"].iloc[-1]) != TARGET:
             return (sym, False, f"last={df['date'].iloc[-1]}")

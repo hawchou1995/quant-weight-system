@@ -1,0 +1,424 @@
+{
+  "W1复刻E0": {
+    "arm": "W1复刻E0",
+    "total_pct": 121.05,
+    "ann_pct": 15.57,
+    "mdd_pct": -29.4,
+    "sharpe": 0.791,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.43,
+    "reasons": {
+      "MA20破位": 297,
+      "硬止损-8%": 14
+    }
+  },
+  "W3等权": {
+    "arm": "W3等权",
+    "total_pct": 54.87,
+    "ann_pct": 8.31,
+    "mdd_pct": -38.8,
+    "sharpe": 0.449,
+    "n_trades": 188,
+    "win_rate": 37.2,
+    "payoff": 2.66,
+    "reasons": {
+      "MA20破位": 178,
+      "硬止损-8%": 10
+    }
+  },
+  "W7等权": {
+    "arm": "W7等权",
+    "total_pct": 93.7,
+    "ann_pct": 12.82,
+    "mdd_pct": -25.9,
+    "sharpe": 0.744,
+    "n_trades": 436,
+    "win_rate": 35.3,
+    "payoff": 3.22,
+    "reasons": {
+      "MA20破位": 419,
+      "硬止损-8%": 17
+    }
+  },
+  "W10等权": {
+    "arm": "W10等权",
+    "total_pct": 87.91,
+    "ann_pct": 12.2,
+    "mdd_pct": -23.1,
+    "sharpe": 0.772,
+    "n_trades": 627,
+    "win_rate": 35.9,
+    "payoff": 2.99,
+    "reasons": {
+      "MA20破位": 604,
+      "硬止损-8%": 23
+    }
+  },
+  "W5线性": {
+    "arm": "W5线性",
+    "total_pct": 83.6,
+    "ann_pct": 11.73,
+    "mdd_pct": -31.5,
+    "sharpe": 0.599,
+    "n_trades": 303,
+    "win_rate": 37.0,
+    "payoff": 3.1,
+    "reasons": {
+      "MA20破位": 291,
+      "硬止损-8%": 12
+    }
+  },
+  "W5平方": {
+    "arm": "W5平方",
+    "total_pct": 74.35,
+    "ann_pct": 10.68,
+    "mdd_pct": -37.6,
+    "sharpe": 0.539,
+    "n_trades": 300,
+    "win_rate": 36.0,
+    "payoff": 3.14,
+    "reasons": {
+      "MA20破位": 287,
+      "硬止损-8%": 13
+    }
+  },
+  "W5几何08": {
+    "arm": "W5几何08",
+    "total_pct": 89.37,
+    "ann_pct": 12.36,
+    "mdd_pct": -30.6,
+    "sharpe": 0.639,
+    "n_trades": 305,
+    "win_rate": 36.7,
+    "payoff": 3.03,
+    "reasons": {
+      "MA20破位": 292,
+      "硬止损-8%": 13
+    }
+  },
+  "W5top2集中": {
+    "arm": "W5top2集中",
+    "total_pct": 97.21,
+    "ann_pct": 13.19,
+    "mdd_pct": -31.8,
+    "sharpe": 0.647,
+    "n_trades": 300,
+    "win_rate": 36.3,
+    "payoff": 3.18,
+    "reasons": {
+      "MA20破位": 288,
+      "硬止损-8%": 12
+    }
+  },
+  "W5波动率倒数": {
+    "arm": "W5波动率倒数",
+    "total_pct": 119.3,
+    "ann_pct": 15.41,
+    "mdd_pct": -31.3,
+    "sharpe": 0.728,
+    "n_trades": 305,
+    "win_rate": 37.7,
+    "payoff": 2.8,
+    "reasons": {
+      "MA20破位": 287,
+      "硬止损-8%": 18
+    }
+  },
+  "W5动量加权": {
+    "arm": "W5动量加权",
+    "total_pct": 168.35,
+    "ann_pct": 19.74,
+    "mdd_pct": -30.7,
+    "sharpe": 0.85,
+    "n_trades": 291,
+    "win_rate": 37.8,
+    "payoff": 3.11,
+    "reasons": {
+      "MA20破位": 275,
+      "硬止损-8%": 16
+    }
+  },
+  "W5流动性加权": {
+    "arm": "W5流动性加权",
+    "total_pct": 24.02,
+    "ann_pct": 4.01,
+    "mdd_pct": -36.3,
+    "sharpe": 0.294,
+    "n_trades": 305,
+    "win_rate": 36.1,
+    "payoff": 2.93,
+    "reasons": {
+      "MA20破位": 292,
+      "硬止损-8%": 13
+    }
+  },
+  "F1低吸过滤0.5": {
+    "arm": "F1低吸过滤0.5",
+    "total_pct": -11.86,
+    "ann_pct": -2.28,
+    "mdd_pct": -26.6,
+    "sharpe": -0.195,
+    "n_trades": 265,
+    "win_rate": 34.0,
+    "payoff": 1.8,
+    "reasons": {
+      "MA20破位": 261,
+      "硬止损-8%": 4
+    }
+  },
+  "F2距离排序382": {
+    "arm": "F2距离排序382",
+    "total_pct": 88.92,
+    "ann_pct": 12.31,
+    "mdd_pct": -23.1,
+    "sharpe": 0.767,
+    "n_trades": 320,
+    "win_rate": 32.8,
+    "payoff": 3.78,
+    "reasons": {
+      "MA20破位": 314,
+      "硬止损-8%": 6
+    }
+  },
+  "F2P60排序382": {
+    "arm": "F2P60排序382",
+    "total_pct": 73.24,
+    "ann_pct": 10.55,
+    "mdd_pct": -25.6,
+    "sharpe": 0.666,
+    "n_trades": 312,
+    "win_rate": 32.7,
+    "payoff": 3.44,
+    "reasons": {
+      "MA20破位": 305,
+      "硬止损-8%": 7
+    }
+  },
+  "F3支撑止损382": {
+    "arm": "F3支撑止损382",
+    "total_pct": 115.56,
+    "ann_pct": 15.05,
+    "mdd_pct": -31.1,
+    "sharpe": 0.765,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.35,
+    "reasons": {
+      "fib0.382支撑止损": 202,
+      "MA20破位": 109
+    }
+  },
+  "F2F3组合": {
+    "arm": "F2F3组合",
+    "total_pct": 84.07,
+    "ann_pct": 11.78,
+    "mdd_pct": -23.1,
+    "sharpe": 0.757,
+    "n_trades": 320,
+    "win_rate": 32.8,
+    "payoff": 3.76,
+    "reasons": {
+      "fib0.382支撑止损": 215,
+      "MA20破位": 105
+    }
+  },
+  "P10节奏": {
+    "arm": "P10节奏",
+    "total_pct": 160.01,
+    "ann_pct": 19.05,
+    "mdd_pct": -32.7,
+    "sharpe": 0.839,
+    "n_trades": 524,
+    "win_rate": 34.4,
+    "payoff": 3.23,
+    "reasons": {
+      "MA20破位": 503,
+      "硬止损-8%": 19,
+      "满60日": 2
+    }
+  },
+  "P40节奏": {
+    "arm": "P40节奏",
+    "total_pct": 160.31,
+    "ann_pct": 19.07,
+    "mdd_pct": -23.8,
+    "sharpe": 1.055,
+    "n_trades": 171,
+    "win_rate": 44.4,
+    "payoff": 3.72,
+    "reasons": {
+      "MA20破位": 162,
+      "硬止损-8%": 9
+    }
+  },
+  "_benchmark_HS300_pct": -14.38,
+  "R30": {
+    "arm": "R30",
+    "total_pct": 41.52,
+    "ann_pct": 6.54,
+    "mdd_pct": -33.2,
+    "sharpe": 0.452,
+    "n_trades": 220,
+    "win_rate": 30.9,
+    "payoff": 3.52,
+    "reasons": {
+      "MA20破位": 207,
+      "硬止损-8%": 13
+    }
+  },
+  "R50": {
+    "arm": "R50",
+    "total_pct": 37.89,
+    "ann_pct": 6.04,
+    "mdd_pct": -20.8,
+    "sharpe": 0.514,
+    "n_trades": 138,
+    "win_rate": 39.1,
+    "payoff": 2.98,
+    "reasons": {
+      "MA20破位": 136,
+      "硬止损-8%": 2
+    }
+  },
+  "R60": {
+    "arm": "R60",
+    "total_pct": 19.71,
+    "ann_pct": 3.34,
+    "mdd_pct": -20.4,
+    "sharpe": 0.319,
+    "n_trades": 115,
+    "win_rate": 35.7,
+    "payoff": 2.91,
+    "reasons": {
+      "MA20破位": 107,
+      "硬止损-8%": 8
+    }
+  },
+  "R80": {
+    "arm": "R80",
+    "total_pct": 58.94,
+    "ann_pct": 8.82,
+    "mdd_pct": -16.9,
+    "sharpe": 0.722,
+    "n_trades": 90,
+    "win_rate": 43.3,
+    "payoff": 4.05,
+    "reasons": {
+      "MA20破位": 86,
+      "硬止损-8%": 4
+    }
+  },
+  "C1=P40+动量": {
+    "arm": "C1=P40+动量",
+    "total_pct": 147.42,
+    "ann_pct": 17.98,
+    "mdd_pct": -23.7,
+    "sharpe": 0.911,
+    "n_trades": 173,
+    "win_rate": 40.5,
+    "payoff": 3.5,
+    "reasons": {
+      "MA20破位": 163,
+      "硬止损-8%": 10
+    }
+  },
+  "C2=P40+N3": {
+    "arm": "C2=P40+N3",
+    "total_pct": 115.5,
+    "ann_pct": 15.04,
+    "mdd_pct": -26.2,
+    "sharpe": 0.773,
+    "n_trades": 102,
+    "win_rate": 47.1,
+    "payoff": 2.96,
+    "reasons": {
+      "MA20破位": 96,
+      "硬止损-8%": 6
+    }
+  },
+  "C3=P40+N7": {
+    "arm": "C3=P40+N7",
+    "total_pct": 120.6,
+    "ann_pct": 15.53,
+    "mdd_pct": -22.4,
+    "sharpe": 0.994,
+    "n_trades": 240,
+    "win_rate": 42.1,
+    "payoff": 3.56,
+    "reasons": {
+      "MA20破位": 228,
+      "硬止损-8%": 12
+    }
+  },
+  "C4=P40+N10": {
+    "arm": "C4=P40+N10",
+    "total_pct": 107.74,
+    "ann_pct": 14.27,
+    "mdd_pct": -18.4,
+    "sharpe": 1.011,
+    "n_trades": 345,
+    "win_rate": 40.9,
+    "payoff": 3.39,
+    "reasons": {
+      "MA20破位": 330,
+      "硬止损-8%": 15
+    }
+  },
+  "C5=P40+动量+N10": {
+    "arm": "C5=P40+动量+N10",
+    "total_pct": 94.83,
+    "ann_pct": 12.94,
+    "mdd_pct": -19.5,
+    "sharpe": 0.892,
+    "n_trades": 345,
+    "win_rate": 41.2,
+    "payoff": 3.15,
+    "reasons": {
+      "MA20破位": 329,
+      "硬止损-8%": 16
+    }
+  },
+  "C6=P40+F2排序": {
+    "arm": "C6=P40+F2排序",
+    "total_pct": 110.25,
+    "ann_pct": 14.52,
+    "mdd_pct": -16.0,
+    "sharpe": 1.04,
+    "n_trades": 171,
+    "win_rate": 39.2,
+    "payoff": 4.13,
+    "reasons": {
+      "MA20破位": 167,
+      "硬止损-8%": 4
+    }
+  },
+  "C7=P40+F2+动量": {
+    "arm": "C7=P40+F2+动量",
+    "total_pct": 102.11,
+    "ann_pct": 13.7,
+    "mdd_pct": -16.2,
+    "sharpe": 1.013,
+    "n_trades": 171,
+    "win_rate": 39.2,
+    "payoff": 4.13,
+    "reasons": {
+      "MA20破位": 167,
+      "硬止损-8%": 4
+    }
+  },
+  "C8=R60+动量": {
+    "arm": "C8=R60+动量",
+    "total_pct": 42.88,
+    "ann_pct": 6.73,
+    "mdd_pct": -18.5,
+    "sharpe": 0.501,
+    "n_trades": 115,
+    "win_rate": 34.8,
+    "payoff": 3.57,
+    "reasons": {
+      "MA20破位": 106,
+      "硬止损-8%": 9
+    }
+  }
+}

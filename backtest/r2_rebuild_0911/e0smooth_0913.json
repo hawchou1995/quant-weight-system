@@ -1,0 +1,70 @@
+{
+  "SMOOTH_LLV30N10": {
+    "arm": "SMOOTH_LLV30N10",
+    "total_pct": -15.97,
+    "ann_pct": -3.12,
+    "mdd_pct": -36.5,
+    "sharpe": -0.093,
+    "n_trades": 365,
+    "win_rate": 21.4,
+    "payoff": 3.44,
+    "reasons": {
+      "LLV30破位": 257,
+      "硬止损-8%": 77,
+      "满60日": 31
+    }
+  },
+  "SMOOTH_LLV20N10": {
+    "arm": "SMOOTH_LLV20N10",
+    "total_pct": -14.02,
+    "ann_pct": -2.72,
+    "mdd_pct": -35.5,
+    "sharpe": -0.082,
+    "n_trades": 404,
+    "win_rate": 23.5,
+    "payoff": 3.11,
+    "reasons": {
+      "LLV20破位": 328,
+      "硬止损-8%": 60,
+      "满60日": 16
+    }
+  },
+  "SMOOTH_baseMA20N5": {
+    "arm": "SMOOTH_baseMA20N5",
+    "total_pct": 10.72,
+    "ann_pct": 1.88,
+    "mdd_pct": -19.9,
+    "sharpe": 0.204,
+    "n_trades": 266,
+    "win_rate": 38.7,
+    "payoff": 1.88,
+    "reasons": {
+      "MA20破位": 257,
+      "硬止损-8%": 9
+    }
+  },
+  "_phase_SMOOTH_LLV30N10": [
+    -15.97,
+    -29.94,
+    -36.66,
+    -37.13,
+    -45.39,
+    -32.45,
+    -37.93,
+    -39.1,
+    -21.22,
+    -30.62
+  ],
+  "_phase_SMOOTH_baseMA20N5": [
+    10.72,
+    -13.29,
+    -30.0,
+    -27.48,
+    -39.9,
+    -31.96,
+    -35.33,
+    -44.29,
+    -20.09,
+    -27.92
+  ]
+}

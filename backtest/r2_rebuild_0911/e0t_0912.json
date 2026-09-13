@@ -1,0 +1,395 @@
+{
+  "BASE复刻": {
+    "arm": "BASE复刻",
+    "total_pct": 121.05,
+    "ann_pct": 15.57,
+    "mdd_pct": -29.4,
+    "sharpe": 0.791,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.43,
+    "reasons": {
+      "MA20破位": 297,
+      "硬止损-8%": 14
+    }
+  },
+  "T1_LLV10": {
+    "arm": "T1_LLV10",
+    "total_pct": 248.07,
+    "ann_pct": 25.56,
+    "mdd_pct": -33.1,
+    "sharpe": 1.022,
+    "n_trades": 273,
+    "win_rate": 32.6,
+    "payoff": 4.52,
+    "reasons": {
+      "LLV10破位": 253,
+      "硬止损-8%": 17,
+      "满60日": 3
+    }
+  },
+  "T1_LLV13": {
+    "arm": "T1_LLV13",
+    "total_pct": 194.03,
+    "ann_pct": 21.75,
+    "mdd_pct": -33.0,
+    "sharpe": 0.882,
+    "n_trades": 255,
+    "win_rate": 31.4,
+    "payoff": 4.58,
+    "reasons": {
+      "LLV13破位": 226,
+      "硬止损-8%": 23,
+      "满60日": 6
+    }
+  },
+  "T1_LLV15": {
+    "arm": "T1_LLV15",
+    "total_pct": 222.66,
+    "ann_pct": 23.83,
+    "mdd_pct": -37.5,
+    "sharpe": 0.936,
+    "n_trades": 242,
+    "win_rate": 28.9,
+    "payoff": 5.34,
+    "reasons": {
+      "LLV15破位": 209,
+      "硬止损-8%": 24,
+      "满60日": 9
+    }
+  },
+  "T1_LLV20": {
+    "arm": "T1_LLV20",
+    "total_pct": 237.21,
+    "ann_pct": 24.83,
+    "mdd_pct": -38.5,
+    "sharpe": 0.937,
+    "n_trades": 218,
+    "win_rate": 26.6,
+    "payoff": 5.99,
+    "reasons": {
+      "LLV20破位": 179,
+      "硬止损-8%": 27,
+      "满60日": 12
+    }
+  },
+  "T1_LLV30": {
+    "arm": "T1_LLV30",
+    "total_pct": 378.38,
+    "ann_pct": 33.06,
+    "mdd_pct": -38.9,
+    "sharpe": 1.128,
+    "n_trades": 187,
+    "win_rate": 28.3,
+    "payoff": 6.51,
+    "reasons": {
+      "LLV30破位": 133,
+      "硬止损-8%": 28,
+      "满60日": 26
+    }
+  },
+  "T1_LLV40": {
+    "arm": "T1_LLV40",
+    "total_pct": 352.58,
+    "ann_pct": 31.72,
+    "mdd_pct": -39.4,
+    "sharpe": 1.074,
+    "n_trades": 177,
+    "win_rate": 26.0,
+    "payoff": 6.82,
+    "reasons": {
+      "LLV40破位": 114,
+      "硬止损-8%": 31,
+      "满60日": 32
+    }
+  },
+  "T1_LLV60": {
+    "arm": "T1_LLV60",
+    "total_pct": 176.41,
+    "ann_pct": 20.39,
+    "mdd_pct": -40.7,
+    "sharpe": 0.755,
+    "n_trades": 155,
+    "win_rate": 27.7,
+    "payoff": 5.15,
+    "reasons": {
+      "LLV60破位": 70,
+      "硬止损-8%": 40,
+      "满60日": 45
+    }
+  },
+  "T2_MA20x1.03": {
+    "arm": "T2_MA20x1.03",
+    "total_pct": 73.32,
+    "ann_pct": 10.56,
+    "mdd_pct": -25.0,
+    "sharpe": 0.675,
+    "n_trades": 332,
+    "win_rate": 39.5,
+    "payoff": 2.75,
+    "reasons": {
+      "MA20x1.03破位": 326,
+      "硬止损-8%": 6
+    }
+  },
+  "T2_MA20x1.05": {
+    "arm": "T2_MA20x1.05",
+    "total_pct": 44.17,
+    "ann_pct": 6.9,
+    "mdd_pct": -20.8,
+    "sharpe": 0.525,
+    "n_trades": 338,
+    "win_rate": 41.4,
+    "payoff": 2.24,
+    "reasons": {
+      "MA20x1.05破位": 333,
+      "硬止损-8%": 5
+    }
+  },
+  "T3_ema144多头排列": {
+    "arm": "T3_ema144多头排列",
+    "total_pct": 284.73,
+    "ann_pct": 27.87,
+    "mdd_pct": -30.9,
+    "sharpe": 1.129,
+    "n_trades": 304,
+    "win_rate": 38.8,
+    "payoff": 3.43,
+    "reasons": {
+      "MA20破位": 285,
+      "硬止损-8%": 19
+    }
+  },
+  "T3_ema576牛熊": {
+    "arm": "T3_ema576牛熊",
+    "total_pct": 94.04,
+    "ann_pct": 12.86,
+    "mdd_pct": -29.2,
+    "sharpe": 0.662,
+    "n_trades": 309,
+    "win_rate": 35.0,
+    "payoff": 3.19,
+    "reasons": {
+      "MA20破位": 294,
+      "硬止损-8%": 15
+    }
+  },
+  "_phase_T1_LLV30": {
+    "off0": 378.38,
+    "tots": [
+      378.38,
+      289.05,
+      375.73,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "median": 144.53,
+    "min": 0.0,
+    "max": 378.38
+  },
+  "_phase_T1_LLV40": {
+    "off0": 352.58,
+    "tots": [
+      352.58,
+      269.06,
+      399.92,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "median": 134.53,
+    "min": 0.0,
+    "max": 399.92
+  },
+  "_phase_T3_ema144多头排列": {
+    "off0": 284.73,
+    "tots": [
+      284.73,
+      44.09,
+      119.11,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "median": 22.05,
+    "min": 0.0,
+    "max": 284.73
+  },
+  "E_LLV30_N7": {
+    "arm": "E_LLV30_N7",
+    "total_pct": 299.8,
+    "ann_pct": 28.77,
+    "mdd_pct": -35.6,
+    "sharpe": 1.094,
+    "n_trades": 254,
+    "win_rate": 29.5,
+    "payoff": 5.63,
+    "reasons": {
+      "LLV30破位": 180,
+      "硬止损-8%": 39,
+      "满60日": 35
+    }
+  },
+  "E_LLV30_N10": {
+    "arm": "E_LLV30_N10",
+    "total_pct": 270.05,
+    "ann_pct": 26.97,
+    "mdd_pct": -32.3,
+    "sharpe": 1.093,
+    "n_trades": 370,
+    "win_rate": 29.5,
+    "payoff": 5.7,
+    "reasons": {
+      "LLV30破位": 254,
+      "硬止损-8%": 64,
+      "满60日": 52
+    }
+  },
+  "E_LLV30_N7_lin": {
+    "arm": "E_LLV30_N7_lin",
+    "total_pct": 415.8,
+    "ann_pct": 34.9,
+    "mdd_pct": -39.1,
+    "sharpe": 1.165,
+    "n_trades": 229,
+    "win_rate": 30.1,
+    "payoff": 5.84,
+    "reasons": {
+      "LLV30破位": 159,
+      "硬止损-8%": 36,
+      "满60日": 34
+    }
+  },
+  "E_LLV20_N7": {
+    "arm": "E_LLV20_N7",
+    "total_pct": 234.19,
+    "ann_pct": 24.63,
+    "mdd_pct": -31.9,
+    "sharpe": 1.002,
+    "n_trades": 293,
+    "win_rate": 28.7,
+    "payoff": 5.34,
+    "reasons": {
+      "LLV20破位": 239,
+      "硬止损-8%": 35,
+      "满60日": 19
+    }
+  },
+  "E_LLV25": {
+    "arm": "E_LLV25",
+    "total_pct": 245.31,
+    "ann_pct": 25.38,
+    "mdd_pct": -38.6,
+    "sharpe": 0.942,
+    "n_trades": 204,
+    "win_rate": 28.4,
+    "payoff": 5.55,
+    "reasons": {
+      "LLV25破位": 160,
+      "硬止损-8%": 27,
+      "满60日": 17
+    }
+  },
+  "E_yearly_LLV30N7": {
+    "2021": -12.19,
+    "2022": 5.75,
+    "2023": 5.86,
+    "2024": 50.92,
+    "2025": 55.78,
+    "2026": 63.51
+  },
+  "E_LLV30N7_slip30": {
+    "arm": "E_LLV30N7_s30",
+    "total_pct": 277.48,
+    "ann_pct": 27.43,
+    "mdd_pct": -35.9,
+    "sharpe": 1.055,
+    "n_trades": 255,
+    "win_rate": 29.0,
+    "payoff": 5.54,
+    "reasons": {
+      "LLV30破位": 180,
+      "硬止损-8%": 40,
+      "满60日": 35
+    }
+  },
+  "E_LLV30N7_slip40": {
+    "arm": "E_LLV30N7_s40",
+    "total_pct": 251.27,
+    "ann_pct": 25.77,
+    "mdd_pct": -36.4,
+    "sharpe": 1.006,
+    "n_trades": 256,
+    "win_rate": 28.1,
+    "payoff": 5.53,
+    "reasons": {
+      "LLV30破位": 180,
+      "硬止损-8%": 41,
+      "满60日": 35
+    }
+  },
+  "E_LLV30N7_randomw": {
+    "n": 300,
+    "sharpe_median": 1.003,
+    "sharpe_p95": 1.239,
+    "total_median": 265.88
+  },
+  "_F_phase_final": {
+    "offs": [
+      0,
+      2,
+      4,
+      6,
+      8,
+      10,
+      12,
+      14,
+      16,
+      18
+    ],
+    "base": [
+      121.05,
+      118.06,
+      102.72,
+      135.39,
+      64.13,
+      130.46,
+      75.97,
+      32.89,
+      71.8,
+      86.26
+    ],
+    "l30n10": [
+      270.05,
+      177.96,
+      305.63,
+      353.51,
+      113.12,
+      214.22,
+      242.48,
+      195.39,
+      209.68,
+      183.31
+    ],
+    "l20n7": [
+      234.19,
+      154.78,
+      253.89,
+      281.05,
+      143.3,
+      306.94,
+      226.16,
+      172.91,
+      189.73,
+      197.63
+    ],
+    "l30n10_median": 211.95,
+    "base_median": 94.49,
+    "l20n7_median": 211.89,
+    "da_median": 143.44,
+    "da_pos": 1.0,
+    "db_median": 128.97,
+    "db_pos": 1.0
+  }
+}

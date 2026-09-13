@@ -837,6 +837,9 @@ def calc_signals(as_of=None):
     # 3) 基金动量 Top10（2026-09-01 FB3 牛熊 regime：牛=动量重 S30 Top10 / 熊=低波重 S45 Top3）
     # 回测（修正引擎 T+1，slip5）：牛动量+熊极防守 → 夏普 1.247（破 1.0）/收益 642.13%/胜率 56.4%/9/11 年正
     #   vs 生产基线（熊清仓）夏普 0.867/243.84% —— 基金熊市防守开仓 +398pp 增益（股票相反，熊市清仓）
+    # 2026-09-11 用户拍板升级 FB3-H20（持仓 10→20 日，月度级轮动）：3000 池 slip5 = 436.44%/年化 17.02%/mdd -36.06%/夏普 1.07/胜率 65.2%/725 笔
+    #   （理想口径 493.54%/1.13）；旧线 T5/H10/S40（243.47%/0.834/55.5%/598 笔）退役；回撤扩大 9.9pp 但 Calmar 9.29→12.10 改善
+    #   产物：short_v3_fund_slip20_summary.json / equity.csv（finalize_short_v3.py --asset fund）
     fund_pool = S.load_fund_pool(3000)
     frows = []
     _fw = FUND_W_BULL if _in_mkt else FUND_W_BEAR

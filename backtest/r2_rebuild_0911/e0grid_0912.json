@@ -1,0 +1,2458 @@
+{
+  "BASE复刻": {
+    "arm": "BASE复刻",
+    "total_pct": 121.05,
+    "ann_pct": 15.57,
+    "mdd_pct": -29.4,
+    "sharpe": 0.791,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.43,
+    "reasons": {
+      "MA20破位": 297,
+      "硬止损-8%": 14
+    }
+  },
+  "M_MA10": {
+    "arm": "M_MA10",
+    "total_pct": 52.97,
+    "ann_pct": 8.07,
+    "mdd_pct": -26.4,
+    "sharpe": 0.544,
+    "n_trades": 338,
+    "win_rate": 35.2,
+    "payoff": 2.76,
+    "reasons": {
+      "MA10破位": 330,
+      "硬止损-8%": 8
+    }
+  },
+  "M_MA15": {
+    "arm": "M_MA15",
+    "total_pct": 94.41,
+    "ann_pct": 12.9,
+    "mdd_pct": -26.2,
+    "sharpe": 0.73,
+    "n_trades": 326,
+    "win_rate": 35.6,
+    "payoff": 3.19,
+    "reasons": {
+      "MA15破位": 317,
+      "硬止损-8%": 9
+    }
+  },
+  "M_MA22": {
+    "arm": "M_MA22",
+    "total_pct": 128.66,
+    "ann_pct": 16.29,
+    "mdd_pct": -27.9,
+    "sharpe": 0.814,
+    "n_trades": 305,
+    "win_rate": 34.1,
+    "payoff": 3.82,
+    "reasons": {
+      "MA22破位": 290,
+      "硬止损-8%": 13,
+      "满60日": 2
+    }
+  },
+  "M_MA25": {
+    "arm": "M_MA25",
+    "total_pct": 172.02,
+    "ann_pct": 20.03,
+    "mdd_pct": -28.1,
+    "sharpe": 0.933,
+    "n_trades": 299,
+    "win_rate": 34.8,
+    "payoff": 4.12,
+    "reasons": {
+      "MA25破位": 284,
+      "硬止损-8%": 12,
+      "满60日": 3
+    }
+  },
+  "M_MA30": {
+    "arm": "M_MA30",
+    "total_pct": 190.45,
+    "ann_pct": 21.48,
+    "mdd_pct": -29.6,
+    "sharpe": 0.963,
+    "n_trades": 289,
+    "win_rate": 37.7,
+    "payoff": 3.83,
+    "reasons": {
+      "MA30破位": 275,
+      "硬止损-8%": 12,
+      "满60日": 2
+    }
+  },
+  "M_MA40": {
+    "arm": "M_MA40",
+    "total_pct": 200.73,
+    "ann_pct": 22.25,
+    "mdd_pct": -30.2,
+    "sharpe": 0.976,
+    "n_trades": 273,
+    "win_rate": 38.1,
+    "payoff": 4.02,
+    "reasons": {
+      "MA40破位": 255,
+      "硬止损-8%": 12,
+      "满60日": 6
+    }
+  },
+  "M_MA50": {
+    "arm": "M_MA50",
+    "total_pct": 193.78,
+    "ann_pct": 21.73,
+    "mdd_pct": -37.2,
+    "sharpe": 0.936,
+    "n_trades": 266,
+    "win_rate": 40.2,
+    "payoff": 3.62,
+    "reasons": {
+      "MA50破位": 244,
+      "硬止损-8%": 13,
+      "满60日": 9
+    }
+  },
+  "M_MA60": {
+    "arm": "M_MA60",
+    "total_pct": 191.31,
+    "ann_pct": 21.54,
+    "mdd_pct": -34.8,
+    "sharpe": 0.947,
+    "n_trades": 257,
+    "win_rate": 39.3,
+    "payoff": 3.83,
+    "reasons": {
+      "MA60破位": 227,
+      "硬止损-8%": 16,
+      "满60日": 14
+    }
+  },
+  "S_stop0.05": {
+    "arm": "S_stop0.05",
+    "total_pct": 126.59,
+    "ann_pct": 16.1,
+    "mdd_pct": -29.6,
+    "sharpe": 0.831,
+    "n_trades": 312,
+    "win_rate": 35.6,
+    "payoff": 3.64,
+    "reasons": {
+      "MA20破位": 274,
+      "硬止损-5%": 38
+    }
+  },
+  "S_stop0.1": {
+    "arm": "S_stop0.1",
+    "total_pct": 115.41,
+    "ann_pct": 15.03,
+    "mdd_pct": -31.1,
+    "sharpe": 0.764,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.35,
+    "reasons": {
+      "MA20破位": 301,
+      "硬止损-10%": 10
+    }
+  },
+  "S_stop0.12": {
+    "arm": "S_stop0.12",
+    "total_pct": 115.41,
+    "ann_pct": 15.03,
+    "mdd_pct": -31.1,
+    "sharpe": 0.764,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.35,
+    "reasons": {
+      "MA20破位": 309,
+      "硬止损-12%": 2
+    }
+  },
+  "S_stop0.15": {
+    "arm": "S_stop0.15",
+    "total_pct": 115.41,
+    "ann_pct": 15.03,
+    "mdd_pct": -31.1,
+    "sharpe": 0.764,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.35,
+    "reasons": {
+      "MA20破位": 310,
+      "硬止损-15%": 1
+    }
+  },
+  "S_stopnone": {
+    "arm": "S_stopnone",
+    "total_pct": 115.41,
+    "ann_pct": 15.03,
+    "mdd_pct": -31.1,
+    "sharpe": 0.764,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.35,
+    "reasons": {
+      "MA20破位": 311
+    }
+  },
+  "H_hold30": {
+    "arm": "H_hold30",
+    "total_pct": 86.84,
+    "ann_pct": 12.08,
+    "mdd_pct": -29.8,
+    "sharpe": 0.671,
+    "n_trades": 317,
+    "win_rate": 36.3,
+    "payoff": 2.97,
+    "reasons": {
+      "MA20破位": 293,
+      "硬止损-8%": 14,
+      "满30日": 10
+    }
+  },
+  "H_hold40": {
+    "arm": "H_hold40",
+    "total_pct": 113.94,
+    "ann_pct": 14.89,
+    "mdd_pct": -25.8,
+    "sharpe": 0.796,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.35,
+    "reasons": {
+      "MA20破位": 291,
+      "硬止损-8%": 14,
+      "满40日": 6
+    }
+  },
+  "H_hold90": {
+    "arm": "H_hold90",
+    "total_pct": 121.05,
+    "ann_pct": 15.57,
+    "mdd_pct": -29.4,
+    "sharpe": 0.791,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.43,
+    "reasons": {
+      "MA20破位": 297,
+      "硬止损-8%": 14
+    }
+  },
+  "H_hold120": {
+    "arm": "H_hold120",
+    "total_pct": 121.05,
+    "ann_pct": 15.57,
+    "mdd_pct": -29.4,
+    "sharpe": 0.791,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.43,
+    "reasons": {
+      "MA20破位": 297,
+      "硬止损-8%": 14
+    }
+  },
+  "H_holdnone": {
+    "arm": "H_holdnone",
+    "total_pct": 121.05,
+    "ann_pct": 15.57,
+    "mdd_pct": -29.4,
+    "sharpe": 0.791,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.43,
+    "reasons": {
+      "MA20破位": 297,
+      "硬止损-8%": 14
+    }
+  },
+  "L_pool5": {
+    "arm": "L_pool5",
+    "total_pct": 121.05,
+    "ann_pct": 15.57,
+    "mdd_pct": -29.4,
+    "sharpe": 0.791,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.43,
+    "reasons": {
+      "MA20破位": 297,
+      "硬止损-8%": 14
+    }
+  },
+  "L_pool20": {
+    "arm": "L_pool20",
+    "total_pct": 121.05,
+    "ann_pct": 15.57,
+    "mdd_pct": -29.4,
+    "sharpe": 0.791,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.43,
+    "reasons": {
+      "MA20破位": 297,
+      "硬止损-8%": 14
+    }
+  },
+  "L_pool50": {
+    "arm": "L_pool50",
+    "total_pct": 121.05,
+    "ann_pct": 15.57,
+    "mdd_pct": -29.4,
+    "sharpe": 0.791,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.43,
+    "reasons": {
+      "MA20破位": 297,
+      "硬止损-8%": 14
+    }
+  },
+  "L_amt2M": {
+    "arm": "L_amt2M",
+    "total_pct": 121.05,
+    "ann_pct": 15.57,
+    "mdd_pct": -29.4,
+    "sharpe": 0.791,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.43,
+    "reasons": {
+      "MA20破位": 297,
+      "硬止损-8%": 14
+    }
+  },
+  "L_amt10M": {
+    "arm": "L_amt10M",
+    "total_pct": 121.05,
+    "ann_pct": 15.57,
+    "mdd_pct": -29.4,
+    "sharpe": 0.791,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.43,
+    "reasons": {
+      "MA20破位": 297,
+      "硬止损-8%": 14
+    }
+  },
+  "L_amt20M": {
+    "arm": "L_amt20M",
+    "total_pct": 121.05,
+    "ann_pct": 15.57,
+    "mdd_pct": -29.4,
+    "sharpe": 0.791,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.43,
+    "reasons": {
+      "MA20破位": 297,
+      "硬止损-8%": 14
+    }
+  },
+  "G_MA10_s0.05_h30": {
+    "arm": "G_MA10_s0.05_h30",
+    "total_pct": 54.81,
+    "ann_pct": 8.3,
+    "mdd_pct": -26.4,
+    "sharpe": 0.562,
+    "n_trades": 338,
+    "win_rate": 35.2,
+    "payoff": 2.79,
+    "reasons": {
+      "MA10破位": 311,
+      "硬止损-5%": 27
+    }
+  },
+  "G_MA10_s0.05_h60": {
+    "arm": "G_MA10_s0.05_h60",
+    "total_pct": 54.81,
+    "ann_pct": 8.3,
+    "mdd_pct": -26.4,
+    "sharpe": 0.562,
+    "n_trades": 338,
+    "win_rate": 35.2,
+    "payoff": 2.79,
+    "reasons": {
+      "MA10破位": 311,
+      "硬止损-5%": 27
+    }
+  },
+  "G_MA10_s0.05_h90": {
+    "arm": "G_MA10_s0.05_h90",
+    "total_pct": 54.81,
+    "ann_pct": 8.3,
+    "mdd_pct": -26.4,
+    "sharpe": 0.562,
+    "n_trades": 338,
+    "win_rate": 35.2,
+    "payoff": 2.79,
+    "reasons": {
+      "MA10破位": 311,
+      "硬止损-5%": 27
+    }
+  },
+  "G_MA10_s0.05_hx": {
+    "arm": "G_MA10_s0.05_hx",
+    "total_pct": 54.81,
+    "ann_pct": 8.3,
+    "mdd_pct": -26.4,
+    "sharpe": 0.562,
+    "n_trades": 338,
+    "win_rate": 35.2,
+    "payoff": 2.79,
+    "reasons": {
+      "MA10破位": 311,
+      "硬止损-5%": 27
+    }
+  },
+  "G_MA10_s0.08_h30": {
+    "arm": "G_MA10_s0.08_h30",
+    "total_pct": 52.97,
+    "ann_pct": 8.07,
+    "mdd_pct": -26.4,
+    "sharpe": 0.544,
+    "n_trades": 338,
+    "win_rate": 35.2,
+    "payoff": 2.76,
+    "reasons": {
+      "MA10破位": 330,
+      "硬止损-8%": 8
+    }
+  },
+  "G_MA10_s0.08_h60": {
+    "arm": "G_MA10_s0.08_h60",
+    "total_pct": 52.97,
+    "ann_pct": 8.07,
+    "mdd_pct": -26.4,
+    "sharpe": 0.544,
+    "n_trades": 338,
+    "win_rate": 35.2,
+    "payoff": 2.76,
+    "reasons": {
+      "MA10破位": 330,
+      "硬止损-8%": 8
+    }
+  },
+  "G_MA10_s0.08_h90": {
+    "arm": "G_MA10_s0.08_h90",
+    "total_pct": 52.97,
+    "ann_pct": 8.07,
+    "mdd_pct": -26.4,
+    "sharpe": 0.544,
+    "n_trades": 338,
+    "win_rate": 35.2,
+    "payoff": 2.76,
+    "reasons": {
+      "MA10破位": 330,
+      "硬止损-8%": 8
+    }
+  },
+  "G_MA10_s0.08_hx": {
+    "arm": "G_MA10_s0.08_hx",
+    "total_pct": 52.97,
+    "ann_pct": 8.07,
+    "mdd_pct": -26.4,
+    "sharpe": 0.544,
+    "n_trades": 338,
+    "win_rate": 35.2,
+    "payoff": 2.76,
+    "reasons": {
+      "MA10破位": 330,
+      "硬止损-8%": 8
+    }
+  },
+  "G_MA10_s0.1_h30": {
+    "arm": "G_MA10_s0.1_h30",
+    "total_pct": 52.97,
+    "ann_pct": 8.07,
+    "mdd_pct": -26.4,
+    "sharpe": 0.544,
+    "n_trades": 338,
+    "win_rate": 35.2,
+    "payoff": 2.76,
+    "reasons": {
+      "MA10破位": 335,
+      "硬止损-10%": 3
+    }
+  },
+  "G_MA10_s0.1_h60": {
+    "arm": "G_MA10_s0.1_h60",
+    "total_pct": 52.97,
+    "ann_pct": 8.07,
+    "mdd_pct": -26.4,
+    "sharpe": 0.544,
+    "n_trades": 338,
+    "win_rate": 35.2,
+    "payoff": 2.76,
+    "reasons": {
+      "MA10破位": 335,
+      "硬止损-10%": 3
+    }
+  },
+  "G_MA10_s0.1_h90": {
+    "arm": "G_MA10_s0.1_h90",
+    "total_pct": 52.97,
+    "ann_pct": 8.07,
+    "mdd_pct": -26.4,
+    "sharpe": 0.544,
+    "n_trades": 338,
+    "win_rate": 35.2,
+    "payoff": 2.76,
+    "reasons": {
+      "MA10破位": 335,
+      "硬止损-10%": 3
+    }
+  },
+  "G_MA10_s0.1_hx": {
+    "arm": "G_MA10_s0.1_hx",
+    "total_pct": 52.97,
+    "ann_pct": 8.07,
+    "mdd_pct": -26.4,
+    "sharpe": 0.544,
+    "n_trades": 338,
+    "win_rate": 35.2,
+    "payoff": 2.76,
+    "reasons": {
+      "MA10破位": 335,
+      "硬止损-10%": 3
+    }
+  },
+  "G_MA10_s0.15_h30": {
+    "arm": "G_MA10_s0.15_h30",
+    "total_pct": 52.97,
+    "ann_pct": 8.07,
+    "mdd_pct": -26.4,
+    "sharpe": 0.544,
+    "n_trades": 338,
+    "win_rate": 35.2,
+    "payoff": 2.76,
+    "reasons": {
+      "MA10破位": 338
+    }
+  },
+  "G_MA10_s0.15_h60": {
+    "arm": "G_MA10_s0.15_h60",
+    "total_pct": 52.97,
+    "ann_pct": 8.07,
+    "mdd_pct": -26.4,
+    "sharpe": 0.544,
+    "n_trades": 338,
+    "win_rate": 35.2,
+    "payoff": 2.76,
+    "reasons": {
+      "MA10破位": 338
+    }
+  },
+  "G_MA10_s0.15_h90": {
+    "arm": "G_MA10_s0.15_h90",
+    "total_pct": 52.97,
+    "ann_pct": 8.07,
+    "mdd_pct": -26.4,
+    "sharpe": 0.544,
+    "n_trades": 338,
+    "win_rate": 35.2,
+    "payoff": 2.76,
+    "reasons": {
+      "MA10破位": 338
+    }
+  },
+  "G_MA10_s0.15_hx": {
+    "arm": "G_MA10_s0.15_hx",
+    "total_pct": 52.97,
+    "ann_pct": 8.07,
+    "mdd_pct": -26.4,
+    "sharpe": 0.544,
+    "n_trades": 338,
+    "win_rate": 35.2,
+    "payoff": 2.76,
+    "reasons": {
+      "MA10破位": 338
+    }
+  },
+  "G_MA10_sx_h30": {
+    "arm": "G_MA10_sx_h30",
+    "total_pct": 52.97,
+    "ann_pct": 8.07,
+    "mdd_pct": -26.4,
+    "sharpe": 0.544,
+    "n_trades": 338,
+    "win_rate": 35.2,
+    "payoff": 2.76,
+    "reasons": {
+      "MA10破位": 338
+    }
+  },
+  "G_MA10_sx_h60": {
+    "arm": "G_MA10_sx_h60",
+    "total_pct": 52.97,
+    "ann_pct": 8.07,
+    "mdd_pct": -26.4,
+    "sharpe": 0.544,
+    "n_trades": 338,
+    "win_rate": 35.2,
+    "payoff": 2.76,
+    "reasons": {
+      "MA10破位": 338
+    }
+  },
+  "G_MA10_sx_h90": {
+    "arm": "G_MA10_sx_h90",
+    "total_pct": 52.97,
+    "ann_pct": 8.07,
+    "mdd_pct": -26.4,
+    "sharpe": 0.544,
+    "n_trades": 338,
+    "win_rate": 35.2,
+    "payoff": 2.76,
+    "reasons": {
+      "MA10破位": 338
+    }
+  },
+  "G_MA10_sx_hx": {
+    "arm": "G_MA10_sx_hx",
+    "total_pct": 52.97,
+    "ann_pct": 8.07,
+    "mdd_pct": -26.4,
+    "sharpe": 0.544,
+    "n_trades": 338,
+    "win_rate": 35.2,
+    "payoff": 2.76,
+    "reasons": {
+      "MA10破位": 338
+    }
+  },
+  "G_MA15_s0.05_h30": {
+    "arm": "G_MA15_s0.05_h30",
+    "total_pct": 105.02,
+    "ann_pct": 14.0,
+    "mdd_pct": -26.0,
+    "sharpe": 0.797,
+    "n_trades": 326,
+    "win_rate": 35.6,
+    "payoff": 3.31,
+    "reasons": {
+      "MA15破位": 283,
+      "硬止损-5%": 37,
+      "满30日": 6
+    }
+  },
+  "G_MA15_s0.05_h60": {
+    "arm": "G_MA15_s0.05_h60",
+    "total_pct": 99.34,
+    "ann_pct": 13.41,
+    "mdd_pct": -26.0,
+    "sharpe": 0.763,
+    "n_trades": 326,
+    "win_rate": 35.6,
+    "payoff": 3.28,
+    "reasons": {
+      "MA15破位": 289,
+      "硬止损-5%": 37
+    }
+  },
+  "G_MA15_s0.05_h90": {
+    "arm": "G_MA15_s0.05_h90",
+    "total_pct": 99.34,
+    "ann_pct": 13.41,
+    "mdd_pct": -26.0,
+    "sharpe": 0.763,
+    "n_trades": 326,
+    "win_rate": 35.6,
+    "payoff": 3.28,
+    "reasons": {
+      "MA15破位": 289,
+      "硬止损-5%": 37
+    }
+  },
+  "G_MA15_s0.05_hx": {
+    "arm": "G_MA15_s0.05_hx",
+    "total_pct": 99.34,
+    "ann_pct": 13.41,
+    "mdd_pct": -26.0,
+    "sharpe": 0.763,
+    "n_trades": 326,
+    "win_rate": 35.6,
+    "payoff": 3.28,
+    "reasons": {
+      "MA15破位": 289,
+      "硬止损-5%": 37
+    }
+  },
+  "G_MA15_s0.08_h30": {
+    "arm": "G_MA15_s0.08_h30",
+    "total_pct": 97.28,
+    "ann_pct": 13.2,
+    "mdd_pct": -26.3,
+    "sharpe": 0.75,
+    "n_trades": 326,
+    "win_rate": 35.6,
+    "payoff": 3.21,
+    "reasons": {
+      "MA15破位": 311,
+      "硬止损-8%": 9,
+      "满30日": 6
+    }
+  },
+  "G_MA15_s0.08_h60": {
+    "arm": "G_MA15_s0.08_h60",
+    "total_pct": 94.41,
+    "ann_pct": 12.9,
+    "mdd_pct": -26.2,
+    "sharpe": 0.73,
+    "n_trades": 326,
+    "win_rate": 35.6,
+    "payoff": 3.19,
+    "reasons": {
+      "MA15破位": 317,
+      "硬止损-8%": 9
+    }
+  },
+  "G_MA15_s0.08_h90": {
+    "arm": "G_MA15_s0.08_h90",
+    "total_pct": 94.41,
+    "ann_pct": 12.9,
+    "mdd_pct": -26.2,
+    "sharpe": 0.73,
+    "n_trades": 326,
+    "win_rate": 35.6,
+    "payoff": 3.19,
+    "reasons": {
+      "MA15破位": 317,
+      "硬止损-8%": 9
+    }
+  },
+  "G_MA15_s0.08_hx": {
+    "arm": "G_MA15_s0.08_hx",
+    "total_pct": 94.41,
+    "ann_pct": 12.9,
+    "mdd_pct": -26.2,
+    "sharpe": 0.73,
+    "n_trades": 326,
+    "win_rate": 35.6,
+    "payoff": 3.19,
+    "reasons": {
+      "MA15破位": 317,
+      "硬止损-8%": 9
+    }
+  },
+  "G_MA15_s0.1_h30": {
+    "arm": "G_MA15_s0.1_h30",
+    "total_pct": 93.8,
+    "ann_pct": 12.83,
+    "mdd_pct": -26.5,
+    "sharpe": 0.731,
+    "n_trades": 326,
+    "win_rate": 35.6,
+    "payoff": 3.16,
+    "reasons": {
+      "MA15破位": 317,
+      "满30日": 6,
+      "硬止损-10%": 3
+    }
+  },
+  "G_MA15_s0.1_h60": {
+    "arm": "G_MA15_s0.1_h60",
+    "total_pct": 90.87,
+    "ann_pct": 12.52,
+    "mdd_pct": -26.5,
+    "sharpe": 0.71,
+    "n_trades": 326,
+    "win_rate": 35.6,
+    "payoff": 3.14,
+    "reasons": {
+      "MA15破位": 323,
+      "硬止损-10%": 3
+    }
+  },
+  "G_MA15_s0.1_h90": {
+    "arm": "G_MA15_s0.1_h90",
+    "total_pct": 90.87,
+    "ann_pct": 12.52,
+    "mdd_pct": -26.5,
+    "sharpe": 0.71,
+    "n_trades": 326,
+    "win_rate": 35.6,
+    "payoff": 3.14,
+    "reasons": {
+      "MA15破位": 323,
+      "硬止损-10%": 3
+    }
+  },
+  "G_MA15_s0.1_hx": {
+    "arm": "G_MA15_s0.1_hx",
+    "total_pct": 90.87,
+    "ann_pct": 12.52,
+    "mdd_pct": -26.5,
+    "sharpe": 0.71,
+    "n_trades": 326,
+    "win_rate": 35.6,
+    "payoff": 3.14,
+    "reasons": {
+      "MA15破位": 323,
+      "硬止损-10%": 3
+    }
+  },
+  "G_MA15_s0.15_h30": {
+    "arm": "G_MA15_s0.15_h30",
+    "total_pct": 93.8,
+    "ann_pct": 12.83,
+    "mdd_pct": -26.5,
+    "sharpe": 0.731,
+    "n_trades": 326,
+    "win_rate": 35.6,
+    "payoff": 3.16,
+    "reasons": {
+      "MA15破位": 320,
+      "满30日": 6
+    }
+  },
+  "G_MA15_s0.15_h60": {
+    "arm": "G_MA15_s0.15_h60",
+    "total_pct": 90.87,
+    "ann_pct": 12.52,
+    "mdd_pct": -26.5,
+    "sharpe": 0.71,
+    "n_trades": 326,
+    "win_rate": 35.6,
+    "payoff": 3.14,
+    "reasons": {
+      "MA15破位": 326
+    }
+  },
+  "G_MA15_s0.15_h90": {
+    "arm": "G_MA15_s0.15_h90",
+    "total_pct": 90.87,
+    "ann_pct": 12.52,
+    "mdd_pct": -26.5,
+    "sharpe": 0.71,
+    "n_trades": 326,
+    "win_rate": 35.6,
+    "payoff": 3.14,
+    "reasons": {
+      "MA15破位": 326
+    }
+  },
+  "G_MA15_s0.15_hx": {
+    "arm": "G_MA15_s0.15_hx",
+    "total_pct": 90.87,
+    "ann_pct": 12.52,
+    "mdd_pct": -26.5,
+    "sharpe": 0.71,
+    "n_trades": 326,
+    "win_rate": 35.6,
+    "payoff": 3.14,
+    "reasons": {
+      "MA15破位": 326
+    }
+  },
+  "G_MA15_sx_h30": {
+    "arm": "G_MA15_sx_h30",
+    "total_pct": 93.8,
+    "ann_pct": 12.83,
+    "mdd_pct": -26.5,
+    "sharpe": 0.731,
+    "n_trades": 326,
+    "win_rate": 35.6,
+    "payoff": 3.16,
+    "reasons": {
+      "MA15破位": 320,
+      "满30日": 6
+    }
+  },
+  "G_MA15_sx_h60": {
+    "arm": "G_MA15_sx_h60",
+    "total_pct": 90.87,
+    "ann_pct": 12.52,
+    "mdd_pct": -26.5,
+    "sharpe": 0.71,
+    "n_trades": 326,
+    "win_rate": 35.6,
+    "payoff": 3.14,
+    "reasons": {
+      "MA15破位": 326
+    }
+  },
+  "G_MA15_sx_h90": {
+    "arm": "G_MA15_sx_h90",
+    "total_pct": 90.87,
+    "ann_pct": 12.52,
+    "mdd_pct": -26.5,
+    "sharpe": 0.71,
+    "n_trades": 326,
+    "win_rate": 35.6,
+    "payoff": 3.14,
+    "reasons": {
+      "MA15破位": 326
+    }
+  },
+  "G_MA15_sx_hx": {
+    "arm": "G_MA15_sx_hx",
+    "total_pct": 90.87,
+    "ann_pct": 12.52,
+    "mdd_pct": -26.5,
+    "sharpe": 0.71,
+    "n_trades": 326,
+    "win_rate": 35.6,
+    "payoff": 3.14,
+    "reasons": {
+      "MA15破位": 326
+    }
+  },
+  "G_MA20_s0.05_h30": {
+    "arm": "G_MA20_s0.05_h30",
+    "total_pct": 94.13,
+    "ann_pct": 12.87,
+    "mdd_pct": -29.6,
+    "sharpe": 0.72,
+    "n_trades": 318,
+    "win_rate": 35.8,
+    "payoff": 3.14,
+    "reasons": {
+      "MA20破位": 269,
+      "硬止损-5%": 39,
+      "满30日": 10
+    }
+  },
+  "G_MA20_s0.05_h60": {
+    "arm": "G_MA20_s0.05_h60",
+    "total_pct": 126.59,
+    "ann_pct": 16.1,
+    "mdd_pct": -29.6,
+    "sharpe": 0.831,
+    "n_trades": 312,
+    "win_rate": 35.6,
+    "payoff": 3.64,
+    "reasons": {
+      "MA20破位": 274,
+      "硬止损-5%": 38
+    }
+  },
+  "G_MA20_s0.05_h90": {
+    "arm": "G_MA20_s0.05_h90",
+    "total_pct": 126.59,
+    "ann_pct": 16.1,
+    "mdd_pct": -29.6,
+    "sharpe": 0.831,
+    "n_trades": 312,
+    "win_rate": 35.6,
+    "payoff": 3.64,
+    "reasons": {
+      "MA20破位": 274,
+      "硬止损-5%": 38
+    }
+  },
+  "G_MA20_s0.05_hx": {
+    "arm": "G_MA20_s0.05_hx",
+    "total_pct": 126.59,
+    "ann_pct": 16.1,
+    "mdd_pct": -29.6,
+    "sharpe": 0.831,
+    "n_trades": 312,
+    "win_rate": 35.6,
+    "payoff": 3.64,
+    "reasons": {
+      "MA20破位": 274,
+      "硬止损-5%": 38
+    }
+  },
+  "G_MA20_s0.08_h30": {
+    "arm": "G_MA20_s0.08_h30",
+    "total_pct": 86.84,
+    "ann_pct": 12.08,
+    "mdd_pct": -29.8,
+    "sharpe": 0.671,
+    "n_trades": 317,
+    "win_rate": 36.3,
+    "payoff": 2.97,
+    "reasons": {
+      "MA20破位": 293,
+      "硬止损-8%": 14,
+      "满30日": 10
+    }
+  },
+  "G_MA20_s0.08_h90": {
+    "arm": "G_MA20_s0.08_h90",
+    "total_pct": 121.05,
+    "ann_pct": 15.57,
+    "mdd_pct": -29.4,
+    "sharpe": 0.791,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.43,
+    "reasons": {
+      "MA20破位": 297,
+      "硬止损-8%": 14
+    }
+  },
+  "G_MA20_s0.08_hx": {
+    "arm": "G_MA20_s0.08_hx",
+    "total_pct": 121.05,
+    "ann_pct": 15.57,
+    "mdd_pct": -29.4,
+    "sharpe": 0.791,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.43,
+    "reasons": {
+      "MA20破位": 297,
+      "硬止损-8%": 14
+    }
+  },
+  "G_MA20_s0.1_h30": {
+    "arm": "G_MA20_s0.1_h30",
+    "total_pct": 81.76,
+    "ann_pct": 11.52,
+    "mdd_pct": -31.4,
+    "sharpe": 0.643,
+    "n_trades": 317,
+    "win_rate": 36.3,
+    "payoff": 2.9,
+    "reasons": {
+      "MA20破位": 297,
+      "硬止损-10%": 10,
+      "满30日": 10
+    }
+  },
+  "G_MA20_s0.1_h60": {
+    "arm": "G_MA20_s0.1_h60",
+    "total_pct": 115.41,
+    "ann_pct": 15.03,
+    "mdd_pct": -31.1,
+    "sharpe": 0.764,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.35,
+    "reasons": {
+      "MA20破位": 301,
+      "硬止损-10%": 10
+    }
+  },
+  "G_MA20_s0.1_h90": {
+    "arm": "G_MA20_s0.1_h90",
+    "total_pct": 115.41,
+    "ann_pct": 15.03,
+    "mdd_pct": -31.1,
+    "sharpe": 0.764,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.35,
+    "reasons": {
+      "MA20破位": 301,
+      "硬止损-10%": 10
+    }
+  },
+  "G_MA20_s0.1_hx": {
+    "arm": "G_MA20_s0.1_hx",
+    "total_pct": 115.41,
+    "ann_pct": 15.03,
+    "mdd_pct": -31.1,
+    "sharpe": 0.764,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.35,
+    "reasons": {
+      "MA20破位": 301,
+      "硬止损-10%": 10
+    }
+  },
+  "G_MA20_s0.15_h30": {
+    "arm": "G_MA20_s0.15_h30",
+    "total_pct": 81.76,
+    "ann_pct": 11.52,
+    "mdd_pct": -31.4,
+    "sharpe": 0.643,
+    "n_trades": 317,
+    "win_rate": 36.3,
+    "payoff": 2.9,
+    "reasons": {
+      "MA20破位": 306,
+      "满30日": 10,
+      "硬止损-15%": 1
+    }
+  },
+  "G_MA20_s0.15_h60": {
+    "arm": "G_MA20_s0.15_h60",
+    "total_pct": 115.41,
+    "ann_pct": 15.03,
+    "mdd_pct": -31.1,
+    "sharpe": 0.764,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.35,
+    "reasons": {
+      "MA20破位": 310,
+      "硬止损-15%": 1
+    }
+  },
+  "G_MA20_s0.15_h90": {
+    "arm": "G_MA20_s0.15_h90",
+    "total_pct": 115.41,
+    "ann_pct": 15.03,
+    "mdd_pct": -31.1,
+    "sharpe": 0.764,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.35,
+    "reasons": {
+      "MA20破位": 310,
+      "硬止损-15%": 1
+    }
+  },
+  "G_MA20_s0.15_hx": {
+    "arm": "G_MA20_s0.15_hx",
+    "total_pct": 115.41,
+    "ann_pct": 15.03,
+    "mdd_pct": -31.1,
+    "sharpe": 0.764,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.35,
+    "reasons": {
+      "MA20破位": 310,
+      "硬止损-15%": 1
+    }
+  },
+  "G_MA20_sx_h30": {
+    "arm": "G_MA20_sx_h30",
+    "total_pct": 81.76,
+    "ann_pct": 11.52,
+    "mdd_pct": -31.4,
+    "sharpe": 0.643,
+    "n_trades": 317,
+    "win_rate": 36.3,
+    "payoff": 2.9,
+    "reasons": {
+      "MA20破位": 307,
+      "满30日": 10
+    }
+  },
+  "G_MA20_sx_h60": {
+    "arm": "G_MA20_sx_h60",
+    "total_pct": 115.41,
+    "ann_pct": 15.03,
+    "mdd_pct": -31.1,
+    "sharpe": 0.764,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.35,
+    "reasons": {
+      "MA20破位": 311
+    }
+  },
+  "G_MA20_sx_h90": {
+    "arm": "G_MA20_sx_h90",
+    "total_pct": 115.41,
+    "ann_pct": 15.03,
+    "mdd_pct": -31.1,
+    "sharpe": 0.764,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.35,
+    "reasons": {
+      "MA20破位": 311
+    }
+  },
+  "G_MA20_sx_hx": {
+    "arm": "G_MA20_sx_hx",
+    "total_pct": 115.41,
+    "ann_pct": 15.03,
+    "mdd_pct": -31.1,
+    "sharpe": 0.764,
+    "n_trades": 311,
+    "win_rate": 36.0,
+    "payoff": 3.35,
+    "reasons": {
+      "MA20破位": 311
+    }
+  },
+  "G_MA22_s0.05_h30": {
+    "arm": "G_MA22_s0.05_h30",
+    "total_pct": 86.43,
+    "ann_pct": 12.04,
+    "mdd_pct": -29.6,
+    "sharpe": 0.684,
+    "n_trades": 314,
+    "win_rate": 33.8,
+    "payoff": 3.33,
+    "reasons": {
+      "MA22破位": 259,
+      "硬止损-5%": 42,
+      "满30日": 13
+    }
+  },
+  "G_MA22_s0.05_h60": {
+    "arm": "G_MA22_s0.05_h60",
+    "total_pct": 128.47,
+    "ann_pct": 16.27,
+    "mdd_pct": -30.4,
+    "sharpe": 0.831,
+    "n_trades": 307,
+    "win_rate": 33.6,
+    "payoff": 4.02,
+    "reasons": {
+      "MA22破位": 265,
+      "硬止损-5%": 40,
+      "满60日": 2
+    }
+  },
+  "G_MA22_s0.05_h90": {
+    "arm": "G_MA22_s0.05_h90",
+    "total_pct": 130.19,
+    "ann_pct": 16.43,
+    "mdd_pct": -30.4,
+    "sharpe": 0.829,
+    "n_trades": 307,
+    "win_rate": 33.6,
+    "payoff": 4.05,
+    "reasons": {
+      "MA22破位": 267,
+      "硬止损-5%": 40
+    }
+  },
+  "G_MA22_s0.05_hx": {
+    "arm": "G_MA22_s0.05_hx",
+    "total_pct": 130.19,
+    "ann_pct": 16.43,
+    "mdd_pct": -30.4,
+    "sharpe": 0.829,
+    "n_trades": 307,
+    "win_rate": 33.6,
+    "payoff": 4.05,
+    "reasons": {
+      "MA22破位": 267,
+      "硬止损-5%": 40
+    }
+  },
+  "G_MA22_s0.08_h30": {
+    "arm": "G_MA22_s0.08_h30",
+    "total_pct": 83.08,
+    "ann_pct": 11.67,
+    "mdd_pct": -28.2,
+    "sharpe": 0.649,
+    "n_trades": 312,
+    "win_rate": 34.6,
+    "payoff": 3.15,
+    "reasons": {
+      "MA22破位": 286,
+      "硬止损-8%": 13,
+      "满30日": 13
+    }
+  },
+  "G_MA22_s0.08_h60": {
+    "arm": "G_MA22_s0.08_h60",
+    "total_pct": 128.66,
+    "ann_pct": 16.29,
+    "mdd_pct": -27.9,
+    "sharpe": 0.814,
+    "n_trades": 305,
+    "win_rate": 34.1,
+    "payoff": 3.82,
+    "reasons": {
+      "MA22破位": 290,
+      "硬止损-8%": 13,
+      "满60日": 2
+    }
+  },
+  "G_MA22_s0.08_h90": {
+    "arm": "G_MA22_s0.08_h90",
+    "total_pct": 130.34,
+    "ann_pct": 16.45,
+    "mdd_pct": -28.0,
+    "sharpe": 0.81,
+    "n_trades": 305,
+    "win_rate": 34.1,
+    "payoff": 3.85,
+    "reasons": {
+      "MA22破位": 292,
+      "硬止损-8%": 13
+    }
+  },
+  "G_MA22_s0.08_hx": {
+    "arm": "G_MA22_s0.08_hx",
+    "total_pct": 130.34,
+    "ann_pct": 16.45,
+    "mdd_pct": -28.0,
+    "sharpe": 0.81,
+    "n_trades": 305,
+    "win_rate": 34.1,
+    "payoff": 3.85,
+    "reasons": {
+      "MA22破位": 292,
+      "硬止损-8%": 13
+    }
+  },
+  "G_MA22_s0.1_h30": {
+    "arm": "G_MA22_s0.1_h30",
+    "total_pct": 77.73,
+    "ann_pct": 11.06,
+    "mdd_pct": -29.8,
+    "sharpe": 0.62,
+    "n_trades": 312,
+    "win_rate": 34.6,
+    "payoff": 3.08,
+    "reasons": {
+      "MA22破位": 290,
+      "硬止损-10%": 9,
+      "满30日": 13
+    }
+  },
+  "G_MA22_s0.1_h60": {
+    "arm": "G_MA22_s0.1_h60",
+    "total_pct": 122.26,
+    "ann_pct": 15.69,
+    "mdd_pct": -29.6,
+    "sharpe": 0.785,
+    "n_trades": 305,
+    "win_rate": 34.1,
+    "payoff": 3.73,
+    "reasons": {
+      "MA22破位": 294,
+      "硬止损-10%": 9,
+      "满60日": 2
+    }
+  },
+  "G_MA22_s0.1_h90": {
+    "arm": "G_MA22_s0.1_h90",
+    "total_pct": 124.42,
+    "ann_pct": 15.89,
+    "mdd_pct": -29.6,
+    "sharpe": 0.785,
+    "n_trades": 305,
+    "win_rate": 34.1,
+    "payoff": 3.76,
+    "reasons": {
+      "MA22破位": 296,
+      "硬止损-10%": 9
+    }
+  },
+  "G_MA22_s0.1_hx": {
+    "arm": "G_MA22_s0.1_hx",
+    "total_pct": 124.42,
+    "ann_pct": 15.89,
+    "mdd_pct": -29.6,
+    "sharpe": 0.785,
+    "n_trades": 305,
+    "win_rate": 34.1,
+    "payoff": 3.76,
+    "reasons": {
+      "MA22破位": 296,
+      "硬止损-10%": 9
+    }
+  },
+  "G_MA22_s0.15_h30": {
+    "arm": "G_MA22_s0.15_h30",
+    "total_pct": 77.73,
+    "ann_pct": 11.06,
+    "mdd_pct": -29.8,
+    "sharpe": 0.62,
+    "n_trades": 312,
+    "win_rate": 34.6,
+    "payoff": 3.08,
+    "reasons": {
+      "MA22破位": 298,
+      "满30日": 13,
+      "硬止损-15%": 1
+    }
+  },
+  "G_MA22_s0.15_h60": {
+    "arm": "G_MA22_s0.15_h60",
+    "total_pct": 122.26,
+    "ann_pct": 15.69,
+    "mdd_pct": -29.6,
+    "sharpe": 0.785,
+    "n_trades": 305,
+    "win_rate": 34.1,
+    "payoff": 3.73,
+    "reasons": {
+      "MA22破位": 302,
+      "满60日": 2,
+      "硬止损-15%": 1
+    }
+  },
+  "G_MA22_s0.15_h90": {
+    "arm": "G_MA22_s0.15_h90",
+    "total_pct": 124.42,
+    "ann_pct": 15.89,
+    "mdd_pct": -29.6,
+    "sharpe": 0.785,
+    "n_trades": 305,
+    "win_rate": 34.1,
+    "payoff": 3.76,
+    "reasons": {
+      "MA22破位": 304,
+      "硬止损-15%": 1
+    }
+  },
+  "G_MA22_s0.15_hx": {
+    "arm": "G_MA22_s0.15_hx",
+    "total_pct": 124.42,
+    "ann_pct": 15.89,
+    "mdd_pct": -29.6,
+    "sharpe": 0.785,
+    "n_trades": 305,
+    "win_rate": 34.1,
+    "payoff": 3.76,
+    "reasons": {
+      "MA22破位": 304,
+      "硬止损-15%": 1
+    }
+  },
+  "G_MA22_sx_h30": {
+    "arm": "G_MA22_sx_h30",
+    "total_pct": 77.73,
+    "ann_pct": 11.06,
+    "mdd_pct": -29.8,
+    "sharpe": 0.62,
+    "n_trades": 312,
+    "win_rate": 34.6,
+    "payoff": 3.08,
+    "reasons": {
+      "MA22破位": 299,
+      "满30日": 13
+    }
+  },
+  "G_MA22_sx_h60": {
+    "arm": "G_MA22_sx_h60",
+    "total_pct": 122.26,
+    "ann_pct": 15.69,
+    "mdd_pct": -29.6,
+    "sharpe": 0.785,
+    "n_trades": 305,
+    "win_rate": 34.1,
+    "payoff": 3.73,
+    "reasons": {
+      "MA22破位": 303,
+      "满60日": 2
+    }
+  },
+  "G_MA22_sx_h90": {
+    "arm": "G_MA22_sx_h90",
+    "total_pct": 124.42,
+    "ann_pct": 15.89,
+    "mdd_pct": -29.6,
+    "sharpe": 0.785,
+    "n_trades": 305,
+    "win_rate": 34.1,
+    "payoff": 3.76,
+    "reasons": {
+      "MA22破位": 305
+    }
+  },
+  "G_MA22_sx_hx": {
+    "arm": "G_MA22_sx_hx",
+    "total_pct": 124.42,
+    "ann_pct": 15.89,
+    "mdd_pct": -29.6,
+    "sharpe": 0.785,
+    "n_trades": 305,
+    "win_rate": 34.1,
+    "payoff": 3.76,
+    "reasons": {
+      "MA22破位": 305
+    }
+  },
+  "G_MA25_s0.05_h30": {
+    "arm": "G_MA25_s0.05_h30",
+    "total_pct": 105.37,
+    "ann_pct": 14.03,
+    "mdd_pct": -26.0,
+    "sharpe": 0.761,
+    "n_trades": 311,
+    "win_rate": 34.4,
+    "payoff": 3.43,
+    "reasons": {
+      "MA25破位": 250,
+      "硬止损-5%": 43,
+      "满30日": 18
+    }
+  },
+  "G_MA25_s0.05_h60": {
+    "arm": "G_MA25_s0.05_h60",
+    "total_pct": 170.98,
+    "ann_pct": 19.95,
+    "mdd_pct": -27.3,
+    "sharpe": 0.948,
+    "n_trades": 302,
+    "win_rate": 34.1,
+    "payoff": 4.34,
+    "reasons": {
+      "MA25破位": 259,
+      "硬止损-5%": 40,
+      "满60日": 3
+    }
+  },
+  "G_MA25_s0.05_h90": {
+    "arm": "G_MA25_s0.05_h90",
+    "total_pct": 168.8,
+    "ann_pct": 19.77,
+    "mdd_pct": -27.3,
+    "sharpe": 0.923,
+    "n_trades": 302,
+    "win_rate": 34.1,
+    "payoff": 4.28,
+    "reasons": {
+      "MA25破位": 262,
+      "硬止损-5%": 40
+    }
+  },
+  "G_MA25_s0.05_hx": {
+    "arm": "G_MA25_s0.05_hx",
+    "total_pct": 168.8,
+    "ann_pct": 19.77,
+    "mdd_pct": -27.3,
+    "sharpe": 0.923,
+    "n_trades": 302,
+    "win_rate": 34.1,
+    "payoff": 4.28,
+    "reasons": {
+      "MA25破位": 262,
+      "硬止损-5%": 40
+    }
+  },
+  "G_MA25_s0.08_h30": {
+    "arm": "G_MA25_s0.08_h30",
+    "total_pct": 105.35,
+    "ann_pct": 14.03,
+    "mdd_pct": -28.8,
+    "sharpe": 0.739,
+    "n_trades": 308,
+    "win_rate": 35.4,
+    "payoff": 3.24,
+    "reasons": {
+      "MA25破位": 278,
+      "硬止损-8%": 12,
+      "满30日": 18
+    }
+  },
+  "G_MA25_s0.08_h60": {
+    "arm": "G_MA25_s0.08_h60",
+    "total_pct": 172.02,
+    "ann_pct": 20.03,
+    "mdd_pct": -28.1,
+    "sharpe": 0.933,
+    "n_trades": 299,
+    "win_rate": 34.8,
+    "payoff": 4.12,
+    "reasons": {
+      "MA25破位": 284,
+      "硬止损-8%": 12,
+      "满60日": 3
+    }
+  },
+  "G_MA25_s0.08_h90": {
+    "arm": "G_MA25_s0.08_h90",
+    "total_pct": 165.42,
+    "ann_pct": 19.5,
+    "mdd_pct": -28.2,
+    "sharpe": 0.897,
+    "n_trades": 299,
+    "win_rate": 34.8,
+    "payoff": 4.06,
+    "reasons": {
+      "MA25破位": 287,
+      "硬止损-8%": 12
+    }
+  },
+  "G_MA25_s0.08_hx": {
+    "arm": "G_MA25_s0.08_hx",
+    "total_pct": 165.42,
+    "ann_pct": 19.5,
+    "mdd_pct": -28.2,
+    "sharpe": 0.897,
+    "n_trades": 299,
+    "win_rate": 34.8,
+    "payoff": 4.06,
+    "reasons": {
+      "MA25破位": 287,
+      "硬止损-8%": 12
+    }
+  },
+  "G_MA25_s0.1_h30": {
+    "arm": "G_MA25_s0.1_h30",
+    "total_pct": 99.06,
+    "ann_pct": 13.39,
+    "mdd_pct": -30.8,
+    "sharpe": 0.708,
+    "n_trades": 308,
+    "win_rate": 35.4,
+    "payoff": 3.16,
+    "reasons": {
+      "MA25破位": 282,
+      "满30日": 18,
+      "硬止损-10%": 8
+    }
+  },
+  "G_MA25_s0.1_h60": {
+    "arm": "G_MA25_s0.1_h60",
+    "total_pct": 159.96,
+    "ann_pct": 19.05,
+    "mdd_pct": -30.0,
+    "sharpe": 0.893,
+    "n_trades": 299,
+    "win_rate": 34.8,
+    "payoff": 4.02,
+    "reasons": {
+      "MA25破位": 288,
+      "硬止损-10%": 8,
+      "满60日": 3
+    }
+  },
+  "G_MA25_s0.1_h90": {
+    "arm": "G_MA25_s0.1_h90",
+    "total_pct": 157.61,
+    "ann_pct": 18.85,
+    "mdd_pct": -30.2,
+    "sharpe": 0.869,
+    "n_trades": 299,
+    "win_rate": 34.8,
+    "payoff": 3.96,
+    "reasons": {
+      "MA25破位": 291,
+      "硬止损-10%": 8
+    }
+  },
+  "G_MA25_s0.1_hx": {
+    "arm": "G_MA25_s0.1_hx",
+    "total_pct": 157.61,
+    "ann_pct": 18.85,
+    "mdd_pct": -30.2,
+    "sharpe": 0.869,
+    "n_trades": 299,
+    "win_rate": 34.8,
+    "payoff": 3.96,
+    "reasons": {
+      "MA25破位": 291,
+      "硬止损-10%": 8
+    }
+  },
+  "G_MA25_s0.15_h30": {
+    "arm": "G_MA25_s0.15_h30",
+    "total_pct": 112.64,
+    "ann_pct": 14.76,
+    "mdd_pct": -31.2,
+    "sharpe": 0.762,
+    "n_trades": 307,
+    "win_rate": 35.8,
+    "payoff": 3.21,
+    "reasons": {
+      "MA25破位": 286,
+      "满30日": 19,
+      "硬止损-15%": 2
+    }
+  },
+  "G_MA25_s0.15_h60": {
+    "arm": "G_MA25_s0.15_h60",
+    "total_pct": 173.32,
+    "ann_pct": 20.14,
+    "mdd_pct": -30.5,
+    "sharpe": 0.931,
+    "n_trades": 298,
+    "win_rate": 35.2,
+    "payoff": 4.06,
+    "reasons": {
+      "MA25破位": 293,
+      "满60日": 3,
+      "硬止损-15%": 2
+    }
+  },
+  "G_MA25_s0.15_h90": {
+    "arm": "G_MA25_s0.15_h90",
+    "total_pct": 167.64,
+    "ann_pct": 19.68,
+    "mdd_pct": -30.6,
+    "sharpe": 0.898,
+    "n_trades": 298,
+    "win_rate": 35.2,
+    "payoff": 4.0,
+    "reasons": {
+      "MA25破位": 296,
+      "硬止损-15%": 2
+    }
+  },
+  "G_MA25_s0.15_hx": {
+    "arm": "G_MA25_s0.15_hx",
+    "total_pct": 167.64,
+    "ann_pct": 19.68,
+    "mdd_pct": -30.6,
+    "sharpe": 0.898,
+    "n_trades": 298,
+    "win_rate": 35.2,
+    "payoff": 4.0,
+    "reasons": {
+      "MA25破位": 296,
+      "硬止损-15%": 2
+    }
+  },
+  "G_MA25_sx_h30": {
+    "arm": "G_MA25_sx_h30",
+    "total_pct": 112.64,
+    "ann_pct": 14.76,
+    "mdd_pct": -31.2,
+    "sharpe": 0.762,
+    "n_trades": 307,
+    "win_rate": 35.8,
+    "payoff": 3.21,
+    "reasons": {
+      "MA25破位": 288,
+      "满30日": 19
+    }
+  },
+  "G_MA25_sx_h60": {
+    "arm": "G_MA25_sx_h60",
+    "total_pct": 173.32,
+    "ann_pct": 20.14,
+    "mdd_pct": -30.5,
+    "sharpe": 0.931,
+    "n_trades": 298,
+    "win_rate": 35.2,
+    "payoff": 4.06,
+    "reasons": {
+      "MA25破位": 295,
+      "满60日": 3
+    }
+  },
+  "G_MA25_sx_h90": {
+    "arm": "G_MA25_sx_h90",
+    "total_pct": 167.64,
+    "ann_pct": 19.68,
+    "mdd_pct": -30.6,
+    "sharpe": 0.898,
+    "n_trades": 298,
+    "win_rate": 35.2,
+    "payoff": 4.0,
+    "reasons": {
+      "MA25破位": 298
+    }
+  },
+  "G_MA25_sx_hx": {
+    "arm": "G_MA25_sx_hx",
+    "total_pct": 167.64,
+    "ann_pct": 19.68,
+    "mdd_pct": -30.6,
+    "sharpe": 0.898,
+    "n_trades": 298,
+    "win_rate": 35.2,
+    "payoff": 4.0,
+    "reasons": {
+      "MA25破位": 298
+    }
+  },
+  "G_MA30_s0.05_h30": {
+    "arm": "G_MA30_s0.05_h30",
+    "total_pct": 139.9,
+    "ann_pct": 17.31,
+    "mdd_pct": -26.8,
+    "sharpe": 0.89,
+    "n_trades": 306,
+    "win_rate": 36.6,
+    "payoff": 3.36,
+    "reasons": {
+      "MA30破位": 240,
+      "硬止损-5%": 46,
+      "满30日": 20
+    }
+  },
+  "G_MA30_s0.05_h60": {
+    "arm": "G_MA30_s0.05_h60",
+    "total_pct": 179.58,
+    "ann_pct": 20.64,
+    "mdd_pct": -28.8,
+    "sharpe": 0.951,
+    "n_trades": 292,
+    "win_rate": 37.0,
+    "payoff": 3.93,
+    "reasons": {
+      "MA30破位": 249,
+      "硬止损-5%": 41,
+      "满60日": 2
+    }
+  },
+  "G_MA30_s0.05_h90": {
+    "arm": "G_MA30_s0.05_h90",
+    "total_pct": 204.01,
+    "ann_pct": 22.49,
+    "mdd_pct": -28.8,
+    "sharpe": 0.999,
+    "n_trades": 291,
+    "win_rate": 36.8,
+    "payoff": 4.2,
+    "reasons": {
+      "MA30破位": 249,
+      "硬止损-5%": 41,
+      "满90日": 1
+    }
+  },
+  "G_MA30_s0.05_hx": {
+    "arm": "G_MA30_s0.05_hx",
+    "total_pct": 193.7,
+    "ann_pct": 21.73,
+    "mdd_pct": -28.8,
+    "sharpe": 0.966,
+    "n_trades": 291,
+    "win_rate": 36.8,
+    "payoff": 4.12,
+    "reasons": {
+      "MA30破位": 250,
+      "硬止损-5%": 41
+    }
+  },
+  "G_MA30_s0.08_h30": {
+    "arm": "G_MA30_s0.08_h30",
+    "total_pct": 131.74,
+    "ann_pct": 16.57,
+    "mdd_pct": -27.8,
+    "sharpe": 0.832,
+    "n_trades": 304,
+    "win_rate": 37.5,
+    "payoff": 3.09,
+    "reasons": {
+      "MA30破位": 268,
+      "满30日": 21,
+      "硬止损-8%": 15
+    }
+  },
+  "G_MA30_s0.08_h60": {
+    "arm": "G_MA30_s0.08_h60",
+    "total_pct": 190.45,
+    "ann_pct": 21.48,
+    "mdd_pct": -29.6,
+    "sharpe": 0.963,
+    "n_trades": 289,
+    "win_rate": 37.7,
+    "payoff": 3.83,
+    "reasons": {
+      "MA30破位": 275,
+      "硬止损-8%": 12,
+      "满60日": 2
+    }
+  },
+  "G_MA30_s0.08_h90": {
+    "arm": "G_MA30_s0.08_h90",
+    "total_pct": 216.0,
+    "ann_pct": 23.36,
+    "mdd_pct": -30.0,
+    "sharpe": 1.012,
+    "n_trades": 288,
+    "win_rate": 37.5,
+    "payoff": 4.09,
+    "reasons": {
+      "MA30破位": 275,
+      "硬止损-8%": 12,
+      "满90日": 1
+    }
+  },
+  "G_MA30_s0.08_hx": {
+    "arm": "G_MA30_s0.08_hx",
+    "total_pct": 205.79,
+    "ann_pct": 22.62,
+    "mdd_pct": -30.0,
+    "sharpe": 0.979,
+    "n_trades": 288,
+    "win_rate": 37.5,
+    "payoff": 4.01,
+    "reasons": {
+      "MA30破位": 276,
+      "硬止损-8%": 12
+    }
+  },
+  "G_MA30_s0.1_h30": {
+    "arm": "G_MA30_s0.1_h30",
+    "total_pct": 124.15,
+    "ann_pct": 15.87,
+    "mdd_pct": -30.2,
+    "sharpe": 0.797,
+    "n_trades": 304,
+    "win_rate": 37.5,
+    "payoff": 3.01,
+    "reasons": {
+      "MA30破位": 273,
+      "满30日": 21,
+      "硬止损-10%": 10
+    }
+  },
+  "G_MA30_s0.1_h60": {
+    "arm": "G_MA30_s0.1_h60",
+    "total_pct": 181.56,
+    "ann_pct": 20.79,
+    "mdd_pct": -31.8,
+    "sharpe": 0.933,
+    "n_trades": 289,
+    "win_rate": 37.7,
+    "payoff": 3.75,
+    "reasons": {
+      "MA30破位": 280,
+      "硬止损-10%": 7,
+      "满60日": 2
+    }
+  },
+  "G_MA30_s0.1_h90": {
+    "arm": "G_MA30_s0.1_h90",
+    "total_pct": 206.36,
+    "ann_pct": 22.67,
+    "mdd_pct": -32.1,
+    "sharpe": 0.982,
+    "n_trades": 288,
+    "win_rate": 37.5,
+    "payoff": 4.0,
+    "reasons": {
+      "MA30破位": 280,
+      "硬止损-10%": 7,
+      "满90日": 1
+    }
+  },
+  "G_MA30_s0.1_hx": {
+    "arm": "G_MA30_s0.1_hx",
+    "total_pct": 197.37,
+    "ann_pct": 22.0,
+    "mdd_pct": -31.9,
+    "sharpe": 0.953,
+    "n_trades": 288,
+    "win_rate": 37.5,
+    "payoff": 3.92,
+    "reasons": {
+      "MA30破位": 281,
+      "硬止损-10%": 7
+    }
+  },
+  "G_MA30_s0.15_h30": {
+    "arm": "G_MA30_s0.15_h30",
+    "total_pct": 137.35,
+    "ann_pct": 17.08,
+    "mdd_pct": -30.4,
+    "sharpe": 0.844,
+    "n_trades": 303,
+    "win_rate": 38.0,
+    "payoff": 3.04,
+    "reasons": {
+      "MA30破位": 279,
+      "满30日": 22,
+      "硬止损-15%": 2
+    }
+  },
+  "G_MA30_s0.15_h60": {
+    "arm": "G_MA30_s0.15_h60",
+    "total_pct": 195.62,
+    "ann_pct": 21.87,
+    "mdd_pct": -31.8,
+    "sharpe": 0.967,
+    "n_trades": 288,
+    "win_rate": 38.2,
+    "payoff": 3.78,
+    "reasons": {
+      "MA30破位": 285,
+      "满60日": 2,
+      "硬止损-15%": 1
+    }
+  },
+  "G_MA30_s0.15_h90": {
+    "arm": "G_MA30_s0.15_h90",
+    "total_pct": 219.3,
+    "ann_pct": 23.6,
+    "mdd_pct": -31.9,
+    "sharpe": 1.012,
+    "n_trades": 287,
+    "win_rate": 38.0,
+    "payoff": 4.04,
+    "reasons": {
+      "MA30破位": 285,
+      "满90日": 1,
+      "硬止损-15%": 1
+    }
+  },
+  "G_MA30_s0.15_hx": {
+    "arm": "G_MA30_s0.15_hx",
+    "total_pct": 210.82,
+    "ann_pct": 22.99,
+    "mdd_pct": -32.0,
+    "sharpe": 0.983,
+    "n_trades": 287,
+    "win_rate": 38.0,
+    "payoff": 3.96,
+    "reasons": {
+      "MA30破位": 286,
+      "硬止损-15%": 1
+    }
+  },
+  "G_MA30_sx_h30": {
+    "arm": "G_MA30_sx_h30",
+    "total_pct": 137.35,
+    "ann_pct": 17.08,
+    "mdd_pct": -30.4,
+    "sharpe": 0.844,
+    "n_trades": 303,
+    "win_rate": 38.0,
+    "payoff": 3.04,
+    "reasons": {
+      "MA30破位": 281,
+      "满30日": 22
+    }
+  },
+  "G_MA30_sx_h60": {
+    "arm": "G_MA30_sx_h60",
+    "total_pct": 195.62,
+    "ann_pct": 21.87,
+    "mdd_pct": -31.8,
+    "sharpe": 0.967,
+    "n_trades": 288,
+    "win_rate": 38.2,
+    "payoff": 3.78,
+    "reasons": {
+      "MA30破位": 286,
+      "满60日": 2
+    }
+  },
+  "G_MA30_sx_h90": {
+    "arm": "G_MA30_sx_h90",
+    "total_pct": 219.3,
+    "ann_pct": 23.6,
+    "mdd_pct": -31.9,
+    "sharpe": 1.012,
+    "n_trades": 287,
+    "win_rate": 38.0,
+    "payoff": 4.04,
+    "reasons": {
+      "MA30破位": 286,
+      "满90日": 1
+    }
+  },
+  "G_MA30_sx_hx": {
+    "arm": "G_MA30_sx_hx",
+    "total_pct": 210.82,
+    "ann_pct": 22.99,
+    "mdd_pct": -32.0,
+    "sharpe": 0.983,
+    "n_trades": 287,
+    "win_rate": 38.0,
+    "payoff": 3.96,
+    "reasons": {
+      "MA30破位": 287
+    }
+  },
+  "G_MA40_s0.05_h30": {
+    "arm": "G_MA40_s0.05_h30",
+    "total_pct": 146.97,
+    "ann_pct": 17.94,
+    "mdd_pct": -22.4,
+    "sharpe": 0.921,
+    "n_trades": 300,
+    "win_rate": 36.3,
+    "payoff": 3.41,
+    "reasons": {
+      "MA40破位": 228,
+      "硬止损-5%": 45,
+      "满30日": 27
+    }
+  },
+  "G_MA40_s0.05_h60": {
+    "arm": "G_MA40_s0.05_h60",
+    "total_pct": 154.51,
+    "ann_pct": 18.59,
+    "mdd_pct": -29.5,
+    "sharpe": 0.852,
+    "n_trades": 276,
+    "win_rate": 37.3,
+    "payoff": 3.83,
+    "reasons": {
+      "MA40破位": 236,
+      "硬止损-5%": 35,
+      "满60日": 5
+    }
+  },
+  "G_MA40_s0.05_h90": {
+    "arm": "G_MA40_s0.05_h90",
+    "total_pct": 267.27,
+    "ann_pct": 26.79,
+    "mdd_pct": -29.1,
+    "sharpe": 1.091,
+    "n_trades": 273,
+    "win_rate": 37.7,
+    "payoff": 4.81,
+    "reasons": {
+      "MA40破位": 236,
+      "硬止损-5%": 34,
+      "满90日": 3
+    }
+  },
+  "G_MA40_s0.05_hx": {
+    "arm": "G_MA40_s0.05_hx",
+    "total_pct": 243.35,
+    "ann_pct": 25.24,
+    "mdd_pct": -31.5,
+    "sharpe": 1.02,
+    "n_trades": 271,
+    "win_rate": 37.3,
+    "payoff": 4.76,
+    "reasons": {
+      "MA40破位": 237,
+      "硬止损-5%": 34
+    }
+  },
+  "G_MA40_s0.08_h30": {
+    "arm": "G_MA40_s0.08_h30",
+    "total_pct": 147.34,
+    "ann_pct": 17.97,
+    "mdd_pct": -27.4,
+    "sharpe": 0.895,
+    "n_trades": 298,
+    "win_rate": 37.2,
+    "payoff": 3.18,
+    "reasons": {
+      "MA40破位": 248,
+      "满30日": 30,
+      "硬止损-8%": 20
+    }
+  },
+  "G_MA40_s0.08_h60": {
+    "arm": "G_MA40_s0.08_h60",
+    "total_pct": 200.73,
+    "ann_pct": 22.25,
+    "mdd_pct": -30.2,
+    "sharpe": 0.976,
+    "n_trades": 273,
+    "win_rate": 38.1,
+    "payoff": 4.02,
+    "reasons": {
+      "MA40破位": 255,
+      "硬止损-8%": 12,
+      "满60日": 6
+    }
+  },
+  "G_MA40_s0.08_h90": {
+    "arm": "G_MA40_s0.08_h90",
+    "total_pct": 300.3,
+    "ann_pct": 28.8,
+    "mdd_pct": -30.1,
+    "sharpe": 1.141,
+    "n_trades": 270,
+    "win_rate": 38.5,
+    "payoff": 4.84,
+    "reasons": {
+      "MA40破位": 256,
+      "硬止损-8%": 11,
+      "满90日": 3
+    }
+  },
+  "G_MA40_s0.08_hx": {
+    "arm": "G_MA40_s0.08_hx",
+    "total_pct": 273.32,
+    "ann_pct": 27.17,
+    "mdd_pct": -31.5,
+    "sharpe": 1.072,
+    "n_trades": 268,
+    "win_rate": 38.1,
+    "payoff": 4.8,
+    "reasons": {
+      "MA40破位": 257,
+      "硬止损-8%": 11
+    }
+  },
+  "G_MA40_s0.1_h30": {
+    "arm": "G_MA40_s0.1_h30",
+    "total_pct": 156.53,
+    "ann_pct": 18.76,
+    "mdd_pct": -27.9,
+    "sharpe": 0.914,
+    "n_trades": 296,
+    "win_rate": 37.5,
+    "payoff": 3.26,
+    "reasons": {
+      "MA40破位": 255,
+      "满30日": 30,
+      "硬止损-10%": 11
+    }
+  },
+  "G_MA40_s0.1_h60": {
+    "arm": "G_MA40_s0.1_h60",
+    "total_pct": 209.88,
+    "ann_pct": 22.92,
+    "mdd_pct": -28.5,
+    "sharpe": 0.998,
+    "n_trades": 272,
+    "win_rate": 38.2,
+    "payoff": 4.08,
+    "reasons": {
+      "MA40破位": 261,
+      "硬止损-10%": 5,
+      "满60日": 6
+    }
+  },
+  "G_MA40_s0.1_h90": {
+    "arm": "G_MA40_s0.1_h90",
+    "total_pct": 313.03,
+    "ann_pct": 29.54,
+    "mdd_pct": -29.5,
+    "sharpe": 1.162,
+    "n_trades": 269,
+    "win_rate": 38.7,
+    "payoff": 4.92,
+    "reasons": {
+      "MA40破位": 262,
+      "硬止损-10%": 4,
+      "满90日": 3
+    }
+  },
+  "G_MA40_s0.1_hx": {
+    "arm": "G_MA40_s0.1_hx",
+    "total_pct": 284.63,
+    "ann_pct": 27.87,
+    "mdd_pct": -31.5,
+    "sharpe": 1.091,
+    "n_trades": 267,
+    "win_rate": 38.2,
+    "payoff": 4.88,
+    "reasons": {
+      "MA40破位": 263,
+      "硬止损-10%": 4
+    }
+  },
+  "G_MA40_s0.15_h30": {
+    "arm": "G_MA40_s0.15_h30",
+    "total_pct": 167.27,
+    "ann_pct": 19.65,
+    "mdd_pct": -28.5,
+    "sharpe": 0.944,
+    "n_trades": 296,
+    "win_rate": 37.8,
+    "payoff": 3.25,
+    "reasons": {
+      "MA40破位": 262,
+      "满30日": 31,
+      "硬止损-15%": 3
+    }
+  },
+  "G_MA40_s0.15_h60": {
+    "arm": "G_MA40_s0.15_h60",
+    "total_pct": 227.96,
+    "ann_pct": 24.2,
+    "mdd_pct": -25.2,
+    "sharpe": 1.039,
+    "n_trades": 271,
+    "win_rate": 38.7,
+    "payoff": 4.13,
+    "reasons": {
+      "MA40破位": 264,
+      "满60日": 6,
+      "硬止损-15%": 1
+    }
+  },
+  "G_MA40_s0.15_h90": {
+    "arm": "G_MA40_s0.15_h90",
+    "total_pct": 338.06,
+    "ann_pct": 30.94,
+    "mdd_pct": -29.5,
+    "sharpe": 1.202,
+    "n_trades": 268,
+    "win_rate": 39.2,
+    "payoff": 5.0,
+    "reasons": {
+      "MA40破位": 265,
+      "满90日": 3
+    }
+  },
+  "G_MA40_s0.15_hx": {
+    "arm": "G_MA40_s0.15_hx",
+    "total_pct": 308.21,
+    "ann_pct": 29.26,
+    "mdd_pct": -31.5,
+    "sharpe": 1.131,
+    "n_trades": 266,
+    "win_rate": 38.7,
+    "payoff": 4.96,
+    "reasons": {
+      "MA40破位": 266
+    }
+  },
+  "G_MA40_sx_h30": {
+    "arm": "G_MA40_sx_h30",
+    "total_pct": 166.48,
+    "ann_pct": 19.58,
+    "mdd_pct": -28.7,
+    "sharpe": 0.941,
+    "n_trades": 296,
+    "win_rate": 37.8,
+    "payoff": 3.25,
+    "reasons": {
+      "MA40破位": 265,
+      "满30日": 31
+    }
+  },
+  "G_MA40_sx_h60": {
+    "arm": "G_MA40_sx_h60",
+    "total_pct": 227.96,
+    "ann_pct": 24.2,
+    "mdd_pct": -25.2,
+    "sharpe": 1.039,
+    "n_trades": 271,
+    "win_rate": 38.7,
+    "payoff": 4.13,
+    "reasons": {
+      "MA40破位": 265,
+      "满60日": 6
+    }
+  },
+  "G_MA40_sx_h90": {
+    "arm": "G_MA40_sx_h90",
+    "total_pct": 338.06,
+    "ann_pct": 30.94,
+    "mdd_pct": -29.5,
+    "sharpe": 1.202,
+    "n_trades": 268,
+    "win_rate": 39.2,
+    "payoff": 5.0,
+    "reasons": {
+      "MA40破位": 265,
+      "满90日": 3
+    }
+  },
+  "G_MA40_sx_hx": {
+    "arm": "G_MA40_sx_hx",
+    "total_pct": 308.21,
+    "ann_pct": 29.26,
+    "mdd_pct": -31.5,
+    "sharpe": 1.131,
+    "n_trades": 266,
+    "win_rate": 38.7,
+    "payoff": 4.96,
+    "reasons": {
+      "MA40破位": 266
+    }
+  },
+  "_grid_top15": [
+    "G_MA40_sx_h90",
+    "G_MA40_s0.15_h90",
+    "G_MA40_s0.1_h90",
+    "G_MA40_s0.08_h90",
+    "G_MA40_sx_hx",
+    "G_MA40_s0.15_hx",
+    "G_MA40_s0.1_hx",
+    "G_MA40_s0.05_h90",
+    "G_MA40_s0.08_hx",
+    "G_MA40_sx_h60",
+    "G_MA40_s0.15_h60",
+    "G_MA40_s0.05_hx",
+    "G_MA30_sx_h90",
+    "G_MA30_s0.15_h90",
+    "G_MA30_s0.08_h90"
+  ],
+  "_phase_audit": {
+    "A1=MA40+无stop+90": {
+      "off0_total": 338.06,
+      "phase_median_total": 51.94,
+      "phase_min": 0.0,
+      "phase_max": 338.06,
+      "phase_median_sharpe": 0.3245,
+      "phase_median_dd": -14.75
+    },
+    "A2=MA40+s15+90": {
+      "off0_total": 338.06,
+      "phase_median_total": 54.605,
+      "phase_min": 0.0,
+      "phase_max": 338.06,
+      "phase_median_sharpe": 0.3345,
+      "phase_median_dd": -14.75
+    },
+    "A3=MA40+s08+90": {
+      "off0_total": 300.3,
+      "phase_median_total": 54.16,
+      "phase_min": 0.0,
+      "phase_max": 300.3,
+      "phase_median_sharpe": 0.335,
+      "phase_median_dd": -14.55
+    },
+    "A4=MA40+无stop+无限": {
+      "off0_total": 308.21,
+      "phase_median_total": 61.12,
+      "phase_min": 0.0,
+      "phase_max": 308.21,
+      "phase_median_sharpe": 0.3515,
+      "phase_median_dd": -15.15
+    },
+    "A5=MA30+无stop+90": {
+      "off0_total": 219.3,
+      "phase_median_total": 32.265,
+      "phase_min": 0.0,
+      "phase_max": 219.3,
+      "phase_median_sharpe": 0.254,
+      "phase_median_dd": -15.2
+    },
+    "A6=MA30+s08+60(基线MA改)": {
+      "off0_total": 190.45,
+      "phase_median_total": 27.975,
+      "phase_min": 0.0,
+      "phase_max": 190.45,
+      "phase_median_sharpe": 0.236,
+      "phase_median_dd": -14.8
+    }
+  },
+  "MA35_sx_h90": {
+    "arm": "MA35_sx_h90",
+    "total_pct": 205.86,
+    "ann_pct": 22.63,
+    "mdd_pct": -30.3,
+    "sharpe": 0.995,
+    "n_trades": 277,
+    "win_rate": 38.6,
+    "payoff": 3.93,
+    "reasons": {
+      "MA35破位": 276,
+      "满90日": 1
+    }
+  },
+  "MA45_sx_h90": {
+    "arm": "MA45_sx_h90",
+    "total_pct": 329.38,
+    "ann_pct": 30.46,
+    "mdd_pct": -32.2,
+    "sharpe": 1.175,
+    "n_trades": 264,
+    "win_rate": 40.2,
+    "payoff": 4.85,
+    "reasons": {
+      "MA45破位": 261,
+      "满90日": 3
+    }
+  },
+  "A1_yearly_pct": {
+    "2021": -6.18,
+    "2022": 0.79,
+    "2023": 4.37,
+    "2024": 1.91,
+    "2025": 101.69,
+    "2026": 115.33
+  },
+  "A1_slip30": {
+    "arm": "A1_slip30",
+    "total_pct": 289.85,
+    "ann_pct": 28.18,
+    "mdd_pct": -29.7,
+    "sharpe": 1.119,
+    "n_trades": 268,
+    "win_rate": 35.8,
+    "payoff": 5.34,
+    "reasons": {
+      "MA40破位": 265,
+      "满90日": 3
+    }
+  },
+  "A1_slip40": {
+    "arm": "A1_slip40",
+    "total_pct": 256.53,
+    "ann_pct": 26.11,
+    "mdd_pct": -29.7,
+    "sharpe": 1.052,
+    "n_trades": 268,
+    "win_rate": 32.8,
+    "payoff": 5.66,
+    "reasons": {
+      "MA40破位": 265,
+      "满90日": 3
+    }
+  }
+}

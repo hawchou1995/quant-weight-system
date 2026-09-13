@@ -195,7 +195,8 @@ def fetch_tx_qfq(sym, retries=3):
                 d = row[0]
                 if d < "2016-01-01":
                     continue
-                vol = float(row[5]) if len(row) > 5 and not isinstance(row[5], dict) else 0
+                vol = (float(row[5]) * 100.0) if len(row) > 5 and not isinstance(row[5], dict) else 0
+                # ⚠ 2026-09-12：腾讯 fqkline volume=手 → ×100 转股（全库单位铁律；本次全库修复的源头补丁）
                 # ⚠ 2026-09-11：腾讯 fqkline 的 row[6] 通常是 dict/缺失 → 此处 amount=0。
                 #   绝不可让它覆盖本地真实成交额 —— merge_save 已加两道防线（本地值沿用 + 自锚定兜底）。
                 amt = float(row[6]) if len(row) > 6 and isinstance(row[6], (int, float)) else 0.0

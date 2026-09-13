@@ -40,7 +40,7 @@ def build_review_log():
         # 回测基准映射（与 review_daily.BENCH_WIN 同源；累计池名 → 基准%）
         BENCH_MAP = {
             "全量池中/长线": 48.1, "长线·基金": 48.1,
-            "短线·主板": 46.8, "短线·创业板": 48.1, "短线·科创板": 57.8, "短线·基金": 55.5,
+            "短线·主板": 46.8, "短线·创业板": 48.1, "短线·科创板": 57.8, "短线·基金": 65.2,  # 2026-09-11 FB3-H20 投产：55.5→65.2
         }
         # 2026-08-21 用户要求：长线和长线的在一起、短线和短线的在一起
         _LT_ORDER = ["全量池中/长线", "长线·主板", "长线·创业板", "长线·科创板", "长线·基金"]
@@ -141,6 +141,7 @@ def md_to_html(md):
     out, in_table = [], False
     for ln in lines:
         ln = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", ln)
+        ln = re.sub(r"`([^`]+)`", r"<code>\1</code>", ln)
         if ln.startswith("|") and "---" not in ln:
             if not in_table:
                 out.append("<table>")
@@ -196,6 +197,7 @@ def build_changelog():
 .rel-head{{font-size:16px;font-weight:700;color:var(--accent);margin-bottom:8px}}
 .rel-body table{{width:100%;border-collapse:collapse;margin:8px 0;font-size:13px}}
 .rel-body td{{border:1px solid var(--border);padding:5px 8px;color:var(--sub)}}
+.rel-body code{{font-family:ui-monospace,Consolas,monospace;font-size:12px;background:rgba(127,127,127,.12);border:1px solid var(--border);border-radius:5px;padding:1px 5px;color:var(--text);word-break:break-all}}
 .rel-body .lg-item{{color:var(--sub);font-size:13px;padding:2px 0 2px 14px;position:relative}}
 .rel-body .lg-item:before{{content:'·';position:absolute;left:2px;color:var(--accent)}}
 .rel-body .lg-note{{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:8px 12px;color:#f59e0b;font-size:12px;margin:6px 0}}

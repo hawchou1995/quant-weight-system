@@ -150,7 +150,7 @@ def fetch_tx_delist(sym: str, retries: int = 3):
                 out.append({
                     "date": d, "open": float(row[1]), "high": float(row[3]),
                     "low": float(row[4]), "close": float(row[2]),
-                    "volume": float(row[5]) if len(row) > 5 and not isinstance(row[5], dict) else 0,
+                    "volume": (float(row[5]) * 100.0) if len(row) > 5 and not isinstance(row[5], dict) else 0,  # 手→股（2026-09-12 源头补丁）
                     "amount": 0,  # 腾讯 day 接口不含成交额
                 })
             df = pd.DataFrame(out, columns=HEADERS)
