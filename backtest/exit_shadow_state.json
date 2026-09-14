@@ -1,0 +1,196 @@
+{
+ "created": "2026-09-14",
+ "note": "pct40 出场影子轨（对账 satellite_paper）",
+ "tracks": {
+  "track_a": {
+   "init_cash": 34000.0,
+   "cash": 34000.0,
+   "held": {
+    "000507": {
+     "shares": 600.0,
+     "entry_px": 5.128553333333334,
+     "trigger_pct": null,
+     "pct": 0.0007
+    },
+    "600168": {
+     "shares": 700.0,
+     "entry_px": 4.425962857142857,
+     "trigger_pct": null,
+     "pct": 0.0003
+    },
+    "000881": {
+     "shares": 500.0,
+     "entry_px": 6.6532599999999995,
+     "trigger_pct": null,
+     "pct": 0.001
+    },
+    "002191": {
+     "shares": 900.0,
+     "entry_px": 3.5726755555555556,
+     "trigger_pct": null,
+     "pct": 0.0028
+    },
+    "000598": {
+     "shares": 400.0,
+     "entry_px": 7.096640000000001,
+     "trigger_pct": null,
+     "pct": 0.0017
+    },
+    "601368": {
+     "shares": 700.0,
+     "entry_px": 4.5261628571428565,
+     "trigger_pct": null,
+     "pct": 0.0028
+    },
+    "600642": {
+     "shares": 300.0,
+     "entry_px": 8.603806666666665,
+     "trigger_pct": null,
+     "pct": 0.0023
+    },
+    "601838": {
+     "shares": 100.0,
+     "entry_px": 20.18018,
+     "trigger_pct": null,
+     "pct": 0.0013
+    },
+    "002926": {
+     "shares": 400.0,
+     "entry_px": 8.279000000000002,
+     "trigger_pct": null,
+     "pct": 0.0033
+    }
+   },
+   "exits": [],
+   "armed": true
+  },
+  "track_b": {
+   "init_cash": 34000.0,
+   "cash": 34000.0,
+   "held": {
+    "002375": {
+     "shares": 400.0,
+     "entry_px": 3.7800199999999995,
+     "trigger_pct": null,
+     "pct": 0.0007
+    },
+    "000507": {
+     "shares": 300.0,
+     "entry_px": 5.136886666666667,
+     "trigger_pct": null,
+     "pct": 0.001
+    },
+    "600668": {
+     "shares": 200.0,
+     "entry_px": 7.339599999999999,
+     "trigger_pct": null,
+     "pct": 0.0013
+    },
+    "600363": {
+     "shares": 100.0,
+     "entry_px": 15.11006,
+     "trigger_pct": null,
+     "pct": 0.0017
+    },
+    "000726": {
+     "shares": 200.0,
+     "entry_px": 6.07708,
+     "trigger_pct": null,
+     "pct": 0.002
+    },
+    "603788": {
+     "shares": 100.0,
+     "entry_px": 13.376600000000002,
+     "trigger_pct": null,
+     "pct": 0.0024
+    },
+    "600894": {
+     "shares": 200.0,
+     "entry_px": 7.32958,
+     "trigger_pct": null,
+     "pct": 0.0027
+    },
+    "603357": {
+     "shares": 200.0,
+     "entry_px": 6.006939999999999,
+     "trigger_pct": null,
+     "pct": 0.003
+    },
+    "002616": {
+     "shares": 300.0,
+     "entry_px": 4.916446666666666,
+     "trigger_pct": null,
+     "pct": 0.0034
+    },
+    "000910": {
+     "shares": 300.0,
+     "entry_px": 5.257126666666667,
+     "trigger_pct": null,
+     "pct": 0.0037
+    },
+    "002051": {
+     "shares": 100.0,
+     "entry_px": 8.67722,
+     "trigger_pct": null,
+     "pct": 0.004
+    },
+    "603187": {
+     "shares": 100.0,
+     "entry_px": 10.721300000000001,
+     "trigger_pct": null,
+     "pct": 0.0044
+    },
+    "000498": {
+     "shares": 300.0,
+     "entry_px": 4.9064266666666665,
+     "trigger_pct": null,
+     "pct": 0.0047
+    },
+    "600284": {
+     "shares": 300.0,
+     "entry_px": 5.1168466666666665,
+     "trigger_pct": null,
+     "pct": 0.005
+    },
+    "002521": {
+     "shares": 200.0,
+     "entry_px": 6.47788,
+     "trigger_pct": null,
+     "pct": 0.0061
+    },
+    "603035": {
+     "shares": 100.0,
+     "entry_px": 10.4207,
+     "trigger_pct": null,
+     "pct": 0.0067
+    }
+   },
+   "exits": [],
+   "armed": true
+  }
+ },
+ "pending_exits": {
+  "track_a": [],
+  "track_b": []
+ },
+ "nav_history": [
+  {
+   "date": "2026-09-11",
+   "track": "track_a",
+   "paper": 34153.85,
+   "shadow": 60782.0,
+   "n_flag_today": 0,
+   "n_pend": 0,
+   "n_held": 9
+  },
+  {
+   "date": "2026-09-11",
+   "track": "track_b",
+   "paper": 33972.07,
+   "shadow": 55561.0,
+   "n_flag_today": 0,
+   "n_pend": 0,
+   "n_held": 16
+  }
+ ]
+}

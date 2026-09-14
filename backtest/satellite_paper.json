@@ -8,10 +8,486 @@
   "cost_model": "佣金 2.5bp(最低5元) + 印税 10bp(卖出) + 滑点按成交",
   "note": "轨A 60 交易日调仓 / 轨B 月频；成交后回填 fills，脚本自动更新净值"
  },
- "fills": [],
- "positions": {"track_a": {}, "track_b": {}},
- "nav_history": [],
+ "fills": [
+  {
+   "date": "2026-09-14",
+   "track": "track_a",
+   "code": "000507",
+   "name": "珠海港",
+   "px": 5.12,
+   "shares": 600,
+   "amount": 3077.13,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_a",
+   "code": "600168",
+   "name": "武汉控股",
+   "px": 4.419,
+   "shares": 700,
+   "amount": 3098.17,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_a",
+   "code": "000881",
+   "name": "中广核技",
+   "px": 6.643,
+   "shares": 500,
+   "amount": 3326.63,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_a",
+   "code": "002932",
+   "name": "*ST明德",
+   "px": 15.22,
+   "shares": 200,
+   "amount": 3049.08,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_a",
+   "code": "002191",
+   "name": "劲嘉股份",
+   "px": 3.567,
+   "shares": 900,
+   "amount": 3215.41,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_a",
+   "code": "000598",
+   "name": "兴蓉环境",
+   "px": 7.084,
+   "shares": 400,
+   "amount": 2838.66,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_a",
+   "code": "601368",
+   "name": "绿城水务",
+   "px": 4.519,
+   "shares": 700,
+   "amount": 3168.31,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_a",
+   "code": "600642",
+   "name": "申能股份",
+   "px": 8.587,
+   "shares": 300,
+   "amount": 2581.14,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_a",
+   "code": "601838",
+   "name": "成都银行",
+   "px": 20.13,
+   "shares": 100,
+   "amount": 2018.02,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_a",
+   "code": "002926",
+   "name": "华西证券",
+   "px": 8.267,
+   "shares": 400,
+   "amount": 3311.6,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_b",
+   "code": "002375",
+   "name": "亚厦股份",
+   "px": 3.768,
+   "shares": 400,
+   "amount": 1512.01,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_b",
+   "code": "000507",
+   "name": "珠海港",
+   "px": 5.12,
+   "shares": 300,
+   "amount": 1541.07,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_b",
+   "code": "600668",
+   "name": "尖峰集团",
+   "px": 7.315,
+   "shares": 200,
+   "amount": 1467.92,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_b",
+   "code": "600363",
+   "name": "联创光电",
+   "px": 15.06,
+   "shares": 100,
+   "amount": 1511.01,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_b",
+   "code": "000726",
+   "name": "鲁 泰Ａ",
+   "px": 6.052,
+   "shares": 200,
+   "amount": 1215.42,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_b",
+   "code": "603788",
+   "name": "宁波高发",
+   "px": 13.327,
+   "shares": 100,
+   "amount": 1337.66,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_b",
+   "code": "600894",
+   "name": "广日股份",
+   "px": 7.305,
+   "shares": 200,
+   "amount": 1465.92,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_b",
+   "code": "603357",
+   "name": "设计总院",
+   "px": 5.982,
+   "shares": 200,
+   "amount": 1201.39,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_b",
+   "code": "002616",
+   "name": "长青集团",
+   "px": 4.9,
+   "shares": 300,
+   "amount": 1474.93,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_b",
+   "code": "000910",
+   "name": "大亚圣象",
+   "px": 5.24,
+   "shares": 300,
+   "amount": 1577.14,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_b",
+   "code": "002051",
+   "name": "中工国际",
+   "px": 8.627,
+   "shares": 100,
+   "amount": 867.72,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_b",
+   "code": "603187",
+   "name": "海容冷链",
+   "px": 10.671,
+   "shares": 100,
+   "amount": 1072.13,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_b",
+   "code": "000498",
+   "name": "山东路桥",
+   "px": 4.89,
+   "shares": 300,
+   "amount": 1471.93,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_b",
+   "code": "600284",
+   "name": "浦东建设",
+   "px": 5.1,
+   "shares": 300,
+   "amount": 1535.05,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_b",
+   "code": "002521",
+   "name": "齐峰新材",
+   "px": 6.453,
+   "shares": 200,
+   "amount": 1295.58,
+   "side": "buy"
+  },
+  {
+   "date": "2026-09-14",
+   "track": "track_b",
+   "code": "603035",
+   "name": "常熟汽饰",
+   "px": 10.371,
+   "shares": 100,
+   "amount": 1042.07,
+   "side": "buy"
+  }
+ ],
+ "positions": {
+  "track_a": {
+   "000507": {
+    "shares": 600.0,
+    "cost": 5.128553333333334,
+    "name": "珠海港",
+    "industry": "公用事业",
+    "last": 5.1
+   },
+   "600168": {
+    "shares": 700.0,
+    "cost": 4.425962857142857,
+    "name": "武汉控股",
+    "industry": "环保",
+    "last": 4.44
+   },
+   "000881": {
+    "shares": 500.0,
+    "cost": 6.6532599999999995,
+    "name": "中广核技",
+    "industry": "基础化工",
+    "last": 6.63
+   },
+   "002932": {
+    "shares": 200.0,
+    "cost": 15.245379999999997,
+    "name": "*ST明德",
+    "industry": "医药生物",
+    "last": 15.28
+   },
+   "002191": {
+    "shares": 900.0,
+    "cost": 3.5726755555555556,
+    "name": "劲嘉股份",
+    "industry": "轻工制造",
+    "last": 3.66
+   },
+   "000598": {
+    "shares": 400.0,
+    "cost": 7.096640000000001,
+    "name": "兴蓉环境",
+    "industry": "环保",
+    "last": 7.15
+   },
+   "601368": {
+    "shares": 700.0,
+    "cost": 4.5261628571428565,
+    "name": "绿城水务",
+    "industry": "环保",
+    "last": 4.57
+   },
+   "600642": {
+    "shares": 300.0,
+    "cost": 8.603806666666665,
+    "name": "申能股份",
+    "industry": "公用事业",
+    "last": 8.71
+   },
+   "601838": {
+    "shares": 100.0,
+    "cost": 20.18018,
+    "name": "成都银行",
+    "industry": "银行",
+    "last": 20.25
+   },
+   "002926": {
+    "shares": 400.0,
+    "cost": 8.279000000000002,
+    "name": "华西证券",
+    "industry": "非银金融",
+    "last": 8.27
+   }
+  },
+  "track_b": {
+   "002375": {
+    "shares": 400.0,
+    "cost": 3.7800199999999995,
+    "name": "亚厦股份",
+    "industry": "建筑装饰",
+    "last": 3.83
+   },
+   "000507": {
+    "shares": 300.0,
+    "cost": 5.136886666666667,
+    "name": "珠海港",
+    "industry": "公用事业",
+    "last": 5.1
+   },
+   "600668": {
+    "shares": 200.0,
+    "cost": 7.339599999999999,
+    "name": "尖峰集团",
+    "industry": "建筑材料",
+    "last": 7.28
+   },
+   "600363": {
+    "shares": 100.0,
+    "cost": 15.11006,
+    "name": "联创光电",
+    "industry": "电子",
+    "last": 15.19
+   },
+   "000726": {
+    "shares": 200.0,
+    "cost": 6.07708,
+    "name": "鲁 泰Ａ",
+    "industry": "纺织服饰",
+    "last": 6.06
+   },
+   "603788": {
+    "shares": 100.0,
+    "cost": 13.376600000000002,
+    "name": "宁波高发",
+    "industry": "汽车",
+    "last": 13.61
+   },
+   "600894": {
+    "shares": 200.0,
+    "cost": 7.32958,
+    "name": "广日股份",
+    "industry": "机械设备",
+    "last": 7.26
+   },
+   "603357": {
+    "shares": 200.0,
+    "cost": 6.006939999999999,
+    "name": "设计总院",
+    "industry": "建筑装饰",
+    "last": 5.97
+   },
+   "002616": {
+    "shares": 300.0,
+    "cost": 4.916446666666666,
+    "name": "长青集团",
+    "industry": "公用事业",
+    "last": 4.9
+   },
+   "000910": {
+    "shares": 300.0,
+    "cost": 5.257126666666667,
+    "name": "大亚圣象",
+    "industry": "轻工制造",
+    "last": 5.28
+   },
+   "002051": {
+    "shares": 100.0,
+    "cost": 8.67722,
+    "name": "中工国际",
+    "industry": "建筑装饰",
+    "last": 8.52
+   },
+   "603187": {
+    "shares": 100.0,
+    "cost": 10.721300000000001,
+    "name": "海容冷链",
+    "industry": "机械设备",
+    "last": 10.7
+   },
+   "000498": {
+    "shares": 300.0,
+    "cost": 4.9064266666666665,
+    "name": "山东路桥",
+    "industry": "建筑装饰",
+    "last": 4.88
+   },
+   "600284": {
+    "shares": 300.0,
+    "cost": 5.1168466666666665,
+    "name": "浦东建设",
+    "industry": "建筑装饰",
+    "last": 5.11
+   },
+   "002521": {
+    "shares": 200.0,
+    "cost": 6.47788,
+    "name": "齐峰新材",
+    "industry": "轻工制造",
+    "last": 6.46
+   },
+   "603035": {
+    "shares": 100.0,
+    "cost": 10.4207,
+    "name": "常熟汽饰",
+    "industry": "汽车",
+    "last": 10.4
+   }
+  }
+ },
+ "nav_history": [
+  {
+   "date": "2026-09-14",
+   "track_a": 34153.85,
+   "track_a_pos": 29838.0
+  },
+  {
+   "date": "2026-09-14",
+   "track_a": 34153.85,
+   "track_a_pos": 29838.0,
+   "track_b": 33972.07,
+   "track_b_pos": 21561.0,
+   "total": 68125.92,
+   "total_ret": 0.00185
+  }
+ ],
  "events": [
-  {"date": "2026-09-13", "event": "模拟盘建档：待 09-14（周一）开盘按 satellite_pool.json 目标清单建仓"}
- ]
+  {
+   "date": "2026-09-13",
+   "event": "模拟盘建档：待 09-14（周一）开盘按 satellite_pool.json 目标清单建仓"
+  },
+  {
+   "date": "2026-09-14",
+   "event": "track_a 建仓 10/10 只，金额/只≈3400，滑点 20bp+佣金2.5bp"
+  },
+  {
+   "date": "2026-09-14",
+   "event": "track_b 建仓 16/20 只，金额/只≈1700，滑点 20bp+佣金2.5bp"
+  }
+ ],
+ "cash_a": 4315.85,
+ "cash_b": 12411.07
 }
