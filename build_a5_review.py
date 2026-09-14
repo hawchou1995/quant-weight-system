@@ -135,6 +135,7 @@ def build():
         "stats": stats, "gate": gate, "n_watch": len(A["watchlist"]),
         "n_avoid": len(A["avoid"]), "n_pos": len(A["positions"]), "n_closed": len(A["closed"]),
     }
+    out["bench"] = bench   # v1.3：基准随口径单一数据源
     json.dump(out, open(os.path.join(REVIEW_DIR, "a5_review.json"), "w", encoding="utf-8"),
               ensure_ascii=False, indent=2)
     print(f"✅ A5 复盘已生成 review/review_a5.md（as_of={as_of} · 已平仓 {len(A['closed'])} · "

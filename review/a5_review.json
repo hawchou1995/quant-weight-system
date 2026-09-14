@@ -1,32 +1,41 @@
 {
   "file": "review_a5.md",
   "as_of": "2026-09-14",
-  "updated": "2026-09-14 17:24:59",
+  "updated": "2026-09-15 00:02:48",
   "stats": {
-    "n": 11,
-    "win_rate": 36.36363636363637,
-    "mean_net": -1.709286095511121,
-    "mean_raw": -0.5690932444502189,
-    "tp_ratio": 0.0,
+    "n": 0,
+    "win_rate": null,
+    "mean_net": null,
+    "mean_raw": null,
+    "tp_ratio": null,
+    "v1_n": 11,
+    "v1_mean_net": -1.709286095511121,
     "nav": 0.822316
   },
   "gate": {
-    "verdict": "信号不足 11/30，继续积累",
+    "verdict": "信号不足 0/30，继续积累",
     "wr": {
       "status": "waiting",
-      "note": "11/30"
+      "note": "0/30"
     },
     "mn": {
       "status": "waiting",
-      "note": "11/30"
+      "note": "0/30"
     },
     "tp": {
       "status": "waiting",
-      "note": "11/30"
+      "note": "0/30"
     }
   },
-  "n_watch": 8,
+  "n_watch": 2,
   "n_avoid": 2,
   "n_pos": 1,
-  "n_closed": 11
+  "n_closed": 11,
+  "bench": {
+    "win_rate": 56.1,
+    "mean_net": 1.19,
+    "tp_ratio": 25.0,
+    "n": 396,
+    "note": "池A 超跌 282笔 +1.37%/58.2% · 池B 趋势 255笔 +1.19%/54.9% · 并集 396笔"
+  }
 }
