@@ -1,32 +1,32 @@
 {
   "file": "review_a5.md",
-  "as_of": "2026-09-11",
-  "updated": "2026-09-11 16:12:41",
+  "as_of": "2026-09-14",
+  "updated": "2026-09-14 17:24:59",
   "stats": {
-    "n": 9,
-    "win_rate": 44.44444444444444,
-    "mean_net": -1.2166488401305409,
-    "mean_raw": -0.07074129381066477,
+    "n": 11,
+    "win_rate": 36.36363636363637,
+    "mean_net": -1.709286095511121,
+    "mean_raw": -0.5690932444502189,
     "tp_ratio": 0.0,
-    "nav": 0.890966
+    "nav": 0.822316
   },
   "gate": {
-    "verdict": "信号不足 9/30，继续积累",
+    "verdict": "信号不足 11/30，继续积累",
     "wr": {
       "status": "waiting",
-      "note": "9/30"
+      "note": "11/30"
     },
     "mn": {
       "status": "waiting",
-      "note": "9/30"
+      "note": "11/30"
     },
     "tp": {
       "status": "waiting",
-      "note": "9/30"
+      "note": "11/30"
     }
   },
-  "n_watch": 9,
-  "n_avoid": 3,
-  "n_pos": 2,
-  "n_closed": 9
+  "n_watch": 8,
+  "n_avoid": 2,
+  "n_pos": 1,
+  "n_closed": 11
 }

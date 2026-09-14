@@ -38,6 +38,12 @@ STEPS = [
     ("双卫星模拟盘 satellite_paper", ["backtest/satellite_paper_0914.py"], False),
     ("pct40 出场影子轨 exit_shadow", ["backtest/exit_shadow_0915.py"], False),
     ("KHunter 模拟盘快照 khunter_snapshot", ["khunter_paper_snapshot.py"], False),
+    # A5 打板实验盘（看板「打板族」视图的数据源）——必须在 build_dual_system 之前跑；[软]=失败不阻断主链
+    # 2026-09-14 补：此前该流水线未接入每日链 → 看板 A5 卡停在 as_of 09-10（持仓只显示 1 只），
+    # 用户据此提问「A5 命中这么多，模拟盘为什么只有一只」。顺序=扫描→数据桥→复盘。
+    ("A5 打板实验盘扫描 paper_daban_a5[软]", [str(BASE.parent / "打板系统A5实验_20260827" / "paper_daban_a5.py")], "--skip-a5" in sys.argv),
+    ("A5 看板数据 build_a5_pool[软]", ["build_a5_pool.py"], "--skip-a5" in sys.argv),
+    ("A5 复盘日志 build_a5_review[软]", ["build_a5_review.py"], "--skip-a5" in sys.argv),
     ("看板重建 build_dual_system", ["build_dual_system.py"], False),
     ("部署 gh-pages", ["_deploy_fundline_0911.py"], "--skip-deploy" in sys.argv),
 ]
@@ -50,6 +56,9 @@ for name, args, skip in STEPS:
     print(f"\n========== {name} ==========", flush=True)
     r = subprocess.run([PY] + args, cwd=str(BASE))
     if r.returncode != 0:
+        if name.endswith("[软]"):   # 软步骤：失败只告警，不阻断（如 A5 实验盘、影子轨）
+            print(f"⚠️ {name} 失败（exit {r.returncode}）—— 非致命，继续后续步骤", flush=True)
+            continue
         fails.append(name)
         print(f"❌ {name} 失败（exit {r.returncode}）—— 中止后续步骤", flush=True)
         break
