@@ -941,7 +941,7 @@ def a5_view_html():
          _txt_td("/".join(p.get("pools", [])) or "v1"),
          _pct_td(p.get("net_ret", 0)*100, 2), _chg_td(p.get("chg")), _pct_td(p.get("ret_1y"), 1),
          _num_td(p.get("rsi"), 1), _num_td(p.get("vr"), 2)])
-        for p in closed]
+        for p in closed_new]
     # 净值曲线（模拟盘点数少，线性折线）
     curve_html = ""
     if len(eq) >= 2:
