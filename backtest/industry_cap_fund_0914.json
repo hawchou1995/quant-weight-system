@@ -1,0 +1,292 @@
+{
+ "prereg": {
+  "track": "C · FB3-H20 基金主仓",
+  "pool": 2000,
+  "slip_main": 5,
+  "phases": [
+   0,
+   4,
+   8,
+   12,
+   16
+  ],
+  "N_grid": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "industry_whitelist_count": 25,
+  "note": "N=0 为对照（现行生产口径）；先去重后约束；宽类/风格类豁免约束"
+ },
+ "runs": {
+  "N0_slip5": {
+   "phases": [
+    {
+     "offset": 0,
+     "total": 781.59,
+     "sharpe": 1.345,
+     "mdd": -26.66,
+     "trades": 742,
+     "win": 67.9,
+     "annual": 22.57
+    },
+    {
+     "offset": 4,
+     "total": 252.88,
+     "sharpe": 0.786,
+     "mdd": -40.27,
+     "trades": 740,
+     "win": 57.2,
+     "annual": 12.51
+    },
+    {
+     "offset": 8,
+     "total": 163.61,
+     "sharpe": 0.631,
+     "mdd": -27.67,
+     "trades": 816,
+     "win": 54.7,
+     "annual": 9.49
+    },
+    {
+     "offset": 12,
+     "total": 332.65,
+     "sharpe": 1.009,
+     "mdd": -26.66,
+     "trades": 715,
+     "win": 59.3,
+     "annual": 14.68
+    },
+    {
+     "offset": 16,
+     "total": 319.17,
+     "sharpe": 0.882,
+     "mdd": -27.87,
+     "trades": 732,
+     "win": 62.2,
+     "annual": 14.34
+    }
+   ],
+   "sharpe_med": 0.882,
+   "total_med": 319.17,
+   "sharpe_min": 0.631,
+   "sharpe_max": 1.345
+  },
+  "N1_slip5": {
+   "phases": [
+    {
+     "offset": 0,
+     "total": 739.08,
+     "sharpe": 1.342,
+     "mdd": -28.68,
+     "trades": 741,
+     "win": 67.7,
+     "annual": 22.01
+    },
+    {
+     "offset": 4,
+     "total": 209.05,
+     "sharpe": 0.743,
+     "mdd": -37.53,
+     "trades": 703,
+     "win": 56.2,
+     "annual": 11.13
+    },
+    {
+     "offset": 8,
+     "total": 181.42,
+     "sharpe": 0.682,
+     "mdd": -25.95,
+     "trades": 810,
+     "win": 54.6,
+     "annual": 10.16
+    },
+    {
+     "offset": 12,
+     "total": 322.73,
+     "sharpe": 1.014,
+     "mdd": -25.35,
+     "trades": 712,
+     "win": 59.1,
+     "annual": 14.43
+    },
+    {
+     "offset": 16,
+     "total": 310.45,
+     "sharpe": 0.885,
+     "mdd": -29.54,
+     "trades": 727,
+     "win": 61.6,
+     "annual": 14.12
+    }
+   ],
+   "sharpe_med": 0.885,
+   "total_med": 310.45,
+   "sharpe_min": 0.682,
+   "sharpe_max": 1.342
+  },
+  "N2_slip5": {
+   "phases": [
+    {
+     "offset": 0,
+     "total": 793.9,
+     "sharpe": 1.369,
+     "mdd": -26.66,
+     "trades": 740,
+     "win": 68.1,
+     "annual": 22.73
+    },
+    {
+     "offset": 4,
+     "total": 248.63,
+     "sharpe": 0.783,
+     "mdd": -39.67,
+     "trades": 736,
+     "win": 56.7,
+     "annual": 12.39
+    },
+    {
+     "offset": 8,
+     "total": 166.28,
+     "sharpe": 0.643,
+     "mdd": -29.26,
+     "trades": 807,
+     "win": 54.8,
+     "annual": 9.59
+    },
+    {
+     "offset": 12,
+     "total": 338.28,
+     "sharpe": 1.025,
+     "mdd": -24.52,
+     "trades": 714,
+     "win": 59.5,
+     "annual": 14.82
+    },
+    {
+     "offset": 16,
+     "total": 302.01,
+     "sharpe": 0.865,
+     "mdd": -28.11,
+     "trades": 730,
+     "win": 61.6,
+     "annual": 13.89
+    }
+   ],
+   "sharpe_med": 0.865,
+   "total_med": 302.01,
+   "sharpe_min": 0.643,
+   "sharpe_max": 1.369
+  },
+  "N3_slip5": {
+   "phases": [
+    {
+     "offset": 0,
+     "total": 775.03,
+     "sharpe": 1.352,
+     "mdd": -26.66,
+     "trades": 742,
+     "win": 68.2,
+     "annual": 22.49
+    },
+    {
+     "offset": 4,
+     "total": 251.1,
+     "sharpe": 0.787,
+     "mdd": -39.59,
+     "trades": 736,
+     "win": 56.9,
+     "annual": 12.46
+    },
+    {
+     "offset": 8,
+     "total": 166.07,
+     "sharpe": 0.639,
+     "mdd": -28.67,
+     "trades": 810,
+     "win": 54.3,
+     "annual": 9.58
+    },
+    {
+     "offset": 12,
+     "total": 328.78,
+     "sharpe": 1.005,
+     "mdd": -25.32,
+     "trades": 715,
+     "win": 59.3,
+     "annual": 14.58
+    },
+    {
+     "offset": 16,
+     "total": 307.9,
+     "sharpe": 0.868,
+     "mdd": -27.99,
+     "trades": 731,
+     "win": 62.1,
+     "annual": 14.05
+    }
+   ],
+   "sharpe_med": 0.868,
+   "total_med": 307.9,
+   "sharpe_min": 0.639,
+   "sharpe_max": 1.352
+  },
+  "N0_slip20": {
+   "off0": {
+    "total": 543.83,
+    "sharpe": 1.16,
+    "mdd": -28.74
+   }
+  },
+  "N0_slip50": {
+   "off0": {
+    "total": 243.41,
+    "sharpe": 0.788,
+    "mdd": -35.21
+   }
+  },
+  "N1_slip20": {
+   "off0": {
+    "total": 512.96,
+    "sharpe": 1.153,
+    "mdd": -31.79
+   }
+  },
+  "N1_slip50": {
+   "off0": {
+    "total": 227.13,
+    "sharpe": 0.773,
+    "mdd": -37.98
+   }
+  },
+  "N2_slip20": {
+   "off0": {
+    "total": 553.23,
+    "sharpe": 1.181,
+    "mdd": -29.39
+   }
+  },
+  "N2_slip50": {
+   "off0": {
+    "total": 248.86,
+    "sharpe": 0.804,
+    "mdd": -35.8
+   }
+  },
+  "N3_slip20": {
+   "off0": {
+    "total": 539.03,
+    "sharpe": 1.165,
+    "mdd": -28.99
+   }
+  },
+  "N3_slip50": {
+   "off0": {
+    "total": 240.85,
+    "sharpe": 0.789,
+    "mdd": -35.44
+   }
+  }
+ }
+}

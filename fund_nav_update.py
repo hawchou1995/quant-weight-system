@@ -58,7 +58,10 @@ def fetch_one(code):
             if not arr:
                 return code, None, "empty"
             rows, seen = [], set()
-            for it in arr[-400:]:
+            # ⚠ 2026-09-14 事故：初版沿用旧脚本的 arr[-400:]（只取最近 400 条）→ 覆盖写把
+            #   3042 只基金的净值历史截断到 1.6 年，基金回测从 733%/夏普1.316 掉到 59%/0.517。
+            #   东财 Data_netWorthTrend 本身返回全历史（实测 000001 = 6005 条），必须全量写。
+            for it in arr:
                 if isinstance(it, dict):
                     ts, nav, chg = it.get("x", 0), it.get("y"), it.get("equityReturn", "")
                 else:

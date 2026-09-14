@@ -132,6 +132,25 @@ def build_squeeze_events(pool, bw_th=0.02, vol_ratio=1.2, ma2_ok=True, min_px=1.
     return events
 
 
+def apply_industry_cap(cand, top_n, max_per_industry=0, industry_of=None):
+    """按分数降序取 top_n，但同一行业最多 max_per_industry 只（0/None=不约束）。
+    cand = [(code, score)]（已按分数降序）；industry_of(code) → 行业名（None/'' = 无标签，各自独立计数）。
+    2026-09-14 预注册实验用（行业集中度约束）；生产默认不启用。"""
+    if not max_per_industry or industry_of is None:
+        return cand[:top_n]
+    picked, cnt = [], {}
+    for code, sc in cand:
+        ind = industry_of(code)
+        if ind:
+            if cnt.get(ind, 0) >= max_per_industry:
+                continue
+            cnt[ind] = cnt.get(ind, 0) + 1
+        picked.append((code, sc))
+        if len(picked) >= top_n:
+            break
+    return picked
+
+
 def run_squeeze(pool, events, top_n=3, max_hold=3, take_profit=0.12, stop_loss=0.08,
                 ma5_exit=True, use_market=True, ma_win=20, cash0=1_000_000, fund_mode=False,
                 slippage_bps=0):
@@ -381,7 +400,8 @@ def _mk_cfg(**kw):
 def run_short_regime(pool, bull_cfg=None, bear_cfg=None, cash0=1_000_000,
                      use_market=True, ma_win=20, min_px=1.0, slippage_bps=20,
                      sky_vol_filter=0, allow_bear_buy=False, fund_mode=False,
-                     tier_cfg=None, idx_mom20_strong=0.03, score_fn=None):
+                     tier_cfg=None, idx_mom20_strong=0.03, score_fn=None,
+                     max_per_industry=0, industry_of=None, offset=0):
     """短线轮动回测（regime 感知版，2026-09-01）：
     T 日收盘打分 → T+1 开盘换仓；市况门控（沪深300>MA）切换牛/熊配置：
     - 牛 regime（in_market=True）：bull_cfg 权重/掩码/门槛/标的数
@@ -403,7 +423,7 @@ def run_short_regime(pool, bull_cfg=None, bear_cfg=None, cash0=1_000_000,
     all_days = [d for d in idx.index if START <= str(d.date()) <= END]
     bull_cfg = _mk_cfg(**(bull_cfg or {}))
     bear_cfg = _mk_cfg(**(bear_cfg or {}))
-    rebal_days = set(all_days[::bull_cfg["hold_days"]])
+    rebal_days = set(all_days[offset::bull_cfg["hold_days"]])   # offset=相位偏移（ADR-0006）
     cash = cash0
     holdings, entry_price, entry_date = {}, {}, {}
     equity_curve, trades = [], []
@@ -526,7 +546,7 @@ def run_short_regime(pool, bull_cfg=None, bear_cfg=None, cash0=1_000_000,
                     cand.append((code, sc))
                     cand_scores[code] = sc
                 cand.sort(key=lambda kv: -kv[1])
-                ranked = cand[:cfg["top_n"]]
+                ranked = apply_industry_cap(cand, cfg["top_n"], max_per_industry, industry_of)
                 keep = {c for c, _ in ranked}
                 # AbacusFlow 换仓 buffer 借鉴（2026-09-01）：持仓标的若仍满足门槛且
                 # 分数 ≥ 候选榜第 top_n 名分数×(1-rebal_buffer)，则保留（降换手/降成本）
@@ -580,14 +600,15 @@ def run_short_regime(pool, bull_cfg=None, bear_cfg=None, cash0=1_000_000,
 def run_short(pool, top_n=10, hold_days=10, score_min=50, cash0=1_000_000,
               use_market=True, ma_win=20, min_px=1.0, min_amt=2e6, fund_mode=False,
               reversal=False, ma5_exit=False, take_profit=0.0, stop_loss=0.0,
-              slippage_bps=0, sky_vol_filter=0):
+              slippage_bps=0, sky_vol_filter=0, max_per_industry=0, industry_of=None,
+              offset=0):
     """短线轮动回测：T 日收盘打分 → T+1 开盘换仓；市况门控（沪深300>MA）
     v3 混合风控：ma5_exit=MA5生命线每日止损 / take_profit=止盈 / stop_loss=固定止损（默认关闭=纯轮动）
     slippage_bps=每边滑点/冲击成本（基点；买入价上浮、卖出价下浮；基金=T+1净值申购赎回费口径）"""
     idx = V.load_index(ma_win).set_index("date")
     in_market_map = idx["in_market"].to_dict()
     all_days = [d for d in idx.index if START <= str(d.date()) <= END]
-    rebal_days = set(all_days[::hold_days])
+    rebal_days = set(all_days[offset::hold_days])   # offset=相位偏移（ADR-0006）
     cash = cash0
     holdings, entry_price, entry_date = {}, {}, {}
     equity_curve, trades = [], []
@@ -685,7 +706,7 @@ def run_short(pool, top_n=10, hold_days=10, score_min=50, cash0=1_000_000,
                             continue
                     cand.append((code, sc))
                 cand.sort(key=lambda kv: -kv[1])
-                ranked = cand[:top_n]
+                ranked = apply_industry_cap(cand, top_n, max_per_industry, industry_of)
                 keep = {c for c, _ in ranked}
                 pending_sell |= {c for c in holdings if c not in keep}
                 pending_buy = ranked
