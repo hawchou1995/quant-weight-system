@@ -152,7 +152,8 @@ def main():
         nh[-1]["total_ret"] = round(total_nav / st["meta"]["initial_cash"] - 1, 5)
     st["events"] = st["events"][-40:]
     if dry:
-        print("[dry] 未写盘。将写 nav_history 尾行：", json.dumps(nh[-1], ensure_ascii=False))
+        tail = json.dumps(nh[-1], ensure_ascii=False) if nh else "（空 nav_history：两轨均未建仓）"
+        print("[dry] 未写盘。将写 nav_history 尾行：", tail)
         return
     STATE.write_text(json.dumps(st, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"== 合计净值 {total_nav:.2f} / {st['meta']['initial_cash']} = {total_nav/st['meta']['initial_cash']-1:+.2%} → {STATE.name}")
