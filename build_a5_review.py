@@ -6,7 +6,7 @@ A5_tp8t2 实验系统 → 复盘日志（2026-08-28 投产，双轨方案 v1.1�
   review/a5_review.json    （结构化数据，供看板 view-review 分区渲染）
 
 口径：模拟盘逐笔跟踪 net_ret（含成本），与 v9/短线池的信号级 T+1 复盘不同，故独立生成。
-验证门基准 = 全部信号口径（46.1%/-0.17%/21.5%），与扫描器执行同口径。
+验证门基准 = v1.3 双池并集（56.1%/+1.19%/tp25.0%，修正口径线上基底），仅计新口径（入场带 pools 标记）。
 
 用法：python build_a5_review.py    （收盘管道 refresh_daily.py 第 6 步调用）
 """
@@ -45,21 +45,25 @@ def build():
     md.append(f"# 🎯 打板实验（A5_tp8t2）模拟盘复盘 · {as_of}")
     md.append("")
     md.append("> **模拟盘边缘验证 · 非实盘指令** · 双轨方案 v1.1：A5_tp8t2 主模型模拟盘 + A2_tp3 回避清单（负期望警示，不单独交易）")
-    md.append("> 口径：逐笔 net_ret（含成本买 0.525%/卖 0.625%）· 验证门基准 = **全部信号口径**（模拟盘无每日≤5/情绪门控，与执行同口径）")
+    md.append("> 口径：逐笔 net_ret（含成本买 0.525%/卖 0.625%）· v1.3（2026-09-15）：双池独立滤网（池A 超跌 ret20≤-7.31% / 池B 趋势 ADX14≥27.9）· 验证门基准 = **双池并集**，新口径独立计数")
     md.append("")
-    md.append("## 📊 验证统计（vs 全部信号基准）")
+    md.append("## 📊 验证统计（vs 双池并集基准 · 新口径自 2026-09-15 起计）")
     md.append("")
-    md.append("| 指标 | 模拟盘 | 回测基准(全部信号) | 验证门 |")
+    _v1n = stats.get("v1_n", 0)
+    if _v1n:
+        md.append(f"> v1 旧口径归档 **{_v1n} 笔**（均值 {stats.get('v1_mean_net', 0):+.2f}%）——口径已替换，不计入新验证门。")
+        md.append("")
+    md.append("| 指标 | 模拟盘（新口径） | 回测基准(双池并集) | 验证门 |")
     md.append("|---|---|---|---|")
     wr = stats["win_rate"]
-    md.append(f"| 已平仓信号 | {stats['n']}/30 | 1,116 | 累计 30 触发判定 |")
-    md.append(f"| 胜率 | {pct(wr, 1) if wr is not None else '—'} | {bench['win_rate']:.1f}% | [35%, 55%] {gate['wr']['note'] if gate['wr']['status']=='waiting' else ''} |")
+    md.append(f"| 已平仓信号 | {stats['n']}/30 | 396 | 累计 30 触发判定 |")
+    md.append(f"| 胜率 | {pct(wr, 1) if wr is not None else '—'} | {bench['win_rate']:.1f}% | [46%, 66%] {gate['wr']['note'] if gate['wr']['status']=='waiting' else ''} |")
     mn = stats["mean_net"]
-    md.append(f"| 均值净收益 | {pct(mn) if mn is not None else '—'} | {bench['mean_net']:+.2f}% | >-0.5% {gate['mn']['note'] if gate['mn']['status']=='waiting' else ''} |")
+    md.append(f"| 均值净收益 | {pct(mn) if mn is not None else '—'} | {bench['mean_net']:+.2f}% | >+0.5% {gate['mn']['note'] if gate['mn']['status']=='waiting' else ''} |")
     tp = stats["tp_ratio"]
-    md.append(f"| tp 出场占比 | {pct(tp, 1) if tp is not None else '—'} | {bench['tp_ratio']:.1f}% | [12%, 32%] {gate['tp']['note'] if gate['tp']['status']=='waiting' else ''} |")
+    md.append(f"| tp 出场占比 | {pct(tp, 1) if tp is not None else '—'} | {bench['tp_ratio']:.1f}% | [15%, 35%] {gate['tp']['note'] if gate['tp']['status']=='waiting' else ''} |")
     nav = stats["nav"]
-    md.append(f"| 净值（已平仓复利） | {nav:.4f} | —（组合复利 -72.2% 警示） | — |")
+    md.append(f"| 净值（已平仓复利） | {nav:.4f} | — | — |")
     md.append("")
     gwr, gmn, gtp = gate["wr"], gate["mn"], gate["tp"]
     md.append("### 🚦 验证门状态")
@@ -72,7 +76,7 @@ def build():
             md.append(f"- {flag} {name}：{g['note']}")
     md.append(f"- **判定：{gate['verdict']}**")
     md.append("")
-    md.append("> ⚠ **组合复利警示（回测）**：单笔算术期望为正（组合信号 +0.11%），但 10 年组合复利 **-72.2%/年化 -27.4%/回撤 -91.4%**——边缘太薄（σ≈5%/日），验证通过前只允许极小仓位（单笔≤1-2%）模拟，**禁止实盘**。")
+    md.append("> ⚠ **组合口径（回测·v1.3 修正样本）**：线上基底 5 槽位组合 +18.9%/回撤 −35.4%；双池并集 +39.7%/回撤 −8.7%（近似模拟）。边缘仍薄（单笔 σ≈5%），验证通过前只允许极小仓位模拟，**禁止实盘**。")
     md.append("")
     md.append("## 💼 当前持仓")
     md.append("")
