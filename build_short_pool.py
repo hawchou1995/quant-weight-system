@@ -870,7 +870,30 @@ def calc_signals(as_of=None):
     # 2026-08-31 生产接入：门槛 S50→S30（对齐 pathA 最优 T10/H10/S30 slip5，唯一过四闸）
     # 2026-09-01 FB3：牛市 S30 Top10 / 熊市 S45 Top3（极防守，低波重）
     _ftop = FUND_TOP_BEAR if not _in_mkt else 10
-    fund_top = [kv for kv in frows if kv[1] >= _fsmin][:_ftop]
+    # 2026-09-14 用户拍板：**同一基金的不同份额（A/C/E…）去重** —— 实盘与模拟盘都按去重后清单执行。
+    #   去重键 = 归一化基名（剥离「中文+单字母」份额后缀）；同基名优先保留 C 类（权威配置=C 类份额），
+    #   否则保留分数更高者。⚠ 回测口径未去重（同标的双份额=实质重复持仓），实盘结果与回测会有差异。
+    _base_pat = re.compile(r"[一-鿿][A-Z]$")
+    def _fund_base(nm):
+        nm = (nm or "").strip()
+        m = _base_pat.search(nm)
+        return nm[:m.start() + 1] if m else nm
+    _cands = [kv for kv in frows if kv[1] >= _fsmin]
+    _groups = {}
+    for kv in _cands:                      # frows 已按分数降序
+        _nm = fnames.get(kv[0][-6:], kv[0][-6:])
+        _groups.setdefault(_fund_base(_nm), []).append((kv, _nm))
+    _ded, _merged = [], []
+    for _b, _lst in _groups.items():
+        _c = [x for x in _lst if x[1].endswith("C")]
+        if len(_lst) > 1:
+            _merged.append([x[1] for x in _lst])
+        _ded.append((_c[0] if _c else _lst[0])[0])
+    _ded.sort(key=lambda kv: -kv[1])
+    fund_top = _ded[:_ftop]
+    if _merged:
+        print(f"  基金份额去重：合并同标的 {len(_merged)} 组（候选 {len(_cands)} → 去重后 {len(_ded)} 只），"
+              f"例：{_merged[:3]}", flush=True)
     print(f"基金池 买入信号 {len(fund_top)} 只（{'牛' if _in_mkt else '熊'}: 分≥{_fsmin} Top{_ftop}，权重{_fw}，不凑数）({time.time()-t0:.0f}s)", flush=True)
 
     # 详情构建（2026-09-02 用户拍板：主信号 KHunter + 基金池，旧战法候选全剔）

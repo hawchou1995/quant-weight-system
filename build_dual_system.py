@@ -1414,6 +1414,7 @@ _gate_txt = ("🟢 开（股票可买）" if _mg.get("open") else "🟠 关（�
 FB3_POOL_CARD = (f'<div class="card" id="fb3-pool-card">'
                  f'<h2>🥇 主仓 FB3-H20 基金池 <span class="badge badge-auto">当前 regime 持仓 · 数据截至 {_sp_j.get("as_of", "—")}</span></h2>'
                  f'<div class="sub">排序=基金动量分降序 · 市况门控 {_gate_txt} · 60% 资金 · 牛市 Top10 动量 / 熊市 Top3 低波（C 类份额，T+1 净值申赎）· 操作=相对模拟盘当前持仓</div>'
+                 f'<div class="sub" style="color:#f59e0b">⚠ 实盘清单已按份额去重（同一基金 A/C/E 类只留一只，优先 C 类）——回测口径未去重，故实盘预期与回测数字（436%/夏普1.07）存在差异</div>'
                  f'<div class="tbl-wrap"><table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>动量分</th><th>权重</th><th>操作</th></tr></thead><tbody>{_fund_rows or "<tr><td colspan=4>空（门控关闭；基金轨熊市照买 Top3）</td></tr>"}</tbody></table></div></div>')
 
 WATCH_V9_CARD = ('<div class="card" id="watch-v9-card"><h2>📌 历史跟踪池（已退役）</h2>'
