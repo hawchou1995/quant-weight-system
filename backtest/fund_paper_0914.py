@@ -58,6 +58,12 @@ def fill_date(series, fund_as_of):
     return max(series) if series else None
 
 
+def save(st):
+    state_events = st.get("events") or []
+    st["events"] = state_events[-40:]
+    STATE.write_text(json.dumps(st, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
 def main():
     dry = "--dry" in sys.argv
     st = json.loads(STATE.read_text(encoding="utf-8")) if STATE.exists() else {
@@ -97,6 +103,9 @@ def main():
             fd = fill_date(series, fund_as_of)
             if fd is None:
                 print(f"  !! {c} 在信号净值日 {fund_as_of} 之后尚无新净值（基金 T+1 公布）—— 待下一交易日")
+                st["events"].append({"date": latest, "event": f"待建仓：信号净值日 {fund_as_of}，等下一净值日（目标 {codes}）"})
+                if not dry:
+                    save(st)
                 return
             nav = series.get(fd)
             if nav is None:
@@ -113,6 +122,9 @@ def main():
             fd = fill_date(series, fund_as_of)
             if fd is None:
                 print(f"  !! {c} 在信号净值日 {fund_as_of} 之后尚无新净值 —— 待下一交易日")
+                st["events"].append({"date": latest, "event": f"待建仓：信号净值日 {fund_as_of}，等下一净值日（目标 {codes}）"})
+                if not dry:
+                    save(st)
                 return
             nav = series.get(fd)
             if nav is None or nav <= 0:
@@ -158,13 +170,12 @@ def main():
     elif latest and st["nav_history"]:
         st["nav_history"][-1].update({"nav": round(nav_now, 2), "ret": round(nav_now / INIT_CASH - 1, 5),
                                       "positions": len(st["positions"])})
-    st["events"] = st["events"][-40:]
     print(f"  持仓 {len(st['positions'])} 只 | 现金 {st['cash']:.2f} + 市值 {mv:.2f} = 净值 {nav_now:.2f}"
           f"（{nav_now/INIT_CASH-1:+.2%}）| 净值日 {latest}")
     if dry:
         print("[dry] 未写盘")
         return
-    STATE.write_text(json.dumps(st, ensure_ascii=False, indent=1), encoding="utf-8")
+    save(st)
     print(f"→ {STATE.name}")
 
 

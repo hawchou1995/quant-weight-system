@@ -136,7 +136,7 @@ try:
                       f'<div class="kpi"><div class="l">持仓标的</div><div class="v">{_npos}</div><div class="s">目标 30</div></div>'
                       f'<div class="kpi"><div class="l">状态</div><div class="v">{"运行中" if _nh else "待建仓"}</div><div class="s">{(_nlast.get("date") if _nh else _pap.get("events", [{}])[-1].get("date", "—"))}</div></div>'
                       f'</div>'
-                      f'<div class="sub">记账口径：信号日次一交易日开盘价×1.002（20bp 滑点）+ 佣金 2.5bp（最低 5 元）· 全自动，无需回填成交</div>'
+                      f'<div class="sub">记账口径：信号日次一交易日开盘价×1.002（20bp 滑点）+ 佣金 2.5bp（最低 5 元）· 全自动，无需回填成交 · <b>pct40 因子化出场已启用（轨B：跌出前 40% 分位 → T+1 开盘卖）</b></div>'
                       f'<div class="sub" style="color:var(--faint)">{(_pap.get("events", [{}])[-1].get("event", ""))}</div>'
                       f'</div>')
 except Exception as _e2:
@@ -492,10 +492,10 @@ def load_curve_norm(f):
 
 v_fund = load_curve_norm("short_v3_fund_slip20_equity.csv")  # 2026-09-13 切 FB3-H20 2000 池曲线（原 v8_fund_equity.csv 退役）
 # 双卫星数据源（2026-09-13 三轨拍板）
-s_ln = json.load(open(BASE / "backtest" / "lnatr_summary_0913.json", encoding="utf-8")) if (BASE / "backtest" / "lnatr_summary_0913.json").exists() else {}
-LN_TAG = "冷门低波 ln_amt20+atr20 · Top10 · 60日调仓（主板含退市 · 2021起 · 20bps滑点）"
-LN_TAG += " · 安慰剂500 p=0.0000 · 与FB3相关-0.165 · slip50稳健 · fwd段制交叉验证方向一致(+29.1%/夏普0.44，段制全换 vs 调仓制增量)"
-v_ln = load_curve_norm("backtest/lnatr_equity_0913.csv")
+s_ln = json.load(open(BASE / "backtest" / "lnatr_v2_summary_0915.json", encoding="utf-8")) if (BASE / "backtest" / "lnatr_v2_summary_0915.json").exists() else {}
+LN_TAG = "冷门低波 ln_amt20+atr20+turn20 三低 · Top20 · 30日调仓 + 中证1000ETF 破MA20 半仓闸（2021-04起 · 20bps · 1M容量中性口径）"
+LN_TAG += " · 窗口 2021-04~2026-09 · off0 夏普 0.96/年化 11.79% · 30 相位中位 0.827（+pct40 后 1.090 待启用）· 旧口径数字不可复现已废弃用"
+v_ln = load_curve_norm("backtest/lnatr_v2_equity_0915.csv")
 
 _sup = json.load(open(BASE / "backtest" / "oss_0913" / "super_combo_0913.json", encoding="utf-8")) if (BASE / "backtest" / "oss_0913" / "super_combo_0913.json").exists() else {}
 if _sup:
@@ -678,21 +678,21 @@ def bt_all_html():
     """中长线回测参考 5 卡（股票分层 4 + 基金；2026-08-17 去 ETF）"""
     cards = "".join([
         bt_card("bt-fund", "🥇 主仓 FB3-H20 基金线", FUND_TAG, s_fund, "curve-chart-fund", color="#3b82f6"),
-        bt_card("bt-ln", "🥈 卫星·冷门低波", LN_TAG, s_ln, "curve-chart-ln", color="#10b981"),
+        bt_card("bt-ln", "🥈 卫星·冷门低波", LN_TAG, s_ln, "curve-chart-ln", color="#10b981", sub="2021-04~2026-09 · 30相位中位"),
         bt_card("bt-super", "🥉 卫星·SUPER", SUPER_TAG, s_super, "curve-chart-super", color="#8b5cf6"),
     ])
     _ret = ('<div class="sub" style="color:#ef4444">⛔ <b>v9 股票分层战法（一体/主板/创业板/科创板四卡）已于 2026-09-13 退役</b>'
             '——十重证伪确认负期望（ADR-0006/0007），历史曲线与明细见更新日志 v5.9~v5.11.15 与 backtest/ 报告存档。</div>')
     return ('<div class="card" id="bt-all">\n'
             '<h2>📊 回测参考 <span class="badge badge-auto">中/长线 · 股票按权限分层</span></h2>\n'
-            '<div class="sub"><b>三轨 60/20/20（2026-09-13 拍板）</b>：主仓 = 基金 NAV 动量牛熊 regime（牛市 Top10/熊市 Top3）｜ 卫星 = 主板量价因子选股（全审计过闸）｜ 信号：<code>backtest/signal_satellite_0913.py</code></div>\n'
+            f'<div class="sub"><b>三轨 60/10/30（2026-09-14 调整：卫星内 轨A/轨B = 25/75）</b>：主仓 = 基金 NAV 动量牛熊 regime（牛市 Top10/熊市 Top3）｜ 卫星 = 主板量价因子选股（全审计过闸）｜ 信号：<code>backtest/signal_satellite_0913.py</code> · <span style="color:#f59e0b;font-weight:600">看板构建 {__import__("datetime").datetime.now():%Y-%m-%d %H:%M}</span></div>\n'
             '<div class="sub" style="color:var(--sub)">💧 <b>滑点敏感性</b>（每边，sweep_ml_slip.py 扫描）：中长线换手低、影响显著小于短线 —— 股票 20bps 收益 -23%（夏普 1.58→1.43）、30bps -31% ｜ 历史固定池（已去除）20bps -13%、30bps -18% —— 实盘 10-20bps 区间内中长线策略稳健</div>\n'
             '<div class="sub" style="color:#d97706">🐻 <b>9/1 牛熊独立权重验证（修正引擎 T+1 · regime=沪深300&gt;MA200 同口径）</b>：生产口径 A（牛开熊清 + 固定权重 0.35/0.25/0.20/0.20）收益 +28.3%/夏普 0.229/回撤 -27.15% 仍最优；牛攻熊守双权重 B/C/D/E 变体（熊市开仓）全面恶化（-25.9%~-65.0%）→ <b>中长期维持「牛开熊清」，熊市开仓不可行</b>（与短线基金相反：基金熊市防守开仓 +398pp 因选到避险型基金）</div>\n'
             '<div class="sub" style="margin-top:10px;padding:8px 10px;background:rgba(59,130,246,.08);border-left:3px solid #3b82f6;border-radius:4px">'
-            '<b>🎯 三轨配置（2026-09-13 拍板 · 60/20/20）</b>｜'
+            '<b>🎯 三轨配置（2026-09-14 调整 · 60/10/30）</b>｜'
             '<b>① 主仓 FB3-H20</b>（60%）：基金 NAV 动量牛熊 regime，牛市 Top10/熊市 Top3 · 2000 池回测 +733.4%/年化 21.95%/回撤 -27.0%/夏普 1.316｜'
-            '<b>② 冷门低波卫星</b>（20%）：主板 ln_amt20+atr20 双低 Top10 · 60 日调仓（全期 105 笔）· 回测 +127.4%/年化 16.2%/回撤 -18.4%/夏普 1.238 · <b>安慰剂 500 次 p=0.0000</b> · 与 FB3 月收益相关 <b>-0.165（负相关）</b> · slip50 稳健（+140.1%/1.333）｜'
-            '<b>③ SUPER 卫星</b>（20% · 2026-09-13 替换 A4D）：13 因子（A4D 6 + Z哥战法原子 7：牛绳/止损空间/距BBI 等）Top20 月频 + 中证1000&lt;MA20 半仓且高波半区 · 回测 off0 年化 22.87%/<b>相位中位 1.151</b>/回撤 -22.0% · 安慰剂 500 p=0.000 · 50bp 压力档 S 1.00 · 100 万对照 S 1.30｜'
+            '<b>② 冷门低波卫星</b>（卫星内 25%）：主板 ln_amt20+atr20+turn20 三低 Top20（中证1000ETF 破 MA20 → 半仓 Top10）· 30 日调仓 · 回测（2021-04起 · 1M 口径）夏普 0.96/年化 11.79%/回撤 -16.5% · 30 相位中位夏普 0.827（+pct40 后 1.090，待启用）（轨A pct40 待启用；旧口径数字不可复现，已作废弃用）｜'
+            '<b>③ SUPER 卫星</b>（30% · 2026-09-14 配比调整；2026-09-13 替换 A4D）：13 因子（A4D 6 + Z哥战法原子 7：牛绳/止损空间/距BBI 等）Top20 月频 + 中证1000&lt;MA20 半仓且高波半区 · 回测 off0 年化 22.87%/<b>相位中位 1.151</b>/回撤 -22.0% · 安慰剂 500 p=0.000 · 50bp 压力档 S 1.00 · 100 万对照 S 1.30｜'
             '信号：<code>backtest/signal_satellite_0913.py</code>（每日收盘跑 → T+1 开盘清单，双卫星已交付；FB3 轨信号接入中）· '
             '⚠ 风险披露：冷门低波轨 atr20 的 IC 方向在 fwd 固定持有语义下与调仓制相反（factorcombo 交叉验证），<b>先小额/模拟盘验证再放大</b>；三轨均为 2021 起回测口径，2021-2026 为结构性分化窗口</div>\n'
             '<div class="bt-grid">' + cards + '</div>\n' + _ret + '\n</div>')
@@ -1367,15 +1367,52 @@ KH_PAPER_CARD = _kh_paper_card()
 try:
     _sat = json.load(open(BASE / "backtest" / "satellite_pool.json", encoding="utf-8"))
 
+    def _fnum(v, nd=2):
+        if v is None:
+            return "—"
+        try:
+            return f"{float(v):,.{nd}f}"
+        except Exception:
+            return str(v)
+
     def _sat_rows(track):
         tr = _sat[track]
-        tds = "".join(
-            f'<tr><td><code>{r["code"]}</code></td><td>{r.get("name", "")}</td><td>{r.get("industry", "—")}</td><td class="num">{r["close"]:.2f}</td>'
-            f'<td class="num">{r["lot"]:,} 元</td><td class="num">{r.get("amount", 0):,} 元</td>'
-            f'<td title="{r.get("detail", "")}"><b>{r.get("score_txt", "—")}</b><div style="font-size:10.5px;color:#94a3b8;line-height:1.35;white-space:normal;max-width:190px">{r.get("parts", "")}</div></td>'
-            f'<td>{r.get("action", "—")}{" ⚠涨停勿追" if r.get("limit_guard") else ""}</td>'
-            + "</tr>"
-            for r in tr["rows"])
+        _is_fund = (track == "track_c")
+
+        def _fp(v):
+            if v is None:
+                return "—"
+            col = "#ef4444" if v > 0 else ("#10b981" if v < 0 else "#94a3b8")
+            return f'<span style="color:{col}">{v:+.2f}%</span>'
+
+        def _row(r):
+            cells = (
+                f'<tr><td><code>{r["code"]}</code></td><td>{r.get("name", "")}</td><td>{r.get("industry", "—")}</td>'
+                f'<td class="num">{_fnum(r.get("close"))}</td>'
+                f'<td class="num">{_fnum(r.get("lot"), 0)} 元</td><td class="num">{_fnum(r.get("amount"), 0)} 元</td>'
+                f'<td title="{r.get("detail", "")}"><b>{r.get("score_txt", "—")}</b>'
+                f'<div style="font-size:10.5px;color:#94a3b8;line-height:1.35;white-space:normal;max-width:190px">{r.get("parts", "")}</div></td>'
+                f'<td>{r.get("action", "—")}{" ⚠涨停勿追" if r.get("limit_guard") else ""}</td>'
+                f'<td class="num">{_fp(r.get("chg"))}</td><td class="num">{_fp(r.get("ret_1y"))}</td>')
+            if _is_fund:
+                return cells + "</tr>"
+            rsi, macd, jv = r.get("rsi14"), r.get("macd_hist"), r.get("kdj_j")
+            mc = "#ef4444" if (macd is not None and macd > 0) else ("#10b981" if macd is not None else "#94a3b8")
+            jc = "#ef4444" if (jv is not None and jv > 80) else ("#3b82f6" if (jv is not None and jv < 20) else "inherit")
+            rsi_s = "—" if rsi is None else f"{rsi:.1f}"
+            macd_s = "—" if macd is None else f"{macd:.3f}"
+            jv_s = "—" if jv is None else f"{jv:.1f}"
+            return (cells
+                    + f'<td class="num">{rsi_s}</td>'
+                    + f'<td class="num" style="color:{mc}">{macd_s}</td>'
+                    + f'<td class="num" style="color:{jc}">{jv_s}</td>'
+                    + "</tr>")
+
+        tds = "".join(_row(r) for r in tr["rows"])
+        head = ("<th>代码</th><th>名称</th><th>行业</th><th>收盘</th><th>一手约</th><th>计划金额</th>"
+                "<th>评分 = 总分 + 子项</th><th>操作</th><th>涨跌幅</th><th>近1年</th>")
+        if not _is_fund:
+            head += "<th>RSI14</th><th>MACD柱</th><th>KDJ-J</th>"
         bt = tr["bt"]
         nr = tr.get("next_rebal_in_days")
         cal_note = f" · 距下次调仓约 {nr} 交易日" if nr is not None else f" · {tr.get('next_rebal', '')}"
@@ -1384,11 +1421,11 @@ try:
                 f'｜回测 +{bt["total"]}%/年化 +{bt["ann"]}%/回撤 {bt["mdd"]}%/夏普 {bt["sharpe"]}</div>'
                 f'<div class="sub" style="color:var(--faint)">{bt["note"]}</div>'
                 f'<div class="toolbar" id="sat-bar-{track}"><input type="text" class="sat-q" data-t="{track}" placeholder="🔍 搜索代码…" autocomplete="off"><select class="sat-sort" data-t="{track}"><option value="idx">清单序</option><option value="code">代码 ↑</option><option value="lot">一手成本 ↑</option></select><span class="count sat-count" data-t="{track}"></span></div>'
-                f'<div class="tbl-wrap"><table class="tbl sat-tbl" data-t="{track}"><thead><tr><th>代码</th><th>名称</th><th>行业</th><th>收盘</th><th>一手约</th><th>计划金额</th><th>评分 = 总分 + 子项</th><th>操作</th></tr></thead><tbody>{tds}</tbody></table></div>')
+                f'<div class="tbl-wrap"><table class="tbl sat-tbl" data-t="{track}"><thead><tr>{head}</tr></thead><tbody>{tds}</tbody></table></div>')
 
     SAT_CARD = (f'<div class="card" id="sat-card">\n'
-                f'<h2>🛰️ 双卫星目标持仓 <span class="badge badge-auto">三轨 60/20/20 · 数据截至 {_sat["asof"]}（收盘）</span></h2>\n'
-                f'<div class="sub">信号生成：<code>backtest/signal_satellite_0913.py</code>（每日收盘跑 → T+1 开盘清单）· 资金占比 20%+20%（FB3-H20 主仓 60%）· 目标持仓为<b>下次调仓的完整清单</b>（非增量）· 评分列悬浮可见拆解 · 操作列=相对模拟盘当前持仓</div>\n'
+                f'<h2>🛰️ 双卫星目标持仓 <span class="badge badge-auto">三轨 60/10/30 · 数据截至 {_sat["asof"]}（收盘）</span></h2>\n'
+                f'<div class="sub">信号生成：<code>backtest/signal_satellite_0913.py</code>（每日收盘跑 → T+1 开盘清单）· 资金占比：卫星内 轨A 25%/轨B 75%（2026-09-14 拍板，原 50/50）｜三轨口径 FB3-H20 主仓 60%· 目标持仓为<b>下次调仓的完整清单</b>（非增量）· 评分列悬浮可见拆解 · 操作列=相对模拟盘当前持仓</div>\n'
                 f'{_sat_rows("track_a")}\n{_sat_rows("track_b")}\n</div>')
 except Exception as _e:
     SAT_CARD = (f'<div class="card" id="sat-card"><h2>🛰️ 双卫星目标持仓</h2>'
@@ -1404,19 +1441,43 @@ try:
 except Exception:
     pass
 _n_f = max(1, len(_fund_tier))
+# 轨C 行级指标（2026-09-14 新增列）：取 satellite_pool.json track_c 行（NAV 口径算 RSI/MACD/KDJ）
+try:
+    _sat_c = {r["code"]: r for r in json.load(open(BASE / "backtest" / "satellite_pool.json", encoding="utf-8")).get("track_c", {}).get("rows", [])}
+except Exception:
+    _sat_c = {}
+
+
+def _fpct(v):
+    if v is None:
+        return "—"
+    col = "#ef4444" if v > 0 else ("#10b981" if v < 0 else "#94a3b8")
+    return f'<span style="color:{col}">{v:+.2f}%</span>'
+
+
 _fund_rows = ""
 for _c in _fund_tier:
     _d = _sp_j.get("details", {}).get(_c, {})
     _act = "持有" if _c in _held_c else "申购"
+    _r = _sat_c.get(_c, {})
+    _rsi, _macd, _jv = _r.get("rsi14"), _r.get("macd_hist"), _r.get("kdj_j")
+    _mc = "#ef4444" if (_macd is not None and _macd > 0) else ("#10b981" if _macd is not None else "#94a3b8")
+    _jc = "#ef4444" if (_jv is not None and _jv > 80) else ("#3b82f6" if (_jv is not None and _jv < 20) else "inherit")
     _fund_rows += (f'<tr><td><code>{_c}</code></td><td>{_d.get("name", "")}</td>'
-                   f'<td class="num">{_d.get("score", "—")}</td><td class="num">{100/_n_f:.1f}%</td><td>{_act}</td></tr>')
+                   f'<td class="num">{_d.get("score", "—")}</td>'
+                   f'<td class="num">{_fpct(_r.get("chg"))}</td><td class="num">{_fpct(_r.get("ret_1y"))}</td>'
+                   f'<td class="num">{"—" if _rsi is None else f"{_rsi:.1f}"}</td>'
+                   f'<td class="num" style="color:{_mc}">{"—" if _macd is None else f"{_macd:.3f}"}</td>'
+                   f'<td class="num" style="color:{_jc}">{"—" if _jv is None else f"{_jv:.1f}"}</td>'
+                   f'<td class="num">{100/_n_f:.1f}%</td><td>{_act}</td></tr>')
 _gate_txt = ("🟢 开（股票可买）" if _mg.get("open") else "🟠 关（仅拦股票池；基金轨不受影响——熊市 FB3 照常买入，转 Top3 低波防守仓）") + f' · 沪深300 {_mg.get("idx_close", "—")} vs MA20 {_mg.get("idx_ma20", "—")}'
 FB3_POOL_CARD = (f'<div class="card" id="fb3-pool-card">'
                  f'<h2>🥇 主仓 FB3-H20 基金池 <span class="badge badge-auto">当前 regime 持仓 · 数据截至 {_sp_j.get("as_of", "—")}</span></h2>'
                  f'<div class="sub">排序=基金动量分降序 · 市况门控 {_gate_txt} · 60% 资金 · 牛市 Top10 动量 / 熊市 Top3 低波（C 类份额，T+1 净值申赎）· 操作=相对模拟盘当前持仓</div>'
                  f'<div class="sub" style="color:#f59e0b">⚠ 实盘清单已按份额去重（同一基金 A/C/E 类只留一只，优先 C 类）——回测口径未去重，故实盘预期与回测数字存在系统性差异</div>'
                  f'<div class="sub" style="color:var(--faint)">行业集中度约束（同行业≤N，N∈{{1,2,3}}）已于 2026-09-14 预注册实测：三轨均未过「相位中位夏普≥对照 + 50bp 档不劣化 + 配对显著」闸 → 不采纳（报告 backtest/报告-行业集中度约束三轨实测_20260914.md）</div>'
-                 f'<div class="tbl-wrap"><table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>动量分</th><th>权重</th><th>操作</th></tr></thead><tbody>{_fund_rows or "<tr><td colspan=4>空（门控关闭；基金轨熊市照买 Top3）</td></tr>"}</tbody></table></div></div>')
+                 f'<div class="tbl-wrap"><table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>动量分</th><th>涨跌幅</th><th>近1年</th><th>RSI14</th><th>MACD柱</th><th>KDJ-J</th><th>权重</th><th>操作</th></tr></thead><tbody>{_fund_rows or "<tr><td colspan=10>空（门控关闭；基金轨熊市照买 Top3）</td></tr>"}</tbody></table></div>'
+                 f'<div class="sub" style="color:var(--faint)">指标口径：基金为 NAV 净值序列口径（RSI14/MACD(12,26,9)柱/KDJ(9,3,3)-J），与股票轨同算法；数据源 <code>fund_nav_cache</code></div></div>')
 
 WATCH_V9_CARD = ('<div class="card" id="watch-v9-card"><h2>📌 历史跟踪池（已退役）</h2>'
                  '<div class="sub" style="color:#ef4444">⛔ v9 跟踪池展示已于 2026-09-13 移除（战法退役，十重证伪）。数据文件保留于 enhanced_data.js 供回溯。</div></div>')
@@ -1776,7 +1837,7 @@ html = f"""<!doctype html>
 <div class="card" id="sys-auto">
 <div class="sys-head">
 <div class="sys-head-top">
-<h2>🛰️ 三轨中长线 <span class="view-badge auto">FB3-H20 主仓 + 冷门低波 / SUPER 双卫星 · 资金 60/20/20</span></h2>
+<h2>🛰️ 三轨中长线 <span class="view-badge auto">FB3-H20 主仓 + 冷门低波 / SUPER 双卫星 · 资金 60/10/30（卫星内 A:B=1:3）</span></h2>
 </div>
 <div class="sys-head-tags">
 <span class="badge badge-auto">v9 股票分层战法已退役（十重证伪 · ADR-0006/0007）</span>
@@ -1789,7 +1850,7 @@ html = f"""<!doctype html>
 {SAT_PAPER_CARD}
 {FUND_PAPER_CARD}
 {FB3_POOL_CARD}
-<div class="card" id="v9-retired-card"><h2>🗂️ v9 全量池（已退役）</h2><div class="sub" style="color:#ef4444">⛔ v9 股票分层战法与 197 只跟踪池已于 2026-09-13 退役并移除展示——十重证伪确认负期望（ADR-0006/0007）。历史回测明细见「📝 更新日志」v5.9~v5.11.15 与 <code>backtest/</code> 报告存档。</div><div class="sub"><b>三轨退出规则</b>：① 主仓 FB3-H20 = 20 交易日月度轮动 + 牛熊 regime 切换（沪深300&lt;MA200 转 Top3 低波防守仓）——<b>无个股止盈止损</b>（基金 NAV 无涨跌停，止盈变体回测全部减值）；② 冷门低波 = 60 交易日到期换仓，持有期无中途操作；③ SUPER = 月频调仓 + 中证1000&lt;MA20 组合半仓闸（且关闸期取高波半区）。</div></div>
+<div class="card" id="v9-retired-card"><h2>🗂️ v9 全量池（已退役）</h2><div class="sub" style="color:#ef4444">⛔ v9 股票分层战法与 197 只跟踪池已于 2026-09-13 退役并移除展示——十重证伪确认负期望（ADR-0006/0007）。历史回测明细见「📝 更新日志」v5.9~v5.11.15 与 <code>backtest/</code> 报告存档。</div><div class="sub"><b>三轨退出规则</b>：① 主仓 FB3-H20 = 20 交易日月度轮动 + 牛熊 regime 切换（沪深300&lt;MA200 转 Top3 低波防守仓）——<b>无个股止盈止损</b>（基金 NAV 无涨跌停，止盈变体回测全部减值）；② 冷门低波 = 30 交易日到期换仓 + 中证1000ETF 破 MA20 半仓闸门（2026-09-14 起）；③ SUPER = 月频调仓 + 中证1000&lt;MA20 组合半仓闸（且关闸期取高波半区）+ <b>pct40 因子化出场已启用（跌出前40%分位 → T+1 开盘卖，留现金至下一调仓）</b>。</div></div>
 </div>
 
 <!-- ============ 视图 C：全量池短线（2026-09-03 起 股票池 / 基金池 分板块展示） ============ -->

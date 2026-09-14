@@ -1,0 +1,69 @@
+def run_engine(comp, N, offset=0, cash0=CASH0, slip=SLIP, calm=True):
+    shares = np.zeros(NC); cost_basis = np.zeros(NC)
+    cash = cash0; eq_curve = np.full(ND, np.nan); trades = []
+    entry_di = np.full(NC, -1); pend_buy = []; pend_sell = []
+    eq_prev_known = cash0
+    def mark(di):
+        nz = np.flatnonzero(shares)
+        return cash if len(nz) == 0 else cash + float(np.dot(shares[nz], close_ff[di][nz]))
+    for di in range(WARMUP, ND):
+        px_open = O[di]; px_prev = close_ff[di - 1]
+        if pend_sell:
+            keep = []
+            for j in pend_sell:
+                if not np.isfinite(px_open[j]) or px_open[j] <= px_prev[j] * 0.902:
+                    keep.append(j); continue
+                px = px_open[j] * (1 - slip); amt = px * shares[j]
+                fee = max(amt * COMM, MIN_COMM) + amt * TAX
+                proceeds = amt - fee
+                cash += proceeds
+                ret = proceeds / cost_basis[j] - 1 if cost_basis[j] > 0 else np.nan
+                trades.append((entry_di[j], di, proceeds - cost_basis[j], ret))
+                shares[j] = 0.0; cost_basis[j] = 0.0; entry_di[j] = -1
+            pend_sell = keep
+        if pend_buy:
+            for j in pend_buy:
+                if shares[j] > 0 or not np.isfinite(px_open[j]) or not ELIG3[di - 1][j]: continue
+                if px_open[j] >= px_prev[j] * 1.098 or px_open[j] <= 0.01: continue
+                budget = eq_prev_known / N
+                lots = math.floor(min(budget, cash) / (px_open[j] * (1 + slip) * 100.0))
+                if lots < 1: continue
+                px = px_open[j] * (1 + slip); amt = px * lots * 100.0
+                fee = max(amt * COMM, MIN_COMM)
+                if amt + fee > cash: continue
+                cash -= amt + fee; shares[j] = lots * 100.0
+                cost_basis[j] = amt + fee; entry_di[j] = di - 1
+            pend_buy = []
+        eq_prev_known = mark(di); eq_curve[di] = eq_prev_known
+        if (di - WARMUP - offset) % F == 0 and di + 1 < ND:
+            row = comp[di]
+            ok = ELIG3[di] & np.isfinite(row)
+            gate_open = bool(np.isfinite(ma20sc[di]) and sc1000[di] > ma20sc[di])
+            if ok.sum() >= N:
+                cand = np.flatnonzero(ok)
+                if gate_open:
+                    N_eff = N; sel = cand
+                else:
+                    N_eff = max(2, N // 2); sel = cand
+                    if calm:
+                        sub = cand[np.isfinite(volpct[di][cand]) & (volpct[di][cand] <= 0.5)]
+                        if len(sub) >= N_eff: sel = sub
+                ordj = sel[np.argsort(-row[sel])]
+                topN = [int(j) for j in ordj[:N_eff]]; topS = set(topN)
+                held = np.flatnonzero(shares > 0)
+                for j in held:
+                    if int(j) not in topS: pend_sell.append(int(j))
+                n_after = int(len([j for j in held if int(j) in topS]))
+                pend_buy = [j for j in topN if shares[j] == 0][:max(0, N_eff - n_after)]
+    eq = pd.Series(eq_curve[WARMUP:], index=pd.to_datetime(cal[WARMUP:])).ffill().dropna()
+    ret = eq.pct_change().dropna()
+    yrs = len(eq) / 244.0
+    ann = (eq.iloc[-1] / eq.iloc[0]) ** (1 / yrs) - 1
+    sharpe = ret.mean() / ret.std() * np.sqrt(244) if ret.std() > 0 else np.nan
+    dd = (eq / eq.cummax() - 1).min()
+    closed = [t for t in trades if np.isfinite(t[3])]
+    yr = {int(yv): float(eq[eq.index.year == yv].iloc[-1] / eq[eq.index.year == yv].iloc[0] - 1)
+          for yv in sorted(set(eq.index.year))}
+    return dict(total=float(eq.iloc[-1] / eq.iloc[0] - 1), ann=float(ann), sharpe=float(sharpe),
+                mdd=float(dd), n_trades=len(closed),
+                win=float(np.mean([t[3] > 0 for t in closed])) if closed else np.nan, by_year=yr, equity=eq)

@@ -34,6 +34,7 @@ STEPS = [
     ("短池+门控+FB3基金池 build_short_pool", ["build_short_pool.py"], False),
     ("复盘日志+跟踪池 review_daily", ["review_daily.py"], False),
     ("复盘日志页 build_log_pages", ["build_log_pages.py"], False),
+    ("市值快照 fetch_val_daily", ["backtest/fetch_val_daily.py"], False),
     ("双卫星池 build_satellite_pool", ["backtest/build_satellite_pool.py"], False),
     ("三轨信号 signal_satellite", ["backtest/signal_satellite_0913.py"], False),
     ("KHunter 模拟盘A khunter_paper", ["khunter_paper_20260903.py"], False),
@@ -42,7 +43,8 @@ STEPS = [
     ("双卫星模拟盘 satellite_paper", ["backtest/satellite_paper_0914.py"], False),
     # 基金主仓（轨C FB3-H20）模拟盘——补齐「三轨模拟盘」最后一块（2026-09-14 用户指出缺）
     ("基金主仓模拟盘 fund_paper[软]", ["backtest/fund_paper_0914.py"], False),
-    ("pct40 出场影子轨 exit_shadow", ["backtest/exit_shadow_0915.py"], False),
+    ("pct40 出场执行 pct40_exit", ["backtest/pct40_exit_apply.py"], False),
+    ("pct40 对照账本 exit_control", ["backtest/exit_control_0915.py"], False),
     ("KHunter 模拟盘快照 khunter_snapshot", ["khunter_paper_snapshot.py"], False),
     # A5 打板实验盘（看板「打板族」视图的数据源）——必须在 build_dual_system 之前跑；[软]=失败不阻断主链
     # 2026-09-14 补：此前该流水线未接入每日链 → 看板 A5 卡停在 as_of 09-10（持仓只显示 1 只），
@@ -79,7 +81,10 @@ if not fails:
                           "khunter_paper_state.json", "khunter_paper_state_c.json",
                           "backtest/a5_paper_state.json", "backtest/satellite_paper.json",
                           "backtest/satellite_paper_init.json", "backtest/turn_shadow_state.json",
-                          "backtest/exit_shadow_state.json"],
+                          "backtest/pct40_exits_state.json", "backtest/exit_control_state.json",
+                          "backtest/pct40_exit_apply.py", "backtest/exit_control_0915.py",
+                          "backtest/fetch_val_daily.py", "backtest/signal_satellite_0913.py",
+                          "backtest/build_satellite_pool.py", "daily_refresh.py"],
                          cwd=str(BASE), capture_output=True)
     if git.returncode == 0:
         c = subprocess.run(["git", "commit", "-m", f"chore(daily): {date.today()} 收盘刷新（池/信号/看板/复盘日志）"],

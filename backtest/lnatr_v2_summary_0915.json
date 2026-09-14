@@ -1,0 +1,12 @@
+{
+ "total_return_pct": 82.99,
+ "annual_return_pct": 11.79,
+ "max_drawdown_pct": -16.47,
+ "sharpe": 0.959,
+ "win_rate_pct": 64.7,
+ "total_trades": 465,
+ "phmed_sharpe": 0.827,
+ "phmin": 0.528,
+ "phmax": 1.028,
+ "_口径": "turn+gate N20/F30 · 窗口 2021-04~2026-09-14 · 1M 容量中性 · off0=实际时间线 / phmed=30相位中位"
+}

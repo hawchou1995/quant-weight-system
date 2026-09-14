@@ -1,0 +1,32 @@
+[  15.0s] frozen picked: ['amount20', 'size_rev', 'amp20', 'wy_ratio', 'neg_sspace', 'size_ep', 'bp', 'neg_dbbi', 'dd120', 'shrink', 'neg_j', 'pspace', 'sqz_ratio']
+D:\Documents\Workbuddy\股票基金\quant-weight-system\backtest\oss_0913\chip_addon_0914.py:79: RuntimeWarning: Mean of empty slice
+  zf = r - np.nanmean(r, axis=1, keepdims=True); zz = zy - np.nanmean(zy, axis=1, keepdims=True)
+C:\Users\Admin\.workbuddy\binaries\python\envs\default\Lib\site-packages\numpy\lib\_nanfunctions_impl.py:2015: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+[  45.1s] IC done. cost_bias_rev IC=0.0883 ICIR=0.549
+[  46.4s] rho vs 13:
+[  46.4s]     wy_ratio       +0.705  <== OVER 0.6
+[  46.4s]     neg_sspace     +0.697  <== OVER 0.6
+[  46.4s]     dd120          +0.655  <== OVER 0.6
+[  46.4s]     size_rev       +0.605  <== OVER 0.6
+[  46.4s]     neg_j          +0.385
+[  46.4s]     pspace         -0.384
+[  46.4s]     amp20          +0.303
+[  46.4s]     neg_dbbi       +0.292
+[  46.4s]     shrink         +0.281
+[  46.4s]     amount20       +0.166
+[  46.4s]     size_ep        +0.077
+[  46.4s]     sqz_ratio      +0.072
+[  46.4s]     bp             +0.062
+[  46.4s] max |rho| = 0.705  -> REDUNDANT(同族, 不做组合级)
+[  47.7s] weight replication max rel dev vs frozen: 0.00%
+D:\Documents\Workbuddy\股票基金\quant-weight-system\backtest\oss_0913\chip_addon_0914.py:203: RuntimeWarning: Mean of empty slice
+  mu = np.nanmean(a, axis=1, keepdims=True); sd = np.nanstd(a, axis=1, keepdims=True)
+C:\Users\Admin\.workbuddy\binaries\python\envs\default\Lib\site-packages\numpy\lib\_nanfunctions_impl.py:2015: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+C:\Users\Admin\.workbuddy\binaries\python\envs\default\Lib\site-packages\numpy\lib\_nanfunctions_impl.py:1863: RuntimeWarning: invalid value encountered in subtract
+  np.subtract(arr, avg, out=arr, casting='unsafe', where=where)
+D:\Documents\Workbuddy\股票基金\quant-weight-system\backtest\oss_0913\chip_addon_0914.py:204: RuntimeWarning: invalid value encountered in subtract
+  z = np.clip((a - mu) / (sd + 1e-12), -3, 3)
+[  50.5s] SKIP 组合级测试 (同族冗余)
+[  50.5s] saved chip_addon_0914.json DONE

@@ -1,0 +1,17 @@
+{
+ "pool": "data_full full mainboard",
+ "n_cols": 3469,
+ "n_extra": 260,
+ "arm": "base/N10/F60",
+ "off0": {
+  "ann": 0.16027247632588293,
+  "sharpe": 0.8819748375146524,
+  "mdd": -0.2525168619932566,
+  "n_trades": 188,
+  "win": 0.6223404255319149
+ },
+ "phmed_sharpe": 0.560748886531582,
+ "phmin": -0.29406520396019864,
+ "phmax": 1.1307959250641275,
+ "note": "extra 票无 H/L -> ATR 用 |C-Cprev| 近似（atr20 偏低, 申报）；turn 因子因缺 fmv 未测"
+}

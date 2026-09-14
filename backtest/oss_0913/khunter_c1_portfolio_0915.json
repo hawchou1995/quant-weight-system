@@ -1,0 +1,57 @@
+{
+ "note": "P1=pos120<=0.20 入场滤网；口径 ob59/osl35/hold25/low3/hybrid；50bp=+30bp/边",
+ "rows": [
+  {
+   "tag": "BASE 20bp",
+   "n": 266,
+   "wr": 62.4,
+   "med": 2.93,
+   "mean": null,
+   "total": 119.4,
+   "maxdd": -20.9,
+   "ann": 8.0,
+   "sharpe": 0.65,
+   "pass4": true,
+   "pass_half": true
+  },
+  {
+   "tag": "P1   20bp",
+   "n": 107,
+   "wr": 69.2,
+   "med": 3.01,
+   "mean": null,
+   "total": 40.2,
+   "maxdd": -11.2,
+   "ann": 3.4,
+   "sharpe": 0.59,
+   "pass4": true,
+   "pass_half": true
+  },
+  {
+   "tag": "BASE 50bp",
+   "n": 265,
+   "wr": 60.4,
+   "med": 2.31,
+   "mean": null,
+   "total": 85.4,
+   "maxdd": -21.9,
+   "ann": 6.2,
+   "sharpe": 0.52,
+   "pass4": true,
+   "pass_half": true
+  },
+  {
+   "tag": "P1   50bp",
+   "n": 107,
+   "wr": 65.4,
+   "med": 2.4,
+   "mean": null,
+   "total": 31.5,
+   "maxdd": -11.8,
+   "ann": 2.7,
+   "sharpe": 0.48,
+   "pass4": true,
+   "pass_half": true
+  }
+ ]
+}
