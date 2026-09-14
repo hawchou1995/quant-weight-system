@@ -1,0 +1,11 @@
+{
+ "stats": {
+  "ok": 1232,
+  "cache": 48,
+  "empty": 4,
+  "err": 0
+ },
+ "fails": [],
+ "tasks": 1284,
+ "cache_dir": "D:\\Tools\\cache\\tdx_min"
+}
