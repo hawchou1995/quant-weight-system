@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-A5_tp8t2 实验系统 → 看板数据桥（2026-08-28 投产，双轨方案 v1.1）
+A5_tp8t2 实验系统 → 看板数据桥（v1.3 · 2026-09-15：双池独立滤网）
 读 打板系统A5实验_20260827/paper_state.json → 生成 a5_pool.js（window.A5_POOL）
 
 设计要点：
@@ -116,20 +116,25 @@ def enrich_indicators(items):
 
 
 # 验证门基准（全部信号口径，与 paper_daban_a5.py report() 一致；来源 optimize_daban_v1_2026-08-27.json A5_tp8t2.all）
+# v1.3（2026-09-15 用户拍板）：验证门基准 = 双池并集（线上基底含 F3 空间≥20%，2016-2026，修正 amt/rel_pos 口径）
 BENCH = {
-    "win_rate": 46.1,      # 全部信号胜率
-    "mean_net": -0.17,     # 全部信号均值净收益 %
-    "tp_ratio": 21.5,      # 全部信号 tp 出场占比 %
-    "n": 1116,
+    "win_rate": 56.1,      # 双池并集胜率
+    "mean_net": 1.19,      # 双池并集均值净收益 %
+    "tp_ratio": 25.0,      # 双池并集 tp 出场占比 %
+    "n": 396,
+    "note": "池A 超跌 282笔 +1.37%/58.2% · 池B 趋势 255笔 +1.19%/54.9% · 并集 396笔",
 }
-# 回测完整数据（展示用，来源 optimize_daban_v1_2026-08-27.json A5_tp8t2）
+# 回测数据（R-daban-opt-0915，口径：真实 amount + 严格 rel_pos + F3 空间≥20%；含成本）
 BACKTEST = {
-    "all": {"label": "全部信号", "n": 1116, "win_rate": 46.1, "mean_net": -0.17,
-            "mean_zero": 0.99, "median": -0.63, "pl_ratio": 1.10, "tp_ratio": 21.5, "avg_hold": 1.06},
-    "comb": {"label": "组合信号(≤5/去重/门控)", "n": 625, "win_rate": 45.0, "mean_net": 0.11,
-             "mean_zero": 1.27, "tp_ratio": 22.4},
-    "port": {"label": "组合净值(等权复利)", "total_return": -72.2, "annual": -27.4,
-             "max_dd": -91.4, "sharpe": -0.11, "days": 1004},
+    "base":  {"label": "线上基底（旧口径，无池）", "n": 692, "win_rate": 50.6, "mean_net": 0.57, "median": 0.10},
+    "poolA": {"label": "池A 超跌 ret20≤-7.31%", "n": 282, "win_rate": 58.2, "mean_net": 1.37, "median": 1.09,
+              "years_pos": "10/10 年正"},
+    "poolB": {"label": "池B 趋势 ADX14≥27.9", "n": 255, "win_rate": 54.9, "mean_net": 1.19, "median": 0.60,
+              "years_pos": "8/10 年正"},
+    "union": {"label": "并集（两池，验证门基准）", "n": 396, "win_rate": 56.1, "mean_net": 1.19,
+              "median": 0.68, "tp_ratio": 25.0, "per_year": 38.6},
+    "v1_archive": {"label": "v1 旧口径归档（2026-08-27~09-14）", "n": 11, "win_rate": 36.4, "mean_net": -1.71,
+                   "note": "口径已替换，不计入新验证门"},
 }
 
 
@@ -162,7 +167,7 @@ def scan_avoid():
 
 
 def gate_status(stats, n_closed):
-    """验证门三闸状态：PASS/观察/FAIL（全部信号基准）"""
+    """验证门三闸状态：PASS/观察/FAIL（v1.3 双池并集基准；仅计新口径）"""
     gates = {}
     if n_closed < 30:
         gates["verdict"] = f"信号不足 {n_closed}/30，继续积累"
@@ -172,12 +177,12 @@ def gate_status(stats, n_closed):
     wr = stats["win_rate"]
     mn = stats["mean_net"]
     tp = stats["tp_ratio"]
-    gates["wr"] = {"status": "PASS" if 35 <= wr <= 55 else "FAIL",
-                   "note": f"{wr:.1f}%（闸 [35%,55%]）"}
-    gates["mn"] = {"status": "PASS" if mn > -0.5 else "FAIL",
-                   "note": f"{mn:+.2f}%（闸 >-0.5%）"}
-    gates["tp"] = {"status": "PASS" if 12 <= tp <= 32 else "FAIL",
-                   "note": f"{tp:.1f}%（闸 [12%,32%]）"}
+    gates["wr"] = {"status": "PASS" if 46 <= wr <= 66 else "FAIL",
+                   "note": f"{wr:.1f}%（闸 [46%,66%]，基准 56.1%）"}
+    gates["mn"] = {"status": "PASS" if mn > 0.5 else "FAIL",
+                   "note": f"{mn:+.2f}%（闸 >+0.5%，基准 +1.19%）"}
+    gates["tp"] = {"status": "PASS" if 15 <= tp <= 35 else "FAIL",
+                   "note": f"{tp:.1f}%（闸 [15%,35%]，基准 25.0%）"}
     if all(g["status"] == "PASS" for g in (gates["wr"], gates["mn"], gates["tp"])):
         gates["verdict"] = "✅ 三闸全过 → 边缘确认，可考虑小仓位实盘（单笔≤1%，总仓≤5%）"
     else:
@@ -193,14 +198,18 @@ def build():
     state = load_state()
     # 回避清单（无状态重算）
     avoid, avoid_d = scan_avoid()
-    # 模拟盘统计
-    closed = [p for p in state.get("positions", []) if p.get("status") == "closed"]
+    # 模拟盘统计（v1.3：验证门只计新口径 = 入场带 pools 标记的交易）
+    closed_all = [p for p in state.get("positions", []) if p.get("status") == "closed"]
+    closed = [p for p in closed_all if p.get("pools")]
+    v1_closed = [p for p in closed_all if not p.get("pools")]
     open_pos = [p for p in state.get("positions", []) if p.get("status") == "open"]
     # 已平仓列表补板块（渲染「已平仓」表板块列，与三清单同标准）
-    for p in closed:
+    for p in closed_all:
         p["board"] = market_board(p.get("code", ""))
     stats = {"n": len(closed), "win_rate": None, "mean_net": None, "mean_raw": None,
-             "tp_ratio": None, "nav": state.get("equity", [{}])[-1].get("nav", 1.0) if state.get("equity") else 1.0}
+             "tp_ratio": None, "v1_n": len(v1_closed),
+             "v1_mean_net": float(np.mean([p.get("net_ret", 0) for p in v1_closed]) * 100) if v1_closed else None,
+             "nav": state.get("equity", [{}])[-1].get("nav", 1.0) if state.get("equity") else 1.0}
     if closed:
         rets = np.array([p.get("net_ret", 0) for p in closed])
         raw = np.array([p.get("raw_ret", 0) for p in closed])
@@ -210,7 +219,7 @@ def build():
             "mean_raw": float(raw.mean() * 100),
             "tp_ratio": float(np.mean([p.get("exit_reason") == "tp" for p in closed]) * 100),
         })
-    gate = gate_status(stats, len(closed))
+    gate = gate_status(stats, len(closed))  # 仅新口径计数（v1.3）
 
     # 技术指标附加（2026-08-28 用户需求：当日涨跌幅/近一年/RSI/量比/MA5偏离）
     watchlist = enrich_indicators(state.get("watchlist", []))
@@ -226,7 +235,7 @@ def build():
         "avoid": avoid,
         "avoid_as_of": avoid_d,
         "positions": positions,
-        "closed": closed,
+        "closed": closed_all,
         "stats": stats,
         "gate": gate,
         "equity": state.get("equity", []),
