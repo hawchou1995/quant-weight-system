@@ -27,6 +27,10 @@ if not FORCE:
 
 STEPS = [
     ("数据更新 update_daily", ["update_daily.py"], "--skip-data" in sys.argv),
+    # 基金净值刷新：必须在 build_short_pool 之前——否则基金信号用旧净值排序
+    # 2026-09-14 补：此前刷新逻辑只在 refresh_daily.py --fund，收盘链从不调用 → 92% 的基金净值停在 08-20，
+    # 占 60% 仓位的 FB3 基金主仓长期用 3 周前净值选基（且新旧净值混算）。[软]=失败不阻断主链。
+    ("基金净值刷新 fund_nav_update[软]", ["fund_nav_update.py"], "--skip-fundnav" in sys.argv),
     ("短池+门控+FB3基金池 build_short_pool", ["build_short_pool.py"], False),
     ("复盘日志+跟踪池 review_daily", ["review_daily.py"], False),
     ("复盘日志页 build_log_pages", ["build_log_pages.py"], False),
@@ -36,6 +40,8 @@ STEPS = [
     ("KHunter 模拟盘C khunter_paper_c", ["khunter_paper_20260903.py", "--state", "khunter_paper_state_c", "--rsi-sell", "50"], False),
     ("A5 打板模拟盘 a5_paper", ["backtest/a5_paper_0914.py"], False),
     ("双卫星模拟盘 satellite_paper", ["backtest/satellite_paper_0914.py"], False),
+    # 基金主仓（轨C FB3-H20）模拟盘——补齐「三轨模拟盘」最后一块（2026-09-14 用户指出缺）
+    ("基金主仓模拟盘 fund_paper[软]", ["backtest/fund_paper_0914.py"], False),
     ("pct40 出场影子轨 exit_shadow", ["backtest/exit_shadow_0915.py"], False),
     ("KHunter 模拟盘快照 khunter_snapshot", ["khunter_paper_snapshot.py"], False),
     # A5 打板实验盘（看板「打板族」视图的数据源）——必须在 build_dual_system 之前跑；[软]=失败不阻断主链
