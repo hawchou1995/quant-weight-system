@@ -73,6 +73,14 @@ if not fails:
             p = subprocess.run(["git", "push", "origin", "main"], cwd=str(BASE), capture_output=True)
             print(f"[git] main 同步 {'✓' if p.returncode == 0 else '✗ ' + p.stderr.decode(errors='replace')[:100]}", flush=True)
 
+# ---- 双卫星模拟盘记账（非致命：按「信号日次一交易日开盘价+20bp」口径自动建仓/日更净值，无需用户回填成交）----
+if not fails:
+    print(f"\n========== 双卫星模拟盘记账 satellite_paper ==========", flush=True)
+    r = subprocess.run([PY, "backtest/satellite_paper_0914.py"],
+                       cwd=str(BASE), capture_output=True, text=True, timeout=600)
+    for ln in ((r.stdout or "") + (r.stderr or "")).strip().splitlines()[-8:]:
+        print(ln, flush=True)
+
 # ---- gushi 策略股池采集（非致命：CDP 离线/未登录/依赖缺失都不阻断主链）----
 def _gushi_py():
     for p in (PY, r"D:/Tools/venvs/pandadata/Scripts/python.exe"):
