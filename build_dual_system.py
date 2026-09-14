@@ -122,7 +122,11 @@ try:
     _pm = _pap.get("meta", {})
     _nh = _pap.get("nav_history", [])
     _npos = sum(len(v) for v in _pap.get("positions", {}).values())
-    _nav = _nh[-1][1] if _nh else 1.0
+    # ⚠ 2026-09-14 修：原写法 `_nh[-1][1]` 把 nav_history 的**字典**当元组/列表索引 → KeyError → 整张卡
+    #   掉进 except 分支渲染成「satellite_paper.json 未生成（'1'）」，用户据此以为模拟盘没生成。
+    _init = float(_pm.get("initial_cash", 68000) or 68000)
+    _nlast = _nh[-1] if _nh else {}
+    _nav = float(_nlast.get("total") or _init) / _init
     _ret = (_nav - 1) * 100
     SAT_PAPER_CARD = (f'<div class="card" id="sat-paper-card">'
                       f'<h2>🧪 双卫星模拟盘 <span class="badge badge-auto">起始 {_pm.get("started", "—")} · 6.8 万（轨A 3.4万+轨B 3.4万）</span></h2>'
@@ -130,14 +134,44 @@ try:
                       f'<div class="kpi"><div class="l">模拟净值</div><div class="v">{_nav:.4f}</div><div class="s">期初 1.0</div></div>'
                       f'<div class="kpi"><div class="l">累计收益</div><div class="v" style="color:{ "#10b981" if _ret >= 0 else "#ef4444" }">{_ret:+.2f}%</div><div class="s">含成本口径</div></div>'
                       f'<div class="kpi"><div class="l">持仓标的</div><div class="v">{_npos}</div><div class="s">目标 30</div></div>'
-                      f'<div class="kpi"><div class="l">状态</div><div class="v">{"运行中" if _nh else "待建仓"}</div><div class="s">{(_nh[-1][0] if _nh else _pap.get("events", [{}])[-1].get("date", "—"))}</div></div>'
+                      f'<div class="kpi"><div class="l">状态</div><div class="v">{"运行中" if _nh else "待建仓"}</div><div class="s">{(_nlast.get("date") if _nh else _pap.get("events", [{}])[-1].get("date", "—"))}</div></div>'
                       f'</div>'
-                      f'<div class="sub">成交回填：<code>holdings_satellite.json</code> + <code>satellite_paper.json</code>（fills/positions/nav_history）· 每日收盘跑 <code>signal_satellite_0913.py</code> 自动对账</div>'
+                      f'<div class="sub">记账口径：信号日次一交易日开盘价×1.002（20bp 滑点）+ 佣金 2.5bp（最低 5 元）· 全自动，无需回填成交</div>'
                       f'<div class="sub" style="color:var(--faint)">{(_pap.get("events", [{}])[-1].get("event", ""))}</div>'
                       f'</div>')
 except Exception as _e2:
     SAT_PAPER_CARD = (f'<div class="card" id="sat-paper-card"><h2>🧪 双卫星模拟盘</h2>'
                       f'<div class="sub">satellite_paper.json 未生成（{_e2}）</div></div>')
+
+# 基金主仓（轨C FB3-H20）模拟盘卡（2026-09-14 用户指出「中长线基金没有模拟盘」后补齐）
+_fp_f = BASE / "backtest" / "fund_paper.json"
+try:
+    _fp = json.load(open(_fp_f, encoding="utf-8"))
+    _fm = _fp.get("meta", {})
+    _fnh = _fp.get("nav_history", [])
+    _finit = float(_fm.get("initial_cash", 102000) or 102000)
+    _flast = _fnh[-1] if _fnh else {}
+    _fnav = float(_flast.get("nav") or _finit) / _finit
+    _fret = (_fnav - 1) * 100
+    _fpos = len(_fp.get("positions", {}))
+    try:
+        _ftarget = len((json.load(open(BASE / "short_pool.json", encoding="utf-8")).get("tiers", {}).get("基金")) or [])
+    except Exception:
+        _ftarget = "—"
+    FUND_PAPER_CARD = (f'<div class="card" id="fund-paper-card">'
+                       f'<h2>🧪 基金主仓模拟盘（轨C FB3-H20） <span class="badge badge-auto">10.2 万（17万×60%）· 持仓 20 交易日</span></h2>'
+                       f'<div class="kpis">'
+                       f'<div class="kpi"><div class="l">模拟净值</div><div class="v">{_fnav:.4f}</div><div class="s">期初 1.0</div></div>'
+                       f'<div class="kpi"><div class="l">累计收益</div><div class="v" style="color:{'#10b981' if _fret >= 0 else '#ef4444'}">{_fret:+.2f}%</div><div class="s">C类份额 5bp/边</div></div>'
+                       f'<div class="kpi"><div class="l">持仓 / 目标</div><div class="v">{_fpos} / {_ftarget}</div><div class="s">牛 Top10 / 熊 Top3</div></div>'
+                       f'<div class="kpi"><div class="l">状态</div><div class="v">{"运行中" if _fnh else "待建仓"}</div><div class="s">{(_flast.get("date") if _fnh else _fp.get("events", [{}])[-1].get("date", "—"))}</div></div>'
+                       f'</div>'
+                       f'<div class="sub">成交口径：信号净值日（fund_as_of）之后第一个净值日按净值成交（基金净值 T+1 公布，当日未出则自动等下一交易日——不用信号日自身净值，避免前视）</div>'
+                       f'<div class="sub" style="color:var(--faint)">{(_fp.get("events", [{}])[-1].get("event", ""))}</div>'
+                       f'</div>')
+except Exception as _e3:
+    FUND_PAPER_CARD = (f'<div class="card" id="fund-paper-card"><h2>🧪 基金主仓模拟盘</h2>'
+                       f'<div class="sub">fund_paper.json 未生成（{_e3}）</div></div>')
 
 # 2026-09-05 用户需求：短线命中策略一览 + 跟踪池行业列 —— 全市场板块/行业紧凑映射（内联 window.STOCK_META）
 # 数据源：short_signals.js 全量股票代码 + stock_industry.json（申万一级，7511 只全市场覆盖）
@@ -463,14 +497,16 @@ LN_TAG = "冷门低波 ln_amt20+atr20 · Top10 · 60日调仓（主板含退市 
 LN_TAG += " · 安慰剂500 p=0.0000 · 与FB3相关-0.165 · slip50稳健 · fwd段制交叉验证方向一致(+29.1%/夏普0.44，段制全换 vs 调仓制增量)"
 v_ln = load_curve_norm("backtest/lnatr_equity_0913.csv")
 
-_a4d = json.load(open(BASE / "backtest" / "factorlab_0913" / "blend_r6c_a4d_0913.json", encoding="utf-8")) if (BASE / "backtest" / "factorlab_0913" / "blend_r6c_a4d_0913.json").exists() else {}
-if _a4d:
-    _o = _a4d["off0"]
-    s_a4d = {"total_return_pct": round(_o["total"] * 100, 2), "annual_return_pct": round(_o["ann"] * 100, 2),
+_sup = json.load(open(BASE / "backtest" / "oss_0913" / "super_combo_0913.json", encoding="utf-8")) if (BASE / "backtest" / "oss_0913" / "super_combo_0913.json").exists() else {}
+if _sup:
+    _o = _sup["best"]["off0"]
+    s_super = {"total_return_pct": None, "annual_return_pct": round(_o["ann"] * 100, 2),
              "max_drawdown_pct": round(_o["mdd"] * 100, 2), "sharpe": round(_o["sharpe"], 3),
              "total_trades": _o.get("n_trades"), "win_rate_pct": round(_o.get("win", 0) * 100, 1)}
-A4D_TAG = "A4D icir6因子+中证1000<MA20半仓闸 · Top20 · 月频（主板含退市 · 2021起）"
-A4D_TAG += " · 相位中位1.107 · 安慰剂500 p=0.000 · DSR 0.987 · slip50稳健"
+else:
+    s_super = {}
+SUPER_TAG = "SUPER 13因子(A4D6+战法原子7)+中证1000<MA20半仓且高波半区 · Top20 · 月频（主板含退市 · 2021起）"
+SUPER_TAG += " · 相位中位1.151 · off0 年化22.87% · 安慰剂500 p=0.000 · slip50档S1.00 · 100万对照S1.30（2026-09-13 替换 A4D）"
 def load_curve_idx(f):
     try:
         df = __import__("pandas").read_csv(BASE / f, index_col=0)
@@ -478,7 +514,9 @@ def load_curve_idx(f):
         return [round(float(x), 2) for x in (v / v[0] * 100)]
     except Exception:
         return []
-v_a4d = load_curve_idx("backtest/factorlab_0913/champion_a4d_equity_0913.csv")
+v_super = load_curve_idx("backtest/oss_0913/super_champion_equity_0913.csv")
+if s_super and v_super:
+    s_super["total_return_pct"] = round(v_super[-1] - 100, 2)
 # 短线净值曲线（短线体系 v3 最优；2026-08-17 去 ETF）
 v_short_fund = load_curve_norm("short_v3_fund_slip20_equity.csv")
 v_short_stock = load_curve_norm("short_v3_stock_slip20_equity.csv")
@@ -641,7 +679,7 @@ def bt_all_html():
     cards = "".join([
         bt_card("bt-fund", "🥇 主仓 FB3-H20 基金线", FUND_TAG, s_fund, "curve-chart-fund", color="#3b82f6"),
         bt_card("bt-ln", "🥈 卫星·冷门低波", LN_TAG, s_ln, "curve-chart-ln", color="#10b981"),
-        bt_card("bt-a4d", "🥉 卫星·A4D", A4D_TAG, s_a4d, "curve-chart-a4d", color="#8b5cf6"),
+        bt_card("bt-super", "🥉 卫星·SUPER", SUPER_TAG, s_super, "curve-chart-super", color="#8b5cf6"),
     ])
     _ret = ('<div class="sub" style="color:#ef4444">⛔ <b>v9 股票分层战法（一体/主板/创业板/科创板四卡）已于 2026-09-13 退役</b>'
             '——十重证伪确认负期望（ADR-0006/0007），历史曲线与明细见更新日志 v5.9~v5.11.15 与 backtest/ 报告存档。</div>')
@@ -654,7 +692,7 @@ def bt_all_html():
             '<b>🎯 三轨配置（2026-09-13 拍板 · 60/20/20）</b>｜'
             '<b>① 主仓 FB3-H20</b>（60%）：基金 NAV 动量牛熊 regime，牛市 Top10/熊市 Top3 · 2000 池回测 +733.4%/年化 21.95%/回撤 -27.0%/夏普 1.316｜'
             '<b>② 冷门低波卫星</b>（20%）：主板 ln_amt20+atr20 双低 Top10 · 60 日调仓（全期 105 笔）· 回测 +127.4%/年化 16.2%/回撤 -18.4%/夏普 1.238 · <b>安慰剂 500 次 p=0.0000</b> · 与 FB3 月收益相关 <b>-0.165（负相关）</b> · slip50 稳健（+140.1%/1.333）｜'
-            '<b>③ A4D 卫星</b>（20%）：icir 6 因子 Top20 月频 + 中证1000&lt;MA20 半仓闸 · 回测 off0 夏普 1.07/<b>相位中位 1.075</b>/回撤 -18.3% · 安慰剂 500 p=0.000/DSR 0.987 · slip50 稳健｜'
+            '<b>③ SUPER 卫星</b>（20% · 2026-09-13 替换 A4D）：13 因子（A4D 6 + Z哥战法原子 7：牛绳/止损空间/距BBI 等）Top20 月频 + 中证1000&lt;MA20 半仓且高波半区 · 回测 off0 年化 22.87%/<b>相位中位 1.151</b>/回撤 -22.0% · 安慰剂 500 p=0.000 · 50bp 压力档 S 1.00 · 100 万对照 S 1.30｜'
             '信号：<code>backtest/signal_satellite_0913.py</code>（每日收盘跑 → T+1 开盘清单，双卫星已交付；FB3 轨信号接入中）· '
             '⚠ 风险披露：冷门低波轨 atr20 的 IC 方向在 fwd 固定持有语义下与调仓制相反（factorcombo 交叉验证），<b>先小额/模拟盘验证再放大</b>；三轨均为 2021 起回测口径，2021-2026 为结构性分化窗口</div>\n'
             '<div class="bt-grid">' + cards + '</div>\n' + _ret + '\n</div>')
@@ -1736,7 +1774,7 @@ html = f"""<!doctype html>
 <div class="card" id="sys-auto">
 <div class="sys-head">
 <div class="sys-head-top">
-<h2>🛰️ 三轨中长线 <span class="view-badge auto">FB3-H20 主仓 + 冷门低波 / A4D 双卫星 · 资金 60/20/20</span></h2>
+<h2>🛰️ 三轨中长线 <span class="view-badge auto">FB3-H20 主仓 + 冷门低波 / SUPER 双卫星 · 资金 60/20/20</span></h2>
 </div>
 <div class="sys-head-tags">
 <span class="badge badge-auto">v9 股票分层战法已退役（十重证伪 · ADR-0006/0007）</span>
@@ -1747,8 +1785,9 @@ html = f"""<!doctype html>
 </div>
 {SAT_CARD}
 {SAT_PAPER_CARD}
+{FUND_PAPER_CARD}
 {FB3_POOL_CARD}
-<div class="card" id="v9-retired-card"><h2>🗂️ v9 全量池（已退役）</h2><div class="sub" style="color:#ef4444">⛔ v9 股票分层战法与 197 只跟踪池已于 2026-09-13 退役并移除展示——十重证伪确认负期望（ADR-0006/0007）。历史回测明细见「📝 更新日志」v5.9~v5.11.15 与 <code>backtest/</code> 报告存档。</div><div class="sub"><b>三轨退出规则</b>：① 主仓 FB3-H20 = 20 交易日月度轮动 + 牛熊 regime 切换（沪深300&lt;MA200 转 Top3 低波防守仓）——<b>无个股止盈止损</b>（基金 NAV 无涨跌停，止盈变体回测全部减值）；② 冷门低波 = 60 交易日到期换仓，持有期无中途操作；③ A4D = 月频调仓 + 中证1000&lt;MA20 组合半仓闸。</div></div>
+<div class="card" id="v9-retired-card"><h2>🗂️ v9 全量池（已退役）</h2><div class="sub" style="color:#ef4444">⛔ v9 股票分层战法与 197 只跟踪池已于 2026-09-13 退役并移除展示——十重证伪确认负期望（ADR-0006/0007）。历史回测明细见「📝 更新日志」v5.9~v5.11.15 与 <code>backtest/</code> 报告存档。</div><div class="sub"><b>三轨退出规则</b>：① 主仓 FB3-H20 = 20 交易日月度轮动 + 牛熊 regime 切换（沪深300&lt;MA200 转 Top3 低波防守仓）——<b>无个股止盈止损</b>（基金 NAV 无涨跌停，止盈变体回测全部减值）；② 冷门低波 = 60 交易日到期换仓，持有期无中途操作；③ SUPER = 月频调仓 + 中证1000&lt;MA20 组合半仓闸（且关闸期取高波半区）。</div></div>
 </div>
 
 <!-- ============ 视图 C：全量池短线（2026-09-03 起 股票池 / 基金池 分板块展示） ============ -->
@@ -1819,7 +1858,7 @@ html = f"""<!doctype html>
 /* 三视图导航（覆盖默认 4 项） */
 window.ENH.nav = [
   ["overview","📊","监控总览",[["overview","总览统计"],["mkt-weather","市场晴雨表"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
-  ["sys-auto","🛰️","三轨中长线",[["sat-card","双卫星目标持仓"],["sat-paper-card","模拟盘"],["fb3-pool-card","FB3 基金池"]]],
+  ["sys-auto","🛰️","三轨中长线",[["sat-card","双卫星目标持仓"],["sat-paper-card","双卫星模拟盘"],["fund-paper-card","基金主仓模拟盘"],["fb3-pool-card","FB3 基金池"]]],
   ["short","⚡","全量池短线",[["card-short-stk","股票池 汇总表"],["card-short-stk-detail","股票池 逐标的详情"],["card-kh-hits","KHunter 命中策略一览"],["card-etf-paper","ETF 动量轮动"],["card-kh-paper","KHunter 模拟盘"],["card-short-fund","基金池 汇总表"],["card-short-fund-detail","基金池 逐标的详情"],["watch-card","短线跟踪"]]],
   ["a5","🎯","打板族",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
   ["comment","💬","评论区",[]]
@@ -1831,7 +1870,7 @@ window.ENH.sub_curves = {{
   stock: {json.dumps(DATA["systems"]["v9_auto"]["equity"])},
   fund: {json.dumps(v_fund)},
   ln: {json.dumps(v_ln)},
-  a4d: {json.dumps(v_a4d)},
+  super: {json.dumps(v_super)},
   short_fund: {json.dumps(v_short_fund)},
   short_stock: {json.dumps(v_short_stock)},
   stk_all: {json.dumps(v9split_curves["all"])}, stk_main: {json.dumps(v9split_curves["main_only"])},
@@ -1870,7 +1909,7 @@ function renderSubCurve(){{
   var C=window.ENH.sub_curves;if(!C)return;
   renderOneCurve('curve-chart-fund', C.fund, '#3b82f6', '主仓 FB3-H20（2000池）', '+'+{s_fund["total_return_pct"]:.0f});
   renderOneCurve('curve-chart-ln', C.ln, '#10b981', '卫星·冷门低波', '+'+{s_ln.get("total_return_pct") or 0:.0f});
-  renderOneCurve('curve-chart-a4d', C.a4d, '#8b5cf6', '卫星·A4D', '+'+{s_a4d.get("total_return_pct") or 0:.0f});
+  renderOneCurve('curve-chart-super', C.super, '#8b5cf6', '卫星·SUPER', '+'+{s_super.get("total_return_pct") or 0:.0f});
   renderOneCurve('curve-chart-stock-all', C.stk_all, '#94a3b8', '股票 一体（v9 已退役）', '+'+{round(s_stk["all"].get("total_return_pct") or 0):.0f});
   renderOneCurve('curve-short-stock-all', C.short_stock, '#f59e0b', '短线 股票 一体', '{(ss_stk["all"].get("total_return_pct") or 0):+.0f}');
   renderOneCurve('curve-short-stock-main', [], '#ea580c', '短线 纯主板（KHunter）', '无净值曲线');
