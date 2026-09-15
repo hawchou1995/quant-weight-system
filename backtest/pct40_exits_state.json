@@ -1,0 +1,32 @@
+{
+ "created": "2026-09-15",
+ "tracks": [
+  "track_b",
+  "track_a"
+ ],
+ "pending": {
+  "track_b": [],
+  "track_a": []
+ },
+ "executed": [],
+ "nav": [
+  {
+   "date": "2026-09-11",
+   "track": "track_b",
+   "nav": 72199.0,
+   "cash": 51000.0,
+   "n_held": 16,
+   "n_flag_today": 0,
+   "n_pend": 0
+  },
+  {
+   "date": "2026-09-15 00:00:00",
+   "track": "track_a",
+   "nav": 46383.0,
+   "cash": 17000.0,
+   "n_held": 10,
+   "n_flag_today": 0,
+   "n_pend": 0
+  }
+ ]
+}
