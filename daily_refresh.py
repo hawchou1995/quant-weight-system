@@ -55,6 +55,15 @@ STEPS = [
     ("看板重建 build_dual_system", ["build_dual_system.py"], False),
     ("部署 gh-pages", ["_deploy_fundline_0911.py"], "--skip-deploy" in sys.argv),
 ]
+# ---- 数据步专用环境：显式禁代理 ----
+# 2026-09-15 根因修复：本机代理（127.0.0.1:随机端口，VPN/Clash 类）会抖动；akshare 内部
+# requests **不带 timeout**（stock_zh_a_short 等），代理一挂/半死 → 复权检测整段永久阻塞
+# （0914 卡 52min / 0915 卡 76min 即此）。项目对腾讯/东财本就 `proxies=None` 直连，此处把
+# 数据步的进程环境也隔离掉，源头消除依赖。（git push 等步骤仍用默认环境，避免影响 GitHub 访问）
+import os as _os
+NO_PROXY_ENV = {**_os.environ, "HTTP_PROXY": "", "HTTPS_PROXY": "", "http_proxy": "", "https_proxy": "",
+                "NO_PROXY": "*", "no_proxy": "*"}
+
 t0 = time.time()
 fails = []
 for name, args, skip in STEPS:
@@ -62,7 +71,8 @@ for name, args, skip in STEPS:
         print(f"[skip] {name}", flush=True)
         continue
     print(f"\n========== {name} ==========", flush=True)
-    r = subprocess.run([PY] + args, cwd=str(BASE))
+    _env = NO_PROXY_ENV if name.startswith("数据更新") else None   # 数据步禁代理（防代理抖动阻塞）
+    r = subprocess.run([PY] + args, cwd=str(BASE), env=_env)
     if r.returncode != 0:
         if name.endswith("[软]"):   # 软步骤：失败只告警，不阻断（如 A5 实验盘、影子轨）
             print(f"⚠️ {name} 失败（exit {r.returncode}）—— 非致命，继续后续步骤", flush=True)
@@ -79,7 +89,7 @@ if not fails:
                           "short_v3_fund_summary.json", "short_v3_fund_slip20_summary.json",
                           "backtest/satellite_pool.json",
                           "khunter_paper_state.json", "khunter_paper_state_c.json",
-                          "backtest/a5_paper_state.json", "backtest/satellite_paper.json",
+                          "backtest/a5_paper_state.json", "backtest/satellite_paper.json", "backtest/satellite_paper_a.json", "backtest/satellite_paper_b.json", "backtest/satellite_cfg.py",
                           "backtest/satellite_paper_init.json", "backtest/turn_shadow_state.json",
                           "backtest/pct40_exits_state.json", "backtest/exit_control_state.json",
                           "backtest/pct40_exit_apply.py", "backtest/exit_control_0915.py",

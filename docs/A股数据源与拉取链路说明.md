@@ -757,7 +757,30 @@ python daily_refresh.py --force --skip-data
 # 4) 首选源恢复后回补全市场
 python tickflow_update.py --workers 10
 ```
-**根因待办**：`update_daily.py` 的并行段应给请求加显式 `timeout`，或收尾时 `executor.shutdown(wait=False)` + `os._exit()`；在修好前，Q12 的三步判据就是标准动作。
+**✅ 根因已定位并修复（2026-09-15 深夜）**：真因不是「线程池缺 shutdown」，而是
+**akshare `stock_zh_a_daily` 内部的 `requests.get` 不带 timeout**（`akshare/stock/stock_zh_a_sina.py:177`），
+而**本机代理（`127.0.0.1:<随机端口>`，VPN/Clash 类）会抖动**——代理一挂/半死，该请求就永久阻塞，
+`run_rebase_check` 的串行循环随之整段挂死（0914 卡 52min / 0915 卡 76min 同一机制；
+实测证据：故障时 akshare 抛 `ProxyError: Unable to connect to proxy 127.0.0.1:48765`，
+同一时刻 `urllib.getproxies()={}` 且显式禁代理的 `requests.get` 返回 200 → 证明是瞬时/半死代理态）。
+
+**已落地的三层防护**（口径不变——仍用 akshare 通道，因其为历史基准权威）：
+1. **单候选墙钟上限** `REBASE_TRY_TIMEOUT=90s`：`_run_with_deadline()` 用 daemon 线程包裹
+   `verify_rebase_drift` 与全量重拉，超时打印 `[超时] … 跳过（不再阻塞整相位）`；
+2. **整相位预算** `REBASE_BUDGET_S=1500s`：用尽即收工并打印 `[收工] 已处理 x/y`，剩余候选下次续跑；
+3. **探针也入闸**：`probe_date()` 加 60s 上限（它是链路第一个网络调用，此前若卡死会先卡在探针）；
+4. **数据步进程环境禁代理**：`daily_refresh.py` 给「数据更新」步注入 `HTTP_PROXY='' / NO_PROXY='*'` 环境
+   （akshare 改不了 timeout，就让它不经过代理；git push 等步骤仍用默认环境，不influence GitHub 访问）。
+
+**验证证据**：`_run_with_deadline(lambda: sleep(9999), 3)` → 3.0s 返回且不误伤正常调用；
+probe 失败路径 → 立即跳过打印「新浪源不可用」；端到端 3 只候选走完整检测 → 12.7s 完成并正确修复
+`bj920006` 基准漂移（810 行）。
+
+**附带修复（同次排查发现，两个静默缺陷）**：`fast_sina_fetch.py`（新浪直连快通道）此前**对所有标的静默返回 None**——
+① 新浪 `klc_kl.js` 日期带 `Z`（UTC-aware）与 `qfq.js` 朴素日期 merge → `TypeError: Cannot join tz-naive with tz-aware`；
+② 全表 `ffill().dropna()` 把未使用列（postVol/postAmt）的空值当作缺失 → 6005 行被砍到 52 行。
+两处已修（现返回 2601 行 / 3.3s）。**但该通道与 akshare 存在历史基准差**（茅台 2203/2590 行差>0.01；
+北交所 `bj920006` 最大差 31%）→ **不可用于复权重拉**，仅作速度路径候选，用前须逐票对拍。
 
 ### Q13 westock 补数时哪些行必须丢弃？
 

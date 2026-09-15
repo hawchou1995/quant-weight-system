@@ -32,7 +32,7 @@
    --force       即使源滞后也强制继续（节假日等场景）
 """
 import os
-import sys, time, json
+import sys, time, json, threading
 from pathlib import Path
 import pandas as pd
 import requests
@@ -211,14 +211,12 @@ def fetch_tx_qfq(sym, retries=3):
     return None
 
 
-def probe_date(fetcher, sym="sh600000"):
-    """探样返回最新交易日（YYYY-MM-DD），失败返回 None"""
-    try:
-        df = fetcher(sym)
-        if df is not None and len(df) > 0:
-            return str(df["date"].iloc[-1])
-    except Exception:
-        pass
+def probe_date(fetcher, sym="sh600000", timeout_s=60):
+    """探样返回最新交易日（YYYY-MM-DD），失败/超时返回 None。
+    2026-09-15：加超时闸 —— 探针是链路里第一个网络调用，此前若 fetcher 卡死会先卡在这里。"""
+    ok, df = _run_with_deadline(lambda: fetcher(sym), timeout_s)
+    if ok and df is not None and len(df) > 0:
+        return str(df["date"].iloc[-1])
     return None
 
 
@@ -373,6 +371,46 @@ def verify_rebase_drift(sym, fetcher):
     return bool(drift * 100 > REBASE_DRIFT_PCT)
 
 
+# ---------------------------------------------------------------------------
+# 复权检测的取数通道（2026-09-15 修复「无超时阻塞」：0914 卡 52min / 0915 卡 76min）
+# 根因：run_rebase_check 用 F.fetch_sina_daily → akshare stock_zh_a_daily，其内部 requests
+#       **不带 timeout**（且每次新建 py_mini_racer VM）→ 单个候选把整段挂死且无法自愈。
+# 处置：改用项目自带直连（fast_sina_fetch，两处请求各 timeout=10s），口径不变（新浪 qfq、volume=股）；
+#       再加两道闸：单候选墙钟上限 + 整相位预算，保证「最坏情况有界」。
+# ---------------------------------------------------------------------------
+REBASE_TRY_TIMEOUT = 90      # 单候选上限（秒）：verify + 必要时全量重拉
+REBASE_BUDGET_S = 1500       # 整相位预算（秒）：超时收工，剩余候选下次继续
+
+
+def fetch_sina_daily_direct(sym, retries=3):
+    """新浪前复权日线（直连，带硬超时）。返回列与 F.fetch_sina_daily 的 HEADERS 完全一致。"""
+    try:
+        from fast_sina_fetch import fetch_fast
+        df = fetch_fast(sym)
+        if df is None or len(df) == 0:
+            return None
+        return df[["date", "open", "high", "low", "close", "volume", "amount"]].reset_index(drop=True)
+    except Exception:
+        return None
+
+
+def _run_with_deadline(fn, timeout_s):
+    """在有界时间内跑 fn()（含网络）。超时返回 (False, None) —— 用 daemon 线程，
+    即便底层卡死不阻塞进程退出（这正是 akshare 通道做不到的）。"""
+    box = {}
+    def _worker():
+        try:
+            box["r"] = fn()
+        except Exception as e:
+            box["e"] = e
+    th = threading.Thread(target=_worker, daemon=True)
+    th.start()
+    th.join(timeout_s)
+    if th.is_alive():
+        return False, None
+    return True, box.get("r")
+
+
 def run_rebase_check(target_date, source):
     """收盘管道兜底：候选剪枝（无网络）→ 重拉验证（有网络）→ 全量 qfq 重拉覆盖。
 
@@ -389,6 +427,9 @@ def run_rebase_check(target_date, source):
         return 0
     print(f"  复权基准检测：候选 {len(cands)} 只（≥{REBASE_JUMP_PCT}% 跳变未放量）→ 重拉验证", flush=True)
     # 规范化源固定新浪（见函数注释）；活动 source 参数忽略，腾讯绝不用于复权重拉
+    # 2026-09-15：**保持 akshare 通道**（口径基准权威）。实测 fast_sina_fetch 直连与之存在历史基准差
+    #   （茅台 2203/2590 行差>0.01、北交所 bj920006 最大差 31%）→ 换通道会改写历史基准，禁用。
+    #   阻塞问题改由「单候选 90s 上限 + 相位 1500s 预算」兜住（见下方 _run_with_deadline）。
     fetcher = F.fetch_sina_daily
     # 新浪可用性探针：不可用时跳过本轮（verify_rebase_drift 虽容错返回 False，
     # 但需显式告知，避免静默漏检漂移）
@@ -396,11 +437,21 @@ def run_rebase_check(target_date, source):
         print("  复权基准检测：新浪源不可用，本次跳过（漂移将在下次收盘管道重试）", flush=True)
         return 0
     fixed = 0
+    t_phase = time.time()
     for i, sym in enumerate(cands, 1):
+        if time.time() - t_phase > REBASE_BUDGET_S:
+            print(f"    [收工] 相位预算 {REBASE_BUDGET_S}s 用尽，已处理 {i-1}/{len(cands)} 只，"
+                  f"剩余候选下次收盘管道继续（数据已落盘的部分不受影响）", flush=True)
+            break
         try:
-            if verify_rebase_drift(sym, fetcher):
-                full = fetcher(sym)  # 全量 qfq（2016 起），覆盖保存 → 基准统一（新浪口径）
-                if full is not None and len(full) > 0:
+            ok, drifted = _run_with_deadline(lambda: verify_rebase_drift(sym, fetcher), REBASE_TRY_TIMEOUT)
+            if not ok:
+                print(f"    [超时] {sym} 验证超过 {REBASE_TRY_TIMEOUT}s，跳过（不再阻塞整相位）", flush=True)
+            elif drifted:
+                ok2, full = _run_with_deadline(lambda: fetcher(sym), REBASE_TRY_TIMEOUT)
+                if not ok2:
+                    print(f"    [超时] {sym} 全量重拉超过 {REBASE_TRY_TIMEOUT}s，跳过", flush=True)
+                elif full is not None and len(full) > 0:
                     F.save_csv(sym, full, "")
                     fixed += 1
                     print(f"    [修复] {sym} 基准漂移 → 已全量重拉 qfq 覆盖 ({len(full)} 行)", flush=True)
