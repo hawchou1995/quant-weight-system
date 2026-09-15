@@ -1,16 +1,16 @@
 {
   "file": "review_a5.md",
-  "as_of": "2026-09-14",
-  "updated": "2026-09-15 00:02:48",
+  "as_of": "2026-09-15",
+  "updated": "2026-09-15 18:10:37",
   "stats": {
     "n": 0,
     "win_rate": null,
     "mean_net": null,
     "mean_raw": null,
     "tp_ratio": null,
-    "v1_n": 11,
-    "v1_mean_net": -1.709286095511121,
-    "nav": 0.822316
+    "v1_n": 12,
+    "v1_mean_net": -1.0033836083851944,
+    "nav": 0.877917
   },
   "gate": {
     "verdict": "信号不足 0/30，继续积累",
@@ -27,10 +27,10 @@
       "note": "0/30"
     }
   },
-  "n_watch": 2,
-  "n_avoid": 2,
-  "n_pos": 1,
-  "n_closed": 11,
+  "n_watch": 1,
+  "n_avoid": 0,
+  "n_pos": 0,
+  "n_closed": 12,
   "bench": {
     "win_rate": 56.1,
     "mean_net": 1.19,
