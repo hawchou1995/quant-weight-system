@@ -974,7 +974,7 @@ def a5_view_html():
         yz = s.get("yz", False)
         fb = s.get("first_board", False)
         if hit:
-            tag = '<span class="badge" style="background:rgba(5,150,105,.18);color:#34d399">✅ A5命中</span>'
+            tag = '<span class="badge" style="background:rgba(5,150,105,.18);color:#34d399">✅ 双池命中</span>'
         elif sealed:
             tag = '<span class="badge" style="background:rgba(217,119,6,.15);color:#fbbf24">封板</span>'
         else:
@@ -987,6 +987,18 @@ def a5_view_html():
         elif sealed:
             st.append('<span class="badge" style="background:rgba(37,99,235,.14);color:#60a5fa">连板</span>')
         st_html = "".join(st) or '<span style="color:var(--faint)">—</span>'
+
+        # v1.3 双池标签（2026-09-15 用户需求：双池直接上全景卡）
+        _pools = s.get("pools", []) or []
+        _pt = []
+        if "R20" in _pools:
+            _pt.append('<span class="badge" style="background:rgba(5,150,105,.18);color:#34d399" '
+                       f'title="池A 超跌：r20 {s.get("r20")}%（需 ≤-7.31%）">A·超跌</span>')
+        if "ADX" in _pools:
+            _pt.append('<span class="badge" style="background:rgba(37,99,235,.16);color:#60a5fa" '
+                       f'title="池B 趋势：ADX {s.get("adx")}（需 ≥27.9）">B·趋势</span>')
+        _pool_html = "".join(_pt) or '<span style="color:var(--faint)">—</span>'
+
         # 档位/建议（2026-09-05 用户需求：命中标签之外给操作建议）
         tier = s.get("tier", "不追")
         advice = s.get("advice", "")
@@ -1000,12 +1012,12 @@ def a5_view_html():
             [_name_code(s["name"], s["code"]), _txt_td(_board_cell(s.get("board"), s.get("ind"))),
              _txt_td(s.get("ind", "—")), _chg_td(s.get("pct")), _txt_td(st_html),
              _txt_td(f'{s.get("amt", 0)/1e8:.2f}'), _num_td(s.get("rel_pos"), 2),
-             _pct_td(s.get("dist_high"), 1), _txt_td(tag), _txt_td(tier_badge),
+             _pct_td(s.get("dist_high"), 1), _txt_td(_pool_html), _txt_td(tag), _txt_td(tier_badge),
              _txt_td(f'<span style="color:var(--sub);font-size:12px">{advice}</span>')]))
     zp_html = f'''<div class="card" id="a5-zt" style="border-color:rgba(5,150,105,.35)">
-<h2>🔥 今日涨停全景 <span class="badge badge-auto">{len(zp_stocks)} 只 · 命中 {len(zp_hits)} 只</span></h2>
-<div class="sub">收盘涨幅 ≥9.5% 或封板标的（{zp_date} 收盘口径）· <b>✅ A5命中</b> = 首板 + 非一字 + rel_pos≤0.5 + F3空间≥20% + 成交额≥5000万 + 双池至少命中其一（v1.3）· 纯观察，不构成交易信号</div>
-{_a5_tbl_full("a5-zt", [("name","标的"),("board","板块"),("ind","行业"),("pct","涨幅"),("status","状态"),("amt","成交额(亿)"),("relpos","相对位置"),("dist","空间%"),("hit","命中"),("tier","档位"),("advice","建议")], zp_rows, "（今日无 ≥9.5% 标的）")}
+<h2>🔥 今日涨停全景 <span class="badge badge-auto">{len(zp_stocks)} 只 · 双池命中 {len(zp_hits)} 只（池A {sum(1 for x in zp_hits if "R20" in (x.get("pools") or []))} · 池B {sum(1 for x in zp_hits if "ADX" in (x.get("pools") or []))}）</span></h2>
+<div class="sub">收盘涨幅 ≥9.5% 或封板标的（{zp_date} 收盘口径）· <b>✅ 双池命中</b> = 首板 + 非一字 + rel_pos≤0.5 + F3空间≥20% + 成交额≥5000万 + <b>池A 超跌（ret20≤-7.31%）/ 池B 趋势（ADX14≥27.9）至少命中其一</b>（v1.3 双池独立）· 滤网池列：A·超跌 / B·趋势（悬浮可见实测值）· 纯观察，不构成交易信号</div>
+{_a5_tbl_full("a5-zt", [("name","标的"),("board","板块"),("ind","行业"),("pct","涨幅"),("status","状态"),("amt","成交额(亿)"),("relpos","相对位置"),("dist","空间%"),("pools","滤网池"),("hit","命中"),("tier","档位"),("advice","建议")], zp_rows, "（今日无 ≥9.5% 标的）")}
 </div>'''
     return f'''<div class="view" id="view-a5">
 <div class="card" id="sys-a5">
