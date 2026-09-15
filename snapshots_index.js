@@ -1,0 +1,1 @@
+window.SNAPSHOTS = {"snapshots": [{"date": "2026-09-15", "file": "20260915_dual.html", "count": "32+0", "dual": true}], "months": [{"month": "2026-09", "items": [{"date": "2026-09-15", "file": "20260915_dual.html", "count": "32+0", "dual": true}]}]};
