@@ -1,0 +1,33 @@
+{
+ "track": "trackA",
+ "F": 30,
+ "N_TOP": 20,
+ "union_med": 48,
+ "union_p90": 57,
+ "union_max": 67,
+ "nominal": 240,
+ "轨A 17k_U中位": {
+  "U": 48,
+  "per_pos": 354.1666666666667,
+  "max_price": 3.4916666666666667,
+  "feasible": true
+ },
+ "轨A 17k_U-P90": {
+  "U": 57,
+  "per_pos": 298.2456140350877,
+  "max_price": 2.9324561403508773,
+  "feasible": false
+ },
+ "轨B 51k_U中位": {
+  "U": 48,
+  "per_pos": 1062.5,
+  "max_price": 10.575,
+  "feasible": true
+ },
+ "轨B 51k_U-P90": {
+  "U": 57,
+  "per_pos": 894.7368421052631,
+  "max_price": 8.897368421052631,
+  "feasible": true
+ }
+}
