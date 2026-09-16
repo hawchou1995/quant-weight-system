@@ -1,0 +1,523 @@
+{
+ "meta": {
+  "date": "2026-09-16",
+  "batch": "kb_top5_batch1",
+  "universe": "mainboard(sh60|sz00)",
+  "universe_audit": {
+   "universe": "mainboard(sh60|sz00)",
+   "filter_applied_to": "腿与轨B 同时生效",
+   "elig_daily_median": 2787,
+   "elig_daily_mean": 2492.1,
+   "elig_daily_min": 0,
+   "elig_days_below_topn": 149,
+   "prefix_filter_bitwise_noop": true,
+   "note": "noop=True → 冻结面板本身已只含主板标的，前缀过滤为恒等变换",
+   "n_codes": 3209,
+   "n_mainboard": 3209,
+   "n_excluded": 0,
+   "prefix3_census_all": {
+    "000": 414,
+    "001": 121,
+    "002": 922,
+    "003": 42,
+    "600": 754,
+    "601": 226,
+    "603": 617,
+    "605": 113
+   },
+   "mainboard_rule": "sh60*(600/601/603/605) | sz00*(000/001/002/003)"
+  },
+  "engine": "oss_0913/oss_super_combo_0913.py 前缀 run_engine",
+  "topn": 20,
+  "phases": [
+   0,
+   4,
+   8,
+   12,
+   16
+  ],
+  "slip_main_bps": 20.0,
+  "slip_stress_bps": 50.0,
+  "cash0": 170000.0,
+  "gates": {
+   "corr_B_max": 0.3,
+   "phmed_sharpe_min": 0.5,
+   "slip50_sharpe_min": 0.3,
+   "blend_dsharpe_min": 0.02
+  },
+  "trackB": {
+   "off0_ann_pct": 22.87,
+   "official_full_universe": 22.87,
+   "off0_sharpe": 1.297,
+   "off0_mdd_pct": -21.96,
+   "window": [
+    "2021-08-16",
+    "2026-09-11"
+   ]
+  },
+  "combo_layer_rule": "修正口径（2026-09-16）：不从轨B挪仓位。(i) 现金端 r_new=r_B+λ·c_t·r_L（c_t=轨B实测闲置现金权重）；(ii) 增量资金 主仓:候选 混合边际。任一 ΔSharpe≥+0.02 且 Calmar 不降 → 组合层改善",
+  "source": "backtest/清单-知识库未测策略存量分类-20260916.md §7.2 Top20 / §7.5 首批5条",
+  "origin_audit": {
+   "kb1": {
+    "page": "页1 §1.3 #16",
+    "src": "99-Archive/00raw-剪藏-20260827/公式之家/2026-07-25 - 通达信〖分歧弱转强〗指标套装，首板缩量回调共振选股模型.md",
+    "verdict": "一致（逐句核对）",
+    "notes": [
+     "X_FW:=CODELIKE('60') OR CODELIKE('00') → 原文显式主板限定，与清单一致",
+     "GSZJ4:=CROSS(M10,M5) 原文确为 MA10 上穿 MA5（形态上=均线死叉/收敛），清单照录一致",
+     "GSZJ2 的 REF(HHV(C,3),X_N1-3) 与 GSZJ3 的 REF(O,X_N1)=首板开盘价 已逐字核对",
+     "实现近似：ZTPRICE 用「C=H ∧ ret≥9.5%（主板）」替代（前复权面板无法还原 2 位小数涨停价）",
+     "实现近似：X_N1<3 的窗口不判（HHV(C,3) 需 3 根）"
+    ]
+   },
+   "kb2": {
+    "page": "页4 §4.2 J#42",
+    "src": "99-Archive/00raw-剪藏-20260824/2026-08-22 - 用PCA提取主成分后，再计算残差波动，这个思路能带来显著提升吗？.md",
+    "verdict": "一致（步骤/阈值核对）",
+    "notes": [
+     "21 交易日截面 PCA → F1（解释度<20% 取前 2）→ 逐股时序回归 → 残差 std，逐字一致",
+     "原文自述：**sigma 最好、mu 次之、skew/ivr 差**；且「IC 相比旧版仅微幅提升，有的甚至不如直接用截面均值作解释变量」→ 本批加了 mean 对照臂",
+     "原文明确：**最大组（高 sigma）表现远差于其他组 = 典型空头因子** → 做多方向应为低 sigma",
+     "实现近似：换手率用成交量替代（StandardScaler 逐列标准化对个股常数因子不变 → 等价）",
+     "实现近似：numpy SVD 复刻 sklearn PCA；残差 std 用 ddof=1（pandas .std() 口径）"
+    ]
+   },
+   "kb3": {
+    "page": "页2 §2.3 09-16[2]",
+    "src": "99-Archive/00raw-剪藏-20260916b/大财师兄/2026-09-16 - 成交量、成交额、成交笔数：三个概念的区别和搭配使用.md",
+    "verdict": "一致（文字阈值核对）；**关键：原文无任何数字阈值**",
+    "notes": [
+     "笔均量=总成交量÷总成交笔数 / 均笔额=总成交额÷总成交笔数（原文照录一致）",
+     "原文阈值均为定性语：「连续多日维持较高水平」「成交量未必大幅增加」「萎缩」→ 无数字",
+     "原文明确「笔均量不能拿去跟别的票横向比，只能自己跟自己比」→ 本批用自身历史相对口径",
+     "**数据缺失**：本地无「成交笔数」列 → 按任务书用 amount/volume(VWAP) 作代理，并显式申报：VWAP 度量的是平均成交价，**不是每笔规模**，代理有效性弱",
+     "另加 Amihud 冲击代理与原文 R1/R2 规则化两臂作对照"
+    ]
+   },
+   "kb4": {
+    "page": "页3 §3.3 #12",
+    "src": "99-Archive/00raw-剪藏-20260831/大阳金融研究所/2026-08-29 - 如何从全市场5000多只个股中选出龙头股？.md",
+    "verdict": "一致（时间分档核对）；**原文另含清单未收录的对称条件**",
+    "notes": [
+     "时间维度 1-2天/1-2周/1-2月/3月 与清单一致（原文：一两天的背离可能是偶然…能横住三个月=三面共振）",
+     "原文另有：「大盘创新低它不创新低，大盘反弹它创新高」→ 清单未收录，本批以rs{n} 超额收益臂覆盖其方向（未单独建「大盘创新低它不创新低」条件臂）",
+     "关键位定义原文为「一个重要的底部，或者大盘的关键支撑位」→ 操作化为 hs300 近250日区间分位≤0.30 或距250日低点≤5%",
+     "实现近似：大盘用沪深300（本地最完整 index_000300.csv），非「上证指数」"
+    ]
+   },
+   "kb5": {
+    "page": "页6.1 打板战法 §1/§2",
+    "src": "99-Archive/00raw-20260829/李韩薇/2026-06-26 - 打板必看！4种绝对不能打的首板….md + 99-Archive/00raw-20260829/量化板上板/2026-05-27 - 散户打板 一套从选股到卖出的完整交易系统….md",
+    "verdict": "部分不一致（见 notes）",
+    "notes": [
+     "F5 `MA5>MA10>MA20>MA60>MA120`：原文一字不差，但**原文极性是「第1步 入选必要条件」**，清单归入「过滤族」→ 本批按原文极性：F5=必须满足",
+     "F7 `当前价距离布林带上轨≤1%`：原文一致（清单转写 close≥上轨×0.99 等价）",
+     "F8 `RSI(14)≥85`：原文一字不差",
+     "F9 `当日已触发一次冲板回落（最高价≥涨停价-1%，现价回落≥3%）`：原文一致；**但原文未定义「回落」基准** → 本批用 (high−close)/high",
+     "**F3 不一致**：原文为「短期累计涨幅超过50%，处于近两三个月价格高点」+「单日成交额是近20日均量的3倍以上」→ 清单转写为「20日累计涨幅>50%」，原文**未给 20 日窗口**，且漏掉「近两三个月价格高点」条件",
+     "**F9 结构性发现**：以「(high−close)/high≥3%」实现时，F9 ∧ 首板(封板) 恒为空集（封板日 close=high 附近）→ 该过滤在 A5 首板域无定义域；另测「入场日」域",
+     "F5/F7/F8 按「首板日」计算（原文为盘中决策日）"
+    ]
+   }
+  },
+  "data_gaps": [
+   "无「成交笔数」列（kb3 原文核心输入）→ VWAP 代理，须另抓；获取路径：通达信本地导出/东财分笔/Tushare 逐笔（页4 §7.4 数据缺口清单已列）",
+   "无分钟/分时数据 → kb5 的 F1/F2/F4/E4 不可测（本批不测）",
+   "前复权面板无法还原 2 位小数涨停价 → ZTPRICE 用 ret≥9.5%+C=H 近似"
+  ],
+  "replica_check_max_abs_diff": 0.0,
+  "kb1_signal_census": {
+   "zt": 74601,
+   "nb": 30432,
+   "g1": 12383,
+   "g2": 438343,
+   "g3": 95561,
+   "g4": 196302,
+   "xg": 164,
+   "stocks_with_xg": 160,
+   "n1_hist": []
+  },
+  "status": "complete"
+ },
+ "trackB_daily_sharpe": 1.2967,
+ "n_legs": 2,
+ "legs": [
+  {
+   "leg": "fenzhi_w10",
+   "phmed_sharpe": NaN,
+   "sharpe_min": NaN,
+   "sharpe_max": NaN,
+   "phase_sharpes": {
+    "0": NaN,
+    "4": NaN
+   },
+   "slip50_sharpe": NaN,
+   "slip50_ann_pct": 0.0,
+   "off0_ann_pct": 0.0,
+   "off0_sharpe": NaN,
+   "off0_mdd_pct": 0.0,
+   "n_trades": 0,
+   "win": NaN,
+   "by_year_pct": {
+    "2021": 0.0,
+    "2022": 0.0,
+    "2023": 0.0,
+    "2024": 0.0,
+    "2025": 0.0,
+    "2026": 0.0
+   },
+   "corr_B": NaN,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "leg_daily_median_n": 1,
+   "halves": {
+    "h1": {
+     "sharpe": NaN,
+     "ann_pct": 0.0,
+     "mdd_pct": 0.0,
+     "window": [
+      "2021-08-17",
+      "2024-03-04"
+     ]
+    },
+    "h2": {
+     "sharpe": NaN,
+     "ann_pct": 0.0,
+     "mdd_pct": 0.0,
+     "window": [
+      "2024-03-05",
+      "2026-09-11"
+     ]
+    },
+    "same_sign": false
+   },
+   "pass_G1": false,
+   "pass_G2": false,
+   "pass_G4_samesign": false,
+   "pass_all": false,
+   "kb": "kb1",
+   "desc": "分歧弱转强事件后 10 日内按新鲜度排序（事件信号→月频映射）",
+   "direction": "long",
+   "approx": null
+  },
+  {
+   "leg": "fenzhi_w20",
+   "phmed_sharpe": NaN,
+   "sharpe_min": NaN,
+   "sharpe_max": NaN,
+   "phase_sharpes": {
+    "0": NaN,
+    "4": NaN
+   },
+   "slip50_sharpe": NaN,
+   "slip50_ann_pct": 0.0,
+   "off0_ann_pct": 0.0,
+   "off0_sharpe": NaN,
+   "off0_mdd_pct": 0.0,
+   "n_trades": 0,
+   "win": NaN,
+   "by_year_pct": {
+    "2021": 0.0,
+    "2022": 0.0,
+    "2023": 0.0,
+    "2024": 0.0,
+    "2025": 0.0,
+    "2026": 0.0
+   },
+   "corr_B": NaN,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "leg_daily_median_n": 2,
+   "halves": {
+    "h1": {
+     "sharpe": NaN,
+     "ann_pct": 0.0,
+     "mdd_pct": 0.0,
+     "window": [
+      "2021-08-17",
+      "2024-03-04"
+     ]
+    },
+    "h2": {
+     "sharpe": NaN,
+     "ann_pct": 0.0,
+     "mdd_pct": 0.0,
+     "window": [
+      "2024-03-05",
+      "2026-09-11"
+     ]
+    },
+    "same_sign": false
+   },
+   "pass_G1": false,
+   "pass_G2": false,
+   "pass_G4_samesign": false,
+   "pass_all": false,
+   "kb": "kb1",
+   "desc": "分歧弱转强事件后 20 日内按新鲜度排序（事件信号→月频映射）",
+   "direction": "long",
+   "approx": null
+  }
+ ],
+ "combos": {
+  "fenzhi_w10": {
+   "leg": "fenzhi_w10",
+   "cash_frac_median": 0.0559,
+   "cash_frac_mean": 0.2528,
+   "cash_i": {
+    "lam25": {
+     "ann_pct": 22.75,
+     "sharpe": 1.297,
+     "vol_pct": 17.02,
+     "mdd_pct": -21.96,
+     "calmar": 1.04,
+     "n_days": 1230,
+     "d_sharpe": 0.0,
+     "d_ann_pp": 0.0,
+     "d_calmar": 0.0,
+     "d_mdd_pp": 0.0,
+     "gate": false
+    },
+    "lam50": {
+     "ann_pct": 22.75,
+     "sharpe": 1.297,
+     "vol_pct": 17.02,
+     "mdd_pct": -21.96,
+     "calmar": 1.04,
+     "n_days": 1230,
+     "d_sharpe": 0.0,
+     "d_ann_pp": 0.0,
+     "d_calmar": 0.0,
+     "d_mdd_pp": 0.0,
+     "gate": false
+    },
+    "lam75": {
+     "ann_pct": 22.75,
+     "sharpe": 1.297,
+     "vol_pct": 17.02,
+     "mdd_pct": -21.96,
+     "calmar": 1.04,
+     "n_days": 1230,
+     "d_sharpe": 0.0,
+     "d_ann_pp": 0.0,
+     "d_calmar": 0.0,
+     "d_mdd_pp": 0.0,
+     "gate": false
+    },
+    "lam100": {
+     "ann_pct": 22.75,
+     "sharpe": 1.297,
+     "vol_pct": 17.02,
+     "mdd_pct": -21.96,
+     "calmar": 1.04,
+     "n_days": 1230,
+     "d_sharpe": 0.0,
+     "d_ann_pp": 0.0,
+     "d_calmar": 0.0,
+     "d_mdd_pp": 0.0,
+     "gate": false
+    }
+   },
+   "increment": {
+    "M85k_a50": {
+     "ann_pct": 18.87,
+     "sharpe": 1.297,
+     "vol_pct": 14.19,
+     "mdd_pct": -18.58,
+     "calmar": 1.02,
+     "n_days": 1230,
+     "wB": 0.8333,
+     "wC": 0.1667,
+     "d_sharpe": 0.0,
+     "d_ann_pp": -3.88,
+     "d_calmar": -0.02,
+     "gate": false
+    },
+    "M85k_a100": {
+     "ann_pct": 15.02,
+     "sharpe": 1.297,
+     "vol_pct": 11.35,
+     "mdd_pct": -15.1,
+     "calmar": 0.99,
+     "n_days": 1230,
+     "wB": 0.6667,
+     "wC": 0.3333,
+     "d_sharpe": 0.0,
+     "d_ann_pp": -7.73,
+     "d_calmar": -0.05,
+     "gate": false
+    },
+    "M170k_a50": {
+     "ann_pct": 16.94,
+     "sharpe": 1.297,
+     "vol_pct": 12.77,
+     "mdd_pct": -16.86,
+     "calmar": 1.01,
+     "n_days": 1230,
+     "wB": 0.75,
+     "wC": 0.25,
+     "d_sharpe": 0.0,
+     "d_ann_pp": -5.81,
+     "d_calmar": -0.03,
+     "gate": false
+    },
+    "M170k_a100": {
+     "ann_pct": 11.2,
+     "sharpe": 1.297,
+     "vol_pct": 8.51,
+     "mdd_pct": -11.5,
+     "calmar": 0.97,
+     "n_days": 1230,
+     "wB": 0.5,
+     "wC": 0.5,
+     "d_sharpe": 0.0,
+     "d_ann_pp": -11.55,
+     "d_calmar": -0.07,
+     "gate": false
+    }
+   },
+   "base_100B": {
+    "ann_pct": 22.75,
+    "sharpe": 1.297,
+    "vol_pct": 17.02,
+    "mdd_pct": -21.96,
+    "calmar": 1.04,
+    "n_days": 1230
+   },
+   "cash_i_best_dS": 0.0,
+   "increment_best_dS": 0.0,
+   "combo_improve": false
+  },
+  "fenzhi_w20": {
+   "leg": "fenzhi_w20",
+   "cash_frac_median": 0.0559,
+   "cash_frac_mean": 0.2528,
+   "cash_i": {
+    "lam25": {
+     "ann_pct": 22.75,
+     "sharpe": 1.297,
+     "vol_pct": 17.02,
+     "mdd_pct": -21.96,
+     "calmar": 1.04,
+     "n_days": 1230,
+     "d_sharpe": 0.0,
+     "d_ann_pp": 0.0,
+     "d_calmar": 0.0,
+     "d_mdd_pp": 0.0,
+     "gate": false
+    },
+    "lam50": {
+     "ann_pct": 22.75,
+     "sharpe": 1.297,
+     "vol_pct": 17.02,
+     "mdd_pct": -21.96,
+     "calmar": 1.04,
+     "n_days": 1230,
+     "d_sharpe": 0.0,
+     "d_ann_pp": 0.0,
+     "d_calmar": 0.0,
+     "d_mdd_pp": 0.0,
+     "gate": false
+    },
+    "lam75": {
+     "ann_pct": 22.75,
+     "sharpe": 1.297,
+     "vol_pct": 17.02,
+     "mdd_pct": -21.96,
+     "calmar": 1.04,
+     "n_days": 1230,
+     "d_sharpe": 0.0,
+     "d_ann_pp": 0.0,
+     "d_calmar": 0.0,
+     "d_mdd_pp": 0.0,
+     "gate": false
+    },
+    "lam100": {
+     "ann_pct": 22.75,
+     "sharpe": 1.297,
+     "vol_pct": 17.02,
+     "mdd_pct": -21.96,
+     "calmar": 1.04,
+     "n_days": 1230,
+     "d_sharpe": 0.0,
+     "d_ann_pp": 0.0,
+     "d_calmar": 0.0,
+     "d_mdd_pp": 0.0,
+     "gate": false
+    }
+   },
+   "increment": {
+    "M85k_a50": {
+     "ann_pct": 18.87,
+     "sharpe": 1.297,
+     "vol_pct": 14.19,
+     "mdd_pct": -18.58,
+     "calmar": 1.02,
+     "n_days": 1230,
+     "wB": 0.8333,
+     "wC": 0.1667,
+     "d_sharpe": 0.0,
+     "d_ann_pp": -3.88,
+     "d_calmar": -0.02,
+     "gate": false
+    },
+    "M85k_a100": {
+     "ann_pct": 15.02,
+     "sharpe": 1.297,
+     "vol_pct": 11.35,
+     "mdd_pct": -15.1,
+     "calmar": 0.99,
+     "n_days": 1230,
+     "wB": 0.6667,
+     "wC": 0.3333,
+     "d_sharpe": 0.0,
+     "d_ann_pp": -7.73,
+     "d_calmar": -0.05,
+     "gate": false
+    },
+    "M170k_a50": {
+     "ann_pct": 16.94,
+     "sharpe": 1.297,
+     "vol_pct": 12.77,
+     "mdd_pct": -16.86,
+     "calmar": 1.01,
+     "n_days": 1230,
+     "wB": 0.75,
+     "wC": 0.25,
+     "d_sharpe": 0.0,
+     "d_ann_pp": -5.81,
+     "d_calmar": -0.03,
+     "gate": false
+    },
+    "M170k_a100": {
+     "ann_pct": 11.2,
+     "sharpe": 1.297,
+     "vol_pct": 8.51,
+     "mdd_pct": -11.5,
+     "calmar": 0.97,
+     "n_days": 1230,
+     "wB": 0.5,
+     "wC": 0.5,
+     "d_sharpe": 0.0,
+     "d_ann_pp": -11.55,
+     "d_calmar": -0.07,
+     "gate": false
+    }
+   },
+   "base_100B": {
+    "ann_pct": 22.75,
+    "sharpe": 1.297,
+    "vol_pct": 17.02,
+    "mdd_pct": -21.96,
+    "calmar": 1.04,
+    "n_days": 1230
+   },
+   "cash_i_best_dS": 0.0,
+   "increment_best_dS": 0.0,
+   "combo_improve": false
+  }
+ },
+ "kb5_event_test": {}
+}
