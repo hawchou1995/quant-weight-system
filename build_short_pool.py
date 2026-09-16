@@ -840,7 +840,10 @@ def calc_signals(as_of=None):
     # 2026-09-11 用户拍板升级 FB3-H20（持仓 10→20 日，月度级轮动）：3000 池 slip5 = 436.44%/年化 17.02%/mdd -36.06%/夏普 1.07/胜率 65.2%/725 笔
     #   （理想口径 493.54%/1.13）；旧线 T5/H10/S40（243.47%/0.834/55.5%/598 笔）退役；回撤扩大 9.9pp 但 Calmar 9.29→12.10 改善
     #   产物：short_v3_fund_slip20_summary.json / equity.csv（finalize_short_v3.py --asset fund）
-    fund_pool = S.load_fund_pool(3000)
+    # ⚠ 2026-09-16 修正：此处原为 load_fund_pool(3000)，与回测口径（finalize_short_v3 = 2000）**不同池**。
+    #   2026-09-13 用户拍板「生产池 3000 → 2000」（依据：2000 池研究 733.38%/夏普 1.316 > 3000 池 436.44%/1.07）
+    #   但当时只改了回测文件 —— 生产信号长期用 3000 池选基，回测数字无法对应。现对齐为 2000（回测=生产同池）。
+    fund_pool = S.load_fund_pool(2000)
     frows = []
     _fw = FUND_W_BULL if _in_mkt else FUND_W_BEAR
     _fsmin = FUND_SCORE_MIN if _in_mkt else FUND_S_BEAR

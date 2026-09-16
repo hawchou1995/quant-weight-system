@@ -97,7 +97,8 @@ def main():
     if fp.exists():
         for x in json.load(open(fp, encoding="utf-8"))["top"][:a.pool]:
             codes.add(x["code"])
-    # ⚠ 关键：基金信号的池 = short_engine.load_fund_pool(3000) 取「缓存目录按名排序的前 N 个文件」，
+    # ⚠ 关键：基金信号的池 = short_engine.load_fund_pool(2000)（2026-09-16 起与回测同池）
+    #   取「缓存目录按名排序的前 N 个文件」；本脚本默认刷 3000 作超集（多刷无害，防未来扩池）
     #   因此刷新范围必须与之对齐，否则信号仍在用旧净值（2026-09-14 实测：只刷跟踪池 126 只不够）。
     codes.update(f.stem for f in sorted(CACHE.glob("*.csv"))[:a.pool])
     for js in ("enhanced_data.js", "short_pool.js"):

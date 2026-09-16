@@ -1,0 +1,126 @@
+{
+ "prereg": {
+  "strategy": "FB3-H20",
+  "phases": [
+   0,
+   4,
+   8,
+   12,
+   16
+  ],
+  "slip_main_bps": 5,
+  "slip_robust_bps": 50,
+  "basis": "2021 起；生产与回测同池校验",
+  "date": "2026-09-16"
+ },
+ "pool_2000": {
+  "pool_arg": 2000,
+  "loaded": 1998,
+  "sharpe_med": 0.872,
+  "total_med": 311.83,
+  "sharpe_min": 0.62,
+  "sharpe_max": 1.336,
+  "phases": [
+   {
+    "offset": 0,
+    "total": 768.5,
+    "sharpe": 1.336,
+    "mdd": -26.66,
+    "trades": 742,
+    "annual": 22.39
+   },
+   {
+    "offset": 4,
+    "total": 248.52,
+    "sharpe": 0.778,
+    "mdd": -40.27,
+    "trades": 740,
+    "annual": 12.38
+   },
+   {
+    "offset": 8,
+    "total": 158.66,
+    "sharpe": 0.62,
+    "mdd": -27.67,
+    "trades": 816,
+    "annual": 9.29
+   },
+   {
+    "offset": 12,
+    "total": 328.8,
+    "sharpe": 1.003,
+    "mdd": -26.66,
+    "trades": 715,
+    "annual": 14.58
+   },
+   {
+    "offset": 16,
+    "total": 311.83,
+    "sharpe": 0.872,
+    "mdd": -27.87,
+    "trades": 732,
+    "annual": 14.14
+   }
+  ],
+  "slip50_off0": {
+   "total": 238.31,
+   "sharpe": 0.779,
+   "mdd": -35.21
+  }
+ },
+ "pool_0": {
+  "pool_arg": 0,
+  "loaded": 14707,
+  "sharpe_med": 0.949,
+  "total_med": 392.74,
+  "sharpe_min": 0.653,
+  "sharpe_max": 1.156,
+  "phases": [
+   {
+    "offset": 0,
+    "total": 444.32,
+    "sharpe": 1.001,
+    "mdd": -35.06,
+    "trades": 808,
+    "annual": 17.16
+   },
+   {
+    "offset": 4,
+    "total": 198.8,
+    "sharpe": 0.653,
+    "mdd": -49.66,
+    "trades": 773,
+    "annual": 10.77
+   },
+   {
+    "offset": 8,
+    "total": 321.16,
+    "sharpe": 0.855,
+    "mdd": -23.93,
+    "trades": 842,
+    "annual": 14.38
+   },
+   {
+    "offset": 12,
+    "total": 541.83,
+    "sharpe": 1.156,
+    "mdd": -19.78,
+    "trades": 716,
+    "annual": 18.98
+   },
+   {
+    "offset": 16,
+    "total": 392.74,
+    "sharpe": 0.949,
+    "mdd": -29.54,
+    "trades": 755,
+    "annual": 16.07
+   }
+  ],
+  "slip50_off0": {
+   "total": 88.09,
+   "sharpe": 0.425,
+   "mdd": -48.81
+  }
+ }
+}

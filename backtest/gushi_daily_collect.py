@@ -16,6 +16,7 @@
 import argparse
 import asyncio
 import json
+import re
 import subprocess
 import sys
 import time
@@ -304,6 +305,81 @@ def run_channels(ports, todo, dry_run):
     return None, role, 0, reason
 
 
+# ============ 自动续费（2026-09-16 用户授权：非 VIP 时自动续费并继续爬）============
+# 护栏（拍板）：① 只买 1 天档 30 积分；② 每日最多 1 次；③ 仅在确有缺失交易日时触发（周末/节假日不花分）；
+#              ④ 余额不足立即停并告警（不重试）；⑤ 论坛登录态若失效，走 LINUX DO 自助登录（同量化站策略）
+FORUM_PAY = "https://gushi.in/index.php?a=quant_points_payment&offer=vip_7d"
+RENEW_LOG = OUT / "renew_log.jsonl"
+
+
+def _renewed_today():
+    if not RENEW_LOG.exists():
+        return False
+    today = date.today().strftime("%Y-%m-%d")
+    try:
+        for ln in RENEW_LOG.read_text(encoding="utf-8").splitlines():
+            if ln.strip():
+                r = json.loads(ln)
+                if r.get("date") == today and r.get("ok"):
+                    return True
+    except Exception:
+        pass
+    return False
+
+
+def _log_renew(rec):
+    try:
+        with open(RENEW_LOG, "a", encoding="utf-8") as fh:
+            fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    except Exception:
+        pass
+
+
+def auto_renew(ws_url, dry=False):
+    """非 VIP 时续费 1 天卡。返回 True=已生效（或 dry 模式已就绪）。"""
+    if _renewed_today():
+        print("[renew] 今日已续费过（每日上限 1 次）——不重复扣分")
+        return False
+    print(f"[renew] 非 VIP → {'检查' if dry else '执行'}续费流程（VIP 1 天体验 / 30 论坛积分）")
+    asyncio.run(navigate(ws_url, FORUM_PAY))
+    time.sleep(8)
+    txt = asyncio.run(ev(ws_url, "document.body.innerText")) or ""
+    # 论坛未登录 → 走 LINUX DO 自助登录
+    if "登录" in txt and "立即兑换" not in txt:
+        print("[renew] 论坛未登录 → 走 LINUX DO 登录")
+        asyncio.run(ev(ws_url, "(()=>{const b=[...document.querySelectorAll('a,button')].find(e=>/LINUX DO/i.test(e.textContent)&&/登录/.test(e.textContent)); if(b){b.click();return 1} return 0})()"))
+        time.sleep(8)
+        asyncio.run(ev(ws_url, "(()=>{const b=[...document.querySelectorAll('button,a')].find(e=>/允许|授权|同意/.test(e.textContent)); if(b){b.click();return 1} return 0})()"))
+        time.sleep(10)
+        asyncio.run(navigate(ws_url, FORUM_PAY))
+        time.sleep(8)
+        txt = asyncio.run(ev(ws_url, "document.body.innerText")) or ""
+    m = re.search(r"论坛积分\s*(\d+)", txt)
+    bal = int(m.group(1)) if m else None
+    can = "立即兑换" in txt
+    print(f"[renew] 页面余额={bal} 可兑换={can}")
+    if bal is None or not can:
+        print("[WARN] 续费页异常（无余额/按钮）——请人工检查 gushi.in 论坛")
+        return False
+    if bal < 30:
+        print(f"[WARN] 论坛积分不足（{bal} < 30）——无法续费。请补积分后重跑（30天档需 600）")
+        _log_renew({"date": date.today().strftime("%Y-%m-%d"), "ok": False, "reason": "insufficient", "balance": bal})
+        return False
+    if dry:
+        print("[renew][dry] 流程就绪（未点击兑换，未扣分）")
+        return True
+    asyncio.run(ev(ws_url, "(()=>{const b=[...document.querySelectorAll('button,a')].find(e=>e.textContent.trim()==='立即兑换'); if(b){b.click();return 1} return 0})()"))
+    time.sleep(10)
+    t2 = asyncio.run(ev(ws_url, "document.body.innerText")) or ""
+    ok = "已生效" in t2
+    om = re.search(r"(QPP\d+[A-Z0-9]*)", t2)
+    _log_renew({"date": date.today().strftime("%Y-%m-%d"), "ok": ok,
+                "order": om.group(1) if om else None, "balance_before": bal, "plan": "vip_7d"})
+    print(f"[renew] {'✅ 已生效' if ok else '❌ 未确认生效'}"
+          f"{'（订单 ' + om.group(1) + '）' if om else ''}")
+    return ok
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-launch", action="store_true")
@@ -311,6 +387,8 @@ def main():
     ap.add_argument("--days", type=int, default=5, help="自愈回补窗口：最近 N 个交易日")
     ap.add_argument("--dry-run", action="store_true", help="只取数不落盘（验证登录态/接口）")
     ap.add_argument("--keep-open", action="store_true", help="采集完不关闭自动化窗口（默认关掉，不留残窗）")
+    ap.add_argument("--renew", action="store_true", help="非 VIP 时自动续费 1 天卡（30 论坛积分）后继续采集")
+    ap.add_argument("--renew-dry", action="store_true", help="只演练续费流程（不点击兑换、不扣分）")
     a = ap.parse_args()
 
     todo = [a.date] if a.date else missing_days(a.days)
@@ -321,6 +399,17 @@ def main():
     ports, launched = candidate_ports(a.no_launch)
     print(f"[todo] 待采日期 {len(todo)} 个：{', '.join(todo)}")
     used, role, total, reason = run_channels(ports, todo, a.dry_run)
+    # 非 VIP（数据脱敏）→ 自动续费后重试一次（护栏见 auto_renew 注释）
+    if reason == "nomask" and (a.renew or a.renew_dry):
+        try:
+            _ws = page_ws(ports[0][0])
+            if auto_renew(_ws, dry=a.renew_dry):
+                if a.renew_dry:
+                    print("[renew][dry] 已就绪（真实运行会自动兑换并继续采集）")
+                    sys.exit(0)
+                used, role, total, reason = run_channels(ports, todo, a.dry_run)
+        except Exception as e:
+            print(f"[WARN] 自动续费异常（未阻断）：{str(e)[:160]}")
     if not used and not launched and not a.no_launch and all(p != AUTO_PORT for p, _ in ports):
         print("[boot] 在线通道均未取到数据，拉起自动化 profile 再试…")
         if boot_auto_profile():

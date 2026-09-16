@@ -136,7 +136,8 @@ if not fails:
     gp = _gushi_py()
     if gp:
         print(f"\n========== gushi 策略股池采集 collect_gushi ==========", flush=True)
-        r = subprocess.run([gp, "backtest/gushi_daily_collect.py", "--days", "10"],
+        # --renew：非 VIP 时自动续费 1 天卡（30 论坛积分）后继续采集（用户 2026-09-16 授权；护栏见脚本注释）
+        r = subprocess.run([gp, "backtest/gushi_daily_collect.py", "--days", "10", "--renew"],
                            cwd=str(BASE), capture_output=True, text=True, timeout=900)
         for ln in ((r.stdout or "") + (r.stderr or "")).strip().splitlines()[-12:]:
             print(ln, flush=True)
