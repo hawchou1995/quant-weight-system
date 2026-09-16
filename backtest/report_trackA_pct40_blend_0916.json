@@ -1,0 +1,203 @@
+{
+ "A_prod_v2(无pct40)": {
+  "single": {
+   "cagr_pct": 12.27,
+   "sharpe": 0.981,
+   "mdd_pct": -16.47,
+   "calmar": 0.75,
+   "days": 1230
+  },
+  "scan": [
+   {
+    "w_A": 0,
+    "cagr_pct": 17.61,
+    "sharpe": 1.292,
+    "mdd_pct": -14.94,
+    "calmar": 1.18,
+    "days": 1230
+   },
+   {
+    "w_A": 0.05,
+    "cagr_pct": 17.07,
+    "sharpe": 1.277,
+    "mdd_pct": -14.77,
+    "calmar": 1.16,
+    "days": 1230
+   },
+   {
+    "w_A": 0.1,
+    "cagr_pct": 16.54,
+    "sharpe": 1.26,
+    "mdd_pct": -14.61,
+    "calmar": 1.13,
+    "days": 1230
+   },
+   {
+    "w_A": 0.15,
+    "cagr_pct": 16.0,
+    "sharpe": 1.239,
+    "mdd_pct": -14.44,
+    "calmar": 1.11,
+    "days": 1230
+   },
+   {
+    "w_A": 0.2,
+    "cagr_pct": 15.46,
+    "sharpe": 1.216,
+    "mdd_pct": -14.28,
+    "calmar": 1.08,
+    "days": 1230
+   },
+   {
+    "w_A": 0.3,
+    "cagr_pct": 14.38,
+    "sharpe": 1.16,
+    "mdd_pct": -13.95,
+    "calmar": 1.03,
+    "days": 1230
+   },
+   {
+    "w_A": 0.4,
+    "cagr_pct": 13.3,
+    "sharpe": 1.092,
+    "mdd_pct": -13.62,
+    "calmar": 0.98,
+    "days": 1230
+   }
+  ]
+ },
+ "A_lab_base(无pct40)": {
+  "single": {
+   "cagr_pct": 13.92,
+   "sharpe": 0.858,
+   "mdd_pct": -21.01,
+   "calmar": 0.66,
+   "days": 1230
+  },
+  "scan": [
+   {
+    "w_A": 0,
+    "cagr_pct": 17.61,
+    "sharpe": 1.292,
+    "mdd_pct": -14.94,
+    "calmar": 1.18,
+    "days": 1230
+   },
+   {
+    "w_A": 0.05,
+    "cagr_pct": 17.18,
+    "sharpe": 1.274,
+    "mdd_pct": -14.7,
+    "calmar": 1.17,
+    "days": 1230
+   },
+   {
+    "w_A": 0.1,
+    "cagr_pct": 16.75,
+    "sharpe": 1.253,
+    "mdd_pct": -14.46,
+    "calmar": 1.16,
+    "days": 1230
+   },
+   {
+    "w_A": 0.15,
+    "cagr_pct": 16.31,
+    "sharpe": 1.229,
+    "mdd_pct": -14.22,
+    "calmar": 1.15,
+    "days": 1230
+   },
+   {
+    "w_A": 0.2,
+    "cagr_pct": 15.87,
+    "sharpe": 1.203,
+    "mdd_pct": -13.98,
+    "calmar": 1.14,
+    "days": 1230
+   },
+   {
+    "w_A": 0.3,
+    "cagr_pct": 14.99,
+    "sharpe": 1.142,
+    "mdd_pct": -13.49,
+    "calmar": 1.11,
+    "days": 1230
+   },
+   {
+    "w_A": 0.4,
+    "cagr_pct": 14.1,
+    "sharpe": 1.073,
+    "mdd_pct": -14.58,
+    "calmar": 0.97,
+    "days": 1230
+   }
+  ]
+ },
+ "A_lab_pct40(启用pct40)": {
+  "single": {
+   "cagr_pct": 16.52,
+   "sharpe": 1.037,
+   "mdd_pct": -21.01,
+   "calmar": 0.79,
+   "days": 1230
+  },
+  "scan": [
+   {
+    "w_A": 0,
+    "cagr_pct": 17.61,
+    "sharpe": 1.292,
+    "mdd_pct": -14.94,
+    "calmar": 1.18,
+    "days": 1230
+   },
+   {
+    "w_A": 0.05,
+    "cagr_pct": 17.3,
+    "sharpe": 1.284,
+    "mdd_pct": -14.7,
+    "calmar": 1.18,
+    "days": 1230
+   },
+   {
+    "w_A": 0.1,
+    "cagr_pct": 17.0,
+    "sharpe": 1.273,
+    "mdd_pct": -14.46,
+    "calmar": 1.18,
+    "days": 1230
+   },
+   {
+    "w_A": 0.15,
+    "cagr_pct": 16.69,
+    "sharpe": 1.26,
+    "mdd_pct": -14.22,
+    "calmar": 1.17,
+    "days": 1230
+   },
+   {
+    "w_A": 0.2,
+    "cagr_pct": 16.38,
+    "sharpe": 1.244,
+    "mdd_pct": -13.98,
+    "calmar": 1.17,
+    "days": 1230
+   },
+   {
+    "w_A": 0.3,
+    "cagr_pct": 15.74,
+    "sharpe": 1.205,
+    "mdd_pct": -13.5,
+    "calmar": 1.17,
+    "days": 1230
+   },
+   {
+    "w_A": 0.4,
+    "cagr_pct": 15.1,
+    "sharpe": 1.156,
+    "mdd_pct": -14.52,
+    "calmar": 1.04,
+    "days": 1230
+   }
+  ]
+ }
+}
