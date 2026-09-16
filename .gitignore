@@ -53,3 +53,12 @@ v8_factor_cache.pkl.bak*
 # 2026-09-11 amount=0 事故的原始 CSV 备份（409 只，本地留存不入库）
 _backup_amt_0911/
 backtest/tongzhou_oauth.json
+
+# 大体积研究数据（禁入库）
+backtest/kv_resonance_0913/
+backtest/khunter_timing_out/
+backtest/new_factor_port_out/
+backtest/asts_0916/
+backtest/tz_data/
+*.npz
+*.npy

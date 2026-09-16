@@ -81,3 +81,74 @@
 | **事件研究器**（compute_market_reaction_windows） | **可用的验证器**（目标由调用方声明、只吃事后价格），**不是因子源** |
 | **行业资金流**（fin_data__） | **唯一可转因子源**：字段干净、PIT 安全、31 行业 × 623 日；代价=2024-01 起 + 5% 日历缺口 |
 | **图谱类**（crowding / chain map / subjects） | crowding 与 subjects **上游挂**；chain map 仅定性 + 身份映射。`identity.source_ids` 的跨源代码映射（lycode↔申万↔篮子）是**值得单独收编的副产品** |
+
+---
+---
+
+# 【第二轮追加】2026-09-16 · 剩余 33 工具（`doc_search__` 17 + `same_boat__` 16）
+
+> 范围界定：84 = `fin_data__`30 + `fin_graph__`21（第一轮 51）+ **`doc_search__`17 + `same_boat__`16（本轮 33）**
+> 证据：`backtest/tz_data/raw/` 本轮 **80 份原始返回**（序号 30~99 + `h`/`i` 探针前缀），全量未截断（最大单份 402 KB）
+> 详细报告：**`backtest/报告-同舟MCP剩余33工具_20260916.md`**
+> 纪律：33/33 全部真实调用过（含失败），无望文生义；全表无 token 明文。
+
+## 六、本轮 33 工具判定一览（简表，字段级明细见详报 §一）
+
+### 6.1 `doc_search__`（17）
+
+| 工具 | 判定 | 一句话结论 |
+|---|---|---|
+| `search_announcements` | **辅助** | **唯一能按"类型+日期"全市场枚举的公告源**；`limit` **硬上限 50、无翻页** → 计数被系统性截断，只能取样不能计数 |
+| `search_company_news` | **辅助** | 字段全（含 `event_type/related_industry/related_stock`），但**纯日期 → `INVALID_QUERY`** |
+| `search_hot_news` | **辅助** | **唯一允许纯日期枚举的新闻源**（单日 23 条），量小 |
+| `search_morning_trading` | **辅助** | 纯日期可枚举（单日 4 条），源 2018-05-08 起 37,276 条 |
+| `search_research_reports` | **辅助** | 公司级须传 `company/ticker`+长窗；**纯日期无返回** → 不能按日枚举 |
+| `search_documents` | **辅助** | 统一入口 9 种 doc_type；research 路径单次 ≤20 |
+| `search_events` | **辅助** | 结构化事件；纯日期 → `INVALID_QUERY` |
+| `search_normalized_events` | **辅助** | `events[{event_date,event_category,event_type[]}]`，弱版日历 |
+| `get_entity_event_timeline` | **辅助** | 复盘主干候选（茅台 180 天 → 18,931 字符） |
+| `search_backtested_events` | **不可用（回测）**/辅助 | 沿用第一轮"疑似前视"判词，本轮复测一致 |
+| `get_event_backtest` | **不可用（回测）**/辅助 | 同上（传 `doc_id` 可正常返回 1,567 字符） |
+| `aggregate_similar_event_backtest` | ❌ **不可用（服务端坏）** | **本轮复测**：只传 `query` 也报网关层 `-32012`；两种入参形态全部失败 |
+| `get_document` | **辅助** | `news/company_news/research/hot_news/announcement/morning_trading` **6 类全部成功**；`doc_id` 是短期 opaque 引用，**禁止持久化** |
+| `get_document_summaries` | **辅助** | 1~5 篇有界并发；必须用当次 `evidence_ref` |
+| `get_document_source_coverage` | **辅助（最有价值单品）** | **11 源完整数据地图 + 日期边界**（research 862 万条/2002 起、announcement 156 万条/2018 起、report_chart 486 万张） |
+| `get_research_coverage` | **辅助/受限** | **`mapped_count=0`，6/6 票全失**；`sample_count/yearly_counts` 可用但**疑似非 PIT** |
+| `list_categories` | **辅助** | 索引路由探查（`all/default` → `daily_event_analysis, report_chunks_data`） |
+
+### 6.2 `same_boat__`（16）
+
+| 工具 | 判定 | 一句话结论 |
+|---|---|---|
+| `get_schema` | **辅助（必读前置）** | 9 张虚拟表全列清单，应作所有 `same_boat__` 调用的第一跳 |
+| `list_research_sectors` | **辅助（标的对齐钥匙）** | **100 个行业目录**，含 `category`(申万一级名) + `market_code`(申万三级 `.SL`) |
+| `search_research_sectors` | **辅助** | 参数是 **`query` 不是 `keyword`**；"光模块" → 0 条（须用其词表） |
+| `list_market_news` | **辅助** | `popularity_score/importance_score/sectors/analysts/publish_time`；`sectors` 须用其词表 |
+| `get_market_news` | **辅助** | 单条要闻详情 |
+| `get_market_news_analysis` | **辅助** | **`analyst_id` 必填且须用该条新闻自己的分析师**（用错→`result=null`） |
+| `list_market_viewpoints` | **辅助** | ⚠️ `limit=200` 实收 50 条**且全在同一天** → **只是当日报表快照，不是历史面板** |
+| `list_sector_viewpoints` | **辅助** | 🔴 **历史硬上限 1 年**：氯碱翻到底 648 条（最早 2025-09-17）；银行Ⅲ 438 条 |
+| `list_analyst_viewpoints` | **辅助** | 单分析师观点（祖老师 10 条 → 118,148 字符） |
+| `get_market_viewpoint_detail` | **辅助** | 观点全文（分节 + images/charts） |
+| `list_market_quotes` | ❌ **不可用（上游挂）** | `MARKET_QUOTE_UPSTREAM_UNAVAILABLE`，**3 次实测** |
+| `get_market_quote_analysis` | ❌ **不可用（同上）** | 取不到任何 `quote_id`，必然连带 |
+| `search_analysts` | **辅助** | 20 位分析师，含 `follow_count/ref_count/tags/research_categories` |
+| `get_analyst_profile` | **辅助** | 单分析师资料（`follow_count=33`/`ref_count=763`） |
+| `get_research_visual_evidence` | **辅助** | `research-visual/1` 图表证据；`market_viewpoint` **不接受 `analyst_id`** |
+| `generate_content_url_link` | **辅助（回链交付）** | `content_type ∈ {market_viewpoint, market_news, market_quote}`；`market_news` 需带 `analyst_id` |
+
+## 七、本轮判词
+
+| 轴 | 判词 |
+|---|---|
+| **`same_boat__` 观点/新闻/分析师轴（16）** | **全部真实可用（除行情异动 2 件上游挂）**，字段结构化程度高（`sentiment_score`/`analyst_count`/`importance_score`/`popularity_score`/`publish_time`）→ **复盘/选题/拥挤度极佳**；但**历史硬上限 1 年** → **不可转因子** |
+| **`doc_search__` 新闻/研报轴（17）** | 可检索、字段干净、**PIT 到秒**；但纯日期枚举大多被封、公告 `limit≤50` 无翻页 → 计数不可信、`get_research_coverage` 映射全失、`aggregate_similar_event_backtest` 网关层永久失败 → **不可转因子**，**复盘归因 + 原文取证**价值高 |
+| **本轮因子结论** | 🔴 **0 个可转因子**。两条候选轴均被历史深度卡死（观点 1 年 / 公告·研报检索侧 1 年余，库存虽到 2002·2018 但检索不到）→ **无法满足统一口径回测**，故**未触发引擎**。基线已复核：`asts_0916/base_equity_off0.csv` 170,000 → 480,479.01 / 1231 交易日 ≈ **22.87% 年化**（与参考一致，可随时复跑） |
+| **上游/服务端坏（3 件）** | `aggregate_similar_event_backtest`（`-32012`）、`list_market_quotes` + `get_market_quote_analysis`（`UPSTREAM_UNAVAILABLE`） |
+
+## 八、运维补记
+
+1. **token 过期 + refresh 失效**：`refresh_token` 被服务端判 `device session is no longer active` → **必须重走设备码授权**；本轮新增 `backtest/_tz_device_auth_0916.py`。
+2. **修复 `connector_tongzhou.py` 静默 401**：`token_obtained_at` 缺失时不触发续期 → 已加 `got <= 0` 强制续期分支（refresh_token 会轮换并落盘）。
+3. **`MCPClient.call_tool` 会把返回截到 6000 字符** → 本轮全部改用 `rpc("tools/call")` 直取，保证原始返回全量未截断。
+

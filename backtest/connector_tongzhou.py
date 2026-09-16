@@ -57,7 +57,10 @@ def _auto_token():
     tok = cfg.get("token") or {}
     got = float(cfg.get("token_obtained_at") or 0)
     life = int(tok.get("expires_in") or 0)
-    need = (not tok.get("access_token")) or (got > 0 and _t.time() - got > max(life - 300, 60))
+    # 2026-09-16 加固：token_obtained_at 缺失（或过期）时必须无条件续期，
+    # 否则旧的 access_token（30min 寿命）会被一直复用 → 静默 401。
+    need = ((not tok.get("access_token")) or (got <= 0)
+            or (got > 0 and _t.time() - got > max(life - 300, 60)))
     if need:
         rt = tok.get("refresh_token")
         cid = (cfg.get("client_device") or cfg.get("client") or {}).get("client_id")
