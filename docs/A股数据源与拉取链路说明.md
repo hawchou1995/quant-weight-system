@@ -757,6 +757,19 @@ python daily_refresh.py --force --skip-data
 # 4) 首选源恢复后回补全市场
 python tickflow_update.py --workers 10
 ```
+**★★ 最终定案（2026-09-16，纠正 09-15 的结论）**：真正的「进程永不退出」根因是
+**py_mini_racer 在解释器退出阶段 join 其 `run_event_loop` 线程且无超时**（与代理无关）。
+- **最小复现**：一个**只**执行 `MiniRacer(); c.eval("1+1")` 的脚本 → 解释器退不出（外部 `timeout` 杀掉，exit=124）；
+  线程表可见 `Thread-1 (run_event_loop)` 残留。
+- 因此 0914 / 0915 / 0916 三天日志都恰好停在「复权基准检测完成」之后——**复权检测是唯一使用 akshare
+  （→ py_mini_racer JS 解码）的相位**。
+- **修复**：`update_daily.py` 在 `__main__` 收尾处 `sys.stdout.flush(); os._exit(rc)`（绕过 atexit / 线程 join）。
+  验证：同一最小复现脚本加 `os._exit(0)` → **exit=0 秒退**；真实数据步端到端（`REBASE_BUDGET_S=8 --limit 2`）
+  → **14 秒自行退出、rc=0**（修复前必被 timeout 杀）。
+- 09-15 记录的「akshare 请求无 timeout × 代理抖动」是**另一**真实问题（循环内单候选阻塞），
+  由「单候选 90s 闸」兜住；相位预算同时由 1500s 上调为 **2400s（可 env `REBASE_BUDGET_S` 覆盖）**
+  ——实测 400 候选正常需 ~30min（0916 只跑完 336/400 就耗尽 1500s）。两者都保留。
+
 **✅ 根因已定位并修复（2026-09-15 深夜）**：真因不是「线程池缺 shutdown」，而是
 **akshare `stock_zh_a_daily` 内部的 `requests.get` 不带 timeout**（`akshare/stock/stock_zh_a_sina.py:177`），
 而**本机代理（`127.0.0.1:<随机端口>`，VPN/Clash 类）会抖动**——代理一挂/半死，该请求就永久阻塞，
