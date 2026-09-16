@@ -696,13 +696,13 @@ def bt_all_html():
             '——十重证伪确认负期望（ADR-0006/0007），历史曲线与明细见更新日志 v5.9~v5.11.15 与 backtest/ 报告存档。</div>')
     return ('<div class="card" id="bt-all">\n'
             '<h2>📊 回测参考 <span class="badge badge-auto">中/长线 · 股票按权限分层</span></h2>\n'
-            f'<div class="sub"><b>三轨 60/10/30（2026-09-14 调整：卫星内 轨A/轨B = 25/75）</b>：主仓 = 基金 NAV 动量牛熊 regime（牛市 Top10/熊市 Top3）｜ 卫星 = 主板量价因子选股（全审计过闸）｜ 信号：<code>backtest/signal_satellite_0913.py</code> · <span style="color:#f59e0b;font-weight:600">看板构建 {__import__("datetime").datetime.now():%Y-%m-%d %H:%M}</span></div>\n'
+            f'<div class="sub"><b>三轨 60/0/40（2026-09-16：轨A 冷门低波退休 → 卫星 100% 轨B）</b>：主仓 = 基金 NAV 动量牛熊 regime（牛市 Top10/熊市 Top3）｜ 卫星 = 主板量价因子选股（全审计过闸）｜ 信号：<code>backtest/signal_satellite_0913.py</code> · <span style="color:#f59e0b;font-weight:600">看板构建 {__import__("datetime").datetime.now():%Y-%m-%d %H:%M}</span></div>\n'
             '<div class="sub" style="color:var(--sub)">💧 <b>滑点敏感性</b>（每边，sweep_ml_slip.py 扫描）：中长线换手低、影响显著小于短线 —— 股票 20bps 收益 -23%（夏普 1.58→1.43）、30bps -31% ｜ 历史固定池（已去除）20bps -13%、30bps -18% —— 实盘 10-20bps 区间内中长线策略稳健</div>\n'
             '<div class="sub" style="color:#d97706">🐻 <b>9/1 牛熊独立权重验证（修正引擎 T+1 · regime=沪深300&gt;MA200 同口径）</b>：生产口径 A（牛开熊清 + 固定权重 0.35/0.25/0.20/0.20）收益 +28.3%/夏普 0.229/回撤 -27.15% 仍最优；牛攻熊守双权重 B/C/D/E 变体（熊市开仓）全面恶化（-25.9%~-65.0%）→ <b>中长期维持「牛开熊清」，熊市开仓不可行</b>（与短线基金相反：基金熊市防守开仓 +398pp 因选到避险型基金）</div>\n'
             '<div class="sub" style="margin-top:10px;padding:8px 10px;background:rgba(59,130,246,.08);border-left:3px solid #3b82f6;border-radius:4px">'
-            '<b>🎯 三轨配置（2026-09-14 调整 · 60/10/30）</b>｜'
+            '<b>🎯 三轨配置（2026-09-16 · 60/0/40 · 轨A 已退休）</b>｜'
             '<b>① 主仓 FB3-H20</b>（60%）：基金 NAV 动量牛熊 regime，牛市 Top10/熊市 Top3 · 2000 池回测 +733.4%/年化 21.95%/回撤 -27.0%/夏普 1.316｜'
-            '<b>② 冷门低波卫星</b>（卫星内 25%）：主板 ln_amt20+atr20+turn20 三低 Top20（中证1000ETF 破 MA20 → 半仓 Top10）· 30 日调仓 · 回测（2021-04起 · 1M 口径）夏普 0.96/年化 11.79%/回撤 -16.5% · 30 相位中位夏普 0.827（+pct40 后 1.090，待启用）（轨A pct40 待启用；旧口径数字不可复现，已作废弃用）｜'
+            '<b>② 冷门低波卫星 · 已退休（2026-09-16，零实盘资金，仅留对照）</b>（原卫星内 25%）：主板 ln_amt20+atr20+turn20 三低 Top20（中证1000ETF 破 MA20 → 半仓 Top10）· 30 日调仓 · 回测（2021-04起 · 1M 口径）夏普 0.96/年化 11.79%/回撤 -16.5% · 30 相位中位夏普 0.827（+pct40 后 1.090，待启用）（轨A pct40 待启用；旧口径数字不可复现，已作废弃用）｜'
             '<b>③ SUPER 卫星</b>（30% · 2026-09-14 配比调整；2026-09-13 替换 A4D）：13 因子（A4D 6 + Z哥战法原子 7：牛绳/止损空间/距BBI 等）Top20 月频 + 中证1000&lt;MA20 半仓且高波半区 · 回测 off0 年化 22.87%/<b>相位中位 1.151</b>/回撤 -22.0% · 安慰剂 500 p=0.000 · 50bp 压力档 S 1.00 · 100 万对照 S 1.30｜'
             '信号：<code>backtest/signal_satellite_0913.py</code>（每日收盘跑 → T+1 开盘清单，双卫星已交付；FB3 轨信号接入中）· '
             '⚠ 风险披露：冷门低波轨 atr20 的 IC 方向在 fwd 固定持有语义下与调仓制相反（factorcombo 交叉验证），<b>先小额/模拟盘验证再放大</b>；三轨均为 2021 起回测口径，2021-2026 为结构性分化窗口</div>\n'
@@ -1451,8 +1451,8 @@ try:
                 f'<div class="tbl-wrap"><table class="tbl sat-tbl" data-t="{track}"><thead><tr>{head}</tr></thead><tbody>{tds}</tbody></table></div>')
 
     SAT_CARD = (f'<div class="card" id="sat-card">\n'
-                f'<h2>🛰️ 双卫星目标持仓 <span class="badge badge-auto">三轨 60/10/30 · 数据截至 {_sat["asof"]}（收盘）</span></h2>\n'
-                f'<div class="sub">信号生成：<code>backtest/signal_satellite_0913.py</code>（每日收盘跑 → T+1 开盘清单）· 资金占比：卫星内 轨A 25%/轨B 75%（2026-09-14 拍板，原 50/50）｜三轨口径 FB3-H20 主仓 60%· 目标持仓为<b>下次调仓的完整清单</b>（非增量）· 评分列悬浮可见拆解 · 操作列=相对模拟盘当前持仓</div>\n'
+                f'<h2>🛰️ 双卫星目标持仓 <span class="badge badge-auto">三轨 60/0/40 · 轨A 已退休 · 数据截至 {_sat["asof"]}（收盘）</span></h2>\n'
+                f'<div class="sub">信号生成：<code>backtest/signal_satellite_0913.py</code>（每日收盘跑 → T+1 开盘清单）· 资金占比：<b>轨B 100%（轨A 已于 2026-09-16 退休）</b>——退休依据：组合层扫描 w_A 越高组合越差（0% 17.61%/夏普1.292 vs 10% 16.54%/1.260）· 与轨B 日收益相关 0.731 无分散价值 · 5% 权重整手不可执行（最低可执行≈12%，而 12% 不优于 0%）｜三轨口径 FB3-H20 主仓 60%· 目标持仓为<b>下次调仓的完整清单</b>（非增量）· 评分列悬浮可见拆解 · 操作列=相对模拟盘当前持仓</div>\n'
                 f'{_sat_rows("track_a")}\n{_sat_rows("track_b")}\n</div>')
 except Exception as _e:
     SAT_CARD = (f'<div class="card" id="sat-card"><h2>🛰️ 双卫星目标持仓</h2>'
@@ -1867,7 +1867,7 @@ html = f"""<!doctype html>
 <div class="card" id="sys-auto">
 <div class="sys-head">
 <div class="sys-head-top">
-<h2>🛰️ 三轨中长线 <span class="view-badge auto">FB3-H20 主仓 + 冷门低波 / SUPER 双卫星 · 资金 60/10/30（卫星内 A:B=1:3）</span></h2>
+<h2>🛰️ 三轨中长线 <span class="view-badge auto">FB3-H20 主仓 + 冷门低波 / SUPER 双卫星 · 资金 60/0/40（轨A 已退休）</span></h2>
 </div>
 <div class="sys-head-tags">
 <span class="badge badge-auto">v9 股票分层战法已退役（十重证伪 · ADR-0006/0007）</span>

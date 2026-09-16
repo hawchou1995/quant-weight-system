@@ -69,7 +69,7 @@ for c in ln_top:
         "parts": f"额 {p_amt:.0f} · 波 {p_atr:.0f} · 换 {p_turn:.0f}（各 0-33.3）",
         "detail": f"额分位{amt_pct[c]:.0%}·波分位{atr_pct[c]:.0%}·换手分位{turn_pct[c]:.0%}（三低合分越高越冷门低波低换手）",
         "amount": round(CAP_A / n_a),
-        "action": "持有" if c in held_a else "新建仓",
+        "action": "已退休·不执行" if CAP_A == 0 else ("持有" if c in held_a else "新建仓"),
     })
 
 # ---- 轨 B：A4D（r6b 原引擎 icir 6 因子）----

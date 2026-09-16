@@ -195,7 +195,7 @@ def main():
     for r in fb3["rows"]:
         print(f"    {r['code']} {r['name']} 动量分 {r['score']}")
     print(f"  市况门控：{'开' if fb3['gate'].get('open') else '关（熊市防守）'}\n")
-    for track, top, reb, last_r in (("轨A 冷门低波三低 Top20/30d", ln_top, REBAL_LN, st["ln_atr"]["last_rebal"]),
+    for track, top, reb, last_r in (("轨A 冷门低波三低 Top20/30d【已退休 0916·仅对照·勿执行】", ln_top, REBAL_LN, st["ln_atr"]["last_rebal"]),
                                     ("轨B SUPER Top20/月频", su_top, 20, st["super"]["last_rebal"])):
         held = list(st["ln_atr" if "冷门" in track else "super"]["holdings"].keys())
         due = (not last_r) or (di_last - days_ix.index(pd.Timestamp(last_r)) >= reb)
