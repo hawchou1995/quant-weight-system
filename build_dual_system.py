@@ -151,8 +151,7 @@ def _sat_paper_card(path, tk, title):
 
 SAT_PAPER_B_CARD = _sat_paper_card(BASE / "backtest" / "satellite_paper_b.json", "track_b",
                                    "🧪 轨B 模拟盘（主轨 · SUPER 13 因子 Top20）")
-SAT_PAPER_A_CARD = _sat_paper_card(BASE / "backtest" / "satellite_paper_a.json", "track_a",
-                                   "🧪 轨A 模拟盘（对照轨 · 冷门低波 · 零实盘资金）")
+# 轨A 模拟盘卡已于 2026-09-16 随轨A 退休一并移除（用户指令：看板不留轨A 内容）
 
 # 基金主仓（轨C FB3-H20）模拟盘卡（2026-09-14 用户指出「中长线基金没有模拟盘」后补齐）
 _fp_f = BASE / "backtest" / "fund_paper.json"
@@ -503,10 +502,7 @@ def load_curve_norm(f):
 
 v_fund = load_curve_norm("short_v3_fund_slip20_equity.csv")  # 2026-09-13 切 FB3-H20 2000 池曲线（原 v8_fund_equity.csv 退役）
 # 双卫星数据源（2026-09-13 三轨拍板）
-s_ln = json.load(open(BASE / "backtest" / "lnatr_v2_summary_0915.json", encoding="utf-8")) if (BASE / "backtest" / "lnatr_v2_summary_0915.json").exists() else {}
-LN_TAG = "冷门低波 ln_amt20+atr20+turn20 三低 · Top20 · 30日调仓 + 中证1000ETF 破MA20 半仓闸（2021-04起 · 20bps · 1M容量中性口径）"
-LN_TAG += " · 窗口 2021-04~2026-09 · off0 夏普 0.96/年化 11.79% · 30 相位中位 0.827（+pct40 后 1.090 待启用）· 旧口径数字不可复现已废弃用"
-v_ln = load_curve_norm("backtest/lnatr_v2_equity_0915.csv")
+s_ln = {}          # 轨A 已于 2026-09-16 退休：摘要/曲线/标签全部移除
 
 _sup = json.load(open(BASE / "backtest" / "oss_0913" / "super_combo_0913.json", encoding="utf-8")) if (BASE / "backtest" / "oss_0913" / "super_combo_0913.json").exists() else {}
 if _sup:
@@ -689,23 +685,21 @@ def bt_all_html():
     """中长线回测参考 5 卡（股票分层 4 + 基金；2026-08-17 去 ETF）"""
     cards = "".join([
         bt_card("bt-fund", "🥇 主仓 FB3-H20 基金线", FUND_TAG, s_fund, "curve-chart-fund", color="#3b82f6"),
-        bt_card("bt-ln", "🥈 卫星·冷门低波", LN_TAG, s_ln, "curve-chart-ln", color="#10b981", sub="2021-04~2026-09 · 30相位中位"),
         bt_card("bt-super", "🥉 卫星·SUPER", SUPER_TAG, s_super, "curve-chart-super", color="#8b5cf6"),
     ])
     _ret = ('<div class="sub" style="color:#ef4444">⛔ <b>v9 股票分层战法（一体/主板/创业板/科创板四卡）已于 2026-09-13 退役</b>'
             '——十重证伪确认负期望（ADR-0006/0007），历史曲线与明细见更新日志 v5.9~v5.11.15 与 backtest/ 报告存档。</div>')
     return ('<div class="card" id="bt-all">\n'
             '<h2>📊 回测参考 <span class="badge badge-auto">中/长线 · 股票按权限分层</span></h2>\n'
-            f'<div class="sub"><b>三轨 60/0/40（2026-09-16：轨A 冷门低波退休 → 卫星 100% 轨B）</b>：主仓 = 基金 NAV 动量牛熊 regime（牛市 Top10/熊市 Top3）｜ 卫星 = 主板量价因子选股（全审计过闸）｜ 信号：<code>backtest/signal_satellite_0913.py</code> · <span style="color:#f59e0b;font-weight:600">看板构建 {__import__("datetime").datetime.now():%Y-%m-%d %H:%M}</span></div>\n'
+            f'<div class="sub"><b>双轨 60/0/40（2026-09-16 起：卫星单轨化）</b>：主仓 = 基金 NAV 动量牛熊 regime（牛市 Top10/熊市 Top3）｜ 卫星 = 主板量价因子选股（全审计过闸）｜ 信号：<code>backtest/signal_satellite_0913.py</code> · <span style="color:#f59e0b;font-weight:600">看板构建 {__import__("datetime").datetime.now():%Y-%m-%d %H:%M}</span></div>\n'
             '<div class="sub" style="color:var(--sub)">💧 <b>滑点敏感性</b>（每边，sweep_ml_slip.py 扫描）：中长线换手低、影响显著小于短线 —— 股票 20bps 收益 -23%（夏普 1.58→1.43）、30bps -31% ｜ 历史固定池（已去除）20bps -13%、30bps -18% —— 实盘 10-20bps 区间内中长线策略稳健</div>\n'
             '<div class="sub" style="color:#d97706">🐻 <b>9/1 牛熊独立权重验证（修正引擎 T+1 · regime=沪深300&gt;MA200 同口径）</b>：生产口径 A（牛开熊清 + 固定权重 0.35/0.25/0.20/0.20）收益 +28.3%/夏普 0.229/回撤 -27.15% 仍最优；牛攻熊守双权重 B/C/D/E 变体（熊市开仓）全面恶化（-25.9%~-65.0%）→ <b>中长期维持「牛开熊清」，熊市开仓不可行</b>（与短线基金相反：基金熊市防守开仓 +398pp 因选到避险型基金）</div>\n'
             '<div class="sub" style="margin-top:10px;padding:8px 10px;background:rgba(59,130,246,.08);border-left:3px solid #3b82f6;border-radius:4px">'
-            '<b>🎯 三轨配置（2026-09-16 · 60/0/40 · 轨A 已退休）</b>｜'
+            '<b>🎯 双轨配置（2026-09-16 · 60/0/40）</b>｜'
             '<b>① 主仓 FB3-H20</b>（60%）：基金 NAV 动量牛熊 regime，牛市 Top10/熊市 Top3 · 2000 池回测 +733.4%/年化 21.95%/回撤 -27.0%/夏普 1.316｜'
-            '<b>② 冷门低波卫星 · 已退休（2026-09-16，零实盘资金，仅留对照）</b>（原卫星内 25%）：主板 ln_amt20+atr20+turn20 三低 Top20（中证1000ETF 破 MA20 → 半仓 Top10）· 30 日调仓 · 回测（2021-04起 · 1M 口径）夏普 0.96/年化 11.79%/回撤 -16.5% · 30 相位中位夏普 0.827（+pct40 后 1.090，待启用）（轨A pct40 待启用；旧口径数字不可复现，已作废弃用）｜'
-            '<b>③ SUPER 卫星</b>（30% · 2026-09-14 配比调整；2026-09-13 替换 A4D）：13 因子（A4D 6 + Z哥战法原子 7：牛绳/止损空间/距BBI 等）Top20 月频 + 中证1000&lt;MA20 半仓且高波半区 · 回测 off0 年化 22.87%/<b>相位中位 1.151</b>/回撤 -22.0% · 安慰剂 500 p=0.000 · 50bp 压力档 S 1.00 · 100 万对照 S 1.30｜'
-            '信号：<code>backtest/signal_satellite_0913.py</code>（每日收盘跑 → T+1 开盘清单，双卫星已交付；FB3 轨信号接入中）· '
-            '⚠ 风险披露：冷门低波轨 atr20 的 IC 方向在 fwd 固定持有语义下与调仓制相反（factorcombo 交叉验证），<b>先小额/模拟盘验证再放大</b>；三轨均为 2021 起回测口径，2021-2026 为结构性分化窗口</div>\n'
+            '<b>② SUPER 卫星</b>（40% · 2026-09-16 卫星单轨化）：13 因子（A4D 6 + Z哥战法原子 7：牛绳/止损空间/距BBI 等）Top20 月频 + 中证1000&lt;MA20 半仓且高波半区 · 回测 off0 年化 22.87%/<b>相位中位 1.151</b>/回撤 -22.0% · 安慰剂 500 p=0.000 · 50bp 压力档 S 1.00 · 100 万对照 S 1.30｜'
+            '信号：<code>backtest/signal_satellite_0913.py</code>（每日收盘跑 → T+1 开盘清单，卫星与主仓信号均已交付）· '
+            '⚠ 风险披露：双轨均为 2021 起回测口径，2021-2026 为结构性分化窗口</div>\n'
             '<div class="bt-grid">' + cards + '</div>\n' + _ret + '\n</div>')
 
 
@@ -1451,9 +1445,9 @@ try:
                 f'<div class="tbl-wrap"><table class="tbl sat-tbl" data-t="{track}"><thead><tr>{head}</tr></thead><tbody>{tds}</tbody></table></div>')
 
     SAT_CARD = (f'<div class="card" id="sat-card">\n'
-                f'<h2>🛰️ 双卫星目标持仓 <span class="badge badge-auto">三轨 60/0/40 · 轨A 已退休 · 数据截至 {_sat["asof"]}（收盘）</span></h2>\n'
-                f'<div class="sub">信号生成：<code>backtest/signal_satellite_0913.py</code>（每日收盘跑 → T+1 开盘清单）· 资金占比：<b>轨B 100%（轨A 已于 2026-09-16 退休）</b>——退休依据：组合层扫描 w_A 越高组合越差（0% 17.61%/夏普1.292 vs 10% 16.54%/1.260）· 与轨B 日收益相关 0.731 无分散价值 · 5% 权重整手不可执行（最低可执行≈12%，而 12% 不优于 0%）｜三轨口径 FB3-H20 主仓 60%· 目标持仓为<b>下次调仓的完整清单</b>（非增量）· 评分列悬浮可见拆解 · 操作列=相对模拟盘当前持仓</div>\n'
-                f'{_sat_rows("track_a")}\n{_sat_rows("track_b")}\n</div>')
+                f'<h2>🛰️ 卫星目标持仓 <span class="badge badge-auto">双轨 60/0/40 · 数据截至 {_sat["asof"]}（收盘）</span></h2>\n'
+                f'<div class="sub">信号生成：<code>backtest/signal_satellite_0913.py</code>（每日收盘跑 → T+1 开盘清单）· 资金占比：<b>卫星 100% 轨B</b>｜双轨口径 FB3-H20 主仓 60%· 目标持仓为<b>下次调仓的完整清单</b>（非增量）· 评分列悬浮可见拆解 · 操作列=相对模拟盘当前持仓</div>\n'
+                f'{_sat_rows("track_b")}\n</div>')
 except Exception as _e:
     SAT_CARD = (f'<div class="card" id="sat-card"><h2>🛰️ 双卫星目标持仓</h2>'
                 f'<div class="sub">satellite_pool.json 未生成 —— 先运行 <code>python backtest/build_satellite_pool.py</code>（{_e}）</div></div>')
@@ -1867,7 +1861,7 @@ html = f"""<!doctype html>
 <div class="card" id="sys-auto">
 <div class="sys-head">
 <div class="sys-head-top">
-<h2>🛰️ 三轨中长线 <span class="view-badge auto">FB3-H20 主仓 + 冷门低波 / SUPER 双卫星 · 资金 60/0/40（轨A 已退休）</span></h2>
+<h2>🛰️ 三轨中长线 <span class="view-badge auto">FB3-H20 主仓 + SUPER 卫星 · 资金 60/0/40</span></h2>
 </div>
 <div class="sys-head-tags">
 <span class="badge badge-auto">v9 股票分层战法已退役（十重证伪 · ADR-0006/0007）</span>
@@ -1878,10 +1872,9 @@ html = f"""<!doctype html>
 </div>
 {SAT_CARD}
 {SAT_PAPER_B_CARD}
-{SAT_PAPER_A_CARD}
 {FUND_PAPER_CARD}
 {FB3_POOL_CARD}
-<div class="card" id="v9-retired-card"><h2>🗂️ v9 全量池（已退役）</h2><div class="sub" style="color:#ef4444">⛔ v9 股票分层战法与 197 只跟踪池已于 2026-09-13 退役并移除展示——十重证伪确认负期望（ADR-0006/0007）。历史回测明细见「📝 更新日志」v5.9~v5.11.15 与 <code>backtest/</code> 报告存档。</div><div class="sub"><b>三轨退出规则</b>：① 主仓 FB3-H20 = 20 交易日月度轮动 + 牛熊 regime 切换（沪深300&lt;MA200 转 Top3 低波防守仓）——<b>无个股止盈止损</b>（基金 NAV 无涨跌停，止盈变体回测全部减值）；② 冷门低波 = 30 交易日到期换仓 + 中证1000ETF 破 MA20 半仓闸门（2026-09-14 起）；③ SUPER = 月频调仓 + 中证1000&lt;MA20 组合半仓闸（且关闸期取高波半区）+ <b>pct40 因子化出场已启用（跌出前40%分位 → T+1 开盘卖，留现金至下一调仓）</b>。</div></div>
+<div class="card" id="v9-retired-card"><h2>🗂️ v9 全量池（已退役）</h2><div class="sub" style="color:#ef4444">⛔ v9 股票分层战法与 197 只跟踪池已于 2026-09-13 退役并移除展示——十重证伪确认负期望（ADR-0006/0007）。历史回测明细见「📝 更新日志」v5.9~v5.11.15 与 <code>backtest/</code> 报告存档。</div><div class="sub"><b>双轨退出规则</b>：① 主仓 FB3-H20 = 20 交易日月度轮动 + 牛熊 regime 切换（沪深300&lt;MA200 转 Top3 低波防守仓）——<b>无个股止盈止损</b>（基金 NAV 无涨跌停，止盈变体回测全部减值）；② SUPER = 月频调仓 + 中证1000&lt;MA20 组合半仓闸（且关闸期取高波半区）+ <b>pct40 因子化出场已启用（跌出前40%分位 → T+1 开盘卖，留现金至下一调仓）</b>。</div></div>
 </div>
 
 <!-- ============ 视图 C：全量池短线（2026-09-03 起 股票池 / 基金池 分板块展示） ============ -->
@@ -1952,7 +1945,7 @@ html = f"""<!doctype html>
 /* 三视图导航（覆盖默认 4 项） */
 window.ENH.nav = [
   ["overview","📊","监控总览",[["overview","总览统计"],["mkt-weather","市场晴雨表"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
-  ["sys-auto","🛰️","三轨中长线",[["sat-card","双卫星目标持仓"],["sat-paper-b-card","轨B 模拟盘（主轨）"],["sat-paper-a-card","轨A 模拟盘（对照）"],["fund-paper-card","基金主仓模拟盘"],["fb3-pool-card","FB3 基金池"]]],
+  ["sys-auto","🛰️","三轨中长线",[["sat-card","卫星目标持仓"],["sat-paper-b-card","轨B 模拟盘（主轨）"],["fund-paper-card","基金主仓模拟盘"],["fb3-pool-card","FB3 基金池"]]],
   ["short","⚡","全量池短线",[["card-short-stk","股票池 汇总表"],["card-short-stk-detail","股票池 逐标的详情"],["card-kh-hits","KHunter 命中策略一览"],["card-etf-paper","ETF 动量轮动"],["card-kh-paper","KHunter 模拟盘"],["card-short-fund","基金池 汇总表"],["card-short-fund-detail","基金池 逐标的详情"],["watch-card","短线跟踪"]]],
   ["a5","🎯","打板族",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
   ["comment","💬","评论区",[]]
@@ -1963,7 +1956,6 @@ window.ENH.NAV_SWITCH = true;
 window.ENH.sub_curves = {{
   stock: {json.dumps(DATA["systems"]["v9_auto"]["equity"])},
   fund: {json.dumps(v_fund)},
-  ln: {json.dumps(v_ln)},
   super: {json.dumps(v_super)},
   short_fund: {json.dumps(v_short_fund)},
   short_stock: {json.dumps(v_short_stock)},
@@ -2002,7 +1994,6 @@ function renderOneCurve(elId, vals, color, label, totalPct){{
 function renderSubCurve(){{
   var C=window.ENH.sub_curves;if(!C)return;
   renderOneCurve('curve-chart-fund', C.fund, '#3b82f6', '主仓 FB3-H20（2000池）', '+'+{s_fund["total_return_pct"]:.0f});
-  renderOneCurve('curve-chart-ln', C.ln, '#10b981', '卫星·冷门低波', '+'+{s_ln.get("total_return_pct") or 0:.0f});
   renderOneCurve('curve-chart-super', C.super, '#8b5cf6', '卫星·SUPER', '+'+{s_super.get("total_return_pct") or 0:.0f});
   renderOneCurve('curve-chart-stock-all', C.stk_all, '#94a3b8', '股票 一体（v9 已退役）', '+'+{round(s_stk["all"].get("total_return_pct") or 0):.0f});
   renderOneCurve('curve-short-stock-all', C.short_stock, '#f59e0b', '短线 股票 一体', '{(ss_stk["all"].get("total_return_pct") or 0):+.0f}');
