@@ -1,0 +1,5556 @@
+{
+ "meta": {
+  "date": "2026-09-16",
+  "stage": 2,
+  "window": [
+   "2021-01-04",
+   "2026-09-11"
+  ],
+  "rebal_days": 20,
+  "phases": [
+   0,
+   4,
+   8,
+   12,
+   16
+  ],
+  "slip_main_bps": 20.0,
+  "slip_stress_bps": 50.0,
+  "cost_model": "slip/边 + 佣金2.5bp(最低5.0元) + 卖出印花5.0bp（=冻结引擎口径）",
+  "leg_sharpe_annualization": 252,
+  "blend_sharpe_annualization": 244.0,
+  "gates": {
+   "corr_B_max": 0.3,
+   "leg_phmed_min": 0.5,
+   "blend_sharpe_gain": 0.02
+  },
+  "cash0": 170000.0,
+  "trackB": {
+   "off0_ann_pct": 22.87,
+   "note": "冻结引擎 oss_super_combo_0913.py off0；窗口 2021-08-16→2026-09-11（面板 WARMUP=150 起）"
+  },
+  "data_gaps": [
+   "无国债期货/期权/商品期货本地数据 → 未测（如实申报）",
+   "黄金只有 ETF 代理（518880/159934/159937）；场外金/金矿股未测",
+   "ETF 价格 = 腾讯 qfq 前复权重抓（etf_qfq_diff.json：核对 1454 只，105 只除权跳变>0.1%）",
+   "ETF 无 T+0 vs T+1 差异：全部按 T 收盘信号→T+1 开盘执行",
+   "货币/理财类 ETF（场内货币基金，价格长期钉在 100/低波，32 只）从动量/低波腿宇宙中排除：其本质是现金，纳入会使低波腿退化为现金且被调仓成本磨损"
+  ],
+  "approx": [
+   "组合层为日频再平衡近似（实际月频调仓会有偏差，量级 ±0.02 夏普内）",
+   "腿指标用 V.summary(√252)，组合层用 √244（与冻结引擎一致）——细微口径差已在 JSON 标注",
+   "相关性为 off0 相位的日收益皮尔逊相关，与阶段1 口径一致",
+   "511090（30年国债）2023-06 才上市 → 其统计窗口更短（JSON align_start）",
+   "开盘涨跌停守卫：买入遇开盘 ≥ 前收×1.098 跳过 / 卖出遇开盘 ≤ 前收×0.902 顺延（与冻结引擎一致）；对 20% 涨跌幅的双创类 ETF 偏保守（会少买/晚卖）",
+   "BH 腿（黄金/国债）只有 1 次买入，故 50bp 档与 20bp 档几乎相同（换手≈0），不构成成本稳健性证据"
+  ]
+ },
+ "trackB_window": [
+  "2021-08-17",
+  "2026-09-11"
+ ],
+ "fb3_window": [
+  "2016-01-04",
+  "2026-09-11"
+ ],
+ "blend_base": {
+  "ann_pct": 17.51,
+  "sharpe": 1.291,
+  "vol_pct": 13.24,
+  "mdd_pct": -14.94,
+  "calmar": 1.17,
+  "n_days": 1230
+ },
+ "n_legs": 30,
+ "legs": [
+  {
+   "leg": "a_mom20_K1",
+   "phmed_sharpe": 0.078,
+   "sharpe_min": -0.121,
+   "sharpe_max": 0.756,
+   "slip50_sharpe": 0.592,
+   "off0_ann_pct": 25.89,
+   "off0_mdd_pct": -43.84,
+   "off0_total_pct": 269.82,
+   "n_trades": 67,
+   "phase_sharpes": {
+    "0": 0.756,
+    "4": 0.078,
+    "8": 0.013,
+    "12": -0.121,
+    "16": 0.525
+   },
+   "by_year_pct": {
+    "2021": 11.2,
+    "2022": -18.7,
+    "2023": 78.1,
+    "2024": 47.6,
+    "2025": 50.0,
+    "2026": 1.9
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": 0.251,
+   "corr_FB3": 0.455,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "ETF 20d 动量 Top1 月度轮动",
+   "group": "a",
+   "assets": [
+    "ETF池(非货币)"
+   ],
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh515220",
+      "name": "煤炭ETF国泰",
+      "px": 1.292,
+      "min_lot_cost": 129.2
+     },
+     {
+      "code": "sz159985",
+      "name": "豆粕ETF华夏",
+      "px": 2.325,
+      "min_lot_cost": 232.6
+     },
+     {
+      "code": "sh515700",
+      "name": "新能源车ETF平安",
+      "px": 1.996,
+      "min_lot_cost": 199.6
+     },
+     {
+      "code": "sh513050",
+      "name": "中概互联网ETF易方达",
+      "px": 1.015,
+      "min_lot_cost": 101.5
+     },
+     {
+      "code": "sh512690",
+      "name": "酒ETF鹏华",
+      "px": 0.412,
+      "min_lot_cost": 41.2
+     }
+    ],
+    "max_min_lot_cost": 232.6,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "a_mom20_K1_abs",
+   "phmed_sharpe": 0.078,
+   "sharpe_min": -0.121,
+   "sharpe_max": 0.756,
+   "slip50_sharpe": 0.592,
+   "off0_ann_pct": 25.89,
+   "off0_mdd_pct": -43.84,
+   "off0_total_pct": 269.82,
+   "n_trades": 67,
+   "phase_sharpes": {
+    "0": 0.756,
+    "4": 0.078,
+    "8": 0.013,
+    "12": -0.121,
+    "16": 0.523
+   },
+   "by_year_pct": {
+    "2021": 11.2,
+    "2022": -18.7,
+    "2023": 78.1,
+    "2024": 47.6,
+    "2025": 50.0,
+    "2026": 1.9
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": 0.251,
+   "corr_FB3": 0.455,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "ETF 20d 动量 Top1（绝对动量保护：<0 留现金）",
+   "group": "a",
+   "assets": [
+    "ETF池(非货币)"
+   ],
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh515220",
+      "name": "煤炭ETF国泰",
+      "px": 1.292,
+      "min_lot_cost": 129.2
+     },
+     {
+      "code": "sz159985",
+      "name": "豆粕ETF华夏",
+      "px": 2.325,
+      "min_lot_cost": 232.6
+     },
+     {
+      "code": "sh515700",
+      "name": "新能源车ETF平安",
+      "px": 1.996,
+      "min_lot_cost": 199.6
+     },
+     {
+      "code": "sh513050",
+      "name": "中概互联网ETF易方达",
+      "px": 1.015,
+      "min_lot_cost": 101.5
+     },
+     {
+      "code": "sh512690",
+      "name": "酒ETF鹏华",
+      "px": 0.412,
+      "min_lot_cost": 41.2
+     }
+    ],
+    "max_min_lot_cost": 232.6,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "a_mom20_K3",
+   "phmed_sharpe": 0.271,
+   "sharpe_min": -0.376,
+   "sharpe_max": 0.718,
+   "slip50_sharpe": 0.54,
+   "off0_ann_pct": 21.82,
+   "off0_mdd_pct": -45.16,
+   "off0_total_pct": 206.9,
+   "n_trades": 191,
+   "phase_sharpes": {
+    "0": 0.718,
+    "4": 0.271,
+    "8": -0.345,
+    "12": -0.376,
+    "16": 0.463
+   },
+   "by_year_pct": {
+    "2021": -4.4,
+    "2022": -22.3,
+    "2023": 82.9,
+    "2024": 36.8,
+    "2025": 51.0,
+    "2026": 6.5
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": 0.276,
+   "corr_FB3": 0.492,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "ETF 20d 动量 Top3 月度轮动",
+   "group": "a",
+   "assets": [
+    "ETF池(非货币)"
+   ],
+   "exec": {
+    "median_names": 3,
+    "hot_assets": [
+     {
+      "code": "sz159981",
+      "name": "能源化工ETF建信",
+      "px": 1.759,
+      "min_lot_cost": 175.9
+     },
+     {
+      "code": "sz159945",
+      "name": "能源ETF广发",
+      "px": 1.392,
+      "min_lot_cost": 139.2
+     },
+     {
+      "code": "sh515220",
+      "name": "煤炭ETF国泰",
+      "px": 1.292,
+      "min_lot_cost": 129.2
+     },
+     {
+      "code": "sz159930",
+      "name": "能源ETF汇添富",
+      "px": 1.73,
+      "min_lot_cost": 173.0
+     },
+     {
+      "code": "sz159855",
+      "name": "影视ETF银华",
+      "px": 0.762,
+      "min_lot_cost": 76.2
+     }
+    ],
+    "max_min_lot_cost": 175.9,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "a_mom20_K3_abs",
+   "phmed_sharpe": 0.271,
+   "sharpe_min": -0.376,
+   "sharpe_max": 0.718,
+   "slip50_sharpe": 0.54,
+   "off0_ann_pct": 21.82,
+   "off0_mdd_pct": -45.16,
+   "off0_total_pct": 206.9,
+   "n_trades": 191,
+   "phase_sharpes": {
+    "0": 0.718,
+    "4": 0.271,
+    "8": -0.345,
+    "12": -0.376,
+    "16": 0.463
+   },
+   "by_year_pct": {
+    "2021": -4.4,
+    "2022": -22.3,
+    "2023": 82.9,
+    "2024": 36.8,
+    "2025": 51.0,
+    "2026": 6.5
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": 0.276,
+   "corr_FB3": 0.492,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "ETF 20d 动量 Top3（绝对动量保护：<0 留现金）",
+   "group": "a",
+   "assets": [
+    "ETF池(非货币)"
+   ],
+   "exec": {
+    "median_names": 3,
+    "hot_assets": [
+     {
+      "code": "sz159981",
+      "name": "能源化工ETF建信",
+      "px": 1.759,
+      "min_lot_cost": 175.9
+     },
+     {
+      "code": "sz159945",
+      "name": "能源ETF广发",
+      "px": 1.392,
+      "min_lot_cost": 139.2
+     },
+     {
+      "code": "sh515220",
+      "name": "煤炭ETF国泰",
+      "px": 1.292,
+      "min_lot_cost": 129.2
+     },
+     {
+      "code": "sz159930",
+      "name": "能源ETF汇添富",
+      "px": 1.73,
+      "min_lot_cost": 173.0
+     },
+     {
+      "code": "sz159855",
+      "name": "影视ETF银华",
+      "px": 0.762,
+      "min_lot_cost": 76.2
+     }
+    ],
+    "max_min_lot_cost": 175.9,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "a_mom20_K5",
+   "phmed_sharpe": 0.242,
+   "sharpe_min": -0.432,
+   "sharpe_max": 0.819,
+   "slip50_sharpe": 0.63,
+   "off0_ann_pct": 24.98,
+   "off0_mdd_pct": -36.31,
+   "off0_total_pct": 254.97,
+   "n_trades": 313,
+   "phase_sharpes": {
+    "0": 0.819,
+    "4": 0.242,
+    "8": -0.342,
+    "12": -0.432,
+    "16": 0.3
+   },
+   "by_year_pct": {
+    "2021": 7.4,
+    "2022": -20.7,
+    "2023": 67.7,
+    "2024": 29.5,
+    "2025": 57.8,
+    "2026": 16.6
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": 0.278,
+   "corr_FB3": 0.519,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "ETF 20d 动量 Top5 月度轮动",
+   "group": "a",
+   "assets": [
+    "ETF池(非货币)"
+   ],
+   "exec": {
+    "median_names": 5,
+    "hot_assets": [
+     {
+      "code": "sz159981",
+      "name": "能源化工ETF建信",
+      "px": 1.759,
+      "min_lot_cost": 175.9
+     },
+     {
+      "code": "sz159930",
+      "name": "能源ETF汇添富",
+      "px": 1.73,
+      "min_lot_cost": 173.0
+     },
+     {
+      "code": "sh515220",
+      "name": "煤炭ETF国泰",
+      "px": 1.292,
+      "min_lot_cost": 129.2
+     },
+     {
+      "code": "sz159945",
+      "name": "能源ETF广发",
+      "px": 1.392,
+      "min_lot_cost": 139.2
+     },
+     {
+      "code": "sz159941",
+      "name": "纳指ETF广发",
+      "px": 1.638,
+      "min_lot_cost": 163.8
+     }
+    ],
+    "max_min_lot_cost": 175.9,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "a_mom20_K5_abs",
+   "phmed_sharpe": 0.242,
+   "sharpe_min": -0.432,
+   "sharpe_max": 0.819,
+   "slip50_sharpe": 0.63,
+   "off0_ann_pct": 24.98,
+   "off0_mdd_pct": -36.31,
+   "off0_total_pct": 254.97,
+   "n_trades": 313,
+   "phase_sharpes": {
+    "0": 0.819,
+    "4": 0.242,
+    "8": -0.342,
+    "12": -0.432,
+    "16": 0.3
+   },
+   "by_year_pct": {
+    "2021": 7.4,
+    "2022": -20.7,
+    "2023": 67.7,
+    "2024": 29.5,
+    "2025": 57.8,
+    "2026": 16.6
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": 0.278,
+   "corr_FB3": 0.519,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "ETF 20d 动量 Top5（绝对动量保护：<0 留现金）",
+   "group": "a",
+   "assets": [
+    "ETF池(非货币)"
+   ],
+   "exec": {
+    "median_names": 5,
+    "hot_assets": [
+     {
+      "code": "sz159981",
+      "name": "能源化工ETF建信",
+      "px": 1.759,
+      "min_lot_cost": 175.9
+     },
+     {
+      "code": "sz159930",
+      "name": "能源ETF汇添富",
+      "px": 1.73,
+      "min_lot_cost": 173.0
+     },
+     {
+      "code": "sh515220",
+      "name": "煤炭ETF国泰",
+      "px": 1.292,
+      "min_lot_cost": 129.2
+     },
+     {
+      "code": "sz159945",
+      "name": "能源ETF广发",
+      "px": 1.392,
+      "min_lot_cost": 139.2
+     },
+     {
+      "code": "sz159941",
+      "name": "纳指ETF广发",
+      "px": 1.638,
+      "min_lot_cost": 163.8
+     }
+    ],
+    "max_min_lot_cost": 175.9,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "a0_mom20_K3_allpool",
+   "phmed_sharpe": 0.271,
+   "sharpe_min": -0.376,
+   "sharpe_max": 0.718,
+   "slip50_sharpe": 0.54,
+   "off0_ann_pct": 21.82,
+   "off0_mdd_pct": -45.16,
+   "off0_total_pct": 206.9,
+   "n_trades": 191,
+   "phase_sharpes": {
+    "0": 0.718,
+    "4": 0.271,
+    "8": -0.345,
+    "12": -0.376,
+    "16": 0.463
+   },
+   "by_year_pct": {
+    "2021": -4.4,
+    "2022": -22.3,
+    "2023": 82.9,
+    "2024": 36.8,
+    "2025": 51.0,
+    "2026": 6.5
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": 0.276,
+   "corr_FB3": 0.492,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "ETF 20d 动量 Top3（含货币 ETF 的全池，敏感性）",
+   "group": "a",
+   "assets": [
+    "全ETF池"
+   ],
+   "exec": {
+    "median_names": 3,
+    "hot_assets": [
+     {
+      "code": "sz159981",
+      "name": "能源化工ETF建信",
+      "px": 1.759,
+      "min_lot_cost": 175.9
+     },
+     {
+      "code": "sz159945",
+      "name": "能源ETF广发",
+      "px": 1.392,
+      "min_lot_cost": 139.2
+     },
+     {
+      "code": "sh515220",
+      "name": "煤炭ETF国泰",
+      "px": 1.292,
+      "min_lot_cost": 129.2
+     },
+     {
+      "code": "sz159930",
+      "name": "能源ETF汇添富",
+      "px": 1.73,
+      "min_lot_cost": 173.0
+     },
+     {
+      "code": "sz159855",
+      "name": "影视ETF银华",
+      "px": 0.762,
+      "min_lot_cost": 76.2
+     }
+    ],
+    "max_min_lot_cost": 175.9,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "b_lowvol_K1",
+   "phmed_sharpe": 1.597,
+   "sharpe_min": 1.345,
+   "sharpe_max": 1.74,
+   "slip50_sharpe": 0.628,
+   "off0_ann_pct": 1.43,
+   "off0_mdd_pct": -1.02,
+   "off0_total_pct": 8.4,
+   "n_trades": 6,
+   "phase_sharpes": {
+    "0": 1.74,
+    "4": 1.597,
+    "8": 1.389,
+    "12": 1.625,
+    "16": 1.345
+   },
+   "by_year_pct": {
+    "2021": 2.7,
+    "2022": 1.6,
+    "2023": 0.5,
+    "2024": 2.2,
+    "2025": 1.5,
+    "2026": -0.2
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": -0.025,
+   "corr_FB3": -0.026,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "ETF 20d 波动率最低 Top1 月度轮动",
+   "group": "b",
+   "assets": [
+    "ETF池(非货币)"
+   ],
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh511360",
+      "name": "短融ETF海富通",
+      "px": 113.912,
+      "min_lot_cost": 11394.0
+     }
+    ],
+    "max_min_lot_cost": 11394.0,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "b_lowvol_K3",
+   "phmed_sharpe": 0.371,
+   "sharpe_min": 0.312,
+   "sharpe_max": 0.911,
+   "slip50_sharpe": -1.262,
+   "off0_ann_pct": 0.31,
+   "off0_mdd_pct": -1.42,
+   "off0_total_pct": 1.78,
+   "n_trades": 69,
+   "phase_sharpes": {
+    "0": 0.371,
+    "4": 0.312,
+    "8": 0.454,
+    "12": 0.911,
+    "16": 0.342
+   },
+   "by_year_pct": {
+    "2021": 1.7,
+    "2022": -0.8,
+    "2023": 0.6,
+    "2024": 1.1,
+    "2025": -0.5,
+    "2026": -0.3
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": -0.085,
+   "corr_FB3": -0.035,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "ETF 20d 波动率最低 Top3 月度轮动",
+   "group": "b",
+   "assets": [
+    "ETF池(非货币)"
+   ],
+   "exec": {
+    "median_names": 3,
+    "hot_assets": [
+     {
+      "code": "sh511360",
+      "name": "短融ETF海富通",
+      "px": 113.912,
+      "min_lot_cost": 11394.0
+     },
+     {
+      "code": "sz159651",
+      "name": "国开债ETF平安",
+      "px": 108.13,
+      "min_lot_cost": 10815.7
+     },
+     {
+      "code": "sz159650",
+      "name": "国开债ETF博时",
+      "px": 108.054,
+      "min_lot_cost": 10808.1
+     },
+     {
+      "code": "sh511030",
+      "name": "公司债ETF平安",
+      "px": 108.396,
+      "min_lot_cost": 10842.3
+     },
+     {
+      "code": "sz159816",
+      "name": "0-4年地方债ETF鹏华",
+      "px": 114.001,
+      "min_lot_cost": 11403.0
+     }
+    ],
+    "max_min_lot_cost": 11403.0,
+    "exec_10pct": false,
+    "exec_15pct": false,
+    "exec_20pct": false
+   }
+  },
+  {
+   "leg": "b_lowvol_K5",
+   "phmed_sharpe": 1.393,
+   "sharpe_min": 1.16,
+   "sharpe_max": 1.59,
+   "slip50_sharpe": -0.517,
+   "off0_ann_pct": 0.98,
+   "off0_mdd_pct": -1.12,
+   "off0_total_pct": 5.7,
+   "n_trades": 85,
+   "phase_sharpes": {
+    "0": 1.393,
+    "4": 1.532,
+    "8": 1.231,
+    "12": 1.59,
+    "16": 1.16
+   },
+   "by_year_pct": {
+    "2021": 2.5,
+    "2022": -0.4,
+    "2023": 1.2,
+    "2024": 2.3,
+    "2025": -0.1,
+    "2026": 0.1
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": -0.104,
+   "corr_FB3": -0.059,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "ETF 20d 波动率最低 Top5 月度轮动",
+   "group": "b",
+   "assets": [
+    "ETF池(非货币)"
+   ],
+   "exec": {
+    "median_names": 5,
+    "hot_assets": [
+     {
+      "code": "sh511360",
+      "name": "短融ETF海富通",
+      "px": 113.912,
+      "min_lot_cost": 11394.0
+     },
+     {
+      "code": "sz159650",
+      "name": "国开债ETF博时",
+      "px": 108.054,
+      "min_lot_cost": 10808.1
+     },
+     {
+      "code": "sz159651",
+      "name": "国开债ETF平安",
+      "px": 108.13,
+      "min_lot_cost": 10815.7
+     },
+     {
+      "code": "sz159816",
+      "name": "0-4年地方债ETF鹏华",
+      "px": 114.001,
+      "min_lot_cost": 11403.0
+     },
+     {
+      "code": "sh511030",
+      "name": "公司债ETF平安",
+      "px": 108.396,
+      "min_lot_cost": 10842.3
+     },
+     {
+      "code": "sz159972",
+      "name": "5年地方债ETF鹏华",
+      "px": 119.695,
+      "min_lot_cost": 11972.5
+     }
+    ],
+    "max_min_lot_cost": 11972.5,
+    "exec_10pct": false,
+    "exec_15pct": false,
+    "exec_20pct": false
+   }
+  },
+  {
+   "leg": "c_gold_bh",
+   "phmed_sharpe": 1.002,
+   "sharpe_min": 0.96,
+   "sharpe_max": 1.007,
+   "slip50_sharpe": 0.96,
+   "off0_ann_pct": 15.62,
+   "off0_mdd_pct": -30.51,
+   "off0_total_pct": 128.03,
+   "n_trades": 0,
+   "phase_sharpes": {
+    "0": 0.96,
+    "4": 1.002,
+    "8": 1.002,
+    "12": 0.992,
+    "16": 1.007
+   },
+   "by_year_pct": {
+    "2021": -7.1,
+    "2022": 10.1,
+    "2023": 16.6,
+    "2024": 27.0,
+    "2025": 55.6,
+    "2026": -5.8
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": 0.084,
+   "corr_FB3": 0.159,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "黄金ETF(518880) 买入持有",
+   "group": "c",
+   "assets": [
+    "sh518880"
+   ],
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh518880",
+      "name": "黄金ETF华安",
+      "px": 8.943,
+      "min_lot_cost": 894.5
+     }
+    ],
+    "max_min_lot_cost": 894.5,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "c_gold_mom",
+   "phmed_sharpe": 0.757,
+   "sharpe_min": 0.634,
+   "sharpe_max": 0.921,
+   "slip50_sharpe": 0.503,
+   "off0_ann_pct": 8.11,
+   "off0_mdd_pct": -27.4,
+   "off0_total_pct": 55.74,
+   "n_trades": 17,
+   "phase_sharpes": {
+    "0": 0.634,
+    "4": 0.757,
+    "8": 0.921,
+    "12": 0.904,
+    "16": 0.736
+   },
+   "by_year_pct": {
+    "2021": -4.7,
+    "2022": 1.0,
+    "2023": 4.7,
+    "2024": 23.5,
+    "2025": 34.4,
+    "2026": -8.6
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": 0.067,
+   "corr_FB3": 0.15,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "黄金ETF 20d 动量择时（<0 留现金）",
+   "group": "c",
+   "assets": [
+    "sh518880"
+   ],
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh518880",
+      "name": "黄金ETF华安",
+      "px": 8.943,
+      "min_lot_cost": 894.5
+     }
+    ],
+    "max_min_lot_cost": 894.5,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "d_sh511010_bh",
+   "phmed_sharpe": 2.106,
+   "sharpe_min": 2.071,
+   "sharpe_max": 2.133,
+   "slip50_sharpe": 2.113,
+   "off0_ann_pct": 3.09,
+   "off0_mdd_pct": -1.52,
+   "off0_total_pct": 18.86,
+   "n_trades": 0,
+   "phase_sharpes": {
+    "0": 2.113,
+    "4": 2.106,
+    "8": 2.071,
+    "12": 2.086,
+    "16": 2.133
+   },
+   "by_year_pct": {
+    "2021": 4.2,
+    "2022": 2.1,
+    "2023": 3.3,
+    "2024": 5.8,
+    "2025": 0.6,
+    "2026": 1.8
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": -0.105,
+   "corr_FB3": -0.081,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "国债ETF(5y) 买入持有",
+   "group": "d",
+   "assets": [
+    "sh511010"
+   ],
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh511010",
+      "name": "国债ETF国泰",
+      "px": 141.146,
+      "min_lot_cost": 14118.1
+     }
+    ],
+    "max_min_lot_cost": 14118.1,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "d_sh511260_bh",
+   "phmed_sharpe": 2.062,
+   "sharpe_min": 2.02,
+   "sharpe_max": 2.079,
+   "slip50_sharpe": 2.073,
+   "off0_ann_pct": 4.09,
+   "off0_mdd_pct": -2.08,
+   "off0_total_pct": 25.58,
+   "n_trades": 0,
+   "phase_sharpes": {
+    "0": 2.073,
+    "4": 2.062,
+    "8": 2.02,
+    "12": 2.038,
+    "16": 2.079
+   },
+   "by_year_pct": {
+    "2021": 5.1,
+    "2022": 2.4,
+    "2023": 4.1,
+    "2024": 8.2,
+    "2025": -0.2,
+    "2026": 2.9
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": -0.143,
+   "corr_FB3": -0.105,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "十年国债ETF 买入持有",
+   "group": "d",
+   "assets": [
+    "sh511260"
+   ],
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh511260",
+      "name": "十年国债ETF国泰",
+      "px": 135.852,
+      "min_lot_cost": 13588.6
+     }
+    ],
+    "max_min_lot_cost": 13588.6,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "d_sh511090_bh",
+   "phmed_sharpe": 1.165,
+   "sharpe_min": 1.152,
+   "sharpe_max": 1.183,
+   "slip50_sharpe": 1.172,
+   "off0_ann_pct": 7.03,
+   "off0_mdd_pct": -8.85,
+   "off0_total_pct": 24.33,
+   "n_trades": 0,
+   "phase_sharpes": {
+    "0": 1.172,
+    "4": 1.155,
+    "8": 1.152,
+    "12": 1.165,
+    "16": 1.183
+   },
+   "by_year_pct": {
+    "2023": 4.7,
+    "2024": 21.1,
+    "2025": -7.0,
+    "2026": 4.2
+   },
+   "start": "2023-06-30",
+   "end": "2026-09-11",
+   "corr_B": -0.19,
+   "corr_FB3": -0.147,
+   "align_n": 779,
+   "align_start": "2023-06-30",
+   "align_end": "2026-09-11",
+   "desc": "30年国债ETF 买入持有",
+   "group": "d",
+   "assets": [
+    "sh511090"
+   ],
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh511090",
+      "name": "30年国债ETF鹏扬",
+      "px": 118.872,
+      "min_lot_cost": 11890.2
+     }
+    ],
+    "max_min_lot_cost": 11890.2,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "d_sh511060_bh",
+   "phmed_sharpe": 2.365,
+   "sharpe_min": 2.314,
+   "sharpe_max": 2.385,
+   "slip50_sharpe": 2.385,
+   "off0_ann_pct": 3.75,
+   "off0_mdd_pct": -1.38,
+   "off0_total_pct": 23.29,
+   "n_trades": 0,
+   "phase_sharpes": {
+    "0": 2.385,
+    "4": 2.365,
+    "8": 2.314,
+    "12": 2.333,
+    "16": 2.374
+   },
+   "by_year_pct": {
+    "2021": 3.6,
+    "2022": 3.3,
+    "2023": 3.5,
+    "2024": 7.4,
+    "2025": 0.9,
+    "2026": 2.3
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": -0.1,
+   "corr_FB3": -0.058,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "5年地方债ETF 买入持有",
+   "group": "d",
+   "assets": [
+    "sh511060"
+   ],
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh511060",
+      "name": "5年地方债ETF海富通",
+      "px": 108.609,
+      "min_lot_cost": 10863.6
+     }
+    ],
+    "max_min_lot_cost": 10863.6,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "d_sh511030_bh",
+   "phmed_sharpe": 1.284,
+   "sharpe_min": 1.277,
+   "sharpe_max": 1.338,
+   "slip50_sharpe": 1.339,
+   "off0_ann_pct": 2.54,
+   "off0_mdd_pct": -4.46,
+   "off0_total_pct": 15.32,
+   "n_trades": 0,
+   "phase_sharpes": {
+    "0": 1.338,
+    "4": 1.323,
+    "8": 1.281,
+    "12": 1.284,
+    "16": 1.277
+   },
+   "by_year_pct": {
+    "2021": 4.6,
+    "2022": -1.8,
+    "2023": 5.3,
+    "2024": 3.5,
+    "2025": 1.5,
+    "2026": 1.6
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": -0.017,
+   "corr_FB3": 0.007,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "公司债ETF 买入持有",
+   "group": "d",
+   "assets": [
+    "sh511030"
+   ],
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh511030",
+      "name": "公司债ETF平安",
+      "px": 108.396,
+      "min_lot_cost": 10842.3
+     }
+    ],
+    "max_min_lot_cost": 10842.3,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "d_sh511220_bh",
+   "phmed_sharpe": 2.327,
+   "sharpe_min": 2.312,
+   "sharpe_max": 2.345,
+   "slip50_sharpe": 2.345,
+   "off0_ann_pct": 3.9,
+   "off0_mdd_pct": -4.24,
+   "off0_total_pct": 24.25,
+   "n_trades": 0,
+   "phase_sharpes": {
+    "0": 2.345,
+    "4": 2.339,
+    "8": 2.312,
+    "12": 2.319,
+    "16": 2.327
+   },
+   "by_year_pct": {
+    "2021": 5.5,
+    "2022": 2.2,
+    "2023": 5.8,
+    "2024": 4.1,
+    "2025": 1.6,
+    "2026": 2.2
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": -0.043,
+   "corr_FB3": -0.039,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "城投债ETF 买入持有",
+   "group": "d",
+   "assets": [
+    "sh511220"
+   ],
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh511220",
+      "name": "城投债ETF海富通",
+      "px": 10.423,
+      "min_lot_cost": 1042.6
+     }
+    ],
+    "max_min_lot_cost": 1042.6,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "d_sh511380_bh",
+   "phmed_sharpe": 0.483,
+   "sharpe_min": 0.468,
+   "sharpe_max": 0.489,
+   "slip50_sharpe": 0.481,
+   "off0_ann_pct": 4.25,
+   "off0_mdd_pct": -15.88,
+   "off0_total_pct": 26.64,
+   "n_trades": 0,
+   "phase_sharpes": {
+    "0": 0.481,
+    "4": 0.489,
+    "8": 0.483,
+    "12": 0.468,
+    "16": 0.485
+   },
+   "by_year_pct": {
+    "2021": 12.7,
+    "2022": -7.3,
+    "2023": -0.6,
+    "2024": 5.8,
+    "2025": 18.9,
+    "2026": -4.4
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": 0.525,
+   "corr_FB3": 0.433,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "可转债ETF 买入持有",
+   "group": "d",
+   "assets": [
+    "sh511380"
+   ],
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh511380",
+      "name": "可转债ETF博时",
+      "px": 13.257,
+      "min_lot_cost": 1326.0
+     }
+    ],
+    "max_min_lot_cost": 1326.0,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "e_gold_bond_5050",
+   "phmed_sharpe": 1.017,
+   "sharpe_min": 0.988,
+   "sharpe_max": 1.024,
+   "slip50_sharpe": 0.988,
+   "off0_ann_pct": 10.17,
+   "off0_mdd_pct": -21.7,
+   "off0_total_pct": 73.4,
+   "n_trades": 0,
+   "phase_sharpes": {
+    "0": 0.988,
+    "4": 1.019,
+    "8": 1.017,
+    "12": 1.01,
+    "16": 1.024
+   },
+   "by_year_pct": {
+    "2021": -1.4,
+    "2022": 5.8,
+    "2023": 9.8,
+    "2024": 16.9,
+    "2025": 31.8,
+    "2026": -3.3
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": 0.086,
+   "corr_FB3": 0.161,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "黄金518880 + 国债511010 等权（月度再平衡）",
+   "group": "e",
+   "assets": [
+    "sh518880",
+    "sh511010"
+   ],
+   "exec": {
+    "median_names": 2,
+    "hot_assets": [
+     {
+      "code": "sh518880",
+      "name": "黄金ETF华安",
+      "px": 8.943,
+      "min_lot_cost": 894.5
+     },
+     {
+      "code": "sh511010",
+      "name": "国债ETF国泰",
+      "px": 141.146,
+      "min_lot_cost": 14118.1
+     }
+    ],
+    "max_min_lot_cost": 14118.1,
+    "exec_10pct": false,
+    "exec_15pct": false,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "e_gold_bond_5050_timed",
+   "phmed_sharpe": 0.616,
+   "sharpe_min": 0.272,
+   "sharpe_max": 0.852,
+   "slip50_sharpe": 0.121,
+   "off0_ann_pct": 2.19,
+   "off0_mdd_pct": -20.66,
+   "off0_total_pct": 13.11,
+   "n_trades": 28,
+   "phase_sharpes": {
+    "0": 0.272,
+    "4": 0.616,
+    "8": 0.851,
+    "12": 0.852,
+    "16": 0.458
+   },
+   "by_year_pct": {
+    "2021": -0.9,
+    "2022": -0.6,
+    "2023": 3.9,
+    "2024": 4.9,
+    "2025": 3.6,
+    "2026": 0.2
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": 0.022,
+   "corr_FB3": 0.136,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "黄金 + 国债 等权 + 各自 20d 动量择时",
+   "group": "e",
+   "assets": [
+    "sh518880",
+    "sh511010"
+   ],
+   "exec": {
+    "median_names": 2,
+    "hot_assets": [
+     {
+      "code": "sh511010",
+      "name": "国债ETF国泰",
+      "px": 141.146,
+      "min_lot_cost": 14118.1
+     },
+     {
+      "code": "sh518880",
+      "name": "黄金ETF华安",
+      "px": 8.943,
+      "min_lot_cost": 894.5
+     }
+    ],
+    "max_min_lot_cost": 14118.1,
+    "exec_10pct": false,
+    "exec_15pct": false,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "e_gold_10y_5050",
+   "phmed_sharpe": 1.047,
+   "sharpe_min": 1.02,
+   "sharpe_max": 1.055,
+   "slip50_sharpe": 1.021,
+   "off0_ann_pct": 10.45,
+   "off0_mdd_pct": -21.42,
+   "off0_total_pct": 75.89,
+   "n_trades": 0,
+   "phase_sharpes": {
+    "0": 1.02,
+    "4": 1.05,
+    "8": 1.047,
+    "12": 1.042,
+    "16": 1.055
+   },
+   "by_year_pct": {
+    "2021": -1.1,
+    "2022": 5.9,
+    "2023": 10.0,
+    "2024": 17.7,
+    "2025": 30.9,
+    "2026": -3.0
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": 0.08,
+   "corr_FB3": 0.158,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "黄金 + 十年国债511260 等权（扩展）",
+   "group": "e",
+   "assets": [
+    "sh518880",
+    "sh511260"
+   ],
+   "exec": {
+    "median_names": 2,
+    "hot_assets": [
+     {
+      "code": "sh518880",
+      "name": "黄金ETF华安",
+      "px": 8.943,
+      "min_lot_cost": 894.5
+     },
+     {
+      "code": "sh511260",
+      "name": "十年国债ETF国泰",
+      "px": 135.852,
+      "min_lot_cost": 13588.6
+     }
+    ],
+    "max_min_lot_cost": 13588.6,
+    "exec_10pct": false,
+    "exec_15pct": false,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "f_stock_gold_mom1",
+   "phmed_sharpe": 0.61,
+   "sharpe_min": 0.524,
+   "sharpe_max": 0.981,
+   "slip50_sharpe": 0.679,
+   "off0_ann_pct": 14.47,
+   "off0_mdd_pct": -21.65,
+   "off0_total_pct": 115.54,
+   "n_trades": 27,
+   "phase_sharpes": {
+    "0": 0.839,
+    "4": 0.981,
+    "8": 0.524,
+    "12": 0.61,
+    "16": 0.61
+   },
+   "by_year_pct": {
+    "2021": 7.4,
+    "2022": 21.0,
+    "2023": 0.4,
+    "2024": 17.9,
+    "2025": 55.6,
+    "2026": -9.1
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": 0.292,
+   "corr_FB3": 0.427,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "股(中证1000ETF) / 金 二选一 20d 动量",
+   "group": "f",
+   "assets": [
+    "sh512100",
+    "sh518880"
+   ],
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh518880",
+      "name": "黄金ETF华安",
+      "px": 8.943,
+      "min_lot_cost": 894.5
+     },
+     {
+      "code": "sh512100",
+      "name": "中证1000ETF南方",
+      "px": 3.014,
+      "min_lot_cost": 301.5
+     }
+    ],
+    "max_min_lot_cost": 894.5,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "f_stock_gold_mom1_abs",
+   "phmed_sharpe": 0.321,
+   "sharpe_min": 0.284,
+   "sharpe_max": 0.909,
+   "slip50_sharpe": 0.519,
+   "off0_ann_pct": 10.55,
+   "off0_mdd_pct": -30.58,
+   "off0_total_pct": 76.8,
+   "n_trades": 27,
+   "phase_sharpes": {
+    "0": 0.692,
+    "4": 0.909,
+    "8": 0.321,
+    "12": 0.284,
+    "16": 0.309
+   },
+   "by_year_pct": {
+    "2021": 14.8,
+    "2022": 8.3,
+    "2023": -0.7,
+    "2024": 19.0,
+    "2025": 53.9,
+    "2026": -23.2
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": 0.27,
+   "corr_FB3": 0.435,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "股 / 金 二选一 + 绝对动量（All Money 留现金）",
+   "group": "f",
+   "assets": [
+    "sh512100",
+    "sh518880"
+   ],
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh518880",
+      "name": "黄金ETF华安",
+      "px": 8.943,
+      "min_lot_cost": 894.5
+     },
+     {
+      "code": "sh512100",
+      "name": "中证1000ETF南方",
+      "px": 3.014,
+      "min_lot_cost": 301.5
+     }
+    ],
+    "max_min_lot_cost": 894.5,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "f_stock_bond_mom1",
+   "phmed_sharpe": 0.03,
+   "sharpe_min": -0.315,
+   "sharpe_max": 0.533,
+   "slip50_sharpe": -0.558,
+   "off0_ann_pct": -5.64,
+   "off0_mdd_pct": -34.3,
+   "off0_total_pct": -28.08,
+   "n_trades": 36,
+   "phase_sharpes": {
+    "0": -0.315,
+    "4": 0.533,
+    "8": 0.136,
+    "12": 0.03,
+    "16": -0.112
+   },
+   "by_year_pct": {
+    "2021": 3.8,
+    "2022": -5.6,
+    "2023": -9.3,
+    "2024": -7.9,
+    "2025": 15.0,
+    "2026": -23.4
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": 0.376,
+   "corr_FB3": 0.477,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "股(中证1000ETF) / 债(511010) 二选一 20d 动量",
+   "group": "f",
+   "assets": [
+    "sh512100",
+    "sh511010"
+   ],
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh511010",
+      "name": "国债ETF国泰",
+      "px": 141.146,
+      "min_lot_cost": 14118.1
+     },
+     {
+      "code": "sh512100",
+      "name": "中证1000ETF南方",
+      "px": 3.014,
+      "min_lot_cost": 301.5
+     }
+    ],
+    "max_min_lot_cost": 14118.1,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "f_stock_bond_mom1_abs",
+   "phmed_sharpe": 0.004,
+   "sharpe_min": -0.329,
+   "sharpe_max": 0.493,
+   "slip50_sharpe": -0.567,
+   "off0_ann_pct": -5.82,
+   "off0_mdd_pct": -35.04,
+   "off0_total_pct": -28.88,
+   "n_trades": 35,
+   "phase_sharpes": {
+    "0": -0.329,
+    "4": 0.493,
+    "8": 0.099,
+    "12": 0.004,
+    "16": -0.105
+   },
+   "by_year_pct": {
+    "2021": 3.8,
+    "2022": -6.8,
+    "2023": -8.9,
+    "2024": -7.9,
+    "2025": 14.2,
+    "2026": -23.3
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": 0.378,
+   "corr_FB3": 0.478,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "股 / 债 二选一 + 绝对动量",
+   "group": "f",
+   "assets": [
+    "sh512100",
+    "sh511010"
+   ],
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh512100",
+      "name": "中证1000ETF南方",
+      "px": 3.014,
+      "min_lot_cost": 301.5
+     },
+     {
+      "code": "sh511010",
+      "name": "国债ETF国泰",
+      "px": 141.146,
+      "min_lot_cost": 14118.1
+     }
+    ],
+    "max_min_lot_cost": 14118.1,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "f_triple_mom1_abs",
+   "phmed_sharpe": 0.407,
+   "sharpe_min": 0.113,
+   "sharpe_max": 0.772,
+   "slip50_sharpe": 0.249,
+   "off0_ann_pct": 7.33,
+   "off0_mdd_pct": -30.82,
+   "off0_total_pct": 49.47,
+   "n_trades": 42,
+   "phase_sharpes": {
+    "0": 0.515,
+    "4": 0.772,
+    "8": 0.407,
+    "12": 0.113,
+    "16": 0.256
+   },
+   "by_year_pct": {
+    "2021": 13.9,
+    "2022": 5.2,
+    "2023": -5.6,
+    "2024": 10.5,
+    "2025": 53.2,
+    "2026": -23.5
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": 0.269,
+   "corr_FB3": 0.437,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "股/金/债 三选一 20d 动量 + 绝对动量",
+   "group": "f",
+   "assets": [
+    "sh512100",
+    "sh518880",
+    "sh511010"
+   ],
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh518880",
+      "name": "黄金ETF华安",
+      "px": 8.943,
+      "min_lot_cost": 894.5
+     },
+     {
+      "code": "sh512100",
+      "name": "中证1000ETF南方",
+      "px": 3.014,
+      "min_lot_cost": 301.5
+     }
+    ],
+    "max_min_lot_cost": 894.5,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "x_nasdaq_bh",
+   "phmed_sharpe": 0.862,
+   "sharpe_min": 0.834,
+   "sharpe_max": 0.876,
+   "slip50_sharpe": 0.871,
+   "off0_ann_pct": 18.07,
+   "off0_mdd_pct": -27.6,
+   "off0_total_pct": 156.99,
+   "n_trades": 0,
+   "phase_sharpes": {
+    "0": 0.871,
+    "4": 0.862,
+    "8": 0.876,
+    "12": 0.847,
+    "16": 0.834
+   },
+   "by_year_pct": {
+    "2021": 25.5,
+    "2022": -26.2,
+    "2023": 50.5,
+    "2024": 34.6,
+    "2025": 15.9,
+    "2026": 14.0
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": 0.192,
+   "corr_FB3": 0.186,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "纳指ETF(513100) 买入持有",
+   "group": "x",
+   "assets": [
+    "sh513100"
+   ],
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh513100",
+      "name": "纳指ETF国泰",
+      "px": 2.201,
+      "min_lot_cost": 220.2
+     }
+    ],
+    "max_min_lot_cost": 220.2,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "x_nasdaq_mom",
+   "phmed_sharpe": 0.653,
+   "sharpe_min": 0.491,
+   "sharpe_max": 1.026,
+   "slip50_sharpe": 0.397,
+   "off0_ann_pct": 6.91,
+   "off0_mdd_pct": -32.04,
+   "off0_total_pct": 43.76,
+   "n_trades": 14,
+   "phase_sharpes": {
+    "0": 0.491,
+    "4": 0.574,
+    "8": 0.699,
+    "12": 1.026,
+    "16": 0.653
+   },
+   "by_year_pct": {
+    "2021": 0.6,
+    "2022": -28.7,
+    "2023": 31.5,
+    "2024": 23.8,
+    "2025": 19.2,
+    "2026": 0.5
+   },
+   "start": "2021-04-08",
+   "end": "2026-09-11",
+   "corr_B": 0.121,
+   "corr_FB3": 0.176,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "纳指ETF 20d 动量择时",
+   "group": "x",
+   "assets": [
+    "sh513100"
+   ],
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh513100",
+      "name": "纳指ETF国泰",
+      "px": 2.201,
+      "min_lot_cost": 220.2
+     }
+    ],
+    "max_min_lot_cost": 220.2,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  {
+   "leg": "x_bond_rot_mom1_abs",
+   "phmed_sharpe": -0.506,
+   "sharpe_min": -0.826,
+   "sharpe_max": -0.226,
+   "slip50_sharpe": -1.893,
+   "off0_ann_pct": -1.35,
+   "off0_mdd_pct": -9.24,
+   "off0_total_pct": -7.43,
+   "n_trades": 52,
+   "phase_sharpes": {
+    "0": -0.605,
+    "4": -0.226,
+    "8": -0.826,
+    "12": -0.506,
+    "16": -0.244
+   },
+   "by_year_pct": {
+    "2021": -3.2,
+    "2022": -1.2,
+    "2023": -1.4,
+    "2024": 2.5,
+    "2025": -4.4,
+    "2026": -0.8
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-11",
+   "corr_B": -0.064,
+   "corr_FB3": -0.028,
+   "align_n": 1230,
+   "align_start": "2021-08-17",
+   "align_end": "2026-09-11",
+   "desc": "国债/地方债/公司债/城投 动量轮动 1 只 + 绝对动量",
+   "group": "x",
+   "assets": [
+    "sh511010",
+    "sh511260",
+    "sh511060",
+    "sh511030",
+    "sh511220"
+   ],
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh511260",
+      "name": "十年国债ETF国泰",
+      "px": 135.852,
+      "min_lot_cost": 13588.6
+     },
+     {
+      "code": "sh511220",
+      "name": "城投债ETF海富通",
+      "px": 10.423,
+      "min_lot_cost": 1042.6
+     }
+    ],
+    "max_min_lot_cost": 13588.6,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  }
+ ],
+ "blends": {
+  "a0_mom20_K3_allpool": {
+   "leg": "a0_mom20_K3_allpool",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 18.24,
+     "sharpe": 1.227,
+     "vol_pct": 14.6,
+     "mdd_pct": -16.66,
+     "calmar": 1.09,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.064,
+     "vs_base_ann_pct": 0.73,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 18.55,
+     "sharpe": 1.176,
+     "vol_pct": 15.59,
+     "mdd_pct": -17.56,
+     "calmar": 1.06,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.115,
+     "vs_base_ann_pct": 1.04,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 18.81,
+     "sharpe": 1.119,
+     "vol_pct": 16.74,
+     "mdd_pct": -18.47,
+     "calmar": 1.02,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.172,
+     "vs_base_ann_pct": 1.3,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 25.23,
+    "sharpe": 0.774,
+    "vol_pct": 39.06,
+    "mdd_pct": -45.16,
+    "calmar": 0.56,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 3,
+    "hot_assets": [
+     {
+      "code": "sz159981",
+      "name": "能源化工ETF建信",
+      "px": 1.759,
+      "min_lot_cost": 175.9
+     },
+     {
+      "code": "sz159945",
+      "name": "能源ETF广发",
+      "px": 1.392,
+      "min_lot_cost": 139.2
+     },
+     {
+      "code": "sh515220",
+      "name": "煤炭ETF国泰",
+      "px": 1.292,
+      "min_lot_cost": 129.2
+     },
+     {
+      "code": "sz159930",
+      "name": "能源ETF汇添富",
+      "px": 1.73,
+      "min_lot_cost": 173.0
+     },
+     {
+      "code": "sz159855",
+      "name": "影视ETF银华",
+      "px": 0.762,
+      "min_lot_cost": 76.2
+     }
+    ],
+    "max_min_lot_cost": 175.9,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  "a_mom20_K1": {
+   "leg": "a_mom20_K1",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 18.84,
+     "sharpe": 1.242,
+     "vol_pct": 14.86,
+     "mdd_pct": -16.54,
+     "calmar": 1.14,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.049,
+     "vs_base_ann_pct": 1.33,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 19.43,
+     "sharpe": 1.192,
+     "vol_pct": 16.06,
+     "mdd_pct": -17.39,
+     "calmar": 1.12,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.099,
+     "vs_base_ann_pct": 1.92,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 19.97,
+     "sharpe": 1.136,
+     "vol_pct": 17.46,
+     "mdd_pct": -18.23,
+     "calmar": 1.1,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.155,
+     "vs_base_ann_pct": 2.46,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 29.13,
+    "sharpe": 0.797,
+    "vol_pct": 44.82,
+    "mdd_pct": -43.84,
+    "calmar": 0.66,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh515220",
+      "name": "煤炭ETF国泰",
+      "px": 1.292,
+      "min_lot_cost": 129.2
+     },
+     {
+      "code": "sz159985",
+      "name": "豆粕ETF华夏",
+      "px": 2.325,
+      "min_lot_cost": 232.6
+     },
+     {
+      "code": "sh515700",
+      "name": "新能源车ETF平安",
+      "px": 1.996,
+      "min_lot_cost": 199.6
+     },
+     {
+      "code": "sh513050",
+      "name": "中概互联网ETF易方达",
+      "px": 1.015,
+      "min_lot_cost": 101.5
+     },
+     {
+      "code": "sh512690",
+      "name": "酒ETF鹏华",
+      "px": 0.412,
+      "min_lot_cost": 41.2
+     }
+    ],
+    "max_min_lot_cost": 232.6,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  "a_mom20_K1_abs": {
+   "leg": "a_mom20_K1_abs",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 18.84,
+     "sharpe": 1.242,
+     "vol_pct": 14.86,
+     "mdd_pct": -16.54,
+     "calmar": 1.14,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.049,
+     "vs_base_ann_pct": 1.33,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 19.43,
+     "sharpe": 1.192,
+     "vol_pct": 16.06,
+     "mdd_pct": -17.39,
+     "calmar": 1.12,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.099,
+     "vs_base_ann_pct": 1.92,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 19.97,
+     "sharpe": 1.136,
+     "vol_pct": 17.46,
+     "mdd_pct": -18.23,
+     "calmar": 1.1,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.155,
+     "vs_base_ann_pct": 2.46,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 29.13,
+    "sharpe": 0.797,
+    "vol_pct": 44.82,
+    "mdd_pct": -43.84,
+    "calmar": 0.66,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh515220",
+      "name": "煤炭ETF国泰",
+      "px": 1.292,
+      "min_lot_cost": 129.2
+     },
+     {
+      "code": "sz159985",
+      "name": "豆粕ETF华夏",
+      "px": 2.325,
+      "min_lot_cost": 232.6
+     },
+     {
+      "code": "sh515700",
+      "name": "新能源车ETF平安",
+      "px": 1.996,
+      "min_lot_cost": 199.6
+     },
+     {
+      "code": "sh513050",
+      "name": "中概互联网ETF易方达",
+      "px": 1.015,
+      "min_lot_cost": 101.5
+     },
+     {
+      "code": "sh512690",
+      "name": "酒ETF鹏华",
+      "px": 0.412,
+      "min_lot_cost": 41.2
+     }
+    ],
+    "max_min_lot_cost": 232.6,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  "a_mom20_K3": {
+   "leg": "a_mom20_K3",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 18.24,
+     "sharpe": 1.227,
+     "vol_pct": 14.6,
+     "mdd_pct": -16.66,
+     "calmar": 1.09,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.064,
+     "vs_base_ann_pct": 0.73,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 18.55,
+     "sharpe": 1.176,
+     "vol_pct": 15.59,
+     "mdd_pct": -17.56,
+     "calmar": 1.06,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.115,
+     "vs_base_ann_pct": 1.04,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 18.81,
+     "sharpe": 1.119,
+     "vol_pct": 16.74,
+     "mdd_pct": -18.47,
+     "calmar": 1.02,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.172,
+     "vs_base_ann_pct": 1.3,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 25.23,
+    "sharpe": 0.774,
+    "vol_pct": 39.06,
+    "mdd_pct": -45.16,
+    "calmar": 0.56,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 3,
+    "hot_assets": [
+     {
+      "code": "sz159981",
+      "name": "能源化工ETF建信",
+      "px": 1.759,
+      "min_lot_cost": 175.9
+     },
+     {
+      "code": "sz159945",
+      "name": "能源ETF广发",
+      "px": 1.392,
+      "min_lot_cost": 139.2
+     },
+     {
+      "code": "sh515220",
+      "name": "煤炭ETF国泰",
+      "px": 1.292,
+      "min_lot_cost": 129.2
+     },
+     {
+      "code": "sz159930",
+      "name": "能源ETF汇添富",
+      "px": 1.73,
+      "min_lot_cost": 173.0
+     },
+     {
+      "code": "sz159855",
+      "name": "影视ETF银华",
+      "px": 0.762,
+      "min_lot_cost": 76.2
+     }
+    ],
+    "max_min_lot_cost": 175.9,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  "a_mom20_K3_abs": {
+   "leg": "a_mom20_K3_abs",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 18.24,
+     "sharpe": 1.227,
+     "vol_pct": 14.6,
+     "mdd_pct": -16.66,
+     "calmar": 1.09,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.064,
+     "vs_base_ann_pct": 0.73,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 18.55,
+     "sharpe": 1.176,
+     "vol_pct": 15.59,
+     "mdd_pct": -17.56,
+     "calmar": 1.06,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.115,
+     "vs_base_ann_pct": 1.04,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 18.81,
+     "sharpe": 1.119,
+     "vol_pct": 16.74,
+     "mdd_pct": -18.47,
+     "calmar": 1.02,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.172,
+     "vs_base_ann_pct": 1.3,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 25.23,
+    "sharpe": 0.774,
+    "vol_pct": 39.06,
+    "mdd_pct": -45.16,
+    "calmar": 0.56,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 3,
+    "hot_assets": [
+     {
+      "code": "sz159981",
+      "name": "能源化工ETF建信",
+      "px": 1.759,
+      "min_lot_cost": 175.9
+     },
+     {
+      "code": "sz159945",
+      "name": "能源ETF广发",
+      "px": 1.392,
+      "min_lot_cost": 139.2
+     },
+     {
+      "code": "sh515220",
+      "name": "煤炭ETF国泰",
+      "px": 1.292,
+      "min_lot_cost": 129.2
+     },
+     {
+      "code": "sz159930",
+      "name": "能源ETF汇添富",
+      "px": 1.73,
+      "min_lot_cost": 173.0
+     },
+     {
+      "code": "sz159855",
+      "name": "影视ETF银华",
+      "px": 0.762,
+      "min_lot_cost": 76.2
+     }
+    ],
+    "max_min_lot_cost": 175.9,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  "a_mom20_K5": {
+   "leg": "a_mom20_K5",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 18.33,
+     "sharpe": 1.243,
+     "vol_pct": 14.45,
+     "mdd_pct": -16.84,
+     "calmar": 1.09,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.048,
+     "vs_base_ann_pct": 0.82,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 18.68,
+     "sharpe": 1.201,
+     "vol_pct": 15.33,
+     "mdd_pct": -17.83,
+     "calmar": 1.05,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.09,
+     "vs_base_ann_pct": 1.17,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 19.01,
+     "sharpe": 1.153,
+     "vol_pct": 16.34,
+     "mdd_pct": -18.81,
+     "calmar": 1.01,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.138,
+     "vs_base_ann_pct": 1.5,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 27.38,
+    "sharpe": 0.857,
+    "vol_pct": 35.88,
+    "mdd_pct": -36.31,
+    "calmar": 0.75,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 5,
+    "hot_assets": [
+     {
+      "code": "sz159981",
+      "name": "能源化工ETF建信",
+      "px": 1.759,
+      "min_lot_cost": 175.9
+     },
+     {
+      "code": "sz159930",
+      "name": "能源ETF汇添富",
+      "px": 1.73,
+      "min_lot_cost": 173.0
+     },
+     {
+      "code": "sh515220",
+      "name": "煤炭ETF国泰",
+      "px": 1.292,
+      "min_lot_cost": 129.2
+     },
+     {
+      "code": "sz159945",
+      "name": "能源ETF广发",
+      "px": 1.392,
+      "min_lot_cost": 139.2
+     },
+     {
+      "code": "sz159941",
+      "name": "纳指ETF广发",
+      "px": 1.638,
+      "min_lot_cost": 163.8
+     }
+    ],
+    "max_min_lot_cost": 175.9,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  "a_mom20_K5_abs": {
+   "leg": "a_mom20_K5_abs",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 18.33,
+     "sharpe": 1.243,
+     "vol_pct": 14.45,
+     "mdd_pct": -16.84,
+     "calmar": 1.09,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.048,
+     "vs_base_ann_pct": 0.82,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 18.68,
+     "sharpe": 1.201,
+     "vol_pct": 15.33,
+     "mdd_pct": -17.83,
+     "calmar": 1.05,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.09,
+     "vs_base_ann_pct": 1.17,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 19.01,
+     "sharpe": 1.153,
+     "vol_pct": 16.34,
+     "mdd_pct": -18.81,
+     "calmar": 1.01,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.138,
+     "vs_base_ann_pct": 1.5,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 27.38,
+    "sharpe": 0.857,
+    "vol_pct": 35.88,
+    "mdd_pct": -36.31,
+    "calmar": 0.75,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 5,
+    "hot_assets": [
+     {
+      "code": "sz159981",
+      "name": "能源化工ETF建信",
+      "px": 1.759,
+      "min_lot_cost": 175.9
+     },
+     {
+      "code": "sz159930",
+      "name": "能源ETF汇添富",
+      "px": 1.73,
+      "min_lot_cost": 173.0
+     },
+     {
+      "code": "sh515220",
+      "name": "煤炭ETF国泰",
+      "px": 1.292,
+      "min_lot_cost": 129.2
+     },
+     {
+      "code": "sz159945",
+      "name": "能源ETF广发",
+      "px": 1.392,
+      "min_lot_cost": 139.2
+     },
+     {
+      "code": "sz159941",
+      "name": "纳指ETF广发",
+      "px": 1.638,
+      "min_lot_cost": 163.8
+     }
+    ],
+    "max_min_lot_cost": 175.9,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  "b_lowvol_K1": {
+   "leg": "b_lowvol_K1",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 15.26,
+     "sharpe": 1.234,
+     "vol_pct": 12.17,
+     "mdd_pct": -14.87,
+     "calmar": 1.03,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.057,
+     "vs_base_ann_pct": -2.25,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 14.13,
+     "sharpe": 1.195,
+     "vol_pct": 11.7,
+     "mdd_pct": -14.88,
+     "calmar": 0.95,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.096,
+     "vs_base_ann_pct": -3.38,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 13.02,
+     "sharpe": 1.149,
+     "vol_pct": 11.26,
+     "mdd_pct": -14.9,
+     "calmar": 0.87,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.142,
+     "vs_base_ann_pct": -4.49,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 1.26,
+    "sharpe": 1.445,
+    "vol_pct": 0.87,
+    "mdd_pct": -1.02,
+    "calmar": 1.23,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh511360",
+      "name": "短融ETF海富通",
+      "px": 113.912,
+      "min_lot_cost": 11394.0
+     }
+    ],
+    "max_min_lot_cost": 11394.0,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  "b_lowvol_K3": {
+   "leg": "b_lowvol_K3",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 15.11,
+     "sharpe": 1.224,
+     "vol_pct": 12.17,
+     "mdd_pct": -14.87,
+     "calmar": 1.02,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.067,
+     "vs_base_ann_pct": -2.4,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 13.92,
+     "sharpe": 1.18,
+     "vol_pct": 11.69,
+     "mdd_pct": -14.88,
+     "calmar": 0.94,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.111,
+     "vs_base_ann_pct": -3.59,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 12.74,
+     "sharpe": 1.127,
+     "vol_pct": 11.26,
+     "mdd_pct": -14.89,
+     "calmar": 0.86,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.164,
+     "vs_base_ann_pct": -4.77,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 0.01,
+    "sharpe": 0.014,
+    "vol_pct": 0.86,
+    "mdd_pct": -1.42,
+    "calmar": 0.01,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 3,
+    "hot_assets": [
+     {
+      "code": "sh511360",
+      "name": "短融ETF海富通",
+      "px": 113.912,
+      "min_lot_cost": 11394.0
+     },
+     {
+      "code": "sz159651",
+      "name": "国开债ETF平安",
+      "px": 108.13,
+      "min_lot_cost": 10815.7
+     },
+     {
+      "code": "sz159650",
+      "name": "国开债ETF博时",
+      "px": 108.054,
+      "min_lot_cost": 10808.1
+     },
+     {
+      "code": "sh511030",
+      "name": "公司债ETF平安",
+      "px": 108.396,
+      "min_lot_cost": 10842.3
+     },
+     {
+      "code": "sz159816",
+      "name": "0-4年地方债ETF鹏华",
+      "px": 114.001,
+      "min_lot_cost": 11403.0
+     }
+    ],
+    "max_min_lot_cost": 11403.0,
+    "exec_10pct": false,
+    "exec_15pct": false,
+    "exec_20pct": false
+   }
+  },
+  "b_lowvol_K5": {
+   "leg": "b_lowvol_K5",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 15.19,
+     "sharpe": 1.229,
+     "vol_pct": 12.17,
+     "mdd_pct": -14.88,
+     "calmar": 1.02,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.062,
+     "vs_base_ann_pct": -2.32,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 14.03,
+     "sharpe": 1.188,
+     "vol_pct": 11.69,
+     "mdd_pct": -14.89,
+     "calmar": 0.94,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.103,
+     "vs_base_ann_pct": -3.48,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 12.88,
+     "sharpe": 1.139,
+     "vol_pct": 11.26,
+     "mdd_pct": -14.91,
+     "calmar": 0.86,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.152,
+     "vs_base_ann_pct": -4.63,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 0.66,
+    "sharpe": 0.965,
+    "vol_pct": 0.69,
+    "mdd_pct": -1.12,
+    "calmar": 0.59,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 5,
+    "hot_assets": [
+     {
+      "code": "sh511360",
+      "name": "短融ETF海富通",
+      "px": 113.912,
+      "min_lot_cost": 11394.0
+     },
+     {
+      "code": "sz159650",
+      "name": "国开债ETF博时",
+      "px": 108.054,
+      "min_lot_cost": 10808.1
+     },
+     {
+      "code": "sz159651",
+      "name": "国开债ETF平安",
+      "px": 108.13,
+      "min_lot_cost": 10815.7
+     },
+     {
+      "code": "sz159816",
+      "name": "0-4年地方债ETF鹏华",
+      "px": 114.001,
+      "min_lot_cost": 11403.0
+     },
+     {
+      "code": "sh511030",
+      "name": "公司债ETF平安",
+      "px": 108.396,
+      "min_lot_cost": 10842.3
+     },
+     {
+      "code": "sz159972",
+      "name": "5年地方债ETF鹏华",
+      "px": 119.695,
+      "min_lot_cost": 11972.5
+     }
+    ],
+    "max_min_lot_cost": 11972.5,
+    "exec_10pct": false,
+    "exec_15pct": false,
+    "exec_20pct": false
+   }
+  },
+  "c_gold_bh": {
+   "leg": "c_gold_bh",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 17.3,
+     "sharpe": 1.338,
+     "vol_pct": 12.58,
+     "mdd_pct": -14.93,
+     "calmar": 1.16,
+     "n_days": 1230,
+     "vs_base_sharpe": 0.047,
+     "vs_base_ann_pct": -0.21,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 17.17,
+     "sharpe": 1.347,
+     "vol_pct": 12.41,
+     "mdd_pct": -14.97,
+     "calmar": 1.15,
+     "n_days": 1230,
+     "vs_base_sharpe": 0.056,
+     "vs_base_ann_pct": -0.34,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 17.03,
+     "sharpe": 1.344,
+     "vol_pct": 12.34,
+     "mdd_pct": -15.0,
+     "calmar": 1.14,
+     "n_days": 1230,
+     "vs_base_sharpe": 0.053,
+     "vs_base_ann_pct": -0.48,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 19.52,
+    "sharpe": 1.117,
+    "vol_pct": 17.42,
+    "mdd_pct": -30.51,
+    "calmar": 0.64,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh518880",
+      "name": "黄金ETF华安",
+      "px": 8.943,
+      "min_lot_cost": 894.5
+     }
+    ],
+    "max_min_lot_cost": 894.5,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  "c_gold_mom": {
+   "leg": "c_gold_mom",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 16.29,
+     "sharpe": 1.279,
+     "vol_pct": 12.48,
+     "mdd_pct": -14.87,
+     "calmar": 1.1,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.012,
+     "vs_base_ann_pct": -1.22,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 15.67,
+     "sharpe": 1.258,
+     "vol_pct": 12.23,
+     "mdd_pct": -14.88,
+     "calmar": 1.05,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.033,
+     "vs_base_ann_pct": -1.84,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 15.04,
+     "sharpe": 1.228,
+     "vol_pct": 12.07,
+     "mdd_pct": -14.9,
+     "calmar": 1.01,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.063,
+     "vs_base_ann_pct": -2.47,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 10.01,
+    "sharpe": 0.728,
+    "vol_pct": 14.67,
+    "mdd_pct": -27.4,
+    "calmar": 0.37,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh518880",
+      "name": "黄金ETF华安",
+      "px": 8.943,
+      "min_lot_cost": 894.5
+     }
+    ],
+    "max_min_lot_cost": 894.5,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  "d_sh511010_bh": {
+   "leg": "d_sh511010_bh",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 15.44,
+     "sharpe": 1.248,
+     "vol_pct": 12.16,
+     "mdd_pct": -14.87,
+     "calmar": 1.04,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.043,
+     "vs_base_ann_pct": -2.07,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 14.41,
+     "sharpe": 1.218,
+     "vol_pct": 11.68,
+     "mdd_pct": -14.88,
+     "calmar": 0.97,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.073,
+     "vs_base_ann_pct": -3.1,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 13.38,
+     "sharpe": 1.18,
+     "vol_pct": 11.24,
+     "mdd_pct": -14.89,
+     "calmar": 0.9,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.111,
+     "vs_base_ann_pct": -4.13,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 2.89,
+    "sharpe": 1.997,
+    "vol_pct": 1.44,
+    "mdd_pct": -1.52,
+    "calmar": 1.9,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh511010",
+      "name": "国债ETF国泰",
+      "px": 141.146,
+      "min_lot_cost": 14118.1
+     }
+    ],
+    "max_min_lot_cost": 14118.1,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  "d_sh511030_bh": {
+   "leg": "d_sh511030_bh",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 15.36,
+     "sharpe": 1.241,
+     "vol_pct": 12.18,
+     "mdd_pct": -14.87,
+     "calmar": 1.03,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.05,
+     "vs_base_ann_pct": -2.15,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 14.29,
+     "sharpe": 1.207,
+     "vol_pct": 11.7,
+     "mdd_pct": -14.88,
+     "calmar": 0.96,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.084,
+     "vs_base_ann_pct": -3.22,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 13.23,
+     "sharpe": 1.164,
+     "vol_pct": 11.27,
+     "mdd_pct": -14.88,
+     "calmar": 0.89,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.127,
+     "vs_base_ann_pct": -4.28,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 2.2,
+    "sharpe": 1.139,
+    "vol_pct": 1.94,
+    "mdd_pct": -4.46,
+    "calmar": 0.49,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh511030",
+      "name": "公司债ETF平安",
+      "px": 108.396,
+      "min_lot_cost": 10842.3
+     }
+    ],
+    "max_min_lot_cost": 10842.3,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  "d_sh511060_bh": {
+   "leg": "d_sh511060_bh",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 15.5,
+     "sharpe": 1.253,
+     "vol_pct": 12.16,
+     "mdd_pct": -14.86,
+     "calmar": 1.04,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.038,
+     "vs_base_ann_pct": -2.01,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 14.5,
+     "sharpe": 1.224,
+     "vol_pct": 11.68,
+     "mdd_pct": -14.86,
+     "calmar": 0.98,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.067,
+     "vs_base_ann_pct": -3.01,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 13.5,
+     "sharpe": 1.189,
+     "vol_pct": 11.25,
+     "mdd_pct": -14.86,
+     "calmar": 0.91,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.102,
+     "vs_base_ann_pct": -4.01,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 3.45,
+    "sharpe": 2.318,
+    "vol_pct": 1.47,
+    "mdd_pct": -1.38,
+    "calmar": 2.5,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh511060",
+      "name": "5年地方债ETF海富通",
+      "px": 108.609,
+      "min_lot_cost": 10863.6
+     }
+    ],
+    "max_min_lot_cost": 10863.6,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  "d_sh511090_bh": {
+   "leg": "d_sh511090_bh",
+   "blend_window": [
+    "2023-06-30",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 25.33,
+    "sharpe": 1.651,
+    "vol_pct": 14.34,
+    "mdd_pct": -14.94,
+    "calmar": 1.7,
+    "n_days": 779
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 23.98,
+     "sharpe": 1.711,
+     "vol_pct": 13.1,
+     "mdd_pct": -14.9,
+     "calmar": 1.61,
+     "n_days": 779,
+     "vs_base_sharpe": 0.06,
+     "vs_base_ann_pct": -1.35,
+     "placebo_cash": {
+      "ann_pct": 23.1,
+      "sharpe": 1.644,
+      "vol_pct": 13.21,
+      "mdd_pct": -14.87,
+      "calmar": 1.55,
+      "n_days": 779,
+      "vs_base_sharpe": -0.007
+     }
+    },
+    "w15": {
+     "ann_pct": 23.29,
+     "sharpe": 1.734,
+     "vol_pct": 12.56,
+     "mdd_pct": -14.92,
+     "calmar": 1.56,
+     "n_days": 779,
+     "vs_base_sharpe": 0.083,
+     "vs_base_ann_pct": -2.04,
+     "placebo_cash": {
+      "ann_pct": 21.98,
+      "sharpe": 1.632,
+      "vol_pct": 12.71,
+      "mdd_pct": -14.88,
+      "calmar": 1.48,
+      "n_days": 779,
+      "vs_base_sharpe": -0.019
+     }
+    },
+    "w20": {
+     "ann_pct": 22.59,
+     "sharpe": 1.751,
+     "vol_pct": 12.08,
+     "mdd_pct": -14.95,
+     "calmar": 1.51,
+     "n_days": 779,
+     "vs_base_sharpe": 0.1,
+     "vs_base_ann_pct": -2.74,
+     "placebo_cash": {
+      "ann_pct": 20.87,
+      "sharpe": 1.613,
+      "vol_pct": 12.25,
+      "mdd_pct": -14.9,
+      "calmar": 1.4,
+      "n_days": 779,
+      "vs_base_sharpe": -0.038
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 7.04,
+    "sharpe": 1.153,
+    "vol_pct": 6.08,
+    "mdd_pct": -8.85,
+    "calmar": 0.8,
+    "n_days": 779
+   },
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh511090",
+      "name": "30年国债ETF鹏扬",
+      "px": 118.872,
+      "min_lot_cost": 11890.2
+     }
+    ],
+    "max_min_lot_cost": 11890.2,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  "d_sh511220_bh": {
+   "leg": "d_sh511220_bh",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 15.52,
+     "sharpe": 1.253,
+     "vol_pct": 12.17,
+     "mdd_pct": -14.87,
+     "calmar": 1.04,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.038,
+     "vs_base_ann_pct": -1.99,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 14.53,
+     "sharpe": 1.226,
+     "vol_pct": 11.69,
+     "mdd_pct": -14.88,
+     "calmar": 0.98,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.065,
+     "vs_base_ann_pct": -2.98,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 13.54,
+     "sharpe": 1.191,
+     "vol_pct": 11.25,
+     "mdd_pct": -14.89,
+     "calmar": 0.91,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.1,
+     "vs_base_ann_pct": -3.97,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 3.6,
+    "sharpe": 2.102,
+    "vol_pct": 1.7,
+    "mdd_pct": -4.24,
+    "calmar": 0.85,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh511220",
+      "name": "城投债ETF海富通",
+      "px": 10.423,
+      "min_lot_cost": 1042.6
+     }
+    ],
+    "max_min_lot_cost": 1042.6,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  "d_sh511260_bh": {
+   "leg": "d_sh511260_bh",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 15.55,
+     "sharpe": 1.258,
+     "vol_pct": 12.15,
+     "mdd_pct": -14.87,
+     "calmar": 1.05,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.033,
+     "vs_base_ann_pct": -1.96,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 14.58,
+     "sharpe": 1.232,
+     "vol_pct": 11.66,
+     "mdd_pct": -14.87,
+     "calmar": 0.98,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.059,
+     "vs_base_ann_pct": -2.93,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 13.6,
+     "sharpe": 1.199,
+     "vol_pct": 11.22,
+     "mdd_pct": -14.88,
+     "calmar": 0.91,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.092,
+     "vs_base_ann_pct": -3.91,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 3.86,
+    "sharpe": 1.944,
+    "vol_pct": 1.97,
+    "mdd_pct": -2.08,
+    "calmar": 1.86,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh511260",
+      "name": "十年国债ETF国泰",
+      "px": 135.852,
+      "min_lot_cost": 13588.6
+     }
+    ],
+    "max_min_lot_cost": 13588.6,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  "e_gold_10y_5050": {
+   "leg": "e_gold_10y_5050",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 16.49,
+     "sharpe": 1.3,
+     "vol_pct": 12.4,
+     "mdd_pct": -14.91,
+     "calmar": 1.11,
+     "n_days": 1230,
+     "vs_base_sharpe": 0.009,
+     "vs_base_ann_pct": -1.02,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 15.96,
+     "sharpe": 1.294,
+     "vol_pct": 12.08,
+     "mdd_pct": -14.93,
+     "calmar": 1.07,
+     "n_days": 1230,
+     "vs_base_sharpe": 0.003,
+     "vs_base_ann_pct": -1.55,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 15.43,
+     "sharpe": 1.28,
+     "vol_pct": 11.82,
+     "mdd_pct": -14.96,
+     "calmar": 1.03,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.011,
+     "vs_base_ann_pct": -2.08,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 12.26,
+    "sharpe": 1.121,
+    "vol_pct": 10.9,
+    "mdd_pct": -21.42,
+    "calmar": 0.57,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 2,
+    "hot_assets": [
+     {
+      "code": "sh518880",
+      "name": "黄金ETF华安",
+      "px": 8.943,
+      "min_lot_cost": 894.5
+     },
+     {
+      "code": "sh511260",
+      "name": "十年国债ETF国泰",
+      "px": 135.852,
+      "min_lot_cost": 13588.6
+     }
+    ],
+    "max_min_lot_cost": 13588.6,
+    "exec_10pct": false,
+    "exec_15pct": false,
+    "exec_20pct": true
+   }
+  },
+  "e_gold_bond_5050": {
+   "leg": "e_gold_bond_5050",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 16.46,
+     "sharpe": 1.297,
+     "vol_pct": 12.41,
+     "mdd_pct": -14.91,
+     "calmar": 1.1,
+     "n_days": 1230,
+     "vs_base_sharpe": 0.006,
+     "vs_base_ann_pct": -1.05,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 15.92,
+     "sharpe": 1.29,
+     "vol_pct": 12.09,
+     "mdd_pct": -14.94,
+     "calmar": 1.07,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.001,
+     "vs_base_ann_pct": -1.59,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 15.38,
+     "sharpe": 1.274,
+     "vol_pct": 11.84,
+     "mdd_pct": -14.97,
+     "calmar": 1.03,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.017,
+     "vs_base_ann_pct": -2.13,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 12.0,
+    "sharpe": 1.091,
+    "vol_pct": 11.01,
+    "mdd_pct": -21.7,
+    "calmar": 0.55,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 2,
+    "hot_assets": [
+     {
+      "code": "sh518880",
+      "name": "黄金ETF华安",
+      "px": 8.943,
+      "min_lot_cost": 894.5
+     },
+     {
+      "code": "sh511010",
+      "name": "国债ETF国泰",
+      "px": 141.146,
+      "min_lot_cost": 14118.1
+     }
+    ],
+    "max_min_lot_cost": 14118.1,
+    "exec_10pct": false,
+    "exec_15pct": false,
+    "exec_20pct": true
+   }
+  },
+  "e_gold_bond_5050_timed": {
+   "leg": "e_gold_bond_5050_timed",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 15.44,
+     "sharpe": 1.231,
+     "vol_pct": 12.35,
+     "mdd_pct": -14.87,
+     "calmar": 1.04,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.06,
+     "vs_base_ann_pct": -2.07,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 14.41,
+     "sharpe": 1.188,
+     "vol_pct": 12.0,
+     "mdd_pct": -14.88,
+     "calmar": 0.97,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.103,
+     "vs_base_ann_pct": -3.1,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 13.37,
+     "sharpe": 1.135,
+     "vol_pct": 11.72,
+     "mdd_pct": -14.89,
+     "calmar": 0.9,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.156,
+     "vs_base_ann_pct": -4.14,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 2.57,
+    "sharpe": 0.296,
+    "vol_pct": 10.5,
+    "mdd_pct": -20.66,
+    "calmar": 0.12,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 2,
+    "hot_assets": [
+     {
+      "code": "sh511010",
+      "name": "国债ETF国泰",
+      "px": 141.146,
+      "min_lot_cost": 14118.1
+     },
+     {
+      "code": "sh518880",
+      "name": "黄金ETF华安",
+      "px": 8.943,
+      "min_lot_cost": 894.5
+     }
+    ],
+    "max_min_lot_cost": 14118.1,
+    "exec_10pct": false,
+    "exec_15pct": false,
+    "exec_20pct": true
+   }
+  },
+  "f_stock_gold_mom1": {
+   "leg": "f_stock_gold_mom1",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 16.8,
+     "sharpe": 1.252,
+     "vol_pct": 13.17,
+     "mdd_pct": -16.57,
+     "calmar": 1.01,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.039,
+     "vs_base_ann_pct": -0.71,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 16.43,
+     "sharpe": 1.22,
+     "vol_pct": 13.26,
+     "mdd_pct": -17.41,
+     "calmar": 0.94,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.071,
+     "vs_base_ann_pct": -1.08,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 16.05,
+     "sharpe": 1.181,
+     "vol_pct": 13.43,
+     "mdd_pct": -18.25,
+     "calmar": 0.88,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.11,
+     "vs_base_ann_pct": -1.46,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 15.12,
+    "sharpe": 0.853,
+    "vol_pct": 18.66,
+    "mdd_pct": -21.65,
+    "calmar": 0.7,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh518880",
+      "name": "黄金ETF华安",
+      "px": 8.943,
+      "min_lot_cost": 894.5
+     },
+     {
+      "code": "sh512100",
+      "name": "中证1000ETF南方",
+      "px": 3.014,
+      "min_lot_cost": 301.5
+     }
+    ],
+    "max_min_lot_cost": 894.5,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  "f_stock_gold_mom1_abs": {
+   "leg": "f_stock_gold_mom1_abs",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 16.17,
+     "sharpe": 1.218,
+     "vol_pct": 13.08,
+     "mdd_pct": -16.55,
+     "calmar": 0.98,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.073,
+     "vs_base_ann_pct": -1.34,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 15.48,
+     "sharpe": 1.169,
+     "vol_pct": 13.12,
+     "mdd_pct": -17.39,
+     "calmar": 0.89,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.122,
+     "vs_base_ann_pct": -2.03,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 14.79,
+     "sharpe": 1.114,
+     "vol_pct": 13.24,
+     "mdd_pct": -18.23,
+     "calmar": 0.81,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.177,
+     "vs_base_ann_pct": -2.72,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 9.19,
+    "sharpe": 0.6,
+    "vol_pct": 17.21,
+    "mdd_pct": -30.58,
+    "calmar": 0.3,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh518880",
+      "name": "黄金ETF华安",
+      "px": 8.943,
+      "min_lot_cost": 894.5
+     },
+     {
+      "code": "sh512100",
+      "name": "中证1000ETF南方",
+      "px": 3.014,
+      "min_lot_cost": 301.5
+     }
+    ],
+    "max_min_lot_cost": 894.5,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  "f_triple_mom1_abs": {
+   "leg": "f_triple_mom1_abs",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 15.78,
+     "sharpe": 1.193,
+     "vol_pct": 13.07,
+     "mdd_pct": -16.57,
+     "calmar": 0.95,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.098,
+     "vs_base_ann_pct": -1.73,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 14.91,
+     "sharpe": 1.132,
+     "vol_pct": 13.11,
+     "mdd_pct": -17.42,
+     "calmar": 0.86,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.159,
+     "vs_base_ann_pct": -2.6,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 14.04,
+     "sharpe": 1.065,
+     "vol_pct": 13.23,
+     "mdd_pct": -18.26,
+     "calmar": 0.77,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.226,
+     "vs_base_ann_pct": -3.47,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 5.66,
+    "sharpe": 0.409,
+    "vol_pct": 17.1,
+    "mdd_pct": -30.82,
+    "calmar": 0.18,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh518880",
+      "name": "黄金ETF华安",
+      "px": 8.943,
+      "min_lot_cost": 894.5
+     },
+     {
+      "code": "sh512100",
+      "name": "中证1000ETF南方",
+      "px": 3.014,
+      "min_lot_cost": 301.5
+     }
+    ],
+    "max_min_lot_cost": 894.5,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  "x_bond_rot_mom1_abs": {
+   "leg": "x_bond_rot_mom1_abs",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 14.93,
+     "sharpe": 1.211,
+     "vol_pct": 12.17,
+     "mdd_pct": -14.87,
+     "calmar": 1.0,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.08,
+     "vs_base_ann_pct": -2.58,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 13.65,
+     "sharpe": 1.16,
+     "vol_pct": 11.69,
+     "mdd_pct": -14.87,
+     "calmar": 0.92,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.131,
+     "vs_base_ann_pct": -3.86,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 12.38,
+     "sharpe": 1.099,
+     "vol_pct": 11.25,
+     "mdd_pct": -14.88,
+     "calmar": 0.83,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.192,
+     "vs_base_ann_pct": -5.13,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": -1.57,
+    "sharpe": -0.708,
+    "vol_pct": 2.22,
+    "mdd_pct": -8.91,
+    "calmar": -0.18,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh511260",
+      "name": "十年国债ETF国泰",
+      "px": 135.852,
+      "min_lot_cost": 13588.6
+     },
+     {
+      "code": "sh511220",
+      "name": "城投债ETF海富通",
+      "px": 10.423,
+      "min_lot_cost": 1042.6
+     }
+    ],
+    "max_min_lot_cost": 13588.6,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  "x_nasdaq_bh": {
+   "leg": "x_nasdaq_bh",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 17.1,
+     "sharpe": 1.295,
+     "vol_pct": 12.91,
+     "mdd_pct": -15.31,
+     "calmar": 1.12,
+     "n_days": 1230,
+     "vs_base_sharpe": 0.004,
+     "vs_base_ann_pct": -0.41,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 16.87,
+     "sharpe": 1.277,
+     "vol_pct": 12.93,
+     "mdd_pct": -15.54,
+     "calmar": 1.09,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.014,
+     "vs_base_ann_pct": -0.64,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 16.62,
+     "sharpe": 1.248,
+     "vol_pct": 13.08,
+     "mdd_pct": -15.77,
+     "calmar": 1.05,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.043,
+     "vs_base_ann_pct": -0.89,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 16.71,
+    "sharpe": 0.793,
+    "vol_pct": 22.89,
+    "mdd_pct": -27.6,
+    "calmar": 0.61,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh513100",
+      "name": "纳指ETF国泰",
+      "px": 2.201,
+      "min_lot_cost": 220.2
+     }
+    ],
+    "max_min_lot_cost": 220.2,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  },
+  "x_nasdaq_mom": {
+   "leg": "x_nasdaq_mom",
+   "blend_window": [
+    "2021-08-17",
+    "2026-09-11"
+   ],
+   "base_on_window": {
+    "ann_pct": 17.51,
+    "sharpe": 1.291,
+    "vol_pct": 13.24,
+    "mdd_pct": -14.94,
+    "calmar": 1.17,
+    "n_days": 1230
+   },
+   "variants": {
+    "w10": {
+     "ann_pct": 16.0,
+     "sharpe": 1.245,
+     "vol_pct": 12.63,
+     "mdd_pct": -15.29,
+     "calmar": 1.05,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.046,
+     "vs_base_ann_pct": -1.51,
+     "placebo_cash": {
+      "ann_pct": 15.11,
+      "sharpe": 1.223,
+      "vol_pct": 12.18,
+      "mdd_pct": -14.87,
+      "calmar": 1.02,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.068
+     }
+    },
+    "w15": {
+     "ann_pct": 15.23,
+     "sharpe": 1.206,
+     "vol_pct": 12.47,
+     "mdd_pct": -15.51,
+     "calmar": 0.98,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.085,
+     "vs_base_ann_pct": -2.28,
+     "placebo_cash": {
+      "ann_pct": 13.92,
+      "sharpe": 1.179,
+      "vol_pct": 11.7,
+      "mdd_pct": -14.88,
+      "calmar": 0.94,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.112
+     }
+    },
+    "w20": {
+     "ann_pct": 14.45,
+     "sharpe": 1.156,
+     "vol_pct": 12.41,
+     "mdd_pct": -15.73,
+     "calmar": 0.92,
+     "n_days": 1230,
+     "vs_base_sharpe": -0.135,
+     "vs_base_ann_pct": -3.06,
+     "placebo_cash": {
+      "ann_pct": 12.73,
+      "sharpe": 1.126,
+      "vol_pct": 11.27,
+      "mdd_pct": -14.9,
+      "calmar": 0.85,
+      "n_days": 1230,
+      "vs_base_sharpe": -0.165
+     }
+    }
+   },
+   "leg_standalone_on_blend_window": {
+    "ann_pct": 7.01,
+    "sharpe": 0.482,
+    "vol_pct": 17.23,
+    "mdd_pct": -32.04,
+    "calmar": 0.22,
+    "n_days": 1230
+   },
+   "exec": {
+    "median_names": 1,
+    "hot_assets": [
+     {
+      "code": "sh513100",
+      "name": "纳指ETF国泰",
+      "px": 2.201,
+      "min_lot_cost": 220.2
+     }
+    ],
+    "max_min_lot_cost": 220.2,
+    "exec_10pct": true,
+    "exec_15pct": true,
+    "exec_20pct": true
+   }
+  }
+ },
+ "robustness": {
+  "a0_mom20_K3_allpool": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.48,
+     "delta": 0.005
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.678,
+     "delta": -0.212
+    }
+   },
+   "yearly_corr_B": {
+    "2021": 0.267,
+    "2022": 0.384,
+    "2023": 0.295,
+    "2024": 0.411,
+    "2025": 0.207,
+    "2026": 0.089
+   }
+  },
+  "a_mom20_K1": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.548,
+     "delta": 0.073
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.658,
+     "delta": -0.232
+    }
+   },
+   "yearly_corr_B": {
+    "2021": 0.268,
+    "2022": 0.328,
+    "2023": 0.253,
+    "2024": 0.314,
+    "2025": 0.178,
+    "2026": 0.181
+   }
+  },
+  "a_mom20_K1_abs": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.548,
+     "delta": 0.073
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.658,
+     "delta": -0.232
+    }
+   },
+   "yearly_corr_B": {
+    "2021": 0.268,
+    "2022": 0.328,
+    "2023": 0.253,
+    "2024": 0.314,
+    "2025": 0.178,
+    "2026": 0.181
+   }
+  },
+  "a_mom20_K3": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.48,
+     "delta": 0.005
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.678,
+     "delta": -0.212
+    }
+   },
+   "yearly_corr_B": {
+    "2021": 0.267,
+    "2022": 0.384,
+    "2023": 0.295,
+    "2024": 0.411,
+    "2025": 0.207,
+    "2026": 0.089
+   }
+  },
+  "a_mom20_K3_abs": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.48,
+     "delta": 0.005
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.678,
+     "delta": -0.212
+    }
+   },
+   "yearly_corr_B": {
+    "2021": 0.267,
+    "2022": 0.384,
+    "2023": 0.295,
+    "2024": 0.411,
+    "2025": 0.207,
+    "2026": 0.089
+   }
+  },
+  "a_mom20_K5": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.444,
+     "delta": -0.031
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.742,
+     "delta": -0.148
+    }
+   },
+   "yearly_corr_B": {
+    "2021": 0.197,
+    "2022": 0.388,
+    "2023": 0.315,
+    "2024": 0.453,
+    "2025": 0.188,
+    "2026": 0.1
+   }
+  },
+  "a_mom20_K5_abs": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.444,
+     "delta": -0.031
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.742,
+     "delta": -0.148
+    }
+   },
+   "yearly_corr_B": {
+    "2021": 0.197,
+    "2022": 0.388,
+    "2023": 0.315,
+    "2024": 0.453,
+    "2025": 0.188,
+    "2026": 0.1
+   }
+  },
+  "b_lowvol_K1": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.212,
+     "delta": -0.263
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.883,
+     "delta": -0.007
+    }
+   },
+   "yearly_corr_B": {
+    "2021": 0.1,
+    "2022": -0.049,
+    "2023": 0.024,
+    "2024": -0.1,
+    "2025": -0.119,
+    "2026": -0.137
+   }
+  },
+  "b_lowvol_K3": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.19,
+     "delta": -0.285
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.871,
+     "delta": -0.019
+    }
+   },
+   "yearly_corr_B": {
+    "2021": -0.288,
+    "2022": -0.081,
+    "2023": 0.028,
+    "2024": -0.053,
+    "2025": -0.137,
+    "2026": -0.105
+   }
+  },
+  "b_lowvol_K5": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.201,
+     "delta": -0.274
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.878,
+     "delta": -0.012
+    }
+   },
+   "yearly_corr_B": {
+    "2021": -0.287,
+    "2022": -0.061,
+    "2023": -0.03,
+    "2024": -0.088,
+    "2025": -0.231,
+    "2026": -0.096
+   }
+  },
+  "c_gold_bh": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.369,
+     "delta": -0.106
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 2.01,
+     "delta": 0.12
+    }
+   },
+   "yearly_corr_B": {
+    "2021": -0.2,
+    "2022": -0.008,
+    "2023": -0.096,
+    "2024": 0.032,
+    "2025": 0.064,
+    "2026": 0.323
+   }
+  },
+  "c_gold_mom": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.23,
+     "delta": -0.245
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.955,
+     "delta": 0.065
+    }
+   },
+   "yearly_corr_B": {
+    "2021": -0.219,
+    "2022": 0.013,
+    "2023": -0.049,
+    "2024": 0.066,
+    "2025": 0.094,
+    "2026": 0.176
+   }
+  },
+  "d_sh511010_bh": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.238,
+     "delta": -0.237
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.904,
+     "delta": 0.014
+    }
+   },
+   "yearly_corr_B": {
+    "2021": -0.181,
+    "2022": -0.033,
+    "2023": -0.095,
+    "2024": -0.134,
+    "2025": -0.188,
+    "2026": -0.004
+   }
+  },
+  "d_sh511030_bh": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.225,
+     "delta": -0.25
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.896,
+     "delta": 0.006
+    }
+   },
+   "yearly_corr_B": {
+    "2021": -0.067,
+    "2022": 0.015,
+    "2023": 0.093,
+    "2024": -0.082,
+    "2025": -0.297,
+    "2026": 0.047
+   }
+  },
+  "d_sh511060_bh": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.249,
+     "delta": -0.226
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.909,
+     "delta": 0.019
+    }
+   },
+   "yearly_corr_B": {
+    "2021": -0.047,
+    "2022": -0.033,
+    "2023": -0.138,
+    "2024": -0.159,
+    "2025": -0.147,
+    "2026": 0.049
+   }
+  },
+  "d_sh511090_bh": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 1.46,
+     "blend_sharpe": 1.753,
+     "delta": 0.293
+    },
+    "h2": {
+     "base_sharpe": 1.832,
+     "blend_sharpe": 1.829,
+     "delta": -0.003
+    }
+   },
+   "yearly_corr_B": {
+    "2023": -0.169,
+    "2024": -0.229,
+    "2025": -0.26,
+    "2026": 0.072
+   }
+  },
+  "d_sh511220_bh": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.263,
+     "delta": -0.212
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.902,
+     "delta": 0.012
+    }
+   },
+   "yearly_corr_B": {
+    "2021": -0.235,
+    "2022": 0.072,
+    "2023": -0.035,
+    "2024": -0.034,
+    "2025": -0.212,
+    "2026": 0.005
+   }
+  },
+  "d_sh511260_bh": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.253,
+     "delta": -0.222
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.919,
+     "delta": 0.029
+    }
+   },
+   "yearly_corr_B": {
+    "2021": -0.286,
+    "2022": -0.044,
+    "2023": -0.122,
+    "2024": -0.176,
+    "2025": -0.236,
+    "2026": 0.039
+   }
+  },
+  "e_gold_10y_5050": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.308,
+     "delta": -0.167
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.968,
+     "delta": 0.078
+    }
+   },
+   "yearly_corr_B": {
+    "2021": -0.242,
+    "2022": -0.017,
+    "2023": -0.111,
+    "2024": 0.005,
+    "2025": 0.045,
+    "2026": 0.317
+   }
+  },
+  "e_gold_bond_5050": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.303,
+     "delta": -0.172
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.964,
+     "delta": 0.074
+    }
+   },
+   "yearly_corr_B": {
+    "2021": -0.22,
+    "2022": -0.014,
+    "2023": -0.107,
+    "2024": 0.018,
+    "2025": 0.052,
+    "2026": 0.317
+   }
+  },
+  "e_gold_bond_5050_timed": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.212,
+     "delta": -0.263
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.857,
+     "delta": -0.033
+    }
+   },
+   "yearly_corr_B": {
+    "2021": -0.231,
+    "2022": -0.021,
+    "2023": -0.072,
+    "2024": -0.104,
+    "2025": -0.026,
+    "2026": 0.159
+   }
+  },
+  "f_stock_gold_mom1": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.325,
+     "delta": -0.15
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.824,
+     "delta": -0.066
+    }
+   },
+   "yearly_corr_B": {
+    "2021": 0.215,
+    "2022": 0.157,
+    "2023": 0.166,
+    "2024": 0.367,
+    "2025": 0.325,
+    "2026": 0.404
+   }
+  },
+  "f_stock_gold_mom1_abs": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.247,
+     "delta": -0.228
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.791,
+     "delta": -0.099
+    }
+   },
+   "yearly_corr_B": {
+    "2021": 0.236,
+    "2022": 0.189,
+    "2023": 0.187,
+    "2024": 0.345,
+    "2025": 0.256,
+    "2026": 0.347
+   }
+  },
+  "f_triple_mom1_abs": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.181,
+     "delta": -0.294
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.769,
+     "delta": -0.121
+    }
+   },
+   "yearly_corr_B": {
+    "2021": 0.228,
+    "2022": 0.187,
+    "2023": 0.187,
+    "2024": 0.353,
+    "2025": 0.253,
+    "2026": 0.347
+   }
+  },
+  "x_bond_rot_mom1_abs": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.159,
+     "delta": -0.316
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.859,
+     "delta": -0.031
+    }
+   },
+   "yearly_corr_B": {
+    "2021": -0.164,
+    "2022": -0.017,
+    "2023": 0.023,
+    "2024": -0.071,
+    "2025": -0.188,
+    "2026": 0.033
+   }
+  },
+  "x_nasdaq_bh": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.373,
+     "delta": -0.102
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.925,
+     "delta": 0.035
+    }
+   },
+   "yearly_corr_B": {
+    "2021": 0.043,
+    "2022": 0.215,
+    "2023": 0.118,
+    "2024": 0.003,
+    "2025": 0.375,
+    "2026": 0.386
+   }
+  },
+  "x_nasdaq_mom": {
+   "halves_w15": {
+    "h1": {
+     "base_sharpe": 0.475,
+     "blend_sharpe": 0.215,
+     "delta": -0.26
+    },
+    "h2": {
+     "base_sharpe": 1.89,
+     "blend_sharpe": 1.914,
+     "delta": 0.024
+    }
+   },
+   "yearly_corr_B": {
+    "2021": 0.09,
+    "2022": 0.205,
+    "2023": 0.05,
+    "2024": 0.043,
+    "2025": 0.031,
+    "2026": 0.32
+   }
+  }
+ },
+ "satellite_blend": {
+  "c_gold_bh": {
+   "variants": {
+    "w10": {
+     "ann_pct": 22.73,
+     "sharpe": 1.401,
+     "vol_pct": 15.57,
+     "mdd_pct": -21.97,
+     "calmar": 1.03,
+     "n_days": 1230,
+     "vs_100B_sharpe": 0.104
+    },
+    "w15": {
+     "ann_pct": 22.69,
+     "sharpe": 1.453,
+     "vol_pct": 14.92,
+     "mdd_pct": -21.98,
+     "calmar": 1.03,
+     "n_days": 1230,
+     "vs_100B_sharpe": 0.156
+    },
+    "w20": {
+     "ann_pct": 22.63,
+     "sharpe": 1.503,
+     "vol_pct": 14.34,
+     "mdd_pct": -22.01,
+     "calmar": 1.03,
+     "n_days": 1230,
+     "vs_100B_sharpe": 0.206
+    },
+    "w30": {
+     "ann_pct": 22.47,
+     "sharpe": 1.588,
+     "vol_pct": 13.41,
+     "mdd_pct": -22.68,
+     "calmar": 0.99,
+     "n_days": 1230,
+     "vs_100B_sharpe": 0.291
+    }
+   },
+   "halves_delta": {
+    "h1_w20": 0.169,
+    "h1_w30": 0.262,
+    "h2_w20": 0.254,
+    "h2_w30": 0.35
+   },
+   "note": "对照 = 卫星 100% 轨B（同窗口）"
+  },
+  "d_sh511090_bh": {
+   "variants": {
+    "w10": {
+     "ann_pct": 18.5,
+     "sharpe": 1.137,
+     "vol_pct": 16.11,
+     "mdd_pct": -19.79,
+     "calmar": 0.93,
+     "n_days": 779,
+     "vs_100B_sharpe": 0.05
+    },
+    "w15": {
+     "ann_pct": 17.93,
+     "sharpe": 1.166,
+     "vol_pct": 15.17,
+     "mdd_pct": -18.68,
+     "calmar": 0.96,
+     "n_days": 779,
+     "vs_100B_sharpe": 0.079
+    },
+    "w20": {
+     "ann_pct": 17.36,
+     "sharpe": 1.199,
+     "vol_pct": 14.23,
+     "mdd_pct": -17.57,
+     "calmar": 0.99,
+     "n_days": 779,
+     "vs_100B_sharpe": 0.112
+    },
+    "w30": {
+     "ann_pct": 16.18,
+     "sharpe": 1.275,
+     "vol_pct": 12.4,
+     "mdd_pct": -15.57,
+     "calmar": 1.04,
+     "n_days": 779,
+     "vs_100B_sharpe": 0.188
+    }
+   },
+   "halves_delta": {
+    "h1_w20": 0.227,
+    "h1_w30": 0.388,
+    "h2_w20": -0.027,
+    "h2_w30": -0.049
+   },
+   "note": "对照 = 卫星 100% 轨B（同窗口）"
+  }
+ },
+ "gold_drift_sensitivity": {
+  "cut0pct": {
+   "gold_ann_pct": 19.63,
+   "gold_sharpe": 1.117,
+   "satellite_b_plus_gold20_delta": 0.206,
+   "book_w8_delta": 0.041,
+   "book_w15_delta": 0.056
+  },
+  "cut4pct": {
+   "gold_ann_pct": 14.94,
+   "gold_sharpe": 0.888,
+   "satellite_b_plus_gold20_delta": 0.15,
+   "book_w8_delta": 0.016,
+   "book_w15_delta": 0.007
+  },
+  "cut8pct": {
+   "gold_ann_pct": 10.44,
+   "gold_sharpe": 0.658,
+   "satellite_b_plus_gold20_delta": 0.095,
+   "book_w8_delta": -0.01,
+   "book_w15_delta": -0.041
+  },
+  "cut12pct": {
+   "gold_ann_pct": 6.11,
+   "gold_sharpe": 0.428,
+   "satellite_b_plus_gold20_delta": 0.039,
+   "book_w8_delta": -0.035,
+   "book_w15_delta": -0.089
+  },
+  "cut16pct": {
+   "gold_ann_pct": 1.95,
+   "gold_sharpe": 0.199,
+   "satellite_b_plus_gold20_delta": -0.017,
+   "book_w8_delta": -0.06,
+   "book_w15_delta": -0.138
+  }
+ }
+}
