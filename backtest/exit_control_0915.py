@@ -11,7 +11,9 @@ import numpy as np, pandas as pd
 
 BASE = Path(r"D:/Documents/Workbuddy/股票基金/quant-weight-system")
 HERE = BASE / "backtest"
-PAPER = HERE / "satellite_paper.json"
+PAPER = HERE / "satellite_paper.json"          # 旧单文件（兼容）
+PAPER_A = HERE / "satellite_paper_a.json"      # 2026-09-15 起双账户
+PAPER_B = HERE / "satellite_paper_b.json"
 STATE = HERE / "exit_control_state.json"
 t0 = time.time()
 def log(*a): print(f"[{time.time()-t0:6.1f}s]", *a, flush=True)
@@ -24,8 +26,21 @@ def px_of(code):
             return {r.date: (float(r.open), float(r.close)) for r in d.itertuples()}
     return {}
 
+def load_paper():
+    """读 paper 账户：优先双文件（2026-09-15 起），回退旧单文件。返回合并结构。"""
+    if PAPER_A.exists() and PAPER_B.exists():
+        out = {"meta": {}, "fills": [], "positions": {}, "nav_history": []}
+        for tk, f in (("track_a", PAPER_A), ("track_b", PAPER_B)):
+            d = json.loads(f.read_text(encoding="utf-8"))
+            out["meta"].update(d.get("meta", {}))
+            out["positions"][tk] = d.get("positions", {})
+            out["fills"] += d.get("fills", [])
+        return out
+    return json.loads(PAPER.read_text(encoding="utf-8"))
+
+
 def main():
-    paper = json.loads(PAPER.read_text(encoding="utf-8"))
+    paper = load_paper()
     st = json.loads(STATE.read_text(encoding="utf-8")) if STATE.exists() else dict(
         created=str(pd.Timestamp.today().date()), note="pct40 生产上线对照账本（无出场）",
         tracks={}, last_fill_idx=0, nav=[])

@@ -146,7 +146,7 @@ def run(fac_dict, rebal=60, topk=10, slip=0.002, offset=0):
     return {"total": tot * 100, "ann": ((1 + tot) ** (252 / max(1, len(eq))) - 1) * 100,
             "mdd": ((eq / np.maximum.accumulate(eq) - 1).min()) * 100,
             "sharpe": float(np.nanmean(r) / np.nanstd(r) * np.sqrt(252)) if np.nanstd(r) > 0 else 0,
-            "n_trades": n_tr}
+            "n_trades": n_tr, "eq": eq}
 
 
 if __name__ == "__main__":

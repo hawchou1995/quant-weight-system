@@ -379,7 +379,9 @@ def verify_rebase_drift(sym, fetcher):
 #       再加两道闸：单候选墙钟上限 + 整相位预算，保证「最坏情况有界」。
 # ---------------------------------------------------------------------------
 REBASE_TRY_TIMEOUT = 90      # 单候选上限（秒）：verify + 必要时全量重拉
-REBASE_BUDGET_S = 1500       # 整相位预算（秒）：超时收工，剩余候选下次继续
+REBASE_BUDGET_S = int(os.environ.get("REBASE_BUDGET_S", "2400"))  # 整相位预算（秒，可 env 覆盖）
+#   默认 2400s（40min）：实测 336 只 / 1500s ≈ 4.5s/只（akshare 每调用新建 JS VM 1.79s + 取数 + 1.2s 节流）
+#   → 400 候选正常需 ~30min，1500s 会切掉尾部 64 只（0916 实测 336/400）。
 
 
 def fetch_sina_daily_direct(sym, retries=3):
@@ -649,4 +651,22 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # ⚠ 2026-09-16 根因修复：本环境下 py_mini_racer（akshare 的 JS 解码依赖）会在解释器退出时
+    #   join 其 run_event_loop 线程且无超时 → **进程永不退出**（实测最小复现：仅 MiniRacer()+eval("1+1")
+    #   的脚本，退出阶段被 timeout 杀掉 exit=124）。复权检测是唯一使用 MiniRacer 的相位，故 0914/0915/0916
+    #   三天日志都停在「复权基准检测完成」后不再推进。→ 所有真实工作落盘后，用 os._exit 直接终结进程。
+    _rc = 0
+    try:
+        main()
+    except SystemExit as _e:
+        _rc = int(_e.code or 0)
+    except Exception:
+        import traceback as _tb
+        _tb.print_exc()
+        _rc = 1
+    try:
+        sys.stdout.flush()
+        sys.stderr.flush()
+    except Exception:
+        pass
+    os._exit(_rc)

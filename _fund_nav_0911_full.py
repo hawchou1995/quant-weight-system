@@ -11,7 +11,7 @@ import requests
 
 BASE = Path(__file__).resolve().parent
 CACHE = BASE / "fund_nav_cache"
-TARGET = "2026-09-10"
+TARGET = "2026-09-11"
 UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
       "Referer": "https://fund.eastmoney.com/"}
 

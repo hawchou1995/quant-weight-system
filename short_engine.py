@@ -319,9 +319,31 @@ def short_score(r, reversal=False, weights=(30, 25, 25, 20), mask=(1, 1, 1, 1)):
     return s
 
 # ---------------- 池 ----------------
-def load_stock_pool():
+def _rss_mb():
+    try:
+        import psutil
+        return psutil.Process().memory_info().rss / 1e6
+    except Exception:
+        return float("nan")
+
+
+def load_stock_pool(tail_n=None):
+    """全市场短池数据。
+
+    tail_n: 只保留每只**最后 N 行**（默认 None = 全历史，研究/回测路径行为不变）。
+        生产日更路径传 tail_n=300 —— 依据（2026-09-16 全量审计）：本函数下游的全部用法
+        最长回看 = 60 行（short_factors 内 c.shift(60) / rolling(20)、_hit_count 内 rolling(60)），
+        300 行 = 5× 余量 → **尾部结果逐位不变**，但 dict 常驻内存降约 8 倍。
+        动机：09-15 每日链在 fund_nav_update（3042 只净值刷新）之后跑本步时
+        出现间歇性原生崩溃 exit 0xC0000005（实测内存占用 84%+），属内存压力下的原生分配失败。
+    """
+    import gc as _gc
+    import time as _time
+    _t0 = _time.time()
     pool = {}
-    for f in sorted((BASE / "data_full").glob("*.csv")):
+    pool = {}
+    _files = sorted((BASE / "data_full").glob("*.csv"))
+    for _i, f in enumerate(_files):
         code = f.stem
         if code.startswith(("bj", "sh5", "sz1", "sh9")):  # sh9=B股（USD计价，流动性差，剔）
             continue
@@ -335,9 +357,14 @@ def load_stock_pool():
             # volume 单位切换不统一（主板/创业板 股→手，科创板保持股）→ 用 fix_amount_units
             # 按股票自锚定代理（详见函数 docstring），保证 amt20 过滤与回测口径一致。
             df = fix_amount_units(df)
+            if tail_n:
+                df = df.tail(int(tail_n)).reset_index(drop=True)
             pool[code] = short_factors(df).set_index("date")
         except Exception:
             continue
+        if tail_n and _i and _i % 500 == 0:      # 内存压力缓解：定期回收（截尾模式才启用）
+            _gc.collect()
+            print(f"  [mem] {_i}/{len(_files)} 只 RSS {_rss_mb():.0f}MB ({_time.time()-_t0:.0f}s)", flush=True)
     # 2026-08-24 修复：剔「死数据」标的——退市/改名后 data_full 停更的股票（如 600317 营口港
     #   2021 年并入辽港股份后数据停在 2021-01-14）仍会以「最新行」参与短线打分并进池/跟踪，
     #   看板显示多年前价格误导。以全市场最新交易日为基准，落后 >10 自然日的标的剔除
@@ -346,6 +373,8 @@ def load_stock_pool():
         _max = max(df.index[-1] for df in pool.values())
         _cut = _max - pd.Timedelta(days=10)
         pool = {c: df for c, df in pool.items() if df.index[-1] >= _cut}
+    print(f"  [mem] load_stock_pool 完成 {len(pool)} 只 RSS {_rss_mb():.0f}MB "
+          f"({_time.time()-_t0:.0f}s){' tail_n=' + str(tail_n) if tail_n else ''}", flush=True)
     return pool
 
 def load_etf_pool():

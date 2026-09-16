@@ -20,7 +20,8 @@ TUI_SET = set(_name[_name.str.contains("退")].index)
 ST_SET = set(_name[_name.str.contains("ST")].index)
 IND = json.load(open(BASE / "stock_industry.json", encoding="utf-8"))["map"]
 PAPER = HERE / "holdings_satellite.json"
-CAP_A, CAP_B = 17000, 51000  # 2026-09-14 拍板：轨A 25% / 轨B 75%
+from satellite_cfg import CAP_A, CAP_B, ROLE_A, ROLE_B, REBASED  # 单一来源（R-single-track-0915）
+# 2026-09-15 拍板：单跑轨B（68k）；轨A 转零资金对照轨（CAP_A=0）
 
 
 def nm(code):

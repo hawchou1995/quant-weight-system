@@ -73,6 +73,16 @@ for name, args, skip in STEPS:
     print(f"\n========== {name} ==========", flush=True)
     _env = NO_PROXY_ENV if name.startswith("数据更新") else None   # 数据步禁代理（防代理抖动阻塞）
     r = subprocess.run([PY] + args, cwd=str(BASE), env=_env)
+    # 2026-09-16：原生崩溃（Windows 0xC0000005 访问违规 = 3221225477 或 -1073741819）
+    # 在本机被观测到在内存吃紧时**间歇**发生（build_short_pool 单独重跑即成功）。
+    # 处置：回收内存 → 等 5s → 原样重试一次；仍失败才走原失败路径。
+    if r.returncode in (3221225477, -1073741819):
+        print(f"⚠️ {name} 原生崩溃 exit {r.returncode} —— 回收内存后重试一次", flush=True)
+        import gc as _gc
+        _gc.collect()
+        time.sleep(5)
+        r = subprocess.run([PY] + args, cwd=str(BASE), env=_env)
+        print(f"   重试 {'成功 ✓' if r.returncode == 0 else f'仍失败 exit {r.returncode}'}", flush=True)
     if r.returncode != 0:
         if name.endswith("[软]"):   # 软步骤：失败只告警，不阻断（如 A5 实验盘、影子轨）
             print(f"⚠️ {name} 失败（exit {r.returncode}）—— 非致命，继续后续步骤", flush=True)

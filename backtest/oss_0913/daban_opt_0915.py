@@ -133,9 +133,11 @@ for code, df0 in d.items():
         if not np.isfinite(amt_c[T-1]) or amt_c[T-1] < CFG['amt_min']:
             continue
         ep = op[T]
+        hi60 = np.nanmax(cl[max(0, T-1-59):T]) if T >= 60 else np.nan
+        dh = (hi60 - cl[T-1]) / hi60 if np.isfinite(hi60) and hi60 > 0 else np.nan
         r = dict(code=code, buy=dates[T], gap=float(gap),
                  f_aro=aro[T-1], f_mom=mom[T-1], f_m200=m200[T-1], f_r20=r20[T-1],
-                 f_vpc=vpc[T-1], f_amt20=amt20v[T-1], f_adx=adx[T-1],
+                 f_vpc=vpc[T-1], f_amt20=amt20v[T-1], f_adx=adx[T-1], f_dh=float(dh),
                  amt20_T1=amt20v[T-1], rp=float(rel_pos[T-1]), amt_c=float(amt_c[T-1]))
         # 基准出场
         eb, px, why = A5.apply_tp_t2(df, feat, T, ep)
