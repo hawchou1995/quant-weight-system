@@ -476,6 +476,33 @@ fetcher = F.fetch_sina_daily      # ⚠ 强制新浪；参数 source 仅保留�
 
 ---
 
+## 4.6 分工定案：日更 / 批量历史 / 按需（2026-09-16）
+
+**背景**：同一天里既要「每天拿到全市场最新截面」，又要「一次性建十几年历史库」，还要「临时查一只票」——
+三种活的成本结构完全不同，**混用会造成小时级等待（已踩坑：用东财分页做日更）**。定案如下：
+
+| 场景 | 走哪个源 | 形态 | 实测 |
+|---|---|---|---|
+| **日更（每日 15:35 后，增量截面）** | **fuyao（同花顺官方 MCP，已在 ZCode）** | 一次调用返回**当日全市场** | 龙虎榜实测：**1 次调用 = 73 条**（含机构/游资净额、涨停原因、概念、热度、1日/3日区间），**零分页** |
+| **批量历史（一次性建库）** | **东财 datacenter 分页** | 500 行/页，脚本化翻页、断点续跑 | 2026-09-16 建成 13 表 ≈300MB（业绩预告 84.7MB / 大宗 57.5MB / 龙虎榜席位 54.8MB / 龙虎榜明细 44.3MB / 股东户数 36.2MB / 增减持 14.4MB …） |
+| **按需单票 / 小批量** | **westock CLI** | 单二进制、无 key | `fund margin|lhb|block <code>` 实测 **844~887 ms/次** |
+| 成篇研究报告 / Excel 模型 | Wind Alice（`alice-financial-copilot`） | 自然语言出报告，耗积分 | key 已配 `~/.wind-alice/config.env` |
+| 分钟线 / 25 年日线 | TDX/TQLEX 直连（`tdxhub.icfqs.com:7615`，token 在 `personal/api-keys.md`） | 单票直连 | 见 §2.7 上文与分时三源表 |
+
+**冒烟自检（各源一行，出问题先跑这个）**：
+```bash
+# fuyao（同花顺官方）：当日龙虎榜截面（应返回 count>0 且有 stock_items）
+#   —— 在 ZCode 内直接调用 MCP 工具 get_a_share_special_data_dragon_tiger_list
+# westock CLI（~0.9s）
+westock fund lhb sh600519
+# 东财 datacenter（分页）：任一 altdata 脚本的小样模式
+python backtest/altdata_lhb.py --limit 1
+# TDX/TQLEX 直连
+python backtest/tdx_data_0913.py --help
+```
+
+**注意**：ETF 不在本表讨论范围（短线线自有 ETF 轮动）；本表服务于「行情 + 资金/筹码 + 事件」三条数据主线。
+
 ## 5. 复权（qfq）处理逻辑
 
 ### 5.1 为什么统一前复权
