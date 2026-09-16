@@ -219,11 +219,19 @@ async def collect_dates(ws_url, dates):
     return json.loads(await ev(ws_url, js))
 
 
+def _ok_code(s):
+    """代码有效性兜底：6 位数字才算真实代码（脱敏占位 '******' 一律剔除）"""
+    c = str(s or "").strip()
+    return len(c) == 6 and c.isdigit()
+
+
 def day_lines(trade_date, day):
-    """把某日原始数据摊平成 picks_daily.jsonl 的行"""
+    """把某日原始数据摊平成 picks_daily.jsonl 的行（含脱敏行兜底剔除）"""
     lines = []
     for f, nm in FACTORS.items():
         for s in ((day.get(f"f_{f}", {}).get("result") or {}).get("stock_list") or []):
+            if not _ok_code(s.get("stock_code")):
+                continue
             lines.append({"date": trade_date, "kind": "factor", "strategy": nm, "fid": f, **{k: s.get(k) for k in (
                 "stock_code", "stock_name", "price", "open_rise", "change_rate", "entity_rate",
                 "market_value", "total_score", "factor_count")},
@@ -231,6 +239,8 @@ def day_lines(trade_date, day):
                 "concepts": (s.get("block_names") or [])[:8]})
     for r in RESON:
         for s in ((day.get(f"r_{r}", {}).get("result") or {}).get("stock_list") or []):
+            if not _ok_code(s.get("stock_code")):
+                continue
             lines.append({"date": trade_date, "kind": "resonance", "strategy": r, "fid": r, **{k: s.get(k) for k in (
                 "stock_code", "stock_name", "price", "open_rise", "change_rate", "entity_rate",
                 "market_value", "total_score")},
@@ -254,6 +264,18 @@ def run_channels(ports, todo, dry_run):
             continue
         role = (data.get("me", {}).get("result") or {}).get("role")
         save_window_floor(data, todo)
+        # ⚠ 2026-09-16 修：regular（普通会员）**同样全面脱敏**（实测 stock_code="******" + masked=True），
+        #   原实现只对「非 vip 非 regular」告警 → 脱敏占位行会被当合法数据落盘（污染全错清单）。
+        #   改为：**只有 vip 才落盘**；其它角色一律拒绝写盘（仅报告）。
+        if role != "vip":
+            _masked = any(
+                ((data.get(d) or {}).get("f_1", {}).get("result") or {}).get("stock_list")
+                and any(str(s.get("stock_code", "")).startswith("*")
+                        for s in (((data.get(d) or {}).get("f_1", {}).get("result") or {}).get("stock_list") or [])[:1])
+                for d in todo)
+            print(f"[warn] 通道 {port} role={role}（非 VIP，脱敏={_masked}）——**拒绝落盘**以保护数据集")
+            reason = "nomask"
+            continue
         if sum(sum(counts(data.get(d) or {})) for d in todo) == 0:
             codes = [((data.get(d) or {}).get("f_1") or {}).get("code") for d in todo]
             if codes and all(c == 403 for c in codes):
@@ -310,6 +332,10 @@ def main():
         print(f"[gushi-daily] 通道 {used[0]}（{used[1]}）| role={role} | 增采 {total} 条{mode}")
     elif reason == "window":
         print(f"[gushi-daily] 待采日期全在站点窗口外（站点硬限：仅最近 15 天）| role={role} | 窗口内数据齐全，无需补采{mode}")
+    elif reason == "nomask":
+        print(f"[gushi-daily] role={role} 非 VIP → 数据脱敏，已拒绝落盘（数据集未被污染）{mode}")
+        print("[WARN] 需开通/续费 VIP：量化商城 https://gushi.in/index.php?a=quant_points_payment"
+              "（VIP 1 天 30 积分 / 30 天 600 积分；用 LINUX DO 登录论坛后兑换即可）")
     else:
         print(f"[gushi-daily] 全部通道未取到数据（最后 role={role}）")
         print("[WARN] 登录态异常——请在自动化窗口（profile D:/Tools/chrome-auto-profile）登录一次 gushi；"

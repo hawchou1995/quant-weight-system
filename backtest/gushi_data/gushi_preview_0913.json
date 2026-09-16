@@ -1,0 +1,118 @@
+{
+ "1": {
+  "days": 11,
+  "n": 66,
+  "mean_chg": 1.951,
+  "mean_open": 2.586
+ },
+ "2": {
+  "days": 11,
+  "n": 66,
+  "mean_chg": 2.982,
+  "mean_open": 3.608
+ },
+ "3": {
+  "days": 11,
+  "n": 80,
+  "mean_chg": 2.902,
+  "mean_open": 2.985
+ },
+ "4": {
+  "days": 11,
+  "n": 60,
+  "mean_chg": 1.539,
+  "mean_open": 2.018
+ },
+ "5": {
+  "days": 11,
+  "n": 60,
+  "mean_chg": 2.764,
+  "mean_open": 2.745
+ },
+ "9": {
+  "days": 11,
+  "n": 34,
+  "mean_chg": 3.051,
+  "mean_open": 3.226
+ },
+ "11": {
+  "days": 11,
+  "n": 28,
+  "mean_chg": 2.508,
+  "mean_open": 2.103
+ },
+ "ten31": {
+  "days": 11,
+  "n": 46,
+  "mean_chg": 2.642,
+  "mean_open": 3.463
+ },
+ "bigcap": {
+  "days": 11,
+  "n": 13,
+  "mean_chg": 3.506,
+  "mean_open": 3.469
+ },
+ "_reson": {
+  "baofactor13": {
+   "days": 11,
+   "n": 0,
+   "mean_chg": null
+  },
+  "fengkou": {
+   "days": 11,
+   "n": 23,
+   "mean_chg": -3.074
+  },
+  "fivestar": {
+   "days": 11,
+   "n": 29,
+   "mean_chg": 0.393
+  },
+  "gnbid": {
+   "days": 11,
+   "n": 207,
+   "mean_chg": -1.415
+  },
+  "highscore": {
+   "days": 11,
+   "n": 30,
+   "mean_chg": -2.254
+  },
+  "hottopic": {
+   "days": 11,
+   "n": 107,
+   "mean_chg": 0.013
+  },
+  "linkgene": {
+   "days": 11,
+   "n": 4,
+   "mean_chg": 1.189
+  },
+  "momentum": {
+   "days": 11,
+   "n": 16,
+   "mean_chg": -0.377
+  },
+  "researchhot": {
+   "days": 11,
+   "n": 40,
+   "mean_chg": -1.936
+  },
+  "sectorlead": {
+   "days": 11,
+   "n": 40,
+   "mean_chg": -0.927
+  },
+  "testplate": {
+   "days": 11,
+   "n": 0,
+   "mean_chg": null
+  },
+  "vip": {
+   "days": 11,
+   "n": 22,
+   "mean_chg": -1.007
+  }
+ }
+}

@@ -1,0 +1,398 @@
+{
+ "竞价多头": {
+  "n": 47,
+  "auc": {
+   "open_rise": 0.95,
+   "ret_prev1": 0.717,
+   "ret_prev5": 0.691,
+   "ret_prev20": 0.8,
+   "dist_hh20": 0.721,
+   "dist_hh60": 0.674,
+   "amt_ratio": 0.608,
+   "mv_log": 1.0,
+   "ma_align": 0.704,
+   "above_ma20": 0.669,
+   "entity": 0.533,
+   "vol_ratio": 0.747,
+   "limit_up_prev": 0.638
+  },
+  "top": [
+   [
+    "mv_log",
+    1.0
+   ],
+   [
+    "open_rise",
+    0.95
+   ],
+   [
+    "ret_prev20",
+    0.8
+   ],
+   [
+    "vol_ratio",
+    0.747
+   ],
+   [
+    "dist_hh20",
+    0.721
+   ],
+   [
+    "ret_prev1",
+    0.717
+   ]
+  ]
+ },
+ "盘前强势": {
+  "n": 42,
+  "auc": {
+   "open_rise": 0.985,
+   "ret_prev1": 0.684,
+   "ret_prev5": 0.642,
+   "ret_prev20": 0.673,
+   "dist_hh20": 0.691,
+   "dist_hh60": 0.584,
+   "amt_ratio": 0.585,
+   "mv_log": 1.0,
+   "ma_align": 0.625,
+   "above_ma20": 0.642,
+   "entity": 0.555,
+   "vol_ratio": 0.873,
+   "limit_up_prev": 0.644
+  },
+  "top": [
+   [
+    "mv_log",
+    1.0
+   ],
+   [
+    "open_rise",
+    0.985
+   ],
+   [
+    "vol_ratio",
+    0.873
+   ],
+   [
+    "dist_hh20",
+    0.691
+   ],
+   [
+    "ret_prev1",
+    0.684
+   ],
+   [
+    "ret_prev20",
+    0.673
+   ]
+  ]
+ },
+ "晨星量化": {
+  "n": 50,
+  "auc": {
+   "open_rise": 0.971,
+   "ret_prev1": 0.742,
+   "ret_prev5": 0.736,
+   "ret_prev20": 0.788,
+   "dist_hh20": 0.726,
+   "dist_hh60": 0.673,
+   "amt_ratio": 0.635,
+   "mv_log": 1.0,
+   "ma_align": 0.683,
+   "above_ma20": 0.68,
+   "entity": 0.567,
+   "vol_ratio": 0.793,
+   "limit_up_prev": 0.599
+  },
+  "top": [
+   [
+    "mv_log",
+    1.0
+   ],
+   [
+    "open_rise",
+    0.971
+   ],
+   [
+    "vol_ratio",
+    0.793
+   ],
+   [
+    "ret_prev20",
+    0.788
+   ],
+   [
+    "ret_prev1",
+    0.742
+   ],
+   [
+    "ret_prev5",
+    0.736
+   ]
+  ]
+ },
+ "竞价阿尔法": {
+  "n": 38,
+  "auc": {
+   "open_rise": 0.864,
+   "ret_prev1": 0.823,
+   "ret_prev5": 0.869,
+   "ret_prev20": 0.886,
+   "dist_hh20": 0.714,
+   "dist_hh60": 0.62,
+   "amt_ratio": 0.602,
+   "mv_log": 1.0,
+   "ma_align": 0.666,
+   "above_ma20": 0.69,
+   "entity": 0.468,
+   "vol_ratio": 0.819,
+   "limit_up_prev": 0.792
+  },
+  "top": [
+   [
+    "mv_log",
+    1.0
+   ],
+   [
+    "ret_prev20",
+    0.886
+   ],
+   [
+    "ret_prev5",
+    0.869
+   ],
+   [
+    "open_rise",
+    0.864
+   ],
+   [
+    "ret_prev1",
+    0.823
+   ],
+   [
+    "vol_ratio",
+    0.819
+   ]
+  ]
+ },
+ "早盘之星": {
+  "n": 38,
+  "auc": {
+   "open_rise": 0.966,
+   "ret_prev1": 0.774,
+   "ret_prev5": 0.794,
+   "ret_prev20": 0.86,
+   "dist_hh20": 0.75,
+   "dist_hh60": 0.632,
+   "amt_ratio": 0.632,
+   "mv_log": 1.0,
+   "ma_align": 0.719,
+   "above_ma20": 0.69,
+   "entity": 0.594,
+   "vol_ratio": 0.791,
+   "limit_up_prev": 0.608
+  },
+  "top": [
+   [
+    "mv_log",
+    1.0
+   ],
+   [
+    "open_rise",
+    0.966
+   ],
+   [
+    "ret_prev20",
+    0.86
+   ],
+   [
+    "ret_prev5",
+    0.794
+   ],
+   [
+    "vol_ratio",
+    0.791
+   ],
+   [
+    "ret_prev1",
+    0.774
+   ]
+  ]
+ },
+ "T+1闪电": {
+  "n": 24,
+  "auc": {
+   "open_rise": 0.957,
+   "ret_prev1": 0.62,
+   "ret_prev5": 0.595,
+   "ret_prev20": 0.622,
+   "dist_hh20": 0.725,
+   "dist_hh60": 0.694,
+   "amt_ratio": 0.528,
+   "mv_log": 1.0,
+   "ma_align": 0.634,
+   "above_ma20": 0.648,
+   "entity": 0.534,
+   "vol_ratio": 0.854,
+   "limit_up_prev": 0.614
+  },
+  "top": [
+   [
+    "mv_log",
+    1.0
+   ],
+   [
+    "open_rise",
+    0.957
+   ],
+   [
+    "vol_ratio",
+    0.854
+   ],
+   [
+    "dist_hh20",
+    0.725
+   ],
+   [
+    "dist_hh60",
+    0.694
+   ],
+   [
+    "above_ma20",
+    0.648
+   ]
+  ]
+ },
+ "黄金两点半": {
+  "n": 26,
+  "auc": {
+   "open_rise": 0.791,
+   "ret_prev1": 0.783,
+   "ret_prev5": 0.736,
+   "ret_prev20": 0.809,
+   "dist_hh20": 0.642,
+   "dist_hh60": 0.518,
+   "amt_ratio": 0.581,
+   "mv_log": 1.0,
+   "ma_align": 0.594,
+   "above_ma20": 0.69,
+   "entity": 0.53,
+   "vol_ratio": 0.773,
+   "limit_up_prev": 0.662
+  },
+  "top": [
+   [
+    "mv_log",
+    1.0
+   ],
+   [
+    "ret_prev20",
+    0.809
+   ],
+   [
+    "open_rise",
+    0.791
+   ],
+   [
+    "ret_prev1",
+    0.783
+   ],
+   [
+    "vol_ratio",
+    0.773
+   ],
+   [
+    "ret_prev5",
+    0.736
+   ]
+  ]
+ },
+ "十点半": {
+  "n": 32,
+  "auc": {
+   "open_rise": 0.948,
+   "ret_prev1": 0.716,
+   "ret_prev5": 0.746,
+   "ret_prev20": 0.631,
+   "dist_hh20": 0.67,
+   "dist_hh60": 0.632,
+   "amt_ratio": 0.575,
+   "mv_log": 1.0,
+   "ma_align": 0.613,
+   "above_ma20": 0.69,
+   "entity": 0.505,
+   "vol_ratio": 0.751,
+   "limit_up_prev": 0.536
+  },
+  "top": [
+   [
+    "mv_log",
+    1.0
+   ],
+   [
+    "open_rise",
+    0.948
+   ],
+   [
+    "vol_ratio",
+    0.751
+   ],
+   [
+    "ret_prev5",
+    0.746
+   ],
+   [
+    "ret_prev1",
+    0.716
+   ],
+   [
+    "above_ma20",
+    0.69
+   ]
+  ]
+ },
+ "大市值": {
+  "n": 10,
+  "auc": {
+   "open_rise": 0.984,
+   "ret_prev1": 0.574,
+   "ret_prev5": 0.48,
+   "ret_prev20": 0.404,
+   "dist_hh20": 0.757,
+   "dist_hh60": 0.777,
+   "amt_ratio": 0.469,
+   "mv_log": 1.0,
+   "ma_align": 0.513,
+   "above_ma20": 0.64,
+   "entity": 0.465,
+   "vol_ratio": 0.953,
+   "limit_up_prev": 0.539
+  },
+  "top": [
+   [
+    "mv_log",
+    1.0
+   ],
+   [
+    "open_rise",
+    0.984
+   ],
+   [
+    "vol_ratio",
+    0.953
+   ],
+   [
+    "dist_hh60",
+    0.777
+   ],
+   [
+    "dist_hh20",
+    0.757
+   ],
+   [
+    "above_ma20",
+    0.64
+   ]
+  ]
+ }
+}
