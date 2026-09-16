@@ -116,32 +116,43 @@ except Exception as _e:
     SHORT_KHUNTER_BEAR = ''
     SHORT_POOL = {}
 
-_pap_f = BASE / "backtest" / "satellite_paper.json"
-try:
-    _pap = json.load(open(_pap_f, encoding="utf-8"))
-    _pm = _pap.get("meta", {})
-    _nh = _pap.get("nav_history", [])
-    _npos = sum(len(v) for v in _pap.get("positions", {}).values())
-    # ⚠ 2026-09-14 修：原写法 `_nh[-1][1]` 把 nav_history 的**字典**当元组/列表索引 → KeyError → 整张卡
-    #   掉进 except 分支渲染成「satellite_paper.json 未生成（'1'）」，用户据此以为模拟盘没生成。
-    _init = float(_pm.get("initial_cash", 68000) or 68000)
-    _nlast = _nh[-1] if _nh else {}
-    _nav = float(_nlast.get("total") or _init) / _init
-    _ret = (_nav - 1) * 100
-    SAT_PAPER_CARD = (f'<div class="card" id="sat-paper-card">'
-                      f'<h2>🧪 双卫星模拟盘 <span class="badge badge-auto">起始 {_pm.get("started", "—")} · 6.8 万（轨A 3.4万+轨B 3.4万）</span></h2>'
-                      f'<div class="kpis">'
-                      f'<div class="kpi"><div class="l">模拟净值</div><div class="v">{_nav:.4f}</div><div class="s">期初 1.0</div></div>'
-                      f'<div class="kpi"><div class="l">累计收益</div><div class="v" style="color:{ "#10b981" if _ret >= 0 else "#ef4444" }">{_ret:+.2f}%</div><div class="s">含成本口径</div></div>'
-                      f'<div class="kpi"><div class="l">持仓标的</div><div class="v">{_npos}</div><div class="s">目标 30</div></div>'
-                      f'<div class="kpi"><div class="l">状态</div><div class="v">{"运行中" if _nh else "待建仓"}</div><div class="s">{(_nlast.get("date") if _nh else _pap.get("events", [{}])[-1].get("date", "—"))}</div></div>'
-                      f'</div>'
-                      f'<div class="sub">记账口径：信号日次一交易日开盘价×1.002（20bp 滑点）+ 佣金 2.5bp（最低 5 元）· 全自动，无需回填成交 · <b>pct40 因子化出场已启用（轨B：跌出前 40% 分位 → T+1 开盘卖）</b></div>'
-                      f'<div class="sub" style="color:var(--faint)">{(_pap.get("events", [{}])[-1].get("event", ""))}</div>'
-                      f'</div>')
-except Exception as _e2:
-    SAT_PAPER_CARD = (f'<div class="card" id="sat-paper-card"><h2>🧪 双卫星模拟盘</h2>'
-                      f'<div class="sub">satellite_paper.json 未生成（{_e2}）</div></div>')
+def _sat_paper_card(path, tk, title):
+    """单轨模拟盘卡（2026-09-15 拆分为轨A/轨B 两张，各自独立账户与基数）。"""
+    tag = tk[-1]
+    try:
+        d = json.load(open(path, encoding="utf-8"))
+        m = d.get("meta", {})
+        nh = d.get("nav_history", [])
+        pos = d.get("positions", {}) or {}
+        basis = float(m.get("basis") or m.get("initial_cash") or 1)
+        last = nh[-1] if nh else {}
+        nav = float(last.get(tk) or basis)
+        ret = (nav / basis - 1) * 100
+        status = "运行中" if nh else "待建仓"
+        dt = last.get("date") if nh else ((d.get("events") or [{}])[-1].get("date", "—"))
+        ev = ((d.get("events") or [{}])[-1].get("event", ""))
+        role = m.get("role", "")
+        return (f'<div class="card" id="sat-paper-{tag}-card">'
+                f'<h2>{title} <span class="badge badge-auto">{m.get("rebased","2026-09-15")[:10]} 重设 · 基数 {basis:,.0f} · {role}</span></h2>'
+                f'<div class="kpis">'
+                f'<div class="kpi"><div class="l">模拟净值</div><div class="v">{nav:,.0f}</div><div class="s">期初 {basis:,.0f}</div></div>'
+                f'<div class="kpi"><div class="l">累计收益</div><div class="v" style="color:{ "#10b981" if ret >= 0 else "#ef4444" }">{ret:+.2f}%</div><div class="s">含成本口径</div></div>'
+                f'<div class="kpi"><div class="l">持仓标的</div><div class="v">{len(pos)}</div><div class="s">{"零实盘资金·仅对照" if tag == "a" else "实盘主轨"}</div></div>'
+                f'<div class="kpi"><div class="l">状态</div><div class="v">{status}</div><div class="s">{dt}</div></div>'
+                f'</div>'
+                f'<div class="sub">记账口径：信号日次一交易日开盘价×1.002（20bp 滑点）+ 佣金 2.5bp（最低 5 元）· 全自动，无需回填成交'
+                + (' · <b>pct40 因子化出场已启用（跌出前 40% 分位 → T+1 开盘卖）</b>' if tag == "b" else ' · 对照轨不执行 pct40（保持纯定期轮动基线）') + '</div>'
+                f'<div class="sub" style="color:var(--faint)">{ev}</div>'
+                f'</div>')
+    except Exception as _e:
+        return (f'<div class="card" id="sat-paper-{tag}-card"><h2>{title}</h2>'
+                f'<div class="sub">账户文件未生成（{_e}）</div></div>')
+
+
+SAT_PAPER_B_CARD = _sat_paper_card(BASE / "backtest" / "satellite_paper_b.json", "track_b",
+                                   "🧪 轨B 模拟盘（主轨 · SUPER 13 因子 Top20）")
+SAT_PAPER_A_CARD = _sat_paper_card(BASE / "backtest" / "satellite_paper_a.json", "track_a",
+                                   "🧪 轨A 模拟盘（对照轨 · 冷门低波 · 零实盘资金）")
 
 # 基金主仓（轨C FB3-H20）模拟盘卡（2026-09-14 用户指出「中长线基金没有模拟盘」后补齐）
 _fp_f = BASE / "backtest" / "fund_paper.json"
@@ -1866,7 +1877,8 @@ html = f"""<!doctype html>
 </div>
 </div>
 {SAT_CARD}
-{SAT_PAPER_CARD}
+{SAT_PAPER_B_CARD}
+{SAT_PAPER_A_CARD}
 {FUND_PAPER_CARD}
 {FB3_POOL_CARD}
 <div class="card" id="v9-retired-card"><h2>🗂️ v9 全量池（已退役）</h2><div class="sub" style="color:#ef4444">⛔ v9 股票分层战法与 197 只跟踪池已于 2026-09-13 退役并移除展示——十重证伪确认负期望（ADR-0006/0007）。历史回测明细见「📝 更新日志」v5.9~v5.11.15 与 <code>backtest/</code> 报告存档。</div><div class="sub"><b>三轨退出规则</b>：① 主仓 FB3-H20 = 20 交易日月度轮动 + 牛熊 regime 切换（沪深300&lt;MA200 转 Top3 低波防守仓）——<b>无个股止盈止损</b>（基金 NAV 无涨跌停，止盈变体回测全部减值）；② 冷门低波 = 30 交易日到期换仓 + 中证1000ETF 破 MA20 半仓闸门（2026-09-14 起）；③ SUPER = 月频调仓 + 中证1000&lt;MA20 组合半仓闸（且关闸期取高波半区）+ <b>pct40 因子化出场已启用（跌出前40%分位 → T+1 开盘卖，留现金至下一调仓）</b>。</div></div>
@@ -1940,7 +1952,7 @@ html = f"""<!doctype html>
 /* 三视图导航（覆盖默认 4 项） */
 window.ENH.nav = [
   ["overview","📊","监控总览",[["overview","总览统计"],["mkt-weather","市场晴雨表"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
-  ["sys-auto","🛰️","三轨中长线",[["sat-card","双卫星目标持仓"],["sat-paper-card","双卫星模拟盘"],["fund-paper-card","基金主仓模拟盘"],["fb3-pool-card","FB3 基金池"]]],
+  ["sys-auto","🛰️","三轨中长线",[["sat-card","双卫星目标持仓"],["sat-paper-b-card","轨B 模拟盘（主轨）"],["sat-paper-a-card","轨A 模拟盘（对照）"],["fund-paper-card","基金主仓模拟盘"],["fb3-pool-card","FB3 基金池"]]],
   ["short","⚡","全量池短线",[["card-short-stk","股票池 汇总表"],["card-short-stk-detail","股票池 逐标的详情"],["card-kh-hits","KHunter 命中策略一览"],["card-etf-paper","ETF 动量轮动"],["card-kh-paper","KHunter 模拟盘"],["card-short-fund","基金池 汇总表"],["card-short-fund-detail","基金池 逐标的详情"],["watch-card","短线跟踪"]]],
   ["a5","🎯","打板族",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
   ["comment","💬","评论区",[]]

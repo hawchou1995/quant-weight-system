@@ -16,12 +16,59 @@ from pathlib import Path
 import pandas as pd
 
 BASE = Path(r"D:/Documents/Workbuddy/股票基金/quant-weight-system")
-STATE = BASE / "backtest" / "satellite_paper.json"
+STATE = BASE / "backtest" / "satellite_paper.json"          # 旧单文件（仅迁移兼容）
+STATE_A = BASE / "backtest" / "satellite_paper_a.json"      # 轨A 独立账户（对照轨）
+STATE_B = BASE / "backtest" / "satellite_paper_b.json"      # 轨B 独立账户（主轨）
 POOL = BASE / "backtest" / "satellite_pool.json"
 INIT_SNAP = BASE / "backtest" / "satellite_paper_init.json"   # 建仓目标快照(冻结信号日清单，防池重建改写)
 COMM, TAX, SLIP, MIN_COMM = 0.00025, 0.0010, 0.0020, 5.0
 TRACKS = ["track_a", "track_b"]
 CASH_KEY = {"track_a": "cash_a", "track_b": "cash_b"}
+STATE_MAP = {"track_a": STATE_A, "track_b": STATE_B}
+sys.path.insert(0, str(Path(__file__).parent))
+try:
+    import satellite_cfg as CFG
+    BASIS = {"track_a": CFG.NAV_A, "track_b": CFG.CAP_B}     # 各轨名义基数（净值口径）
+except Exception:
+    BASIS = {"track_a": 34000.0, "track_b": 34000.0}
+
+
+def load_state():
+    """从两个独立账户文件合并为内部单字典；两文件缺失则回退读旧单文件（迁移兼容）。"""
+    if not (STATE_A.exists() and STATE_B.exists()):
+        return json.loads(STATE.read_text(encoding="utf-8"))
+    st = {"meta": {}, "fills": [], "positions": {}, "nav_history": [], "events": []}
+    by_date = {}
+    for tk, f in STATE_MAP.items():
+        d = json.loads(f.read_text(encoding="utf-8"))
+        for k, v in (d.get("meta") or {}).items():
+            st["meta"].setdefault(k, v)
+        st[CASH_KEY[tk]] = d.get("cash")
+        st["positions"][tk] = d.get("positions", {})
+        st["fills"] += d.get("fills", [])
+        st["events"] += d.get("events", [])
+        for h in d.get("nav_history", []):
+            by_date.setdefault(h["date"], {"date": h["date"]}).update(
+                {k: v for k, v in h.items() if k != "date"})
+    st["nav_history"] = [by_date[k] for k in sorted(by_date)]
+    st["meta"]["initial_cash"] = sum(BASIS.values())
+    return st
+
+
+def save_state(st):
+    """把内部单字典按轨拆成两个独立账户文件（各含自己的 cash/positions/fills/nav）。"""
+    for tk, f in STATE_MAP.items():
+        meta = {k: v for k, v in (st.get("meta") or {}).items() if not k.startswith("cash_")}
+        meta.update(dict(track=tk, basis=BASIS[tk],
+                         role=("对照轨·零实盘资金" if tk == "track_a" else "主轨")))
+        d = dict(meta=meta, track=tk, cash=st.get(CASH_KEY[tk]),
+                 positions=st.get("positions", {}).get(tk, {}),
+                 fills=[x for x in st.get("fills", []) if x.get("track") == tk],
+                 events=[x for x in st.get("events", []) if x.get("track", tk) == tk],
+                 nav_history=[{"date": h["date"], **{k: v for k, v in h.items()
+                                                     if k in (tk, f"{tk}_pos")}}
+                              for h in st.get("nav_history", []) if tk in h])
+        f.write_text(json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8")
 
 def load_px(code, date=None):
     """返回 {date: (open, close)}；date=None 全量"""
@@ -38,7 +85,7 @@ def load_px(code, date=None):
     return {r.date: (float(r.open), float(r.close)) for r in df.itertuples()}
 
 def main():
-    st = json.loads(STATE.read_text(encoding="utf-8"))
+    st = load_state()
     pool = json.loads(POOL.read_text(encoding="utf-8"))
     dry = "--dry" in sys.argv
     target_date = None
@@ -143,7 +190,7 @@ def main():
             nh[-1][f"{label}_pos"] = round(mv, 2)
         else:
             nh.append({**({} if not nh or nh[-1].get("date") != last else nh[-1]), "date": last, label: round(nav, 2), f"{label}_pos": round(mv, 2)})
-        print(f"  {tk}: 现金 {cash:.2f} + 市值 {mv:.2f} = 净值 {nav:.2f}（{nav/34000-1:+.2%}）")
+        print(f"  {tk}: 现金 {cash:.2f} + 市值 {mv:.2f} = 净值 {nav:.2f}（{nav/BASIS[tk]-1:+.2%}）")
 
     # total 汇总到最新 nav 行
     nh = st["nav_history"]
@@ -155,7 +202,7 @@ def main():
         tail = json.dumps(nh[-1], ensure_ascii=False) if nh else "（空 nav_history：两轨均未建仓）"
         print("[dry] 未写盘。将写 nav_history 尾行：", tail)
         return
-    STATE.write_text(json.dumps(st, ensure_ascii=False, indent=1), encoding="utf-8")
+    save_state(st)
     print(f"== 合计净值 {total_nav:.2f} / {st['meta']['initial_cash']} = {total_nav/st['meta']['initial_cash']-1:+.2%} → {STATE.name}")
 
 if __name__ == "__main__":

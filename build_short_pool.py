@@ -562,7 +562,7 @@ def calc_signals(as_of=None):
         market_gate["jiandi_panic"] = {"note": "jiandi_panic.json 缺失/解析失败", "source": "unavailable"}
 
     # 1) 股票反转：按权限分层各取 Top10（主板/创业板/科创板，2026-08-17 用户决策）
-    stock_pool = S.load_stock_pool()
+    stock_pool = S.load_stock_pool(tail_n=300)   # 2026-09-16：截尾 300 行（下游最长回看 60 行，5× 余量）→ 常驻内存降约 8 倍，治 0xC0000005 间歇原生崩溃
     # 2026-08-27 修复：全市场最新交易日基准（停牌股新鲜度校验用）。
     # 002274 华昌化工 08-26 起停牌，as_of=None 时 iloc[-1] 会取 08-25 旧数据评分入池（65.2 强买入），
     # 看板显示旧价格误导。load_stock_pool 的 10 自然日阈值只挡「死数据」，挡不住短期停牌股。
