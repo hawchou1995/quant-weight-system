@@ -52,3 +52,4 @@ v8_factor_cache.pkl.bak*
 .workbuddy/
 # 2026-09-11 amount=0 事故的原始 CSV 备份（409 只，本地留存不入库）
 _backup_amt_0911/
+backtest/tongzhou_oauth.json

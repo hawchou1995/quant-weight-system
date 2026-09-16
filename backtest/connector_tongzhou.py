@@ -28,6 +28,7 @@
 """
 import json
 import os
+import pathlib
 import sys
 
 sys.path.insert(0, "D:/Documents/Workbuddy/股票基金/quant-weight-system/backtest")
@@ -37,9 +38,55 @@ NAME = "tongzhou"
 TOKEN_ENV = "TONGZHOU_TOKEN"   # 授权后把 OAuth access token 放这里即可跑
 
 
+# ---- OAuth 自动续期（2026-09-16 授权后新增）----
+OAUTH_JSON = r"D:/Documents/Workbuddy/股票基金/quant-weight-system/backtest/tongzhou_oauth.json"
+GATEWAY = "https://mcp-gateway.textmind-gz.com"
+MCP_URL = f"{GATEWAY}/mcp/tongzhou-research"
+_TOKEN_CACHE = {"tok": None, "at": 0.0}
+
+
+def _auto_token():
+    """无 TONGZHOU_TOKEN 环境变量时：读 OAuth 凭据，必要时用 refresh_token 续期。"""
+    import time as _t, urllib.parse as _up, urllib.request as _ur, urllib.error as _ue
+    if _TOKEN_CACHE["tok"] and _t.time() - _TOKEN_CACHE["at"] < 1200:
+        return _TOKEN_CACHE["tok"]
+    try:
+        cfg = json.loads(pathlib.Path(OAUTH_JSON).read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    tok = cfg.get("token") or {}
+    got = float(cfg.get("token_obtained_at") or 0)
+    life = int(tok.get("expires_in") or 0)
+    need = (not tok.get("access_token")) or (got > 0 and _t.time() - got > max(life - 300, 60))
+    if need:
+        rt = tok.get("refresh_token")
+        cid = (cfg.get("client_device") or cfg.get("client") or {}).get("client_id")
+        if rt and cid:
+            try:
+                req = _ur.Request(f"{GATEWAY}/oauth/token",
+                                  data=_up.urlencode({"grant_type": "refresh_token", "refresh_token": rt,
+                                                      "client_id": cid, "resource": MCP_URL}).encode(),
+                                  headers={"Content-Type": "application/x-www-form-urlencoded",
+                                           "Accept": "application/json"})
+                with _ur.urlopen(req, timeout=20) as r:
+                    nt = json.loads(r.read())
+                if nt.get("access_token"):
+                    cfg["token"] = {**tok, **nt}
+                    cfg["token_obtained_at"] = _t.time()
+                    pathlib.Path(OAUTH_JSON).write_text(json.dumps(cfg, ensure_ascii=False, indent=1), encoding="utf-8")
+                    tok = cfg["token"]
+                    print(f"[token] 已自动续期（expires_in={nt.get('expires_in')}）", file=sys.stderr, flush=True)
+            except Exception as e:
+                print(f"[token] 续期失败：{type(e).__name__} {str(e)[:80]}", file=sys.stderr, flush=True)
+    at = tok.get("access_token")
+    if at:
+        _TOKEN_CACHE.update({"tok": at, "at": _t.time()})
+    return at
+
+
 def _client():
     headers = {}
-    tok = os.environ.get(TOKEN_ENV)
+    tok = os.environ.get(TOKEN_ENV) or _auto_token()
     if tok:
         headers["Authorization"] = tok if tok.lower().startswith("bearer ") else f"Bearer {tok}"
     return MCPClient(ENDPOINTS[NAME]["url"], headers=headers, name=NAME, timeout=60)
