@@ -170,7 +170,13 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <h2 style="margin:0">📝 更新日志 <span class="badge badge-auto">GitHub Release 风格</span></h2>
 </div>
 <div class="sub">量化系统版本更新记录：复盘发现设计缺陷 → 启动系统更新 → 在此登记版本/日期/更新内容</div>
-<div class="rel"><div class="rel-head">v5.13.3 - 2026-09-13（基金线生产池 3000 → 2000 · 用户拍板「用 2000 池 700%+ 那个」）</div><div class="rel-body">
+<div class="rel"><div class="rel-head">v5.13.4 - 2026-09-17（看板：ret20 倾斜影子轨卡上线 · 视图 A「三轨中长线」内）</div><div class="rel-body">
+
+<p><b>内容</b>：新增「🧪 影子轨 · ret20 倾斜（#2 λ0.2 主 / #4 λ0.3 陪跑）」卡 —— 纸面跟踪 ret20 权重再校准候选（生产 composite 未动）。数据源 <code>backtest/shadow_ret20/{ledger.csv,daily_metrics.jsonl}</code>（每日链影子轨软步骤产出）。验收口径：≥1-3 个月前瞻 · 月度多数为正 · 相对回撤不失控；首检 10 月中。</p>
+
+<p><b>同批工程修复</b>：stage2/blend/placebo/micro 四脚本硬断言 22.87 改软锚 <code>engine_anchor.json</code>（|Δ|>3pp 中止；实机 21.35%/漂移 0.00pp 通过）；shadow_ret20 Top20 剔 ST/退 与生产 <code>name_hist</code> 同源（修复前 250 日回扫 23 日会漏 ST）。</p>
+
+</div></div><div class="rel"><div class="rel-head">v5.13.3 - 2026-09-13（基金线生产池 3000 → 2000 · 用户拍板「用 2000 池 700%+ 那个」）</div><div class="rel-body">
 
 <p><b>依据（2000 池 vs 3000 池，slip 5bps 生产口径 · 2016-01 起）</b></p>
 
