@@ -52,6 +52,9 @@ STEPS = [
     ("A5 打板实验盘扫描 paper_daban_a5[软]", [str(BASE.parent / "打板系统A5实验_20260827" / "paper_daban_a5.py")], "--skip-a5" in sys.argv),
     ("A5 看板数据 build_a5_pool[软]", ["build_a5_pool.py"], "--skip-a5" in sys.argv),
     ("A5 复盘日志 build_a5_review[软]", ["build_a5_review.py"], "--skip-a5" in sys.argv),
+    # kxmm 市场情绪（恐贪指数+热力图）数据抓取——看板「市场情绪」视图数据源；[软]=失败不阻断，
+    # 失败时保留上一份 kxmm_data.js（页面继续显示旧数据+日期）。R-kxmm-0917
+    ("kxmm 市场情绪数据 fetch_kxmm[软]", ["backtest/fetch_kxmm.py"], "--skip-kxmm" in sys.argv),
     ("看板重建 build_dual_system", ["build_dual_system.py"], False),
     ("部署 gh-pages", ["_deploy_fundline_0911.py"], "--skip-deploy" in sys.argv),
 ]
@@ -104,7 +107,8 @@ if not fails:
                           "backtest/pct40_exits_state.json", "backtest/exit_control_state.json",
                           "backtest/pct40_exit_apply.py", "backtest/exit_control_0915.py",
                           "backtest/fetch_val_daily.py", "backtest/signal_satellite_0913.py",
-                          "backtest/build_satellite_pool.py", "daily_refresh.py"],
+                          "backtest/build_satellite_pool.py", "backtest/fetch_kxmm.py",
+                          "kxmm_card.py", "kxmm_data.js", "echarts.min.js", "daily_refresh.py"],
                          cwd=str(BASE), capture_output=True)
     if git.returncode == 0:
         c = subprocess.run(["git", "commit", "-m", f"chore(daily): {date.today()} 收盘刷新（池/信号/看板/复盘日志）"],

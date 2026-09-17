@@ -15,6 +15,7 @@ sys.path.insert(0, str(BASE))
 import v8_selector as V
 sys.path.insert(0, str(BASE))
 from ui_components import THEME_CSS, NAV_HTML, COMMON_JS
+from kxmm_card import KXMM_CSS, KXMM_VIEW_HTML, KXMM_JS
 
 js_src = (BASE / "enhanced_data.js").read_text(encoding="utf-8")
 DATA = json.loads(js_src[len("window.ENH = "):-1])
@@ -1713,7 +1714,7 @@ html = f"""<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2016'%3E%3Crect%20width='16'%20height='16'%20rx='3'%20fill='%232563eb'/%3E%3Cpath%20d='M3%2012V8h2v4zM6%2012V4h2v8zM9%2012V6h2v6zM12%2012V2h2v10z'%20fill='%23fff'/%3E%3C/svg%3E">
 <title>标的监控看板（数据截至 {DATA["meta"].get("as_of", "—")} · 构建 {build_ts}）</title>
-<style>{THEME_CSS}
+<style>{THEME_CSS}{KXMM_CSS}
 /* 三视图切换 */
 .view{{display:none}}
 .view.active{{display:block}}
@@ -1883,6 +1884,8 @@ html = f"""<!doctype html>
 <!-- ============ 视图 D：打板族（双池滤网 v1.3 · 第三个系统，池A 超跌/池B 趋势 + 生产预筛模拟盘） ============ -->
 {a5_view_html()}
 
+{KXMM_VIEW_HTML}
+
 <!-- ============ 视图 E：复盘日志（内嵌，与各池同形态） ============ -->
 <div class="view" id="view-review">
 {_rev_cum}
@@ -1935,6 +1938,8 @@ html = f"""<!doctype html>
 <script src="a5_pool.js"></script>
 <script src="market_breadth.js"></script>
 <script src="market_weather.js"></script>
+<script src="echarts.min.js"></script>
+<script src="kxmm_data.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/artalk@2/dist/Artalk.css">
 <script src="https://unpkg.com/artalk@2/dist/Artalk.js"></script>
 <script>window.SHORT_POOL = {SHORT_POOL_SLIM};</script>
@@ -1948,6 +1953,7 @@ window.ENH.nav = [
   ["sys-auto","🛰️","三轨中长线",[["sat-card","卫星目标持仓"],["sat-paper-b-card","轨B 模拟盘（主轨）"],["fund-paper-card","基金主仓模拟盘"],["fb3-pool-card","FB3 基金池"]]],
   ["short","⚡","全量池短线",[["card-short-stk","股票池 汇总表"],["card-short-stk-detail","股票池 逐标的详情"],["card-kh-hits","KHunter 命中策略一览"],["card-etf-paper","ETF 动量轮动"],["card-kh-paper","KHunter 模拟盘"],["card-short-fund","基金池 汇总表"],["card-short-fund-detail","基金池 逐标的详情"],["watch-card","短线跟踪"]]],
   ["a5","🎯","打板族",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
+  ["kxmm","😨","市场情绪",[["kxmm-fg","恐贪指数"],["kxmm-heat","热力图"]]],
   ["comment","💬","评论区",[]]
 ];
 /* 视图切换模式：滚动不更新导航高亮（COMMON_JS renderSidenav 检测此标志） */
@@ -2003,7 +2009,7 @@ function renderSubCurve(){{
   renderOneCurve('curve-short-fund', C.short_fund, '#3b82f6', '基金短线', '{ss_fund["total_return_pct"]:+.0f}');
 }}
 /* 视图切换（hash 驱动：切换时更新 location.hash，加载/前进后退时按 hash 定位） */
-var VIEW_MAP={{'overview':'view-overview','sys-auto':'view-auto','short':'view-short','a5':'view-a5','review':'view-review','changelog':'view-changelog','comment':'view-comment'}};
+var VIEW_MAP={{'overview':'view-overview','sys-auto':'view-auto','short':'view-short','a5':'view-a5','review':'view-review','changelog':'view-changelog','comment':'view-comment','kxmm':'view-kxmm'}};
 function switchView(key){{
   var v=VIEW_MAP[key];if(!v)return;
   document.querySelectorAll('.view').forEach(function(x){{x.classList.remove('active');}});
@@ -2531,6 +2537,7 @@ document.addEventListener('DOMContentLoaded',function(){{
   }});
 }});
 </script>
+<script>{KXMM_JS}</script>
 </body></html>"""
 
 out = BASE / "dual_system.html"

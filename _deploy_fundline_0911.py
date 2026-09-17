@@ -20,6 +20,9 @@ SYNC = [
     "changelog.md",
     "changelog.html",
     "review_log.html",
+    # kxmm 市场情绪（R-kxmm-0917）：数据文件（每日链抓取）+ ECharts 本地化
+    "kxmm_data.js",
+    "echarts.min.js",
 ]
 DUAL = ["dual_system.html", "index.html"]
 
