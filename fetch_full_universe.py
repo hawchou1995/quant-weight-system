@@ -108,7 +108,55 @@ def fetch_sina_daily(sym: str, retries: int = 3):
 
 
 def fetch_sina_etf(sym: str, retries: int = 3):
-    """新浪 ETF 日线（原始价）"""
+    """新浪 ETF 日线（原始价）
+
+    ⚠ 2026-09-17 根因修复（R-fullpool-0917，勿回退）：
+      原实现走 `ak.fund_etf_hist_sina` → `finance.sina.com.cn/realstock/company/{sym}/
+      hisdata_klc2/klc_kl.js`（JS 端点 + py_mini_racer 解码）。实测该端点对 **ETF 服务端滞后**：
+      sh510050 / sh512100 / sz159915 末行全停在 09-16，而同一天同族的 A 股端点 sh600519 已到 09-17
+      → 1626 只 ETF 集体"假陈旧"，全量补数跑完仍 26.4% 陈旧，链上守卫 ABORT 掉看板重建。
+      改走与 A 股同族的 `money.finance.sina.com.cn/.../CN_MarketData.getKLineData`：
+        scale=240（日线）、datalen=3000（覆盖 2016+ 全部交易日）。
+      实测三只 ETF 末行 = 2026-09-17，且 volume 与 hq.sinajs 实时量逐位一致
+      （sh510050 2026-09-17 volume=483343312 = 实时 483343312）→ 单位同为「股」，与本地历史一致。
+      该端点不返回 amount → 置 0；merge_save 对 amount≤0 有「绝不拿 0 覆盖本地非 0」防线，
+      新增行再由 _repair_amount（vol×close×mult 自锚定）兜底 → 成交额不丢，无需额外处理。
+      旧 klc_kl.js 路径保留为 _fetch_sina_etf_klcjs 兜底（仅当 json 端点整体失败时降级）。
+    """
+    url = ("https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/"
+           f"CN_MarketData.getKLineData?symbol={sym}&scale=240&ma=no&datalen=3000")
+    for attempt in range(1, retries + 1):
+        try:
+            r = requests.get(url, timeout=25,
+                             headers={**UA, "Referer": "https://finance.sina.com.cn"})
+            js = r.json()
+            if not js:
+                _backoff(attempt)
+                continue
+            df = pd.DataFrame(js)
+            if df.empty or "day" not in df.columns:
+                _backoff(attempt)
+                continue
+            df["date"] = pd.to_datetime(df["day"]).dt.strftime("%Y-%m-%d")
+            for c in ("open", "high", "low", "close", "volume"):
+                if c in df.columns:
+                    df[c] = pd.to_numeric(df[c], errors="coerce")
+                else:
+                    df[c] = 0.0
+            df["amount"] = 0.0            # 端点无成交额；由 merge_save/_repair_amount 兜底
+            df = df[HEADERS].drop_duplicates(subset="date").sort_values("date")
+            df = df[df["date"] >= "2016-01-01"]      # 只保留 2016 之后
+            if df.empty:
+                _backoff(attempt)
+                continue
+            return df
+        except Exception:
+            _backoff(attempt)
+    return _fetch_sina_etf_klcjs(sym, retries=1)
+
+
+def _fetch_sina_etf_klcjs(sym: str, retries: int = 3):
+    """新浪 ETF 日线 · 旧 klc_kl.js 路径（兜底，2026-09-17 降级；实测对 ETF 服务端滞后 1 日）"""
     for attempt in range(1, retries + 1):
         try:
             df = ak.fund_etf_hist_sina(symbol=sym)

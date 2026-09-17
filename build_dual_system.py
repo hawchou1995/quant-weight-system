@@ -266,6 +266,59 @@ def _gold_sat_card():
 GOLD_SAT_CARD = _gold_sat_card()
 
 
+# ret20 倾斜臂模拟盘卡（R-ret20-paper-0917 · 2026-09-17 用户拍板 #2/#4「投产并加模拟盘」）
+# 数据源：backtest/ret20_paper_l02.json / ret20_paper_l03.json（daily_refresh「ret20 倾斜臂模拟盘」软步骤产出）
+#        + backtest/shadow_ret20/daily_metrics.jsonl（臂 NAV 与 TopN 重合度）
+def _ret20_paper_card():
+    import json as _js
+    _arms = [("l02", "λ0.2", "#2 · 影子轨主候选"), ("l03", "λ0.3", "#4 · 影子轨陪跑")]
+    try:
+        _rows, _nav, _ovl = [], {}, {}
+        for _a, _lab, _tagd in _arms:
+            _p = BASE / "backtest" / f"ret20_paper_{_a}.json"
+            _d = _js.loads(_p.read_text(encoding="utf-8"))
+            _nh = _d.get("nav_history") or []
+            _bs = float(_d["meta"].get("basis") or 68000.0)
+            _nv = float(((_nh[-1] if _nh else {}) or {}).get("nav") or _bs)
+            _nav[_a] = _nv / _bs
+            _rows.append((_a, _lab, _tagd, _nv / _bs, len(_d.get("positions") or {}),
+                          float(_d.get("cash") or 0.0), _d["meta"].get("signal_date", "—"),
+                          "运行中" if _nh else "待建仓"))
+        try:
+            _m = (BASE / "backtest" / "shadow_ret20" / "daily_metrics.jsonl").read_text(encoding="utf-8")
+            _last = _js.loads(_m.strip().splitlines()[-1])
+            _ovl = _last.get("overlap") or {}
+            _nav["base"] = float((_last.get("nav") or {}).get("base") or 1.0)
+        except Exception:
+            pass
+        _tr = "".join(
+            f'<tr><td><b>{_lab}</b></td><td>{_tagd}</td><td>{_nv:.4f}</td><td>{_pn} 只</td>'
+            f'<td>{_cs:.0f}</td><td>{_sg}</td><td>{_stt}</td></tr>'
+            for _a, _lab, _tagd, _nv, _pn, _cs, _sg, _stt in _rows)
+        _otxt = (f"λ0.2 与 BASE 重合 <b>{float(_ovl.get('l02_vs_base', 0)):.3f}</b> · "
+                 f"λ0.3 与 BASE <b>{float(_ovl.get('l03_vs_base', 0)):.3f}</b> · "
+                 f"λ0.2/λ0.3 互重合 <b>{float(_ovl.get('l02_vs_l03', 0)):.3f}</b>"
+                 f"｜BASE 臂 NAV {_nav.get('base', 1.0):.4f}（同窗影子）") if _ovl else "影子 metrics 未就绪"
+        return (f'<div class="card" id="ret20-paper-card">'
+                f'<h2>📐 ret20 倾斜臂模拟盘（λ0.2 / λ0.3） <span class="badge badge-auto">2026-09-17 投产 · 生产 composite 未改</span></h2>'
+                f'<div class="sub">形态：<code>l02=(z(comp)+0.2·z(ret20))/1.2</code>、<code>l03=(z(comp)+0.3·z(ret20))/1.3</code>'
+                f'，冻结引擎 BASE 原样 = 生产口径 · 两臂各 <b>68,000 同额纯对照</b>（零实盘资金申领，不与轨B 抢配额）</div>'
+                f'<table><thead><tr><th>臂</th><th>定位</th><th>NAV</th><th>在仓</th><th>现金</th><th>信号日</th><th>状态</th></tr></thead>'
+                f'<tbody>{_tr}</tbody></table>'
+                f'<div class="sub">{_otxt}</div>'
+                f'<div class="sub" style="color:#b45309">⚠ 样本外记录 = 0 天（研究侧读数 λ0.2 off0 +25.08%/S1.411/50bp 19.25；'
+                f'λ0.3 +24.36%/S1.376/50bp 18.67；安慰剂 p 均 0.05）→ 毕业首检 <b>2026-10-15</b>：'
+                f'① NAV ≥ BASE 臂 ② 月度多数为正 ③ 相对回撤 ≤ BASE+5pp</div>'
+                f'<div class="sub" style="color:var(--faint)">账本 backtest/ret20_paper_l02.json / ret20_paper_l03.json；'
+                f'信号源 backtest/shadow_ret20/state.json。每日链内刷新。</div></div>')
+    except Exception as _e:
+        return (f'<div class="card" id="ret20-paper-card"><h2>📐 ret20 倾斜臂模拟盘</h2>'
+                f'<div class="sub">ret20_paper_l02/l03.json 未生成（{_e}）→ 运行 backtest/ret20_paper.py</div></div>')
+
+
+RET20_PAPER_CARD = _ret20_paper_card()
+
+
 
 # 2026-09-05 用户需求：短线命中策略一览 + 跟踪池行业列 —— 全市场板块/行业紧凑映射（内联 window.STOCK_META）
 # 数据源：short_signals.js 全量股票代码 + stock_industry.json（申万一级，7511 只全市场覆盖）
@@ -1957,6 +2010,7 @@ html = f"""<!doctype html>
 {SAT_CARD}
 {SAT_PAPER_B_CARD}
 {GOLD_SAT_CARD}
+{RET20_PAPER_CARD}
 {FUND_PAPER_CARD}
 {SHADOW_RET20_CARD}
 {FB3_POOL_CARD}
@@ -2035,7 +2089,7 @@ html = f"""<!doctype html>
 /* 三视图导航（覆盖默认 4 项） */
 window.ENH.nav = [
   ["overview","📊","监控总览",[["overview","总览统计"],["mkt-weather","市场晴雨表"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
-  ["sys-auto","🛰️","三轨中长线",[["sat-card","卫星目标持仓"],["sat-paper-b-card","轨B 模拟盘（主轨）"],["fund-paper-card","基金主仓模拟盘"],["fb3-pool-card","FB3 基金池"]]],
+  ["sys-auto","🛰️","三轨中长线",[["sat-card","卫星目标持仓"],["sat-paper-b-card","轨B 模拟盘（主轨）"],["gold-sat-card","黄金卫星叠加"],["ret20-paper-card","ret20 倾斜臂模拟盘"],["fund-paper-card","基金主仓模拟盘"],["fb3-pool-card","FB3 基金池"]]],
   ["short","⚡","全量池短线",[["card-short-stk","股票池 汇总表"],["card-short-stk-detail","股票池 逐标的详情"],["card-kh-hits","KHunter 命中策略一览"],["card-etf-paper","ETF 动量轮动"],["card-kh-paper","KHunter 模拟盘"],["card-short-fund","基金池 汇总表"],["card-short-fund-detail","基金池 逐标的详情"],["watch-card","短线跟踪"]]],
   ["a5","🎯","打板族",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
   ["kxmm","😨","市场情绪",[["kxmm-fg","恐贪指数"],["kxmm-heat","热力图"]]],

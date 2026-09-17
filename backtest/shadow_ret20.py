@@ -178,6 +178,18 @@ _lines = _keep
 with open(METRICS, "w", encoding="utf-8") as fh:
     if _lines: fh.write("\n".join(_lines) + "\n")
     fh.write(json.dumps(met, ensure_ascii=False) + "\n")
+# 当日臂清单 + 信号日回写 state.json（R-ret20-paper-0917：ret20_paper.py 的唯一信号来源，
+# 免去下游反读 daily_metrics.jsonl 末行这种隐式耦合；start_date/spec 保持不动。）
+try:
+    _st = json.load(open(STATE, encoding="utf-8")) if os.path.exists(STATE) else {}
+    _st["last_signal_date"] = last_date
+    _st["lists"] = {k: list(v) for k, v in lists.items()}
+    _st["updated"] = last_date
+    json.dump(_st, open(STATE, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    log(f"[state] 臂清单回写 {STATE}（信号日 {last_date}）")
+except Exception as _e:
+    log(f"[state] 臂清单回写失败（{type(_e).__name__}: {_e}）——ret20_paper 退回读 metrics 末行")
+
 # 引擎锚文件（供研究侧 load_engine 自维护对齐；日链每次运行刷新）
 json.dump({"base_off0_ann": round(annB, 3), "asof": last_date, "historical": 22.87,
            "note": "冻结引擎 BASE 臂 off0 年化（当前数据版本）；研究侧 load_engine 读此文件做对齐检查"},

@@ -64,6 +64,12 @@ STEPS = [
     # [软]=失败不阻断主链；--skip-gold 跳过。
     ("黄金卫星模拟盘 gold_sat_paper[软]", ["backtest/gold_sat_paper.py"], "--skip-gold" in sys.argv),
     ("双卫星模拟盘 satellite_paper", ["backtest/satellite_paper_0914.py"], False),
+    # ret20 倾斜臂模拟盘（R-ret20-paper-0917 · 2026-09-17 用户拍板 #2/#4「投产并加模拟盘」）
+    # 形态：**不改生产 composite**（冻结引擎原样 = BASE）；λ0.2 / λ0.3 各以 68,000 **同额纯对照账户**落地，
+    #       零实盘资金申领 → 逐日 A/B 可比、不与轨B 抢配额。信号唯一来源 = shadow_ret20/state.json 的当日臂清单。
+    #       毕业首检 2026-10-15（NAV≥BASE 臂 / 月多数正 / 相对回撤≤BASE+5pp），过门后才由用户拍板给配额。
+    # [软]=失败不阻断主链；--skip-ret20 跳过。
+    ("ret20 倾斜臂模拟盘 ret20_paper[软]", ["backtest/ret20_paper.py"], "--skip-ret20" in sys.argv),
     # 基金主仓（轨C FB3-H20）模拟盘——补齐「三轨模拟盘」最后一块（2026-09-14 用户指出缺）
     ("基金主仓模拟盘 fund_paper[软]", ["backtest/fund_paper_0914.py"], False),
     ("pct40 出场执行 pct40_exit", ["backtest/pct40_exit_apply.py"], False),
@@ -135,6 +141,7 @@ if not fails:
                           "backtest/a5_paper_state.json", "backtest/satellite_paper.json", "backtest/satellite_paper_a.json", "backtest/satellite_paper_b.json", "backtest/satellite_cfg.py",
                           "backtest/satellite_paper_init.json", "backtest/turn_shadow_state.json",
                           "backtest/gold_sat_paper.json", "backtest/gold_sat_paper.py",
+                          "backtest/ret20_paper.py", "backtest/ret20_paper_l02.json", "backtest/ret20_paper_l03.json",
                           "backtest/shadow_ret20.py", "backtest/engine_anchor.json",
                           "backtest/shadow_ret20/ledger.csv", "backtest/shadow_ret20/state.json",
                           "backtest/shadow_ret20/daily_metrics.jsonl",
@@ -142,6 +149,8 @@ if not fails:
                           "backtest/pct40_exit_apply.py", "backtest/exit_control_0915.py",
                           "backtest/fetch_val_daily.py", "backtest/signal_satellite_0913.py",
                           "backtest/build_satellite_pool.py", "backtest/fetch_kxmm.py",
+                          "backtest/check_data_freshness.py", "backtest/fullpool_guard.py",
+                          "backtest/_data_freshness.json", "backtest/verify_gold_sat_0917.json",
                           "backtest/ensure_index_row.py", "index_000300.csv",
                           "kxmm_card.py", "kxmm_data.js", "echarts.min.js", "daily_refresh.py"],
                          cwd=str(BASE), capture_output=True)
