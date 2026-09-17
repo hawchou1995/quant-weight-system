@@ -2470,7 +2470,9 @@ document.addEventListener('DOMContentLoaded',function(){{
     if(ind)ind.addEventListener('change',applyA5);
   }});
   /* 统一联动：搜索 + 板块/行业/档位筛选 → 表格行 + 详情卡片同步；排序后卡片重排 */
-  ['tbl-v9','tbl-short-stk','tbl-short-fund'].forEach(function(id){{
+  /* 2026-09-17（R-v9wire-0917）：列表曾含 'tbl-v9'，v9 表格退役移除后此处首个 id 即 table=null
+     → 抛错中止整个 forEach → 后两张在用表格（短线股票池/基金池）的四类联动静默失效。已移除 v9 + 加空值守卫。 */
+  ['tbl-short-stk','tbl-short-fund'].forEach(function(id){{
     var q=document.getElementById(id+'-q'), mk=document.getElementById(id+'-mk');
     var ind=document.getElementById(id+'-ind'), tier=document.getElementById(id+'-tier');
     var buyonly=document.getElementById(id+'-buyonly');
@@ -2510,6 +2512,7 @@ document.addEventListener('DOMContentLoaded',function(){{
     }});
     /* 排序联动：表头排序后，卡片按同样顺序重排（按 data-code 匹配） */
     var table=document.getElementById(id);
+    if(!table)return;   /* 表缺失（退役/未渲染）→ 跳过本 id，防 null 抛出中止其余表格接线 */
     if(table&&cardsBox){{
       table.querySelectorAll('th[data-key]').forEach(function(th){{
         th.addEventListener('click',function(){{

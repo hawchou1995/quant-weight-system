@@ -15,18 +15,23 @@ BASE = Path(__file__).resolve().parent
 PY = sys.executable
 FORCE = "--force" in sys.argv
 
-# ---- 交易日闸门 ----
-if not FORCE:
-    idx = pd.read_csv(BASE / "index_000300.csv", dtype={"date": str})
-    last_trade = idx["date"].iloc[-1]
-    today = date.today().strftime("%Y-%m-%d")
-    if last_trade != today:
-        print(f"[skip] 非交易日（最新交易日 {last_trade} ≠ 今天 {today}）——收盘刷新无需执行", flush=True)
-        sys.exit(0)
-    print(f"[交易日确认] {today} = 最新交易日 ✓", flush=True)
+# ---- 交易日闸门（R-gate-0917 重构：数据步后置 + HS300 行自动维护）----
+# 旧逻辑以「index_000300.csv 末行==今天」判交易日，但该文件仓库无写手（长期靠人工"补 HS300 指数行"，
+# 见 09-16 提交说明）→ 15:30 自动链时末行必为昨天 → 恒输出 [skip] 非交易日 → 实际全靠傍晚人工
+# --force 追跑（09-16 卡死进程的命令行带 --force 即证）。
+# 新逻辑：① 周末直接跳过；② 工作日先跑数据步，再由链内步骤 ensure_index_row 判定——
+#   今日 HS300 行情可取得 = 交易日 → 自动写入/刷新 index_000300.csv（消除人工补行 + 修正
+#   review_daily 等步骤的 as-of 依赖）；不可取得（节假日/数据源未就绪）= 非交易日 →
+#   该步 exit 3 → 主链打印 skip 并干净退出（数据步已完成，无副作用）。
+if not FORCE and date.today().weekday() >= 5:
+    _wd = "一二三四五六日"[date.today().weekday()]
+    print(f"[skip] 周末（{date.today().strftime('%Y-%m-%d')} 周{_wd}）——收盘刷新无需执行", flush=True)
+    sys.exit(0)
 
 STEPS = [
     ("数据更新 update_daily", ["update_daily.py"], "--skip-data" in sys.argv),
+    # HS300 指数行维护 + 交易日闸门（R-gate-0917）：exit 3 = 今日行情不可得（非交易日/未就绪）→ 主链跳过后续
+    ("HS300 索引行 ensure_index_row", ["backtest/ensure_index_row.py"], False),
     # 基金净值刷新：必须在 build_short_pool 之前——否则基金信号用旧净值排序
     # 2026-09-14 补：此前刷新逻辑只在 refresh_daily.py --fund，收盘链从不调用 → 92% 的基金净值停在 08-20，
     # 占 60% 仓位的 FB3 基金主仓长期用 3 周前净值选基（且新旧净值混算）。[软]=失败不阻断主链。
@@ -86,6 +91,13 @@ for name, args, skip in STEPS:
         time.sleep(5)
         r = subprocess.run([PY] + args, cwd=str(BASE), env=_env)
         print(f"   重试 {'成功 ✓' if r.returncode == 0 else f'仍失败 exit {r.returncode}'}", flush=True)
+    if r.returncode == 3 and name.startswith("HS300 索引行"):
+        if FORCE:
+            print("⚠️ 今日 HS300 行情不可得（非交易日/数据源未就绪）—— --force 继续执行", flush=True)
+            continue
+        print("[skip] 非交易日：今日 HS300 行情不可得（数据源无今日行情）—— 数据步已完成，跳过后续步骤",
+              flush=True)
+        sys.exit(0)
     if r.returncode != 0:
         if name.endswith("[软]"):   # 软步骤：失败只告警，不阻断（如 A5 实验盘、影子轨）
             print(f"⚠️ {name} 失败（exit {r.returncode}）—— 非致命，继续后续步骤", flush=True)
@@ -108,6 +120,7 @@ if not fails:
                           "backtest/pct40_exit_apply.py", "backtest/exit_control_0915.py",
                           "backtest/fetch_val_daily.py", "backtest/signal_satellite_0913.py",
                           "backtest/build_satellite_pool.py", "backtest/fetch_kxmm.py",
+                          "backtest/ensure_index_row.py", "index_000300.csv",
                           "kxmm_card.py", "kxmm_data.js", "echarts.min.js", "daily_refresh.py"],
                          cwd=str(BASE), capture_output=True)
     if git.returncode == 0:
