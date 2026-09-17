@@ -30,6 +30,9 @@ if not FORCE and date.today().weekday() >= 5:
 
 STEPS = [
     ("数据更新 update_daily", ["update_daily.py"], "--skip-data" in sys.argv),
+    # 估值日更（2026-09-17 建，R-valfreeze-0917）：根因=旧管道只写 4 列快照、从不扩展 val_em 主表
+    # → 主表冻结 → factorlab/oss 面板冻结 → 生产轨B 目标清单冻结（asof 谎报）。[软]=失败不阻断。
+    ("估值日更 fetch_val_em_daily[软]", ["fetch_val_em_daily.py"], "--skip-val" in sys.argv),
     # HS300 指数行维护 + 交易日闸门（R-gate-0917）：exit 3 = 今日行情不可得（非交易日/未就绪）→ 主链跳过后续
     ("HS300 索引行 ensure_index_row", ["backtest/ensure_index_row.py"], False),
     # 基金净值刷新：必须在 build_short_pool 之前——否则基金信号用旧净值排序
@@ -40,6 +43,12 @@ STEPS = [
     ("复盘日志+跟踪池 review_daily", ["review_daily.py"], False),
     ("复盘日志页 build_log_pages", ["build_log_pages.py"], False),
     ("市值快照 fetch_val_daily", ["backtest/fetch_val_daily.py"], False),
+    # 面板刷新 + 影子轨（2026-09-17 建）：必须在 build_satellite_pool 之前——轨B 与影子轨
+    # 共用同一面板；重建器自带「已最新则跳过」守卫。[软]=失败不阻断（影子轨数据会停更一天）。
+    ("面板刷新 rebuild_panels[软]", ["backtest/rebuild_panels.py"], "--skip-panel" in sys.argv),
+    # 影子轨 shadow_ret20（用户 2026-09-17 拍板 ③纸面跟踪）：BASE / λ0.2 / λ0.3 三臂日度记录，
+    # 生产 composite 不动。产出 backtest/shadow_ret20/{ledger.csv,daily_metrics.jsonl}。
+    ("影子轨 shadow_ret20[软]", ["backtest/shadow_ret20.py"], "--skip-shadow" in sys.argv),
     ("双卫星池 build_satellite_pool", ["backtest/build_satellite_pool.py"], False),
     ("三轨信号 signal_satellite", ["backtest/signal_satellite_0913.py"], False),
     ("KHunter 模拟盘A khunter_paper", ["khunter_paper_20260903.py"], False),

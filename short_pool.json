@@ -1,43 +1,43 @@
 {
-  "as_of": "2026-09-16",
-  "fund_as_of": "2026-09-15",
+  "as_of": "2026-09-17",
+  "fund_as_of": "2026-09-16",
   "details": {
-    "001595": {
-      "code": "001595",
-      "key": "001595",
-      "name": "天弘中证银行ETF联接C",
+    "003401": {
+      "code": "003401",
+      "key": "003401",
+      "name": "工银可转债债券",
       "pool": "short",
       "perm": "short",
       "board": "基金",
-      "industry": "银行",
+      "industry": "债券基金",
       "biz": "—",
-      "px": 1.8,
-      "chg": -1.18,
-      "ret_1y": 0.8,
-      "score": 77.4,
+      "px": 1.87,
+      "chg": 1.77,
+      "ret_1y": 9.0,
+      "score": 79.4,
       "score_prev": null,
       "tier": "强买入",
       "tier_prev": null,
-      "short_score": 77.4,
+      "short_score": 79.4,
       "short_tier": "强买入",
       "factors": {
-        "mom": 5.3,
+        "mom": 3.7,
         "vr": null,
-        "trend": 0,
+        "trend": 100,
         "volume": 50.0,
         "osc": 50,
-        "risk": 98.6
+        "risk": 97.1
       },
       "comp": {
-        "trend": 0,
-        "momentum": 65.8,
+        "trend": 100,
+        "momentum": 61.2,
         "volume": 50.0,
         "osc": 50,
-        "risk": 98.6,
+        "risk": 97.1,
         "news": 0.0
       },
-      "radar_svg": "<svg viewBox=\"0 0 120 120\" width=\"120\" height=\"120\" style=\"flex:0 0 auto\"><polygon points=\"60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"16.8\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"103.2\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,58.7 84.6,45.8 78.7,70.8 60.0,81.6 23.1,81.3 58.9,59.4\" fill=\"var(--radar-good)\" fill-opacity=\"0.18\" stroke=\"var(--radar-good)\" stroke-width=\"1.5\"/><circle cx=\"60.0\" cy=\"58.7\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"2.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">趋势</text><circle cx=\"84.6\" cy=\"45.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">动能</text><circle cx=\"78.7\" cy=\"70.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">量能</text><circle cx=\"60.0\" cy=\"81.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"119.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">超买</text><circle cx=\"23.1\" cy=\"81.3\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">风控</text><circle cx=\"58.9\" cy=\"59.4\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">研报</text><text x=\"60.0\" y=\"64.0\" style=\"fill:var(--radar-good)\" font-size=\"15\" font-weight=\"700\" text-anchor=\"middle\">77</text></svg>",
-      "rsi": 58.2,
+      "radar_svg": "<svg viewBox=\"0 0 120 120\" width=\"120\" height=\"120\" style=\"flex:0 0 auto\"><polygon points=\"60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"16.8\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"103.2\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 82.9,46.8 78.7,70.8 60.0,81.6 23.7,81.0 58.9,59.4\" fill=\"var(--radar-good)\" fill-opacity=\"0.18\" stroke=\"var(--radar-good)\" stroke-width=\"1.5\"/><circle cx=\"60.0\" cy=\"16.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"2.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">趋势</text><circle cx=\"82.9\" cy=\"46.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">动能</text><circle cx=\"78.7\" cy=\"70.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">量能</text><circle cx=\"60.0\" cy=\"81.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"119.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">超买</text><circle cx=\"23.7\" cy=\"81.0\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">风控</text><circle cx=\"58.9\" cy=\"59.4\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">研报</text><text x=\"60.0\" y=\"64.0\" style=\"fill:var(--radar-good)\" font-size=\"15\" font-weight=\"700\" text-anchor=\"middle\">79</text></svg>",
+      "rsi": 58.7,
       "kline": [],
       "factor_hist": [],
       "trades": {
@@ -47,26 +47,26 @@
       "pick": null,
       "khunter": null
     },
-    "000244": {
-      "code": "000244",
-      "key": "000244",
-      "name": "天弘稳利定期开放A",
+    "004026": {
+      "code": "004026",
+      "key": "004026",
+      "name": "融通收益增强债券C",
       "pool": "short",
       "perm": "short",
       "board": "基金",
-      "industry": "未分类基金",
+      "industry": "指数增强",
       "biz": "—",
-      "px": 1.36,
-      "chg": 0.04,
-      "ret_1y": 8.7,
-      "score": 75.9,
+      "px": 1.14,
+      "chg": 0.93,
+      "ret_1y": -4.3,
+      "score": 78.8,
       "score_prev": null,
       "tier": "强买入",
       "tier_prev": null,
-      "short_score": 75.9,
+      "short_score": 78.8,
       "short_tier": "强买入",
       "factors": {
-        "mom": 0.6,
+        "mom": 2.3,
         "vr": null,
         "trend": 100,
         "volume": 50.0,
@@ -75,14 +75,14 @@
       },
       "comp": {
         "trend": 100,
-        "momentum": 51.7,
+        "momentum": 56.8,
         "volume": 50.0,
         "osc": 50,
         "risk": 100,
         "news": 0.0
       },
-      "radar_svg": "<svg viewBox=\"0 0 120 120\" width=\"120\" height=\"120\" style=\"flex:0 0 auto\"><polygon points=\"60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"16.8\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"103.2\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 79.3,48.8 78.7,70.8 60.0,81.6 22.6,81.6 58.9,59.4\" fill=\"var(--radar-good)\" fill-opacity=\"0.18\" stroke=\"var(--radar-good)\" stroke-width=\"1.5\"/><circle cx=\"60.0\" cy=\"16.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"2.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">趋势</text><circle cx=\"79.3\" cy=\"48.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">动能</text><circle cx=\"78.7\" cy=\"70.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">量能</text><circle cx=\"60.0\" cy=\"81.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"119.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">超买</text><circle cx=\"22.6\" cy=\"81.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">风控</text><circle cx=\"58.9\" cy=\"59.4\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">研报</text><text x=\"60.0\" y=\"64.0\" style=\"fill:var(--radar-good)\" font-size=\"15\" font-weight=\"700\" text-anchor=\"middle\">76</text></svg>",
-      "rsi": 89.1,
+      "radar_svg": "<svg viewBox=\"0 0 120 120\" width=\"120\" height=\"120\" style=\"flex:0 0 auto\"><polygon points=\"60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"16.8\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"103.2\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 81.3,47.7 78.7,70.8 60.0,81.6 22.6,81.6 58.9,59.4\" fill=\"var(--radar-good)\" fill-opacity=\"0.18\" stroke=\"var(--radar-good)\" stroke-width=\"1.5\"/><circle cx=\"60.0\" cy=\"16.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"2.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">趋势</text><circle cx=\"81.3\" cy=\"47.7\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">动能</text><circle cx=\"78.7\" cy=\"70.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">量能</text><circle cx=\"60.0\" cy=\"81.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"119.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">超买</text><circle cx=\"22.6\" cy=\"81.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">风控</text><circle cx=\"58.9\" cy=\"59.4\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">研报</text><text x=\"60.0\" y=\"64.0\" style=\"fill:var(--radar-good)\" font-size=\"15\" font-weight=\"700\" text-anchor=\"middle\">79</text></svg>",
+      "rsi": 56.9,
       "kline": [],
       "factor_hist": [],
       "trades": {
@@ -92,42 +92,42 @@
       "pick": null,
       "khunter": null
     },
-    "004437": {
-      "code": "004437",
-      "key": "004437",
-      "name": "汇添富年年泰定开混合C",
+    "004243": {
+      "code": "004243",
+      "key": "004243",
+      "name": "广发道琼斯石油指数人民币C",
       "pool": "short",
       "perm": "short",
       "board": "基金",
-      "industry": "均衡配置",
+      "industry": "石油石化",
       "biz": "—",
-      "px": 1.25,
-      "chg": 0.0,
-      "ret_1y": 4.0,
-      "score": 75.8,
+      "px": 3.19,
+      "chg": 2.94,
+      "ret_1y": 39.9,
+      "score": 77.7,
       "score_prev": null,
       "tier": "强买入",
       "tier_prev": null,
-      "short_score": 75.8,
+      "short_score": 77.7,
       "short_tier": "强买入",
       "factors": {
-        "mom": 0.5,
+        "mom": 7.0,
         "vr": null,
-        "trend": 0,
+        "trend": 100,
         "volume": 50.0,
         "osc": 50,
-        "risk": 100
+        "risk": 80.2
       },
       "comp": {
-        "trend": 0,
-        "momentum": 51.5,
+        "trend": 100,
+        "momentum": 70.9,
         "volume": 50.0,
         "osc": 50,
-        "risk": 100,
+        "risk": 80.2,
         "news": 0.0
       },
-      "radar_svg": "<svg viewBox=\"0 0 120 120\" width=\"120\" height=\"120\" style=\"flex:0 0 auto\"><polygon points=\"60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"16.8\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"103.2\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,58.7 79.3,48.9 78.7,70.8 60.0,81.6 22.6,81.6 58.9,59.4\" fill=\"var(--radar-good)\" fill-opacity=\"0.18\" stroke=\"var(--radar-good)\" stroke-width=\"1.5\"/><circle cx=\"60.0\" cy=\"58.7\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"2.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">趋势</text><circle cx=\"79.3\" cy=\"48.9\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">动能</text><circle cx=\"78.7\" cy=\"70.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">量能</text><circle cx=\"60.0\" cy=\"81.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"119.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">超买</text><circle cx=\"22.6\" cy=\"81.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">风控</text><circle cx=\"58.9\" cy=\"59.4\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">研报</text><text x=\"60.0\" y=\"64.0\" style=\"fill:var(--radar-good)\" font-size=\"15\" font-weight=\"700\" text-anchor=\"middle\">76</text></svg>",
-      "rsi": NaN,
+      "radar_svg": "<svg viewBox=\"0 0 120 120\" width=\"120\" height=\"120\" style=\"flex:0 0 auto\"><polygon points=\"60.0,49.2 69.4,54.6 69.4,65.4 60.0,70.8 50.6,65.4 50.6,54.6\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,38.4 78.7,49.2 78.7,70.8 60.0,81.6 41.3,70.8 41.3,49.2\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,27.6 88.1,43.8 88.1,76.2 60.0,92.4 31.9,76.2 31.9,43.8\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 97.4,38.4 97.4,81.6 60.0,103.2 22.6,81.6 22.6,38.4\" fill=\"none\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"16.8\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"97.4\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"60.0\" y2=\"103.2\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"81.6\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><line x1=\"60.0\" y1=\"60.0\" x2=\"22.6\" y2=\"38.4\" style=\"stroke:var(--radar-ring)\" stroke-width=\"1\"/><polygon points=\"60.0,16.8 86.5,44.7 78.7,70.8 60.0,81.6 30.0,77.3 58.9,59.4\" fill=\"var(--radar-good)\" fill-opacity=\"0.18\" stroke=\"var(--radar-good)\" stroke-width=\"1.5\"/><circle cx=\"60.0\" cy=\"16.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"2.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">趋势</text><circle cx=\"86.5\" cy=\"44.7\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">动能</text><circle cx=\"78.7\" cy=\"70.8\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"113.1\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">量能</text><circle cx=\"60.0\" cy=\"81.6\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"60.0\" y=\"119.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">超买</text><circle cx=\"30.0\" cy=\"77.3\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"93.7\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">风控</text><circle cx=\"58.9\" cy=\"59.4\" r=\"2.5\" fill=\"var(--radar-good)\"/><text x=\"6.9\" y=\"32.3\" style=\"fill:var(--radar-label)\" font-size=\"9\" text-anchor=\"middle\" font-weight=\"600\">研报</text><text x=\"60.0\" y=\"64.0\" style=\"fill:var(--radar-good)\" font-size=\"15\" font-weight=\"700\" text-anchor=\"middle\">78</text></svg>",
+      "rsi": 81.8,
       "kline": [],
       "factor_hist": [],
       "trades": {
@@ -143,16 +143,16 @@
     "创业板": [],
     "科创板": [],
     "基金": [
-      "001595",
-      "000244",
-      "004437"
+      "003401",
+      "004026",
+      "004243"
     ]
   },
   "market_gate": {
     "open": false,
-    "as_of": "2026-09-16",
-    "idx_close": 4480.27,
-    "idx_ma20": 4560.87,
+    "as_of": "2026-09-17",
+    "idx_close": 4460.16,
+    "idx_ma20": 4554.24,
     "bear60": true,
     "sentiment": {
       "zone": "中性",
@@ -205,7 +205,6 @@
         "sh600177",
         "sh600183",
         "sh600184",
-        "sh600186",
         "sh600192",
         "sh600207",
         "sh600210",
@@ -227,7 +226,6 @@
         "sh600410",
         "sh600435",
         "sh600483",
-        "sh600500",
         "sh600501",
         "sh600505",
         "sh600516",
@@ -235,7 +233,6 @@
         "sh600579",
         "sh600596",
         "sh600601",
-        "sh600642",
         "sh600644",
         "sh600671",
         "sh600674",
@@ -259,6 +256,7 @@
         "sh600901",
         "sh600903",
         "sh600908",
+        "sh600926",
         "sh600956",
         "sh600967",
         "sh600977",
@@ -270,7 +268,6 @@
         "sh601107",
         "sh601169",
         "sh601199",
-        "sh601208",
         "sh601218",
         "sh601222",
         "sh601298",
@@ -294,7 +291,6 @@
         "sh601900",
         "sh601949",
         "sh601975",
-        "sh601985",
         "sh601988",
         "sh601996",
         "sh601998",
@@ -347,7 +343,6 @@
         "sh603606",
         "sh603608",
         "sh603615",
-        "sh603618",
         "sh603628",
         "sh603650",
         "sh603657",
@@ -408,7 +403,6 @@
         "sz000731",
         "sz000738",
         "sz000739",
-        "sz000768",
         "sz000823",
         "sz000859",
         "sz000862",
@@ -469,13 +463,11 @@
         "sz002279",
         "sz002297",
         "sz002300",
-        "sz002303",
         "sz002357",
         "sz002362",
         "sz002377",
         "sz002383",
         "sz002389",
-        "sz002396",
         "sz002413",
         "sz002436",
         "sz002443",
@@ -541,7 +533,7 @@
         "sz002983",
         "sz002985",
         "sz002988",
-        "sz002997",
+        "sz002990",
         "sz003001",
         "sz003006",
         "sz003013",
@@ -605,7 +597,6 @@
         "sh600249",
         "sh600255",
         "sh600256",
-        "sh600261",
         "sh600278",
         "sh600293",
         "sh600310",
@@ -659,13 +650,13 @@
         "sh600622",
         "sh600629",
         "sh600637",
+        "sh600641",
         "sh600642",
         "sh600644",
         "sh600657",
         "sh600667",
         "sh600671",
         "sh600674",
-        "sh600681",
         "sh600685",
         "sh600689",
         "sh600691",
@@ -716,7 +707,6 @@
         "sh600903",
         "sh600908",
         "sh600917",
-        "sh600919",
         "sh600926",
         "sh600929",
         "sh600956",
@@ -786,6 +776,7 @@
         "sh601869",
         "sh601872",
         "sh601882",
+        "sh601886",
         "sh601890",
         "sh601900",
         "sh601916",
@@ -858,6 +849,7 @@
         "sh603255",
         "sh603256",
         "sh603258",
+        "sh603259",
         "sh603266",
         "sh603267",
         "sh603269",
@@ -919,7 +911,6 @@
         "sh603665",
         "sh603668",
         "sh603678",
-        "sh603679",
         "sh603681",
         "sh603683",
         "sh603685",
@@ -979,6 +970,7 @@
         "sh605080",
         "sh605088",
         "sh605100",
+        "sh605111",
         "sh605118",
         "sh605123",
         "sh605136",
@@ -1010,6 +1002,7 @@
         "sz000027",
         "sz000035",
         "sz000045",
+        "sz000055",
         "sz000058",
         "sz000059",
         "sz000062",
@@ -1020,7 +1013,6 @@
         "sz000409",
         "sz000411",
         "sz000419",
-        "sz000507",
         "sz000510",
         "sz000516",
         "sz000519",
@@ -1088,10 +1080,10 @@
         "sz000901",
         "sz000905",
         "sz000906",
-        "sz000912",
         "sz000921",
         "sz000923",
         "sz000928",
+        "sz000930",
         "sz000962",
         "sz000966",
         "sz000969",
@@ -1116,7 +1108,6 @@
         "sz001286",
         "sz001287",
         "sz001288",
-        "sz001299",
         "sz001316",
         "sz001319",
         "sz001324",
@@ -1158,7 +1149,6 @@
         "sz002100",
         "sz002106",
         "sz002107",
-        "sz002111",
         "sz002119",
         "sz002120",
         "sz002127",
@@ -1171,7 +1161,6 @@
         "sz002155",
         "sz002157",
         "sz002161",
-        "sz002163",
         "sz002169",
         "sz002171",
         "sz002172",
@@ -1212,6 +1201,7 @@
         "sz002303",
         "sz002312",
         "sz002320",
+        "sz002321",
         "sz002328",
         "sz002332",
         "sz002339",
@@ -1247,7 +1237,6 @@
         "sz002468",
         "sz002471",
         "sz002474",
-        "sz002479",
         "sz002483",
         "sz002486",
         "sz002487",
@@ -1312,11 +1301,10 @@
         "sz002746",
         "sz002748",
         "sz002752",
-        "sz002753",
         "sz002757",
-        "sz002758",
         "sz002762",
         "sz002771",
+        "sz002774",
         "sz002779",
         "sz002780",
         "sz002785",
@@ -1385,7 +1373,6 @@
         "sz002985",
         "sz002988",
         "sz002990",
-        "sz002997",
         "sz003001",
         "sz003002",
         "sz003005",
@@ -1406,28 +1393,30 @@
         "sz003816"
       ],
       "buy_n": 0,
-      "watch_n": 40,
+      "watch_n": 42,
       "watch": [
         "002213",
-        "002774",
         "603023",
         "002730",
         "002552",
         "000981",
         "600667",
         "002640",
+        "002321",
         "000962",
+        "000055",
         "002859",
         "002654",
+        "600641",
         "002976",
         "002961",
-        "000726",
         "001212",
         "603125",
         "605399",
         "002362",
         "002204",
         "000720",
+        "002762",
         "002232",
         "603155",
         "600644",
@@ -1469,6 +1458,7 @@
       "top4": "🎯 KHunter 主信号"
     }
   },
+  "_backfilled_0814": true,
   "track": {
     "300009": {
       "entry": "2026-08-21",
@@ -1480,13 +1470,13 @@
       "gate_closed": true,
       "last": {
         "name": "安科生物",
-        "px": 8.02,
+        "px": 8.08,
         "chg": 0.75,
-        "score": 11.7,
+        "score": 41.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       }
     },
@@ -1500,13 +1490,13 @@
       "first_seen": "2026-08-26",
       "last": {
         "name": "亿纬锂能",
-        "px": 48.66,
-        "chg": 0.62,
-        "score": 42.5,
+        "px": 48.23,
+        "chg": -0.41,
+        "score": 43.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -1521,13 +1511,13 @@
       "first_seen": "2026-09-02",
       "last": {
         "name": "钢研高纳",
-        "px": 15.86,
-        "chg": 0.83,
-        "score": 22.9,
+        "px": 15.76,
+        "chg": -0.63,
+        "score": 20.4,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -1542,13 +1532,13 @@
       "first_seen": "2026-08-26",
       "last": {
         "name": "万顺新材",
-        "px": 6.58,
-        "chg": 1.08,
-        "score": 22.0,
+        "px": 6.44,
+        "chg": -2.13,
+        "score": 18.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -1563,13 +1553,13 @@
       "first_seen": "2026-08-31",
       "last": {
         "name": "碧水源",
-        "px": 3.39,
-        "chg": 0.0,
-        "score": 22.7,
+        "px": 3.38,
+        "chg": -0.29,
+        "score": 26.7,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -1584,13 +1574,13 @@
       "gate_closed": true,
       "last": {
         "name": "海新能科",
-        "px": 3.49,
-        "chg": 0.87,
-        "score": 16.9,
+        "px": 3.5,
+        "chg": 0.29,
+        "score": 29.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       }
     },
@@ -1604,13 +1594,13 @@
       "first_seen": "2026-08-24",
       "last": {
         "name": "宝利国际",
-        "px": 3.51,
-        "chg": 1.15,
-        "score": 18.6,
+        "px": 3.49,
+        "chg": -0.57,
+        "score": 11.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -1625,13 +1615,13 @@
       "first_seen": "2026-08-31",
       "last": {
         "name": "宋城演艺",
-        "px": 5.72,
-        "chg": 0.0,
-        "score": 17.7,
+        "px": 5.73,
+        "chg": 0.17,
+        "score": 23.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -1646,13 +1636,13 @@
       "gate_closed": true,
       "last": {
         "name": "福安药业",
-        "px": 3.77,
-        "chg": 0.53,
-        "score": 25.4,
+        "px": 3.8,
+        "chg": 0.8,
+        "score": 33.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       }
     },
@@ -1666,13 +1656,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "聚光科技",
-        "px": 12.19,
-        "chg": 0.41,
-        "score": 21.5,
+        "px": 12.4,
+        "chg": 1.72,
+        "score": 31.0,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -1687,13 +1677,13 @@
       "first_seen": "2026-08-26",
       "last": {
         "name": "日科化学",
-        "px": 10.2,
-        "chg": 3.24,
-        "score": 23.9,
+        "px": 10.11,
+        "chg": -0.88,
+        "score": 15.0,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -1708,13 +1698,13 @@
       "first_seen": "2026-08-31",
       "last": {
         "name": "鸿利智汇",
-        "px": 6.88,
-        "chg": 2.53,
-        "score": 24.7,
+        "px": 6.86,
+        "chg": -0.29,
+        "score": 24.0,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -1729,13 +1719,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "东宝生物",
-        "px": 4.86,
-        "chg": 1.04,
-        "score": 19.4,
+        "px": 4.9,
+        "chg": 0.82,
+        "score": 30.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -1750,13 +1740,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "飞力达",
-        "px": 6.03,
-        "chg": 2.03,
-        "score": 19.4,
+        "px": 6.07,
+        "chg": 0.66,
+        "score": 29.3,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -1771,13 +1761,13 @@
       "first_seen": "2026-08-25",
       "last": {
         "name": "三诺生物",
-        "px": 15.45,
-        "chg": 0.13,
-        "score": 28.5,
+        "px": 15.59,
+        "chg": 0.91,
+        "score": 37.0,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -1792,13 +1782,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "博晖创新",
-        "px": 4.8,
-        "chg": 0.63,
-        "score": 15.0,
+        "px": 4.89,
+        "chg": 1.88,
+        "score": 29.7,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -1813,13 +1803,13 @@
       "first_seen": "2026-09-02",
       "last": {
         "name": "天壕能源",
-        "px": 4.92,
-        "chg": 1.23,
-        "score": 21.2,
+        "px": 4.93,
+        "chg": 0.2,
+        "score": 18.0,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -1834,13 +1824,13 @@
       "first_seen": "2026-09-01",
       "last": {
         "name": "科恒股份",
-        "px": 8.58,
-        "chg": 0.82,
-        "score": 13.9,
+        "px": 8.49,
+        "chg": -1.05,
+        "score": 11.7,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -1855,13 +1845,13 @@
       "first_seen": "2026-08-26",
       "last": {
         "name": "汇金股份",
-        "px": 9.09,
-        "chg": 7.07,
-        "score": 15.3,
+        "px": 8.8,
+        "chg": -3.19,
+        "score": 12.4,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -1875,13 +1865,13 @@
       "type": "stock",
       "last": {
         "name": "鹏翎股份",
-        "px": 4.04,
-        "chg": 1.0,
-        "score": 17.4,
+        "px": 4.09,
+        "chg": 1.24,
+        "score": 19.4,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -1895,13 +1885,13 @@
       "type": "stock",
       "last": {
         "name": "节能国祯",
-        "px": 6.74,
-        "chg": 0.9,
-        "score": 19.8,
+        "px": 6.68,
+        "chg": -0.89,
+        "score": 24.3,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -1916,13 +1906,13 @@
       "gate_closed": true,
       "last": {
         "name": "九强生物",
-        "px": 11.18,
-        "chg": -0.27,
-        "score": 20.8,
+        "px": 11.28,
+        "chg": 0.89,
+        "score": 32.5,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       }
     },
@@ -1936,13 +1926,13 @@
       "first_seen": "2026-08-28",
       "last": {
         "name": "立中集团",
-        "px": 19.75,
-        "chg": 0.36,
-        "score": 19.5,
+        "px": 19.6,
+        "chg": -0.76,
+        "score": 17.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -1957,13 +1947,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "美康生物",
-        "px": 9.41,
-        "chg": 0.53,
-        "score": 32.2,
+        "px": 9.54,
+        "chg": 1.38,
+        "score": 52.7,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -1978,13 +1968,13 @@
       "first_seen": "2026-08-31",
       "last": {
         "name": "金雷股份",
-        "px": 19.44,
-        "chg": -2.02,
-        "score": 45.4,
+        "px": 20.36,
+        "chg": 4.73,
+        "score": 50.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -1999,13 +1989,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "山河药辅",
-        "px": 12.55,
-        "chg": -0.4,
-        "score": 27.5,
+        "px": 12.72,
+        "chg": 1.35,
+        "score": 36.1,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2020,13 +2010,13 @@
       "gate_closed": true,
       "last": {
         "name": "三鑫医疗",
-        "px": 8.95,
-        "chg": -1.1,
-        "score": 35.4,
+        "px": 8.98,
+        "chg": 0.34,
+        "score": 44.4,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       }
     },
@@ -2040,13 +2030,13 @@
       "first_seen": "2026-08-25",
       "last": {
         "name": "德尔股份",
-        "px": 30.5,
-        "chg": 8.77,
-        "score": 43.8,
+        "px": 30.24,
+        "chg": -0.85,
+        "score": 41.3,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2061,13 +2051,13 @@
       "first_seen": "2026-08-25",
       "last": {
         "name": "温氏股份",
-        "px": 14.66,
-        "chg": -2.2,
-        "score": 26.2,
+        "px": 14.63,
+        "chg": -0.2,
+        "score": 25.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2082,13 +2072,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "新美星",
-        "px": 8.68,
-        "chg": 2.36,
-        "score": 14.4,
+        "px": 8.77,
+        "chg": 1.04,
+        "score": 16.3,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2103,13 +2093,13 @@
       "first_seen": "2026-09-02",
       "last": {
         "name": "今天国际",
-        "px": 7.02,
-        "chg": 0.72,
-        "score": 13.7,
+        "px": 6.97,
+        "chg": -0.71,
+        "score": 11.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2124,13 +2114,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "康泰生物",
-        "px": 11.67,
-        "chg": 0.09,
-        "score": 6.7,
+        "px": 11.77,
+        "chg": 0.86,
+        "score": 33.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2145,13 +2135,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "晨化股份",
-        "px": 10.14,
-        "chg": 2.01,
-        "score": 21.0,
+        "px": 10.12,
+        "chg": -0.2,
+        "score": 24.4,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2166,13 +2156,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "三雄极光",
-        "px": 9.56,
-        "chg": 2.91,
-        "score": 29.5,
+        "px": 9.57,
+        "chg": 0.1,
+        "score": 35.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2187,13 +2177,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "亿联网络",
-        "px": 41.57,
-        "chg": 1.09,
-        "score": 21.9,
+        "px": 41.49,
+        "chg": -0.19,
+        "score": 27.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2208,13 +2198,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "同和药业",
-        "px": 6.73,
-        "chg": 0.75,
-        "score": 32.5,
+        "px": 6.81,
+        "chg": 1.19,
+        "score": 39.0,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2229,13 +2219,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "正海生物",
-        "px": 14.58,
-        "chg": 0.55,
-        "score": 22.5,
+        "px": 14.82,
+        "chg": 1.65,
+        "score": 29.5,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2250,13 +2240,13 @@
       "first_seen": "2026-08-28",
       "last": {
         "name": "科蓝软件",
-        "px": 7.65,
-        "chg": 1.06,
-        "score": 13.3,
+        "px": 7.63,
+        "chg": -0.26,
+        "score": 12.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2271,13 +2261,13 @@
       "first_seen": "2026-08-25",
       "last": {
         "name": "英科医疗",
-        "px": 51.15,
-        "chg": -4.75,
-        "score": 11.6,
+        "px": 51.4,
+        "chg": 0.49,
+        "score": 12.1,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2292,13 +2282,13 @@
       "first_seen": "2026-08-25",
       "last": {
         "name": "迈瑞医疗",
-        "px": 158.03,
-        "chg": -1.42,
-        "score": 17.5,
+        "px": 156.8,
+        "chg": -0.78,
+        "score": 12.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2313,13 +2303,13 @@
       "first_seen": "2026-08-27",
       "last": {
         "name": "立华股份",
-        "px": 20.35,
-        "chg": -2.49,
-        "score": 18.0,
+        "px": 20.38,
+        "chg": 0.15,
+        "score": 17.0,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2334,13 +2324,13 @@
       "first_seen": "2026-09-01",
       "last": {
         "name": "新媒股份",
-        "px": 34.47,
-        "chg": 0.03,
-        "score": 23.1,
+        "px": 34.58,
+        "chg": 0.32,
+        "score": 24.0,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2355,13 +2345,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "力合科技",
-        "px": 10.21,
-        "chg": 3.13,
-        "score": 31.9,
+        "px": 10.07,
+        "chg": -1.37,
+        "score": 27.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2376,13 +2366,13 @@
       "first_seen": "2026-08-26",
       "last": {
         "name": "阿尔特",
-        "px": 12.69,
-        "chg": 2.75,
-        "score": 21.4,
+        "px": 12.96,
+        "chg": 2.13,
+        "score": 22.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2397,13 +2387,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "交大思诺",
-        "px": 23.05,
-        "chg": 0.92,
-        "score": 23.4,
+        "px": 23.24,
+        "chg": 0.82,
+        "score": 31.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2418,13 +2408,13 @@
       "first_seen": "2026-08-25",
       "last": {
         "name": "图南股份",
-        "px": 34.76,
-        "chg": 1.91,
-        "score": 24.0,
+        "px": 34.93,
+        "chg": 0.49,
+        "score": 24.5,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2439,13 +2429,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "南大环境",
-        "px": 25.62,
-        "chg": 1.91,
-        "score": 14.6,
+        "px": 25.3,
+        "chg": -1.25,
+        "score": 12.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2460,13 +2450,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "圣元环保",
-        "px": 17.07,
-        "chg": 0.23,
-        "score": 9.1,
+        "px": 17.33,
+        "chg": 1.52,
+        "score": 17.5,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2481,13 +2471,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "康泰医学",
-        "px": 10.54,
-        "chg": 0.0,
-        "score": 25.4,
+        "px": 10.58,
+        "chg": 0.38,
+        "score": 37.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2502,13 +2492,13 @@
       "first_seen": "2026-08-24",
       "last": {
         "name": "龙利得",
-        "px": 6.27,
-        "chg": 0.8,
-        "score": 8.7,
+        "px": 6.3,
+        "chg": 0.48,
+        "score": 15.1,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2523,13 +2513,13 @@
       "first_seen": "2026-08-26",
       "last": {
         "name": "翔丰华",
-        "px": 26.49,
-        "chg": 1.81,
-        "score": 23.4,
+        "px": 26.2,
+        "chg": -1.09,
+        "score": 20.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2544,13 +2534,13 @@
       "first_seen": "2026-08-28",
       "last": {
         "name": "爱美客",
-        "px": 88.84,
-        "chg": 0.57,
-        "score": 23.4,
+        "px": 88.8,
+        "chg": -0.05,
+        "score": 29.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2565,13 +2555,13 @@
       "first_seen": "2026-08-27",
       "last": {
         "name": "瑞丰新材",
-        "px": 27.66,
-        "chg": 0.84,
-        "score": 12.8,
+        "px": 27.29,
+        "chg": -1.34,
+        "score": 11.0,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2586,13 +2576,13 @@
       "first_seen": "2026-08-24",
       "last": {
         "name": "建工修复",
-        "px": 11.73,
-        "chg": 1.38,
-        "score": 8.9,
+        "px": 11.82,
+        "chg": 0.77,
+        "score": 14.3,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2608,12 +2598,12 @@
       "last": {
         "name": "通业科技",
         "px": 16.21,
-        "chg": 3.25,
-        "score": 9.9,
+        "chg": 1.25,
+        "score": 13.5,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2628,13 +2618,13 @@
       "first_seen": "2026-08-25",
       "last": {
         "name": "晓鸣股份",
-        "px": 16.27,
-        "chg": -1.57,
-        "score": 14.4,
+        "px": 16.54,
+        "chg": 1.66,
+        "score": 7.5,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2649,13 +2639,13 @@
       "first_seen": "2026-08-27",
       "last": {
         "name": "金龙鱼",
-        "px": 24.91,
-        "chg": -0.95,
-        "score": 9.8,
+        "px": 24.89,
+        "chg": -0.08,
+        "score": 8.5,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2671,12 +2661,12 @@
       "last": {
         "name": "金鹰重工",
         "px": 8.9,
-        "chg": 0.79,
-        "score": 18.5,
+        "chg": 0.0,
+        "score": 22.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2691,13 +2681,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "华润材料",
-        "px": 6.94,
-        "chg": 3.58,
-        "score": 19.8,
+        "px": 6.81,
+        "chg": -1.87,
+        "score": 15.7,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2712,13 +2702,13 @@
       "first_seen": "2026-09-01",
       "last": {
         "name": "明月镜片",
-        "px": 28.54,
-        "chg": 1.46,
-        "score": 15.2,
+        "px": 29.3,
+        "chg": 2.66,
+        "score": 20.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2733,13 +2723,13 @@
       "first_seen": "2026-08-24",
       "last": {
         "name": "华研精机",
-        "px": 27.61,
-        "chg": 1.81,
-        "score": 8.8,
+        "px": 27.72,
+        "chg": 0.4,
+        "score": 8.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2754,13 +2744,13 @@
       "first_seen": "2026-08-31",
       "last": {
         "name": "中科环保",
-        "px": 5.66,
-        "chg": 0.71,
-        "score": 32.5,
+        "px": 5.64,
+        "chg": 0.89,
+        "score": 34.3,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2775,13 +2765,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "三元生物",
-        "px": 23.18,
-        "chg": -0.13,
-        "score": 13.5,
+        "px": 23.53,
+        "chg": 1.51,
+        "score": 16.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2797,12 +2787,12 @@
       "last": {
         "name": "华兰疫苗",
         "px": 18.13,
-        "chg": 1.28,
-        "score": 12.4,
+        "chg": 0.0,
+        "score": 38.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2817,13 +2807,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "聚胶股份",
-        "px": 25.66,
-        "chg": 3.3,
-        "score": 51.3,
+        "px": 25.3,
+        "chg": -1.4,
+        "score": 52.3,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2838,13 +2828,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "川宁生物",
-        "px": 7.95,
-        "chg": -1.0,
-        "score": 36.7,
+        "px": 7.96,
+        "chg": 0.13,
+        "score": 47.5,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2859,13 +2849,13 @@
       "first_seen": "2026-08-27",
       "last": {
         "name": "朗坤科技",
-        "px": 24.42,
-        "chg": -3.74,
-        "score": 10.2,
+        "px": 24.74,
+        "chg": 1.31,
+        "score": 10.7,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2880,13 +2870,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "豪江智能",
-        "px": 13.46,
-        "chg": 1.97,
-        "score": 25.3,
+        "px": 13.73,
+        "chg": 2.01,
+        "score": 44.3,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2901,13 +2891,13 @@
       "first_seen": "2026-09-01",
       "last": {
         "name": "赛维时代",
-        "px": 22.84,
-        "chg": 4.2,
-        "score": 51.8,
+        "px": 24.01,
+        "chg": 5.12,
+        "score": 57.0,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2922,13 +2912,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "森泰股份",
-        "px": 16.88,
-        "chg": 1.93,
-        "score": 25.5,
+        "px": 17.09,
+        "chg": 1.24,
+        "score": 33.0,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2943,13 +2933,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "智迪科技",
-        "px": 20.9,
-        "chg": 0.87,
-        "score": 11.2,
+        "px": 20.88,
+        "chg": -0.1,
+        "score": 19.3,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2964,13 +2954,13 @@
       "first_seen": "2026-08-25",
       "last": {
         "name": "绿联科技",
-        "px": 53.76,
-        "chg": 2.42,
-        "score": 13.8,
+        "px": 52.81,
+        "chg": -1.77,
+        "score": 11.5,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -2985,13 +2975,13 @@
       "first_seen": "2026-08-27",
       "last": {
         "name": "中航成飞",
-        "px": 59.7,
-        "chg": -0.13,
-        "score": 12.7,
+        "px": 59.5,
+        "chg": -0.34,
+        "score": 11.1,
         "tier": "不开新仓·仅跟踪",
         "pool": "创业板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3006,13 +2996,13 @@
       "first_seen": "2026-08-31",
       "last": {
         "name": "宁波联合",
-        "px": 6.06,
-        "chg": 1.17,
-        "score": 22.8,
+        "px": 6.1,
+        "chg": 0.66,
+        "score": 29.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3027,33 +3017,13 @@
       "first_seen": "2026-08-28",
       "last": {
         "name": "黄山旅游",
-        "px": 10.75,
-        "chg": 0.75,
-        "score": 19.5,
+        "px": 10.67,
+        "chg": -0.74,
+        "score": 20.4,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
-        "gate_closed": true
-      },
-      "gate_closed": true
-    },
-    "600081": {
-      "entry": "2026-08-18",
-      "pool": "主板",
-      "type": "stock",
-      "exit": "2026-09-17",
-      "status": "active",
-      "last_seen": "2026-08-19",
-      "last": {
-        "name": "东风科技",
-        "px": 10.21,
-        "chg": -0.39,
-        "score": 25.8,
-        "tier": "不开新仓·仅跟踪",
-        "pool": "主板",
-        "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3067,13 +3037,13 @@
       "last_seen": "2026-08-21",
       "last": {
         "name": "武汉控股",
-        "px": 4.35,
-        "chg": 0.0,
-        "score": 23.9,
+        "px": 4.33,
+        "chg": -0.46,
+        "score": 29.7,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3088,13 +3058,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "中牧股份",
-        "px": 6.65,
-        "chg": -0.89,
-        "score": 11.3,
+        "px": 6.69,
+        "chg": 0.6,
+        "score": 16.4,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3109,13 +3079,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "西藏药业",
-        "px": 35.9,
-        "chg": -0.58,
-        "score": 21.7,
+        "px": 35.77,
+        "chg": -0.36,
+        "score": 42.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3130,13 +3100,13 @@
       "first_seen": "2026-09-02",
       "last": {
         "name": "全柴动力",
-        "px": 7.43,
-        "chg": 0.68,
-        "score": 15.5,
+        "px": 7.51,
+        "chg": 1.08,
+        "score": 21.0,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3150,13 +3120,13 @@
       "type": "stock",
       "last": {
         "name": "冠农股份",
-        "px": 10.17,
-        "chg": 1.4,
-        "score": 5.1,
+        "px": 10.18,
+        "chg": 0.1,
+        "score": 10.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3170,13 +3140,13 @@
       "type": "stock",
       "last": {
         "name": "阳光照明",
-        "px": 3.2,
-        "chg": 1.59,
-        "score": 30.5,
+        "px": 3.19,
+        "chg": -0.31,
+        "score": 30.4,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3191,13 +3161,13 @@
       "first_seen": "2026-08-24",
       "last": {
         "name": "华阳股份",
-        "px": 9.18,
-        "chg": 0.22,
-        "score": 19.9,
+        "px": 9.04,
+        "chg": -1.53,
+        "score": 15.1,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3212,13 +3182,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "亚宝药业",
-        "px": 6.61,
+        "px": 6.6,
         "chg": -0.15,
-        "score": 18.3,
+        "score": 23.4,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3233,13 +3203,13 @@
       "first_seen": "2026-08-25",
       "last": {
         "name": "五洲交通",
-        "px": 4.14,
-        "chg": -2.59,
-        "score": 17.4,
+        "px": 4.13,
+        "chg": -0.24,
+        "score": 15.0,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3254,13 +3224,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "盘江股份",
-        "px": 5.17,
-        "chg": -0.58,
-        "score": 3.4,
+        "px": 5.06,
+        "chg": -2.13,
+        "score": 7.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3275,13 +3245,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "千金药业",
-        "px": 11.33,
-        "chg": -0.61,
-        "score": 9.1,
+        "px": 11.48,
+        "chg": 1.32,
+        "score": 9.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3296,13 +3266,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "上海能源",
-        "px": 10.7,
-        "chg": 0.56,
-        "score": 11.9,
+        "px": 10.45,
+        "chg": -2.34,
+        "score": 10.5,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3317,33 +3287,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "腾达建设",
-        "px": 2.06,
-        "chg": 1.48,
-        "score": 26.4,
+        "px": 2.07,
+        "chg": 0.49,
+        "score": 27.5,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
-        "gate_closed": true
-      },
-      "gate_closed": true
-    },
-    "600523": {
-      "entry": "2026-08-18",
-      "pool": "主板",
-      "type": "stock",
-      "exit": "2026-09-17",
-      "status": "active",
-      "last_seen": "2026-08-19",
-      "last": {
-        "name": "贵航股份",
-        "px": 11.84,
-        "chg": 0.0,
-        "score": 26.0,
-        "tier": "不开新仓·仅跟踪",
-        "pool": "主板",
-        "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3358,13 +3308,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "菲达环保",
-        "px": 4.56,
-        "chg": 0.66,
-        "score": 21.5,
+        "px": 4.57,
+        "chg": 0.22,
+        "score": 17.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3379,13 +3329,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "XD新世界",
-        "px": 6.21,
-        "chg": 0.32,
-        "score": 20.1,
+        "px": 6.25,
+        "chg": 0.64,
+        "score": 20.4,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3400,13 +3350,13 @@
       "first_seen": "2026-08-31",
       "last": {
         "name": "申能股份",
-        "px": 8.68,
-        "chg": -0.34,
-        "score": 40.4,
+        "px": 8.61,
+        "chg": -0.81,
+        "score": 36.0,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3421,13 +3371,13 @@
       "first_seen": "2026-09-02",
       "last": {
         "name": "百川能源",
-        "px": 3.49,
-        "chg": 0.29,
-        "score": 26.7,
+        "px": 3.45,
+        "chg": -1.15,
+        "score": 21.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3442,13 +3392,13 @@
       "first_seen": "2026-08-28",
       "last": {
         "name": "上海石化",
-        "px": 2.8,
-        "chg": 0.0,
-        "score": 19.7,
+        "px": 2.77,
+        "chg": -1.07,
+        "score": 16.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3463,13 +3413,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "辽宁成大",
-        "px": 10.31,
-        "chg": 0.49,
-        "score": 15.1,
+        "px": 10.23,
+        "chg": -0.78,
+        "score": 24.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3484,13 +3434,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "鲁抗医药",
-        "px": 7.45,
-        "chg": 0.27,
-        "score": 19.9,
+        "px": 7.52,
+        "chg": 0.94,
+        "score": 25.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3505,13 +3455,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "国电电力",
-        "px": 5.32,
-        "chg": -0.19,
-        "score": 36.3,
+        "px": 5.26,
+        "chg": -1.13,
+        "score": 30.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3525,13 +3475,13 @@
       "last_seen": "2026-08-21",
       "last": {
         "name": "宇通重工",
-        "px": 9.34,
-        "chg": 0.32,
-        "score": 13.9,
+        "px": 9.49,
+        "chg": 1.61,
+        "score": 18.7,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3548,11 +3498,11 @@
         "name": "XD益民集",
         "px": 3.58,
         "chg": 0.0,
-        "score": 10.0,
+        "score": 9.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3567,13 +3517,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "江苏银行",
-        "px": 12.16,
-        "chg": -1.54,
-        "score": 30.8,
+        "px": 12.04,
+        "chg": -0.99,
+        "score": 25.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3588,13 +3538,13 @@
       "first_seen": "2026-08-24",
       "last": {
         "name": "苏能股份",
-        "px": 4.12,
-        "chg": 0.49,
-        "score": 24.7,
+        "px": 4.13,
+        "chg": 0.24,
+        "score": 27.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3609,13 +3559,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "杭州银行",
-        "px": 17.21,
-        "chg": -1.04,
-        "score": 36.0,
+        "px": 17.13,
+        "chg": -0.46,
+        "score": 32.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3630,13 +3580,13 @@
       "first_seen": "2026-09-02",
       "last": {
         "name": "中国移动",
-        "px": 96.94,
-        "chg": -0.87,
-        "score": 25.0,
+        "px": 96.9,
+        "chg": -0.04,
+        "score": 21.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3651,13 +3601,13 @@
       "first_seen": "2026-08-27",
       "last": {
         "name": "恒源煤电",
-        "px": 8.58,
-        "chg": 0.0,
-        "score": 14.2,
+        "px": 8.44,
+        "chg": -1.63,
+        "score": 14.0,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3672,13 +3622,13 @@
       "first_seen": "2026-08-28",
       "last": {
         "name": "金陵饭店",
-        "px": 6.72,
-        "chg": -0.59,
-        "score": 14.6,
+        "px": 6.75,
+        "chg": 0.45,
+        "score": 14.1,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3704,26 +3654,6 @@
       },
       "gate_closed": true
     },
-    "601099": {
-      "entry": "2026-08-18",
-      "pool": "主板",
-      "type": "stock",
-      "exit": "2026-09-17",
-      "status": "active",
-      "last_seen": "2026-08-19",
-      "last": {
-        "name": "太平洋",
-        "px": 3.44,
-        "chg": 0.58,
-        "score": 15.3,
-        "tier": "不开新仓·仅跟踪",
-        "pool": "主板",
-        "type": "stock",
-        "date": "2026-09-16",
-        "gate_closed": true
-      },
-      "gate_closed": true
-    },
     "601121": {
       "entry": "2026-08-20",
       "last_seen": "2026-08-20",
@@ -3734,33 +3664,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "宝地矿业",
-        "px": 7.09,
-        "chg": 0.14,
-        "score": 18.2,
+        "px": 7.06,
+        "chg": -0.42,
+        "score": 18.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
-        "gate_closed": true
-      },
-      "gate_closed": true
-    },
-    "601156": {
-      "entry": "2026-08-18",
-      "pool": "主板",
-      "type": "stock",
-      "exit": "2026-09-17",
-      "status": "active",
-      "last_seen": "2026-08-19",
-      "last": {
-        "name": "东航物流",
-        "px": 18.25,
-        "chg": 2.01,
-        "score": 22.7,
-        "tier": "不开新仓·仅跟踪",
-        "pool": "主板",
-        "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3775,13 +3685,13 @@
       "first_seen": "2026-08-31",
       "last": {
         "name": "北京银行",
-        "px": 5.6,
-        "chg": -1.06,
-        "score": 35.0,
+        "px": 5.54,
+        "chg": -1.07,
+        "score": 31.3,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3796,13 +3706,13 @@
       "first_seen": "2026-08-26",
       "last": {
         "name": "青岛港",
-        "px": 9.61,
-        "chg": 0.31,
-        "score": 59.5,
+        "px": 9.75,
+        "chg": 1.46,
+        "score": 63.0,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3817,13 +3727,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "绿城水务",
-        "px": 4.49,
-        "chg": 0.67,
-        "score": 27.5,
+        "px": 4.47,
+        "chg": -0.45,
+        "score": 31.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3838,13 +3748,13 @@
       "first_seen": "2026-08-25",
       "last": {
         "name": "北元化工",
-        "px": 3.69,
-        "chg": -1.6,
-        "score": 21.7,
+        "px": 3.65,
+        "chg": -1.08,
+        "score": 18.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3859,13 +3769,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "齐鲁银行",
-        "px": 6.98,
-        "chg": -1.55,
-        "score": 25.3,
+        "px": 6.89,
+        "chg": -1.29,
+        "score": 19.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3880,13 +3790,13 @@
       "first_seen": "2026-09-01",
       "last": {
         "name": "中海油服",
-        "px": 12.41,
-        "chg": 0.89,
-        "score": 20.8,
+        "px": 12.07,
+        "chg": -2.74,
+        "score": 17.4,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3901,13 +3811,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "成都银行",
-        "px": 19.87,
-        "chg": -0.85,
-        "score": 41.0,
+        "px": 19.82,
+        "chg": -0.25,
+        "score": 37.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3922,13 +3832,13 @@
       "first_seen": "2026-09-01",
       "last": {
         "name": "南方传媒",
-        "px": 12.36,
-        "chg": -1.12,
-        "score": 23.5,
+        "px": 12.27,
+        "chg": -0.73,
+        "score": 22.4,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3943,13 +3853,13 @@
       "first_seen": "2026-09-02",
       "last": {
         "name": "中国核电",
-        "px": 9.1,
-        "chg": 0.89,
-        "score": 43.2,
+        "px": 9.01,
+        "chg": -0.99,
+        "score": 38.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3964,13 +3874,13 @@
       "first_seen": "2026-08-31",
       "last": {
         "name": "音飞储存",
-        "px": 8.95,
-        "chg": 0.9,
-        "score": 17.0,
+        "px": 9.03,
+        "chg": 0.89,
+        "score": 17.7,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -3985,13 +3895,13 @@
       "first_seen": "2026-08-31",
       "last": {
         "name": "新疆火炬",
-        "px": 19.62,
-        "chg": 2.83,
-        "score": 18.5,
+        "px": 19.25,
+        "chg": -1.89,
+        "score": 13.7,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4006,13 +3916,13 @@
       "first_seen": "2026-09-01",
       "last": {
         "name": "九华旅游",
-        "px": 32.05,
-        "chg": 0.03,
-        "score": 9.6,
+        "px": 32.55,
+        "chg": 1.56,
+        "score": 20.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4027,13 +3937,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "索宝蛋白",
-        "px": 16.55,
-        "chg": 0.91,
-        "score": 33.0,
+        "px": 16.63,
+        "chg": 0.48,
+        "score": 34.1,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4048,13 +3958,13 @@
       "first_seen": "2026-09-01",
       "last": {
         "name": "锦泓集团",
-        "px": 7.58,
-        "chg": -0.79,
-        "score": 25.8,
+        "px": 7.59,
+        "chg": 0.13,
+        "score": 29.1,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4069,13 +3979,13 @@
       "gate_closed": true,
       "last": {
         "name": "步长制药",
-        "px": 14.71,
-        "chg": 0.68,
-        "score": 34.0,
+        "px": 14.62,
+        "chg": -0.61,
+        "score": 42.3,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       }
     },
@@ -4089,13 +3999,13 @@
       "first_seen": "2026-08-27",
       "last": {
         "name": "世茂能源",
-        "px": 24.26,
-        "chg": 1.72,
-        "score": 18.1,
+        "px": 23.81,
+        "chg": -1.85,
+        "score": 13.7,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4110,13 +4020,13 @@
       "first_seen": "2026-08-24",
       "last": {
         "name": "华达新材",
-        "px": 7.77,
-        "chg": 1.57,
-        "score": 10.1,
+        "px": 7.8,
+        "chg": 0.39,
+        "score": 10.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4131,13 +4041,13 @@
       "first_seen": "2026-08-26",
       "last": {
         "name": "中国通号",
-        "px": 4.63,
-        "chg": 0.0,
-        "score": 31.8,
+        "px": 4.62,
+        "chg": -0.22,
+        "score": 34.5,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4152,13 +4062,13 @@
       "gate_closed": true,
       "last": {
         "name": "南微医学",
-        "px": 81.67,
-        "chg": 3.3,
-        "score": 51.4,
+        "px": 81.7,
+        "chg": 0.04,
+        "score": 47.1,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       }
     },
@@ -4172,13 +4082,13 @@
       "first_seen": "2026-08-24",
       "last": {
         "name": "传音控股",
-        "px": 52.41,
-        "chg": 0.85,
-        "score": 23.1,
+        "px": 52.31,
+        "chg": -0.19,
+        "score": 31.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4193,13 +4103,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "安旭生物",
-        "px": 28.15,
-        "chg": 0.72,
-        "score": 21.6,
+        "px": 28.34,
+        "chg": 0.67,
+        "score": 31.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4214,13 +4124,13 @@
       "first_seen": "2026-08-24",
       "last": {
         "name": "英科再生",
-        "px": 33.58,
-        "chg": 0.12,
-        "score": 33.5,
+        "px": 33.5,
+        "chg": -0.24,
+        "score": 35.5,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4235,13 +4145,13 @@
       "gate_closed": true,
       "last": {
         "name": "近岸蛋白",
-        "px": 84.0,
-        "chg": 8.95,
-        "score": 38.5,
+        "px": 99.75,
+        "chg": 18.75,
+        "score": 43.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       }
     },
@@ -4255,13 +4165,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "海尔生物",
-        "px": 30.71,
-        "chg": -0.32,
-        "score": 23.6,
+        "px": 30.64,
+        "chg": -0.23,
+        "score": 21.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4276,13 +4186,13 @@
       "first_seen": "2026-08-26",
       "last": {
         "name": "先惠技术",
-        "px": 54.4,
-        "chg": -0.87,
-        "score": 39.4,
+        "px": 54.11,
+        "chg": -0.53,
+        "score": 44.4,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4297,13 +4207,13 @@
       "first_seen": "2026-08-28",
       "last": {
         "name": "道通科技",
-        "px": 25.45,
-        "chg": 0.87,
-        "score": 15.0,
+        "px": 25.09,
+        "chg": -1.41,
+        "score": 13.7,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4318,13 +4228,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "圣湘生物",
-        "px": 15.64,
-        "chg": 0.77,
-        "score": 13.6,
+        "px": 15.87,
+        "chg": 1.47,
+        "score": 33.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4339,13 +4249,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "东方生物",
-        "px": 17.77,
-        "chg": -0.95,
-        "score": 26.1,
+        "px": 18.02,
+        "chg": 1.41,
+        "score": 37.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4360,13 +4270,13 @@
       "first_seen": "2026-09-02",
       "last": {
         "name": "经纬恒润",
-        "px": 57.35,
-        "chg": 0.88,
-        "score": 32.7,
+        "px": 57.59,
+        "chg": 0.42,
+        "score": 38.4,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4381,13 +4291,13 @@
       "first_seen": "2026-08-26",
       "last": {
         "name": "华虹宏力",
-        "px": 224.08,
-        "chg": 4.42,
-        "score": 17.4,
+        "px": 220.9,
+        "chg": -1.42,
+        "score": 18.7,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4402,13 +4312,13 @@
       "first_seen": "2026-08-27",
       "last": {
         "name": "微电生理",
-        "px": 16.69,
-        "chg": 0.97,
-        "score": 30.3,
+        "px": 16.85,
+        "chg": 0.96,
+        "score": 32.7,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4423,13 +4333,13 @@
       "first_seen": "2026-08-24",
       "last": {
         "name": "三孚新科",
-        "px": 105.6,
-        "chg": 0.95,
-        "score": 25.5,
+        "px": 103.71,
+        "chg": -1.79,
+        "score": 23.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4444,13 +4354,13 @@
       "first_seen": "2026-08-24",
       "last": {
         "name": "甬矽电子",
-        "px": 62.7,
-        "chg": 6.45,
-        "score": 19.7,
+        "px": 61.42,
+        "chg": -2.04,
+        "score": 25.1,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4465,13 +4375,13 @@
       "first_seen": "2026-08-28",
       "last": {
         "name": "铁建重工",
-        "px": 3.95,
+        "px": 3.94,
         "chg": -0.25,
-        "score": 28.8,
+        "score": 34.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4486,13 +4396,13 @@
       "first_seen": "2026-09-02",
       "last": {
         "name": "振华风光",
-        "px": 37.46,
-        "chg": 2.91,
-        "score": 28.8,
+        "px": 37.11,
+        "chg": -0.93,
+        "score": 30.4,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4507,13 +4417,13 @@
       "first_seen": "2026-08-24",
       "last": {
         "name": "科捷智能",
-        "px": 16.55,
-        "chg": 0.85,
-        "score": 16.0,
+        "px": 16.31,
+        "chg": -1.45,
+        "score": 12.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4528,13 +4438,13 @@
       "first_seen": "2026-08-27",
       "last": {
         "name": "三未信安",
-        "px": 23.59,
-        "chg": -0.3,
-        "score": 17.9,
+        "px": 23.8,
+        "chg": 0.89,
+        "score": 19.0,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4549,13 +4459,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "科前生物",
-        "px": 12.29,
-        "chg": 0.0,
-        "score": 27.1,
+        "px": 12.28,
+        "chg": -0.08,
+        "score": 34.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4570,13 +4480,13 @@
       "first_seen": "2026-08-27",
       "last": {
         "name": "亚辉龙",
-        "px": 9.45,
-        "chg": 0.85,
-        "score": 3.7,
+        "px": 9.64,
+        "chg": 2.01,
+        "score": 10.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4591,13 +4501,13 @@
       "first_seen": "2026-08-24",
       "last": {
         "name": "江航装备",
-        "px": 11.15,
-        "chg": 0.36,
-        "score": 16.3,
+        "px": 11.11,
+        "chg": -0.36,
+        "score": 15.5,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4612,13 +4522,13 @@
       "first_seen": "2026-08-24",
       "last": {
         "name": "力合微",
-        "px": 20.14,
-        "chg": 5.01,
-        "score": 28.9,
+        "px": 20.03,
+        "chg": -0.55,
+        "score": 27.7,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4633,13 +4543,13 @@
       "first_seen": "2026-08-25",
       "last": {
         "name": "泰凌微",
-        "px": 28.24,
-        "chg": 3.29,
-        "score": 12.5,
+        "px": 28.19,
+        "chg": -0.18,
+        "score": 12.4,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4654,13 +4564,13 @@
       "first_seen": "2026-08-24",
       "last": {
         "name": "恒玄科技",
-        "px": 95.14,
-        "chg": 5.36,
-        "score": 46.6,
+        "px": 96.0,
+        "chg": 0.9,
+        "score": 54.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4675,13 +4585,13 @@
       "first_seen": "2026-08-28",
       "last": {
         "name": "合合信息",
-        "px": 89.9,
-        "chg": 0.47,
-        "score": 33.4,
+        "px": 88.32,
+        "chg": -1.76,
+        "score": 20.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4696,13 +4606,13 @@
       "first_seen": "2026-08-28",
       "last": {
         "name": "星球石墨",
-        "px": 22.15,
-        "chg": 1.61,
-        "score": 32.5,
+        "px": 22.05,
+        "chg": -0.45,
+        "score": 34.7,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4717,13 +4627,13 @@
       "first_seen": "2026-08-25",
       "last": {
         "name": "元琛科技",
-        "px": 8.96,
-        "chg": 0.79,
-        "score": 38.1,
+        "px": 9.03,
+        "chg": 0.78,
+        "score": 43.1,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4738,13 +4648,13 @@
       "first_seen": "2026-08-27",
       "last": {
         "name": "佳驰科技",
-        "px": 41.0,
-        "chg": 3.17,
-        "score": 18.0,
+        "px": 40.15,
+        "chg": -2.07,
+        "score": 21.0,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4759,13 +4669,13 @@
       "first_seen": "2026-08-24",
       "last": {
         "name": "拉普拉斯",
-        "px": 41.4,
-        "chg": 0.88,
-        "score": 29.9,
+        "px": 41.84,
+        "chg": 1.06,
+        "score": 24.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4780,13 +4690,13 @@
       "gate_closed": true,
       "last": {
         "name": "成大生物",
-        "px": 19.76,
-        "chg": 0.51,
-        "score": 17.8,
+        "px": 19.9,
+        "chg": 0.71,
+        "score": 32.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       }
     },
@@ -4800,13 +4710,13 @@
       "first_seen": "2026-08-26",
       "last": {
         "name": "珠海冠宇",
-        "px": 13.89,
-        "chg": 1.46,
-        "score": 5.1,
+        "px": 13.66,
+        "chg": -1.66,
+        "score": 19.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4821,13 +4731,13 @@
       "first_seen": "2026-08-24",
       "last": {
         "name": "五矿新能",
-        "px": 7.8,
-        "chg": 3.17,
-        "score": 30.6,
+        "px": 7.64,
+        "chg": -2.05,
+        "score": 35.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4842,13 +4752,13 @@
       "first_seen": "2026-08-25",
       "last": {
         "name": "宏华数科",
-        "px": 40.59,
-        "chg": -0.44,
-        "score": 39.0,
+        "px": 41.2,
+        "chg": 1.5,
+        "score": 43.1,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4863,13 +4773,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "倍轻松",
-        "px": 17.23,
-        "chg": 2.68,
-        "score": 30.2,
+        "px": 17.45,
+        "chg": 1.28,
+        "score": 35.3,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4884,13 +4794,13 @@
       "first_seen": "2026-08-27",
       "last": {
         "name": "艾为电子",
-        "px": 53.6,
-        "chg": 2.8,
-        "score": 5.1,
+        "px": 53.26,
+        "chg": -0.63,
+        "score": 7.0,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4905,13 +4815,13 @@
       "first_seen": "2026-08-26",
       "last": {
         "name": "天能股份",
-        "px": 20.66,
-        "chg": 0.39,
-        "score": 29.7,
+        "px": 20.55,
+        "chg": -0.53,
+        "score": 32.5,
         "tier": "不开新仓·仅跟踪",
         "pool": "科创板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4925,13 +4835,13 @@
       "type": "stock",
       "last": {
         "name": "丽江股份",
-        "px": 8.31,
-        "chg": 0.12,
-        "score": 16.9,
+        "px": 8.36,
+        "chg": 0.6,
+        "score": 17.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -4945,13 +4855,13 @@
       "type": "stock",
       "last": {
         "name": "辉隆股份",
-        "px": 5.16,
-        "chg": 0.98,
-        "score": 9.9,
+        "px": 5.18,
+        "chg": 0.39,
+        "score": 8.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -5002,12 +4912,12 @@
       "last": {
         "name": "招商瑞丰灵活配置混合发起式A",
         "px": 2.21,
-        "chg": -1.12,
-        "score": 29.8,
-        "tier": "不买",
+        "chg": 0.14,
+        "score": 36.9,
+        "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "002017": {
@@ -5019,13 +4929,13 @@
       "type": "fund",
       "last": {
         "name": "东信和平",
-        "px": 2.09,
-        "chg": -1.09,
-        "score": 29.9,
-        "tier": "不买",
+        "px": 2.1,
+        "chg": 0.1,
+        "score": 36.7,
+        "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "004355": {
@@ -5037,13 +4947,13 @@
       "type": "fund",
       "last": {
         "name": "嘉实丰和灵活配置混合A",
-        "px": 2.26,
-        "chg": -0.69,
-        "score": 14.2,
+        "px": 2.27,
+        "chg": 0.72,
+        "score": 16.3,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "002158": {
@@ -5056,12 +4966,12 @@
       "last": {
         "name": "汉钟精机",
         "px": 1.19,
-        "chg": -0.67,
-        "score": 17.8,
+        "chg": 0.25,
+        "score": 18.7,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "001796": {
@@ -5074,12 +4984,12 @@
       "last": {
         "name": "汇添富安鑫智选混合A",
         "px": 1.16,
-        "chg": -0.69,
-        "score": 17.7,
+        "chg": 0.26,
+        "score": 18.7,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "002133": {
@@ -5091,13 +5001,13 @@
       "type": "fund",
       "last": {
         "name": "广宇集团",
-        "px": 2.96,
-        "chg": -0.44,
-        "score": 16.6,
+        "px": 3.01,
+        "chg": 1.72,
+        "score": 26.6,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "002495": {
@@ -5109,13 +5019,13 @@
       "type": "fund",
       "last": {
         "name": "佳隆股份",
-        "px": 1.92,
-        "chg": -2.35,
-        "score": 13.0,
+        "px": 1.95,
+        "chg": 1.67,
+        "score": 18.0,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "002496": {
@@ -5127,13 +5037,13 @@
       "type": "fund",
       "last": {
         "name": "辉丰股份",
-        "px": 1.87,
-        "chg": -2.35,
-        "score": 13.1,
+        "px": 1.9,
+        "chg": 1.66,
+        "score": 18.0,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "000768": {
@@ -5146,13 +5056,13 @@
       "gate_closed": true,
       "last": {
         "name": "中航西飞",
-        "px": 22.35,
-        "chg": 0.22,
-        "score": 14.1,
+        "px": 22.22,
+        "chg": -0.58,
+        "score": 12.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       }
     },
@@ -5166,13 +5076,13 @@
       "gate_closed": true,
       "last": {
         "name": "达安基因",
-        "px": 5.22,
-        "chg": 0.19,
-        "score": 18.3,
+        "px": 5.27,
+        "chg": 0.96,
+        "score": 39.1,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       }
     },
@@ -5186,13 +5096,13 @@
       "gate_closed": true,
       "last": {
         "name": "华茂股份",
-        "px": 4.04,
-        "chg": 1.25,
-        "score": 4.9,
+        "px": 4.13,
+        "chg": 2.23,
+        "score": 13.7,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       }
     },
@@ -5206,13 +5116,13 @@
       "first_seen": "2026-08-19",
       "last": {
         "name": "中信建投轮换混合A",
-        "px": 3.36,
-        "chg": -0.22,
-        "score": 22.1,
-        "tier": "不买",
+        "px": 3.38,
+        "chg": 0.78,
+        "score": 30.3,
+        "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "001616": {
@@ -5226,12 +5136,12 @@
       "last": {
         "name": "嘉实环保低碳股票",
         "px": 2.6,
-        "chg": -1.59,
-        "score": 17.9,
+        "chg": 0.19,
+        "score": 18.4,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "006568": {
@@ -5264,12 +5174,12 @@
       "last": {
         "name": "国投瑞银国家安全混合A",
         "px": 1.21,
-        "chg": -1.28,
-        "score": 35.8,
+        "chg": 0.02,
+        "score": 42.9,
         "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "003823": {
@@ -5282,13 +5192,13 @@
       "first_seen": "2026-08-19",
       "last": {
         "name": "中信建投轮换混合C",
-        "px": 3.25,
-        "chg": -0.22,
-        "score": 21.9,
-        "tier": "不买",
+        "px": 3.28,
+        "chg": 0.78,
+        "score": 30.1,
+        "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "002989": {
@@ -5301,13 +5211,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "中天精装",
-        "px": 0.99,
-        "chg": -0.03,
-        "score": 16.4,
+        "px": 1.0,
+        "chg": 1.21,
+        "score": 23.0,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "001148": {
@@ -5321,12 +5231,12 @@
       "last": {
         "name": "申万菱信多策略灵活配置混合A",
         "px": 2.53,
-        "chg": -0.47,
-        "score": 22.2,
+        "chg": -0.04,
+        "score": 21.5,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "001724": {
@@ -5340,12 +5250,12 @@
       "last": {
         "name": "申万菱信多策略灵活配置混合C",
         "px": 2.44,
-        "chg": -0.49,
-        "score": 22.1,
+        "chg": -0.04,
+        "score": 21.3,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "001256": {
@@ -5358,13 +5268,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "炜冈科技",
-        "px": 1.48,
-        "chg": -0.45,
-        "score": 19.5,
+        "px": 1.49,
+        "chg": 0.38,
+        "score": 22.3,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "002808": {
@@ -5377,13 +5287,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "恒久退",
-        "px": 1.4,
-        "chg": -0.43,
-        "score": 20.0,
+        "px": 1.41,
+        "chg": 0.37,
+        "score": 22.6,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "006007": {
@@ -5453,13 +5363,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "智慧农业",
-        "px": 2.79,
-        "chg": 0.72,
-        "score": 4.8,
+        "px": 2.82,
+        "chg": 1.08,
+        "score": 5.5,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -5474,13 +5384,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "亚厦股份",
-        "px": 3.76,
-        "chg": 0.27,
-        "score": 15.6,
+        "px": 3.78,
+        "chg": 0.53,
+        "score": 15.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -5495,13 +5405,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "供销大集",
-        "px": 1.49,
-        "chg": 0.68,
-        "score": 6.0,
+        "px": 1.5,
+        "chg": 0.67,
+        "score": 6.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -5516,13 +5426,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "浙农股份",
-        "px": 8.57,
-        "chg": 0.82,
-        "score": 11.4,
+        "px": 8.62,
+        "chg": 0.58,
+        "score": 11.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -5537,13 +5447,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "罗 牛 山",
-        "px": 5.8,
-        "chg": -1.19,
-        "score": 12.5,
+        "px": 5.94,
+        "chg": 2.41,
+        "score": 12.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -5558,13 +5468,13 @@
       "first_seen": "2026-08-20",
       "last": {
         "name": "中粮科技",
-        "px": 5.01,
-        "chg": 0.8,
-        "score": 13.3,
+        "px": 5.21,
+        "chg": 3.99,
+        "score": 12.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -5637,12 +5547,12 @@
       "last": {
         "name": "易方达标普医疗保健美元汇A",
         "px": 0.31,
-        "chg": 1.27,
-        "score": 23.4,
+        "chg": 0.22,
+        "score": 22.7,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-14"
+        "date": "2026-09-15"
       }
     },
     "001093": {
@@ -5656,12 +5566,12 @@
       "last": {
         "name": "广发生物科技指数美元(QDII)A",
         "px": 0.25,
-        "chg": 0.77,
-        "score": 14.5,
+        "chg": -1.64,
+        "score": 7.3,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-14"
+        "date": "2026-09-15"
       }
     },
     "001092": {
@@ -5674,13 +5584,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "广发生物科技指数人民币(QDII)A",
-        "px": 1.69,
-        "chg": 0.71,
-        "score": 13.1,
+        "px": 1.66,
+        "chg": -1.71,
+        "score": 7.3,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-14"
+        "date": "2026-09-15"
       }
     },
     "001420": {
@@ -5693,13 +5603,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "南方大数据300A",
-        "px": 2.01,
-        "chg": -2.57,
-        "score": 13.9,
+        "px": 2.04,
+        "chg": 1.51,
+        "score": 21.7,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "001426": {
@@ -5712,13 +5622,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "南方大数据300C",
-        "px": 1.93,
-        "chg": -2.57,
-        "score": 13.8,
+        "px": 1.96,
+        "chg": 1.51,
+        "score": 21.5,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "003717": {
@@ -5731,13 +5641,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "中银量化精选混合A",
-        "px": 1.17,
-        "chg": -2.97,
-        "score": 13.6,
+        "px": 1.19,
+        "chg": 1.68,
+        "score": 22.6,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "005109": {
@@ -5788,13 +5698,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "泓德泓业混合",
-        "px": 1.3,
-        "chg": -2.93,
-        "score": 0.0,
+        "px": 1.32,
+        "chg": 1.23,
+        "score": 1.6,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "001414": {
@@ -5807,13 +5717,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "国联鑫起点混合C",
-        "px": 1.16,
-        "chg": -3.57,
-        "score": 12.4,
+        "px": 1.18,
+        "chg": 1.6,
+        "score": 19.3,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "002753": {
@@ -5826,13 +5736,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "永东股份",
-        "px": 6.78,
-        "chg": 3.2,
-        "score": 26.4,
+        "px": 6.67,
+        "chg": -1.62,
+        "score": 23.0,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -5847,13 +5757,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "桂林三金",
-        "px": 12.12,
-        "chg": -0.16,
-        "score": 30.6,
+        "px": 12.11,
+        "chg": -0.08,
+        "score": 37.1,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -5869,12 +5779,12 @@
       "last": {
         "name": "仁和药业",
         "px": 5.18,
-        "chg": -0.58,
-        "score": 25.0,
+        "chg": 0.0,
+        "score": 32.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -5889,13 +5799,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "南京公用",
-        "px": 5.67,
-        "chg": 1.07,
-        "score": 17.0,
+        "px": 5.66,
+        "chg": -0.18,
+        "score": 24.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -5910,13 +5820,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "精华制药",
-        "px": 8.01,
-        "chg": -2.2,
-        "score": 18.4,
+        "px": 8.03,
+        "chg": 0.25,
+        "score": 17.3,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -5931,13 +5841,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "金河生物",
-        "px": 5.13,
-        "chg": 1.18,
-        "score": 18.8,
+        "px": 5.17,
+        "chg": 0.78,
+        "score": 25.1,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -5952,13 +5862,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "华特达因",
-        "px": 24.25,
-        "chg": -0.25,
-        "score": 24.5,
+        "px": 24.02,
+        "chg": -0.95,
+        "score": 25.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -5973,13 +5883,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "以岭药业",
-        "px": 15.18,
-        "chg": -0.13,
-        "score": 32.7,
+        "px": 15.12,
+        "chg": -0.4,
+        "score": 43.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -5995,12 +5905,12 @@
       "last": {
         "name": "三 力 士",
         "px": 3.77,
-        "chg": 2.45,
-        "score": 10.0,
+        "chg": 0.0,
+        "score": 8.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6015,13 +5925,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "卫星化学",
-        "px": 26.87,
-        "chg": 0.07,
-        "score": 14.9,
+        "px": 26.34,
+        "chg": -1.97,
+        "score": 15.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6036,13 +5946,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "美能能源",
-        "px": 9.89,
-        "chg": -3.61,
-        "score": 10.5,
+        "px": 9.63,
+        "chg": -2.63,
+        "score": 12.3,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6057,13 +5967,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "奥佳华",
-        "px": 5.47,
-        "chg": -0.55,
-        "score": 13.2,
+        "px": 5.57,
+        "chg": 1.83,
+        "score": 15.3,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6078,13 +5988,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "瑞鹄模具",
-        "px": 29.14,
-        "chg": -0.34,
-        "score": 39.9,
+        "px": 26.67,
+        "chg": -8.48,
+        "score": 19.9,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6100,12 +6010,12 @@
       "last": {
         "name": "公元股份",
         "px": 3.78,
-        "chg": -0.26,
-        "score": 19.6,
+        "chg": 0.0,
+        "score": 23.1,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6120,13 +6030,13 @@
       "first_seen": "2026-08-21",
       "last": {
         "name": "富春环保",
-        "px": 5.83,
-        "chg": -1.69,
-        "score": 19.4,
+        "px": 5.82,
+        "chg": -0.17,
+        "score": 15.4,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6142,12 +6052,12 @@
       "last": {
         "name": "冀中能源",
         "px": 4.45,
-        "chg": -1.33,
-        "score": 12.3,
+        "chg": 0.0,
+        "score": 14.1,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6162,13 +6072,13 @@
       "first_seen": "2026-08-24",
       "last": {
         "name": "獐子岛",
-        "px": 3.65,
-        "chg": 0.83,
-        "score": 14.1,
+        "px": 3.68,
+        "chg": 0.82,
+        "score": 13.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6183,13 +6093,13 @@
       "first_seen": "2026-08-24",
       "last": {
         "name": "泸天化",
-        "px": 4.05,
-        "chg": 1.25,
-        "score": 9.9,
+        "px": 4.1,
+        "chg": 1.23,
+        "score": 9.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6204,13 +6114,13 @@
       "first_seen": "2026-08-25",
       "last": {
         "name": "苏常柴Ａ",
-        "px": 5.1,
-        "chg": 0.59,
-        "score": 24.0,
+        "px": 5.18,
+        "chg": 1.57,
+        "score": 28.0,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6225,13 +6135,13 @@
       "first_seen": "2026-08-26",
       "last": {
         "name": "华西证券",
-        "px": 8.22,
-        "chg": 0.24,
-        "score": 14.4,
+        "px": 8.18,
+        "chg": -0.49,
+        "score": 16.5,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6246,13 +6156,13 @@
       "first_seen": "2026-08-26",
       "last": {
         "name": "中山公用",
-        "px": 10.99,
-        "chg": 0.18,
-        "score": 30.5,
+        "px": 10.79,
+        "chg": -1.82,
+        "score": 16.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6267,13 +6177,13 @@
       "first_seen": "2026-08-27",
       "last": {
         "name": "长青集团",
-        "px": 4.86,
-        "chg": 1.25,
-        "score": 31.6,
+        "px": 4.82,
+        "chg": -0.82,
+        "score": 27.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6288,13 +6198,13 @@
       "first_seen": "2026-08-27",
       "last": {
         "name": "华英农业",
-        "px": 1.98,
-        "chg": 0.0,
-        "score": 8.3,
+        "px": 2.18,
+        "chg": 10.1,
+        "score": 36.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6309,13 +6219,13 @@
       "first_seen": "2026-08-27",
       "last": {
         "name": "吉林敖东",
-        "px": 17.46,
-        "chg": 0.34,
-        "score": 18.9,
+        "px": 17.31,
+        "chg": -0.86,
+        "score": 23.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6332,13 +6242,13 @@
       "suspend_since": "2026-08-26",
       "last": {
         "name": "华昌化工",
-        "px": 5.96,
-        "chg": 0.17,
-        "score": 22.5,
+        "px": 5.88,
+        "chg": -1.34,
+        "score": 21.6,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6353,13 +6263,13 @@
       "first_seen": "2026-08-28",
       "last": {
         "name": "珠海港",
-        "px": 5.05,
+        "px": 5.04,
         "chg": -0.2,
-        "score": 33.1,
+        "score": 30.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6374,13 +6284,13 @@
       "first_seen": "2026-08-31",
       "last": {
         "name": "方大集团",
-        "px": 3.82,
-        "chg": 10.09,
-        "score": 59.2,
+        "px": 3.68,
+        "chg": -3.66,
+        "score": 52.1,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6395,13 +6305,13 @@
       "first_seen": "2026-08-31",
       "last": {
         "name": "威海广泰",
-        "px": 9.57,
+        "px": 9.53,
         "chg": -0.42,
-        "score": 24.0,
+        "score": 21.7,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6416,13 +6326,13 @@
       "first_seen": "2026-09-01",
       "last": {
         "name": "信隆健康",
-        "px": 5.94,
-        "chg": 1.71,
-        "score": 15.7,
+        "px": 5.99,
+        "chg": 0.84,
+        "score": 15.8,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6438,12 +6348,12 @@
       "last": {
         "name": "神州高铁",
         "px": 2.4,
-        "chg": 0.42,
-        "score": 16.4,
+        "chg": 0.0,
+        "score": 18.4,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6458,13 +6368,13 @@
       "first_seen": "2026-09-01",
       "last": {
         "name": "冀东装备",
-        "px": 8.59,
-        "chg": 1.3,
-        "score": 19.1,
+        "px": 8.65,
+        "chg": 0.7,
+        "score": 18.1,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6479,13 +6389,13 @@
       "first_seen": "2026-09-01",
       "last": {
         "name": "惠博普",
-        "px": 2.81,
-        "chg": 1.08,
+        "px": 2.76,
+        "chg": -1.78,
         "score": 14.5,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6500,13 +6410,13 @@
       "first_seen": "2026-09-01",
       "last": {
         "name": "兴蓉环境",
-        "px": 7.05,
-        "chg": -0.14,
-        "score": 23.5,
+        "px": 7.0,
+        "chg": -0.71,
+        "score": 25.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6521,13 +6431,13 @@
       "first_seen": "2026-09-03",
       "last": {
         "name": "中恒电气",
-        "px": 36.14,
-        "chg": 3.7,
-        "score": 25.3,
+        "px": 35.54,
+        "chg": -1.66,
+        "score": 29.2,
         "tier": "不开新仓·仅跟踪",
         "pool": "主板",
         "type": "stock",
-        "date": "2026-09-16",
+        "date": "2026-09-17",
         "gate_closed": true
       },
       "gate_closed": true
@@ -6542,13 +6452,13 @@
       "first_seen": "2026-09-11",
       "last": {
         "name": "南方产业智选股票A",
-        "px": 2.02,
-        "chg": -0.39,
-        "score": 28.6,
+        "px": 2.0,
+        "chg": -0.66,
+        "score": 22.1,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "004879": {
@@ -6619,12 +6529,12 @@
       "last": {
         "name": "嘉实沪港深回报混合",
         "px": 1.73,
-        "chg": -1.27,
+        "chg": 0.1,
         "score": 15.7,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "003378": {
@@ -6637,13 +6547,13 @@
       "first_seen": "2026-09-14",
       "last": {
         "name": "泰康策略优选混合",
-        "px": 1.72,
-        "chg": -0.5,
-        "score": 18.1,
+        "px": 1.73,
+        "chg": 0.47,
+        "score": 19.9,
         "tier": "不买",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-16"
       }
     },
     "005938": {
@@ -6666,22 +6576,22 @@
       }
     },
     "003401": {
-      "entry": "2026-09-14",
-      "last_seen": "2026-09-14",
-      "exit": "2026-10-14",
+      "entry": "2026-09-17",
+      "last_seen": "2026-09-17",
+      "exit": "2026-10-17",
       "status": "active",
       "pool": "基金",
       "type": "fund",
       "first_seen": "2026-09-14",
       "last": {
         "name": "工银可转债债券",
-        "px": 1.84,
-        "chg": -0.33,
-        "score": 37.3,
-        "tier": "买入",
+        "px": 1.87,
+        "chg": 1.77,
+        "score": 79.4,
+        "tier": "强买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-15"
+        "date": "2026-09-17"
       }
     },
     "005937": {
@@ -6732,10 +6642,10 @@
       "first_seen": "2026-09-15",
       "last": {
         "name": "天弘中证银行ETF联接C",
-        "px": 1.8,
-        "chg": -1.18,
-        "score": 77.4,
-        "tier": "强买入",
+        "px": 1.79,
+        "chg": -0.64,
+        "score": 40.3,
+        "tier": "买入",
         "pool": "基金",
         "type": "fund",
         "date": "2026-09-16"
@@ -6778,39 +6688,77 @@
         "type": "fund",
         "date": "2026-09-16"
       }
-    }
-  },
-  "track_pending_short": {
+    },
     "000244": {
-      "entry_candidate": "2026-09-16",
-      "first_seen": "2026-09-16",
+      "entry": "2026-09-17",
+      "last_seen": "2026-09-17",
+      "exit": "2026-10-17",
+      "status": "active",
       "pool": "基金",
       "type": "fund",
+      "first_seen": "2026-09-16",
       "last": {
         "name": "天弘稳利定期开放A",
         "px": 1.36,
         "chg": 0.04,
-        "score": 75.9,
-        "tier": "强买入",
+        "score": 46.1,
+        "tier": "买入",
         "pool": "基金",
         "type": "fund",
-        "date": "2026-09-16"
+        "date": "2026-09-11"
       }
     },
     "004437": {
-      "entry_candidate": "2026-09-16",
-      "first_seen": "2026-09-16",
+      "entry": "2026-09-17",
+      "last_seen": "2026-09-17",
+      "exit": "2026-10-17",
+      "status": "active",
       "pool": "基金",
       "type": "fund",
+      "first_seen": "2026-09-16",
       "last": {
         "name": "汇添富年年泰定开混合C",
         "px": 1.25,
         "chg": 0.0,
-        "score": 75.8,
-        "tier": "强买入",
+        "score": 46.0,
+        "tier": "买入",
         "pool": "基金",
         "type": "fund",
         "date": "2026-09-16"
+      }
+    }
+  },
+  "track_pending_short": {
+    "004026": {
+      "entry_candidate": "2026-09-17",
+      "first_seen": "2026-09-17",
+      "pool": "基金",
+      "type": "fund",
+      "last": {
+        "name": "融通收益增强债券C",
+        "px": 1.14,
+        "chg": 0.93,
+        "score": 78.8,
+        "tier": "强买入",
+        "pool": "基金",
+        "type": "fund",
+        "date": "2026-09-17"
+      }
+    },
+    "004243": {
+      "entry_candidate": "2026-09-17",
+      "first_seen": "2026-09-17",
+      "pool": "基金",
+      "type": "fund",
+      "last": {
+        "name": "广发道琼斯石油指数人民币C",
+        "px": 3.19,
+        "chg": 2.94,
+        "score": 77.7,
+        "tier": "强买入",
+        "pool": "基金",
+        "type": "fund",
+        "date": "2026-09-17"
       }
     }
   }
