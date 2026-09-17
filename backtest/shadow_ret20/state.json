@@ -1,0 +1,11 @@
+{
+ "start_date": "2026-09-16",
+ "spec": {
+  "base": "冻结引擎 composite()（13 因子 ICIR 复合）",
+  "l02": "(z(comp)+0.2·z(ret20))/1.2",
+  "l03": "(z(comp)+0.3·z(ret20))/1.3",
+  "engine": "run_engine(arm, 20, offset=0)；成本=引擎内建（20bp 基准档 / 50bp 压力档）",
+  "decision": "2026-09-17 用户拍板 ③纸面跟踪；生产 composite 不动"
+ },
+ "created": "2026-09-17 13:30"
+}

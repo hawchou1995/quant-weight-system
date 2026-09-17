@@ -30,6 +30,10 @@ if not FORCE and date.today().weekday() >= 5:
 
 STEPS = [
     ("数据更新 update_daily", ["update_daily.py"], "--skip-data" in sys.argv),
+    # 全量池守卫（R-fullpool-0917，2026-09-17 建）：降级源只补池内子集（如 440/7539）→ 全市场口径
+    # 数据（涨停全景/A5 扫描）失真。本步查 data_full 新鲜度，陈旧 >100 只自动触发全量补数（约 1-2h）。
+    # [软]=失败不阻断主链；--skip-fullguard 跳过。
+    ("全量池守卫 fullpool_guard[软]", ["backtest/fullpool_guard.py"], "--skip-fullguard" in sys.argv),
     # 估值日更（2026-09-17 建，R-valfreeze-0917）：根因=旧管道只写 4 列快照、从不扩展 val_em 主表
     # → 主表冻结 → factorlab/oss 面板冻结 → 生产轨B 目标清单冻结（asof 谎报）。[软]=失败不阻断。
     ("估值日更 fetch_val_em_daily[软]", ["fetch_val_em_daily.py"], "--skip-val" in sys.argv),
@@ -54,6 +58,11 @@ STEPS = [
     ("KHunter 模拟盘A khunter_paper", ["khunter_paper_20260903.py"], False),
     ("KHunter 模拟盘C khunter_paper_c", ["khunter_paper_20260903.py", "--state", "khunter_paper_state_c", "--rsi-sell", "50"], False),
     ("A5 打板模拟盘 a5_paper", ["backtest/a5_paper_0914.py"], False),
+    # 黄金卫星叠加模拟盘（R-gold-sat-0917 · 2026-09-17 用户拍板投产）：轨B 内划出 10%（6800）
+    # 买入 sh518880 买入持有（B&H），并把黄金腿镜像成轨B 的一个 position。**必须在 satellite_paper 之前**
+    # ——satellite_paper 的 mark 循环会逐只 load_px(code) 取价 → 黄金市值自动进轨B 净值（总敞口保持 CAP_B）。
+    # [软]=失败不阻断主链；--skip-gold 跳过。
+    ("黄金卫星模拟盘 gold_sat_paper[软]", ["backtest/gold_sat_paper.py"], "--skip-gold" in sys.argv),
     ("双卫星模拟盘 satellite_paper", ["backtest/satellite_paper_0914.py"], False),
     # 基金主仓（轨C FB3-H20）模拟盘——补齐「三轨模拟盘」最后一块（2026-09-14 用户指出缺）
     ("基金主仓模拟盘 fund_paper[软]", ["backtest/fund_paper_0914.py"], False),
@@ -125,6 +134,10 @@ if not fails:
                           "khunter_paper_state.json", "khunter_paper_state_c.json",
                           "backtest/a5_paper_state.json", "backtest/satellite_paper.json", "backtest/satellite_paper_a.json", "backtest/satellite_paper_b.json", "backtest/satellite_cfg.py",
                           "backtest/satellite_paper_init.json", "backtest/turn_shadow_state.json",
+                          "backtest/gold_sat_paper.json", "backtest/gold_sat_paper.py",
+                          "backtest/shadow_ret20.py", "backtest/engine_anchor.json",
+                          "backtest/shadow_ret20/ledger.csv", "backtest/shadow_ret20/state.json",
+                          "backtest/shadow_ret20/daily_metrics.jsonl",
                           "backtest/pct40_exits_state.json", "backtest/exit_control_state.json",
                           "backtest/pct40_exit_apply.py", "backtest/exit_control_0915.py",
                           "backtest/fetch_val_daily.py", "backtest/signal_satellite_0913.py",

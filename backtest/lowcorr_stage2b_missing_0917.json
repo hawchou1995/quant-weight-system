@@ -1,0 +1,170 @@
+{
+ "meta": {
+  "date": "2026-09-17",
+  "stage": "2b-missing",
+  "window": [
+   "2021-01-04",
+   "2026-09-16"
+  ],
+  "note": "补齐 GitHub 清单未跑项；与 stage2 同 harness；本批数据版本=面板延展至 09-16（轨B 锚软校验）",
+  "deviations": [
+   "allweather: 20日周期(原版月末+阈值+80%)",
+   "crossborder: 10日周期(原版信号驱动+5日渐进)",
+   "gold_panic: 5日检查(原版日频)",
+   "erba/dividend: 标准化(原仓库未 clone/规则反推)"
+  ]
+ },
+ "n_legs": 5,
+ "legs": [
+  {
+   "leg": "g_allweather_erc",
+   "phmed_sharpe": 0.98,
+   "sharpe_min": 0.938,
+   "sharpe_max": 0.989,
+   "slip50_sharpe": 0.933,
+   "off0_ann_pct": 7.48,
+   "off0_mdd_pct": -8.58,
+   "off0_total_pct": 48.12,
+   "n_trades": 0,
+   "phase_sharpes": {
+    "0": 0.938,
+    "4": 0.98,
+    "8": 0.989,
+    "12": 0.976,
+    "16": 0.987
+   },
+   "by_year_pct": {
+    "2021": 3.2,
+    "2022": 4.2,
+    "2023": 2.3,
+    "2024": 8.6,
+    "2025": 19.5,
+    "2026": 3.3
+   },
+   "start": "2021-04-08",
+   "end": "2026-09-16",
+   "corr_B": 0.461,
+   "pass_gate": false
+  },
+  {
+   "leg": "k_crossborder_mom10",
+   "phmed_sharpe": 0.263,
+   "sharpe_min": -0.011,
+   "sharpe_max": 0.51,
+   "slip50_sharpe": -0.509,
+   "off0_ann_pct": -1.89,
+   "off0_mdd_pct": -50.0,
+   "off0_total_pct": -10.22,
+   "n_trades": 106,
+   "phase_sharpes": {
+    "0": 0.017,
+    "4": 0.367,
+    "8": 0.51,
+    "12": -0.011,
+    "16": 0.263
+   },
+   "by_year_pct": {
+    "2021": -20.1,
+    "2022": -33.8,
+    "2023": 12.1,
+    "2024": 16.9,
+    "2025": 34.4,
+    "2026": -7.9
+   },
+   "start": "2021-01-20",
+   "end": "2026-09-16",
+   "corr_B": 0.366,
+   "pass_gate": false
+  },
+  {
+   "leg": "c2_gold_panic",
+   "phmed_sharpe": -0.202,
+   "sharpe_min": -0.361,
+   "sharpe_max": 0.001,
+   "slip50_sharpe": -0.428,
+   "off0_ann_pct": -3.93,
+   "off0_mdd_pct": -61.68,
+   "off0_total_pct": -20.41,
+   "n_trades": 117,
+   "phase_sharpes": {
+    "0": 0.001,
+    "4": -0.219,
+    "8": -0.202,
+    "12": -0.179,
+    "16": -0.361
+   },
+   "by_year_pct": {
+    "2021": 14.0,
+    "2022": -35.3,
+    "2023": -20.0,
+    "2024": -0.5,
+    "2025": 24.3,
+    "2026": 11.8
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-16",
+   "corr_B": 0.362,
+   "pass_gate": false
+  },
+  {
+   "leg": "i_erba_rot",
+   "phmed_sharpe": -0.257,
+   "sharpe_min": -0.332,
+   "sharpe_max": 0.201,
+   "slip50_sharpe": -0.53,
+   "off0_ann_pct": -5.7,
+   "off0_mdd_pct": -35.83,
+   "off0_total_pct": -28.41,
+   "n_trades": 28,
+   "phase_sharpes": {
+    "0": -0.332,
+    "4": 0.201,
+    "8": -0.036,
+    "12": -0.257,
+    "16": -0.275
+   },
+   "by_year_pct": {
+    "2021": 0.3,
+    "2022": -14.4,
+    "2023": -10.8,
+    "2024": -4.8,
+    "2025": 23.5,
+    "2026": -20.5
+   },
+   "start": "2021-01-06",
+   "end": "2026-09-16",
+   "corr_B": 0.33,
+   "pass_gate": false
+  },
+  {
+   "leg": "j_dividend_ma120",
+   "phmed_sharpe": -0.2,
+   "sharpe_min": -0.627,
+   "sharpe_max": 0.039,
+   "slip50_sharpe": -0.292,
+   "off0_ann_pct": -3.23,
+   "off0_mdd_pct": -31.46,
+   "off0_total_pct": -15.68,
+   "n_trades": 10,
+   "phase_sharpes": {
+    "0": -0.2,
+    "4": -0.627,
+    "8": -0.334,
+    "12": -0.139,
+    "16": 0.039
+   },
+   "by_year_pct": {
+    "2021": -0.5,
+    "2022": -15.3,
+    "2023": 6.4,
+    "2024": 3.9,
+    "2025": -6.9,
+    "2026": -0.7
+   },
+   "start": "2021-07-07",
+   "end": "2026-09-16",
+   "corr_B": 0.315,
+   "pass_gate": false
+  }
+ ]
+}

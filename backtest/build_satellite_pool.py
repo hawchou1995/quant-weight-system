@@ -20,7 +20,8 @@ TUI_SET = set(_name[_name.str.contains("退")].index)
 ST_SET = set(_name[_name.str.contains("ST")].index)
 IND = json.load(open(BASE / "stock_industry.json", encoding="utf-8"))["map"]
 PAPER = HERE / "holdings_satellite.json"
-from satellite_cfg import CAP_A, CAP_B, ROLE_A, ROLE_B, REBASED  # 单一来源（R-single-track-0915）
+from satellite_cfg import (CAP_A, CAP_B, ROLE_A, ROLE_B, REBASED,  # 单一来源（R-single-track-0915）
+                          STOCK_BUDGET_B, GOLD_CODE, GOLD_W, GOLD_NOTIONAL)  # R-gold-sat-0917
 # 2026-09-15 拍板：单跑轨B（68k）；轨A 转零资金对照轨（CAP_A=0）
 
 
@@ -109,7 +110,7 @@ for j in ok:
         "score_txt": f"{sc_row[j]:.2f}", "score": round(float(sc_row[j]), 2),
         "parts": parts,
         "detail": f"icir复合分（z·权重：{detail}…）",
-        "amount": round(CAP_B / n_b),
+        "amount": round(STOCK_BUDGET_B / n_b),   # R-gold-sat-0917：轨B 股票袖预算（68000−6800），黄金另计
         "action": "持有" if c in held_b else "新建仓",
         "limit_guard": guard,
     })
@@ -208,6 +209,10 @@ out = {
         "ranking": "排序=13 因子 ICIR 加权复合分降序（amount20/size_rev/neg_sspace/wy_ratio/amp20/size_ep/bp/shrink/neg_dbbi/dd120/neg_j/pspace/sqz_ratio，权重冻结自 super_combo_0913.json）",
         "rebal": "月频（rebal=20 · offset 0）",
         "next_rebal": "每月调仓窗",
+        "gold_overlay": {"code": GOLD_CODE, "name": "黄金ETF华安", "w": GOLD_W,
+                         "notional": GOLD_NOTIONAL, "stock_budget": STOCK_BUDGET_B,
+                         "mode": "买入持有（B&H）· 永不回补",
+                         "note": "卫星层 ΔS(w10)=+0.104 过门（+0.02）；只做卫星层，book 档不上"},
         "bt": {"total": 22.87, "ann": 22.87, "mdd": -22.0, "sharpe": 1.30,
                "note": "相位中位 S 1.151 / 年化 19.61% · 20 相位最小 0.706 · 安慰剂500 p=0.000 · 50bp 压力档 S 1.00 · 100万对照 S 1.30 · 已过滤 ST/退（继承 A4D 过滤口径）"},
         "rows": a4_rows,

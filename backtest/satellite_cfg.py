@@ -18,3 +18,15 @@ RETIRE_REASON = ("轨A 退休依据：① 组合层扫描（主仓固定 60%）w
                  "④ pct40 启用后重跑仍低于 w_A=0（1.273 vs 1.292）。证据：backtest/report_trackA_pct40_blend_0916.json")
 ROLE_B = "主轨"
 REBASED = "2026-09-15"
+
+
+# ---- 黄金卫星叠加（R-gold-sat-0917 · 2026-09-17 用户拍板按 grill 推荐投产）----
+# 证据：backtest/verify_gold_sat_0917.json（独立复验）+ backtest/lowcorr_stage2_crossasset_0916.json（stage2 全枚举）
+# 卫星层 ΔS(w10)=+0.104（采纳门 +0.02，同窗 100% 轨B 基准）；分半 h1/h2 双正；安慰剂（同权重换现金）为负。
+# 黄金腿 = sh518880 买入持有（c_gold_bh phmed 1.002 / 0 笔交易；择时臂 c_gold_mom 仅 0.757 → 不采纳）。
+# 只做卫星层：book 档（60% FB3+40% 轨B）盈亏平衡需黄金年化 14.4% → 硬伤，不上。
+GOLD_CODE = "sh518880"                  # 黄金ETF华安（data_full/sh518880.csv 在位）
+GOLD_W = 0.10                           # 黄金占卫星（轨B）权重
+GOLD_NOTIONAL = round(CAP_B * GOLD_W)   # 6800 = 黄金袖名义资金
+STOCK_BUDGET_B = CAP_B - GOLD_NOTIONAL  # 61200 = 轨B 股票袖预算（卫星总敞口仍 = CAP_B，不超配）
+GOLD_MODE = "buy_hold"                  # 买入持有、永不卖出；永不回补（漂移仅看板展示）

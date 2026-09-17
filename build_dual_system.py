@@ -184,6 +184,89 @@ except Exception as _e3:
     FUND_PAPER_CARD = (f'<div class="card" id="fund-paper-card"><h2>🧪 基金主仓模拟盘</h2>'
                        f'<div class="sub">fund_paper.json 未生成（{_e3}）</div></div>')
 
+# ret20 倾斜影子轨卡（2026-09-17 建：用户拍板 ③纸面跟踪；#2 λ0.2 主候选 / #4 λ0.3 陪跑）
+# 数据源：backtest/shadow_ret20/{ledger.csv, daily_metrics.jsonl}（daily_refresh 影子轨软步骤产出）
+def _shadow_ret20_card():
+    import pandas as _pd, json as _js
+    try:
+        _sb = BASE / "backtest" / "shadow_ret20"
+        led = _pd.read_csv(_sb / "ledger.csv")
+        _ln = (_sb / "daily_metrics.jsonl").read_text(encoding="utf-8").strip().splitlines()
+        met = _js.loads(_ln[-1]) if _ln else {}
+        start = str(led["date"].iloc[0]); days = len(led)
+        last = led.iloc[-1]
+
+        def _nv(k, pre="nav_"):
+            try:
+                v = float(last[pre + k])
+                return v if v == v else None
+            except Exception:
+                return None
+
+        nb, n2, n3 = _nv("base"), _nv("l02"), _nv("l03")
+        b50, s50 = _nv("base", "nav50_"), _nv("l02", "nav50_")
+        d2 = (n2 / nb - 1) * 100 if (nb and n2) else 0.0
+        d3 = (n3 / nb - 1) * 100 if (nb and n3) else 0.0
+        d50 = (s50 / b50 - 1) * 100 if (b50 and s50) else 0.0
+        ov = (met.get("overlap") or {}).get("l02_vs_base")
+        _col = lambda v: "#10b981" if (v or 0) >= 0 else "#ef4444"
+        f_n2 = f"{n2:.4f}" if n2 else "—"
+        f_nb = f"{nb:.4f}" if nb else "—"
+        f_n3 = f"{n3:.4f}" if n3 else "—"
+        return (f'<div class="card" id="shadow-ret20-card">'
+                f'<h2>🧪 影子轨 · ret20 倾斜（#2 λ0.2 主 / #4 λ0.3 陪跑） <span class="badge badge-auto">纸面跟踪 · 生产 composite 未动</span></h2>'
+                f'<div class="kpis">'
+                f'<div class="kpi"><div class="l">λ0.2 归一净值</div><div class="v">{f_n2}</div><div class="s">vs BASE <b style="color:{_col(d2)}">{d2:+.2f}%</b></div></div>'
+                f'<div class="kpi"><div class="l">BASE 归一净值</div><div class="v">{f_nb}</div><div class="s">生产口径基准臂</div></div>'
+                f'<div class="kpi"><div class="l">λ0.3 归一净值</div><div class="v">{f_n3}</div><div class="s">vs BASE <b style="color:{_col(d3)}">{d3:+.2f}%</b></div></div>'
+                f'<div class="kpi"><div class="l">跟踪进度</div><div class="v">{days} 日</div><div class="s">起点 {start} · TopN 重合 {ov if ov is not None else "—"}</div></div>'
+                f'</div>'
+                f'<div class="sub">机制：(z(comp)+λ·z(ret20))/(1+λ)，把生产复合分隐含的反转倾斜压回一点（corr(z_ret,z_comp)=−0.602）· 20bp 基准档（50bp 压力档 L02−BASE {d50:+.2f}%）· T+1 开盘执行</div>'
+                f'<div class="sub" style="color:var(--faint)">验收（用户定）：≥1-3 个月前瞻 · 月度多数为正 · 相对回撤不失控；首检 10 月中。数据 backtest/shadow_ret20/，每日链内刷新</div>'
+                f'</div>')
+    except Exception as _e:
+        return (f'<div class="card" id="shadow-ret20-card"><h2>🧪 影子轨 · ret20 倾斜</h2>'
+                f'<div class="sub">数据未生成（{_e}）→ 运行 backtest/shadow_ret20.py</div></div>')
+
+SHADOW_RET20_CARD = _shadow_ret20_card()
+
+# 黄金卫星叠加卡（R-gold-sat-0917 · 2026-09-17 用户拍板投产）
+# 数据源：backtest/gold_sat_paper.json（daily_refresh「黄金卫星模拟盘」软步骤产出）
+def _gold_sat_card():
+    import json as _js
+    try:
+        _g = _js.loads((BASE / "backtest" / "gold_sat_paper.json").read_text(encoding="utf-8"))
+        _m = _g.get("meta", {})
+        _nh = _g.get("nav_history", [])
+        _notional = float(_m.get("notional") or 6800.0)
+        _last = _nh[-1] if _nh else {}
+        _nav = float(_last.get("nav") or _notional)
+        _ret = (_nav / _notional - 1) * 100
+        _share = float(_last.get("share") or 0.0) * 100
+        _lots = int(sum(float(p.get("shares", 0)) for p in (_g.get("positions") or {}).values()) // 100)
+        _stat = "运行中" if _nh else "待建仓"
+        _cold = "#10b981" if _ret >= 0 else "#ef4444"
+        _flags = "；".join(_m.get("hard_flags") or [])
+        return (f'<div class="card" id="gold-sat-card">'
+                f'<h2>🥇 黄金卫星叠加（轨B 内 10% · sh518880 买入持有） <span class="badge badge-auto">2026-09-17 投产 · 只做卫星层</span></h2>'
+                f'<div class="kpis">'
+                f'<div class="kpi"><div class="l">黄金袖净值</div><div class="v">{_nav / _notional:.4f}</div><div class="s">名义 {_notional:.0f} · {_lots} 手</div></div>'
+                f'<div class="kpi"><div class="l">累计收益</div><div class="v" style="color:{_cold}">{_ret:+.2f}%</div><div class="s">B&H · 无卖出</div></div>'
+                f'<div class="kpi"><div class="l">实际占比</div><div class="v">{_share:.1f}%</div><div class="s">目标 10% · 永不回补</div></div>'
+                f'<div class="kpi"><div class="l">状态</div><div class="v">{_stat}</div><div class="s">信号 {_m.get("signal_date", "—")} → T+1 开盘</div></div>'
+                f'</div>'
+                f'<div class="sub">叠加式 <code>r_sat=(1−w)·r_B+w·r_gold</code>，w=10%，<b>替换</b>轨B 的 10%（卫星总敞口仍 68000，不超配）· 黄金腿 = 518880 买入持有、永不卖出 · 卫星层 ΔS(w10) = <b>+0.104</b>（采纳门 +0.02）· 分半 h1/h2 双正</div>'
+                f'<div class="sub" style="color:#b45309">⚠ 硬伤申报：{_flags}</div>'
+                f'<div class="sub" style="color:var(--faint)">账本 backtest/gold_sat_paper.json；黄金腿已镜像进轨B 账户（卫星 mark 逐只取价自动计入净值）。每日链内刷新。</div>'
+                f'</div>')
+    except Exception as _e:
+        return (f'<div class="card" id="gold-sat-card"><h2>🥇 黄金卫星叠加</h2>'
+                f'<div class="sub">gold_sat_paper.json 未生成（{_e}）→ 运行 backtest/gold_sat_paper.py</div></div>')
+
+GOLD_SAT_CARD = _gold_sat_card()
+
+
+
 # 2026-09-05 用户需求：短线命中策略一览 + 跟踪池行业列 —— 全市场板块/行业紧凑映射（内联 window.STOCK_META）
 # 数据源：short_signals.js 全量股票代码 + stock_industry.json（申万一级，7511 只全市场覆盖）
 try:
@@ -1873,7 +1956,9 @@ html = f"""<!doctype html>
 </div>
 {SAT_CARD}
 {SAT_PAPER_B_CARD}
+{GOLD_SAT_CARD}
 {FUND_PAPER_CARD}
+{SHADOW_RET20_CARD}
 {FB3_POOL_CARD}
 <div class="card" id="v9-retired-card"><h2>🗂️ v9 全量池（已退役）</h2><div class="sub" style="color:#ef4444">⛔ v9 股票分层战法与 197 只跟踪池已于 2026-09-13 退役并移除展示——十重证伪确认负期望（ADR-0006/0007）。历史回测明细见「📝 更新日志」v5.9~v5.11.15 与 <code>backtest/</code> 报告存档。</div><div class="sub"><b>双轨退出规则</b>：① 主仓 FB3-H20 = 20 交易日月度轮动 + 牛熊 regime 切换（沪深300&lt;MA200 转 Top3 低波防守仓）——<b>无个股止盈止损</b>（基金 NAV 无涨跌停，止盈变体回测全部减值）；② SUPER = 月频调仓 + 中证1000&lt;MA20 组合半仓闸（且关闸期取高波半区）+ <b>pct40 因子化出场已启用（跌出前40%分位 → T+1 开盘卖，留现金至下一调仓）</b>。</div></div>
 </div>
