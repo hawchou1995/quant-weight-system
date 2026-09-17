@@ -427,8 +427,19 @@ def main():
               "（VIP 1 天 30 积分 / 30 天 600 积分；用 LINUX DO 登录论坛后兑换即可）")
     else:
         print(f"[gushi-daily] 全部通道未取到数据（最后 role={role}）")
-        print("[WARN] 登录态异常——请在自动化窗口（profile D:/Tools/chrome-auto-profile）登录一次 gushi；"
-              "登录态会持久保存，之后无需再操作")
+        # ⚠ 2026-09-17 修：原文案一律归因「登录态异常」是**误诊**（实测链首 15:31 试采时
+        #   站点当日数据尚未上线 → 返回 HTML 错误页 → 全通道失败，与登录无关）。
+        #   按本地时刻分场景提示，避免每天刷假告警把真问题淹没。
+        _hhmm = int(time.strftime("%H%M"))
+        if _hhmm < 1630:
+            print("[WARN] 全部通道未取到数据——当前 %s，站点当日数据实测**最早 16:22** 才上线"
+                  "（2026-09-14 实测 trading_date=当天 / is_today=true），此刻空手属正常，"
+                  "正式采集请等收盘后 ~16:30 再跑。" % time.strftime("%H:%M"))
+        else:
+            print("[WARN] 全部通道未取到数据——已过 16:30 仍空手：先排除「待采日期含未来交易日」"
+                  "（站点对越界日期返回 HTML 错误页）；若日期正常则才是登录态问题——"
+                  "请在自动化窗口（profile D:/Tools/chrome-auto-profile）登录一次 gushi，"
+                  "登录态会持久保存，之后无需再操作")
     if launched and not a.keep_open:
         close_auto_profile()
 

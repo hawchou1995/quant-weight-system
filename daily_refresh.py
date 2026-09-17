@@ -96,8 +96,56 @@ import os as _os
 NO_PROXY_ENV = {**_os.environ, "HTTP_PROXY": "", "HTTPS_PROXY": "", "http_proxy": "", "https_proxy": "",
                 "NO_PROXY": "*", "no_proxy": "*"}
 
+# ---- gushi 策略股池采集（R-gushi-early-0917 双保险：链首试采 + 链尾正式采集）----
+# 为什么放两处（2026-09-17 夜实测依据）：
+#   ① 站点 VIP = 24h 卡，到期锚点 = 上次续费时刻。链尾正式采集落在 ~16:38 → 在窗口内，
+#      到期日当天**无需续费也能采到**（「一天顶两天」的机制就在这里）。
+#   ② 但链一旦慢（如 fullpool_guard 触发 1-2h 全量补数）就会跨过到期点 → role 非 vip →
+#      脚本拒绝落盘（保护数据集）→ 当日数据丢失。故链首再做一次**机会主义试采**。
+#   ③ 站点当日数据实测**最早 16:22** 才有（2026-09-14：trading_date=2026-09-14 / is_today=true /
+#      role=vip，mtime 16:22）→ 链首 15:31 试采大概率「当日未上线」而空手，属预期，不影响正式采集。
+#   ④ 链首试采**不带 --renew**（永不扣分）；唯一允许扣分的入口是链尾正式采集。
+#   ⑤ 试采若拿到非 vip 数据也不会落盘（脚本对 role != vip 一律拒绝写）→ 不存在「坏数据覆盖好数据」。
+# 非致命：CDP 离线 / 未登录 / 依赖缺失都不阻断主链。
+
 t0 = time.time()
 fails = []
+# ---- gushi 策略股池采集（非致命：CDP 离线/未登录/依赖缺失都不阻断主链）----
+def _gushi_py():
+    for p in (PY, r"D:/Tools/venvs/pandadata/Scripts/python.exe"):
+        try:
+            if subprocess.run([p, "-c", "import websockets"], capture_output=True).returncode == 0:
+                return p
+        except FileNotFoundError:
+            continue
+    return None
+
+
+if not fails:
+    gp = _gushi_py()
+    if gp:
+        print(f"\n========== gushi 策略股池采集 collect_gushi（链首·试采，不续费）==========", flush=True)
+        r = subprocess.run([gp, "backtest/gushi_daily_collect.py", "--days", "10"],
+                           cwd=str(BASE), capture_output=True, text=True, timeout=900)
+        for ln in ((r.stdout or "") + (r.stderr or "")).strip().splitlines()[-8:]:
+            print(ln, flush=True)
+    else:
+        print("[skip] gushi 采集：无可用解释器（websockets 缺失）", flush=True)
+
+# ---- gushi 正式采集（链尾·唯一允许续费的入口）----
+# 位置依据：链首试采（~15:31）大概率早于站点当日数据上线时刻（实测最早 16:22）；
+#           链尾实测落在 ~16:38，落在「数据已上线」且「VIP 未到期」的窗口内。
+# 扣分护栏全部在采集脚本内：_renewed_today() 每日 1 次上限 + 余额不足不扣分 + 非 vip 不落盘。
+if not fails:
+    _gp2 = _gushi_py()
+    if _gp2:
+        print(f"\n========== gushi 策略股池采集 collect_gushi（链尾·正式，可续费）==========", flush=True)
+        # --renew：非 VIP 时自动续费 1 天卡（30 论坛积分）后继续采集（用户 2026-09-16 授权；护栏见脚本注释）
+        r = subprocess.run([_gp2, "backtest/gushi_daily_collect.py", "--days", "10", "--renew"],
+                           cwd=str(BASE), capture_output=True, text=True, timeout=900)
+        for ln in ((r.stdout or "") + (r.stderr or "")).strip().splitlines()[-12:]:
+            print(ln, flush=True)
+
 for name, args, skip in STEPS:
     if skip:
         print(f"[skip] {name}", flush=True)
@@ -152,6 +200,8 @@ if not fails:
                           "backtest/check_data_freshness.py", "backtest/fullpool_guard.py",
                           "backtest/_data_freshness.json", "backtest/verify_gold_sat_0917.json",
                           "backtest/ensure_index_row.py", "index_000300.csv",
+                          # 2026-09-17 补：三个生产源文件此前从未进过链的 git 白名单（链只 add 产物）
+                          "build_dual_system.py", "fetch_full_universe.py", "update_daily.py",
                           "kxmm_card.py", "kxmm_data.js", "echarts.min.js", "daily_refresh.py"],
                          cwd=str(BASE), capture_output=True)
     if git.returncode == 0:
@@ -169,28 +219,6 @@ if not fails:
     for ln in ((r.stdout or "") + (r.stderr or "")).strip().splitlines()[-8:]:
         print(ln, flush=True)
 
-# ---- gushi 策略股池采集（非致命：CDP 离线/未登录/依赖缺失都不阻断主链）----
-def _gushi_py():
-    for p in (PY, r"D:/Tools/venvs/pandadata/Scripts/python.exe"):
-        try:
-            if subprocess.run([p, "-c", "import websockets"], capture_output=True).returncode == 0:
-                return p
-        except FileNotFoundError:
-            continue
-    return None
-
-
-if not fails:
-    gp = _gushi_py()
-    if gp:
-        print(f"\n========== gushi 策略股池采集 collect_gushi ==========", flush=True)
-        # --renew：非 VIP 时自动续费 1 天卡（30 论坛积分）后继续采集（用户 2026-09-16 授权；护栏见脚本注释）
-        r = subprocess.run([gp, "backtest/gushi_daily_collect.py", "--days", "10", "--renew"],
-                           cwd=str(BASE), capture_output=True, text=True, timeout=900)
-        for ln in ((r.stdout or "") + (r.stderr or "")).strip().splitlines()[-12:]:
-            print(ln, flush=True)
-    else:
-        print("[skip] gushi 采集：无可用解释器（websockets 缺失）", flush=True)
 
 print(f"\n{'❌ 失败: ' + ', '.join(fails) if fails else '✅ 全链完成'} · 总耗时 {time.time()-t0:.0f}s", flush=True)
 sys.exit(1 if fails else 0)
