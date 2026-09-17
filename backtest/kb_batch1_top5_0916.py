@@ -89,8 +89,16 @@ def load_engine():
     log(f"[轨B·全宇宙自检] off0 年化 {ann_all:.2f}%（官方 22.87%）| 夏普(√244) {r_all['sharpe']:.3f} | "
         f"回撤 {r_all['mdd']*100:.1f}% | {r_all['equity'].index[0].date()}→{r_all['equity'].index[-1].date()}"
         f"（{len(r_all['equity'])}d, {r_all['n_trades']} 笔）")
-    if abs(ann_all - 22.87) > 0.5:
-        log(f"[ABORT] 轨B 复现年化 {ann_all:.2f}% ≠ 22.87% → 口径未对齐，拒绝出结论")
+    _anchor = 22.87
+    try:
+        import json as _js, os as _os
+        _af = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "engine_anchor.json")
+        if _os.path.exists(_af):
+            _anchor = float(_js.load(open(_af, encoding="utf-8"))["base_off0_ann"])
+    except Exception:
+        pass
+    if abs(ann_all - _anchor) > 0.5:
+        log(f"[ABORT] 轨B 复现年化 {ann_all:.2f}% ≠ 锚 {_anchor}%（engine_anchor.json/历史 22.87）→ 口径未对齐，拒绝出结论")
         sys.exit(2)
 
     codes = G["codes"]

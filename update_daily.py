@@ -278,6 +278,23 @@ def load_pool_codes():
         codes.update(sp.get("track_pending_short", {}).keys())
     except Exception:
         pass
+    # 卫星池（2026-09-17 P1 修复）：三轨卫星目标清单 + 双卫星模拟盘持仓纳入降级补数范围——
+    # 事故根因之一=降级补数不含卫星池标的，一批标的滞后即卡住卫星建仓判定。
+    try:
+        sp2 = json.loads((BASE / "backtest" / "satellite_pool.json").read_text(encoding="utf-8"))
+        for tk in ("track_a", "track_b"):
+            for r in ((sp2.get(tk) or {}).get("rows") or []):
+                if r.get("code"):
+                    codes.add(str(r["code"]))
+        for wf in ("satellite_paper_a.json", "satellite_paper_b.json"):
+            try:
+                w = json.loads((BASE / "backtest" / wf).read_text(encoding="utf-8"))
+                for _tk, _pos in (w.get("positions") or {}).items():
+                    codes.update((_pos or {}).keys())
+            except Exception:
+                pass
+    except Exception:
+        pass
     syms = set()
     for c in codes:
         c6 = c[-6:]

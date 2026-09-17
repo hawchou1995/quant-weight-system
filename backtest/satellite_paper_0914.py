@@ -110,11 +110,26 @@ def main():
         init_src = dict(asof=s.get("asof"), **{tk: (s["tracks"].get(tk) or {}) for tk in TRACKS})
         print(f"建仓快照: asof={init_src.get('asof')}（frozen）")
 
-    # 最新交易日（以池内第一只为样本）
-    sample = next(r["code"] for r in (pool["track_a"]["rows"] or [{"code": "sh600519"}]))
-    cal = sorted(load_px(sample).keys())
+    # 最新交易日（2026-09-17 P2 修复：权威日历=index_000300.csv〔链内 ensure_index_row 维护〕；
+    # 旧实现以「池内第一只票」为样本，样本滞后/停牌即误判"数据未到"→建仓不发生（09-16 事故根因之二）。
+    cal_src = "index_000300"
+    try:
+        _idx = pd.read_csv(BASE / "index_000300.csv", parse_dates=["date"])
+        cal = sorted(_idx["date"].dt.strftime("%Y-%m-%d").tolist())
+        if not cal:
+            raise ValueError("empty index calendar")
+    except Exception:
+        _dates = set()
+        for _tk in TRACKS:
+            for _r in ((pool.get(_tk) or {}).get("rows") or []):
+                try:
+                    _dates |= set(load_px(_r["code"]).keys())
+                except Exception:
+                    pass
+        cal = sorted(_dates)
+        cal_src = "池内并集(回退)"
     last = cal[-1]
-    print(f"数据截至 {last} | 池 asof {pool.get('asof')}")
+    print(f"数据截至 {last}（日历源：{cal_src}）| 池 asof {pool.get('asof')}")
 
     # 自动建仓：空仓轨 + 目标清单 → 信号日(asof)之后的第一个交易日开盘执行
     asof = init_src.get("asof")

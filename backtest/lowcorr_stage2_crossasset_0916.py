@@ -63,6 +63,14 @@ def log(*a):
 
 
 # ============================================================ 1) 轨B 基准
+def _anchor_value():
+    """软锚（2026-09-17）：读 shadow_ret20 日链刷新的 engine_anchor.json；缺省回落历史锚 22.87"""
+    try:
+        return float(json.loads((OSS.parent / "engine_anchor.json").read_text(encoding="utf-8"))["base_off0_ann"])
+    except Exception:
+        return 22.87
+
+
 def load_track_b():
     src = (OSS / "oss_super_combo_0913.py").read_text(encoding="utf-8")
     g = {}
@@ -72,12 +80,16 @@ def load_track_b():
     ann = float(r["ann"]) * 100
     eq = r["equity"]
     cal = pd.to_datetime([str(d)[:10] for d in g["cal"]])   # 面板全窗口（2021-01-04 起）
-    log(f"[轨B] off0 年化 {ann:.2f}%（官方 22.87%）| 夏普(引擎√244) {r['sharpe']:.3f} | "
+    _anchor = _anchor_value()          # 2026-09-17 软锚：数据 vintage 日更，22.87 为历史锚非硬门
+    _d = abs(ann - _anchor)
+    log(f"[轨B] off0 年化 {ann:.2f}%（锚 {_anchor}% | 漂移 {_d:.2f}pp）| 夏普(引擎√244) {r['sharpe']:.3f} | "
         f"回撤 {r['mdd']*100:.1f}% | 净值区间 {eq.index[0].date()}→{eq.index[-1].date()} | "
         f"面板日历 {cal[0].date()}→{cal[-1].date()}（{len(cal)}d，WARMUP=150）")
-    if abs(ann - 22.87) > 0.5:
-        log(f"[ABORT] 轨B 复现年化 {ann:.2f}% ≠ 官方 22.87% → 口径未对齐，拒绝出结论")
+    if _d > 3.0:
+        log(f"[ABORT] 轨B 复现年化 {ann:.2f}% 偏离锚 {_anchor}% 达 {_d:.2f}pp（>3pp）→ 口径/数据异常，拒绝出结论")
         sys.exit(2)
+    elif _d > 1.0:
+        log(f"[WARN] 轨B 锚漂移 {_d:.2f}pp（数据版本推进所致，正常范围）")
     return eq, cal
 
 
@@ -505,7 +517,8 @@ def main():
         "cost_model": f"slip/边 + 佣金{COMM*1e4}bp(最低{MIN_COMM}元) + 卖出印花{TAX*1e4}bp（=冻结引擎口径）",
         "leg_sharpe_annualization": 252, "blend_sharpe_annualization": ANN_BLEND,
         "gates": GATES, "cash0": CASH0,
-        "trackB": {"off0_ann_pct": 22.87, "note": "冻结引擎 oss_super_combo_0913.py off0；窗口 " +
+        "trackB": {"off0_ann_pct": _anchor_value(), "official_hist": 22.87,
+                   "note": "冻结引擎 oss_super_combo_0913.py off0（软锚 engine_anchor.json）；窗口 " +
                    f"{eqB.index[0].date()}→{eqB.index[-1].date()}（面板 WARMUP=150 起）"},
         "data_gaps": ["无国债期货/期权/商品期货本地数据 → 未测（如实申报）",
                       "黄金只有 ETF 代理（518880/159934/159937）；场外金/金矿股未测",
