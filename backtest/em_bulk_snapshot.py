@@ -42,14 +42,16 @@ HEADERS = {
 FIELDS = "f2,f3,f5,f6,f12,f13,f14,f15,f16,f17,f18"
 # 沪深主板/创业板/科创板 + 北交所
 FS = "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048"
+# ETF/基金通道（--etf）：实测 1614 只（沪 902 / 深 712），单位同为 ×100（892 样本 vol/f5 恒 100.00）
+FS_ETF = "b:MK0021,b:MK0022,b:MK0023,b:MK0024"
 HDR = ["date", "open", "high", "low", "close", "volume", "amount"]
 MISMATCH_TOL = 0.02          # 单位/口径校验：允许 2% 不一致
 
 
-def page(pn, pz=100, retries=4):
+def page(pn, pz=100, retries=4, _fs=FS):
     params = {"pn": str(pn), "pz": str(pz), "po": "1", "np": "1",
               "ut": "bd1d9ddb04089700cf9c27f6f7426281", "fltt": "2", "invt": "2",
-              "fid": "f12", "fs": FS, "fields": FIELDS, "_": int(time.time() * 1000)}
+              "fid": "f12", "fs": _fs, "fields": FIELDS, "_": int(time.time() * 1000)}
     last = None
     for i in range(1, retries + 1):
         host = HOSTS[(i - 1) % len(HOSTS)]          # 失败轮换主机
@@ -64,11 +66,11 @@ def page(pn, pz=100, retries=4):
     raise RuntimeError(f"page {pn} 连续 {retries} 次失败: {type(last).__name__} {last}")
 
 
-def pull_all():
+def pull_all(_fs=FS):
     rows, pn, total = [], 1, None
     t0 = time.time()
     while True:
-        d = page(pn)
+        d = page(pn, _fs=_fs)
         data = d.get("data") or {}
         total = data.get("total") or total
         diff = data.get("diff") or []
@@ -134,9 +136,11 @@ def main():
         limit = int(sys.argv[sys.argv.index("--limit") + 1])
 
     trade_day = open(CAL, encoding="utf-8").read().strip().splitlines()[-1].split(",")[0][:10]
-    print(f"[cal] 目标交易日 {trade_day}")
+    use_etf = "--etf" in sys.argv
+    _fs = FS_ETF if use_etf else FS
+    print(f"[cal] 目标交易日 {trade_day} | 通道 {'ETF/基金' if use_etf else 'A股'}")
 
-    rows, total, el = pull_all()
+    rows, total, el = pull_all(_fs)
     print(f"[em] 拉取 {len(rows)}/{total} 只（{el:.2f}s）")
 
     m = {}
