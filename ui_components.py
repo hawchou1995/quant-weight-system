@@ -172,7 +172,7 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 # ---------------- 顶部导航 + 左侧导航 ----------------
 NAV_HTML = """
 <div class="topbar">
-  <div class="logo" onclick="location.hash='#overview'"><span class="dot"></span>量化权重监控</div>
+  <div class="logo" onclick="location.hash='#kxmm'"><span class="dot"></span>量化权重监控</div>
   <div class="sidenav" id="sidenav"></div>
   <span class="sn-foot-slot" id="sn-foot-slot"></span>
   <div class="spacer"></div>

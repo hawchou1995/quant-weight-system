@@ -69,7 +69,7 @@ KXMM_CSS = KXMM_CSS + """
 
 KXMM_VIEW_HTML = """
 <!-- ============ 视图 F：市场情绪（kxmm 恐贪指数 + 热力图）· R-kxmm-0917 ============ -->
-<div class="view" id="view-kxmm">
+<div class="view active" id="view-kxmm">
 
 <div class="card" id="kxmm-fg">
   <h2>😨 恐贪指数 <span class="badge badge-auto">数据源：kxmm.online（开心檬檬）</span></h2>
