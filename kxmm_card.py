@@ -638,6 +638,27 @@ KXMM_JS = KXMM_JS + r"""
     return true;
   }
 
+  /* 盘中实时（R-live-0918）：外部注入全市场快照 → 就地改值 → 复用 render() 重渲染。
+     rows = [{c:代码, p:涨跌幅%, a:成交额亿, m:总市值亿, f:流通市值亿}] */
+  window.HM_APPLY = function(rows, ts){
+    if(!HD || !HD.tree || !rows || !rows.length) return 0;
+    var idx = {};
+    HD.tree.forEach(function(sec){ (sec.children || []).forEach(function(x){ idx[x.c] = x; }); });
+    var hit = 0;
+    rows.forEach(function(r){
+      var x = idx[r.c]; if(!x) return;
+      if(r.p != null && !isNaN(r.p)) x.p = r.p;
+      if(r.a > 0) x.a = r.a;
+      if(r.m > 0) x.m = r.m;
+      if(r.f > 0) x.f = r.f;
+      hit++;
+    });
+    if(hit && chart) render();
+    var a = el('hm-asof');
+    if(a && ts) a.textContent = '截至 ' + ts + ' · 实时快照';
+    return hit;
+  };
+
   function activate(){
     if(built) { if(chart) chart.resize(); return; }
     if(render()) built = true;

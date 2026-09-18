@@ -273,6 +273,10 @@ function mktBadgeHtml(){
   var today=now.getFullYear()+'-'+p(now.getMonth()+1)+'-'+p(now.getDate());
   var hm=now.getHours()*100+now.getMinutes();
   var cls='mkt-rest',txt='休市';
+  /* 盘中实时（R-live-0918）：行情源时间戳证明今天在交易 → 覆盖构建期 tradeDay
+     （否则上一交易日构建的页面在新交易日会一直显示"休市"） */
+  var lv=window.INTRADAY&&window.INTRADAY.state;
+  if(lv&&lv.live){s={isTradingDay:true,tradeDay:today};}
   if(s.isTradingDay&&s.tradeDay===today){
     if(hm<930){cls='mkt-pre';txt='未开盘';}
     else if(hm<1130){cls='mkt-open';txt='开市中';}
@@ -280,7 +284,7 @@ function mktBadgeHtml(){
     else if(hm<1500){cls='mkt-open';txt='开市中';}
     else{cls='mkt-rest';txt='已收盘';}
   }
-  return '<span class="mkt-badge '+cls+'" title="交易日 '+((s.tradeDay)||'—')+' · 本地时钟判定"><span class="d"></span>'+txt
+  return '<span class="mkt-badge '+cls+'" title="交易日 '+((s.tradeDay)||'—')+' · '+((lv&&lv.live)?'实时探测(行情源时间戳)':'本地时钟判定')+'"><span class="d"></span>'+txt
     +'<span class="clk" style="font-variant-numeric:tabular-nums;opacity:.85">'
     +p(now.getHours())+':'+p(now.getMinutes())+':'+p(now.getSeconds())+'</span></span>';
 }

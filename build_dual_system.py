@@ -16,6 +16,7 @@ import v8_selector as V
 sys.path.insert(0, str(BASE))
 from ui_components import THEME_CSS, NAV_HTML, COMMON_JS
 from kxmm_card import KXMM_CSS, KXMM_VIEW_HTML, KXMM_JS
+from intraday_live import INTRADAY_JS
 
 
 def _crowding():
@@ -77,15 +78,15 @@ def _crowd_card():
                 + str(c.get("n", 0)) + ' 条。</div></div>')
     s = c["score"]
     if s >= 80:
-        lab, col, hint = "极度拥挤", "#ef4444", "量能与情绪同时亢奋，历史上此区间后波动放大"
+        lab, col, hint = "极度拥挤", "var(--up)", "量能与情绪同时亢奋，历史上此区间后波动放大"
     elif s >= 65:
-        lab, col, hint = "偏拥挤", "#f59e0b", "成交活跃度高，注意追高风险"
+        lab, col, hint = "偏拥挤", "var(--warn)", "成交活跃度高，注意追高风险"
     elif s >= 40:
         lab, col, hint = "中性", "#3b82f6", "量能与估值偏离均处常态区间"
     elif s >= 25:
-        lab, col, hint = "偏冷清", "#10b981", "量能萎缩，留意流动性"
+        lab, col, hint = "偏冷清", "var(--down)", "量能萎缩，留意流动性"
     else:
-        lab, col, hint = "极度冷清", "#10b981", "成交与情绪双低，历史上多为底部区域特征"
+        lab, col, hint = "极度冷清", "var(--down)", "成交与情绪双低，历史上多为底部区域特征"
     return (
         '<div class="card" id="crowd-card">'
         '<h2>大盘拥挤度 <span class="badge badge-auto" style="background:' + col + '22;color:' + col + '">'
@@ -216,9 +217,9 @@ try:
     # 2026-09-07 牛熊分域 MA250 投产（Phase 11 定稿 · 用户拍板方案 2）+ 09-04 弱牛域 + 22:45 ob59 升级：
     #   🐻 熊市(<MA250, osl35+low3+ob59) / 🌞 牛市(>MA20, osl32+无low+ob75) / 🌙 弱牛回调(MA20下/MA250上, osl32+无low+ob80)
     if _bear60:
-        _kh_regime_txt, _kh_regime_color = "🐻 熊市（MA250 下 · osl35+low3+ob59 · 可买入）", "#1f8a4c"
+        _kh_regime_txt, _kh_regime_color = "🐻 熊市（MA250 下 · osl35+low3+ob59 · 可买入）", "var(--down)"
     elif _mg.get("open"):
-        _kh_regime_txt, _kh_regime_color = "🌞 牛市（MA20 上 · osl32+无low+ob75 · 可买入）", "#1f8a4c"
+        _kh_regime_txt, _kh_regime_color = "🌞 牛市（MA20 上 · osl32+无low+ob75 · 可买入）", "var(--down)"
     else:
         _kh_regime_txt, _kh_regime_color = "🌙 弱牛回调（MA20 下/MA250 上 · osl32+无low+ob80 · 可买入）", "#b45309"
     SHORT_KHUNTER_BEAR = (f'<span class="badge badge-auto" style="background:{_kh_regime_color};color:#fff">'
@@ -270,7 +271,7 @@ def _sat_paper_card(path, tk, title):
                 f'<h2>{title} <span class="badge badge-auto">{m.get("rebased","2026-09-15")[:10]} 重设 · 基数 {basis:,.0f} · {role}</span></h2>'
                 f'<div class="kpis">'
                 f'<div class="kpi"><div class="l">模拟净值</div><div class="v">{nav:,.0f}</div><div class="s">期初 {basis:,.0f}</div></div>'
-                f'<div class="kpi"><div class="l">累计收益</div><div class="v" style="color:{ "#10b981" if ret >= 0 else "#ef4444" }">{ret:+.2f}%</div><div class="s">含成本口径</div></div>'
+                f'<div class="kpi"><div class="l">累计收益</div><div class="v" style="color:{ "var(--down)" if ret >= 0 else "var(--up)" }">{ret:+.2f}%</div><div class="s">含成本口径</div></div>'
                 f'<div class="kpi"><div class="l">持仓标的</div><div class="v">{len(pos)}</div><div class="s">{"零实盘资金·仅对照" if tag == "a" else "实盘主轨"}</div></div>'
                 f'<div class="kpi"><div class="l">状态</div><div class="v">{status}</div><div class="s">{dt}</div></div>'
                 f'</div>'
@@ -342,7 +343,7 @@ def _shadow_ret20_card():
         d3 = (n3 / nb - 1) * 100 if (nb and n3) else 0.0
         d50 = (s50 / b50 - 1) * 100 if (b50 and s50) else 0.0
         ov = (met.get("overlap") or {}).get("l02_vs_base")
-        _col = lambda v: "#10b981" if (v or 0) >= 0 else "#ef4444"
+        _col = lambda v: "var(--down)" if (v or 0) >= 0 else "var(--up)"
         f_n2 = f"{n2:.4f}" if n2 else "—"
         f_nb = f"{nb:.4f}" if nb else "—"
         f_n3 = f"{n3:.4f}" if n3 else "—"
@@ -378,7 +379,7 @@ def _gold_sat_card():
         _share = float(_last.get("share") or 0.0) * 100
         _lots = int(sum(float(p.get("shares", 0)) for p in (_g.get("positions") or {}).values()) // 100)
         _stat = "运行中" if _nh else "待建仓"
-        _cold = "#10b981" if _ret >= 0 else "#ef4444"
+        _cold = "var(--down)" if _ret >= 0 else "var(--up)"
         _flags = "；".join(_m.get("hard_flags") or [])
         return (f'<div class="card" id="gold-sat-card">'
                 f'<h2>🥇 黄金卫星叠加（轨B 内 10% · sh518880 买入持有） <span class="badge badge-auto">2026-09-17 投产 · 只做卫星层</span></h2>'
@@ -577,9 +578,9 @@ try:
         _bw_avg60 = _stat.fmean(_bw_series[-60:])
         _bw_pct = _bw_now / _bw_avg60 - 1 if _bw_avg60 else 0.0
         if _bw_pct < -0.15:
-            _bw_state, _bw_color = "收窄·选方向", "#d97706"
+            _bw_state, _bw_color = "收窄·选方向", "var(--warn)"
         elif _bw_pct > 0.15:
-            _bw_state, _bw_color = "张开·方向已出", "#dc2626"
+            _bw_state, _bw_color = "张开·方向已出", "var(--up)"
         else:
             _bw_state, _bw_color = "中性", "#6b7280"
         BB_BW_KPI = f'<div class="kpi"><div class="l">📐 沪深300 布林带宽</div><div class="v" style="color:{_bw_color}">{_bw_state}</div><div class="s">带宽 {_bw_now*100:.1f}% vs 60日均 {_bw_avg60*100:.1f}%（{_bw_pct*100:+.0f}%）· 观察非信号</div></div>'
@@ -946,7 +947,7 @@ ss_stk["main_c"] = KH_BT_C if KH_BT_C else {}
 ss_stk_tag["main_c"] = "KHunter 激进版参考卖出 RSI>50 · 全窗口对比口径（生产=MA250 卡）" if KH_BT_C else ""
 
 
-def bt_card(cid, title, tag, s, curve_id, color="#f59e0b", sub="2016-01~2026-08"):
+def bt_card(cid, title, tag, s, curve_id, color="var(--warn)", sub="2016-01~2026-08"):
     """回测 KPI 卡（收益/年化/回撤·夏普 + 净值曲线容器）"""
     if not s:
         return f'<div class="bt-card" id="{cid}"><div class="bt-head"><b>{title}</b><span class="bt-tag">{tag}</span></div><div class="kpis"><div class="kpi"><div class="l">回测收益</div><div class="v">—</div><div class="s">回测中…</div></div></div><div class="bt-curve" id="{curve_id}"></div></div>'
@@ -965,7 +966,7 @@ def bt_all_html():
     """中长线回测参考 5 卡（股票分层 4 + 基金；2026-08-17 去 ETF）"""
     cards = "".join([
         bt_card("bt-fund", "🥇 主仓 FB3-H20 基金线", FUND_TAG, s_fund, "curve-chart-fund", color="#3b82f6"),
-        bt_card("bt-super", "🥉 卫星·SUPER", SUPER_TAG, s_super, "curve-chart-super", color="#d97706"),
+        bt_card("bt-super", "🥉 卫星·SUPER", SUPER_TAG, s_super, "curve-chart-super", color="var(--warn)"),
     ])
     _ret = ('<div class="sub" style="color:var(--up)">⛔ <b>v9 股票分层战法（一体/主板/创业板/科创板四卡）已于 2026-09-13 退役</b>'
             '——十重证伪确认负期望（ADR-0006/0007），历史曲线与明细见更新日志 v5.9~v5.11.15 与 backtest/ 报告存档。</div>')
@@ -990,7 +991,7 @@ def bt_short_html():
     2026-09-03 生产切换：纯主板卡= 标准版 ob55+低价3元（主卖出）+ 激进版 ob50（参考卖出）双卡（资金池口径含回撤）；
     2026-09-07 MA250 分域投产（ob58→ob59 升级）：生产=MA250 分域卡（熊 MA250 下 osl35+low3+ob59 / 牛 MA20 上 osl32+ob75）；
     B 版(30%止损)已否决不入卡"""
-    def _card(cid, title, tag, s, curve_id, color="#f59e0b"):
+    def _card(cid, title, tag, s, curve_id, color="var(--warn)"):
         if not s:
             # 说明卡（创业板/科创板未回测等）
             return (f'<div class="bt-card" id="{cid}" style="border-color:rgba(120,113,108,.3)">'
@@ -1038,7 +1039,7 @@ def bt_short_html():
 </div></div>''')
     cards = "".join([
         _card("bt-short-stock-all", "📈 短线 股票 一体", ss_stk_tag["all"], ss_stk["all"], "curve-short-stock-all"),
-        _card("bt-short-stock-main", "📈 短线 纯主板 · 标准版(主卖出 RSI>59)", ss_stk_tag["main"], ss_stk["main"], "curve-short-stock-main", color="#ea580c"),
+        _card("bt-short-stock-main", "📈 短线 纯主板 · 标准版(主卖出 RSI>59)", ss_stk_tag["main"], ss_stk["main"], "curve-short-stock-main", color="var(--warn)"),
         _c_cards,
         _hybrid_card,
         _card("bt-short-stock-gem", "📈 短线 纯创业板", ss_stk_tag["gem"], ss_stk["gem"], "curve-short-stock-gem"),
@@ -1232,8 +1233,8 @@ def a5_view_html():
     if len(eq) >= 2:
         pts = " ".join(f"{i},{v['nav']}" for i, v in enumerate(eq))
         curve_html = (f'<svg viewBox="0 0 600 120" style="width:100%;max-width:700px;margin-top:10px">'
-                      f'<polyline points="{pts}" fill="none" stroke="#f59e0b" stroke-width="2"/>'
-                      f'<text x="8" y="16" font-size="12" fill="#9ca3af">模拟盘净值 {st.get("nav", 1.0):.4f}（{len(eq)} 个交易点）</text></svg>')
+                      f'<polyline points="{pts}" fill="none" stroke="var(--warn)" stroke-width="2"/>'
+                      f'<text x="8" y="16" font-size="12" fill="var(--faint)">模拟盘净值 {st.get("nav", 1.0):.4f}（{len(eq)} 个交易点）</text></svg>')
     elif eq:
         curve_html = f'<div class="sub" style="color:var(--faint)">净值曲线待积累（当前 {len(eq)} 个点）· 首个平仓后开始绘制</div>'
 
@@ -1691,7 +1692,7 @@ try:
         def _fp(v):
             if v is None:
                 return "—"
-            col = "#ef4444" if v > 0 else ("#10b981" if v < 0 else "#94a3b8")
+            col = "var(--up)" if v > 0 else ("var(--down)" if v < 0 else "var(--faint)")
             return f'<span style="color:{col}">{v:+.2f}%</span>'
 
         def _row(r):
@@ -1711,8 +1712,8 @@ try:
             if _is_fund:
                 return cells + "</tr>"
             rsi, macd, jv = r.get("rsi14"), r.get("macd_hist"), r.get("kdj_j")
-            mc = "#ef4444" if (macd is not None and macd > 0) else ("#10b981" if macd is not None else "#94a3b8")
-            jc = "#ef4444" if (jv is not None and jv > 80) else ("#3b82f6" if (jv is not None and jv < 20) else "inherit")
+            mc = "var(--up)" if (macd is not None and macd > 0) else ("var(--down)" if macd is not None else "var(--faint)")
+            jc = "var(--up)" if (jv is not None and jv > 80) else ("#3b82f6" if (jv is not None and jv < 20) else "inherit")
             rsi_s = "—" if rsi is None else f"{rsi:.1f}"
             macd_s = "—" if macd is None else f"{macd:.3f}"
             jv_s = "—" if jv is None else f"{jv:.1f}"
@@ -1770,7 +1771,7 @@ except Exception:
 def _fpct(v):
     if v is None:
         return "—"
-    col = "#ef4444" if v > 0 else ("#10b981" if v < 0 else "#94a3b8")
+    col = "var(--up)" if v > 0 else ("var(--down)" if v < 0 else "var(--faint)")
     return f'<span style="color:{col}">{v:+.2f}%</span>'
 
 
@@ -1780,8 +1781,8 @@ for _c in _fund_tier:
     _act = "持有" if _c in _held_c else "申购"
     _r = _sat_c.get(_c, {})
     _rsi, _macd, _jv = _r.get("rsi14"), _r.get("macd_hist"), _r.get("kdj_j")
-    _mc = "#ef4444" if (_macd is not None and _macd > 0) else ("#10b981" if _macd is not None else "#94a3b8")
-    _jc = "#ef4444" if (_jv is not None and _jv > 80) else ("#3b82f6" if (_jv is not None and _jv < 20) else "inherit")
+    _mc = "var(--up)" if (_macd is not None and _macd > 0) else ("var(--down)" if _macd is not None else "var(--faint)")
+    _jc = "var(--up)" if (_jv is not None and _jv > 80) else ("#3b82f6" if (_jv is not None and _jv < 20) else "inherit")
     _fund_rows += (f'<tr><td><code>{_c}</code></td><td>{_d.get("name", "")}</td>'
                    f'<td class="num">{_d.get("score", "—")}</td>'
                    f'<td class="num">{_fpct(_r.get("chg"))}</td><td class="num">{_fpct(_r.get("ret_1y"))}</td>'
@@ -2208,7 +2209,7 @@ html = f"""<!doctype html>
 </div>
 
 </div>
-<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 {build_ts} · 版本 v5.13.6（+扁平控制台皮肤） · 数据截至 {DATA["meta"].get("as_of", "—")} · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 {build_ts} · 版本 v5.13.7（+盘中实时数据层） · 数据截至 {DATA["meta"].get("as_of", "—")} · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({{top:0,behavior:'smooth'}})">↑</button>
@@ -2257,7 +2258,7 @@ window.ENH.sub_curves = {{
 function renderOneCurve(elId, vals, color, label, totalPct){{
   var el=document.getElementById(elId);if(!el)return;
   if(!vals||!vals.length){{ /* 未回测/无修正口径：画占位文字 */
-    el.innerHTML='<svg viewBox="0 0 1400 240" style="width:100%;height:auto"><text x="700" y="120" font-size="15" fill="#9ca3af" text-anchor="middle">未回测 · 用户仅可买主板（KHunter 主信号按主板回测，见卡片 KPI）</text></svg>';
+    el.innerHTML='<svg viewBox="0 0 1400 240" style="width:100%;height:auto"><text x="700" y="120" font-size="15" fill="var(--faint)" text-anchor="middle">未回测 · 用户仅可买主板（KHunter 主信号按主板回测，见卡片 KPI）</text></svg>';
     return;
   }}
   var n=vals.length,W=1400,H=240,PAD_L=70,PAD_R=20,PAD_T=22,PAD_B=28;
@@ -2269,16 +2270,16 @@ function renderOneCurve(elId, vals, color, label, totalPct){{
   var g='';
   for(var t=100;t<=hi*1.02;t*=2){{if(t<lo*0.95)continue;
     g+='<line x1="'+PAD_L+'" y1="'+y(t)+'" x2="'+(W-PAD_R)+'" y2="'+y(t)+'" stroke="rgba(128,128,128,.15)"/>';
-    g+='<text x="'+(PAD_L-8)+'" y="'+(y(t)+4)+'" font-size="12" fill="#9ca3af" text-anchor="end">'+tickLabel(t)+'</text>';}}
+    g+='<text x="'+(PAD_L-8)+'" y="'+(y(t)+4)+'" font-size="12" fill="var(--faint)" text-anchor="end">'+tickLabel(t)+'</text>';}}
   var prevYr=null;
   for(var i=0;i<n;i++){{var yr=2016+Math.floor(i/252);
-    if(yr!==prevYr){{g+='<text x="'+x(i)+'" y="'+(H-PAD_B+18)+'" font-size="13" fill="#9ca3af" text-anchor="middle">'+yr+'</text>';prevYr=yr;}}}}
+    if(yr!==prevYr){{g+='<text x="'+x(i)+'" y="'+(H-PAD_B+18)+'" font-size="13" fill="var(--faint)" text-anchor="middle">'+yr+'</text>';prevYr=yr;}}}}
   var pts='';
   for(var i=0;i<vals.length;i+=3){{pts+=x(i).toFixed(1)+','+y(vals[i]).toFixed(1)+' ';}}
   el.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+g+
     '<polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="2"/>'+
     '<text x="'+(PAD_L+10)+'" y="'+(PAD_T+16)+'" font-size="13" fill="'+color+'">'+label+' → +'+totalPct+'%</text>'+
-    '<text x="'+(W-PAD_R-6)+'" y="'+(PAD_T+8)+'" font-size="11" fill="#9ca3af" text-anchor="end">对数坐标 · 净值(100起)</text></svg>';
+    '<text x="'+(W-PAD_R-6)+'" y="'+(PAD_T+8)+'" font-size="11" fill="var(--faint)" text-anchor="end">对数坐标 · 净值(100起)</text></svg>';
 }}
 function renderSubCurve(){{
   var C=window.ENH.sub_curves;if(!C)return;
@@ -2824,6 +2825,7 @@ document.addEventListener('DOMContentLoaded',function(){{
 }});
 </script>
 <script>{KXMM_JS}</script>
+<script>{INTRADAY_JS}</script>
 </body></html>"""
 
 # --- #10 皮肤层（2026-09-18）：渲染期统一去 emoji ---
