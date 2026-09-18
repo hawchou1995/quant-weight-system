@@ -7,8 +7,8 @@
       "entry_px": 38.5906,
       "shares": 500,
       "rsi_entry": 29.920814479637997,
-      "hold_days": 8,
-      "last_close": 35.54
+      "hold_days": 9,
+      "last_close": 36.16
     }
   ],
   "pending_buys": [],
@@ -91,6 +91,14 @@
       "nav": 98474.69,
       "cash": 80704.69,
       "pos_val": 17770.0,
+      "n_pos": 1,
+      "bear": true
+    },
+    {
+      "date": "2026-09-18",
+      "nav": 98784.69,
+      "cash": 80704.69,
+      "pos_val": 18080.0,
       "n_pos": 1,
       "bear": true
     }

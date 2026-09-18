@@ -156,6 +156,22 @@
    "paper": null,
    "n_held": 18,
    "skipped_pct40": 0
+  },
+  {
+   "date": "2026-09-18",
+   "track": "track_a",
+   "control": -56.03,
+   "paper": null,
+   "n_held": 8,
+   "skipped_pct40": 0
+  },
+  {
+   "date": "2026-09-18",
+   "track": "track_b",
+   "control": 836.7,
+   "paper": null,
+   "n_held": 18,
+   "skipped_pct40": 0
   }
  ]
 }

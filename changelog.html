@@ -172,6 +172,13 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <div class="sub">量化系统版本更新记录：复盘发现设计缺陷 → 启动系统更新 → 在此登记版本/日期/更新内容</div>
 <div class="rel"><div class="rel-head">v5.13.4 - 2026-09-17（看板：ret20 倾斜影子轨卡上线 · 视图 A「三轨中长线」内）</div><div class="rel-body">
 
+</div></div><div class="rel"><div class="rel-head">v5.13.5（2026-09-17）黄金卫星叠加投产（轨B 内 10% · sh518880 买入持有）</div><div class="rel-body">
+<div class='lg-item'><b>投产</b>（用户拍板按 grill 推荐）：卫星层 w=10%，<code>r_sat=(1−w)·r_B+w·r_gold</code>，<b>替换</b>轨B 的 10%（卫星总敞口仍 68000，不超配）；黄金腿 518880 <b>买入持有、永不卖出</b>。</div>
+<div class='lg-item'>新增 <code>backtest/gold_sat_paper.py</code>（黄金袖账本 <code>backtest/gold_sat_paper.json</code>）+ <code>satellite_cfg.py</code> 黄金常量（<code>GOLD_W/GOLD_NOTIONAL/STOCK_BUDGET_B</code>）+ 每日链新步骤（软，在 satellite_paper 之前）+ 看板「🥇 黄金卫星叠加」卡。</div>
+<div class='lg-item'>实现要点：黄金腿以<b>镜像持仓</b>落进 <code>satellite_paper_b.json</code>，卫星 mark 逐只取价自动计入净值 → <code>satellite_paper_0914.py</code> <b>零逻辑改动</b>。</div>
+<div class='lg-item'>证据：卫星层 ΔS(w10)=+0.104（门 +0.02）、分半双正、安慰剂为负；<code>verify_gold_sat_0917.json</code> 独立复验。</div>
+<div class='lg-item'><b>硬伤申报</b>：卫星档保 ΔS≥+0.02 需黄金年化 ≈5%/年；B&H 换手≈0 故 50bp 档不构成成本证据；样本窗 2021-08→2026-09 为黄金大牛段，样本外未测。book 档（需黄金 14.4%/年）不上。</div>
+
 <p><b>内容</b>：新增「🧪 影子轨 · ret20 倾斜（#2 λ0.2 主 / #4 λ0.3 陪跑）」卡 —— 纸面跟踪 ret20 权重再校准候选（生产 composite 未动）。数据源 <code>backtest/shadow_ret20/{ledger.csv,daily_metrics.jsonl}</code>（每日链影子轨软步骤产出）。验收口径：≥1-3 个月前瞻 · 月度多数为正 · 相对回撤不失控；首检 10 月中。</p>
 
 <p><b>同批工程修复</b>：stage2/blend/placebo/micro 四脚本硬断言 22.87 改软锚 <code>engine_anchor.json</code>（|Δ|>3pp 中止；实机 21.35%/漂移 0.00pp 通过）；shadow_ret20 Top20 剔 ST/退 与生产 <code>name_hist</code> 同源（修复前 250 日回扫 23 日会漏 ST）。</p>
