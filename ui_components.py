@@ -38,7 +38,7 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 .gh-link:hover{border-color:var(--accent);color:var(--accent)}
 
 /* ---------- 左侧宽侧边栏（图标+文字） ---------- */
-# 折叠态 56px（图标栏）→ 悬浮展开 190px；**覆盖式不推挤内容**，避免回流跳动
+/* 折叠态 56px（图标栏）→ 悬浮展开 190px；覆盖式不推挤内容，避免回流跳动 */
 .sidenav{position:fixed;left:0;top:0;bottom:0;width:56px;background:var(--nav-bg);border-right:1px solid var(--border);
   display:flex;flex-direction:column;padding:16px 10px;z-index:850;overflow-y:auto;overflow-x:hidden;
   transition:width .18s ease,box-shadow .18s ease}
