@@ -38,37 +38,42 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 .gh-link:hover{border-color:var(--accent);color:var(--accent)}
 
 /* ---------- 左侧宽侧边栏（图标+文字） ---------- */
-/* 折叠态 56px（图标栏）→ 悬浮展开 190px；覆盖式不推挤内容，避免回流跳动 */
-.sidenav{position:fixed;left:0;top:0;bottom:0;width:56px;background:var(--nav-bg);border-right:1px solid var(--border);
-  display:flex;flex-direction:column;padding:16px 10px;z-index:850;overflow-y:auto;overflow-x:hidden;
-  transition:width .18s ease,box-shadow .18s ease}
-.sidenav:hover{width:190px;box-shadow:0 10px 34px rgba(0,0,0,.16)}
-.sidenav .sn-logo{font-size:14px;font-weight:700;padding:2px 10px 14px;display:flex;align-items:center;gap:8px}
+/* 顶部横导航（2026-09-18 · 用户决策「顶部横 tab」）：深色通栏 + 扁平 tab，仿 gushi 语言 */
+.sidenav{position:sticky;top:0;left:0;right:0;width:auto;height:54px;background:#1b2130;border-right:none;
+  border-bottom:1px solid var(--border);display:flex;flex-direction:row;align-items:center;gap:2px;
+  padding:0 16px;z-index:850;overflow:visible}
+.sidenav .sn-logo{font-size:14px;font-weight:700;padding:0 16px 0 0;margin-right:8px;display:flex;align-items:center;gap:8px;color:#fff;
+  border-right:1px solid rgba(255,255,255,.16);height:22px}
 .sidenav .sn-logo .dot{width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,#f59e0b,#ef4444);display:inline-block}
-.sidenav .sn-sep{height:1px;background:var(--line);margin:8px 6px}
-.sidenav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
-  color:var(--sub);text-decoration:none;font-size:13px;margin-bottom:2px;transition:all .15s}
+.sidenav .sn-sep{width:1px;height:22px;background:rgba(255,255,255,.16);margin:0 6px;flex:none}
+.sidenav a{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:9px;
+  color:rgba(255,255,255,.74);text-decoration:none;font-size:13px;transition:all .15s;white-space:nowrap}
 .sidenav a .ic{font-size:16px;width:20px;text-align:center}
-.sidenav a:hover{background:var(--card2);color:var(--text)}
-.sidenav a.active{background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(239,68,68,.15));color:var(--accent);font-weight:600}
-.sidenav .sn-sub{margin:0 0 8px 22px;display:flex;flex-direction:column;gap:2px}
+.sidenav a:hover{background:rgba(255,255,255,.10);color:#fff}
+.sidenav a.active{background:linear-gradient(135deg,#FF9A3D 0%,#F2701D 100%);color:#fff;font-weight:600}
+/* 子章节下拉暂收起（gushi 无子导航；内容一张不丢，只在视图内）。下一轮补 hover 下拉 */
+.sidenav .sn-sub{display:none;margin:0;flex-direction:row;gap:2px}
 .sidenav .sn-sub.collapsed{display:none}
 .sidenav .sn-arrow{margin-left:auto;font-size:10px;color:var(--faint)}
 .sidenav .sn-sub a{padding:5px 10px;font-size:12px;color:var(--sub);border-radius:8px;font-weight:400}
 .sidenav .sn-sub a .dot-sub{width:4px;height:4px;border-radius:50%;background:var(--line);flex:none}
 .sidenav .sn-sub a:hover{color:var(--text);background:var(--card2)}
 .sidenav .sn-sub a.active{color:var(--accent);font-weight:600;background:rgba(245,158,11,.08)}
-.sidenav .sn-foot{margin-top:auto;display:flex;flex-direction:column;gap:6px}
+.sidenav .sn-foot{margin-top:0;margin-left:auto;display:flex;flex-direction:row;align-items:center;gap:8px}
+/* 开市/休市五态徽章（用户决策 4） */
+.mkt-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;
+  padding:4px 11px;border-radius:20px;border:1px solid transparent;white-space:nowrap}
+.mkt-badge .d{width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+.mkt-open{background:rgba(16,185,129,.16);color:#34d399;border-color:rgba(16,185,129,.35)}
+.mkt-mid{background:rgba(245,158,11,.16);color:#fbbf24;border-color:rgba(245,158,11,.35)}
+.mkt-rest{background:rgba(148,163,184,.16);color:#94a3b8;border-color:rgba(148,163,184,.3)}
+.mkt-pre{background:rgba(59,130,246,.16);color:#60a5fa;border-color:rgba(59,130,246,.35)}
 /* 打板族「建议」列：限宽 + 允许换行（原不换行撑宽，把其他列压成两行） */
 .tbl td .adv-cell{display:block;white-space:normal;line-height:1.4;max-width:216px;margin:0 auto;text-align:left}
 .tbl th[data-key="advice"]{min-width:216px}
-body.sidenav-open .container{margin-left:56px}   /* 常驻 56；展开时导航覆盖其上，不推挤 */
-.sidenav .lbl,.sidenav .sn-logo .txt{white-space:nowrap;opacity:0;transition:opacity .14s ease}
-.sidenav:hover .lbl,.sidenav:hover .sn-logo .txt{opacity:1}
-.sidenav .sn-sub{opacity:0;transition:opacity .14s ease;pointer-events:none}
-.sidenav:hover .sn-sub{opacity:1;pointer-events:auto}
-.sidenav .sn-arrow{opacity:0;transition:opacity .14s ease}
-.sidenav:hover .sn-arrow{opacity:1}
+/* 顶部横栏：内容不再被导航占位；标签常显（原折叠态的 opacity/transition 全部移除） */
+body.sidenav-open .container{margin-left:0;padding-top:22px}
+.sidenav .sn-arrow{display:none}
 
 /* ---------- 通用卡片 ---------- */
 .card{background:var(--card);border-radius:16px;padding:22px;margin-bottom:22px;border:1px solid var(--border)}
@@ -182,30 +187,55 @@ function toggleTheme(){var t=document.documentElement.getAttribute('data-theme')
 try{applyTheme(localStorage.getItem('qw-theme')||'light')}catch(e){applyTheme('light')}
 
 /* ---------- 左侧导航（JS 点击滚动，不依赖 hash；标的信息与表格同页，无独立报告入口） ---------- */
+/* 开市/休市五态徽章（用户决策 4）：本地时钟 + 构建期判定的交易日 */
+function mktBadgeHtml(){
+  var s=window.MKT_STATUS||{};
+  var now=new Date();
+  var p=function(n){return (n<10?'0':'')+n;};
+  var today=now.getFullYear()+'-'+p(now.getMonth()+1)+'-'+p(now.getDate());
+  var hm=now.getHours()*100+now.getMinutes();
+  var cls='mkt-rest',txt='休市';
+  if(s.isTradingDay&&s.tradeDay===today){
+    if(hm<930){cls='mkt-pre';txt='未开盘';}
+    else if(hm<1130){cls='mkt-open';txt='开市中';}
+    else if(hm<1300){cls='mkt-mid';txt='午间休市';}
+    else if(hm<1500){cls='mkt-open';txt='开市中';}
+    else{cls='mkt-rest';txt='已收盘';}
+  }
+  return '<span class="mkt-badge '+cls+'" title="交易日 '+((s.tradeDay)||'—')+' · 本地时钟判定"><span class="d"></span>'+txt+'</span>';
+}
 function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)return;
   var html='<div class="sn-logo"><span class="dot"></span><span class="txt">量化权重监控</span></div><div class="sn-sep"></div>';
   window.ENH.nav.forEach(function(it){
     var subs=it[3];
     var hasSubs=subs&&subs.length;
-    html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"'+(hasSubs?' data-toggle="1"':'')+'><span class="ic">'+it[1]+'</span><span class="lbl">'+it[2]+'</span>'+(hasSubs?'<span class="sn-arrow">▾</span>':'')+'</a>';
+    var ext=it[4];
+    if(ext){
+      html+='<a href="'+ext+'" target="_blank" rel="noopener"><span class="ic">'+it[1]+'</span><span class="lbl">'+it[2]+'</span></a>';
+    }else{
+      html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"'+(hasSubs?' data-toggle="1"':'')+'><span class="ic">'+it[1]+'</span><span class="lbl">'+it[2]+'</span>'+(hasSubs?'<span class="sn-arrow">▾</span>':'')+'</a>';
+    }
     // 子章节（2026-08-17 用户需求）：点击先切视图再滚动到区块；主项点击可折叠/展开
     if(hasSubs){
       html+='<div class="sn-sub">';
-      subs.forEach(function(s){html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'" data-sub="'+s[0]+'"><span class="dot-sub"></span><span class="lbl">'+s[1]+'</span></a>';});
+      subs.forEach(function(s){html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'" data-sub="'+s[0]+'" data-view="'+(s[2]||it[0])+'"><span class="dot-sub"></span><span class="lbl">'+s[1]+'</span></a>';});
       html+='</div>';}});
   html+='<div class="sn-sep"></div><div class="sn-foot">'+
     '<a href="javascript:void(0)" data-anchor="review"><span class="ic">📋</span><span class="lbl">复盘日志</span></a>'+
     '<a href="javascript:void(0)" data-anchor="changelog"><span class="ic">📝</span><span class="lbl">更新日志</span></a>'+
     '<a href="https://qingju.me/" target="_blank" rel="noopener"><span class="ic">💬</span><span class="lbl">青橘社区</span></a></div>';
   nav.innerHTML=html;
+  var _ft=nav.querySelector('.sn-foot');
+  if(_ft)_ft.insertAdjacentHTML('afterbegin', mktBadgeHtml());
   document.body.classList.add('sidenav-open');
   nav.querySelectorAll('a[data-anchor]').forEach(function(a){
     a.addEventListener('click',function(e){
       e.preventDefault();
       var t=a.getAttribute('data-anchor');
       var sub=a.getAttribute('data-sub');
+      var vw=a.getAttribute('data-view')||t;
       // 视图切换模式：交给 switchView；否则滚动定位
-      if(window.switchView){window.switchView(t);}
+      if(window.switchView){window.switchView(vw);}
       else{
         var el=document.getElementById(t);
         if(el){el.scrollIntoView({behavior:'auto',block:'start'});

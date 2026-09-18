@@ -17,6 +17,23 @@ sys.path.insert(0, str(BASE))
 from ui_components import THEME_CSS, NAV_HTML, COMMON_JS
 from kxmm_card import KXMM_CSS, KXMM_VIEW_HTML, KXMM_JS
 
+
+def _mkt_status():
+    """开市/休市徽章（2026-09-18 用户决策 4）：构建期判定今日是否交易日。
+    tradeDay = index_000300.csv 末行（最近交易日）；isTradingDay = 该末行 == 今日。
+    盘中/休市时段由前端按本地时钟二次判定，不依赖外部接口。"""
+    from datetime import date as _d
+    _p = Path(__file__).resolve().parent / "index_000300.csv"
+    try:
+        _last = _p.read_text(encoding="utf-8").strip().splitlines()[-1].split(",")[0][:10]
+    except Exception:
+        _last = ""
+    _today = _d.today().strftime("%Y-%m-%d")
+    return {"tradeDay": _last, "today": _today, "isTradingDay": _last == _today}
+
+
+_MKT_STATUS = _mkt_status()
+
 js_src = (BASE / "enhanced_data.js").read_text(encoding="utf-8")
 DATA = json.loads(js_src[len("window.ENH = "):-1])
 details = DATA["details"]
@@ -2089,15 +2106,16 @@ html = f"""<!doctype html>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
 window.ENH.nav = [
-  ["overview","📊","监控总览",[["overview","总览统计"],["mkt-weather","市场晴雨表"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
-  ["sys-auto","🛰️","三轨中长线",[["sat-card","卫星目标持仓"],["sat-paper-b-card","轨B 模拟盘（主轨）"],["gold-sat-card","黄金卫星叠加"],["ret20-paper-card","ret20 倾斜臂模拟盘"],["fb3-pool-card","FB3 基金池"],["fund-paper-card","基金主仓模拟盘"]]],
-  ["short","⚡","全量池短线",[["card-short-stk","股票池 汇总表"],["card-short-stk-detail","股票池 逐标的详情"],["card-kh-hits","KHunter 命中策略一览"],["card-etf-paper","ETF 动量轮动"],["card-kh-paper","KHunter 模拟盘"],["card-short-fund","基金池 汇总表"],["card-short-fund-detail","基金池 逐标的详情"],["watch-card","短线跟踪"]]],
-  ["a5","🎯","打板族",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
-  ["kxmm","😨","市场情绪",[["kxmm-fg","恐贪指数"],["kxmm-heat","热力图"]]],
-  ["comment","💬","评论区",[]]
+  ["kxmm","📊","市场晴雨",[["kxmm-fg","恐贪指数"],["kxmm-heat","热力图"],["mkt-weather","市场晴雨表","overview"],["bt-all","回测参考","overview"],["bt-short","短线回测","overview"],["overview","总览统计","overview"]]],
+  ["sys-auto","🛰️","中长线池",[["sat-card","卫星目标持仓"],["sat-paper-b-card","轨B 模拟盘（主轨）"],["gold-sat-card","黄金卫星叠加"],["ret20-paper-card","ret20 倾斜臂模拟盘"],["fb3-pool-card","FB3 基金池"],["fund-paper-card","基金主仓模拟盘"]]],
+  ["short","⚡","短线选股",[["card-short-stk","股票池 汇总表"],["card-short-stk-detail","股票池 逐标的详情"],["card-kh-hits","KHunter 命中策略一览"],["card-etf-paper","ETF 动量轮动"],["card-kh-paper","KHunter 模拟盘"],["card-short-fund","基金池 汇总表"],["card-short-fund-detail","基金池 逐标的详情"],["watch-card","短线跟踪"]]],
+  ["a5","🎯","打板专区",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
+  ["qingju","💬","社区讨论",[],"https://qingju.me/"]
 ];
 /* 视图切换模式：滚动不更新导航高亮（COMMON_JS renderSidenav 检测此标志） */
 window.ENH.NAV_SWITCH = true;
+/* 开市/休市徽章数据（构建期注入）：tradeDay = index_000300 末行；isTradingDay = 末行是否今日 */
+window.MKT_STATUS = {json.dumps(_MKT_STATUS)};
 /* 三池回测净值（股票/基金，监控总览展示；2026-08-17 去 ETF） */
 window.ENH.sub_curves = {{
   stock: {json.dumps(DATA["systems"]["v9_auto"]["equity"])},
