@@ -23,7 +23,7 @@ struct = [
     ("顺序 = 市场晴雨→三池→社区讨论",
      [n for _, _, n in tabs] == ["市场晴雨", "中长线池", "短线选股", "打板专区", "社区讨论"]),
     ("社区讨论为外链", 'href="https://qingju.me/" target="_blank"' in h),
-    ("顶部横栏 CSS", "height:54px;background:#1b2130" in h),
+    ("顶部横栏 CSS", "height:52px;background:#1b2130" in h),
     ("content 不再被占位", "body.sidenav-open .container{margin-left:0;" in h),
     ("徽章 CSS + 函数", ".mkt-badge{" in h and "function mktBadgeHtml()" in h),
     ("MKT_STATUS 已注入", "window.MKT_STATUS = {" in h),
@@ -69,9 +69,9 @@ async def main():
     nt = d.get("navTag") or {}
     bd = d.get("badge") or {}
     rend = [
-        ("导航为全宽顶部横栏（宽>300、高≈54、flex-row、sticky）",
+        ("导航为全宽顶部横栏（宽>300、高≈52、flex-row、static）",
          nt.get("w", 0) > 300 and 50 <= nt.get("h", 0) <= 60
-         and nt.get("dir") == "row" and nt.get("pos") == "sticky"),
+         and nt.get("dir") == "row" and nt.get("pos") == "static"),
         ("深色底 #1b2130", "27, 33, 48" in str(nt.get("bg"))),
         ("主 tab 5 个且文本正确",
          d.get("tabs") == ["市场晴雨", "中长线池", "短线选股", "打板专区", "社区讨论"]),

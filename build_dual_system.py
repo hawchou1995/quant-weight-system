@@ -389,7 +389,7 @@ def _gold_sat_card():
                 f'<div class="kpi"><div class="l">状态</div><div class="v">{_stat}</div><div class="s">信号 {_m.get("signal_date", "—")} → T+1 开盘</div></div>'
                 f'</div>'
                 f'<div class="sub">叠加式 <code>r_sat=(1−w)·r_B+w·r_gold</code>，w=10%，<b>替换</b>轨B 的 10%（卫星总敞口仍 68000，不超配）· 黄金腿 = 518880 买入持有、永不卖出 · 卫星层 ΔS(w10) = <b>+0.104</b>（采纳门 +0.02）· 分半 h1/h2 双正</div>'
-                f'<div class="sub" style="color:#b45309">⚠ 硬伤申报：{_flags}</div>'
+                f'<div class="sub" style="color:var(--warn)">⚠ 硬伤申报：{_flags}</div>'
                 f'<div class="sub" style="color:var(--faint)">账本 backtest/gold_sat_paper.json；黄金腿已镜像进轨B 账户（卫星 mark 逐只取价自动计入净值）。每日链内刷新。</div>'
                 f'</div>')
     except Exception as _e:
@@ -439,7 +439,7 @@ def _ret20_paper_card():
                 f'<table class="tbl"><thead><tr><th>臂</th><th>定位</th><th>NAV</th><th>在仓</th><th>现金</th><th>信号日</th><th>状态</th></tr></thead>'
                 f'<tbody>{_tr}</tbody></table>'
                 f'<div class="sub">{_otxt}</div>'
-                f'<div class="sub" style="color:#b45309">⚠ 样本外记录 = 0 天（研究侧读数 λ0.2 off0 +25.08%/S1.411/50bp 19.25；'
+                f'<div class="sub" style="color:var(--warn)">⚠ 样本外记录 = 0 天（研究侧读数 λ0.2 off0 +25.08%/S1.411/50bp 19.25；'
                 f'λ0.3 +24.36%/S1.376/50bp 18.67；安慰剂 p 均 0.05）→ 毕业首检 <b>2026-10-15</b>：'
                 f'① NAV ≥ BASE 臂 ② 月度多数为正 ③ 相对回撤 ≤ BASE+5pp</div>'
                 f'<div class="sub" style="color:var(--faint)">账本 backtest/ret20_paper_l02.json / ret20_paper_l03.json；'
@@ -672,7 +672,7 @@ def rows_html_for(items, score_sub="趋势/动量/量能/超买/风控"):
         # 可等盘中回落至 3% 以内再考虑买入
         gap_badge = ""
         if d.get("gap") is not None and d["gap"] > 3:
-            gap_badge = (f'<span class="badge" style="background:rgba(239,68,68,.15);color:#f87171;" '
+            gap_badge = (f'<span class="badge" style="background:rgba(239,68,68,.15);color:var(--up);" '
                          f'title="开盘跳空高开 {d["gap"]:.1f}%（vs 昨收），反转空间被开盘吃掉，不追高；可等盘中回落至 3% 以内再考虑买入">'
                          f'⚠ 高开{d["gap"]:.1f}% 规避（回落&lt;3%可买）</span>')
         # 2026-08-20 用户决策：市况门控改为「仅提醒」——门控关闭时入池股票标「仅提醒·非买入」，
@@ -687,7 +687,7 @@ def rows_html_for(items, score_sub="趋势/动量/量能/超买/风控"):
         below_tag = ""
         if d.get("below_entry"):
             _emin = d.get("entry_min") or 65
-            below_tag = (f'<span class="badge" style="background:rgba(148,163,184,.18);color:#94a3b8;" '
+            below_tag = (f'<span class="badge" style="background:rgba(148,163,184,.18);color:var(--faint);" '
                          f'title="权重分 {d["score"]:.1f} 已跌破入池门槛 {_emin} 分：本标的为上次再平衡日（'
                          f'{DATA.get("meta",{}).get("pool_rebalance",{}).get("last_select","—")}）的达标标的，'
                          f'权重分随行情回落属正常；软标记仅提示，不改变交易语义（买入看档位/择时，'
@@ -745,7 +745,7 @@ def cards_html_for(items):
 <h3>{d["name"]} <span class="sub">{d["code"]}</span> <span class="board-tag">{board}</span> <span class="board-tag">{d["industry"]}</span>{"🎯 KHunter 主信号" if d.get("pick")=="top4" else ("候选·仅观察" if d.get("pick")=="cand" else "")}</h3>
 <p class="meta">现价 <b>{d["px"]:.2f}</b>（<span class="{"up" if (d["chg"] or 0)>0 else "down"}">{f"{d['chg']:+.2f}%" if d["chg"] is not None else "—"}</span>）｜ 近一年 <span class="{"up" if (d["ret_1y"] or 0)>0 else "down"}">{f"{d['ret_1y']:+.0f}%" if d["ret_1y"] is not None else "—"}</span> ｜ RSI {d["rsi"]:.0f}</p>
 <p class="meta">权重 <b>{d["score"]:.1f} 分</b> → {tier_pill(d["tier"])} ｜ 建议：{action_for(d)} ｜ {ma200_txt}</p>
-{f'<p class="meta" style="color:#94a3b8">⚠ 低于入池门槛 {d.get("entry_min") or 65} 分（软标记 · 不改变交易语义）</p>' if d.get("below_entry") else ""}
+{f'<p class="meta" style="color:var(--faint)">⚠ 低于入池门槛 {d.get("entry_min") or 65} 分（软标记 · 不改变交易语义）</p>' if d.get("below_entry") else ""}
 <p class="meta">六类：趋势 {comp.get("trend",0):.0f}｜动能 {comp.get("momentum",0):.0f}｜量能 {comp.get("volume",0):.0f}｜超买 {comp.get("osc",0):.0f}｜风控 {comp.get("risk",0):.0f}｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">{d.get("biz", "—")}</p>
 </div>
@@ -955,7 +955,7 @@ def bt_card(cid, title, tag, s, curve_id, color="#f59e0b", sub="2016-01~2026-08"
 <div class="kpis">
 <div class="kpi"><div class="l">回测收益</div><div class="v" style="color:{color}">{s["total_return_pct"]:+.1f}%</div><div class="s">{sub}</div></div>
 <div class="kpi"><div class="l">年化</div><div class="v">{s["annual_return_pct"]:.1f}%</div><div class="s">胜率 {s.get("win_rate_pct",0):.0f}%</div></div>
-<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">{s["max_drawdown_pct"]:.1f}%</div><div class="s">夏普 {s["sharpe"]:.2f} · {s.get("total_trades",0)} 笔</div></div>
+<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:var(--up)">{s["max_drawdown_pct"]:.1f}%</div><div class="s">夏普 {s["sharpe"]:.2f} · {s.get("total_trades",0)} 笔</div></div>
 </div>
 <div class="bt-curve" id="{curve_id}"></div>
 </div>'''
@@ -965,15 +965,15 @@ def bt_all_html():
     """中长线回测参考 5 卡（股票分层 4 + 基金；2026-08-17 去 ETF）"""
     cards = "".join([
         bt_card("bt-fund", "🥇 主仓 FB3-H20 基金线", FUND_TAG, s_fund, "curve-chart-fund", color="#3b82f6"),
-        bt_card("bt-super", "🥉 卫星·SUPER", SUPER_TAG, s_super, "curve-chart-super", color="#8b5cf6"),
+        bt_card("bt-super", "🥉 卫星·SUPER", SUPER_TAG, s_super, "curve-chart-super", color="#d97706"),
     ])
-    _ret = ('<div class="sub" style="color:#ef4444">⛔ <b>v9 股票分层战法（一体/主板/创业板/科创板四卡）已于 2026-09-13 退役</b>'
+    _ret = ('<div class="sub" style="color:var(--up)">⛔ <b>v9 股票分层战法（一体/主板/创业板/科创板四卡）已于 2026-09-13 退役</b>'
             '——十重证伪确认负期望（ADR-0006/0007），历史曲线与明细见更新日志 v5.9~v5.11.15 与 backtest/ 报告存档。</div>')
     return ('<div class="card" id="bt-all">\n'
             '<h2>📊 回测参考 <span class="badge badge-auto">中/长线 · 股票按权限分层</span></h2>\n'
-            f'<div class="sub"><b>双轨 60/0/40（2026-09-16 起：卫星单轨化）</b>：主仓 = 基金 NAV 动量牛熊 regime（牛市 Top10/熊市 Top3）｜ 卫星 = 主板量价因子选股（全审计过闸）｜ 信号：<code>backtest/signal_satellite_0913.py</code> · <span style="color:#f59e0b;font-weight:600">看板构建 {__import__("datetime").datetime.now():%Y-%m-%d %H:%M}</span></div>\n'
+            f'<div class="sub"><b>双轨 60/0/40（2026-09-16 起：卫星单轨化）</b>：主仓 = 基金 NAV 动量牛熊 regime（牛市 Top10/熊市 Top3）｜ 卫星 = 主板量价因子选股（全审计过闸）｜ 信号：<code>backtest/signal_satellite_0913.py</code> · <span style="color:var(--warn);font-weight:600">看板构建 {__import__("datetime").datetime.now():%Y-%m-%d %H:%M}</span></div>\n'
             '<div class="sub" style="color:var(--sub)">💧 <b>滑点敏感性</b>（每边，sweep_ml_slip.py 扫描）：中长线换手低、影响显著小于短线 —— 股票 20bps 收益 -23%（夏普 1.58→1.43）、30bps -31% ｜ 历史固定池（已去除）20bps -13%、30bps -18% —— 实盘 10-20bps 区间内中长线策略稳健</div>\n'
-            '<div class="sub" style="color:#d97706">🐻 <b>9/1 牛熊独立权重验证（修正引擎 T+1 · regime=沪深300&gt;MA200 同口径）</b>：生产口径 A（牛开熊清 + 固定权重 0.35/0.25/0.20/0.20）收益 +28.3%/夏普 0.229/回撤 -27.15% 仍最优；牛攻熊守双权重 B/C/D/E 变体（熊市开仓）全面恶化（-25.9%~-65.0%）→ <b>中长期维持「牛开熊清」，熊市开仓不可行</b>（与短线基金相反：基金熊市防守开仓 +398pp 因选到避险型基金）</div>\n'
+            '<div class="sub" style="color:var(--warn)">🐻 <b>9/1 牛熊独立权重验证（修正引擎 T+1 · regime=沪深300&gt;MA200 同口径）</b>：生产口径 A（牛开熊清 + 固定权重 0.35/0.25/0.20/0.20）收益 +28.3%/夏普 0.229/回撤 -27.15% 仍最优；牛攻熊守双权重 B/C/D/E 变体（熊市开仓）全面恶化（-25.9%~-65.0%）→ <b>中长期维持「牛开熊清」，熊市开仓不可行</b>（与短线基金相反：基金熊市防守开仓 +398pp 因选到避险型基金）</div>\n'
             '<div class="sub" style="margin-top:10px;padding:8px 10px;background:rgba(59,130,246,.08);border-left:3px solid #3b82f6;border-radius:4px">'
             '<b>🎯 双轨配置（2026-09-16 · 60/0/40）</b>｜'
             '<b>① 主仓 FB3-H20</b>（60%）：基金 NAV 动量牛熊 regime，牛市 Top10/熊市 Top3 · 2000 池回测 +733.4%/年化 21.95%/回撤 -27.0%/夏普 1.316｜'
@@ -1005,7 +1005,7 @@ def bt_short_html():
             _pool = s.get("pool_mdd") is not None
             if _pool:
                 _kpi3 = (f'<div class="kpi"><div class="l">资金池(N5) 回撤</div>'
-                         f'<div class="v" style="color:#ef4444">{s["pool_mdd"]:.1f}%</div>'
+                         f'<div class="v" style="color:var(--up)">{s["pool_mdd"]:.1f}%</div>'
                          f'<div class="s">资金池(N5) 年化 {s["pool_ann"]:+.2f}% · 夏普 {s["pool_sharpe"]:.2f}</div></div>')
                 _kpi2s = f'2024 灾年 {s["y2024"]:+.2f}%' if s.get("y2024") is not None else f'均值 {s["mean"]:+.2f}%'
             else:
@@ -1021,14 +1021,14 @@ def bt_short_html():
                     f'{_kpi3}'
                     f'</div></div>')
         return bt_card(cid, title, tag, s, curve_id, color=color)
-    _c_cards = (f'{_card("bt-short-stock-main-c", "📈 短线 纯主板 · 激进版(OB50 参考)", ss_stk_tag["main_c"], ss_stk["main_c"], "curve-short-stock-main-c", color="#7c3aed")}'
+    _c_cards = (f'{_card("bt-short-stock-main-c", "📈 短线 纯主板 · 激进版(OB50 参考)", ss_stk_tag["main_c"], ss_stk["main_c"], "curve-short-stock-main-c", color="#64748b")}'
                 if KH_BT_C else "")
     # 🌟 MA250 牛熊分域总卡（生产口径 · 组合化资金 · Phase 11 · 2026-09-07 投产 · ob59 最终版）
     _hybrid_card = ('''<div class="bt-card" id="bt-short-stock-hybrid" style="border-color:rgba(37,99,235,.5)">
 <div class="bt-head"><b>🌟 生产口径：牛熊分域 MA250 总卡（ob59）</b><span class="bt-tag">组合化资金 · 正在用的就是它</span></div>
 <div class="kpis">
 <div class="kpi"><div class="l">组合总收益</div><div class="v" style="color:var(--up)">+119.4%</div><div class="s">n=266 · 胜率 62.4% · ob59 定稿</div></div>
-<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:#ef4444">-20.91%</div><div class="s">夏普 0.648 · 均值 +3.08%/笔 · 满窗验证</div></div>
+<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:var(--up)">-20.91%</div><div class="s">夏普 0.648 · 均值 +3.08%/笔 · 满窗验证</div></div>
 <div class="kpi"><div class="l">牛(>MA20)</div><div class="v" style="color:var(--up)">med +4.67%</div><div class="s">n=65 · wr 62% · 独立过闸</div></div>
 <div class="kpi"><div class="l">熊(&lt;MA250)</div><div class="v" style="color:var(--up)">med +2.78%</div><div class="s">n=201 · wr 62% · 独立过闸</div></div>
 </div>
@@ -1125,7 +1125,7 @@ def a5_view_html():
     def _gate_pill(g, label, base):
         if g.get("status") == "waiting":
             return f'<span class="op op-watch">⏳ {label} {g.get("note", "")}</span>'
-        flag = "✅" if g.get("status") == "PASS" else "⛔"
+        flag = "✓" if g.get("status") == "PASS" else "✕"
         cls = "op-add" if g.get("status") == "PASS" else "op-cut"
         return f'<span class="op {cls}">{flag} {label} {g.get("note", "")}</span>'
     gate_bar = ('<div class="op-stats">' +
@@ -1181,7 +1181,7 @@ def a5_view_html():
         rp = w.get("rel_pos")
         ok = (dh is not None and dh >= 20) and (rp is None or rp <= 0.5)
         if ok:
-            inner = f'<span class="board-tag board-sh" title="生产预筛：F3空间≥20% + 低位rel≤0.5（池A/池B 为附加滤网）">✅</span>'
+            inner = f'<span class="board-tag board-sh" title="生产预筛：F3空间≥20% + 低位rel≤0.5（池A/池B 为附加滤网）">✓</span>'
             return f'<td>{inner} {dh:.0f}%</td>' if with_val else f'<td>{inner}</td>'
         return _txt_td("—")
     wl_rows = [_row(
@@ -1259,14 +1259,14 @@ def a5_view_html():
         yz = s.get("yz", False)
         fb = s.get("first_board", False)
         if hit:
-            tag = '<span class="badge" style="background:rgba(5,150,105,.18);color:#34d399">✅ 双池命中</span>'
+            tag = '<span class="badge" style="background:rgba(5,150,105,.18);color:var(--down)">✅ 双池命中</span>'
         elif sealed:
             tag = '<span class="badge" style="background:rgba(217,119,6,.15);color:#fbbf24">封板</span>'
         else:
             tag = '<span class="badge" style="background:rgba(107,114,128,.15);color:#9ca3af">未封</span>'
         st = []
         if yz:
-            st.append('<span class="badge" style="background:rgba(239,68,68,.14);color:#f87171">一字</span>')
+            st.append('<span class="badge" style="background:rgba(239,68,68,.14);color:var(--up)">一字</span>')
         elif fb:
             st.append('<span class="badge" style="background:rgba(37,99,235,.14);color:#60a5fa">首板</span>')
         elif sealed:
@@ -1277,7 +1277,7 @@ def a5_view_html():
         _pools = s.get("pools", []) or []
         _pt = []
         if "R20" in _pools:
-            _pt.append('<span class="badge" style="background:rgba(5,150,105,.18);color:#34d399" '
+            _pt.append('<span class="badge" style="background:rgba(5,150,105,.18);color:var(--down)" '
                        f'title="池A 超跌：r20 {s.get("r20")}%（需 ≤-7.31%）">A·超跌</span>')
         if "ADX" in _pools:
             _pt.append('<span class="badge" style="background:rgba(37,99,235,.16);color:#60a5fa" '
@@ -1288,7 +1288,7 @@ def a5_view_html():
         tier = s.get("tier", "不追")
         advice = s.get("advice", "")
         if hit:
-            tier_badge = f'<span class="badge" style="background:rgba(5,150,105,.18);color:#34d399">观察</span>'
+            tier_badge = f'<span class="badge" style="background:rgba(5,150,105,.18);color:var(--down)">观察</span>'
         else:
             tier_badge = f'<span class="badge" style="background:rgba(107,114,128,.15);color:#9ca3af">不追</span>'
         zp_rows.append(_row(
@@ -1328,7 +1328,7 @@ def a5_view_html():
 <div class="sub">今日首板 · 双池至少命中其一（池A 超跌 / 池B 趋势）· 明日低开 2-5% 则入场 · 当日涨跌幅为实时数据，近一年/RSI/量比/MA5偏离为收盘口径</div>
 {_a5_tbl_full("a5-wl", [("name","标的"),("board","板块"),("ind","行业"),("sbdate","首板日"),("pools","滤网池"),("relpos","相对位置"),("amt","成交额(万)"),("gate","过闸"),("chg","当日涨跌"),("ret1y","近一年"),("rsi","RSI"),("vr","量比"),("ma5dev","MA5偏离")], wl_rows, "（无观察标的）")}
 </div>
-<div class="card" id="a5-avoid" style="border-color:rgba(217,119,6,.35)">
+<div class="card" id="a5-avoid" style="border-left:3px solid rgba(217,119,6,.55)">
 <h2>⚠ A2_tp3 回避清单 <span class="badge badge-auto">{len(av)} 只 · 负期望警示</span></h2>
 <div class="sub">今日满足 A2_tp3 信号（首板次日低开 2-6% + 相对位置≤0.7 + 成交额≥5000万）· 回测胜率 63.1% 但单笔均值 -1.39%（盈亏比 0.29）→ <b>信号出现时回避或减仓，不追高</b></div>
 {_a5_tbl_full("a5-av", [("name","标的"),("board","板块"),("ind","行业"),("sbdate","首板日"),("gap","今日低开"),("relpos","相对位置"),("amt","成交额(万)"),("chg","当日涨跌"),("ret1y","近一年"),("rsi","RSI"),("vr","量比"),("ma5dev","MA5偏离")], av_rows, "（无）")}
@@ -1793,13 +1793,13 @@ _gate_txt = ("🟢 开（股票可买）" if _mg.get("open") else "🟠 关（�
 FB3_POOL_CARD = (f'<div class="card" id="fb3-pool-card">'
                  f'<h2>🥇 主仓 FB3-H20 基金池 <span class="badge badge-auto">当前 regime 持仓 · 数据截至 {_sp_j.get("as_of", "—")}</span></h2>'
                  f'<div class="sub">排序=基金动量分降序 · 市况门控 {_gate_txt} · 60% 资金 · 牛市 Top10 动量 / 熊市 Top3 低波（C 类份额，T+1 净值申赎）· 操作=相对模拟盘当前持仓</div>'
-                 f'<div class="sub" style="color:#f59e0b">⚠ 实盘清单已按份额去重（同一基金 A/C/E 类只留一只，优先 C 类）——回测口径未去重，故实盘预期与回测数字存在系统性差异</div>'
+                 f'<div class="sub" style="color:var(--warn)">⚠ 实盘清单已按份额去重（同一基金 A/C/E 类只留一只，优先 C 类）——回测口径未去重，故实盘预期与回测数字存在系统性差异</div>'
                  f'<div class="sub" style="color:var(--faint)">行业集中度约束（同行业≤N，N∈{{1,2,3}}）已于 2026-09-14 预注册实测：三轨均未过「相位中位夏普≥对照 + 50bp 档不劣化 + 配对显著」闸 → 不采纳（报告 backtest/报告-行业集中度约束三轨实测_20260914.md）</div>'
                  f'<div class="tbl-wrap"><table class="tbl"><thead><tr><th>代码</th><th>名称</th><th>动量分</th><th>涨跌幅</th><th>近1年</th><th>RSI14</th><th>MACD柱</th><th>KDJ-J</th><th>权重</th><th>操作</th></tr></thead><tbody>{_fund_rows or "<tr><td colspan=10>空（门控关闭；基金轨熊市照买 Top3）</td></tr>"}</tbody></table></div>'
                  f'<div class="sub" style="color:var(--faint)">指标口径：基金为 NAV 净值序列口径（RSI14/MACD(12,26,9)柱/KDJ(9,3,3)-J），与股票轨同算法；数据源 <code>fund_nav_cache</code></div></div>')
 
 WATCH_V9_CARD = ('<div class="card" id="watch-v9-card"><h2>📌 历史跟踪池（已退役）</h2>'
-                 '<div class="sub" style="color:#ef4444">⛔ v9 跟踪池展示已于 2026-09-13 移除（战法退役，十重证伪）。数据文件保留于 enhanced_data.js 供回溯。</div></div>')
+                 '<div class="sub" style="color:var(--up)">⛔ v9 跟踪池展示已于 2026-09-13 移除（战法退役，十重证伪）。数据文件保留于 enhanced_data.js 供回溯。</div></div>')
 
 # ---- 复盘日志 + 更新日志（v5.11.1 内嵌视图：与各池同形态，导航内切换）----
 def md_to_html(md):
@@ -1855,7 +1855,7 @@ for _i, _r in enumerate(_rev_sorted):
     if not _f.exists() or _r["file"] in _seen_rf:
         continue
     _seen_rf.add(_r["file"])
-    _flag = "🔴" if _r.get("defects", 0) > 0 else "✅"
+    _flag = "✕" if _r.get("defects", 0) > 0 else "✓"
     _open = " open" if _i == 0 else ""          # 最新一篇默认展开，其余折叠
     REVIEW_LIST_HTML += (f'<details class="rev-item"{_open}>'
                          f'<summary><span class="rev-flag">{_flag}</span><b>{_r["date"]}</b>'
@@ -1884,7 +1884,7 @@ if _a5rev_f.exists():
         f'<div class="kpi"><div class="l">止盈占比</div><div class="v">{f"{_tp:.1f}%" if _tp is not None else "—"}</div><div class="s">基准 {_btp:.1f}% · 闸 [15,35]%</div></div>'
         f'<div class="kpi"><div class="l">净值</div><div class="v">{_ars.get("nav", 1.0):.4f}</div><div class="s">全部已平仓复利（含 v1 归档）</div></div>'
     )
-    _flag = "✅" if _arg.get("verdict", "").startswith("✅") else ("⏳" if _arg.get("verdict", "").startswith("信号不足") else "⛔")
+    _flag = "✓" if _arg.get("verdict", "").startswith("✅") else ("…" if _arg.get("verdict", "").startswith("信号不足") else "✕")
     A5_REVIEW_BLOCK = (f'<h2>🎯 打板族（双池滤网 v1.3）模拟盘验证 <span class="badge badge-auto">池A 超跌 / 池B 趋势 · 非实盘指令</span></h2>'
                        f'<div class="sub">逐笔模拟盘跟踪（net_ret 含成本）· 验证门基准 = 双池并集（胜率 56.1% / 均值 +1.19% / tp 25.0%）· 新口径独立计数（v1 旧口径 11 笔归档）· 详细见「🎯 打板族」视图</div>'
                        f'<div class="kpis" style="margin-bottom:10px">{_a5kpi}</div>'
@@ -2020,11 +2020,11 @@ html = f"""<!doctype html>
 /* 三视图切换 */
 .view{{display:none}}
 .view.active{{display:block}}
-.view-badge{{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;margin-left:8px;vertical-align:middle}}
-.view-badge.auto{{background:rgba(245,158,11,.15);color:#b45309}}
+.view-badge{{display:inline-block;padding:1px 7px;border:1px solid transparent;border-radius:var(--r-sm);font-size:11px;background:var(--card2);color:var(--sub);margin-left:8px;vertical-align:middle}}
+.view-badge.auto{{background:rgba(245,158,11,.12);color:var(--warn);border-color:rgba(245,158,11,.25)}}
 [data-theme="dark"] .view-badge.auto{{color:#fbbf24}}
-.view-badge.lite{{background:rgba(59,130,246,.15);color:#1d4ed8}}
-[data-theme="dark"] .view-badge.lite{{color:#60a5fa}}
+.view-badge.lite{{background:var(--card2);color:var(--sub);border-color:var(--border)}}
+[data-theme="dark"] .view-badge.lite{{background:var(--card2);color:var(--sub);border-color:var(--border)}}
 /* 系统头部排版（2026-08-21）：标题+更新时间一左一右，标签按内容分行，门控最前 */
 .sys-head{{display:flex;flex-direction:column;gap:10px}}
 .sys-head-top{{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}}
@@ -2037,8 +2037,8 @@ html = f"""<!doctype html>
 :root{{--radar-ring:#e2e8f0;--radar-axis:#e5e9f0;--radar-label:#4a5568;--radar-score:#1a202c;--radar-sub:#9ca3af}}
 [data-theme="dark"]{{--radar-ring:#2d3748;--radar-axis:#2a3440;--radar-label:#cbd5e1;--radar-score:#f1f5f9;--radar-sub:#64748b}}
 /* 筛选条 */
-.toolbar .flt{{background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:7px 10px;font-size:13px;font-family:inherit}}
-.toolbar input[type=text]{{background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:7px 12px;font-size:13px;width:200px;font-family:inherit}}
+.toolbar .flt{{background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:var(--r);padding:6px 9px;font-size:12.5px;font-family:inherit}}
+.toolbar input[type=text]{{background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:var(--r);padding:6px 11px;font-size:12.5px;width:200px;font-family:inherit}}
 /* 表头两行（权重分/构成第二行指标名） */
 .th-sub{{font-size:10px;color:var(--faint);font-weight:400;margin-top:2px}}
 /* 到顶/到底浮动按钮 */
@@ -2047,13 +2047,13 @@ html = f"""<!doctype html>
 .scroll-fab button:hover{{border-color:var(--accent);color:var(--accent)}}
 /* 基金回测参考 · 三池独立大卡（2026-08-17 去 ETF） */
 .bt-grid{{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}}
-.bt-card{{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:16px}}
-.bt-card .bt-head{{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:15px}}
-.bt-card .bt-tag{{font-size:11px;color:var(--faint);background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2px 10px}}
-.bt-card .bt-curve{{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:6px;margin-top:10px}}
+.bt-card{{background:var(--card2);border:1px solid var(--border);border-radius:var(--r);padding:16px}}
+.bt-card .bt-head{{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:13.5px;font-weight:600}}
+.bt-card .bt-tag{{font-size:11px;color:var(--faint);background:var(--card);border:1px solid var(--border);border-radius:var(--r-sm);padding:2px 10px}}
+.bt-card .bt-curve{{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:6px;margin-top:10px}}
 /* 日志视图（内嵌，主题变量驱动） */
-.rev-item,.rel-item{{background:var(--card2);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}}
-.rev-item summary,.rel-item summary{{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;font-size:13px;color:var(--text);list-style:none;flex-wrap:wrap;user-select:none}}
+.rev-item,.rel-item{{background:var(--card2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden}}
+.rev-item summary,.rel-item summary{{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;font-size:12.5px;color:var(--text);list-style:none;flex-wrap:wrap;user-select:none}}
 .rev-item summary::-webkit-details-marker,.rel-item summary::-webkit-details-marker{{display:none}}
 .rev-item summary::before,.rel-item summary::before{{content:'▸';color:var(--faint);transition:transform .15s;font-size:12px}}
 .rev-item[open] summary::before,.rel-item[open] summary::before{{transform:rotate(90deg)}}
@@ -2063,14 +2063,14 @@ html = f"""<!doctype html>
 .rev-meta{{color:var(--faint);font-size:12px}}
 .rev-body{{padding:14px 16px}}
 /* 累计总览独立卡片（2026-08-18 晚：内嵌视图顶部仅一份） */
-.rev-cum{{background:linear-gradient(135deg,var(--card2),var(--card));border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:14px}}
-.rev-cum-title{{font-size:16px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:10px;margin-bottom:6px}}
-.rev-cum-badge{{font-size:11px;color:var(--faint);background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2px 10px;font-weight:400}}
+.rev-cum{{background:var(--card2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:12px}}
+.rev-cum-title{{font-size:14px;font-weight:600;color:var(--accent);display:flex;align-items:center;gap:8px;margin-bottom:6px}}
+.rev-cum-badge{{font-size:11px;color:var(--faint);background:var(--card);border:1px solid var(--border);border-radius:var(--r-sm);padding:2px 10px;font-weight:400}}
 .rev-cum-sub{{color:var(--faint);font-size:12px;margin-bottom:8px}}
 .rev-cum .tbl th{{background:var(--card2)}}
 .rev-cum .tbl tbody tr.rev-cum-total td{{font-weight:700;background:var(--card2)}}
 .rel-ver{{font-weight:700;font-size:15px;color:var(--accent);letter-spacing:.5px}}
-.rel-date{{color:var(--faint);font-size:12px;background:var(--card);border:1px solid var(--border);padding:2px 10px;border-radius:20px}}
+.rel-date{{color:var(--faint);font-size:11.5px;background:var(--card);border:1px solid var(--border);padding:1px 7px;border-radius:var(--r-sm)}}
 .rel-body{{color:var(--text);font-size:13px;line-height:1.75}}
 .rel-body ul{{margin:6px 0 6px 18px;padding:0}}
 .rel-body li{{margin:4px 0}}
@@ -2080,11 +2080,11 @@ html = f"""<!doctype html>
 .rev-md p{{margin:6px 0;color:var(--text)}}
 .rev-md blockquote{{background:var(--card2);border-left:3px solid var(--accent);padding:8px 12px;margin:8px 0;border-radius:0 8px 8px 0;color:var(--sub)}}
 /* 持仓跟踪 */
-#watch-table .up{{color:#22c55e}} #watch-table .down{{color:#ef4444}} #watch-table .warn{{color:#f59e0b}}
-#watch-v9-table .up{{color:#22c55e}} #watch-v9-table .down{{color:#ef4444}} #watch-v9-table .warn{{color:#f59e0b}}
+#watch-table .up{{color:var(--down)}} #watch-table .down{{color:var(--up)}} #watch-table .warn{{color:var(--warn)}}
+#watch-v9-table .up{{color:var(--down)}} #watch-v9-table .down{{color:var(--up)}} #watch-v9-table .warn{{color:var(--warn)}}
 #watch-table td,#watch-v9-table td{{font-variant-numeric:tabular-nums}}
-.bt-short{{background:var(--card2);border:1px dashed var(--border);border-radius:14px;padding:22px;text-align:center;margin-top:16px}}
-.bt-short h3{{margin:0 0 8px;color:var(--sub);font-size:15px}}
+.bt-short{{background:var(--card2);border:1px dashed var(--border);border-radius:var(--r);padding:22px;text-align:center;margin-top:16px}}
+.bt-short h3{{margin:0 0 6px;color:var(--sub);font-size:13.5px}}
 .bt-short .sub{{color:var(--faint);font-size:12px;line-height:1.8}}
 /* 大卡片折叠 */
 .card{{transition:box-shadow .15s}}
@@ -2096,28 +2096,28 @@ html = f"""<!doctype html>
 .card.collapsed .fold-arrow{{transform:rotate(-90deg);display:inline-block}}
 /* 操作统计条（各系统视图） */
 .op-stats{{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}}
-.op{{font-size:13px;padding:6px 14px;border-radius:20px;background:var(--card2);border:1px solid var(--border)}}
-.op b{{font-size:15px}}
+.op{{font-size:13px;padding:6px 14px;border-radius:var(--r-sm);background:var(--card2);border:1px solid var(--border)}}
+.op b{{font-size:13.5px}}
 .op-add{{color:var(--up)}}
-.op-watch{{color:#d97706}}
+.op-watch{{color:var(--warn)}}
 .op-cut{{color:var(--down)}}
 /* 子池分节标题（R-poolsec-0918 · 用户需求 #6） */
-.pool-sec{{display:flex;align-items:baseline;gap:10px;margin:26px 2px 10px;padding-bottom:8px;
+.pool-sec{{display:flex;align-items:baseline;gap:10px;margin:20px 2px 8px;padding-bottom:7px;
   border-bottom:1px solid var(--border)}}
-.pool-sec b{{font-size:14.5px;font-weight:700;color:var(--text)}}
+.pool-sec b{{font-size:13.5px;font-weight:600;color:var(--text)}}
 .pool-sec span{{font-size:12px;color:var(--faint)}}
 /* 逐标的详情卡片（模板风格 · 等高适配） */
 .stock-cards{{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px}}
-.stock-card{{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:stretch}}
+.stock-card{{background:var(--card2);border:1px solid var(--border);border-radius:var(--r);padding:14px;display:flex;gap:12px;align-items:stretch}}
 .stock-card .radar-wrap{{flex:0 0 120px;display:flex;align-items:center;justify-content:center}}
 .stock-card .radar-wrap svg{{width:120px;height:120px}}
 .stock-card .body{{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}}
-.stock-card h3{{margin:0 0 6px;font-size:15px}}
+.stock-card h3{{margin:0 0 6px;font-size:14px}}
 .stock-card .sub{{color:var(--faint);font-size:11px;font-weight:400}}
 .stock-card .meta{{color:var(--sub);font-size:12px;margin:3px 0;line-height:1.6}}
 /* ETF 动量轮动卡片（2026-09-06） */
 .etf-code{{color:var(--faint);font-size:10px;margin-left:6px;font-family:var(--mono,monospace)}}
-.etf-sec{{font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px}}
+.etf-sec{{font-size:12.5px;font-weight:600;color:var(--accent);margin-bottom:6px}}
 #card-etf-paper .tbl{{margin-bottom:0}}
 #card-etf-paper .kpis{{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}}
 #card-kh-paper .kpis{{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}}
@@ -2150,7 +2150,7 @@ html = f"""<!doctype html>
 {FB3_POOL_CARD}
 <div class="pool-sec"><b>模拟盘</b><span>基金线 · FB3 主仓</span></div>
 {FUND_PAPER_CARD}
-<div class="card" id="v9-retired-card" data-removed="1" style="display:none"><h2>🗂️ v9 全量池（已退役）</h2><div class="sub" style="color:#ef4444">⛔ v9 股票分层战法与 197 只跟踪池已于 2026-09-13 退役并移除展示——十重证伪确认负期望（ADR-0006/0007）。历史回测明细见「📝 更新日志」v5.9~v5.11.15 与 <code>backtest/</code> 报告存档。</div><div class="sub"><b>双轨退出规则</b>：① 主仓 FB3-H20 = 20 交易日月度轮动 + 牛熊 regime 切换（沪深300&lt;MA200 转 Top3 低波防守仓）——<b>无个股止盈止损</b>（基金 NAV 无涨跌停，止盈变体回测全部减值）；② SUPER = 月频调仓 + 中证1000&lt;MA20 组合半仓闸（且关闸期取高波半区）+ <b>pct40 因子化出场已启用（跌出前40%分位 → T+1 开盘卖，留现金至下一调仓）</b>。</div></div>
+<div class="card" id="v9-retired-card" data-removed="1" style="display:none"><h2>🗂️ v9 全量池（已退役）</h2><div class="sub" style="color:var(--up)">⛔ v9 股票分层战法与 197 只跟踪池已于 2026-09-13 退役并移除展示——十重证伪确认负期望（ADR-0006/0007）。历史回测明细见「📝 更新日志」v5.9~v5.11.15 与 <code>backtest/</code> 报告存档。</div><div class="sub"><b>双轨退出规则</b>：① 主仓 FB3-H20 = 20 交易日月度轮动 + 牛熊 regime 切换（沪深300&lt;MA200 转 Top3 低波防守仓）——<b>无个股止盈止损</b>（基金 NAV 无涨跌停，止盈变体回测全部减值）；② SUPER = 月频调仓 + 中证1000&lt;MA20 组合半仓闸（且关闸期取高波半区）+ <b>pct40 因子化出场已启用（跌出前40%分位 → T+1 开盘卖，留现金至下一调仓）</b>。</div></div>
 <div class="pool-sec"><b>回测数据</b><span>中长线三轨</span></div>
 {bt_all_html()}
 <div class="card" id="lt-rule"><h2>选股指标逻辑</h2>
@@ -2201,14 +2201,14 @@ html = f"""<!doctype html>
   <div id="comment-loading">💬 评论加载中…<span class="comment-loading-sub">（首次打开可能需要 30-60 秒，后端为 Render 免费层，闲置后休眠唤醒）</span></div>
 </div>
 <style>
-#comment-loading{{display:none;flex-direction:column;align-items:center;gap:6px;padding:36px 12px;color:var(--faint,#888);font-size:14px;border:1px dashed var(--line,#ddd);border-radius:12px;margin-top:12px}}
+#comment-loading{{display:none;flex-direction:column;align-items:center;gap:6px;padding:36px 12px;color:var(--faint,#888);font-size:14px;border:1px dashed var(--line,#ddd);border-radius:var(--r);margin-top:12px}}
 #comment-loading .comment-loading-sub{{font-size:12px;opacity:.75}}
 </style>
 </div>
 </div>
 
 </div>
-<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 {build_ts} · 版本 v5.12.0（+🌦市场晴雨表） · 数据截至 {DATA["meta"].get("as_of", "—")} · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
+<div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 {build_ts} · 版本 v5.13.6（+扁平控制台皮肤） · 数据截至 {DATA["meta"].get("as_of", "—")} · 若页面与预期不符请 Ctrl+F5 强制刷新</div>
 <!-- 到顶/到底浮动按钮 -->
 <div class="scroll-fab">
 <button title="回到顶部" onclick="window.scrollTo({{top:0,behavior:'smooth'}})">↑</button>
@@ -2415,7 +2415,7 @@ document.addEventListener('DOMContentLoaded',function(){{
     var _gateBox=document.getElementById('watch-gate');
     if(_gateBox){{
       if(_gateOpen===false){{
-        _gateBox.innerHTML='<div class="sub" style="margin-bottom:6px;color:#d97706">⚠ 市况门控关闭（沪深300 '+( _mg.idx_close!=null?_mg.idx_close:'—')+' < MA20 '+( _mg.idx_ma20!=null?_mg.idx_ma20:'—')+'）—— 已入池跟踪标的仅跟踪卖出信号，「不开新仓·仅跟踪」（安全口径，非买入）</div>';
+        _gateBox.innerHTML='<div class="sub" style="margin-bottom:6px;color:var(--warn)">⚠ 市况门控关闭（沪深300 '+( _mg.idx_close!=null?_mg.idx_close:'—')+' < MA20 '+( _mg.idx_ma20!=null?_mg.idx_ma20:'—')+'）—— 已入池跟踪标的仅跟踪卖出信号，「不开新仓·仅跟踪」（安全口径，非买入）</div>';
       }}else{{_gateBox.innerHTML='';}}
     }}
     // 待确认（pending）：当日新上榜、下个收盘确认后入正式池（2026-08-18 用户需求，与中长线一致）
@@ -2424,7 +2424,7 @@ document.addEventListener('DOMContentLoaded',function(){{
     var pkeys=Object.keys(pnd);
     if(pendBox){{
       if(pkeys.length){{
-        var ph='<div class="sub" style="margin-bottom:6px;color:#d97706">⏳ 待确认 '+pkeys.length+' 只 —— 上榜后下一收盘确认在池再入池（隔离当日信号）</div><table class="tbl"><tbody>';
+        var ph='<div class="sub" style="margin-bottom:6px;color:var(--warn)">⏳ 待确认 '+pkeys.length+' 只 —— 上榜后下一收盘确认在池再入池（隔离当日信号）</div><table class="tbl"><tbody>';
         pkeys.forEach(function(c){{
           var p=pnd[c]||{{}};var last=p.last||{{}};
           var nm=last.name||c;
@@ -2622,7 +2622,7 @@ document.addEventListener('DOMContentLoaded',function(){{
     var pkeys=Object.keys(pnd);
     if(pendBox){{
       if(pkeys.length){{
-        var ph='<div class="sub" style="margin-bottom:6px;color:#d97706">⏳ 待确认 '+pkeys.length+' 只 —— 上榜后下一收盘确认在榜再入池（隔离当日信号）</div><table class="tbl"><tbody>';
+        var ph='<div class="sub" style="margin-bottom:6px;color:var(--warn)">⏳ 待确认 '+pkeys.length+' 只 —— 上榜后下一收盘确认在榜再入池（隔离当日信号）</div><table class="tbl"><tbody>';
         pkeys.forEach(function(c){{
           var p=pnd[c]||{{}};var last=p.last||{{}};var nm=last.name||(E.details&&E.details[c]&&E.details[c].name)||c;
           ph+='<tr><td>'+c+'</td><td>'+nm+'</td><td style="text-align:center">'+p.pool+'</td><td style="text-align:center">'+(p.entry_candidate||'—')+'</td><td style="text-align:right">'+(last.px!==undefined&&last.px!==null?last.px.toFixed(2):'—')+'</td><td style="text-align:center">'+(last.tier||'—')+'</td></tr>';
@@ -2684,7 +2684,7 @@ document.addEventListener('DOMContentLoaded',function(){{
       var rec=r.rec;var px=(rec.px!==undefined&&rec.px!==null)?rec.px:null;
       var ageS=r.age+' 天 / 剩 '+(365-r.age)+' 天';
       var exitT=r.exit||'—';
-      var status=r.inPool?'<span style="color:#dc2626;font-weight:600">在池</span>':'<span style="color:var(--faint)">已掉出池（观察）</span>';
+      var status=r.inPool?'<span style="color:var(--up);font-weight:600">在池</span>':'<span style="color:var(--faint)">已掉出池（观察）</span>';
       // 2026-09-05 用户需求：跟踪池统一格式（板块/行业列）
       var ind=(E.details&&E.details[r.code])?(E.details[r.code].industry||'—'):'—';
       h+='<tr><td><b>'+(rec.name||'—')+'</b><br><span style="color:var(--faint);font-size:11px">'+r.code+'</span></td><td>'+boardCell(r.pool)+'</td><td>'+ind+'</td><td style="text-align:center">'+r.entry+'</td><td style="text-align:center">'+exitT+'</td><td style="text-align:center">'+ageS+'</td>'+
@@ -2825,6 +2825,19 @@ document.addEventListener('DOMContentLoaded',function(){{
 </script>
 <script>{KXMM_JS}</script>
 </body></html>"""
+
+# --- #10 皮肤层（2026-09-18）：渲染期统一去 emoji ---
+# 扁平控制台视觉语言：pictograph 一律清掉；保留 ✓✕（判定符号）、↑↓→ 箭头、①②③ 序号、▲▼ 与 ● 等排版符号。
+# 放渲染期而非逐行改源码：实测产物里 90% 的 emoji 来自数据层（pool JSON / 复盘 md / 验证 JSON），
+# 逐行改源码改不完、且会被每日链重新写入。
+import re as _re_ui
+_UI_EMOJI = ("\U0001F100-\U0001F1FF\U0001F300-\U0001FAFF\u2600-\u27BF"
+             "\u2B00-\u2BFF\u23E9-\u23FF\uFE0F")
+_UI_KEEP = "\u2713\u2714\u2715\u2717"
+_ui_re = _re_ui.compile("(?![%s])[%s][ \t\u00a0\u2002\u2003]?" % (_UI_KEEP, _UI_EMOJI))
+_ui_n = len(_ui_re.findall(html))
+html = _ui_re.sub("", html)
+print(f"UI 净化（#10 皮肤层）：清除 {_ui_n} 个 emoji")
 
 out = BASE / "dual_system.html"
 out.write_text(html, encoding="utf-8")

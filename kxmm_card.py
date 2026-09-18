@@ -27,11 +27,11 @@ KXMM_CSS = """
 .kx-arch-item .st{font-size:11px;font-weight:600}
 .kx-sec{margin-top:16px;border-top:1px dashed var(--border);padding-top:12px}
 .kx-sec-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:6px}
-.kx-select{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:8px;
+.kx-select{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:var(--r-sm);
   padding:4px 8px;font-size:12px;max-width:190px}
 .kx-chart{width:100%}
 .kx-ind-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:8px 0}
-.kx-ind-card{border:1px solid var(--border);border-radius:10px;padding:8px 10px;cursor:pointer;
+.kx-ind-card{border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;cursor:pointer;
   background:var(--card);transition:border-color .15s}
 .kx-ind-card:hover{border-color:var(--accent)}
 .kx-ind-card.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
@@ -40,11 +40,11 @@ KXMM_CSS = """
 .kx-ind-card .t{font-size:11px;color:var(--sub);margin-top:3px;line-height:1.35}
 .kx-ind-card .d{font-size:10px;color:var(--faint);margin-top:3px}
 .kx-heat-ctrl{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:8px 0}
-.kx-tabs,.kx-subtabs{display:inline-flex;border:1px solid var(--border);border-radius:10px;overflow:hidden}
-.kx-tab,.kx-subtab{padding:5px 14px;font-size:13px;cursor:pointer;background:var(--card);color:var(--sub);
+.kx-tabs,.kx-subtabs{display:inline-flex;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.kx-tab,.kx-subtab{padding:5px 12px;font-size:12.5px;cursor:pointer;background:var(--card);color:var(--sub);
   border-right:1px solid var(--border);user-select:none}
 .kx-tab:last-child,.kx-subtab:last-child{border-right:none}
-.kx-tab.active,.kx-subtab.active{background:var(--accent);color:#fff;font-weight:600}
+.kx-tab.active,.kx-subtab.active{background:var(--accent);color:var(--accent-ink);font-weight:600}
 .kx-subtab{font-size:12px;padding:4px 11px}
 .kx-selects{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--sub);margin-left:auto}
 """
@@ -52,11 +52,11 @@ KXMM_CSS = """
 KXMM_CSS = KXMM_CSS + """
 /* 热力树图（R-heatmap-0918） */
 #hm-card .hm-bar{display:flex;align-items:center;gap:14px;margin:6px 0 10px;flex-wrap:wrap}
-#hm-card .hm-seg{display:inline-flex;background:var(--card2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+#hm-card .hm-seg{display:inline-flex;background:var(--card2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
 #hm-card .hm-btn{background:transparent;border:none;color:var(--sub);font-family:inherit;font-size:12.5px;
   padding:7px 14px;cursor:pointer;transition:background .15s,color .15s}
 #hm-card .hm-btn:hover{color:var(--text)}
-#hm-card .hm-btn.active{background:linear-gradient(135deg,#FF9A3D 0%,#F2701D 100%);color:#fff;font-weight:600}
+#hm-card .hm-btn.active{background:var(--accent);color:var(--accent-ink);font-weight:600}
 #hm-card .hm-hint{font-size:12px;color:var(--faint)}
 #hm-card .hm-chart{width:100%;height:640px}
 #hm-card .hm-legend{display:inline-flex;align-items:center;gap:5px;margin-left:12px;color:var(--faint);font-size:11px}
@@ -72,7 +72,7 @@ KXMM_VIEW_HTML = """
 <div class="view active" id="view-kxmm">
 
 <div class="card" id="kxmm-fg">
-  <h2>😨 恐贪指数 <span class="badge badge-auto">数据源：kxmm.online（开心檬檬）</span></h2>
+  <h2>恐贪指数 <span class="badge badge-auto">数据源：kxmm.online（开心檬檬）</span></h2>
   <div class="sub" id="kxmm-fg-meta">加载中…</div>
   <div class="kx-badges" id="kxmm-badges"></div>
 
@@ -108,7 +108,7 @@ KXMM_VIEW_HTML = """
 </div>
 
 <div class="card" id="kxmm-heat">
-  <h2>🔥 市场热力图 <span class="badge badge-auto">矩形树图 · 面积/颜色可切换</span></h2>
+  <h2>市场热力图 <span class="badge badge-auto">矩形树图 · 面积/颜色可切换</span></h2>
   <div class="sub" id="kxmm-heat-meta">加载中…</div>
   <div class="kx-heat-ctrl">
     <span class="kx-tabs" id="kxmm-tabs">
