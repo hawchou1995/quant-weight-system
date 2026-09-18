@@ -27,7 +27,7 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
   border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;
   gap:10px;padding:0 16px;flex-wrap:nowrap}
 body{padding-top:56px}
-.topbar .logo{color:#fff}
+.topbar .logo{color:#fff;flex:none;white-space:nowrap}
 .topbar .tb-btn{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);color:#fff}
 .topbar .tb-btn:hover{background:rgba(255,255,255,.18)}
 .topbar .community{background:rgba(255,255,255,.10);color:#fff}
@@ -46,8 +46,13 @@ body{padding-top:56px}
 
 /* ---------- 左侧宽侧边栏（图标+文字） ---------- */
 /* 横 tab 组（已并入 .topbar，2026-09-18）：透明内联，不再是独立一栏 */
-.sidenav{position:static;flex:1;min-width:0;display:flex;flex-direction:row;
-  align-items:center;gap:2px;overflow-x:auto;overflow-y:visible;padding:0;background:transparent}
+.sidenav{position:static;flex:0 1 auto;min-width:0;display:flex;flex-direction:row;
+  align-items:center;gap:2px;overflow:visible;padding:0;background:transparent}
+.sn-foot-slot{display:flex;align-items:center;gap:4px;flex:none}
+.sn-foot-slot a{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;
+  color:rgba(255,255,255,.72);text-decoration:none;font-size:12.5px;white-space:nowrap;transition:all .15s}
+.sn-foot-slot a:hover{background:rgba(255,255,255,.10);color:#fff}
+.sn-foot-slot a .ic{font-size:14px}
 .sidenav .sn-logo{font-size:14px;font-weight:700;padding:0 16px 0 0;margin-right:8px;display:flex;align-items:center;gap:8px;color:#fff;
   border-right:1px solid rgba(255,255,255,.16);height:22px}
 .sidenav .sn-logo .dot{width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,#f59e0b,#ef4444);display:inline-block}
@@ -65,7 +70,7 @@ body{padding-top:56px}
 .sidenav .sn-sub a .dot-sub{width:4px;height:4px;border-radius:50%;background:var(--line);flex:none}
 .sidenav .sn-sub a:hover{color:var(--text);background:var(--card2)}
 .sidenav .sn-sub a.active{color:var(--accent);font-weight:600;background:rgba(245,158,11,.08)}
-.sidenav .sn-foot{margin-top:0;margin-left:auto;display:flex;flex-direction:row;align-items:center;gap:8px}
+.sidenav .sn-foot{display:none}   /* foot 已移到 .sn-foot-slot（2026-09-18） */
 /* 开市/休市五态徽章（用户决策 4） */
 .mkt-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;
   padding:4px 11px;border-radius:20px;border:1px solid transparent;white-space:nowrap}
@@ -169,6 +174,7 @@ NAV_HTML = """
 <div class="topbar">
   <div class="logo" onclick="location.hash='#overview'"><span class="dot"></span>量化权重监控</div>
   <div class="sidenav" id="sidenav"></div>
+  <span class="sn-foot-slot" id="sn-foot-slot"></span>
   <div class="spacer"></div>
   <button class="tb-btn" id="theme-btn" onclick="toggleTheme()">🌙 夜间</button>
   <a class="community" href="https://qingju.me/" target="_blank" rel="noopener">💬 青橘社区</a>
@@ -217,7 +223,7 @@ function tickClock(){var b=document.querySelector('.mkt-badge');if(!b)return;
   b.className=nb.className;b.innerHTML=nb.innerHTML;b.title=nb.title;}
 setInterval(tickClock,1000);
 function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)return;
-  var html='<div class="sn-logo"><span class="dot"></span><span class="txt">量化权重监控</span></div><div class="sn-sep"></div>';
+  var html='';   /* 品牌名与分隔符：横栏已有 .topbar .logo，此处不再重复（2026-09-18） */
   window.ENH.nav.forEach(function(it){
     var subs=it[3];
     var hasSubs=subs&&subs.length;
@@ -232,13 +238,12 @@ function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)retu
       html+='<div class="sn-sub">';
       subs.forEach(function(s){html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'" data-sub="'+s[0]+'" data-view="'+(s[2]||it[0])+'"><span class="dot-sub"></span><span class="lbl">'+s[1]+'</span></a>';});
       html+='</div>';}});
-  html+='<div class="sn-sep"></div><div class="sn-foot">'+
-    '<a href="javascript:void(0)" data-anchor="review"><span class="ic">📋</span><span class="lbl">复盘日志</span></a>'+
-    '<a href="javascript:void(0)" data-anchor="changelog"><span class="ic">📝</span><span class="lbl">更新日志</span></a>'+
-    '<a href="https://qingju.me/" target="_blank" rel="noopener"><span class="ic">💬</span><span class="lbl">青橘社区</span></a></div>';
+  var _foot='<a href="javascript:void(0)" data-anchor="review"><span class="ic">📋</span>复盘日志</a>'+
+    '<a href="javascript:void(0)" data-anchor="changelog"><span class="ic">📝</span>更新日志</a>'+
+    '';   /* 青橘社区：横栏已有 .community 链接，foot 不重复 */
   nav.innerHTML=html;
-  var _ft=nav.querySelector('.sn-foot');
-  if(_ft)_ft.insertAdjacentHTML('afterbegin', mktBadgeHtml());
+  var _slot=document.getElementById('sn-foot-slot');
+  if(_slot)_slot.innerHTML=mktBadgeHtml()+_foot;
   document.body.classList.add('sidenav-open');
   nav.querySelectorAll('a[data-anchor]').forEach(function(a){
     a.addEventListener('click',function(e){
