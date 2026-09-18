@@ -34,6 +34,11 @@ STEPS = [
     # 数据（涨停全景/A5 扫描）失真。本步查 data_full 新鲜度，陈旧 >100 只自动触发全量补数（约 1-2h）。
     # [软]=失败不阻断主链；--skip-fullguard 跳过。
     ("全量池守卫 fullpool_guard[软]", ["backtest/fullpool_guard.py"], "--skip-fullguard" in sys.argv),
+    # 东财全市场批量补齐（R-em-bulk-0918 · 用户 2026-09-18 批准）：A股(5560只/11s) → ETF/LOF(1751只/3s)
+    # → 单只端点兜底。全部幂等（只补「本地末行 < 交易日」），正常日待补 0；三源同时滞后时是唯一
+    # 能十几秒补齐全市场的通道。实测：A股 4191 只、ETF 704 只、残余 26 只一次补全。
+    # [软]=失败不阻断主链；--skip-embulk 跳过。
+    ("东财批量补齐 em_bulk[软]", ["backtest/em_bulk_all.py"], "--skip-embulk" in sys.argv),
     # 估值日更（2026-09-17 建，R-valfreeze-0917）：根因=旧管道只写 4 列快照、从不扩展 val_em 主表
     # → 主表冻结 → factorlab/oss 面板冻结 → 生产轨B 目标清单冻结（asof 谎报）。[软]=失败不阻断。
     ("估值日更 fetch_val_em_daily[软]", ["fetch_val_em_daily.py"], "--skip-val" in sys.argv),
