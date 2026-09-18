@@ -18,6 +18,99 @@ from ui_components import THEME_CSS, NAV_HTML, COMMON_JS
 from kxmm_card import KXMM_CSS, KXMM_VIEW_HTML, KXMM_JS
 
 
+def _crowding():
+    """大盘拥挤度（代理口径 · 2026-09-18 用户需求 #11）。
+
+    三成分全部来自已有产物（不新建数据依赖）：
+      量能分位 45% — 沪深300 成交量 20 日分位（index_000300.csv volume 列）
+      趋势乖离 35% — 沪深300 收盘相对 MA20 乖离，±5% 映射 0~100
+      情绪温度 20% — kxmm 恐贪指数（kxmm_data.js fear_greed.base.num）
+    定位：风险提示，不是买卖信号。
+    """
+    import csv as _csv
+    out = {"score": None, "vol_pct": None, "bias": None, "fg": None, "n": 0}
+    try:
+        rows = []
+        with open(BASE / "index_000300.csv", encoding="utf-8") as fh:
+            for r in _csv.DictReader(fh):
+                rows.append(r)
+        rows = [r for r in rows if r.get("close")][-40:]
+        out["n"] = len(rows)
+        if len(rows) >= 25:
+            vols = [float(r["volume"]) for r in rows[-20:]]
+            hist = [float(r["volume"]) for r in rows]
+            cur = vols[-1]
+            out["vol_pct"] = round(sum(1 for v in hist if v <= cur) / len(hist) * 100, 1)
+            closes = [float(r["close"]) for r in rows]
+            ma20 = sum(closes[-20:]) / 20
+            bias = (closes[-1] / ma20 - 1) * 100
+            out["bias"] = round(bias, 2)
+            out["bias_pct"] = round(max(0.0, min(100.0, (bias + 5) / 10 * 100)), 1)
+    except Exception:
+        pass
+    try:
+        _t = (BASE / "kxmm_data.js").read_text(encoding="utf-8")
+        _j = json.loads(_t[_t.find("{"):_t.rfind("}") + 1])
+        _fg = (_j.get("fear_greed") or {}).get("base") or {}
+        out["fg"] = _fg.get("num")
+        out["fg_txt"] = _fg.get("status_str")
+    except Exception:
+        pass
+    try:
+        if out["vol_pct"] is not None and out["bias_pct"] is not None:
+            fg = out["fg"] if isinstance(out["fg"], (int, float)) else 50
+            out["score"] = round(out["vol_pct"] * 0.45 + out["bias_pct"] * 0.35 + fg * 0.20, 1)
+    except Exception:
+        pass
+    return out
+
+
+_CROWD = _crowding()
+
+
+def _crowd_card():
+    """拥挤度卡 HTML（注入市场晴雨视图）。数据缺失时降级显示，不抛错。"""
+    c = _CROWD
+    if c.get("score") is None:
+        return ('<div class="card" id="crowd-card"><h2>大盘拥挤度 <span class="badge badge-auto">数据不足</span></h2>'
+                '<div class="sub">需要 ≥25 个交易日的 index_000300 记录；当前样本 '
+                + str(c.get("n", 0)) + ' 条。</div></div>')
+    s = c["score"]
+    if s >= 80:
+        lab, col, hint = "极度拥挤", "#ef4444", "量能与情绪同时亢奋，历史上此区间后波动放大"
+    elif s >= 65:
+        lab, col, hint = "偏拥挤", "#f59e0b", "成交活跃度高，注意追高风险"
+    elif s >= 40:
+        lab, col, hint = "中性", "#3b82f6", "量能与估值偏离均处常态区间"
+    elif s >= 25:
+        lab, col, hint = "偏冷清", "#10b981", "量能萎缩，留意流动性"
+    else:
+        lab, col, hint = "极度冷清", "#10b981", "成交与情绪双低，历史上多为底部区域特征"
+    return (
+        '<div class="card" id="crowd-card">'
+        '<h2>大盘拥挤度 <span class="badge badge-auto" style="background:' + col + '22;color:' + col + '">'
+        + lab + '</span></h2>'
+        '<div class="sub">代理口径（非买卖信号）：<b>量能分位</b> 45%（沪深300 成交量 20 日分位）+ '
+        '<b>趋势乖离</b> 35%（收盘 vs MA20，±5% 映射）+ <b>情绪温度</b> 20%（恐贪指数）</div>'
+        '<div class="kpis">'
+        '<div class="kpi"><div class="l">拥挤度</div><div class="v" style="color:' + col + '">'
+        + f'{s:.1f}' + '</div><div class="s">0~100 · 越高越拥挤</div></div>'
+        '<div class="kpi"><div class="l">量能分位</div><div class="v">' + f'{c["vol_pct"]:.1f}' + '</div>'
+        '<div class="s">沪深300 成交量 20 日分位</div></div>'
+        '<div class="kpi"><div class="l">趋势乖离</div><div class="v">' + f'{c["bias"]:+.2f}%' + '</div>'
+        '<div class="s">收盘 vs MA20</div></div>'
+        '<div class="kpi"><div class="l">情绪温度</div><div class="v">' + str(c.get("fg") if c.get("fg") is not None else "—")
+        + '</div><div class="s">恐贪指数 · ' + str(c.get("fg_txt") or "—") + '</div></div>'
+        '</div>'
+        '<div class="sub" style="color:var(--faint)">' + hint + ' · 样本 ' + str(c["n"]) + ' 个交易日'
+        '（index_000300）｜ 仅客观展示，不构成交易信号</div>'
+        '</div>'
+    )
+
+
+_CROWD_CARD = _crowd_card()
+
+
 def _mkt_status():
     """开市/休市徽章（2026-09-18 用户决策 4）：构建期判定今日是否交易日。
     tradeDay = index_000300.csv 末行（最近交易日）；isTradingDay = 该末行 == 今日。
@@ -2050,7 +2143,7 @@ html = f"""<!doctype html>
 <!-- ============ 视图 D：打板族（双池滤网 v1.3 · 第三个系统，池A 超跌/池B 趋势 + 生产预筛模拟盘） ============ -->
 {a5_view_html()}
 
-{KXMM_VIEW_HTML}
+{KXMM_VIEW_HTML.replace("<!--KXMM_EXTRA-->", _CROWD_CARD)}
 
 <!-- ============ 视图 E：复盘日志（内嵌，与各池同形态） ============ -->
 <div class="view" id="view-review">

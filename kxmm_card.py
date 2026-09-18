@@ -146,6 +146,7 @@ KXMM_VIEW_HTML = """
 <div class="sub" id="hm-note" style="color:var(--faint)"></div>
 </div>
 
+<!--KXMM_EXTRA-->
 </div>
 """
 
