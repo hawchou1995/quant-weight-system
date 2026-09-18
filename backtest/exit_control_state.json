@@ -44,7 +44,7 @@
   },
   "track_b": {
    "init_cash": 0.0,
-   "cash": -52841.30000000001,
+   "cash": -59123.83000000001,
    "held": {
     "001256": {
      "shares": 100.0,
@@ -117,13 +117,17 @@
     "603035": {
      "shares": 300.0,
      "cost": 10.22
+    },
+    "sh518880": {
+     "shares": 700.0,
+     "cost": 8.968
     }
    },
    "skipped_pct40": 0,
    "armed": true
   }
  },
- "last_fill_idx": 26,
+ "last_fill_idx": 27,
  "nav": [
   {
    "date": "2026-09-16",
@@ -187,6 +191,22 @@
    "control": 836.7,
    "paper": null,
    "n_held": 18,
+   "skipped_pct40": 0
+  },
+  {
+   "date": "2026-09-18",
+   "track": "track_a",
+   "control": -56.03,
+   "paper": null,
+   "n_held": 8,
+   "skipped_pct40": 0
+  },
+  {
+   "date": "2026-09-18",
+   "track": "track_b",
+   "control": 1086.17,
+   "paper": null,
+   "n_held": 19,
    "skipped_pct40": 0
   }
  ]
