@@ -624,7 +624,7 @@ def cards_html_for(items):
 {f'<p class="meta" style="color:#94a3b8">⚠ 低于入池门槛 {d.get("entry_min") or 65} 分（软标记 · 不改变交易语义）</p>' if d.get("below_entry") else ""}
 <p class="meta">六类：趋势 {comp.get("trend",0):.0f}｜动能 {comp.get("momentum",0):.0f}｜量能 {comp.get("volume",0):.0f}｜超买 {comp.get("osc",0):.0f}｜风控 {comp.get("risk",0):.0f}｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">{d.get("biz", "—")}</p>
-</div>{bt_short_html()}
+</div>
 </div>'''
     return cards
 
@@ -1198,6 +1198,7 @@ def a5_view_html():
 {gate_bar}
 </div>
 {zp_html}
+<div class="pool-sec"><b>选股结果</b><span>双池滤网 v1.3 · 观察清单</span></div>
 <div class="card" id="a5-watchlist">
 <h2>📋 观察清单 <span class="badge badge-auto">{len(wl)} 只</span></h2>
 <div class="sub">今日首板 · 双池至少命中其一（池A 超跌 / 池B 趋势）· 明日低开 2-5% 则入场 · 当日涨跌幅为实时数据，近一年/RSI/量比/MA5偏离为收盘口径</div>
@@ -1208,6 +1209,7 @@ def a5_view_html():
 <div class="sub">今日满足 A2_tp3 信号（首板次日低开 2-6% + 相对位置≤0.7 + 成交额≥5000万）· 回测胜率 63.1% 但单笔均值 -1.39%（盈亏比 0.29）→ <b>信号出现时回避或减仓，不追高</b></div>
 {_a5_tbl_full("a5-av", [("name","标的"),("board","板块"),("ind","行业"),("sbdate","首板日"),("gap","今日低开"),("relpos","相对位置"),("amt","成交额(万)"),("chg","当日涨跌"),("ret1y","近一年"),("rsi","RSI"),("vr","量比"),("ma5dev","MA5偏离")], av_rows, "（无）")}
 </div>
+<div class="pool-sec"><b>模拟盘</b><span>双池 v1.3 · 持仓与净值</span></div>
 <div class="card" id="a5-positions">
 <h2>💼 模拟盘持仓 <span class="badge badge-auto">{len(pos)} 只</span></h2>
 <div class="sub">入场 = 开盘价低开确认 · 出场 T+1/T+2 冲高≥入场×1.08 止盈，否则收盘卖；涨停顺延/强平</div>
@@ -1222,6 +1224,7 @@ def a5_view_html():
 <h2>📈 模拟盘净值曲线 <span class="badge badge-auto">已平仓复利</span></h2>
 <div class="sub">回测（v1.3 修正口径）：线上基底 5 槽位组合 +18.9%/回撤 −35.4%；双池并集 +39.7%/回撤 −8.7%（近似模拟）。净值曲线验证的是边缘是否存在而非盈利，小仓位实验形态</div>
 {curve_html}
+<div class="pool-sec"><b>回测数据</b><span>打板双池</span></div>
 {bt_a5_html()}
 </div>
 </div>'''
@@ -1834,6 +1837,7 @@ KH_HITS_CARD = f'''<div class="card" id="card-kh-hits">
 </div>'''
 
 SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
+<div class="pool-sec"><b>选股结果</b><span>股票线 · 全量池短线</span></div>
 {system_block(
   "view-short-stk", "sys-short-stk",
   "⚡ 短线 · 股票池", "auto", "主板 KHunter 主信号 · A59 主卖出 / C50 参考 · 低价≥3元",
@@ -1847,8 +1851,10 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
   as_of=SHORT_POOL_ASOF, intraday_note=SHORT_POOL_INTRADAY,
   as_of_min=SHORT_POOL.get("intraday_ts") or SHORT_POOL_ASOF_MIN,
   tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=(), inline=True)}
+<div class="pool-sec"><b>选股结果</b><span>股票线 · KHunter 命中策略</span></div>
 {KH_HITS_CARD}
 {ETF_PAPER_CARD}
+<div class="pool-sec"><b>模拟盘</b><span>股票线 · KHunter / ETF</span></div>
 {KH_PAPER_CARD}
 {system_block(
   "view-short-fund", "sys-short-fund",
@@ -1863,6 +1869,8 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
   as_of_min="20:00",
   tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=(), inline=True)}
 {WATCH_CARD}
+<div class="pool-sec"><b>回测数据</b><span>短线池</span></div>
+{bt_short_html()}
 </div>'''
 
 html = f"""<!doctype html>
@@ -1955,6 +1963,11 @@ html = f"""<!doctype html>
 .op-add{{color:var(--up)}}
 .op-watch{{color:#d97706}}
 .op-cut{{color:var(--down)}}
+/* 子池分节标题（R-poolsec-0918 · 用户需求 #6） */
+.pool-sec{{display:flex;align-items:baseline;gap:10px;margin:26px 2px 10px;padding-bottom:8px;
+  border-bottom:1px solid var(--border)}}
+.pool-sec b{{font-size:14.5px;font-weight:700;color:var(--text)}}
+.pool-sec span{{font-size:12px;color:var(--faint)}}
 /* 逐标的详情卡片（模板风格 · 等高适配） */
 .stock-cards{{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px}}
 .stock-card{{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:stretch}}
@@ -2011,14 +2024,19 @@ html = f"""<!doctype html>
 </div>
 </div>
 </div>
+<div class="pool-sec"><b>选股结果</b><span>股票线 · SUPER 卫星</span></div>
 {SAT_CARD}
+<div class="pool-sec"><b>模拟盘</b><span>股票线 · 轨B + 黄金 + ret20 臂</span></div>
 {SAT_PAPER_B_CARD}
 {GOLD_SAT_CARD}
 {RET20_PAPER_CARD}
 {SHADOW_RET20_CARD}
+<div class="pool-sec"><b>选股结果</b><span>基金线 · FB3-H20</span></div>
 {FB3_POOL_CARD}
+<div class="pool-sec"><b>模拟盘</b><span>基金线 · FB3 主仓</span></div>
 {FUND_PAPER_CARD}
 <div class="card" id="v9-retired-card" data-removed="1" style="display:none"><h2>🗂️ v9 全量池（已退役）</h2><div class="sub" style="color:#ef4444">⛔ v9 股票分层战法与 197 只跟踪池已于 2026-09-13 退役并移除展示——十重证伪确认负期望（ADR-0006/0007）。历史回测明细见「📝 更新日志」v5.9~v5.11.15 与 <code>backtest/</code> 报告存档。</div><div class="sub"><b>双轨退出规则</b>：① 主仓 FB3-H20 = 20 交易日月度轮动 + 牛熊 regime 切换（沪深300&lt;MA200 转 Top3 低波防守仓）——<b>无个股止盈止损</b>（基金 NAV 无涨跌停，止盈变体回测全部减值）；② SUPER = 月频调仓 + 中证1000&lt;MA20 组合半仓闸（且关闸期取高波半区）+ <b>pct40 因子化出场已启用（跌出前40%分位 → T+1 开盘卖，留现金至下一调仓）</b>。</div></div>
+<div class="pool-sec"><b>回测数据</b><span>中长线三轨</span></div>
 {bt_all_html()}
 <div class="card" id="lt-rule"><h2>选股指标逻辑</h2>
 <div class="rule-box" style="margin-bottom:0"><b>监控口径</b>：权重分 = 动量30% + 趋势35% + Aroon20% + 量价15%（2026-09-08 投产 V5）｜ 档位 = ≥75 满仓加仓 / ≥60 轻仓加仓 / ≥45 观望 / ≥30 减半 / &lt;30 清仓
