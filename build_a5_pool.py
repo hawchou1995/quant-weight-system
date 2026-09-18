@@ -241,7 +241,8 @@ def build():
         "equity": state.get("equity", []),
         # 今日涨停全景（2026-09-05 用户需求：≥9.5%/封板一览 + A5 命中标记，纯观察）
         "zt_panorama": state.get("zt_panorama", {"date": None, "stocks": []}),
-        # 盘中 patch 标记（2026-08-28）：update_intraday_dashboard.py 盘中重写 a5_pool.js 时置 intraday=True
+        # 盘中标记：旧 update_intraday_dashboard.py（2026-09-18 退役）曾置 True；
+        # 现由客户端实时层（intraday_live.py）直接覆盖页面价格，该字段保留但恒为 False
         "intraday": False,
     }
     with open(os.path.join(BASE, "a5_pool.js"), "w", encoding="utf-8") as f:

@@ -1,3 +1,15 @@
+## v5.13.8 - 2026-09-18（退役旧盘中链：服务端 patch + 重建 + 部署路线）
+
+用户拍板退役。**退役前先摸清引用面**（这一步比删文件重要）：无 Windows 计划任务调用、`daily_refresh.py` 无引用、`intraday_quotes_*.json` 仅被它消费、`行情监控/`+`monitor/` 是另一套子系统（读 `raw_kline`，与本链无关）。
+
+**删除（git rm，历史可回溯）**
+- `update_intraday_dashboard.py` —— 9:30/14:30 拉快照 → patch `enhanced_data.js`/`short_pool.js`/`a5_pool.js` → 重建整页 → gh-pages 部署
+- `build_intraday_0821.py` / `_build_intraday_quotes_0819.py` —— 该链的一次性产物生成器（日期写死、不可复用）
+- `intraday_quotes_*.json` ×9（跟踪部分）；未跟踪的 11 份陈旧快照 + `_tmp_0909_quotes.py` 先备份到 `D:/Tools/_retired_intraday_0918/` 再删（可回退）
+
+**替代**：客户端实时层（v5.13.7）—— 页面打开即拉行情，覆盖面更大（选股池价格/涨跌幅 + 树图全市场），且零部署、不依赖本机常开
+**保留**：`行情监控/` 与 `monitor/`（独立子系统的分时数据，与本链无关）；`build_a5_pool.py` 的 `intraday` 字段机制保留（数据驱动，无人设置时恒为 False，注释已同步）
+
 ## v5.13.7 - 2026-09-18（盘中实时数据层：#4b 热力树图盘中实时 + 选股池涨跌幅盘中更新）
 
 **做法**：纯浏览器端实时层（新模块 `intraday_live.py` → 构建期注入 `{INTRADAY_JS}`）。页面打开后由浏览器直连行情源，**不依赖本机常开、不需要盘中定时重建/部署**（对比原 `update_intraday_dashboard.py` 路线：每次刷新要重建整页 + 一个 gh-pages 提交）。

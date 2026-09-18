@@ -78,6 +78,14 @@ async def main():
     ws = G.page_ws(G.AUTO_PORT)
     await G.navigate(ws, URL)
     await asyncio.sleep(5)
+    # 等首屏实时层拉完（树图 56 请求）—— 否则输入事件排队会让 hover 判定抖动
+    for _ in range(20):
+        try:
+            if json.loads(await G.ev(ws, 'JSON.stringify(!!(window.INTRADAY&&INTRADAY.state.lastTree))')) :
+                break
+        except Exception:
+            pass
+        await asyncio.sleep(1)
     d = json.loads(await G.ev(ws, MEASURE))
     print("\n=== 渲染态（真实 Chrome 计算样式）===")
     print("  顶栏:", d.get("topbar"), "| body:", d.get("body"))
@@ -116,7 +124,7 @@ async def main():
     async with websockets.connect(ws, max_size=64 * 1024 * 1024, open_timeout=15) as c:
         await c.send(json.dumps({"id": 91, "method": "Input.dispatchMouseEvent",
                                  "params": {"type": "mouseMoved", "x": b["x"], "y": b["y"], "buttons": 0}}))
-        await asyncio.sleep(1)
+        await asyncio.sleep(2.5)
     after = json.loads(await G.ev(ws, """JSON.stringify((function(){
       var s=document.querySelectorAll('#sidenav .sn-grp')[1].querySelector('.sn-sub');
       var r=s.getBoundingClientRect(); var c=getComputedStyle(s);
@@ -129,8 +137,8 @@ async def main():
     # ---- 移开后收起 ----
     async with websockets.connect(ws, max_size=64 * 1024 * 1024, open_timeout=15) as c:
         await c.send(json.dumps({"id": 92, "method": "Input.dispatchMouseEvent",
-                                 "params": {"type": "mouseMoved", "x": 960, "y": 700, "buttons": 0}}))
-        await asyncio.sleep(1)
+                                 "params": {"type": "mouseMoved", "x": 960, "y": 900, "buttons": 0}}))
+        await asyncio.sleep(2.5)
     off = json.loads(await G.ev(ws, """JSON.stringify({d:getComputedStyle(document.querySelectorAll('#sidenav .sn-grp')[1].querySelector('.sn-sub')).display})"""))
     ck("移开后自动收起", off.get("d") == "none", str(off))
 

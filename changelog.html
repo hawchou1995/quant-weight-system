@@ -216,7 +216,19 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <h2 style="margin:0">📝 更新日志 <span class="badge badge-auto">GitHub Release 风格</span></h2>
 </div>
 <div class="sub">量化系统版本更新记录：复盘发现设计缺陷 → 启动系统更新 → 在此登记版本/日期/更新内容</div>
-<div class="rel"><div class="rel-head">v5.13.7 - 2026-09-18（盘中实时数据层：#4b 热力树图盘中实时 + 选股池涨跌幅盘中更新）</div><div class="rel-body">
+<div class="rel"><div class="rel-head">v5.13.8 - 2026-09-18（退役旧盘中链：服务端 patch + 重建 + 部署路线）</div><div class="rel-body">
+
+<p>用户拍板退役。<b>退役前先摸清引用面</b>（这一步比删文件重要）：无 Windows 计划任务调用、<code>daily_refresh.py</code> 无引用、<code>intraday_quotes_*.json</code> 仅被它消费、<code>行情监控/</code>+<code>monitor/</code> 是另一套子系统（读 <code>raw_kline</code>，与本链无关）。</p>
+
+<p><b>删除（git rm，历史可回溯）</b></p>
+<div class='lg-item'><code>update_intraday_dashboard.py</code> —— 9:30/14:30 拉快照 → patch <code>enhanced_data.js</code>/<code>short_pool.js</code>/<code>a5_pool.js</code> → 重建整页 → gh-pages 部署</div>
+<div class='lg-item'><code>build_intraday_0821.py</code> / <code>_build_intraday_quotes_0819.py</code> —— 该链的一次性产物生成器（日期写死、不可复用）</div>
+<div class='lg-item'><code>intraday_quotes_*.json</code> ×9（跟踪部分）；未跟踪的 11 份陈旧快照 + <code>_tmp_0909_quotes.py</code> 先备份到 <code>D:/Tools/_retired_intraday_0918/</code> 再删（可回退）</div>
+
+<p><b>替代</b>：客户端实时层（v5.13.7）—— 页面打开即拉行情，覆盖面更大（选股池价格/涨跌幅 + 树图全市场），且零部署、不依赖本机常开</p>
+<p><b>保留</b>：<code>行情监控/</code> 与 <code>monitor/</code>（独立子系统的分时数据，与本链无关）；<code>build_a5_pool.py</code> 的 <code>intraday</code> 字段机制保留（数据驱动，无人设置时恒为 False，注释已同步）</p>
+
+</div></div><div class="rel"><div class="rel-head">v5.13.7 - 2026-09-18（盘中实时数据层：#4b 热力树图盘中实时 + 选股池涨跌幅盘中更新）</div><div class="rel-body">
 
 <p><b>做法</b>：纯浏览器端实时层（新模块 <code>intraday_live.py</code> → 构建期注入 <code>{INTRADAY_JS}</code>）。页面打开后由浏览器直连行情源，<b>不依赖本机常开、不需要盘中定时重建/部署</b>（对比原 <code>update_intraday_dashboard.py</code> 路线：每次刷新要重建整页 + 一个 gh-pages 提交）。</p>
 

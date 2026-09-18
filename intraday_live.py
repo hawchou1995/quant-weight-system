@@ -156,11 +156,15 @@ INTRADAY_JS = r"""
   }
 
   /* ---------- DOM：找可更新的单元格 ---------- */
-  function targets(){
-    var out = [], tbs = document.querySelectorAll('table.tbl');
+  /* 单一扫描出口：targets=可刷单元格；tables=逐表诊断信息（供覆盖率/排错脚本读取，
+     避免诊断脚本自己复制一份判据 —— 那是本会话踩过两次的坑） */
+  function scan(){
+    var out = [], info = [], tbs = document.querySelectorAll('table.tbl');
     for (var i = 0; i < tbs.length; i++) {
       var tb = tbs[i], ths = tb.querySelectorAll('thead th');
       if (!ths.length) continue;
+      var tid = tb.id || tb.getAttribute('data-t') || '(无id)';
+      var nRows = tb.querySelectorAll('tbody tr').length;
       var pxI = -1, pcI = -1;
       for (var j = 0; j < ths.length; j++) {
         var th = ths[j], k = (th.getAttribute('data-key') || '').toLowerCase();
@@ -168,13 +172,20 @@ INTRADAY_JS = r"""
         if (pxI < 0 && (CFG.KEY_PX.indexOf(k) >= 0 || CFG.PX_HDR.indexOf(tx) >= 0)) pxI = j;
         if (pcI < 0 && (CFG.KEY_PCT.indexOf(k) >= 0 || CFG.PCT_HDR.indexOf(tx) >= 0)) pcI = j;
       }
-      if (pxI < 0 && pcI < 0) continue;
-      /* 组合估值表（模拟盘持仓等）：行内有 浮盈/权重/净值 等由价格派生的列 ——
-         只把价格换成实时会让同一行自相矛盾，故整表跳过（保持收盘口径一致） */
+      if (pxI < 0 && pcI < 0) { info.push({id: tid, rows: nRows, elig: 0, live: 0, skip: '无价格/涨跌列'}); continue; }
+      /* 组合估值表：行内有由价格派生的 浮盈/盈亏/市值/净值 列 → 只把价格换实时会让同一行自相矛盾，整表跳过。
+         注意「权重」要限定条件：权重总分 / 权重分 是评分（不是持仓权重），短线选股池正是这种 —— 
+         故仅在「无涨跌幅列」时才把 权重 视为估值列（模拟盘持仓表就是这种）。 */
       var hdrAll = '';
       for (var z = 0; z < ths.length; z++) hdrAll += (ths[z].textContent || '');
-      if (/浮盈|盈亏|权重|净值|市值/.test(hdrAll)) continue;
+      if (/浮盈|盈亏|市值|净值/.test(hdrAll)) {
+        info.push({id: tid, rows: nRows, elig: 0, live: 0, skip: '估值表(浮盈/盈亏/市值/净值)'}); continue;
+      }
+      if (pcI < 0 && /权重/.test(hdrAll)) {
+        info.push({id: tid, rows: nRows, elig: 0, live: 0, skip: '估值表(权重列且无涨跌幅列)'}); continue;
+      }
       var trs = tb.querySelectorAll('tbody tr');
+      var nElig = 0;
       for (var r = 0; r < trs.length; r++) {
         var tr = trs[r];
         if (tr.getAttribute('data-market') === '基金') continue;      /* 场外基金：净值 T-1，无盘中 */
@@ -199,10 +210,13 @@ INTRADAY_JS = r"""
         out.push({tr: tr, tb: tb, code: code, name: name,
                   px: pxI >= 0 && tds[pxI] ? tds[pxI] : null,
                   pct: pcI >= 0 && tds[pcI] ? tds[pcI] : null});
+        nElig++;
       }
+      info.push({id: tid, rows: nRows, elig: nElig, live: tb.querySelectorAll('td.live-cell').length, skip: nElig ? '' : '行内无代码'});
     }
-    return out;
+    return {targets: out, tables: info};
   }
+  function targets(){ return scan().targets; }
 
   function setPx(td, v, ts){
     if (!td) return;
@@ -386,7 +400,8 @@ INTRADAY_JS = r"""
       }, 600);
     });
   });
-  window.INTRADAY = {refresh: refresh, applyQuotes: applyQuotes, targets: targets, state: S, __fetchPool: fetchPool,
+  window.INTRADAY = {refresh: refresh, applyQuotes: applyQuotes, targets: targets, state: S,
+                     __scan: scan, __fetchPool: fetchPool,
                      setOn: setOn, cfg: CFG};
 })();
 """
