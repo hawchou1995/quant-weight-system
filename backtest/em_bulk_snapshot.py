@@ -43,7 +43,7 @@ FIELDS = "f2,f3,f5,f6,f12,f13,f14,f15,f16,f17,f18"
 # 沪深主板/创业板/科创板 + 北交所
 FS = "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048"
 # ETF/基金通道（--etf）：实测 1614 只（沪 902 / 深 712），单位同为 ×100（892 样本 vol/f5 恒 100.00）
-FS_ETF = "b:MK0021,b:MK0022,b:MK0023,b:MK0024"
+FS_ETF = "b:MK0021,b:MK0022,b:MK0023,b:MK0024,b:MK0025,b:MK0026"   # +LOF/封闭基金（实测 MK0025 命中 160916）
 HDR = ["date", "open", "high", "low", "close", "volume", "amount"]
 MISMATCH_TOL = 0.02          # 单位/口径校验：允许 2% 不一致
 
