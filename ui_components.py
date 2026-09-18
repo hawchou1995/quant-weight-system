@@ -22,8 +22,15 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 .container{max-width:1560px;margin:0 auto;padding:0 24px 40px}
 
 /* ---------- 顶部导航 ---------- */
-.topbar{position:sticky;top:0;z-index:900;background:var(--nav-bg);border-bottom:1px solid var(--border);
-  box-shadow:var(--shadow);display:flex;align-items:center;gap:14px;padding:10px 22px;flex-wrap:wrap}
+/* 单条固定顶栏（2026-09-18 用户 #1/#2：原先品牌栏+横 tab 两条栏 → 合并；且必须 fixed 不随滚动走） */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;background:#1b2130;
+  border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;
+  gap:10px;padding:0 16px;flex-wrap:nowrap}
+body{padding-top:56px}
+.topbar .logo{color:#fff}
+.topbar .tb-btn{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);color:#fff}
+.topbar .tb-btn:hover{background:rgba(255,255,255,.18)}
+.topbar .community{background:rgba(255,255,255,.10);color:#fff}
 .topbar .logo{font-size:17px;font-weight:700;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
 .topbar .logo .dot{width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,#f59e0b,#ef4444);display:inline-block}
 .topbar .spacer{flex:1}
@@ -38,10 +45,9 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 .gh-link:hover{border-color:var(--accent);color:var(--accent)}
 
 /* ---------- 左侧宽侧边栏（图标+文字） ---------- */
-/* 顶部横导航（2026-09-18 · 用户决策「顶部横 tab」）：深色通栏 + 扁平 tab，仿 gushi 语言 */
-.sidenav{position:sticky;top:0;left:0;right:0;width:auto;height:54px;background:#1b2130;border-right:none;
-  border-bottom:1px solid var(--border);display:flex;flex-direction:row;align-items:center;gap:2px;
-  padding:0 16px;z-index:850;overflow:visible}
+/* 横 tab 组（已并入 .topbar，2026-09-18）：透明内联，不再是独立一栏 */
+.sidenav{position:static;flex:1;min-width:0;display:flex;flex-direction:row;
+  align-items:center;gap:2px;overflow-x:auto;overflow-y:visible;padding:0;background:transparent}
 .sidenav .sn-logo{font-size:14px;font-weight:700;padding:0 16px 0 0;margin-right:8px;display:flex;align-items:center;gap:8px;color:#fff;
   border-right:1px solid rgba(255,255,255,.16);height:22px}
 .sidenav .sn-logo .dot{width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,#f59e0b,#ef4444);display:inline-block}
@@ -162,12 +168,12 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 NAV_HTML = """
 <div class="topbar">
   <div class="logo" onclick="location.hash='#overview'"><span class="dot"></span>量化权重监控</div>
+  <div class="sidenav" id="sidenav"></div>
   <div class="spacer"></div>
   <button class="tb-btn" id="theme-btn" onclick="toggleTheme()">🌙 夜间</button>
   <a class="community" href="https://qingju.me/" target="_blank" rel="noopener">💬 青橘社区</a>
   <a class="gh-link" href="https://github.com/hawchou1995/quant-weight-system" target="_blank" rel="noopener" title="GitHub 开源项目（quant-weight-system）"><svg viewBox="0 0 16 16" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
 </div>
-<div class="sidenav" id="sidenav"></div>
 """
 
 SIDENAV_ITEMS = [
@@ -202,8 +208,14 @@ function mktBadgeHtml(){
     else if(hm<1500){cls='mkt-open';txt='开市中';}
     else{cls='mkt-rest';txt='已收盘';}
   }
-  return '<span class="mkt-badge '+cls+'" title="交易日 '+((s.tradeDay)||'—')+' · 本地时钟判定"><span class="d"></span>'+txt+'</span>';
+  return '<span class="mkt-badge '+cls+'" title="交易日 '+((s.tradeDay)||'—')+' · 本地时钟判定"><span class="d"></span>'+txt
+    +'<span class="clk" style="font-variant-numeric:tabular-nums;opacity:.85">'
+    +p(now.getHours())+':'+p(now.getMinutes())+':'+p(now.getSeconds())+'</span></span>';
 }
+function tickClock(){var b=document.querySelector('.mkt-badge');if(!b)return;
+  var h=mktBadgeHtml();var t=document.createElement('div');t.innerHTML=h;var nb=t.firstChild;
+  b.className=nb.className;b.innerHTML=nb.innerHTML;b.title=nb.title;}
+setInterval(tickClock,1000);
 function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)return;
   var html='<div class="sn-logo"><span class="dot"></span><span class="txt">量化权重监控</span></div><div class="sn-sep"></div>';
   window.ENH.nav.forEach(function(it){

@@ -439,8 +439,15 @@ KXMM_JS = r"""
       var col=(mColor&&mColor.t==='signed')? divergingColor(cv==null?0:cv, maxAbs) : seqColor(cv==null?0:cv, maxSeq);
       return {name:it.name, value:sv, raw:it, itemStyle:{color:col}};
     });
+    var _cs=getComputedStyle(document.documentElement);
+    var _cardC=(_cs.getPropertyValue('--card')||'#fff').trim();
+    var _bordC=(_cs.getPropertyValue('--border')||'#e5e7eb').trim();
+    var _textC=(_cs.getPropertyValue('--text')||'#111827').trim();
     charts.heat.setOption({
       tooltip:{
+        backgroundColor:_cardC, borderColor:_bordC, borderWidth:1,
+        textStyle:{color:_textC, fontSize:12},
+        extraCssText:'box-shadow:0 8px 26px rgba(0,0,0,.14);border-radius:10px;padding:10px 12px;line-height:1.6',
         formatter:function(p){
           var it=p.data.raw||{};
           var lines=['<b>'+it.name+'</b>'+(it.code?(' <span style="color:#94a3b8">'+it.code+'</span>'):'')];

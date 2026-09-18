@@ -1566,8 +1566,8 @@ try:
                 f'<tr><td><code>{r["code"]}</code></td><td>{r.get("name", "")}</td><td>{r.get("industry", "—")}</td>'
                 f'<td class="num">{_fnum(r.get("close"))}</td>'
                 f'<td class="num">{_fnum(r.get("lot"), 0)} 元</td><td class="num">{_fnum(r.get("amount"), 0)} 元</td>'
-                f'<td title="{r.get("detail", "")}"><b>{r.get("score_txt", "—")}</b>'
-                f'<div style="font-size:10.5px;color:#94a3b8;line-height:1.35;white-space:normal;max-width:190px">{r.get("parts", "")}</div></td>'
+                f'<td title="{r.get("detail", "")}"><b>{r.get("score_txt", "—")}</b></td>'
+                f'<td><div style="font-size:10.5px;color:#94a3b8;line-height:1.35;white-space:normal;max-width:190px" title="{r.get("detail", "")}">{r.get("parts", "")}</div></td>'
                 f'<td>{r.get("action", "—")}{" ⚠涨停勿追" if r.get("limit_guard") else ""}</td>'
                 f'<td class="num">{_fp(r.get("chg"))}</td><td class="num">{_fp(r.get("ret_1y"))}</td>')
             if _is_fund:
@@ -1586,7 +1586,7 @@ try:
 
         tds = "".join(_row(r) for r in tr["rows"])
         head = ("<th>代码</th><th>名称</th><th>行业</th><th>收盘</th><th>一手约</th><th>计划金额</th>"
-                "<th>评分 = 总分 + 子项</th><th>操作</th><th>涨跌幅</th><th>近1年</th>")
+                "<th>评分总分</th><th>子项评分</th><th>操作</th><th>涨跌幅</th><th>近1年</th>")
         if not _is_fund:
             head += "<th>RSI14</th><th>MACD柱</th><th>KDJ-J</th>"
         bt = tr["bt"]
