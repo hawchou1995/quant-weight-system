@@ -624,7 +624,8 @@ def cards_html_for(items):
 {f'<p class="meta" style="color:#94a3b8">⚠ 低于入池门槛 {d.get("entry_min") or 65} 分（软标记 · 不改变交易语义）</p>' if d.get("below_entry") else ""}
 <p class="meta">六类：趋势 {comp.get("trend",0):.0f}｜动能 {comp.get("momentum",0):.0f}｜量能 {comp.get("volume",0):.0f}｜超买 {comp.get("osc",0):.0f}｜风控 {comp.get("risk",0):.0f}｜研报 0.0</p>
 <p class="meta" style="color:var(--faint)">{d.get("biz", "—")}</p>
-</div></div>'''
+</div>{bt_short_html()}
+</div>'''
     return cards
 
 # ---------------- 视图区 ----------------
@@ -1221,6 +1222,7 @@ def a5_view_html():
 <h2>📈 模拟盘净值曲线 <span class="badge badge-auto">已平仓复利</span></h2>
 <div class="sub">回测（v1.3 修正口径）：线上基底 5 槽位组合 +18.9%/回撤 −35.4%；双池并集 +39.7%/回撤 −8.7%（近似模拟）。净值曲线验证的是边缘是否存在而非盈利，小仓位实验形态</div>
 {curve_html}
+{bt_a5_html()}
 </div>
 </div>'''
 
@@ -1972,21 +1974,8 @@ html = f"""<!doctype html>
 {NAV_HTML}
 <div class="container">
 
-<!-- ============ 视图 0：监控总览 ============ -->
+<!-- ============ 视图 0：市场晴雨表（总览 KPI 卡已于 2026-09-18 按用户要求移除） ============ -->
 <div class="view active" id="view-overview">
-<div class="card" id="overview">
-<h2>📊 标的监控总览 <span class="badge badge-auto">数据截至 {DATA["meta"].get("as_of", "—")}{"（盘中实时）" if DATA["meta"].get("intraday") else " 收盘"}</span></h2>
-<div class="sub">左侧导航切换：🅰️ 全量池中/长线（全市场自动池·股票分层+基金） / ⚡ 短线 / 🎯 打板族（双池滤网 v1.3 · 模拟盘观察） · 信号仅供参考</div>
-<div class="kpis">
-<div class="kpi"><div class="l">🟢 加仓区</div><div class="v" style="color:#dc2626">{sum(1 for d in all_items if d["tier"] in ("满仓加仓","轻仓加仓"))} 只</div><div class="s">满仓+轻仓加仓</div></div>
-<div class="kpi"><div class="l">🟡 观望区</div><div class="v" style="color:#d97706">{sum(1 for d in all_items if d["tier"]=="观望")} 只</div><div class="s">持有不加</div></div>
-<div class="kpi"><div class="l">🔴 减/清仓区</div><div class="v" style="color:#16a34a">{sum(1 for d in all_items if d["tier"] in ("减至半仓","清仓"))} 只</div><div class="s">减半或清仓</div></div>
-<div class="kpi"><div class="l">共监控</div><div class="v">{len(all_items)} 只</div><div class="s">全量池 {len(v9_items)} 行</div></div>
-{BB_BW_KPI}
-</div>
-<div class="rule-box" style="margin-bottom:0"><b>监控口径</b>：权重分 = 动量30% + 趋势35% + Aroon20% + 量价15%（2026-09-08 投产 V5）｜ 档位 = ≥75 满仓加仓 / ≥60 轻仓加仓 / ≥45 观望 / ≥30 减半 / &lt;30 清仓
-<br><b>卖出闸门（每日）</b>：全量池 掉榜连续5日 或 权重分&lt;50 → 清仓信号（21交易日倒计时）｜ 市况门控 沪深300 vs MA200（仅提醒，非交易指令）</div>
-</div>
 <!-- 🌦 市场晴雨表（niuone 口径 · 30s 实时 · 纯展示非信号） -->
 <div class="card" id="mkt-weather" style="margin-top:14px">
 <h2>🌦 市场晴雨表 <span class="badge badge-auto" id="mw-badge">—</span></h2>
@@ -2007,9 +1996,6 @@ html = f"""<!doctype html>
 .mw-chart{{border-top:1px dashed var(--border,#e2e8f0);padding-top:10px}}
 </style>
 </div>
-{bt_all_html()}
-{bt_short_html()}
-{bt_a5_html()}
 </div>
 <!-- ============ 视图 A：三轨中长线（2026-09-13 起） ============ -->
 <div class="view" id="view-auto">
@@ -2033,6 +2019,11 @@ html = f"""<!doctype html>
 {FB3_POOL_CARD}
 {FUND_PAPER_CARD}
 <div class="card" id="v9-retired-card" data-removed="1" style="display:none"><h2>🗂️ v9 全量池（已退役）</h2><div class="sub" style="color:#ef4444">⛔ v9 股票分层战法与 197 只跟踪池已于 2026-09-13 退役并移除展示——十重证伪确认负期望（ADR-0006/0007）。历史回测明细见「📝 更新日志」v5.9~v5.11.15 与 <code>backtest/</code> 报告存档。</div><div class="sub"><b>双轨退出规则</b>：① 主仓 FB3-H20 = 20 交易日月度轮动 + 牛熊 regime 切换（沪深300&lt;MA200 转 Top3 低波防守仓）——<b>无个股止盈止损</b>（基金 NAV 无涨跌停，止盈变体回测全部减值）；② SUPER = 月频调仓 + 中证1000&lt;MA20 组合半仓闸（且关闸期取高波半区）+ <b>pct40 因子化出场已启用（跌出前40%分位 → T+1 开盘卖，留现金至下一调仓）</b>。</div></div>
+{bt_all_html()}
+<div class="card" id="lt-rule"><h2>选股指标逻辑</h2>
+<div class="rule-box" style="margin-bottom:0"><b>监控口径</b>：权重分 = 动量30% + 趋势35% + Aroon20% + 量价15%（2026-09-08 投产 V5）｜ 档位 = ≥75 满仓加仓 / ≥60 轻仓加仓 / ≥45 观望 / ≥30 减半 / &lt;30 清仓
+<br><b>卖出闸门（每日）</b>：全量池 掉榜连续5日 或 权重分&lt;50 → 清仓信号（21交易日倒计时）｜ 市况门控 沪深300 vs MA200（仅提醒，非交易指令）</div>
+</div>
 </div>
 
 <!-- ============ 视图 C：全量池短线（2026-09-03 起 股票池 / 基金池 分板块展示） ============ -->
