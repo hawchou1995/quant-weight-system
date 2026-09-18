@@ -68,6 +68,8 @@ for c in ln_top:
         "close": round(float(d["close"]), 2), "lot": round(float(d["close"]) * 100),
         "score_txt": f"{sc:.0f}", "score": sc,
         "parts": f"额 {p_amt:.0f} · 波 {p_atr:.0f} · 换 {p_turn:.0f}（各 0-33.3）",
+        # 结构化子项（R-subcols-0918）：供看板按「每个指标一列」渲染，勿拆显示串
+        "parts_kv": [["额", p_amt], ["波", p_atr], ["换", p_turn]],
         "detail": f"额分位{amt_pct[c]:.0%}·波分位{atr_pct[c]:.0%}·换手分位{turn_pct[c]:.0%}（三低合分越高越冷门低波低换手）",
         "amount": round(CAP_A / n_a),
         "action": "已退休·不执行" if CAP_A == 0 else ("持有" if c in held_a else "新建仓"),
@@ -109,6 +111,8 @@ for j in ok:
         "close": round(clse, 2), "lot": round(clse * 100),
         "score_txt": f"{sc_row[j]:.2f}", "score": round(float(sc_row[j]), 2),
         "parts": parts,
+        # 结构化子项（R-subcols-0918）：13 因子贡献，按 |贡献| 降序（与 parts 同序）
+        "parts_kv": [[_lbl.get(k, k), round(v, 2)] for k, v in contrib],
         "detail": f"icir复合分（z·权重：{detail}…）",
         "amount": round(STOCK_BUDGET_B / n_b),   # R-gold-sat-0917：轨B 股票袖预算（68000−6800），黄金另计
         "action": "持有" if c in held_b else "新建仓",

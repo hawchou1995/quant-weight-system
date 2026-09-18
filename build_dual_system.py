@@ -1683,12 +1683,17 @@ try:
             return f'<span style="color:{col}">{v:+.2f}%</span>'
 
         def _row(r):
+            _kv = {k: v for k, v in (r.get("parts_kv") or [])}
             cells = (
                 f'<tr><td><code>{r["code"]}</code></td><td>{r.get("name", "")}</td><td>{r.get("industry", "—")}</td>'
                 f'<td class="num">{_fnum(r.get("close"))}</td>'
                 f'<td class="num">{_fnum(r.get("lot"), 0)} 元</td><td class="num">{_fnum(r.get("amount"), 0)} 元</td>'
                 f'<td title="{r.get("detail", "")}"><b>{r.get("score_txt", "—")}</b></td>'
-                f'<td><div style="font-size:10.5px;color:#94a3b8;line-height:1.35;white-space:normal;max-width:190px" title="{r.get("detail", "")}">{r.get("parts", "")}</div></td>'
+                )
+            cells = cells + "".join(
+                f'<td class="num" style="text-align:center;font-size:12px">{_kv.get(lbl, "—")}</td>'
+                for lbl in _subs)
+            cells = cells + (
                 f'<td>{r.get("action", "—")}{" ⚠涨停勿追" if r.get("limit_guard") else ""}</td>'
                 f'<td class="num">{_fp(r.get("chg"))}</td><td class="num">{_fp(r.get("ret_1y"))}</td>')
             if _is_fund:
@@ -1705,9 +1710,14 @@ try:
                     + f'<td class="num" style="color:{jc}">{jv_s}</td>'
                     + "</tr>")
 
+        # 子项列名须在 _row 被调用前确定（_row 内部引用 _subs，否则 free variable 报错）
+        _subs = [k for k, _v in ((tr["rows"][0].get("parts_kv") or []) if tr.get("rows") else [])]
+        _sub_th = "".join(
+            f'<th style="text-align:center;font-weight:500">{lbl}</th>' for lbl in _subs)
         tds = "".join(_row(r) for r in tr["rows"])
         head = ("<th>代码</th><th>名称</th><th>行业</th><th>收盘</th><th>一手约</th><th>计划金额</th>"
-                "<th>评分总分</th><th>子项评分</th><th>操作</th><th>涨跌幅</th><th>近1年</th>")
+                "<th>评分总分</th>" + _sub_th +
+                "<th>操作</th><th>涨跌幅</th><th>近1年</th>")
         if not _is_fund:
             head += "<th>RSI14</th><th>MACD柱</th><th>KDJ-J</th>"
         bt = tr["bt"]
