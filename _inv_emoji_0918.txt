@@ -1,0 +1,236 @@
+
+===== ui_components.py : 18 行含 emoji，去重 11 种 =====
+字符统计: →x8 🌙x2 📋x2 ↓x2 ↑x2 💬x1 📊x1 ⚡x1 ☀x1 📝x1 ✕x1
+     25| /* 单条固定顶栏（2026-09-18 用户 #1/#2：原先品牌栏+横 tab 两条栏 → 合并；且必须 fixed 不随滚动走） */
+     88| /* 2026-09-18 修：原先 margin-left:0 覆盖掉 .container 自身的 margin:0 auto → 宽屏左对齐 */
+    185| <button class="tb-btn" id="theme-btn" onclick="toggleTheme()">🌙 夜间</button>
+    186| <a class="community" href="https://qingju.me/" target="_blank" rel="noopener">💬 青橘社区</a>
+    192| ("overview", "📊", "监控总览"),
+    193| ("sys-auto", "🅰️", "全量池中/长线"),
+    194| ("short", "⚡", "全量池短线"),
+    195| ("table", "📋", "标的监控表"),
+    202| var b=document.getElementById('theme-btn');if(b)b.textContent=t==='dark'?'☀️ 日间':'🌙 夜间';
+    247| var _foot='<a href="javascript:void(0)" data-anchor="review"><span class="ic">📋</span>复盘日志</a>'+
+    248| '<a href="javascript:void(0)" data-anchor="changelog"><span class="ic">📝</span>更新日志</a>'+
+    325| return '<span class="'+(up?'pill-chg-up':'pill-chg-down')+'">'+prev+'→'+cur+'</span>';}
+    371| var va=parseFloat(String(ta).replace(/[+,%—→↓↑]/g,''));
+    372| var vb=parseFloat(String(tb).replace(/[+,%—→↓↑]/g,''));
+    398| '<button class="m-close" onclick="document.getElementById(\'modal-mask\').classList.remove(\'open\')">✕</button></div>'+
+    497| /* 对数 Y 轴：v8 净值 100→4100 而 v9 仅到 940，线性坐标下 v9 会被压扁贴底、刻度挤成"皱纹"。
+    520| '<text x="'+(PAD_L+10)+'" y="'+(PAD_T+18)+'" font-size="13" fill="#3b82f6">个人版 → +'+S.v8_lite.summary.total_return_pct+'%</text>'+
+    521| '<text x="'+(PAD_L+10)+'" y="'+(PAD_T+36)+'" font-size="13" fill="#f59e0b">普适版 → +'+S.v9_auto.summary.total_return_pct+'%</text>'+
+
+===== build_dual_system.py : 203 行含 emoji，去重 43 种 =====
+字符统计: →x70 ⚠x23 ✅x15 🎯x12 📈x9 🟢x9 🔴x9 🔍x7 🧪x6 ⛔x6 🐻x5 ↑x5 🌞x4 🌙x4 🥇x4 📊x4 🟡x4 ↓x4 📝x4 🌦x3 🕐x3 📐x3 🔵x3 🏆x3 📋x3 📌x3 🛰x3 🔄x2 💧x2 🌟x2 ⚡x2 💼x2 🐺x2 💬x2 🗓x1 🥉x1 🔥x1 📜x1 🥈x1 🟠x1
+    114| _MKT_WEATHER_CARD = f'''<!-- 🌦 市场晴雨表（niuone 口径 · 30s 实时 · 纯展示非信号） -->
+    116| <h2>🌦 市场晴雨表 <span class="badge badge-auto" id="mw-badge">—</span></h2>
+    120| <div id="mw-jiandi" class="mw-summary" style="border-top:1px dashed var(--border,#e2e8f0);padding-top:8px;margin-top:8px;font-size:12px
+    161| # 2026-08-21 用户清仓全部自买股票 → 固定池彻底去除（MAIN_CODES=[]），v8_items 恒为空（保留变量兼容）
+    200| # ⚠ 2026-09-03 双版本部署：A55 主卖出 + C50 参考卖出 并行展示（ver 字段来自 sel_meta.khunter）
+    211| f'信号观察 = 已命中但未触发；卖出 = 标准版分域（熊 RSI&gt;{_kh_ver.get("sell_a", 55)} / 牛 RSI&gt;{_kh_ver.get("sell_a_bull", 75)} / 弱牛 RSI&gt;{_kh_ver.get("
+    217| #   🐻 熊市(<MA250, osl35+low3+ob59) / 🌞 牛市(>MA20, osl32+无low+ob75) / 🌙 弱牛回调(MA20下/MA250上, osl32+无low+ob80)
+    219| _kh_regime_txt, _kh_regime_color = "🐻 熊市（MA250 下 · osl35+low3+ob59 · 可买入）", "#1f8a4c"
+    221| _kh_regime_txt, _kh_regime_color = "🌞 牛市（MA20 上 · osl32+无low+ob75 · 可买入）", "#1f8a4c"
+    223| _kh_regime_txt, _kh_regime_color = "🌙 弱牛回调（MA20 下/MA250 上 · osl32+无low+ob80 · 可买入）", "#b45309"
+    228| SHORT_POOL_GATE = f'<span class="badge badge-auto" style="background:#1f8a4c;color:#fff">市况门控 ✅ 开（{_mg.get("idx_close")} &gt; MA20 {_mg
+    231| # 2026-09-02 豁免：KHunter 主信号不受 MA20 门控（回测全窗口证据）→ 2026-09-03 牛熊分域接管（熊市全开/牛市>MA20 开）→ 2026-09-04 弱牛域投产三态全开
+    232| SHORT_POOL_GATE = f'<span class="badge badge-auto" style="background:#d97706;color:#fff">市况门控 ⚠ 关 · 仅提醒（沪深300 {_mg.get("idx_close")} &l
+    278| + (' · <b>pct40 因子化出场已启用（跌出前 40% 分位 → T+1 开盘卖）</b>' if tag == "b" else ' · 对照轨不执行 pct40（保持纯定期轮动基线）') + '</div>'
+    287| "🧪 轨B 模拟盘（主轨 · SUPER 13 因子 Top20）")
+    306| f'<h2>🧪 基金主仓模拟盘（轨C FB3-H20） <span class="badge badge-auto">10.2 万（17万×60%）· 持仓 20 交易日</span></h2>'
+    317| FUND_PAPER_CARD = (f'<div class="card" id="fund-paper-card"><h2>🧪 基金主仓模拟盘</h2>'
+    350| f'<h2>🧪 影子轨 · ret20 倾斜（#2 λ0.2 主 / #4 λ0.3 陪跑） <span class="badge badge-auto">纸面跟踪 · 生产 composite 未动</span></h2>'
+    361| return (f'<div class="card" id="shadow-ret20-card"><h2>🧪 影子轨 · ret20 倾斜</h2>'
+    362| f'<div class="sub">数据未生成（{_e}）→ 运行 backtest/shadow_ret20.py</div></div>')
+    384| f'<h2>🥇 黄金卫星叠加（轨B 内 10% · sh518880 买入持有） <span class="badge badge-auto">2026-09-17 投产 · 只做卫星层</span></h2>'
+    389| f'<div class="kpi"><div class="l">状态</div><div class="v">{_stat}</div><div class="s">信号 {_m.get("signal_date", "—")} → T+1 开盘</div></di
+    392| f'<div class="sub" style="color:#b45309">⚠ 硬伤申报：{_flags}</div>'
+    396| return (f'<div class="card" id="gold-sat-card"><h2>🥇 黄金卫星叠加</h2>'
+    397| f'<div class="sub">gold_sat_paper.json 未生成（{_e}）→ 运行 backtest/gold_sat_paper.py</div></div>')
+    436| f'<h2>📐 ret20 倾斜臂模拟盘（λ0.2 / λ0.3） <span class="badge badge-auto">2026-09-17 投产 · 生产 composite 未改</span></h2>'
+    442| f'<div class="sub" style="color:#b45309">⚠ 样本外记录 = 0 天（研究侧读数 λ0.2 off0 +25.08%/S1.411/50bp 19.25；'
+    443| f'λ0.3 +24.36%/S1.376/50bp 18.67；安慰剂 p 均 0.05）→ 毕业首检 <b>2026-10-15</b>：'
+    448| return (f'<div class="card" id="ret20-paper-card"><h2>📐 ret20 倾斜臂模拟盘</h2>'
+    449| f'<div class="sub">ret20_paper_l02/l03.json 未生成（{_e}）→ 运行 backtest/ret20_paper.py</div></div>')
+    463| """6 位代码 → 板块（与 build_short_pool.board_of 同口径）"""
+    480| # 跟踪池基金补全：track/pending 中未覆盖的基金代码 → 按基金名识别主题（industry_pool.fund_industry）
+    507| # 中长线 MA200 市况门控徽章（2026-08-19：与回测口径 use_timing=True/MA200 一致；沪深300<MA200 → 熊市保护，不回补新仓）
+    512| LT_GATE_BADGE = f'<span class="badge badge-auto" style="background:#1f8a4c;color:#fff">市况门控 ✅ 开（沪深300 {_lt_close:.0f} &gt; MA200 {_lt_m
+    515| LT_GATE_BADGE = f'<span class="badge badge-auto" style="background:#d97706;color:#fff">市况门控 ⚠ 关 · 仅提醒（沪深300 {_lt_close:.0f} &lt; MA200 
+    521| # 语义 = 月度再平衡（21 交易日），未到期维持现榜 → 让用户一眼看懂「为何榜单标的还是上次选的那批」。
+    535| f'title="距上次选池已满 {_every} 个交易日 → 本次已触发换榜">'
+    536| f'🔄 选池已到期 · 本次换榜</span>')
+    542| f'🗓 距下次再平衡 {_dtn} 个交易日</span>')
+    544| f"距下次再平衡 {_dtn} 个交易日 · 标的一旦权重分跌破入池门槛会打「⚠ 低于入池门槛」软标记，"
+    552| # ⚠ 2026-09-08 修复：本模块未导入 pandas（原写法 name 'pd' is not defined 静默失败），改标准库实现
+    585| BB_BW_KPI = f'<div class="kpi"><div class="l">📐 沪深300 布林带宽</div><div class="v" style="color:{_bw_color}">{_bw_state}</div><div class="s
+    647| "超买": "osc", "风控": "risk"}          # 子项标签 → comp 字典键
+    661| chg_tier = f'<span class="{"pill-chg-up" if up else "pill-chg-down"}">{d["tier_prev"]}→{d["tier"]}</span>'
+    677| f'⚠ 高开{d["gap"]:.1f}% 规避（回落&lt;3%可买）</span>')
+    694| f'清仓看 score&lt;50 的跟踪池信号）">⚠ 低于入池门槛 {_emin}</span>')
+    700| f'🎯 KHunter 主信号</span>')
+    745| <h3>{d["name"]} <span class="sub">{d["code"]}</span> <span class="board-tag">{board}</span> <span class="board-tag">{d["industry"]}</sp
+    747| <p class="meta">权重 <b>{d["score"]:.1f} 分</b> → {tier_pill(d["tier"])} ｜ 建议：{action_for(d)} ｜ {ma200_txt}</p>
+    748| {f'<p class="meta" style="color:#94a3b8">⚠ 低于入池门槛 {d.get("entry_min") or 65} 分（软标记 · 不改变交易语义）</p>' if d.get("below_entry") else ""}
+    766| # ⚠ 2026-09-13 用户拍板：中长线基金卡切换 FB3-H20 2000 池口径（v8 混合版 +184.3%/10.3% 退役）。
+    867| # 2026-09-02 晚修复：旧战法（反转打分）已全量弃用 → 分层「已下架」占位卡下线，
+    941| # 创业板/科创板：用户仅主板可买，KHunter 仅主板回测 → 明确说明卡
+    967| bt_card("bt-fund", "🥇 主仓 FB3-H20 基金线", FUND_TAG, s_fund, "curve-chart-fund", color="#3b82f6"),
+    968| bt_card("bt-super", "🥉 卫星·SUPER", SUPER_TAG, s_super, "curve-chart-super", color="#8b5cf6"),
+    970| _ret = ('<div class="sub" style="color:#ef4444">⛔ <b>v9 股票分层战法（一体/主板/创业板/科创板四卡）已于 2026-09-13 退役</b>'
+    973| '<h2>📊 回测参考 <span class="badge badge-auto">中/长线 · 股票按权限分层</span></h2>\n'
+    975| '<div class="sub" style="color:var(--sub)">💧 <b>滑点敏感性</b>（每边，sweep_ml_slip.py 扫描）：中长线换手低、影响显著小于短线 —— 股票 20bps 收益 -23%（夏普 1.58→1.43）、30b
+    976| '<div class="sub" style="color:#d97706">🐻 <b>9/1 牛熊独立权重验证（修正引擎 T+1 · regime=沪深300&gt;MA200 同口径）</b>：生产口径 A（牛开熊清 + 固定权重 0.35/0.25/0.20/0
+    978| '<b>🎯 双轨配置（2026-09-16 · 60/0/40）</b>｜'
+    981| '信号：<code>backtest/signal_satellite_0913.py</code>（每日收盘跑 → T+1 开盘清单，卫星与主仓信号均已交付）· '
+    982| '⚠ 风险披露：双轨均为 2021 起回测口径，2021-2026 为结构性分化窗口</div>\n'
+    988| 2026-09-02 晚修复：旧战法弃用 → 纯主板卡改接 KHunter 主信号回测（全窗口无门控 · 四闸 PASS）；
+    991| 2026-09-07 MA250 分域投产（ob58→ob59 升级）：生产=MA250 分域卡（熊 MA250 下 osl35+low3+ob59 / 牛 MA20 上 osl32+ob75）；
+   1024| _c_cards = (f'{_card("bt-short-stock-main-c", "📈 短线 纯主板 · 激进版(OB50 参考)", ss_stk_tag["main_c"], ss_stk["main_c"], "curve-short-stock-mai
+   1026| # 🌟 MA250 牛熊分域总卡（生产口径 · 组合化资金 · Phase 11 · 2026-09-07 投产 · ob59 最终版）
+   1028| <div class="bt-head"><b>🌟 生产口径：牛熊分域 MA250 总卡（ob59）</b><span class="bt-tag">组合化资金 · 正在用的就是它</span></div>
+   1040| _card("bt-short-stock-all", "📈 短线 股票 一体", ss_stk_tag["all"], ss_stk["all"], "curve-short-stock-all"),
+   1041| _card("bt-short-stock-main", "📈 短线 纯主板 · 标准版(主卖出 RSI>59)", ss_stk_tag["main"], ss_stk["main"], "curve-short-stock-main", color="#ea580c
+   1044| _card("bt-short-stock-gem", "📈 短线 纯创业板", ss_stk_tag["gem"], ss_stk["gem"], "curve-short-stock-gem"),
+   1045| _card("bt-short-stock-star", "📈 短线 纯科创板", ss_stk_tag["star"], ss_stk["star"], "curve-short-stock-star"),
+   1046| bt_card("bt-short-fund", "🔵 短线 基金", ss_fund_tag, ss_fund, "curve-short-fund", color="#3b82f6"),
+   1049| '<h2>⚡ 短线回测参考 <span class="badge badge-auto">生产主信号=KHunter · 修正引擎 T+1 · 2026-09-07 牛熊分域(MA250) + 09-04 弱牛域</span></h2>\n'
+   1050| '''<div class="sub">📊 <b>短线「在用什么」= 牛熊分域(进场) + 标准版/激进版(卖出线)，外加 H6 动量强弱切换(打分)</b>——三个独立维度，别混：
+   1051| ① <b>牛熊分域（MA250 买入框架 + 09-04 弱牛域）</b>：🐻 熊市(沪深300&lt;MA250)：KHunter 信号+RSI&lt;35+收盘≥3元 → 可买；🌞 牛市(&gt;MA20)：信号+RSI&lt;32+无低价 → 可买；🌙 弱牛回调(
+   1054| '<div class="sub" style="color:var(--sub)">💧 <b>回撤就看一张卡</b>：正在用的 = <b>生产口径 MA250 卡（回撤 -20.91%）</b>——牛熊分域入场 + 标准版 ob59 卖出，组合化资金计算。标准版/激进
+   1055| '<div class="sub" style="color:#7c3aed">🧪 <b>9/1 熊市三策略吸收验证（用户框架规则化 · 修正引擎 T+1）</b>：S1 超跌反弹单笔 +0.48%/胜率 52.6% 但<b>几何均值 -1.73%</b>、S3 右侧追
+   1072| f'<h2>🏆 打板族（生产配置） <span class="badge badge-auto">v1.3 双池独立滤网 · 2026-09-15 上线</span></h2>\n'
+   1074| f'<div class="sub" style="color:#059669">✅ <b>R-daban-opt-0915 实测（修正口径：真实 amount + 严格 rel_pos）</b>：线上基底 692 笔 +0.57% → 双池并集 396 笔 +1.19
+   1087| f'<input type="text" id="{tbl_id}-q" placeholder="🔍 搜索名称 / 代码 / 板块 / 行业…">'
+   1099| """第三个系统视图：🎯 打板实验（A5_tp8t2 模拟盘 + A2_tp3 回避清单）"""
+   1128| flag = "✅" if g.get("status") == "PASS" else "⛔"
+   1184| inner = f'<span class="board-tag board-sh" title="生产预筛：F3空间≥20% + 低位rel≤0.5（池A/池B 为附加滤网）">✅</span>'
+   1262| tag = '<span class="badge" style="background:rgba(5,150,105,.18);color:#34d399">✅ 双池命中</span>'
+   1303| <h2>🔥 今日涨停全景 <span class="badge badge-auto">{len(zp_stocks)} 只 · 双池命中 {len(zp_hits)} 只（池A {sum(1 for x in zp_hits if "R20" in (x.get("p
+   1304| <div class="sub">收盘涨幅 ≥9.5% 或封板标的（{zp_date} 收盘口径）· <b>✅ 双池命中</b> = 首板 + 非一字 + rel_pos≤0.5 + F3空间≥20% + 成交额≥5000万 + <b>池A 超跌（ret20≤-7.31
+   1311| <h2>🎯 打板族（双池滤网 v1.3） <span class="view-badge auto">池A 超跌 / 池B 趋势 · 模拟盘观察</span></h2>
+   1315| <span class="badge badge-auto" style="background:#059669;color:#fff">✅ v1.3 双池独立滤网（2026-09-15 上线）· 模拟盘观察中</span>
+   1327| <h2>📋 观察清单 <span class="badge badge-auto">{len(wl)} 只</span></h2>
+   1332| <h2>⚠ A2_tp3 回避清单 <span class="badge badge-auto">{len(av)} 只 · 负期望警示</span></h2>
+   1333| <div class="sub">今日满足 A2_tp3 信号（首板次日低开 2-6% + 相对位置≤0.7 + 成交额≥5000万）· 回测胜率 63.1% 但单笔均值 -1.39%（盈亏比 0.29）→ <b>信号出现时回避或减仓，不追高</b></div>
+   1338| <h2>💼 模拟盘持仓 <span class="badge badge-auto">{len(pos)} 只</span></h2>
+   1343| <h2>📜 已平仓（新口径） <span class="badge badge-auto">{len(closed_new)} 笔 · v1 归档 {len(closed) - len(closed_new)} 笔</span></h2>
+   1348| <h2>📈 模拟盘净值曲线 <span class="badge badge-auto">已平仓复利</span></h2>
+   1379| <span class="op op-add">🟢 加仓区 <b>{sum(t8.get(t,0) for t in tier_add)}</b> 只</span>
+   1380| <span class="op op-watch">🟡 观望 <b>{sum(t8.get(t,0) for t in tier_watch)}</b> 只</span>
+   1381| <span class="op op-cut">🔴 减/清仓区 <b>{sum(t8.get(t,0) for t in tier_cut)}</b> 只</span>
+   1405| <h2>📋 标的汇总表 <span class="badge {badge}">{len(items)} 行</span></h2>
+   1408| <input type="text" id="{tbl_id}-q" placeholder="🔍 搜索名称 / 代码 / 行业…">
+   1413| <button id="{tbl_id}-buyonly" class="flt" title="只看买入候选（剔除减半/清仓）" style="cursor:pointer;padding:7px 12px">🔍 只看可买信号</button>
+   1426| <h2>🔍 逐标的详情（雷达图） <span class="count" id="{tbl_id}-cardcount" style="font-size:12px"></span></h2>
+   1439| <h2>📌 全量池短线跟踪 <span class="badge badge-auto">自动 · 保留 30 天</span></h2>
+   1440| <div class="sub">上方短线表<b>可买入标的（强买入/买入）</b>上榜次日收盘确认后自动加入跟踪，30 天自动移除（<b>2026-08-18 起新上榜先入「待确认」隔日入池</b>，隔离当日收盘信号）· 卖出规则（与回测一致）：<b>收盘跌破 MA5
+   1444| <input type="text" id="watch-q" name="watch-q" placeholder="🔍 搜索代码 / 名称…" autocomplete="off" spellcheck="false" aria-label="搜索跟踪标的（代码或名
+   1448| <select id="watch-sort" class="flt" title="排序方式" aria-label="排序方式"><option value="entry">加入时间 ↓</option><option value="chg">涨跌 ↓</optio
+   1472| '<h2>📈 ETF 动量轮动（冻结模型） <span class="badge badge-auto">待数据</span></h2>'
+   1484| # 名称查表 + 板块映射（2026-09-06 用户需求：区分板块 → 宽基股票/商品/债券）
+   1502| if _c == _top1: _tag = " 🏆 Top1"
+   1503| elif _c == _top2: _tag = " 🥈 Top2"
+   1526| _pend_txt = f"挂单：{_pend.get('signal_date')}→{_pend.get('exec_date')}（{_pend.get('scale')}）" if _pend else "无挂单（下个信号日 9/30 月末）"
+   1539| <div class="card-h"><h2>📈 ETF 动量轮动（冻结模型） <span class="badge badge-auto">自动 · 2026-09-06 定稿</span></h2><span class="fold-arrow">▾</span>
+   1541| <div class="sub"><b>冻结配置</b>：core 6 只（沪深300/中证500/上证50/创业板/黄金/国债）· 20 日动量 · 绝对动量保护（Top1&lt;0 空仓）· 前 2 等权 · 目标波动率 <b>12%</b>（20 日窗口·clam
+   1544| <span class="op op-add">📊 信号状态：<b>{'🏆 ' + _names.get(_top1,'') + ' + ' + _names.get(_top2,'') if _top1 and _top2 else (('⛔ 空仓（绝对动量保护）')
+   1550| <div class="etf-sec">🎯 当前信号（20 日动量排名，数据截至 {_as_of}）</div>
+   1555| <div class="etf-sec">💼 模拟盘持仓 <span class="badge badge-auto">¥100,000 起点 · 9/3 初始化 @ {_pdate}</span></div>
+   1561| <div class="sub" style="margin-top:10px;color:var(--faint)">模拟盘 = 前向验证《公众号 ETF 动量轮动策略》冻结模型（目标 12%）在真实时间线上的复现；与股票池（KHunter）/基金池（场外动量）完全独
+   1586| '<h2>🐺 KHunter 模拟盘 <span class="badge badge-auto">待数据</span></h2>'
+   1641| # 策略英文名 → 中文名（映射自 backtest/khunter_all_strategies_backtest.py SIGNALS）
+   1657| <div class="card-h"><h2>🐺 KHunter 模拟盘（A/C 双轨） <span class="badge badge-auto">自动 · 前向验证</span></h2><span class="fold-arrow">▾</span></di
+   1661| {_track_sec(_tA, "🅰️ A 轨（标准版 · 出场 RSI&gt;59）")}
+   1664| <div class="etf-sec" style="margin-top:14px">📊 15 策略基础信号回测（各策略最优持有期 · 事件口径） <span class="badge badge-auto">未过滤 · 负值=原始信号期望</span></div>
+   1666| <div class="sub" style="margin-top:6px;color:var(--faint)">⚠ 上方为 15 策略<b>原始信号</b>（无过滤）事件口径：均值普遍为负（胜率~40% 但右尾不足）——<b>不含</b>分域 RSI 过滤，<b>
+   1709| f'<td>{r.get("action", "—")}{" ⚠涨停勿追" if r.get("limit_guard") else ""}</td>'
+   1742| f'<div class="toolbar" id="sat-bar-{track}"><input type="text" class="sat-q" data-t="{track}" placeholder="🔍 搜索代码…" autocomplete="off">
+   1746| f'<h2>🛰️ 卫星目标持仓 <span class="badge badge-auto">双轨 60/0/40 · 数据截至 {_sat["asof"]}（收盘）</span></h2>\n'
+   1747| f'<div class="sub">信号生成：<code>backtest/signal_satellite_0913.py</code>（每日收盘跑 → T+1 开盘清单）· 资金占比：<b>卫星 100% 轨B</b>｜双轨口径 FB3-H20 主仓 60%· 目
+   1750| SAT_CARD = (f'<div class="card" id="sat-card"><h2>🛰️ 双卫星目标持仓</h2>'
+   1792| _gate_txt = ("🟢 开（股票可买）" if _mg.get("open") else "🟠 关（仅拦股票池；基金轨不受影响——熊市 FB3 照常买入，转 Top3 低波防守仓）") + f' · 沪深300 {_mg.get("idx_close", "—"
+   1794| f'<h2>🥇 主仓 FB3-H20 基金池 <span class="badge badge-auto">当前 regime 持仓 · 数据截至 {_sp_j.get("as_of", "—")}</span></h2>'
+   1796| f'<div class="sub" style="color:#f59e0b">⚠ 实盘清单已按份额去重（同一基金 A/C/E 类只留一只，优先 C 类）——回测口径未去重，故实盘预期与回测数字存在系统性差异</div>'
+   1797| f'<div class="sub" style="color:var(--faint)">行业集中度约束（同行业≤N，N∈{{1,2,3}}）已于 2026-09-14 预注册实测：三轨均未过「相位中位夏普≥对照 + 50bp 档不劣化 + 配对显著」闸 → 不采纳（
+   1801| WATCH_V9_CARD = ('<div class="card" id="watch-v9-card"><h2>📌 历史跟踪池（已退役）</h2>'
+   1802| '<div class="sub" style="color:#ef4444">⛔ v9 跟踪池展示已于 2026-09-13 移除（战法退役，十重证伪）。数据文件保留于 enhanced_data.js 供回溯。</div></div>')
+   1806| """轻量 markdown → HTML（标题/表格/列表/粗体/代码/引用），复用主题 .tbl 样式，全部走 CSS 变量"""
+   1858| _flag = "🔴" if _r.get("defects", 0) > 0 else "✅"
+   1887| _flag = "✅" if _arg.get("verdict", "").startswith("✅") else ("⏳" if _arg.get("verdict", "").startswith("信号不足") else "⛔")
+   1888| A5_REVIEW_BLOCK = (f'<h2>🎯 打板族（双池滤网 v1.3）模拟盘验证 <span class="badge badge-auto">池A 超跌 / 池B 趋势 · 非实盘指令</span></h2>'
+   1889| f'<div class="sub">逐笔模拟盘跟踪（net_ret 含成本）· 验证门基准 = 双池并集（胜率 56.1% / 均值 +1.19% / tp 25.0%）· 新口径独立计数（v1 旧口径 11 笔归档）· 详细见「🎯 打板族」视图</div>'
+   1904| "短线·主板": 46.8, "短线·创业板": 48.1, "短线·科创板": 57.8, "短线·基金": 65.2,  # 2026-09-11 FB3-H20 投产：55.5（T5/H10/S40 退役）→ 65.2
+   1923| _rev_cum = (f'<div class="rev-cum"><div class="rev-cum-title">📈 累计总览'
+   1926| f'<table class="tbl"><thead><tr><th>池</th><th>累计标的</th><th>累计买入</th><th>🟢吃到</th>'
+   1927| f'<th>🔴被套</th><th>⚪持平</th><th>累计胜率</th><th>回测基准</th><th>累计均收</th></tr></thead>'
+   1956| <h2>🎯 KHunter 命中策略一览 <span class="badge badge-auto">自动 · 按 RSI 升序</span></h2>
+   1959| <input type="text" id="kh-hits-q" placeholder="🔍 搜索代码 / 名称 / 策略…" autocomplete="off" spellcheck="false">
+   1981| "⚡ 短线 · 股票池", "auto", "主板 KHunter 主信号 · A59 主卖出 / C50 参考 · 低价≥3元",
+   1983| "信号池 = 回测买入清单：KHunter 15 策略信号 + 信号日 RSI&lt;35 超卖 + 收盘≥3元（主板限定·事件独立·有信号即买）· 卖出 = <b>逐股独立</b>：持仓股自身 RSI 确认日 &gt; 标准版阈值（熊 59/牛 75） → T+1 开
+   1988| head_note=f"<b>🎯 KHunter 主信号（蓝标）= 主板 15 策略信号命中 + 信号日 RSI&lt;35 超卖 + 收盘≥3元 + 熊市(沪深300&lt;MA250)</b>（2026-09-07 牛熊线 MA250 投产 + ob59 升级：MA
+   1999| "🔵 短线 · 基金池", "auto", "场外基金动量（分≥50 才入池）",
+   2003| head_tags=['<span class="badge badge-auto">🔵 场外基金动量（分≥50）</span>',
+   2133| <h2>🛰️ 三轨中长线 <span class="view-badge auto">FB3-H20 主仓 + SUPER 卫星 · 资金 60/0/40</span></h2>
+   2153| <div class="card" id="v9-retired-card" data-removed="1" style="display:none"><h2>🗂️ v9 全量池（已退役）</h2><div class="sub" style="color:#ef44
+   2158| <br><b>卖出闸门（每日）</b>：全量池 掉榜连续5日 或 权重分&lt;50 → 清仓信号（21交易日倒计时）｜ 市况门控 沪深300 vs MA200（仅提醒，非交易指令）</div>
+   2174| <h2>🎯 打板族（双池滤网 v1.3）模拟盘验证 <span class="badge badge-auto">池A 超跌 / 池B 趋势 · 非实盘指令</span></h2>
+   2175| <div class="sub">逐笔模拟盘跟踪（net_ret 含成本）· 验证门基准 = 双池并集（胜率 56.1% / 均值 +1.19% / tp 25.0%）· 新口径独立计数（v1 旧口径 11 笔归档）· 详细见「🎯 打板族」视图</div>
+   2179| <h2>📋 复盘日志 <span class="badge badge-auto">{len(_rev_sorted)} 篇</span></h2>
+   2180| <div class="sub">每个交易日复盘：信号标的哪些吃到 / 哪些被套 / 是否符合系统设计（对比回测基准）· 发现设计缺陷 → 启动系统更新并登记于「📝 更新日志」· 点击日期展开/折叠当日复盘详情（日期降序，最新在前）</div>
+   2188| <h2>📝 更新日志 <span class="badge badge-auto">GitHub Release 风格</span></h2>
+   2189| <div class="sub">版本 / 日期 / 更新内容 —— 复盘发现系统设计缺陷 → 启动量化系统更新 → 在此登记</div>
+   2197| <h2>💬 评论区 <span class="badge badge-auto">Artalk</span></h2>
+   2201| <div id="comment-loading">💬 评论加载中…<span class="comment-loading-sub">（首次打开可能需要 30-60 秒，后端为 Render 免费层，闲置后休眠唤醒）</span></div>
+   2211| <div class="sub" style="text-align:center;color:var(--faint);font-size:11px;padding:8px 0 4px">看板构建于 {build_ts} · 版本 v5.12.0（+🌦市场晴雨表） ·
+   2214| <button title="回到顶部" onclick="window.scrollTo({{top:0,behavior:'smooth'}})">↑</button>
+   2215| <button title="滚到底部" onclick="window.scrollTo({{top:document.body.scrollHeight,behavior:'smooth'}})">↓</button>
+   2280| '<text x="'+(PAD_L+10)+'" y="'+(PAD_T+16)+'" font-size="13" fill="'+color+'">'+label+' → +'+totalPct+'%</text>'+
+   2339| server: 'https://artalk-8iqt.onrender.com',   // ⚠ Artalk 后端（Render 免费层，2026-08-19 上线）
+   2377| if(!jp){{box.innerHTML='<span>🕐 见底信号·市场级恐慌观察：暂无数据（jiandi_panic.json 未生成/未接入）</span>';return;}}
+   2381| box.innerHTML='<span class="mw-item">🕐 见底信号(主板) 入市 <b>'+ (c.rushi!=null?c.rushi:'—') +'</b> / 机会 <b>'+ (c.jihui!=null?c.jihui:'—') +'</
+   2418| _gateBox.innerHTML='<div class="sub" style="margin-bottom:6px;color:#d97706">⚠ 市况门控关闭（沪深300 '+( _mg.idx_close!=null?_mg.idx_close:'—')+
+   2462| if(kh.c_sell){{tierC='激进:卖出';actC='🔴 激进版·卖出';actCCls='down';}}
+   2463| else if(kh.sell){{tierC='激进:卖出';actC='🔴 激进版·卖出';actCCls='down';}}
+   2464| else if(kh.buy){{tierC='激进:持有';actC='🟢 激进版·持有/跟踪';actCCls='up';}}
+   2465| else if(kh.c_sell===false||kh.sell===false){{tierC='激进:持有';actC='🟢 激进版·持有/跟踪';actCCls='up';}}
+   2469| else if(rec.ma5_above===false){{act='⚠️ 次日卖出（破MA5）';actCls='down';tierDisp='破MA5·卖出';}}
+   2470| else if(rec.tier==='清仓'){{act='🔴 清仓';actCls='down';}}
+   2471| else if(rec.tier==='减至半仓'){{act='🔴 减至半仓';actCls='down';}}
+   2473| else if(rec.tier==='强买入'){{act='🟢 强买入信号（KHunter）';actCls='up';}}
+   2474| else if(rec.tier==='买入'){{act='🟢 买入信号（KHunter）';actCls='up';}}
+   2475| else if(!topSet[code]){{act='🔄 下次轮动换出';actCls='warn';}}
+   2476| else if(rec.tier==='轻仓加仓'||rec.tier==='满仓加仓'){{act='✅ 继续持有';actCls='up';}}
+   2477| else {{act='🟡 观望（不补不加）';actCls='warn';}}
+   2516| var h='<div class="sub" style="margin-bottom:6px;color:var(--sub)">🧭 版本说明：<b>标准版</b>=生产主信号（熊市卖出 RSI&gt;59 / 牛市卖出 RSI&gt;75）；<b>激进版</b>=
+   2525| var ma5Disp=susp?'—':(rec.ma5_above?'✅ 上方':'⚠️ 下方');
+   2527| // 2026-09-05 修复：SHORT_POOL_SLIM 不含 details → 走 stockMeta（STOCK_META 全市场映射，回退 ENH.details）
+   2544| /* 2026-09-05 修复（用户反馈）：①表头被 innerHTML 整体替换删除 → 只替换 tbody；②分域问号 = 数据缺 regime → 兜底显示 —；
+   2545| ③标准版(A59)/激进版(C50) 混一列打架 → 拆四列独立展示 */
+   2547| var KH_REGIME_CN={{'bear':'🐻 熊市','bull':'🌞 牛市','weak_bull':'🌙 弱牛'}};
+   2548| /* 标准版（A59 主卖出）：buy→买入 / sell→卖出（note 为 A 版文案）/ 否则观望 */
+   2550| if(kh.buy)return {{tier:'买入',act:'🟢 买入信号 · T+1 开盘买入',cls:'up'}};
+   2551| if(kh.sell)return {{tier:'卖出',act:kh.note||'🔴 卖出信号 · T+1 开盘卖',cls:'down'}};
+   2552| return {{tier:'观望',act:'🟡 未达买入/卖出阈值 · 仅观察',cls:'warn'}};
+   2554| /* 激进版（C50 参考线）：buy→买入 / c_sell→卖出 / 否则观望（与标准版独立，不打架） */
+   2556| if(kh.buy)return {{tier:'买入',act:'🟢 买入信号 · T+1 开盘买入',cls:'up'}};
+   2557| if(kh.c_sell)return {{tier:'卖出',act:'🔴 激进版参考卖出（RSI>50）· T+1 开盘卖',cls:'down'}};
+   2558| return {{tier:'观望',act:'🟡 未达买入/卖出阈值 · 仅观察',cls:'warn'}};
+   2755| /* 统一联动：搜索 + 板块/行业/档位筛选 → 表格行 + 详情卡片同步；排序后卡片重排 */
+   2757| → 抛错中止整个 forEach → 后两张在用表格（短线股票池/基金池）的四类联动静默失效。已移除 v9 + 加空值守卫。 */
+   2798| if(!table)return;   /* 表缺失（退役/未渲染）→ 跳过本 id，防 null 抛出中止其余表格接线 */
+   2813| /* 行/卡片点击 → 详情弹层（同页处理） */
+   2840| # HTML 文本中 < 后跟字母/数字但非标签开头（如 <MA60) → 未转义风险）
+   2845| print(f"⚠ 警告：检测到 {len(_bad)} 处疑似未转义 '<'（可能破坏 HTML 结构）：")
+   2849| print("✅ HTML 转义校验通过：无未转义 '<'（已豁免 <script> 块内 JS 比较符）")
+   2855| print("⚠ div 深度变负（嵌套错位）！")
+   2857| print(f"✅ div 平衡校验: 终局深度 {_dep}")
+
+===== kxmm_card.py : 6 行含 emoji，去重 3 种 =====
+字符统计: →x6 😨x1 🔥x1
+      4| 数据由 backtest/fetch_kxmm.py 每日链抓取 → kxmm_data.js（window.KXMM_DATA）
+     75| <h2>😨 恐贪指数 <span class="badge badge-auto">数据源：kxmm.online（开心檬檬）</span></h2>
+    111| <h2>🔥 市场热力图 <span class="badge badge-auto">矩形树图 · 面积/颜色可切换</span></h2>
+    134| <div class="sub">根=<b>A股全市场</b> → 中间=<b>申万一级行业</b> → 叶=<b>个股</b>；<b>面积</b>表示体量、<b>颜色</b>表示涨跌幅（红涨绿跌）。
+    224| var hue=215-215*t;   /* 蓝(恐惧) → 红(贪婪) */
+    560| /* 发散色阶：绿(-) → 浅灰(0) → 红(+)；中国习惯红涨绿跌 */
