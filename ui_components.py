@@ -25,7 +25,9 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 /* 单条固定顶栏（2026-09-18 用户 #1/#2：原先品牌栏+横 tab 两条栏 → 合并；且必须 fixed 不随滚动走） */
 .topbar{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;background:#1b2130;
   border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;
-  gap:10px;padding:0 16px;flex-wrap:nowrap}
+  gap:10px;flex-wrap:nowrap;
+  /* 与 .container 同宽居中（1560 + 24 内边距），宽屏下顶栏内容不再贴左 */
+  padding:0 max(16px,calc((100vw - 1560px)/2))}
 body{padding-top:56px}
 .topbar .logo{color:#fff;flex:none;white-space:nowrap}
 .topbar .tb-btn{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);color:#fff}
@@ -83,7 +85,8 @@ body{padding-top:56px}
 .tbl td .adv-cell{display:block;white-space:normal;line-height:1.4;max-width:216px;margin:0 auto;text-align:left}
 .tbl th[data-key="advice"]{min-width:216px}
 /* 顶部横栏：内容不再被导航占位；标签常显（原折叠态的 opacity/transition 全部移除） */
-body.sidenav-open .container{margin-left:0;padding-top:22px}
+/* 2026-09-18 修：原先 margin-left:0 覆盖掉 .container 自身的 margin:0 auto → 宽屏左对齐 */
+body.sidenav-open .container{padding-top:22px}
 .sidenav .sn-arrow{display:none}
 
 /* ---------- 通用卡片 ---------- */

@@ -643,8 +643,12 @@ def _board_cell(v, ind=None):
     return f'<span class="board-tag {cls}"{tip}>{v}</span>'
 
 
-def rows_html_for(items):
-    """模板式汇总表行：标的 | 板块 | 行业 | 现价 | 涨跌幅 | 近一年 | 权重分+六类构成 | 超买分解 | 量能分解 | 置信度 | 档位 | 档位变化"""
+SCORE_SUB_MAP = {"趋势": "trend", "动量": "momentum", "量能": "volume",
+                 "超买": "osc", "风控": "risk"}          # 子项标签 → comp 字典键
+
+
+def rows_html_for(items, score_sub="趋势/动量/量能/超买/风控"):
+    """模板式汇总表行（2026-09-18：子项由单列斜杠串改为每个指标一列）"""
     rows = ""
     for rank, d in enumerate(items, 1):
         chg_cls = "up" if (d["chg"] or 0) > 0 else "down"
@@ -656,7 +660,11 @@ def rows_html_for(items):
             up = d["tier"] in ("满仓加仓", "轻仓加仓")
             chg_tier = f'<span class="{"pill-chg-up" if up else "pill-chg-down"}">{d["tier_prev"]}→{d["tier"]}</span>'
         comp = d.get("comp", {})
-        comp_txt = f'{comp.get("trend",0):.0f}/{comp.get("momentum",0):.0f}/{comp.get("volume",0):.0f}/{comp.get("osc",0):.0f}/{comp.get("risk",0):.0f}'
+        _labs = [x for x in str(score_sub).split("/") if x]
+        _sub_cells = "".join(
+            f'<td class="num" style="text-align:center;font-size:12px">'
+            f'{comp.get(SCORE_SUB_MAP.get(_lb, _lb), 0):.0f}</td>' for _lb in _labs)
+        comp_txt = "/".join(f'{comp.get(SCORE_SUB_MAP.get(_lb, _lb), 0):.0f}' for _lb in _labs)
         rsi_txt = f'{d["rsi"]:.0f}' if d.get("rsi") is not None else "—"
         vp_txt = f'{comp.get("volume",0):.0f}'
         board = d["board"]
@@ -699,7 +707,7 @@ def rows_html_for(items):
 <td style="text-align:right" class="{chg_cls}" data-v="{d["chg"] or 0}">{chg_txt}</td>
 <td style="text-align:right" class="{ret_cls}" data-v="{d["ret_1y"] or 0}">{ret_txt}</td>
 <td style="text-align:center" data-v="{d["score"] or 0}"><b>{d["score"]:.1f}</b></td>
-<td style="text-align:center"><span style="color:var(--faint);font-size:11px" title="子项：趋势/动量/量能/超买/风控">{comp_txt}</span></td>
+{_sub_cells}
 <td style="text-align:center;font-size:11px;color:var(--sub)">{rsi_txt}</td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">{vp_txt}</td>
 <td style="text-align:center" data-v="100"><span class="board-tag">{conf_level(d)}置信</span></td>
@@ -1373,6 +1381,10 @@ def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extr
 <span class="op op-cut">🔴 减/清仓区 <b>{sum(t8.get(t,0) for t in tier_cut)}</b> 只</span>
 </div>'''
     tier_opts_html = "".join(f"<option>{t}</option>" for t in tier_opts)
+    # 子项列（2026-09-18）：按 score_sub 的 '/' 拆成每指标一列（股票 5 项 / 基金 2 项）
+    _sub_th = "".join(
+        f'<th data-key="sub{i}" style="text-align:center">{lb}</th>'
+        for i, lb in enumerate([x for x in str(score_sub).split("/") if x]))
     _tags_html = "".join(head_tags) if head_tags else ""
     _head_extra = ""
     if _tags_html:
@@ -1403,10 +1415,10 @@ def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extr
 <table class="tbl" id="{tbl_id}">
 <thead><tr>
 <th data-key="rank" style="text-align:center">#</th><th data-key="name">标的</th><th data-key="board">板块</th><th data-key="industry">行业</th><th data-key="px" style="text-align:right">现价</th>
-<th data-key="chg" style="text-align:right">涨跌幅</th><th data-key="ret1y" style="text-align:right">近一年</th><th data-key="score" style="text-align:center">权重总分</th><th data-key="sub" style="text-align:center">子项评分<div class="th-sub">{score_sub}</div></th><th data-key="rsi" style="text-align:center">RSI</th><th data-key="vp" style="text-align:center">量能</th>
+<th data-key="chg" style="text-align:right">涨跌幅</th><th data-key="ret1y" style="text-align:right">近一年</th><th data-key="score" style="text-align:center">权重总分</th>{_sub_th}<th data-key="rsi" style="text-align:center">RSI</th><th data-key="vp" style="text-align:center">量能</th>
 <th data-key="conf" style="text-align:center">置信度</th><th data-key="tier" style="text-align:center">档位</th><th data-key="tierchg" style="text-align:center">档位变化</th><th data-key="action" style="text-align:center">建议动作</th>
 </tr></thead>
-<tbody>{rows_html_for(items)}</tbody>
+<tbody>{rows_html_for(items, score_sub)}</tbody>
 </table>
 <div class="note">{note}</div>
 </div>
