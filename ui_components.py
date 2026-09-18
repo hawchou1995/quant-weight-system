@@ -65,8 +65,11 @@ body{padding-top:52px}
 .sidenav .sn-sep{width:1px;height:22px;background:rgba(255,255,255,.16);margin:0 6px;flex:none}
 .sidenav a{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:var(--r);
   color:rgba(255,255,255,.74);text-decoration:none;font-size:13px;transition:all .15s;white-space:nowrap}
+/* 图标位已停用（纯文字 tab）；:empty 兜底。
+   坑（v5.13.9）：此处曾与未实现的 blank 伪类写成同一条选择器列表 → 整条规则被浏览器丢弃，
+   空图标位一直占位。规则：一条规则只写一个伪类，别把"猜的伪类"混进同一个列表 */
 .sidenav a .ic{font-size:16px;width:20px;text-align:center}
-.sidenav a .ic:empty,.sidenav a .ic:blank{display:none}
+.sidenav a .ic:empty{display:none}
 .sidenav a:hover{background:rgba(255,255,255,.10);color:#fff}
 .sidenav a.active{background:rgba(255,255,255,.10);color:#fff;font-weight:600;box-shadow:inset 0 -2px 0 var(--accent)}
 /* 子章节 hover 下拉（2026-09-18 #10 皮肤层）：每个 tab 由 JS 包在 .sn-grp 定位容器里 */
@@ -243,6 +246,7 @@ function tickClock(){var b=document.querySelector('.mkt-badge');if(!b)return;
   var h=mktBadgeHtml();var t=document.createElement('div');t.innerHTML=h;var nb=t.firstChild;
   b.className=nb.className;b.innerHTML=nb.innerHTML;b.title=nb.title;}
 setInterval(tickClock,1000);
+function _ic(s){return s?('<span class="ic">'+s+'</span>'):'';}   /* 无图标则不渲染图标位（不留空占位） */
 function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)return;
   var html='';   /* 品牌名与分隔符：横栏已有 .topbar .logo，此处不再重复（2026-09-18） */
   window.ENH.nav.forEach(function(it){
@@ -251,9 +255,9 @@ function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)retu
     var ext=it[4];
     html+='<div class="sn-grp">';
     if(ext){
-      html+='<a href="'+ext+'" target="_blank" rel="noopener"><span class="ic">'+it[1]+'</span><span class="lbl">'+it[2]+'</span></a>';
+      html+='<a href="'+ext+'" target="_blank" rel="noopener">'+_ic(it[1])+'<span class="lbl">'+it[2]+'</span></a>';
     }else{
-      html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"'+(hasSubs?' data-toggle="1"':'')+'><span class="ic">'+it[1]+'</span><span class="lbl">'+it[2]+'</span>'+(hasSubs?'<span class="sn-arrow">▾</span>':'')+'</a>';
+      html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"'+(hasSubs?' data-toggle="1"':'')+'>'+_ic(it[1])+'<span class="lbl">'+it[2]+'</span>'+(hasSubs?'<span class="sn-arrow">▾</span>':'')+'</a>';
     }
     // 子章节（2026-08-17 用户需求）：点击先切视图再滚动到区块；主项点击可折叠/展开
     if(hasSubs){

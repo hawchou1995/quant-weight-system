@@ -62,8 +62,10 @@ body{padding-top:52px}
 .sidenav .sn-sep{width:1px;height:22px;background:rgba(255,255,255,.16);margin:0 6px;flex:none}
 .sidenav a{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:var(--r);
   color:rgba(255,255,255,.74);text-decoration:none;font-size:13px;transition:all .15s;white-space:nowrap}
+/* 图标位已停用（R-live-0918 后纯文字 tab）；:empty 兜底 —— 注意不可与 :blank 同列，
+   未知伪类会让整条选择器列表失效（实测因此空占位一直存在） */
 .sidenav a .ic{font-size:16px;width:20px;text-align:center}
-.sidenav a .ic:empty,.sidenav a .ic:blank{display:none}
+.sidenav a .ic:empty{display:none}
 .sidenav a:hover{background:rgba(255,255,255,.10);color:#fff}
 .sidenav a.active{background:rgba(255,255,255,.10);color:#fff;font-weight:600;box-shadow:inset 0 -2px 0 var(--accent)}
 /* 子章节 hover 下拉（2026-09-18 #10 皮肤层）：每个 tab 由 JS 包在 .sn-grp 定位容器里 */
@@ -216,7 +218,22 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <h2 style="margin:0">📝 更新日志 <span class="badge badge-auto">GitHub Release 风格</span></h2>
 </div>
 <div class="sub">量化系统版本更新记录：复盘发现设计缺陷 → 启动系统更新 → 在此登记版本/日期/更新内容</div>
-<div class="rel"><div class="rel-head">v5.13.8 - 2026-09-18（退役旧盘中链：服务端 patch + 重建 + 部署路线）</div><div class="rel-body">
+<div class="rel"><div class="rel-head">v5.13.9 - 2026-09-18（顶栏五个标签的空图标占位修复）</div><div class="rel-body">
+
+<p><b>现象</b>（用户报「顶栏五个标签有 emoji 占位，不协调」）：五 tab 左侧各留着一个 20px 空位，文字偏右、五个标签看着不匀。</p>
+
+<p><b>根因</b>：#10 皮肤层去 emoji 时，我加的隐藏规则写成</p>
+<p><code>.sidenav a .ic:empty,.sidenav a .ic:blank{display:none}</code> —— <b><code>:blank</code> 不是 Chrome 实现的伪类，逗号选择器列表里只要有一个非法项，整条规则会被浏览器丢弃</b> ⇒ <code>:empty</code> 那条从未生效，空图标位一直占位（渲染态实测：<code>.ic</code> 计算 display=block、宽 20px，tab 宽 104px）。</p>
+
+<p><b>修法（双保险）</b></p>
+<div class='lg-item'>CSS：删掉 <code>:blank</code>，只留 <code>.sidenav a .ic:empty{display:none}</code></div>
+<div class='lg-item'>JS：<code>renderSidenav</code> 增加 <code>_ic()</code> —— 图标为空时<b>根本不渲染</b> <code><span class="ic"></code>（治本，不依赖 <code>:empty</code> 语义）</div>
+
+<p><b>验证（渲染态）</b>：五个 tab 宽度 <b>76 / 76 / 76 / 76 / 76px（极差 0）</b>、导航内 <code>.ic</code> 数量 = 0、hover 下拉正常（6 子项）；另做<b>全站 CSS 选择器合法性扫描</b>（逐条 <code>querySelector</code> 试解析）—— 无其他非法选择器（<code>:blank</code> 是唯一一处）。</p>
+
+<p><b>同批记录（用户拍板）</b>：图表语义色（恐贪仪表盘彩虹弧 / 热力图红绿 / ECharts 序列色）<b>维持现状，不降饱和</b> —— 该项关闭，不再列入待办。</p>
+
+</div></div><div class="rel"><div class="rel-head">v5.13.8 - 2026-09-18（退役旧盘中链：服务端 patch + 重建 + 部署路线）</div><div class="rel-body">
 
 <p>用户拍板退役。<b>退役前先摸清引用面</b>（这一步比删文件重要）：无 Windows 计划任务调用、<code>daily_refresh.py</code> 无引用、<code>intraday_quotes_*.json</code> 仅被它消费、<code>行情监控/</code>+<code>monitor/</code> 是另一套子系统（读 <code>raw_kline</code>，与本链无关）。</p>
 
@@ -728,6 +745,7 @@ function tickClock(){var b=document.querySelector('.mkt-badge');if(!b)return;
   var h=mktBadgeHtml();var t=document.createElement('div');t.innerHTML=h;var nb=t.firstChild;
   b.className=nb.className;b.innerHTML=nb.innerHTML;b.title=nb.title;}
 setInterval(tickClock,1000);
+function _ic(s){return s?('<span class="ic">'+s+'</span>'):'';}   /* 无图标则不渲染图标位（不留空占位） */
 function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)return;
   var html='';   /* 品牌名与分隔符：横栏已有 .topbar .logo，此处不再重复（2026-09-18） */
   window.ENH.nav.forEach(function(it){
@@ -736,9 +754,9 @@ function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)retu
     var ext=it[4];
     html+='<div class="sn-grp">';
     if(ext){
-      html+='<a href="'+ext+'" target="_blank" rel="noopener"><span class="ic">'+it[1]+'</span><span class="lbl">'+it[2]+'</span></a>';
+      html+='<a href="'+ext+'" target="_blank" rel="noopener">'+_ic(it[1])+'<span class="lbl">'+it[2]+'</span></a>';
     }else{
-      html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"'+(hasSubs?' data-toggle="1"':'')+'><span class="ic">'+it[1]+'</span><span class="lbl">'+it[2]+'</span>'+(hasSubs?'<span class="sn-arrow">▾</span>':'')+'</a>';
+      html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"'+(hasSubs?' data-toggle="1"':'')+'>'+_ic(it[1])+'<span class="lbl">'+it[2]+'</span>'+(hasSubs?'<span class="sn-arrow">▾</span>':'')+'</a>';
     }
     // 子章节（2026-08-17 用户需求）：点击先切视图再滚动到区块；主项点击可折叠/展开
     if(hasSubs){
