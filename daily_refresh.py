@@ -39,6 +39,9 @@ STEPS = [
     # 能十几秒补齐全市场的通道。实测：A股 4191 只、ETF 704 只、残余 26 只一次补全。
     # [软]=失败不阻断主链；--skip-embulk 跳过。
     ("东财批量补齐 em_bulk[软]", ["backtest/em_bulk_all.py"], "--skip-embulk" in sys.argv),
+    # 热力树图数据（#4）：东财快照 + stock_industry 申万一级 → heatmap_data.js。
+    # [软]=失败不阻断（页面保留上一份）；--skip-heatmap 跳过。
+    ("热力树图数据 heatmap[软]", ["backtest/build_heatmap.py"], "--skip-heatmap" in sys.argv),
     # 估值日更（2026-09-17 建，R-valfreeze-0917）：根因=旧管道只写 4 列快照、从不扩展 val_em 主表
     # → 主表冻结 → factorlab/oss 面板冻结 → 生产轨B 目标清单冻结（asof 谎报）。[软]=失败不阻断。
     ("估值日更 fetch_val_em_daily[软]", ["fetch_val_em_daily.py"], "--skip-val" in sys.argv),
@@ -184,7 +187,8 @@ if not fails:
                           "backtest/ensure_index_row.py", "index_000300.csv",
                           # 2026-09-17 补：三个生产源文件此前从未进过链的 git 白名单（链只 add 产物）
                           "build_dual_system.py", "fetch_full_universe.py", "update_daily.py",
-                          "kxmm_card.py", "kxmm_data.js", "echarts.min.js", "daily_refresh.py"],
+                          "kxmm_card.py", "kxmm_data.js", "heatmap_data.js",
+                          "backtest/build_heatmap.py", "echarts.min.js", "daily_refresh.py"],
                          cwd=str(BASE), capture_output=True)
     if git.returncode == 0:
         c = subprocess.run(["git", "commit", "-m", f"chore(daily): {date.today()} 收盘刷新（池/信号/看板/复盘日志）"],

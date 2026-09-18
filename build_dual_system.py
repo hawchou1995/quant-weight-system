@@ -2097,6 +2097,7 @@ html = f"""<!doctype html>
 <script src="market_weather.js"></script>
 <script src="echarts.min.js"></script>
 <script src="kxmm_data.js"></script>
+<script src="heatmap_data.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/artalk@2/dist/Artalk.css">
 <script src="https://unpkg.com/artalk@2/dist/Artalk.js"></script>
 <script>window.SHORT_POOL = {SHORT_POOL_SLIM};</script>
