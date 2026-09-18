@@ -97,6 +97,24 @@ def read_shadow():
         return {}
 
 
+def lists_for_date(date_str):
+    """从 shadow_ret20/daily_metrics.jsonl 取指定日期的臂清单（逐日一行，含 lists）。"""
+    m = HERE / "shadow_ret20" / "daily_metrics.jsonl"
+    if not m.exists() or not date_str:
+        return {}
+    try:
+        for ln in reversed(m.read_text(encoding="utf-8").strip().splitlines()):
+            try:
+                row = json.loads(ln)
+            except Exception:
+                continue
+            if row.get("date") == date_str:
+                return row.get("lists") or {}
+    except Exception:
+        pass
+    return {}
+
+
 def load_state(arm):
     p = STATE_MAP[arm]
     if p.exists():
@@ -218,8 +236,19 @@ def main():
         basis = float(st["meta"].get("basis", BASIS))
 
         # ---- 成交日 ----
+        # ⚠ 2026-09-18 修（R-ret20-fix-0918）：**首建仓必须用账户自己存的 meta.signal_date**，
+        #    不能用每轮重算的 shadow 最新信号日 —— 否则 09-17 信号的 T+1（09-18）会被永久跳过
+        #    （09-18 当天 shadow 把 last_signal_date 覆写成 09-18，auto 只认 > 09-18 的 09-21）。
+        sig_eff = sig
+        if not pos and (st.get("meta") or {}).get("signal_date"):
+            sig_eff = st["meta"]["signal_date"]
+            hist = lists_for_date(sig_eff)
+            if hist.get(arm):
+                codes = [c for c in hist[arm] if c]
+                if sig_eff != sig:
+                    print(f"[{arm}] 首建仓：改用账户信号日 {sig_eff}（shadow 最新 {sig}）→ {len(codes)} 只")
         last_fill = (st["fills"][-1]["date"] if st["fills"] else None)
-        auto = [d for d in cal if sig and d > sig]
+        auto = [d for d in cal if sig_eff and d > sig_eff]
         fill_date = target or (auto[0] if auto else None)
         need_init = (not pos) and float(st["cash"]) > 0
         # 调仓：距上次成交 ≥ REBAL_DAYS 个交易日，且清单与在仓集合不同
@@ -236,6 +265,8 @@ def main():
             n = build(arm, st, codes, fill_date, float(st["cash"]))
             if n:
                 print(f"[{arm}] {'建仓' if need_init else '调仓'} @ {fill_date}：{n} 笔 → 在仓 {len(st['positions'])} 只")
+                st["meta"]["signal_date"] = fill_date
+                st["meta"]["filled"] = fill_date
             else:
                 print(f"[{arm}] {fill_date} 无可成交（行情未到）")
         elif need_init and not fill_date:
