@@ -216,7 +216,32 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <h2 style="margin:0">📝 更新日志 <span class="badge badge-auto">GitHub Release 风格</span></h2>
 </div>
 <div class="sub">量化系统版本更新记录：复盘发现设计缺陷 → 启动系统更新 → 在此登记版本/日期/更新内容</div>
-<div class="rel"><div class="rel-head">v5.13.6 - 2026-09-18（#10 整体 UI 推翻重做：扁平控制台皮肤）</div><div class="rel-body">
+<div class="rel"><div class="rel-head">v5.13.7 - 2026-09-18（盘中实时数据层：#4b 热力树图盘中实时 + 选股池涨跌幅盘中更新）</div><div class="rel-body">
+
+<p><b>做法</b>：纯浏览器端实时层（新模块 <code>intraday_live.py</code> → 构建期注入 <code>{INTRADAY_JS}</code>）。页面打开后由浏览器直连行情源，<b>不依赖本机常开、不需要盘中定时重建/部署</b>（对比原 <code>update_intraday_dashboard.py</code> 路线：每次刷新要重建整页 + 一个 gh-pages 提交）。</p>
+
+<p><b>通道实测（真实 Chrome，file:// 与线上 https 双 Origin 都过）</b></p>
+<div class='lg-item'>东财 <code>push2delay</code>：<code>ulist.np</code> 返回 <code>Access-Control-Allow-Origin: *</code>，800 码单请求 26ms；<code>clist</code> 单页硬上限 100 行 → <b>全市场 5560 只 56 次请求共 1.1 秒</b></div>
+<div class='lg-item'>腾讯 <code>qt.gtimg.cn</code>：ACAO <code>*</code>、对 Referer 无要求；浏览器端 500 码/请求可用（900 码被拒）→ 作兜底通道</div>
+
+<p><b>选股池涨跌幅 / 现价盘中更新</b></p>
+<div class='lg-item'>覆盖：中长线池卫星表（收盘·涨跌幅）、短线选股股票池、打板专区（观察清单 / 持仓 / 今日涨停全景）、ETF 动量表；实测 <b>425 个目标格 → 390 格成功改写、35 格正确跳过</b></div>
+<div class='lg-item'>口径纪律：<b>只补价格类字段</b>（现价/收盘、涨跌幅/当日涨跌/涨幅）。评分、档位、RSI、近一年、MACD、KDJ 是日线派生（上一交易日收盘口径），一律不碰；页面上以<b>表头「实时」小标签 + 卡片「实时 HH:MM:SS」徽章</b>区分口径</div>
+<div class='lg-item'><b>防串码双重校验</b>：行代码（<code>data-code</code> 优先）+ 行情返回名称比对（归一空白/全角空格/XD·XR·DR·N·C·ST 前缀）。实测正确拦下 <b>7 处「场外基金代码与 A 股同号」冲突</b>（如 002496 前海开源量化优选C vs 辉丰股份），并修掉 3 处除权前缀误拦（XD新化股 / XD成都银 / 页面名 XD益民集）</div>
+<div class='lg-item'>自动跳过：场外基金 28 格（净值 T-1，无盘中行情）、停牌股（601059 信达证券停牌）</div>
+
+<p><b>热力树图盘中实时（#4b）</b></p>
+<div class='lg-item'>全市场快照（涨跌幅 / 成交额 / 总市值 / 流通市值）→ <code>window.HM_APPLY</code> 就地改值并复用渲染函数重绘，<b>面积档跟随当前选择</b>（总市值 / 成交额 / 流通市值）</div>
+<div class='lg-item'>实测：全市场 5560 只 <b>662ms</b> 完成刷新；卡片徽章与说明行显示「实时快照 · 更新于 HH:MM:SS（全市场 5560 只）」</div>
+<div class='lg-item'>流量闸门：树图<b>只在「市场晴雨」视图可见时</b>刷新（否则省下 56 次请求）；切到该页时自动补刷</div>
+
+<p><b>调度与开关</b>：选股池 60s / 树图 180s / 行情探测 60s；页面隐藏时暂停；非交易时段自动退避 15 分钟；左下角「实时」药丸=总开关（点击开/关，localStorage 记忆），并显示上证涨跌与市况（<code>盘中 HH:MM:SS</code> / <code>非交易时段 · 数据 09-18 16:14</code>）</p>
+<p><b>开市徽章联动</b>：行情源时间戳证明"今天在交易"时，顶栏徽章以实时探测为准 —— 否则上一交易日构建的页面在新交易日会一直显示"休市"</p>
+
+<p><b>验证</b>：合成报价注入（含防串码守卫反向测试：错名 0 改写）+ 真实端到端刷新 + JS 异常捕获 = <b>0 未捕获异常 / 0 console.error</b>；截图目视确认（卫星表实时格 / 树图徽章 / 左下药丸）</p>
+<p><b>并存说明</b>：原服务端盘中脚本 <code>update_intraday_dashboard.py</code>（9:30/14:30 重建+部署）未退役，两者不冲突 —— 客户端层总以更新值覆盖；是否退役待拍板</p>
+
+</div></div><div class="rel"><div class="rel-head">v5.13.6 - 2026-09-18（#10 整体 UI 推翻重做：扁平控制台皮肤）</div><div class="rel-body">
 
 <p><b>背景</b>：用户反馈「整体 UI 风格 AI 味太浓」→ 按已实测的参考基线（gushi 选股系统：深色单栏 + 细边框白卡 + 小圆角 + 单一强调色 + 纯文字 tab）重做皮肤层。</p>
 
@@ -671,6 +696,10 @@ function mktBadgeHtml(){
   var today=now.getFullYear()+'-'+p(now.getMonth()+1)+'-'+p(now.getDate());
   var hm=now.getHours()*100+now.getMinutes();
   var cls='mkt-rest',txt='休市';
+  /* 盘中实时（R-live-0918）：行情源时间戳证明今天在交易 → 覆盖构建期 tradeDay
+     （否则上一交易日构建的页面在新交易日会一直显示"休市"） */
+  var lv=window.INTRADAY&&window.INTRADAY.state;
+  if(lv&&lv.live){s={isTradingDay:true,tradeDay:today};}
   if(s.isTradingDay&&s.tradeDay===today){
     if(hm<930){cls='mkt-pre';txt='未开盘';}
     else if(hm<1130){cls='mkt-open';txt='开市中';}
@@ -678,7 +707,7 @@ function mktBadgeHtml(){
     else if(hm<1500){cls='mkt-open';txt='开市中';}
     else{cls='mkt-rest';txt='已收盘';}
   }
-  return '<span class="mkt-badge '+cls+'" title="交易日 '+((s.tradeDay)||'—')+' · 本地时钟判定"><span class="d"></span>'+txt
+  return '<span class="mkt-badge '+cls+'" title="交易日 '+((s.tradeDay)||'—')+' · '+((lv&&lv.live)?'实时探测(行情源时间戳)':'本地时钟判定')+'"><span class="d"></span>'+txt
     +'<span class="clk" style="font-variant-numeric:tabular-nums;opacity:.85">'
     +p(now.getHours())+':'+p(now.getMinutes())+':'+p(now.getSeconds())+'</span></span>';
 }
