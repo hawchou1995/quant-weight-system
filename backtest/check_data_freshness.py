@@ -37,7 +37,8 @@ def kind(stem: str) -> str:
     """证券分型（2026-09-17 加，R-fullpool-0917）：三个系统只吃 A 股，ETF/基金不得混进门控分母"""
     m, c = stem[:2], stem[2:] if stem[:2] in ("sh", "sz", "bj") else stem
     if m == "bj":
-        return "A股-北交所"
+        # 2026-09-18 用户拍板：不做北交所 → 标为「未使用」（**不计入门控分母**，但保留可观测性）
+        return "未使用-北交所"
     if m == "sh" and c[:2] in ("60", "68"):
         return "A股-沪市"
     if m == "sz" and c[:2] in ("00", "30"):
@@ -53,6 +54,9 @@ def kind(stem: str) -> str:
     if m == "sz" and c[:3] in ("399", "398", "000"):
         return "指数/其他-深"
     return "其他"
+
+
+NOT_IN_UNIVERSE = ("未使用-北交所",)   # 不做北交所（2026-09-18 拍板）：不计入任何门控/口径统计
 
 
 def is_stock(k: str) -> bool:
@@ -99,7 +103,9 @@ def main():
                 stale_list.append([f.stem, d])
 
     # 门控口径：**可交易标的中真正陈旧的数量**（A股 + 现仍在交易的 ETF；剔除退市/长停）
-    stale_tradable = sum(v["stale"] - v["delisted"] for v in by_kind.values())
+    # 门控只数「我们真的用到的宇宙」：北交所已判定不做（引擎/短池宇宙均不含），排除分母
+    stale_tradable = sum(v["stale"] - v["delisted"] for k, v in by_kind.items()
+                         if not k.startswith(NOT_IN_UNIVERSE))
     stale_stock = sum(v["stale"] - v["delisted"] for k, v in by_kind.items() if is_stock(k))
     stale_etf = sum(v["stale"] - v["delisted"] for k, v in by_kind.items()
                     if k.startswith("ETF"))

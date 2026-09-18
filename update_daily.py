@@ -545,6 +545,13 @@ def main():
 
     # 2. 扫描滞后
     lag = scan_lag(target_date)
+    # 2026-09-18 用户拍板：**不做北交所** → 不再重拉（data_full/bj*.csv 保留不删，故可逆；
+    # 需要临时拉回用 --include-bj）。北交所无任何下游消费者（引擎宇宙/短池宇宙均不含）。
+    if "--include-bj" not in args:
+        _bj = [x for x in lag if str(x[0]).startswith("bj")]
+        if _bj:
+            lag = [x for x in lag if not str(x[0]).startswith("bj")]
+            print(f"  跳过北交所 {len(_bj)} 只（不做北交所；--include-bj 可覆盖）", flush=True)
     # ⚠ 2026-08-19 修复：新浪源连续多日滞后时全市场滞后来高达数千只——
     #    降级源激活（tx）时默认只补「池内 + 跟踪池（含掉榜）」代码，避免 2 小时全量重拉；
     #    需全量重建请显式 --all

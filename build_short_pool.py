@@ -139,6 +139,8 @@ def board_of(code):
         return "科创板"
     if code.startswith(("sh5", "sz1")):
         return "ETF"
+    if code.startswith("bj"):          # 2026-09-18 补：原先 fallthrough 到「基金」
+        return "北交所"                 # 会把 bj 当基金套用基金口径打分（防雷）
     return "基金"
 
 def comp_short(r, board):
