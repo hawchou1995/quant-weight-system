@@ -38,8 +38,11 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 .gh-link:hover{border-color:var(--accent);color:var(--accent)}
 
 /* ---------- 左侧宽侧边栏（图标+文字） ---------- */
-.sidenav{position:fixed;left:0;top:0;bottom:0;width:190px;background:var(--nav-bg);border-right:1px solid var(--border);
-  display:flex;flex-direction:column;padding:16px 10px;z-index:850;overflow-y:auto}
+# 折叠态 56px（图标栏）→ 悬浮展开 190px；**覆盖式不推挤内容**，避免回流跳动
+.sidenav{position:fixed;left:0;top:0;bottom:0;width:56px;background:var(--nav-bg);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;padding:16px 10px;z-index:850;overflow-y:auto;overflow-x:hidden;
+  transition:width .18s ease,box-shadow .18s ease}
+.sidenav:hover{width:190px;box-shadow:0 10px 34px rgba(0,0,0,.16)}
 .sidenav .sn-logo{font-size:14px;font-weight:700;padding:2px 10px 14px;display:flex;align-items:center;gap:8px}
 .sidenav .sn-logo .dot{width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,#f59e0b,#ef4444);display:inline-block}
 .sidenav .sn-sep{height:1px;background:var(--line);margin:8px 6px}
@@ -56,7 +59,16 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 .sidenav .sn-sub a:hover{color:var(--text);background:var(--card2)}
 .sidenav .sn-sub a.active{color:var(--accent);font-weight:600;background:rgba(245,158,11,.08)}
 .sidenav .sn-foot{margin-top:auto;display:flex;flex-direction:column;gap:6px}
-body.sidenav-open .container{margin-left:190px}
+/* 打板族「建议」列：限宽 + 允许换行（原不换行撑宽，把其他列压成两行） */
+.tbl td .adv-cell{display:block;white-space:normal;line-height:1.4;max-width:216px;margin:0 auto;text-align:left}
+.tbl th[data-key="advice"]{min-width:216px}
+body.sidenav-open .container{margin-left:56px}   /* 常驻 56；展开时导航覆盖其上，不推挤 */
+.sidenav .lbl,.sidenav .sn-logo .txt{white-space:nowrap;opacity:0;transition:opacity .14s ease}
+.sidenav:hover .lbl,.sidenav:hover .sn-logo .txt{opacity:1}
+.sidenav .sn-sub{opacity:0;transition:opacity .14s ease;pointer-events:none}
+.sidenav:hover .sn-sub{opacity:1;pointer-events:auto}
+.sidenav .sn-arrow{opacity:0;transition:opacity .14s ease}
+.sidenav:hover .sn-arrow{opacity:1}
 
 /* ---------- 通用卡片 ---------- */
 .card{background:var(--card);border-radius:16px;padding:22px;margin-bottom:22px;border:1px solid var(--border)}
@@ -171,20 +183,20 @@ try{applyTheme(localStorage.getItem('qw-theme')||'light')}catch(e){applyTheme('l
 
 /* ---------- 左侧导航（JS 点击滚动，不依赖 hash；标的信息与表格同页，无独立报告入口） ---------- */
 function renderSidenav(){var nav=document.getElementById('sidenav');if(!nav)return;
-  var html='<div class="sn-logo"><span class="dot"></span>量化权重监控</div><div class="sn-sep"></div>';
+  var html='<div class="sn-logo"><span class="dot"></span><span class="txt">量化权重监控</span></div><div class="sn-sep"></div>';
   window.ENH.nav.forEach(function(it){
     var subs=it[3];
     var hasSubs=subs&&subs.length;
-    html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"'+(hasSubs?' data-toggle="1"':'')+'><span class="ic">'+it[1]+'</span>'+it[2]+(hasSubs?'<span class="sn-arrow">▾</span>':'')+'</a>';
+    html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'"'+(hasSubs?' data-toggle="1"':'')+'><span class="ic">'+it[1]+'</span><span class="lbl">'+it[2]+'</span>'+(hasSubs?'<span class="sn-arrow">▾</span>':'')+'</a>';
     // 子章节（2026-08-17 用户需求）：点击先切视图再滚动到区块；主项点击可折叠/展开
     if(hasSubs){
       html+='<div class="sn-sub">';
-      subs.forEach(function(s){html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'" data-sub="'+s[0]+'"><span class="dot-sub"></span>'+s[1]+'</a>';});
+      subs.forEach(function(s){html+='<a href="javascript:void(0)" data-anchor="'+it[0]+'" data-sub="'+s[0]+'"><span class="dot-sub"></span><span class="lbl">'+s[1]+'</span></a>';});
       html+='</div>';}});
   html+='<div class="sn-sep"></div><div class="sn-foot">'+
-    '<a href="javascript:void(0)" data-anchor="review"><span class="ic">📋</span>复盘日志</a>'+
-    '<a href="javascript:void(0)" data-anchor="changelog"><span class="ic">📝</span>更新日志</a>'+
-    '<a href="https://qingju.me/" target="_blank" rel="noopener"><span class="ic">💬</span>青橘社区</a></div>';
+    '<a href="javascript:void(0)" data-anchor="review"><span class="ic">📋</span><span class="lbl">复盘日志</span></a>'+
+    '<a href="javascript:void(0)" data-anchor="changelog"><span class="ic">📝</span><span class="lbl">更新日志</span></a>'+
+    '<a href="https://qingju.me/" target="_blank" rel="noopener"><span class="ic">💬</span><span class="lbl">青橘社区</span></a></div>';
   nav.innerHTML=html;
   document.body.classList.add('sidenav-open');
   nav.querySelectorAll('a[data-anchor]').forEach(function(a){

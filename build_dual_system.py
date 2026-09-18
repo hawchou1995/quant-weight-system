@@ -303,7 +303,7 @@ def _ret20_paper_card():
                 f'<h2>📐 ret20 倾斜臂模拟盘（λ0.2 / λ0.3） <span class="badge badge-auto">2026-09-17 投产 · 生产 composite 未改</span></h2>'
                 f'<div class="sub">形态：<code>l02=(z(comp)+0.2·z(ret20))/1.2</code>、<code>l03=(z(comp)+0.3·z(ret20))/1.3</code>'
                 f'，冻结引擎 BASE 原样 = 生产口径 · 两臂各 <b>68,000 同额纯对照</b>（零实盘资金申领，不与轨B 抢配额）</div>'
-                f'<table><thead><tr><th>臂</th><th>定位</th><th>NAV</th><th>在仓</th><th>现金</th><th>信号日</th><th>状态</th></tr></thead>'
+                f'<table class="tbl"><thead><tr><th>臂</th><th>定位</th><th>NAV</th><th>在仓</th><th>现金</th><th>信号日</th><th>状态</th></tr></thead>'
                 f'<tbody>{_tr}</tbody></table>'
                 f'<div class="sub">{_otxt}</div>'
                 f'<div class="sub" style="color:#b45309">⚠ 样本外记录 = 0 天（研究侧读数 λ0.2 off0 +25.08%/S1.411/50bp 19.25；'
@@ -565,7 +565,8 @@ def rows_html_for(items):
 <td style="text-align:right" data-v="{d["px"]}">{d["px"]:.2f}</td>
 <td style="text-align:right" class="{chg_cls}" data-v="{d["chg"] or 0}">{chg_txt}</td>
 <td style="text-align:right" class="{ret_cls}" data-v="{d["ret_1y"] or 0}">{ret_txt}</td>
-<td style="text-align:center"><b>{d["score"]:.1f}</b><br><span style="color:var(--faint);font-size:10px" title="趋势/动量/量能/超买/风控">{comp_txt}</span></td>
+<td style="text-align:center" data-v="{d["score"] or 0}"><b>{d["score"]:.1f}</b></td>
+<td style="text-align:center"><span style="color:var(--faint);font-size:11px" title="子项：趋势/动量/量能/超买/风控">{comp_txt}</span></td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">{rsi_txt}</td>
 <td style="text-align:center;font-size:11px;color:var(--sub)">{vp_txt}</td>
 <td style="text-align:center" data-v="100"><span class="board-tag">{conf_level(d)}置信</span></td>
@@ -1155,7 +1156,7 @@ def a5_view_html():
              _txt_td(s.get("ind", "—")), _chg_td(s.get("pct")), _txt_td(st_html),
              _txt_td(f'{s.get("amt", 0)/1e8:.2f}'), _num_td(s.get("rel_pos"), 2),
              _pct_td(s.get("dist_high"), 1), _txt_td(_pool_html), _txt_td(tag), _txt_td(tier_badge),
-             _txt_td(f'<span style="color:var(--sub);font-size:12px">{advice}</span>')]))
+             _txt_td(f'<span class="adv-cell" style="color:var(--sub);font-size:11.5px">{advice}</span>')]))
     zp_html = f'''<div class="card" id="a5-zt" style="border-color:rgba(5,150,105,.35)">
 <h2>🔥 今日涨停全景 <span class="badge badge-auto">{len(zp_stocks)} 只 · 双池命中 {len(zp_hits)} 只（池A {sum(1 for x in zp_hits if "R20" in (x.get("pools") or []))} · 池B {sum(1 for x in zp_hits if "ADX" in (x.get("pools") or []))}）</span></h2>
 <div class="sub">收盘涨幅 ≥9.5% 或封板标的（{zp_date} 收盘口径）· <b>✅ 双池命中</b> = 首板 + 非一字 + rel_pos≤0.5 + F3空间≥20% + 成交额≥5000万 + <b>池A 超跌（ret20≤-7.31%）/ 池B 趋势（ADX14≥27.9）至少命中其一</b>（v1.3 双池独立）· 滤网池列：A·超跌 / B·趋势（悬浮可见实测值）· 纯观察，不构成交易信号</div>
@@ -1264,7 +1265,7 @@ def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extr
 <table class="tbl" id="{tbl_id}">
 <thead><tr>
 <th data-key="rank" style="text-align:center">#</th><th data-key="name">标的</th><th data-key="board">板块</th><th data-key="industry">行业</th><th data-key="px" style="text-align:right">现价</th>
-<th data-key="chg" style="text-align:right">涨跌幅</th><th data-key="ret1y" style="text-align:right">近一年</th><th data-key="score" style="text-align:center">权重分<div class="th-sub">{score_sub}</div></th><th data-key="rsi" style="text-align:center">RSI</th><th data-key="vp" style="text-align:center">量能</th>
+<th data-key="chg" style="text-align:right">涨跌幅</th><th data-key="ret1y" style="text-align:right">近一年</th><th data-key="score" style="text-align:center">权重总分</th><th data-key="sub" style="text-align:center">子项评分<div class="th-sub">{score_sub}</div></th><th data-key="rsi" style="text-align:center">RSI</th><th data-key="vp" style="text-align:center">量能</th>
 <th data-key="conf" style="text-align:center">置信度</th><th data-key="tier" style="text-align:center">档位</th><th data-key="tierchg" style="text-align:center">档位变化</th><th data-key="action" style="text-align:center">建议动作</th>
 </tr></thead>
 <tbody>{rows_html_for(items)}</tbody>
@@ -2011,10 +2012,10 @@ html = f"""<!doctype html>
 {SAT_PAPER_B_CARD}
 {GOLD_SAT_CARD}
 {RET20_PAPER_CARD}
-{FUND_PAPER_CARD}
 {SHADOW_RET20_CARD}
 {FB3_POOL_CARD}
-<div class="card" id="v9-retired-card"><h2>🗂️ v9 全量池（已退役）</h2><div class="sub" style="color:#ef4444">⛔ v9 股票分层战法与 197 只跟踪池已于 2026-09-13 退役并移除展示——十重证伪确认负期望（ADR-0006/0007）。历史回测明细见「📝 更新日志」v5.9~v5.11.15 与 <code>backtest/</code> 报告存档。</div><div class="sub"><b>双轨退出规则</b>：① 主仓 FB3-H20 = 20 交易日月度轮动 + 牛熊 regime 切换（沪深300&lt;MA200 转 Top3 低波防守仓）——<b>无个股止盈止损</b>（基金 NAV 无涨跌停，止盈变体回测全部减值）；② SUPER = 月频调仓 + 中证1000&lt;MA20 组合半仓闸（且关闸期取高波半区）+ <b>pct40 因子化出场已启用（跌出前40%分位 → T+1 开盘卖，留现金至下一调仓）</b>。</div></div>
+{FUND_PAPER_CARD}
+<div class="card" id="v9-retired-card" data-removed="1" style="display:none"><h2>🗂️ v9 全量池（已退役）</h2><div class="sub" style="color:#ef4444">⛔ v9 股票分层战法与 197 只跟踪池已于 2026-09-13 退役并移除展示——十重证伪确认负期望（ADR-0006/0007）。历史回测明细见「📝 更新日志」v5.9~v5.11.15 与 <code>backtest/</code> 报告存档。</div><div class="sub"><b>双轨退出规则</b>：① 主仓 FB3-H20 = 20 交易日月度轮动 + 牛熊 regime 切换（沪深300&lt;MA200 转 Top3 低波防守仓）——<b>无个股止盈止损</b>（基金 NAV 无涨跌停，止盈变体回测全部减值）；② SUPER = 月频调仓 + 中证1000&lt;MA20 组合半仓闸（且关闸期取高波半区）+ <b>pct40 因子化出场已启用（跌出前40%分位 → T+1 开盘卖，留现金至下一调仓）</b>。</div></div>
 </div>
 
 <!-- ============ 视图 C：全量池短线（2026-09-03 起 股票池 / 基金池 分板块展示） ============ -->
@@ -2089,7 +2090,7 @@ html = f"""<!doctype html>
 /* 三视图导航（覆盖默认 4 项） */
 window.ENH.nav = [
   ["overview","📊","监控总览",[["overview","总览统计"],["mkt-weather","市场晴雨表"],["bt-all","回测参考·中长线"],["bt-short","短线回测"]]],
-  ["sys-auto","🛰️","三轨中长线",[["sat-card","卫星目标持仓"],["sat-paper-b-card","轨B 模拟盘（主轨）"],["gold-sat-card","黄金卫星叠加"],["ret20-paper-card","ret20 倾斜臂模拟盘"],["fund-paper-card","基金主仓模拟盘"],["fb3-pool-card","FB3 基金池"]]],
+  ["sys-auto","🛰️","三轨中长线",[["sat-card","卫星目标持仓"],["sat-paper-b-card","轨B 模拟盘（主轨）"],["gold-sat-card","黄金卫星叠加"],["ret20-paper-card","ret20 倾斜臂模拟盘"],["fb3-pool-card","FB3 基金池"],["fund-paper-card","基金主仓模拟盘"]]],
   ["short","⚡","全量池短线",[["card-short-stk","股票池 汇总表"],["card-short-stk-detail","股票池 逐标的详情"],["card-kh-hits","KHunter 命中策略一览"],["card-etf-paper","ETF 动量轮动"],["card-kh-paper","KHunter 模拟盘"],["card-short-fund","基金池 汇总表"],["card-short-fund-detail","基金池 逐标的详情"],["watch-card","短线跟踪"]]],
   ["a5","🎯","打板族",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
   ["kxmm","😨","市场情绪",[["kxmm-fg","恐贪指数"],["kxmm-heat","热力图"]]],
