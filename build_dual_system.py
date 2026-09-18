@@ -2231,11 +2231,11 @@ html = f"""<!doctype html>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
 window.ENH.nav = [
-  ["kxmm","📊","市场晴雨",[["kxmm-fg","恐贪指数"],["kxmm-heat","热力图"],["hm-card","热力树图"],["crowd-card","大盘拥挤度"],["mkt-weather","市场晴雨表"]]],
-  ["sys-auto","🛰️","中长线池",[["sat-card","卫星目标持仓"],["sat-paper-b-card","轨B 模拟盘（主轨）"],["gold-sat-card","黄金卫星叠加"],["ret20-paper-card","ret20 倾斜臂模拟盘"],["fb3-pool-card","FB3 基金池"],["fund-paper-card","基金主仓模拟盘"]]],
-  ["short","⚡","短线选股",[["card-short-stk","股票池 汇总表"],["card-short-stk-detail","股票池 逐标的详情"],["card-kh-hits","KHunter 命中策略一览"],["card-etf-paper","ETF 动量轮动"],["card-kh-paper","KHunter 模拟盘"],["card-short-fund","基金池 汇总表"],["card-short-fund-detail","基金池 逐标的详情"],["watch-card","短线跟踪"]]],
-  ["a5","🎯","打板专区",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
-  ["qingju","💬","社区讨论",[],"https://qingju.me/"]
+  ["kxmm","","市场晴雨",[["kxmm-fg","恐贪指数"],["kxmm-heat","热力图"],["hm-card","热力树图"],["crowd-card","大盘拥挤度"],["mkt-weather","市场晴雨表"]]],
+  ["sys-auto","","中长线池",[["sat-card","卫星目标持仓"],["sat-paper-b-card","轨B 模拟盘（主轨）"],["gold-sat-card","黄金卫星叠加"],["ret20-paper-card","ret20 倾斜臂模拟盘"],["fb3-pool-card","FB3 基金池"],["fund-paper-card","基金主仓模拟盘"]]],
+  ["short","","短线选股",[["card-short-stk","股票池 汇总表"],["card-short-stk-detail","股票池 逐标的详情"],["card-kh-hits","KHunter 命中策略一览"],["card-etf-paper","ETF 动量轮动"],["card-kh-paper","KHunter 模拟盘"],["card-short-fund","基金池 汇总表"],["card-short-fund-detail","基金池 逐标的详情"],["watch-card","短线跟踪"]]],
+  ["a5","","打板专区",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
+  ["qingju","","社区讨论",[],"https://qingju.me/"]
 ];
 /* 视图切换模式：滚动不更新导航高亮（COMMON_JS renderSidenav 检测此标志） */
 window.ENH.NAV_SWITCH = true;

@@ -90,7 +90,10 @@ body.sidenav-open .container{padding-top:22px}
 .sidenav .sn-arrow{display:none}
 
 /* ---------- 通用卡片 ---------- */
-.card{background:var(--card);border-radius:16px;padding:22px;margin-bottom:22px;border:1px solid var(--border)}
+.card{background:var(--card);border-radius:16px;padding:22px;margin-bottom:22px;border:1px solid var(--border);overflow-x:auto}
+/* 2026-09-18：列多的表（如卫星表 26 列）改为卡片内横向滚动，不再压扁每列导致不可读 */
+.tbl td.num,.tbl th.num{white-space:nowrap}
+.tbl>tbody>tr>td,.tbl>thead>tr>th{min-width:44px}
 .card h2{font-size:18px;margin:0 0 4px;display:flex;align-items:center;gap:10px}
 .card .sub{color:var(--sub);font-size:12px;margin-bottom:14px}
 .badge{font-size:11px;padding:2px 10px;border-radius:20px;font-weight:500}
