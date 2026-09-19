@@ -1,0 +1,52 @@
+{
+ "B0 无阀": {
+  "n": 225,
+  "kept_mean_pct": 4.21136025471311,
+  "kept_win": 59.55555555555555,
+  "t_cluster": 3.361841940111089,
+  "dropped_n": 0,
+  "dropped_mean_pct": null,
+  "diff_pp": NaN,
+  "pair_day_diff_pp": NaN
+ },
+ "V1 强势门": {
+  "n": 11,
+  "kept_mean_pct": 5.123375734598161,
+  "kept_win": 72.72727272727273,
+  "t_cluster": 1.2523340285872542,
+  "dropped_n": 214,
+  "dropped_mean_pct": 4.164480954345188,
+  "diff_pp": 0.958894780252973,
+  "pair_day_diff_pp": -10.873585447297106
+ },
+ "V2 不弱门": {
+  "n": 179,
+  "kept_mean_pct": 4.820579120322705,
+  "kept_win": 60.893854748603346,
+  "t_cluster": 3.35031964328609,
+  "dropped_n": 46,
+  "dropped_mean_pct": 1.8407042341888207,
+  "diff_pp": 2.979874886133884,
+  "pair_day_diff_pp": 9.68411912278143
+ },
+ "V3 反向": {
+  "n": 46,
+  "kept_mean_pct": 1.8407042341888207,
+  "kept_win": 54.347826086956516,
+  "t_cluster": 0.7801835900128786,
+  "dropped_n": 179,
+  "dropped_mean_pct": 4.820579120322705,
+  "diff_pp": -2.979874886133884,
+  "pair_day_diff_pp": -9.68411912278143
+ },
+ "V4 排除带": {
+  "n": 215,
+  "kept_mean_pct": 4.177571929316646,
+  "kept_win": 59.53488372093023,
+  "t_cluster": 3.19568605945922,
+  "dropped_n": 10,
+  "dropped_mean_pct": 4.93780925073711,
+  "diff_pp": -0.7602373214204636,
+  "pair_day_diff_pp": NaN
+ }
+}
