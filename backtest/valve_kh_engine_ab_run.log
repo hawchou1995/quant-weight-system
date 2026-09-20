@@ -1,0 +1,47 @@
+[    0.0s] 加载 v8_factor_cache.pkl ...
+[    2.3s] cache 5391 只
+[  141.9s] 信号缓存构建完成: 3007 只（ST 过滤 开）
+[  141.8s] 主板信号缓存 3007 只
+[  141.8s] 牛熊态 2848 天（is_bear 占比 45.3%）
+[  150.8s] 候选 stock-day 1600 个（osl_loose=40） / unique (code,signal_day) 1600 个
+    [minute-fail] 000666 20200212: ValueError empty/short n=0
+[  161.4s]   分时进度 100/1600（失败 1）
+[  165.5s]   分时进度 200/1600（失败 1）
+[  169.7s]   分时进度 300/1600（失败 1）
+[  173.5s]   分时进度 400/1600（失败 1）
+[  177.6s]   分时进度 500/1600（失败 1）
+[  181.5s]   分时进度 600/1600（失败 1）
+[  185.8s]   分时进度 700/1600（失败 1）
+[  189.8s]   分时进度 800/1600（失败 1）
+[  193.4s]   分时进度 900/1600（失败 1）
+[  197.8s]   分时进度 1000/1600（失败 1）
+[  201.7s]   分时进度 1100/1600（失败 1）
+    [minute-fail] 600837 20230915: ValueError empty/short n=0
+[  211.0s]   分时进度 1200/1600（失败 2）
+[  214.9s]   分时进度 1300/1600（失败 2）
+[  218.4s]   分时进度 1400/1600（失败 2）
+[  222.5s]   分时进度 1500/1600（失败 2）
+[  225.8s]   分时进度 1600/1600（失败 2）
+[  225.8s] 分时抓取完成：1600 个 unique stock-day，失败 2 个
+[  225.8s] 阀统计：候选 1600｜回落>0.2% 剔除 437｜抓取失败剔除 2｜V2 后保留 1161｜回落幅度 median=0.000% p10=-0.562% p90=0.693%
+[  225.8s] 注入完成：run_khunter_port_valve（B0=VALVE None / V2=过滤函数，同一容器）
+
+===== 引擎内 A/B（生产口径 PROD_KW；只差 gate 与阀）=====
+hybrid_wb B0 原版引擎(自检)      n= 328 wr= 62.2% med=  2.821% mean=  3.035% total=  153.74% ann=  9.47% sharpe= 0.665 mdd=  -20.9% 正年10/11 (249s)
+hybrid_wb B0               n= 328 wr= 62.2% med=  2.821% mean=  3.035% total=  153.74% ann=  9.47% sharpe= 0.665 mdd=  -20.9% 正年10/11 (271s)
+hybrid_wb V2               n= 271 wr=62.36% med=   3.06% mean=   3.25% total=  127.91% ann=  8.34% sharpe= 0.627 mdd= -20.59% 正年8/11 (294s)
+hybrid_wb V2_failpass      n= 271 wr=62.36% med=   3.06% mean=   3.25% total=  127.91% ann=  8.34% sharpe= 0.627 mdd= -20.59% 正年8/11 (317s)
+none B0                    n= 326 wr=62.27% med=  3.198% mean=  3.147% total=  159.62% ann=  9.72% sharpe= 0.647 mdd= -23.18% 正年9/11 (341s)
+none V2                    n= 270 wr= 63.7% med=  3.741% mean=  3.542% total=  143.27% ann=  9.02% sharpe= 0.658 mdd= -22.81% 正年8/11 (365s)
+none V2_failpass           n= 270 wr= 63.7% med=  3.741% mean=  3.542% total=  143.27% ann=  9.02% sharpe= 0.658 mdd= -22.81% 正年8/11 (387s)
+
+===== ① 引擎基线 vs 优化 BASE（9.9%/0.684/mdd-20.91%/n=329）=====
+  引擎 B0: ann=9.47% sharpe=0.665 mdd=-20.9% n=328
+  优化 BASE: ann=9.9% sharpe=0.684 mdd=-20.91% n=329
+  Δ: ann=-0.43pp sharpe=-0.019 mdd=0.01pp n=-1
+  自检：patched(VALVE=None) vs 原版引擎 一致 = True
+
+===== ③ A/B 差值 =====
+  [hybrid_wb] Δ年化 -1.13pp (降收益)｜Δ夏普 -0.038｜Δ回撤 +0.31pp (降回撤)｜Δ笔数 -57
+  [none] Δ年化 -0.70pp (降收益)｜Δ夏普 +0.011｜Δ回撤 +0.37pp (降回撤)｜Δ笔数 -56
+[  387.1s] ✅ 保存 D:\Documents\Workbuddy\股票基金\quant-weight-system\backtest\valve_kh_engine_prod.json
