@@ -169,7 +169,8 @@ def main():
          "B4 MA20>MA60": np.where(np.isfinite(F["ma60"]), F["ma20"] > F["ma60"], False),
          "B5 RSI14≤70": np.where(np.isfinite(F["rsi"]), F["rsi"] <= 70.0, False),
          "B6 收盘≥5元": np.where(np.isfinite(F["C"]), F["C"] >= 5.0, False)}
-    # 清仓形态（A1c/A2c/A3c）：阀不过时，除不开新仓外，已有持仓次日开盘全平
+    # ⚠ A1c/A2c/A3c「触发即清仓」= **未实现**（仅过滤入场，未实现强制平仓）→ 与不清仓档读数相同，
+    #   属重复行，不得据此说「清仓有效/无效」。实现需另写支持「阀失败即平仓」的模拟器。
     ACS = {"A1c hs300>MA20·清仓": IX["above20"], "A2c hs300>MA60·清仓": IX["above60"],
            "A3c hs300>MA250·清仓": IX["above250"]}
 
@@ -253,7 +254,9 @@ def main():
     print("\n" + "-" * 120)
     print("③ 三重门筛选（①Δ回撤≤−5pp ②超随机对照 5 分位 ③年化≥沪深300 +2.46%）")
     print("-" * 120)
-    thr_imp = max(-v["min"] for v in out["control"].values())   # 随机阀能达到的**最大**改善
+    # 改善 = 回撤 − 基线回撤，**数值变大才算改善**；随机能做到的最大改善 = max(Δ回撤)
+    # ⚠ 曾误写 max(−min)：min 是**最差**抽样，方向反了（2026-09-21 自查）
+    thr_imp = max(v["max"] for v in out["control"].values())
     passed = []
     for aname, bname, rec in rows:
         if rec["gate1"] and rec["gate3"] and rec["d_mdd"] >= thr_imp:

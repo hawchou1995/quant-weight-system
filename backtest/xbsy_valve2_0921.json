@@ -1,0 +1,153 @@
+{
+ "base": {
+  "tag": "x",
+  "days": 2604,
+  "years": 10.76,
+  "total_return": 0.6183,
+  "cagr": 0.0458,
+  "sharpe": 0.334,
+  "max_drawdown": -0.3401,
+  "n_trades": 1164,
+  "win_rate_per_trade": 0.5507,
+  "mean_per_trade": 0.01248,
+  "win_rate_per_day": 0.5048,
+  "hold_median": 28,
+  "final_nav": 275118.0
+ },
+ "valve": {
+  "tag": "x",
+  "days": 2604,
+  "years": 10.76,
+  "total_return": 0.8272,
+  "cagr": 0.0576,
+  "sharpe": 0.405,
+  "max_drawdown": -0.2479,
+  "n_trades": 893,
+  "win_rate_per_trade": 0.5454,
+  "mean_per_trade": 0.01724,
+  "win_rate_per_day": 0.5044,
+  "hold_median": 33,
+  "final_nav": 310619.0
+ },
+ "imp_mdd": 0.0922,
+ "d_sharpe": 0.071,
+ "k_sig": 191172,
+ "days_blocked": 1223,
+ "draws": 100,
+ "controls": {
+  "C1_信号级": {
+   "n": 100,
+   "mdd_min": -0.523,
+   "mdd_max": -0.3255,
+   "mdd_mean": -0.4145,
+   "imp_max": 0.0146,
+   "sharpe_max": 0.436,
+   "sharpe_mean": 0.273,
+   "cagr_max": 0.0726,
+   "cagr_mean": 0.0358,
+   "pct_mdd_better_than_valve": 1.0,
+   "pct_sharpe_better_than_valve": 0.04
+  },
+  "C2_交易日级": {
+   "n": 100,
+   "mdd_min": -0.4607,
+   "mdd_max": -0.3206,
+   "mdd_mean": -0.3832,
+   "imp_max": 0.0195,
+   "sharpe_max": 0.442,
+   "sharpe_mean": 0.2591,
+   "cagr_max": 0.0686,
+   "cagr_mean": 0.0317,
+   "pct_mdd_better_than_valve": 1.0,
+   "pct_sharpe_better_than_valve": 0.02
+  }
+ },
+ "by_year": {
+  "2016": {
+   "valve": 0.0571,
+   "valve_mdd": -0.0695,
+   "base": 0.0106,
+   "base_mdd": -0.0944,
+   "hs300": -0.0458
+  },
+  "2017": {
+   "valve": -0.0637,
+   "valve_mdd": -0.1956,
+   "base": -0.0546,
+   "base_mdd": -0.1134,
+   "hs300": 0.206
+  },
+  "2018": {
+   "valve": -0.1139,
+   "valve_mdd": -0.1688,
+   "base": -0.2362,
+   "base_mdd": -0.2852,
+   "hs300": -0.2634
+  },
+  "2019": {
+   "valve": 0.2261,
+   "valve_mdd": -0.1424,
+   "base": 0.241,
+   "base_mdd": -0.155,
+   "hs300": 0.3795
+  },
+  "2020": {
+   "valve": 0.1555,
+   "valve_mdd": -0.1253,
+   "base": 0.0013,
+   "base_mdd": -0.1223,
+   "hs300": 0.2551
+  },
+  "2021": {
+   "valve": 0.0177,
+   "valve_mdd": -0.1276,
+   "base": 0.1611,
+   "base_mdd": -0.108,
+   "hs300": -0.0621
+  },
+  "2022": {
+   "valve": -0.107,
+   "valve_mdd": -0.1544,
+   "base": -0.024,
+   "base_mdd": -0.176,
+   "hs300": -0.2127
+  },
+  "2023": {
+   "valve": -0.0415,
+   "valve_mdd": -0.1324,
+   "base": 0.0306,
+   "base_mdd": -0.1243,
+   "hs300": -0.1175
+  },
+  "2024": {
+   "valve": 0.3909,
+   "valve_mdd": -0.1118,
+   "base": 0.4247,
+   "base_mdd": -0.1059,
+   "hs300": 0.162
+  },
+  "2025": {
+   "valve": 0.1716,
+   "valve_mdd": -0.0833,
+   "base": 0.1082,
+   "base_mdd": -0.0804,
+   "hs300": 0.2119
+  },
+  "2026": {
+   "valve": -0.0282,
+   "valve_mdd": -0.1307,
+   "base": -0.0699,
+   "base_mdd": -0.1711,
+   "hs300": -0.0446
+  }
+ },
+ "gates": {
+  "g1": true,
+  "g2": false,
+  "g3": true,
+  "thr_imp": 0.0195,
+  "thr_sharpe": 0.442,
+  "verdict": "不能证明超随机"
+ },
+ "elapsed_s": 496.8
+}
