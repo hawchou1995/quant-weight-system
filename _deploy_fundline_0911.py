@@ -7,7 +7,7 @@
 - changelog.md / changelog.html / review_log.html（v5.13.1 条目）
 随后 push gh-pages + 回读校验 + HTTP 端到端（检查 FB3-H20 上线）。
 """
-import hashlib, shutil, subprocess, sys, time
+import hashlib, re, shutil, subprocess, sys, time
 from pathlib import Path
 
 REPO = Path(r"D:/Documents/Workbuddy/股票基金/quant-weight-system")
@@ -24,8 +24,26 @@ SYNC = [
     "kxmm_data.js",
     "heatmap_data.js",
     "echarts.min.js",
+    # ⚠ 2026-09-21 修复（用户报「看板还是旧的」）：index.html 的运行期 <script src> 依赖漏进 SYNC。
+    #   漏点：dist 只被 `git add -A` 打包——**不覆盖就不更新**，SYNC 才是 repo→dist 刷新的唯一入口。
+    #   后果实证：线上 short_signals.js 停在 {"as_of":"2026-09-15"}（命中一览卡/短线池整块读它），
+    #   而 repo 当时已是 09-21；enhanced_data.js / a5_pool.js 同病（dist 均为 09-15）。
+    "short_signals.js",
+    "enhanced_data.js",
+    "a5_pool.js",
+    "market_breadth.js",
+    "market_weather.js",
 ]
 DUAL = ["dual_system.html", "index.html"]
+
+# 运行期依赖守卫（2026-09-21 新增）：index.html 里每个本地 <script src> 必须在 SYNC 内，
+# 否则部署会「成功」但继续发旧文件。缺一个就在部署前直接中止，不让静默陈旧再发生。
+_RUNTIME_DEPS = list(dict.fromkeys(re.findall(
+    r'<script src="([^":/]+\.js)"',
+    (REPO / "index.html").read_text(encoding="utf-8", errors="replace"))))
+_MISSING_DEPS = [d for d in _RUNTIME_DEPS if d not in SYNC]
+assert not _MISSING_DEPS, f"index.html 运行期依赖未纳入 SYNC（部署会静默发旧文件）：{_MISSING_DEPS}"
+print(f"运行期依赖守卫 ✅ {len(_RUNTIME_DEPS)} 个本地 <script src> 全部在 SYNC：{'、'.join(_RUNTIME_DEPS)}")
 
 
 def md5(p: Path) -> str:
