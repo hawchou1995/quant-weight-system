@@ -1,5 +1,5 @@
 {
- "ts": "2026-09-18 18:23",
+ "ts": "2026-09-21 16:22",
  "trade_day": "2026-09-18",
  "total": 7540,
  "fresh": 7201,
@@ -9,9 +9,9 @@
  "stale_tradable": 14,
  "stale_stock": 12,
  "stale_etf": 2,
- "stock_total": 5875,
- "stock_fresh": 5545,
- "stock_fresh_pct": 94.4,
+ "stock_total": 5533,
+ "stock_fresh": 5203,
+ "stock_fresh_pct": 94.0,
  "by_kind": {
   "其他": {
    "total": 32,
@@ -19,7 +19,7 @@
    "stale": 5,
    "delisted": 5
   },
-  "A股-北交所": {
+  "未使用-北交所": {
    "total": 342,
    "fresh": 342,
    "stale": 0,

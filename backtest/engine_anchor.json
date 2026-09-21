@@ -1,6 +1,6 @@
 {
- "base_off0_ann": 20.828,
- "asof": "2026-09-18",
+ "base_off0_ann": 20.972,
+ "asof": "2026-09-21",
  "historical": 22.87,
  "note": "冻结引擎 BASE 臂 off0 年化（当前数据版本）；研究侧 load_engine 读此文件做对齐检查"
 }

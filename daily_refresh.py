@@ -86,12 +86,24 @@ STEPS = [
     # A5 打板实验盘（看板「打板族」视图的数据源）——必须在 build_dual_system 之前跑；[软]=失败不阻断主链
     # 2026-09-14 补：此前该流水线未接入每日链 → 看板 A5 卡停在 as_of 09-10（持仓只显示 1 只），
     # 用户据此提问「A5 命中这么多，模拟盘为什么只有一只」。顺序=扫描→数据桥→复盘。
+    # 反向筛回避资产日更（R-daban-negscreen-0919 · 2026-09-20 用户批准）：A5 反向筛闸门的资产
+    # （kv 面板 → 10 臂信号 → block9/block10 回避掩码）随 data_full 推进。**必须在 A5 扫描之前**——
+    # 不建这步，闸门覆盖会停在资产末日（2026-09-11 实测）→「闸门开了但拦不到东西」。
+    # 历史行逐位保留 + 漂移即中止：data_full 历史复权再被修订时不会 silent 改写已验证决策
+    # （2026-09-20 实测：data_full 历史价 09-13 后被复权重述，1229/3960 股 ±1%）。
+    # 无新交易日时秒退（不写盘）；[软]=失败不阻断主链（闸门退回上一份资产 + 扫描器打 !! 告警）。
+    ("反向筛资产日更 revscreen_regen[软]", ["backtest/revscreen_regen.py"], "--skip-rev" in sys.argv),
     ("A5 打板实验盘扫描 paper_daban_a5[软]", [str(BASE.parent / "打板系统A5实验_20260827" / "paper_daban_a5.py")], "--skip-a5" in sys.argv),
     ("A5 看板数据 build_a5_pool[软]", ["build_a5_pool.py"], "--skip-a5" in sys.argv),
     ("A5 复盘日志 build_a5_review[软]", ["build_a5_review.py"], "--skip-a5" in sys.argv),
     # kxmm 市场情绪（恐贪指数+热力图）数据抓取——看板「市场情绪」视图数据源；[软]=失败不阻断，
     # 失败时保留上一份 kxmm_data.js（页面继续显示旧数据+日期）。R-kxmm-0917
     ("kxmm 市场情绪数据 fetch_kxmm[软]", ["backtest/fetch_kxmm.py"], "--skip-kxmm" in sys.argv),
+    # 因子四检查日链闸（R-gatewiring-0918，2026-09-18 建）：跑便宜的两项——
+    # ① warmup-check 于面板 mask（检出引擎域门切掉上市初期，陷阱 ★176）
+    # ② finite-check 于日链状态 JSON 的数字叶子（拦 inf/NaN 静默污染，陷阱 ★178）
+    # 仅 FAIL 时非零（FAIL 会打印到日志，但 [软] 语义下不阻断主链）；--skip-gate 跳过。
+    ("因子检查闸 factor_gate_daily[软]", ["backtest/factor_gate_daily.py"], "--skip-gate" in sys.argv),
     ("看板重建 build_dual_system", ["build_dual_system.py"], False),
     ("部署 gh-pages", ["_deploy_fundline_0911.py"], "--skip-deploy" in sys.argv),
 ]
