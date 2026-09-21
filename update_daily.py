@@ -343,6 +343,8 @@ def scan_rebase_candidates(target_date):
     """fresh 文件（尾日=最新）中近 32 日有 ≥REBASE_JUMP_PCT% 单日跳变且未放量者 → 候选"""
     cands = []
     for f in sorted(OUT_DIR.glob("*.csv")):
+        if f.stem.startswith("bj"):
+            continue   # 2026-09-21：不做北交所（与滞后清单同口径；否则每日候选首位全被 bj* 占满）
         if f.stat().st_size < 100:
             continue
         rows = _tail_rows(f, 40)

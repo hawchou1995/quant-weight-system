@@ -30,6 +30,11 @@ if not FORCE and date.today().weekday() >= 5:
 
 STEPS = [
     ("数据更新 update_daily", ["update_daily.py"], "--skip-data" in sys.argv),
+    # HS300 指数行维护 + 交易日闸门（R-gate-0917）：exit 3 = 今日行情不可得（非交易日/未就绪）→ 主链跳过后续
+    # 2026-09-21 修：**必须紧跟在数据更新之后**——它是唯一写入 index_000300 当日行的步骤，
+    # 而 fullpool_guard / em_bulk / heatmap 都靠该文件末行判定「今日」。原先排在它们之后
+    # → 三步拿到上一交易日做基准：freshness 误报新鲜、guard 漏补、em_bulk 口径校验拒写(rc=2)。
+    ("HS300 索引行 ensure_index_row", ["backtest/ensure_index_row.py"], False),
     # 全量池守卫（R-fullpool-0917，2026-09-17 建）：降级源只补池内子集（如 440/7539）→ 全市场口径
     # 数据（涨停全景/A5 扫描）失真。本步查 data_full 新鲜度，陈旧 >100 只自动触发全量补数（约 1-2h）。
     # [软]=失败不阻断主链；--skip-fullguard 跳过。
@@ -45,8 +50,6 @@ STEPS = [
     # 估值日更（2026-09-17 建，R-valfreeze-0917）：根因=旧管道只写 4 列快照、从不扩展 val_em 主表
     # → 主表冻结 → factorlab/oss 面板冻结 → 生产轨B 目标清单冻结（asof 谎报）。[软]=失败不阻断。
     ("估值日更 fetch_val_em_daily[软]", ["fetch_val_em_daily.py"], "--skip-val" in sys.argv),
-    # HS300 指数行维护 + 交易日闸门（R-gate-0917）：exit 3 = 今日行情不可得（非交易日/未就绪）→ 主链跳过后续
-    ("HS300 索引行 ensure_index_row", ["backtest/ensure_index_row.py"], False),
     # 基金净值刷新：必须在 build_short_pool 之前——否则基金信号用旧净值排序
     # 2026-09-14 补：此前刷新逻辑只在 refresh_daily.py --fund，收盘链从不调用 → 92% 的基金净值停在 08-20，
     # 占 60% 仓位的 FB3 基金主仓长期用 3 周前净值选基（且新旧净值混算）。[软]=失败不阻断主链。
