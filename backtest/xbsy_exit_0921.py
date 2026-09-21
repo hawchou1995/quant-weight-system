@@ -90,6 +90,17 @@ def exit_day_matrix(O, C, V, cfg):
         conf5 = X.roll_sum(below.astype(np.float64), 5) == 5   # 连续 5 日收盘 < MA5
         NX = np.minimum(NX, np.where(conf5, ar + 1, INF))
 
+    # 2026-09-21 追加（用户新止损）：跌破 MA(C,10) → 次日开盘卖。ma10_days=1 单日 / 2 连续两日
+    if cfg.get("ma10"):
+        nd = int(cfg.get("ma10_days", 1))
+        ma10 = X.roll_mean(C, 10)
+        below10 = np.where(np.isfinite(ma10), C < ma10, False)
+        if nd <= 1:
+            conf10 = below10
+        else:
+            conf10 = X.roll_sum(below10.astype(np.float64), nd) == nd
+        NX = np.minimum(NX, np.where(conf10, ar + 1, INF))
+
     # 后缀最小值：NX[t] = min over i ≥ t（规则与入场日无关，故一次预计算供全部入场复用）
     NX = np.minimum.accumulate(NX[::-1], axis=0)[::-1]
     return NX
