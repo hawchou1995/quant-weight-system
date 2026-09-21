@@ -55,6 +55,17 @@ STEPS = [
     # 占 60% 仓位的 FB3 基金主仓长期用 3 周前净值选基（且新旧净值混算）。[软]=失败不阻断主链。
     ("基金净值刷新 fund_nav_update[软]", ["fund_nav_update.py"], "--skip-fundnav" in sys.argv),
     ("短池+门控+FB3基金池 build_short_pool", ["build_short_pool.py"], False),
+    # 全量池因子缓存重建（R-v8cache-0921 · 2026-09-21 用户批准接进日链）：
+    # 根因=v9_auto.py:14 `pool_all = V.load_pool()` 在 **import 时**就读 v8_factor_cache.pkl，
+    # 而该缓存此前**从不被日链刷新**（源是 data_full，属派生缓存）→ 缓存一冻，
+    # build_enhanced_data 的 meta.as_of 就冻 → **看板页面标题「数据截至 X」与中长线池的
+    # 股价/评分一起停住**。实测事故：缓存停 09-15 → 线上标题写「数据截至 2026-09-18」，
+    # 而全市场数据已到 09-21（用户报「看板还是旧的」）。
+    # 必须排在 review_daily **之前**——review_daily.py:31 `import build_enhanced_data` 即执行。
+    # 幂等：sidecar `v8_factor_cache.meta.json` 的 as_of ≥ 交易日 → 跳过（正常日 0 成本）；
+    # 陈旧时全量重算（实测 5394 只 / 1.6 分钟 / 1.33 GB，原子替换，末行回退即拒写）。
+    # [软]=失败不阻断主链（看板退回旧缓存渲染，但不会静默写坏缓存）；--skip-v8cache 跳过。
+    ("全量池因子缓存 rebuild_v8cache[软]", ["backtest/rebuild_v8cache.py"], "--skip-v8cache" in sys.argv),
     ("复盘日志+跟踪池 review_daily", ["review_daily.py"], False),
     ("复盘日志页 build_log_pages", ["build_log_pages.py"], False),
     ("市值快照 fetch_val_daily", ["backtest/fetch_val_daily.py"], False),
@@ -203,7 +214,8 @@ if not fails:
                           # 2026-09-17 补：三个生产源文件此前从未进过链的 git 白名单（链只 add 产物）
                           "build_dual_system.py", "fetch_full_universe.py", "update_daily.py",
                           "kxmm_card.py", "kxmm_data.js", "heatmap_data.js",
-                          "backtest/build_heatmap.py", "echarts.min.js", "daily_refresh.py"],
+                          "backtest/build_heatmap.py", "echarts.min.js", "daily_refresh.py",
+                          "backtest/rebuild_v8cache.py"],
                          cwd=str(BASE), capture_output=True)
     if git.returncode == 0:
         c = subprocess.run(["git", "commit", "-m", f"chore(daily): {date.today()} 收盘刷新（池/信号/看板/复盘日志）"],
