@@ -219,7 +219,32 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <h2 style="margin:0">📝 更新日志 <span class="badge badge-auto">GitHub Release 风格</span></h2>
 </div>
 <div class="sub">量化系统版本更新记录：复盘发现设计缺陷 → 启动系统更新 → 在此登记版本/日期/更新内容</div>
-<div class="rel"><div class="rel-head">v5.13.9 - 2026-09-18（顶栏五个标签的空图标占位修复）</div><div class="rel-body">
+<div class="rel"><div class="rel-head">v5.13.10 - 2026-09-22（新增「超跌低开低吸」策略 + 短线系统双标签分组）</div><div class="rel-body">
+
+<p><b>新增策略「超跌低开低吸」</b>（R-sharesweb-0921 系列，源自 shares-web 仓库的方向翻转改造）</p>
+
+<div class='lg-item'><b>定义</b>：T 收盘判定 —— 超跌 <code>ret20(T-1) ≤ −7.31%</code> ＋ 熊市门 <code>沪深300(T) < MA20</code> ＋ 非ST ＋ 量比 ≥1.2 ＋ <b>市值/换手横截面分位带</b>（市值 [.20,.70] / 换手 [.40,.80]）；T+1 开盘执行 —— <b>开盘跳空 gap ∈ [−5%,−2%]</b> 才买，<b>单票权重 = min(1/n, 1/3)</b>，未用资金持国债ETF，T+1 收盘卖出（一日持股）。</div>
+<div class='lg-item'><b>投产口径</b>：B4 分位滤网 + 单票上限 1/3。回测（全窗 2016-2026，20bp+国债ETF）：<b>年化 +18.78% / 夏普 1.254 / 最差回撤 −15.12% / 胜率 57.2% / 5,080 笔</b>；<b>50bp 压力档 +8.03% / 夏普 0.609 / 回撤 −21.30%</b>（旧绝对滤网基线的 50bp 档为 −0.44%，已死）。</div>
+<div class='lg-item'><b>四轨影子盘</b>（日链第 27–30 步，<code>[软]</code> 执行，首个稳定周后硬化）：旧基线（绝对滤网·全池）/ B4 无上限（全池）/ <b>B4+K3（全池）★投产</b> / B4+K3（真主板，封存集头对头对照）。</div>
+<div class='lg-item'><b>今日收盘候选</b>输出 <code>backtest/qlch_candidates.json</code>（3 轨分列，等次日开盘 gap 判定）。</div>
+
+<p><b>短线系统分为两个标签组</b>（用户需求）</p>
+
+<div class='lg-item'><code>超跌低开低吸</code> —— 卡片含 <b>策略定义 / 选股结果（今日收盘候选）/ 模拟盘（四轨）/ 跟踪池 / 回测数据</b>（与 Khunter 同等结构）。</div>
+<div class='lg-item'><code>超卖伏击（Khunter 系列）</code> —— 命中策略一览 / 模拟盘 / ETF 动量轮动。</div>
+<div class='lg-item'>导航子项同步改名：<code>超跌低开低吸</code> / <code>超卖伏击 · 命中策略</code> / <code>超卖伏击 · 模拟盘</code>。</div>
+<div class='lg-item'>Khunter 系列定名 <b>「超卖伏击」</b>（4 字）；本策略定名 <b>「超跌低开低吸」</b>。</div>
+
+<p><b>⚠ 同批更正与披露</b></p>
+
+<p>1. <b>命名撞名更正</b>：本策略此前自称「C1」与项目内已有三处冲突（<code>weight_system_backtest_indicator_eval.py</code> 的 C1 筹码因子 / <code>_density_fund_0912.py</code> 的 C1 净利>0 / R-fib-0914 的 C1 入场滤网）→ 对外一律改用「超跌低开低吸」，内部文件前缀 <code>qlch_</code> 保留。</p>
+<p>2. <b>「主板」标注错误更正</b>：面板 glob <code>sh6*/sz0*</code> <b>含科创板 618 只（15.1%，20% 涨跌幅）</b>，此前 8 份报告标「主板」处应读作「全池（含科创板）」。结论结构不受影响，<b>数值归因受影响</b>——剔除科创板后 B4 年化 −10.56pp、旧基线 +3.84pp（逐臂不同）。</p>
+<p>3. <b>回测数据卡内附诚实标注</b>：B4 无上限行标「⚠ 含 248 天单票满仓，收益依赖分配约定，不采信」（该 248 天贡献 43.3% 总收益）。</p>
+<p>4. <b>影子盘状态</b>：全部为模拟轨，<b>不申领实盘资金</b>；毕业门见 <code>PRE-REGISTRATION_20260921_qlch_paper.md</code>（10 门）与 <code>PRE-REGISTRATION_20260921_qlch_mainboard.md</code>（七门）。封存集 = 2026-09-22 起。</p>
+
+<p><b>修掉自身 bug</b>：<code>qlch_paper</code> 模块此前<b>不幂等</b>——同一日期重复运行会把收益重复计入净值（日链 <code>--force</code> 会踩到）→ 已加幂等守卫并验证。</p>
+
+</div></div><div class="rel"><div class="rel-head">v5.13.9 - 2026-09-18（顶栏五个标签的空图标占位修复）</div><div class="rel-body">
 
 <p><b>现象</b>（用户报「顶栏五个标签有 emoji 占位，不协调」）：五 tab 左侧各留着一个 20px 空位，文字偏右、五个标签看着不匀。</p>
 
