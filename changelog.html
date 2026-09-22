@@ -74,9 +74,10 @@ body{padding-top:52px}
 .sidenav .sn-sub{display:none;position:absolute;top:100%;left:0;min-width:154px;margin:0;padding:5px;
   flex-direction:column;gap:1px;background:#232a36;border:1px solid rgba(255,255,255,.10);
   border-radius:0 0 var(--r) var(--r);box-shadow:0 10px 24px rgba(0,0,0,.30);z-index:960}
-.sn-grp:hover .sn-sub{display:flex}
-.sidenav .sn-arrow{margin-left:2px;font-size:10px;color:rgba(255,255,255,.42)}
-.sn-grp:hover .sn-arrow{color:#fff}
+/* 2026-09-22 停用 hover 下拉（R-dash-subtab-0922）：视图内已改为「策略子标签」，两者冲突。
+   保留 .sn-sub DOM（历史锚点仍可点），但不再悬停弹出。 */
+.sn-grp:hover .sn-sub{display:none}
+.sidenav .sn-arrow{display:none}/* 箭头同废（无下拉）*/
 .sidenav .sn-sub a{padding:6px 10px;font-size:12.5px;color:rgba(255,255,255,.72);border-radius:var(--r-sm);
   font-weight:400;white-space:nowrap}
 .sidenav .sn-sub a .dot-sub{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.32);flex:none}
@@ -219,7 +220,35 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <h2 style="margin:0">📝 更新日志 <span class="badge badge-auto">GitHub Release 风格</span></h2>
 </div>
 <div class="sub">量化系统版本更新记录：复盘发现设计缺陷 → 启动系统更新 → 在此登记版本/日期/更新内容</div>
-<div class="rel"><div class="rel-head">v5.13.11 - 2026-09-22（看板子标签结构改造 + 全局术语通俗化）</div><div class="rel-body">
+<div class="rel"><div class="rel-head">v5.13.12 - 2026-09-22（候选改表格 + 停用顶栏 hover 下拉 + 跟踪池剔除退休标的）</div><div class="rel-body">
+
+<p>用户三条反馈（附截图）逐条落地。</p>
+
+<p><b>① 超跌低开低吸「今日收盘候选」芯片云 → 标准表格</b></p>
+
+<p>截图问题：114 只挤成 <code>flex-wrap</code> 芯片云，代码+名称两列挤在一起无法读。</p>
+<p>改为标准表格 6 列：<code>代码 / 名称 / 板块 / 行业 / 现价 / 涨跌幅</code>，带 <code>data-key</code>/<code>data-v</code>（可排序），涨跌幅按涨跌着色，按涨跌幅升序排列，底部标注总数与入场条件（gap 区间）。</p>
+
+<p>配套：<code>qlch_paper</code> 候选输出<b>扩字段</b>（新增 <code>board</code> / <code>ind</code> / <code>close</code> / <code>chg</code>），行业取自面板 <code>ind_names</code>+<code>ind_id</code>。</p>
+
+<p><b>② 停用顶栏 hover 下拉</b>（与视图内策略子标签冲突）</p>
+
+<p><code>ui_components.py</code>：<code>.sn-grp:hover .sn-sub{display:flex}</code> → <code>display:none</code>，<code>.sn-arrow</code> 一并隐藏。</p>
+<p><code>.sn-sub</code> DOM 保留（历史锚点仍可点），仅不再悬停弹出。</p>
+
+<p><b>③ 短线跟踪池：剔除退休策略标的</b></p>
+
+<p>实测：<code>short_pool.json</code> 的 <code>track</code> 共 <b>175 条</b>，其中 <code>pool ∈ {创业板 51, 科创板 34}</code> = <b>85 条（48.6%）</b>属已退休的旧战法标的——<b>现行超卖伏击为主板限定，这些标的不可能被它选中</b>。</p>
+<p>处置：构建期清洗（非破坏性，不改源 JSON），<b>175 → 90 条</b>，构建日志打印剔除数。<code>track_pending_short</code> 同规则清洗。</p>
+
+<p><b>自伤与修复记录</b></p>
+
+<div class='lg-item'>候选表补丁<b>漏了闭合 <code></div></code></b> → 构建期 <code>div 平衡 = 1</code> 被校验拦下 → 补上后归零。<b>这是 div 平衡校验第二次实际拦下问题</b>（第一次是 v5.13.11 的锚点断言）。</div>
+<div class='lg-item'>候选输出原本写在幂等守卫<b>之后</b> → 同日期重跑时被守卫提前 return，导致候选陈旧。已移至守卫<b>之前</b>（候选是每日产出，不应受账本状态影响）。</div>
+
+<p><b>构建验收</b>：div 平衡 0 / HTML 转义通过 / 候选表 114 行解析成功 / hover 下拉确认停用 / 跟踪池 175→90。</p>
+
+</div></div><div class="rel"><div class="rel-head">v5.13.11 - 2026-09-22（看板子标签结构改造 + 全局术语通俗化）</div><div class="rel-body">
 
 <p><b>用户需求</b>：做成 i.gushi.in 式「大类 → 策略子标签」结构，全部策略通用；术语改成通俗名；资产配置交用户；选股池表格字段统一。</p>
 
