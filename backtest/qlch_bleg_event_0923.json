@@ -1,0 +1,1308 @@
+{
+ "meta": {
+  "title": "R-qlch-bleg-0923 · G2 事件级 B 腿增量检验（历史域）",
+  "script": "backtest/qlch_bleg_event_0923.py",
+  "version": "qlch-bleg-event-0923/v1",
+  "preregistration": "backtest/PRE-REGISTRATION_20260923_qlch_bleg_followup.md",
+  "engine": "backtest/qlch_grid_bt_0923.py → backtest/qlch_paper_20260921.py",
+  "cost_tiers": {
+   "P20": 0.002,
+   "S60": 0.006
+  },
+  "primary_exit": "X3 (TP25/SL-30/H30)",
+  "secondary_exit": "X0 (TP15/SL-20/H20)",
+  "bootstrap": {
+   "n": 10000,
+   "cluster_primary": "entry_day",
+   "cluster_robust": "stock",
+   "seed": 20260923,
+   "note": "成块重采样；A/B 各自独立聚合，Δ = mean(B) − mean(A)"
+  },
+  "windows_by": "entry_day",
+  "windows": {
+   "full": {
+    "lo_i": 511,
+    "hi_i": 2605,
+    "lo": "2018-02-02",
+    "hi": "2026-09-22"
+   },
+   "train": {
+    "lo_i": 511,
+    "hi_i": 1460,
+    "lo": "2018-02-02",
+    "hi": "2021-12-31"
+   },
+   "val": {
+    "lo_i": 1461,
+    "hi_i": 2605,
+    "lo": "2022-01-04",
+    "hi": "2026-09-22"
+   }
+  },
+  "run_at": "2026-09-22 23:58:45",
+  "python": "3.13.14",
+  "numpy": "2.3.5",
+  "panels": {
+   "cal_0": "2016-01-04",
+   "cal_last": "2026-09-22",
+   "T": 2606,
+   "n_symbols": 4087
+  },
+  "entry_opportunities": {
+   "A": 3440,
+   "B": 346,
+   "C": 35412
+  },
+  "elapsed_sec": 39.0
+ },
+ "crosscheck_prev_round": {
+  "prev_json": "backtest/qlch_bfamily_0923.json",
+  "prev_entry_opportunities": {
+   "A": 3440,
+   "B": 346,
+   "C": 35412
+  },
+  "now": {
+   "A": 3440,
+   "B": 346,
+   "C": 35412
+  },
+  "match": true
+ },
+ "cases": {
+  "X3|full|P20": {
+   "A": {
+    "n_events_in_win": 3440,
+    "n_used": 3430,
+    "n_dropped_panel_end": 10,
+    "rets": {
+     "n": 3430,
+     "mean_pct": 8.7756,
+     "median_pct": 7.8897,
+     "std_pct": 14.7513,
+     "p25_pct": -1.3772,
+     "p75_pct": 24.8,
+     "wr_pct": 72.012
+    },
+    "mean_hold": 25.08,
+    "exit_reasons": {
+     "止损跳空": 13,
+     "止盈跳空": 193,
+     "止损触发": 42,
+     "止盈触发": 940,
+     "到期平仓": 2242
+    },
+    "over_window_exit": 0
+   },
+   "B": {
+    "n_events_in_win": 346,
+    "n_used": 346,
+    "n_dropped_panel_end": 0,
+    "rets": {
+     "n": 346,
+     "mean_pct": 13.362,
+     "median_pct": 24.8,
+     "std_pct": 15.5322,
+     "p25_pct": 1.3842,
+     "p75_pct": 24.8,
+     "wr_pct": 78.902
+    },
+    "mean_hold": 20.289,
+    "exit_reasons": {
+     "止损跳空": 4,
+     "止盈跳空": 35,
+     "止损触发": 5,
+     "止盈触发": 146,
+     "到期平仓": 156
+    },
+    "over_window_exit": 0
+   },
+   "C": {
+    "n_events_in_win": 35412,
+    "n_used": 35327,
+    "n_dropped_panel_end": 85,
+    "rets": {
+     "n": 35327,
+     "mean_pct": 4.1481,
+     "median_pct": 3.0083,
+     "std_pct": 14.9993,
+     "p25_pct": -5.7659,
+     "p75_pct": 15.0535,
+     "wr_pct": 59.13
+    },
+    "mean_hold": 26.905,
+    "exit_reasons": {
+     "止损跳空": 248,
+     "止盈跳空": 1590,
+     "止损触发": 930,
+     "止盈触发": 5758,
+     "到期平仓": 26801
+    },
+    "over_window_exit": 0
+   },
+   "delta_B_minus_A": {
+    "by_day": {
+     "point_pp": 4.5864,
+     "ci95_lo_pp": -1.5101,
+     "ci95_hi_pp": 8.131,
+     "p_delta_gt0": 0.8853,
+     "n_clusters": 547,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    },
+    "by_stock": {
+     "point_pp": 4.5864,
+     "ci95_lo_pp": 2.8329,
+     "ci95_hi_pp": 6.2726,
+     "p_delta_gt0": 1.0,
+     "n_clusters": 1502,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    }
+   },
+   "delta_same_day_paired": {
+    "n_days": 95,
+    "mean_pp": -1.552,
+    "median_pp": -0.9044,
+    "share_days_positive": 0.4316
+   }
+  },
+  "X3|full|S60": {
+   "A": {
+    "n_events_in_win": 3440,
+    "n_used": 3430,
+    "n_dropped_panel_end": 10,
+    "rets": {
+     "n": 3430,
+     "mean_pct": 8.3756,
+     "median_pct": 7.4897,
+     "std_pct": 14.7513,
+     "p25_pct": -1.7772,
+     "p75_pct": 24.4,
+     "wr_pct": 71.05
+    },
+    "mean_hold": 25.08,
+    "exit_reasons": {
+     "止损跳空": 13,
+     "止盈跳空": 193,
+     "止损触发": 42,
+     "止盈触发": 940,
+     "到期平仓": 2242
+    },
+    "over_window_exit": 0
+   },
+   "B": {
+    "n_events_in_win": 346,
+    "n_used": 346,
+    "n_dropped_panel_end": 0,
+    "rets": {
+     "n": 346,
+     "mean_pct": 12.962,
+     "median_pct": 24.4,
+     "std_pct": 15.5322,
+     "p25_pct": 0.9842,
+     "p75_pct": 24.4,
+     "wr_pct": 77.168
+    },
+    "mean_hold": 20.289,
+    "exit_reasons": {
+     "止损跳空": 4,
+     "止盈跳空": 35,
+     "止损触发": 5,
+     "止盈触发": 146,
+     "到期平仓": 156
+    },
+    "over_window_exit": 0
+   },
+   "C": {
+    "n_events_in_win": 35412,
+    "n_used": 35327,
+    "n_dropped_panel_end": 85,
+    "rets": {
+     "n": 35327,
+     "mean_pct": 3.7481,
+     "median_pct": 2.6083,
+     "std_pct": 14.9993,
+     "p25_pct": -6.1659,
+     "p75_pct": 14.6535,
+     "wr_pct": 57.874
+    },
+    "mean_hold": 26.905,
+    "exit_reasons": {
+     "止损跳空": 248,
+     "止盈跳空": 1590,
+     "止损触发": 930,
+     "止盈触发": 5758,
+     "到期平仓": 26801
+    },
+    "over_window_exit": 0
+   },
+   "delta_B_minus_A": {
+    "by_day": {
+     "point_pp": 4.5864,
+     "ci95_lo_pp": -1.5101,
+     "ci95_hi_pp": 8.131,
+     "p_delta_gt0": 0.8853,
+     "n_clusters": 547,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    },
+    "by_stock": {
+     "point_pp": 4.5864,
+     "ci95_lo_pp": 2.8329,
+     "ci95_hi_pp": 6.2726,
+     "p_delta_gt0": 1.0,
+     "n_clusters": 1502,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    }
+   },
+   "delta_same_day_paired": {
+    "n_days": 95,
+    "mean_pp": -1.552,
+    "median_pp": -0.9044,
+    "share_days_positive": 0.4316
+   }
+  },
+  "X3|train|P20": {
+   "A": {
+    "n_events_in_win": 1755,
+    "n_used": 1746,
+    "n_dropped_panel_end": 9,
+    "rets": {
+     "n": 1746,
+     "mean_pct": 7.0508,
+     "median_pct": 4.874,
+     "std_pct": 13.5118,
+     "p25_pct": -2.2555,
+     "p75_pct": 24.8,
+     "wr_pct": 68.156
+    },
+    "mean_hold": 26.683,
+    "exit_reasons": {
+     "止损跳空": 6,
+     "止盈跳空": 77,
+     "止损触发": 8,
+     "止盈触发": 368,
+     "到期平仓": 1287
+    },
+    "over_window_exit": 5
+   },
+   "B": {
+    "n_events_in_win": 111,
+    "n_used": 111,
+    "n_dropped_panel_end": 0,
+    "rets": {
+     "n": 111,
+     "mean_pct": 4.6588,
+     "median_pct": 2.5632,
+     "std_pct": 16.8709,
+     "p25_pct": -6.3119,
+     "p75_pct": 24.8,
+     "wr_pct": 59.459
+    },
+    "mean_hold": 25.784,
+    "exit_reasons": {
+     "止损跳空": 3,
+     "止盈跳空": 7,
+     "止损触发": 3,
+     "止盈触发": 22,
+     "到期平仓": 76
+    },
+    "over_window_exit": 1
+   },
+   "C": {
+    "n_events_in_win": 13508,
+    "n_used": 13453,
+    "n_dropped_panel_end": 55,
+    "rets": {
+     "n": 13453,
+     "mean_pct": 3.7181,
+     "median_pct": 2.0457,
+     "std_pct": 13.215,
+     "p25_pct": -5.1754,
+     "p75_pct": 11.4716,
+     "wr_pct": 57.192
+    },
+    "mean_hold": 27.865,
+    "exit_reasons": {
+     "止损跳空": 49,
+     "止盈跳空": 434,
+     "止损触发": 77,
+     "止盈触发": 1881,
+     "到期平仓": 11012
+    },
+    "over_window_exit": 97
+   },
+   "delta_B_minus_A": {
+    "by_day": {
+     "point_pp": -2.392,
+     "ci95_lo_pp": -5.9082,
+     "ci95_hi_pp": 0.9587,
+     "p_delta_gt0": 0.0874,
+     "n_clusters": 270,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    },
+    "by_stock": {
+     "point_pp": -2.392,
+     "ci95_lo_pp": -5.6931,
+     "ci95_hi_pp": 0.8315,
+     "p_delta_gt0": 0.0746,
+     "n_clusters": 960,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    }
+   },
+   "delta_same_day_paired": {
+    "n_days": 53,
+    "mean_pp": -4.7685,
+    "median_pp": -6.8512,
+    "share_days_positive": 0.3019
+   }
+  },
+  "X3|train|S60": {
+   "A": {
+    "n_events_in_win": 1755,
+    "n_used": 1746,
+    "n_dropped_panel_end": 9,
+    "rets": {
+     "n": 1746,
+     "mean_pct": 6.6508,
+     "median_pct": 4.474,
+     "std_pct": 13.5118,
+     "p25_pct": -2.6555,
+     "p75_pct": 24.4,
+     "wr_pct": 66.896
+    },
+    "mean_hold": 26.683,
+    "exit_reasons": {
+     "止损跳空": 6,
+     "止盈跳空": 77,
+     "止损触发": 8,
+     "止盈触发": 368,
+     "到期平仓": 1287
+    },
+    "over_window_exit": 5
+   },
+   "B": {
+    "n_events_in_win": 111,
+    "n_used": 111,
+    "n_dropped_panel_end": 0,
+    "rets": {
+     "n": 111,
+     "mean_pct": 4.2588,
+     "median_pct": 2.1632,
+     "std_pct": 16.8709,
+     "p25_pct": -6.7119,
+     "p75_pct": 24.4,
+     "wr_pct": 54.955
+    },
+    "mean_hold": 25.784,
+    "exit_reasons": {
+     "止损跳空": 3,
+     "止盈跳空": 7,
+     "止损触发": 3,
+     "止盈触发": 22,
+     "到期平仓": 76
+    },
+    "over_window_exit": 1
+   },
+   "C": {
+    "n_events_in_win": 13508,
+    "n_used": 13453,
+    "n_dropped_panel_end": 55,
+    "rets": {
+     "n": 13453,
+     "mean_pct": 3.3181,
+     "median_pct": 1.6457,
+     "std_pct": 13.215,
+     "p25_pct": -5.5754,
+     "p75_pct": 11.0716,
+     "wr_pct": 55.594
+    },
+    "mean_hold": 27.865,
+    "exit_reasons": {
+     "止损跳空": 49,
+     "止盈跳空": 434,
+     "止损触发": 77,
+     "止盈触发": 1881,
+     "到期平仓": 11012
+    },
+    "over_window_exit": 97
+   },
+   "delta_B_minus_A": {
+    "by_day": {
+     "point_pp": -2.392,
+     "ci95_lo_pp": -5.9082,
+     "ci95_hi_pp": 0.9587,
+     "p_delta_gt0": 0.0874,
+     "n_clusters": 270,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    },
+    "by_stock": {
+     "point_pp": -2.392,
+     "ci95_lo_pp": -5.6931,
+     "ci95_hi_pp": 0.8315,
+     "p_delta_gt0": 0.0746,
+     "n_clusters": 960,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    }
+   },
+   "delta_same_day_paired": {
+    "n_days": 53,
+    "mean_pp": -4.7685,
+    "median_pp": -6.8512,
+    "share_days_positive": 0.3019
+   }
+  },
+  "X3|val|P20": {
+   "A": {
+    "n_events_in_win": 1685,
+    "n_used": 1684,
+    "n_dropped_panel_end": 1,
+    "rets": {
+     "n": 1684,
+     "mean_pct": 10.5638,
+     "median_pct": 13.0191,
+     "std_pct": 15.7407,
+     "p25_pct": 0.6238,
+     "p75_pct": 24.8,
+     "wr_pct": 76.01
+    },
+    "mean_hold": 23.418,
+    "exit_reasons": {
+     "止损跳空": 7,
+     "止盈跳空": 116,
+     "止损触发": 34,
+     "止盈触发": 572,
+     "到期平仓": 955
+    },
+    "over_window_exit": 0
+   },
+   "B": {
+    "n_events_in_win": 235,
+    "n_used": 235,
+    "n_dropped_panel_end": 0,
+    "rets": {
+     "n": 235,
+     "mean_pct": 17.4729,
+     "median_pct": 24.8,
+     "std_pct": 12.9995,
+     "p25_pct": 12.7029,
+     "p75_pct": 24.8,
+     "wr_pct": 88.085
+    },
+    "mean_hold": 17.694,
+    "exit_reasons": {
+     "止损跳空": 1,
+     "止盈跳空": 28,
+     "止损触发": 2,
+     "止盈触发": 124,
+     "到期平仓": 80
+    },
+    "over_window_exit": 0
+   },
+   "C": {
+    "n_events_in_win": 21904,
+    "n_used": 21874,
+    "n_dropped_panel_end": 30,
+    "rets": {
+     "n": 21874,
+     "mean_pct": 4.4125,
+     "median_pct": 3.831,
+     "std_pct": 15.9927,
+     "p25_pct": -6.2454,
+     "p75_pct": 17.8496,
+     "wr_pct": 60.323
+    },
+    "mean_hold": 26.314,
+    "exit_reasons": {
+     "止损跳空": 199,
+     "止盈跳空": 1156,
+     "止损触发": 853,
+     "止盈触发": 3877,
+     "到期平仓": 15789
+    },
+    "over_window_exit": 0
+   },
+   "delta_B_minus_A": {
+    "by_day": {
+     "point_pp": 6.9091,
+     "ci95_lo_pp": -0.0075,
+     "ci95_hi_pp": 10.2244,
+     "p_delta_gt0": 0.9745,
+     "n_clusters": 277,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    },
+    "by_stock": {
+     "point_pp": 6.9091,
+     "ci95_lo_pp": 5.0789,
+     "ci95_hi_pp": 8.7233,
+     "p_delta_gt0": 1.0,
+     "n_clusters": 1068,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    }
+   },
+   "delta_same_day_paired": {
+    "n_days": 42,
+    "mean_pp": 2.5069,
+    "median_pp": 0.9884,
+    "share_days_positive": 0.5952
+   }
+  },
+  "X3|val|S60": {
+   "A": {
+    "n_events_in_win": 1685,
+    "n_used": 1684,
+    "n_dropped_panel_end": 1,
+    "rets": {
+     "n": 1684,
+     "mean_pct": 10.1638,
+     "median_pct": 12.6191,
+     "std_pct": 15.7407,
+     "p25_pct": 0.2238,
+     "p75_pct": 24.4,
+     "wr_pct": 75.356
+    },
+    "mean_hold": 23.418,
+    "exit_reasons": {
+     "止损跳空": 7,
+     "止盈跳空": 116,
+     "止损触发": 34,
+     "止盈触发": 572,
+     "到期平仓": 955
+    },
+    "over_window_exit": 0
+   },
+   "B": {
+    "n_events_in_win": 235,
+    "n_used": 235,
+    "n_dropped_panel_end": 0,
+    "rets": {
+     "n": 235,
+     "mean_pct": 17.0729,
+     "median_pct": 24.4,
+     "std_pct": 12.9995,
+     "p25_pct": 12.3029,
+     "p75_pct": 24.4,
+     "wr_pct": 87.66
+    },
+    "mean_hold": 17.694,
+    "exit_reasons": {
+     "止损跳空": 1,
+     "止盈跳空": 28,
+     "止损触发": 2,
+     "止盈触发": 124,
+     "到期平仓": 80
+    },
+    "over_window_exit": 0
+   },
+   "C": {
+    "n_events_in_win": 21904,
+    "n_used": 21874,
+    "n_dropped_panel_end": 30,
+    "rets": {
+     "n": 21874,
+     "mean_pct": 4.0125,
+     "median_pct": 3.431,
+     "std_pct": 15.9927,
+     "p25_pct": -6.6454,
+     "p75_pct": 17.4496,
+     "wr_pct": 59.276
+    },
+    "mean_hold": 26.314,
+    "exit_reasons": {
+     "止损跳空": 199,
+     "止盈跳空": 1156,
+     "止损触发": 853,
+     "止盈触发": 3877,
+     "到期平仓": 15789
+    },
+    "over_window_exit": 0
+   },
+   "delta_B_minus_A": {
+    "by_day": {
+     "point_pp": 6.9091,
+     "ci95_lo_pp": -0.0075,
+     "ci95_hi_pp": 10.2244,
+     "p_delta_gt0": 0.9745,
+     "n_clusters": 277,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    },
+    "by_stock": {
+     "point_pp": 6.9091,
+     "ci95_lo_pp": 5.0789,
+     "ci95_hi_pp": 8.7233,
+     "p_delta_gt0": 1.0,
+     "n_clusters": 1068,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    }
+   },
+   "delta_same_day_paired": {
+    "n_days": 42,
+    "mean_pp": 2.5069,
+    "median_pp": 0.9884,
+    "share_days_positive": 0.5952
+   }
+  },
+  "X0|full|P20": {
+   "A": {
+    "n_events_in_win": 3440,
+    "n_used": 3434,
+    "n_dropped_panel_end": 6,
+    "rets": {
+     "n": 3434,
+     "mean_pct": 6.2832,
+     "median_pct": 10.8284,
+     "std_pct": 10.7001,
+     "p25_pct": -0.988,
+     "p75_pct": 14.8,
+     "wr_pct": 72.568
+    },
+    "mean_hold": 14.658,
+    "exit_reasons": {
+     "止损跳空": 31,
+     "止盈跳空": 223,
+     "止损触发": 119,
+     "止盈触发": 1422,
+     "到期平仓": 1639
+    },
+    "over_window_exit": 0
+   },
+   "B": {
+    "n_events_in_win": 346,
+    "n_used": 346,
+    "n_dropped_panel_end": 0,
+    "rets": {
+     "n": 346,
+     "mean_pct": 7.6269,
+     "median_pct": 14.8,
+     "std_pct": 11.7857,
+     "p25_pct": 0.5304,
+     "p75_pct": 14.8,
+     "wr_pct": 76.012
+    },
+    "mean_hold": 11.003,
+    "exit_reasons": {
+     "止损跳空": 8,
+     "止盈跳空": 28,
+     "止损触发": 19,
+     "止盈触发": 188,
+     "到期平仓": 103
+    },
+    "over_window_exit": 0
+   },
+   "C": {
+    "n_events_in_win": 35412,
+    "n_used": 35333,
+    "n_dropped_panel_end": 79,
+    "rets": {
+     "n": 35333,
+     "mean_pct": 1.9639,
+     "median_pct": 2.3536,
+     "std_pct": 11.5819,
+     "p25_pct": -5.865,
+     "p75_pct": 14.8,
+     "wr_pct": 57.708
+    },
+    "mean_hold": 16.425,
+    "exit_reasons": {
+     "止损跳空": 493,
+     "止盈跳空": 1542,
+     "止损触发": 2726,
+     "止盈触发": 9048,
+     "到期平仓": 21524
+    },
+    "over_window_exit": 0
+   },
+   "delta_B_minus_A": {
+    "by_day": {
+     "point_pp": 1.3437,
+     "ci95_lo_pp": -3.0985,
+     "ci95_hi_pp": 3.949,
+     "p_delta_gt0": 0.6539,
+     "n_clusters": 548,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    },
+    "by_stock": {
+     "point_pp": 1.3437,
+     "ci95_lo_pp": 0.035,
+     "ci95_hi_pp": 2.6457,
+     "p_delta_gt0": 0.9776,
+     "n_clusters": 1502,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    }
+   },
+   "delta_same_day_paired": {
+    "n_days": 95,
+    "mean_pp": -1.6807,
+    "median_pp": -0.8128,
+    "share_days_positive": 0.4211
+   }
+  },
+  "X0|full|S60": {
+   "A": {
+    "n_events_in_win": 3440,
+    "n_used": 3434,
+    "n_dropped_panel_end": 6,
+    "rets": {
+     "n": 3434,
+     "mean_pct": 5.8832,
+     "median_pct": 10.4284,
+     "std_pct": 10.7001,
+     "p25_pct": -1.388,
+     "p75_pct": 14.4,
+     "wr_pct": 71.374
+    },
+    "mean_hold": 14.658,
+    "exit_reasons": {
+     "止损跳空": 31,
+     "止盈跳空": 223,
+     "止损触发": 119,
+     "止盈触发": 1422,
+     "到期平仓": 1639
+    },
+    "over_window_exit": 0
+   },
+   "B": {
+    "n_events_in_win": 346,
+    "n_used": 346,
+    "n_dropped_panel_end": 0,
+    "rets": {
+     "n": 346,
+     "mean_pct": 7.2269,
+     "median_pct": 14.4,
+     "std_pct": 11.7857,
+     "p25_pct": 0.1304,
+     "p75_pct": 14.4,
+     "wr_pct": 75.145
+    },
+    "mean_hold": 11.003,
+    "exit_reasons": {
+     "止损跳空": 8,
+     "止盈跳空": 28,
+     "止损触发": 19,
+     "止盈触发": 188,
+     "到期平仓": 103
+    },
+    "over_window_exit": 0
+   },
+   "C": {
+    "n_events_in_win": 35412,
+    "n_used": 35333,
+    "n_dropped_panel_end": 79,
+    "rets": {
+     "n": 35333,
+     "mean_pct": 1.5639,
+     "median_pct": 1.9536,
+     "std_pct": 11.5819,
+     "p25_pct": -6.265,
+     "p75_pct": 14.4,
+     "wr_pct": 56.378
+    },
+    "mean_hold": 16.425,
+    "exit_reasons": {
+     "止损跳空": 493,
+     "止盈跳空": 1542,
+     "止损触发": 2726,
+     "止盈触发": 9048,
+     "到期平仓": 21524
+    },
+    "over_window_exit": 0
+   },
+   "delta_B_minus_A": {
+    "by_day": {
+     "point_pp": 1.3437,
+     "ci95_lo_pp": -3.0985,
+     "ci95_hi_pp": 3.949,
+     "p_delta_gt0": 0.6539,
+     "n_clusters": 548,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    },
+    "by_stock": {
+     "point_pp": 1.3437,
+     "ci95_lo_pp": 0.035,
+     "ci95_hi_pp": 2.6457,
+     "p_delta_gt0": 0.9776,
+     "n_clusters": 1502,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    }
+   },
+   "delta_same_day_paired": {
+    "n_days": 95,
+    "mean_pp": -1.6807,
+    "median_pp": -0.8128,
+    "share_days_positive": 0.4211
+   }
+  },
+  "X0|train|P20": {
+   "A": {
+    "n_events_in_win": 1755,
+    "n_used": 1750,
+    "n_dropped_panel_end": 5,
+    "rets": {
+     "n": 1750,
+     "mean_pct": 5.5257,
+     "median_pct": 7.3263,
+     "std_pct": 10.2348,
+     "p25_pct": -1.8349,
+     "p75_pct": 14.8,
+     "wr_pct": 69.429
+    },
+    "mean_hold": 16.002,
+    "exit_reasons": {
+     "止损跳空": 13,
+     "止盈跳空": 89,
+     "止损触发": 34,
+     "止盈触发": 642,
+     "到期平仓": 972
+    },
+    "over_window_exit": 3
+   },
+   "B": {
+    "n_events_in_win": 111,
+    "n_used": 111,
+    "n_dropped_panel_end": 0,
+    "rets": {
+     "n": 111,
+     "mean_pct": 2.351,
+     "median_pct": 5.7089,
+     "std_pct": 13.4457,
+     "p25_pct": -8.1949,
+     "p75_pct": 14.8,
+     "wr_pct": 55.856
+    },
+    "mean_hold": 14.441,
+    "exit_reasons": {
+     "止损跳空": 4,
+     "止盈跳空": 8,
+     "止损触发": 9,
+     "止盈触发": 36,
+     "到期平仓": 54
+    },
+    "over_window_exit": 0
+   },
+   "C": {
+    "n_events_in_win": 13508,
+    "n_used": 13453,
+    "n_dropped_panel_end": 55,
+    "rets": {
+     "n": 13453,
+     "mean_pct": 2.6966,
+     "median_pct": 2.4162,
+     "std_pct": 10.2467,
+     "p25_pct": -4.3378,
+     "p75_pct": 14.8,
+     "wr_pct": 59.674
+    },
+    "mean_hold": 17.36,
+    "exit_reasons": {
+     "止损跳空": 104,
+     "止盈跳空": 518,
+     "止损触发": 437,
+     "止盈触发": 3196,
+     "到期平仓": 9198
+    },
+    "over_window_exit": 82
+   },
+   "delta_B_minus_A": {
+    "by_day": {
+     "point_pp": -3.1747,
+     "ci95_lo_pp": -6.0024,
+     "ci95_hi_pp": -0.4094,
+     "p_delta_gt0": 0.0124,
+     "n_clusters": 271,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    },
+    "by_stock": {
+     "point_pp": -3.1747,
+     "ci95_lo_pp": -5.8012,
+     "ci95_hi_pp": -0.6189,
+     "p_delta_gt0": 0.0073,
+     "n_clusters": 960,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    }
+   },
+   "delta_same_day_paired": {
+    "n_days": 53,
+    "mean_pp": -4.1477,
+    "median_pp": -2.5363,
+    "share_days_positive": 0.3396
+   }
+  },
+  "X0|train|S60": {
+   "A": {
+    "n_events_in_win": 1755,
+    "n_used": 1750,
+    "n_dropped_panel_end": 5,
+    "rets": {
+     "n": 1750,
+     "mean_pct": 5.1257,
+     "median_pct": 6.9263,
+     "std_pct": 10.2348,
+     "p25_pct": -2.2349,
+     "p75_pct": 14.4,
+     "wr_pct": 68.114
+    },
+    "mean_hold": 16.002,
+    "exit_reasons": {
+     "止损跳空": 13,
+     "止盈跳空": 89,
+     "止损触发": 34,
+     "止盈触发": 642,
+     "到期平仓": 972
+    },
+    "over_window_exit": 3
+   },
+   "B": {
+    "n_events_in_win": 111,
+    "n_used": 111,
+    "n_dropped_panel_end": 0,
+    "rets": {
+     "n": 111,
+     "mean_pct": 1.951,
+     "median_pct": 5.3089,
+     "std_pct": 13.4457,
+     "p25_pct": -8.5949,
+     "p75_pct": 14.4,
+     "wr_pct": 53.153
+    },
+    "mean_hold": 14.441,
+    "exit_reasons": {
+     "止损跳空": 4,
+     "止盈跳空": 8,
+     "止损触发": 9,
+     "止盈触发": 36,
+     "到期平仓": 54
+    },
+    "over_window_exit": 0
+   },
+   "C": {
+    "n_events_in_win": 13508,
+    "n_used": 13453,
+    "n_dropped_panel_end": 55,
+    "rets": {
+     "n": 13453,
+     "mean_pct": 2.2966,
+     "median_pct": 2.0162,
+     "std_pct": 10.2467,
+     "p25_pct": -4.7378,
+     "p75_pct": 14.4,
+     "wr_pct": 58.106
+    },
+    "mean_hold": 17.36,
+    "exit_reasons": {
+     "止损跳空": 104,
+     "止盈跳空": 518,
+     "止损触发": 437,
+     "止盈触发": 3196,
+     "到期平仓": 9198
+    },
+    "over_window_exit": 82
+   },
+   "delta_B_minus_A": {
+    "by_day": {
+     "point_pp": -3.1747,
+     "ci95_lo_pp": -6.0024,
+     "ci95_hi_pp": -0.4094,
+     "p_delta_gt0": 0.0124,
+     "n_clusters": 271,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    },
+    "by_stock": {
+     "point_pp": -3.1747,
+     "ci95_lo_pp": -5.8012,
+     "ci95_hi_pp": -0.6189,
+     "p_delta_gt0": 0.0073,
+     "n_clusters": 960,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    }
+   },
+   "delta_same_day_paired": {
+    "n_days": 53,
+    "mean_pp": -4.1477,
+    "median_pp": -2.5363,
+    "share_days_positive": 0.3396
+   }
+  },
+  "X0|val|P20": {
+   "A": {
+    "n_events_in_win": 1685,
+    "n_used": 1684,
+    "n_dropped_panel_end": 1,
+    "rets": {
+     "n": 1684,
+     "mean_pct": 7.0705,
+     "median_pct": 14.8,
+     "std_pct": 11.1116,
+     "p25_pct": 0.3181,
+     "p75_pct": 14.8,
+     "wr_pct": 75.831
+    },
+    "mean_hold": 13.262,
+    "exit_reasons": {
+     "止损跳空": 18,
+     "止盈跳空": 134,
+     "止损触发": 85,
+     "止盈触发": 780,
+     "到期平仓": 667
+    },
+    "over_window_exit": 0
+   },
+   "B": {
+    "n_events_in_win": 235,
+    "n_used": 235,
+    "n_dropped_panel_end": 0,
+    "rets": {
+     "n": 235,
+     "mean_pct": 10.1189,
+     "median_pct": 14.8,
+     "std_pct": 10.0182,
+     "p25_pct": 10.8323,
+     "p75_pct": 14.8,
+     "wr_pct": 85.532
+    },
+    "mean_hold": 9.379,
+    "exit_reasons": {
+     "止损跳空": 4,
+     "止盈跳空": 20,
+     "止损触发": 10,
+     "止盈触发": 152,
+     "到期平仓": 49
+    },
+    "over_window_exit": 0
+   },
+   "C": {
+    "n_events_in_win": 21904,
+    "n_used": 21880,
+    "n_dropped_panel_end": 24,
+    "rets": {
+     "n": 21880,
+     "mean_pct": 1.5133,
+     "median_pct": 2.2845,
+     "std_pct": 12.3098,
+     "p25_pct": -7.0323,
+     "p75_pct": 14.8,
+     "wr_pct": 56.499
+    },
+    "mean_hold": 15.851,
+    "exit_reasons": {
+     "止损跳空": 389,
+     "止盈跳空": 1024,
+     "止损触发": 2289,
+     "止盈触发": 5852,
+     "到期平仓": 12326
+    },
+    "over_window_exit": 0
+   },
+   "delta_B_minus_A": {
+    "by_day": {
+     "point_pp": 3.0484,
+     "ci95_lo_pp": -2.2546,
+     "ci95_hi_pp": 5.2936,
+     "p_delta_gt0": 0.8409,
+     "n_clusters": 277,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    },
+    "by_stock": {
+     "point_pp": 3.0484,
+     "ci95_lo_pp": 1.6359,
+     "ci95_hi_pp": 4.3815,
+     "p_delta_gt0": 1.0,
+     "n_clusters": 1069,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    }
+   },
+   "delta_same_day_paired": {
+    "n_days": 42,
+    "mean_pp": 1.4326,
+    "median_pp": 0.4645,
+    "share_days_positive": 0.5238
+   }
+  },
+  "X0|val|S60": {
+   "A": {
+    "n_events_in_win": 1685,
+    "n_used": 1684,
+    "n_dropped_panel_end": 1,
+    "rets": {
+     "n": 1684,
+     "mean_pct": 6.6705,
+     "median_pct": 14.4,
+     "std_pct": 11.1116,
+     "p25_pct": -0.0819,
+     "p75_pct": 14.4,
+     "wr_pct": 74.762
+    },
+    "mean_hold": 13.262,
+    "exit_reasons": {
+     "止损跳空": 18,
+     "止盈跳空": 134,
+     "止损触发": 85,
+     "止盈触发": 780,
+     "到期平仓": 667
+    },
+    "over_window_exit": 0
+   },
+   "B": {
+    "n_events_in_win": 235,
+    "n_used": 235,
+    "n_dropped_panel_end": 0,
+    "rets": {
+     "n": 235,
+     "mean_pct": 9.7189,
+     "median_pct": 14.4,
+     "std_pct": 10.0182,
+     "p25_pct": 10.4323,
+     "p75_pct": 14.4,
+     "wr_pct": 85.532
+    },
+    "mean_hold": 9.379,
+    "exit_reasons": {
+     "止损跳空": 4,
+     "止盈跳空": 20,
+     "止损触发": 10,
+     "止盈触发": 152,
+     "到期平仓": 49
+    },
+    "over_window_exit": 0
+   },
+   "C": {
+    "n_events_in_win": 21904,
+    "n_used": 21880,
+    "n_dropped_panel_end": 24,
+    "rets": {
+     "n": 21880,
+     "mean_pct": 1.1133,
+     "median_pct": 1.8845,
+     "std_pct": 12.3098,
+     "p25_pct": -7.4323,
+     "p75_pct": 14.4,
+     "wr_pct": 55.315
+    },
+    "mean_hold": 15.851,
+    "exit_reasons": {
+     "止损跳空": 389,
+     "止盈跳空": 1024,
+     "止损触发": 2289,
+     "止盈触发": 5852,
+     "到期平仓": 12326
+    },
+    "over_window_exit": 0
+   },
+   "delta_B_minus_A": {
+    "by_day": {
+     "point_pp": 3.0484,
+     "ci95_lo_pp": -2.2546,
+     "ci95_hi_pp": 5.2936,
+     "p_delta_gt0": 0.8409,
+     "n_clusters": 277,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    },
+    "by_stock": {
+     "point_pp": 3.0484,
+     "ci95_lo_pp": 1.6359,
+     "ci95_hi_pp": 4.3815,
+     "p_delta_gt0": 1.0,
+     "n_clusters": 1069,
+     "n_boot_used": 10000,
+     "n_boot_dropped": 0
+    }
+   },
+   "delta_same_day_paired": {
+    "n_days": 42,
+    "mean_pp": 1.4326,
+    "median_pp": 0.4645,
+    "share_days_positive": 0.5238
+   }
+  }
+ },
+ "gate_G2": {
+  "rule": "预注册 §四 G2：均值(B)−均值(A) ≥ +1.0pp 且 bootstrap 95% CI 下界 > 0（主 = X3 · full 窗 · 生产档 20bp）",
+  "primary_P20": {
+   "window": "full",
+   "cost": "P20",
+   "exit": "X3",
+   "point_pp": 4.5864,
+   "ci95_lo_pp": -1.5101,
+   "thr_point_pp": 1.0,
+   "thr_ci": ">0",
+   "pass_point": true,
+   "pass_ci": false,
+   "pass": false
+  },
+  "stress_S60": {
+   "window": "full",
+   "cost": "S60",
+   "exit": "X3",
+   "point_pp": 4.5864,
+   "ci95_lo_pp": -1.5101,
+   "thr_point_pp": 1.0,
+   "thr_ci": ">0",
+   "pass_point": true,
+   "pass_ci": false,
+   "pass": false
+  },
+  "by_window": {
+   "full": {
+    "window": "full",
+    "cost": "P20",
+    "exit": "X3",
+    "point_pp": 4.5864,
+    "ci95_lo_pp": -1.5101,
+    "thr_point_pp": 1.0,
+    "thr_ci": ">0",
+    "pass_point": true,
+    "pass_ci": false,
+    "pass": false
+   },
+   "train": {
+    "window": "train",
+    "cost": "P20",
+    "exit": "X3",
+    "point_pp": -2.392,
+    "ci95_lo_pp": -5.9082,
+    "thr_point_pp": 1.0,
+    "thr_ci": ">0",
+    "pass_point": false,
+    "pass_ci": false,
+    "pass": false
+   },
+   "val": {
+    "window": "val",
+    "cost": "P20",
+    "exit": "X3",
+    "point_pp": 6.9091,
+    "ci95_lo_pp": -0.0075,
+    "thr_point_pp": 1.0,
+    "thr_ci": ">0",
+    "pass_point": true,
+    "pass_ci": false,
+    "pass": false
+   }
+  },
+  "verdict": "FAIL",
+  "pressure_note": "压力档（60bp）不成立 —— 已在报告披露"
+ },
+ "log": [
+  "(省略中间日志；完整 stdout 见运行记录)"
+ ]
+}
