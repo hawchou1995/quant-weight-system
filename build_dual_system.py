@@ -2033,6 +2033,28 @@ QLCH_TRACKS = [
 def qlch_card():
     import json as _j
     B = BASE / "backtest"
+    # ---- 三列参数（2026-09-22 用户需求）：单一来源 = qlch 生产脚本，**不硬编码** ----
+    _QP = B / "qlch_paper_20260921.py"
+    _mm = re.search(r"TP_PCT,\s*SL_PCT,\s*MAXHOLD\s*=\s*([\d.]+),\s*(-?[\d.]+),\s*(\d+)",
+                    _QP.read_text(encoding="utf-8")) if _QP.exists() else None
+    TP, SL, MH = ((float(_mm.group(1)), float(_mm.group(2)), int(_mm.group(3)))
+                  if _mm else (0.15, -0.20, 20))
+    _PARAM_OK = bool(_mm)
+    # 交易日历（纯文本读 index_000300.csv；本文件未导入 pandas）—— 用于「轮动点」精确日期
+    try:
+        _cal = [ln.split(",")[0] for ln in
+                (BASE / "index_000300.csv").read_text(encoding="utf-8").strip().splitlines()[1:]
+                if ln[:4].isdigit()]
+    except Exception:
+        _cal = []
+
+    def _rot(ed):
+        """轮动点 = 入场日 + MH 个交易日；日历不足则退回参数口径。"""
+        if not _cal or not ed or ed not in _cal:
+            return "≤ %d 个交易日" % MH
+        j = _cal.index(ed) + MH
+        return _cal[j] if j < len(_cal) else "≤ %d 个交易日（未到期）" % MH
+
     cand = {}
     fp = B / "qlch_candidates.json"
     if fp.exists():
@@ -2128,18 +2150,6 @@ def qlch_card():
                      '<th data-key="sl" title="策略止损点：买入价 ×(1+SL)，SL 从 qlch 生产脚本解析；价格按明日买点区间折算">止损点 −20%</th>'
                      '<th data-key="rot" title="轮动点：最长持有 MAXHOLD 个交易日，到期轮动（未触发止盈/止损时）">轮动点 20 交易日</th>'
                      '</tr></thead><tbody>')
-            # 2026-09-22 用户需求：加三列（策略止盈点 +15% / 止损点 −20% / 轮动点 20 交易日）
-            # 参数单一来源：从 qlch 生产脚本解析，**不硬编码**（脚本改了看板自动跟）。
-            _QP = B / "qlch_paper_20260921.py"
-            _mm = re.search(r"TP_PCT,\s*SL_PCT,\s*MAXHOLD\s*=\s*([\d.]+),\s*(-?[\d.]+),\s*(\d+)",
-                            _QP.read_text(encoding="utf-8")) if _QP.exists() else None
-            if _mm:
-                TP, SL, MH = float(_mm.group(1)), float(_mm.group(2)), int(_mm.group(3))
-            else:
-                TP, SL, MH = 0.15, -0.20, 20
-                L.append('<div class="sub" style="color:var(--warn)">⚠ 未能从 qlch 脚本解析'
-                         '止盈/止损/轮动参数，下表按默认 15% / −20% / 20 交易日 展示</div>')
-
             def _tpsl(c):
                 _lo, _hi = _band(c)
                 if _lo is None:
@@ -2218,18 +2228,28 @@ def qlch_card():
         for t in d.get("trades", []):
             if t.get("code"):
                 alltr.append((t.get("exit_date") or t.get("entry_date") or "", t.get("code", ""),
-                              t.get("name", ""), label.split("（")[0], t.get("gap"), t.get("net_ret")))
+                              t.get("name", ""), label.split("（")[0], t.get("gap"), t.get("net_ret"),
+                              t.get("entry_px"), t.get("entry_date")))
     alltr.sort(key=lambda x: x[0], reverse=True)
     if alltr:
         L.append('<table class="tbl" style="width:100%;font-size:12.5px">'
-                 '<thead><tr><th>日期</th><th>代码</th><th>名称</th><th>轨</th><th>gap</th><th>净收益</th></tr></thead><tbody>')
-        for d0, c0, n0, lab, gp, nr in alltr[:30]:
+                 '<thead><tr><th>日期</th><th>代码</th><th>名称</th><th>轨</th><th>gap</th><th>净收益</th>'
+                 '<th title="策略止盈点：买入价 ×(1+TP)，TP 从 qlch 生产脚本解析">止盈点 +15%</th>'
+                 '<th title="策略止损点：买入价 ×(1+SL)">止损点 −20%</th>'
+                 '<th title="轮动点：入场日 + MAXHOLD 个交易日（未触发止盈/止损时到期轮动）">轮动点</th>'
+                 '</tr></thead><tbody>')
+        for d0, c0, n0, lab, gp, nr, epx, ed in alltr[:30]:
             gs = "%+.2f%%" % (gp * 100) if isinstance(gp, (int, float)) else "—"
             ns = "%+.2f%%" % (nr * 100) if isinstance(nr, (int, float)) else "—"
             col = "var(--up)" if isinstance(nr, (int, float)) and nr > 0 else "var(--down)"
+            _tp = ("%.3f" % (epx * (1 + TP))) if isinstance(epx, (int, float)) and epx else "—"
+            _sl = ("%.3f" % (epx * (1 + SL))) if isinstance(epx, (int, float)) and epx else "—"
             L.append('<tr><td>%s</td><td>%s</td><td>%s</td><td style="color:var(--sub)">%s</td>'
-                     '<td>%s</td><td style="color:%s"><b>%s</b></td></tr>'
-                     % (d0, c0, n0, lab, gs, col, ns))
+                     '<td>%s</td><td style="color:%s"><b>%s</b></td>'
+                     '<td style="font-variant-numeric:tabular-nums;color:var(--up)">%s</td>'
+                     '<td style="font-variant-numeric:tabular-nums;color:var(--down)">%s</td>'
+                     '<td style="color:var(--sub)">%s</td></tr>'
+                     % (d0, c0, n0, lab, gs, col, ns, _tp, _sl, _rot(ed)))
         L.append('</tbody></table>')
     else:
         L.append('<div style="font-size:12.5px;color:var(--faint)">暂无成交（2026-09-22 起进入封存集采集期）</div>')
