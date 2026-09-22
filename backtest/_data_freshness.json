@@ -1,14 +1,14 @@
 {
- "ts": "2026-09-22 17:20",
+ "ts": "2026-09-22 19:11",
  "trade_day": "2026-09-22",
  "total": 7540,
- "fresh": 6128,
- "stale": 1411,
+ "fresh": 6859,
+ "stale": 680,
  "nodate": 1,
- "stale_pct": 18.7,
- "stale_tradable": 745,
+ "stale_pct": 9.0,
+ "stale_tradable": 14,
  "stale_stock": 13,
- "stale_etf": 732,
+ "stale_etf": 1,
  "stock_total": 5533,
  "stock_fresh": 5202,
  "stock_fresh_pct": 94.0,
@@ -45,8 +45,8 @@
   },
   "ETF/基金-深": {
    "total": 731,
-   "fresh": 0,
-   "stale": 731,
+   "fresh": 731,
+   "stale": 0,
    "delisted": 0
   }
  },
