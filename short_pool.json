@@ -1966,7 +1966,6 @@
       "top4": "🎯 KHunter 主信号"
     }
   },
-  "_backfilled_0814": true,
   "track": {
     "300014": {
       "entry": "2026-08-27",
@@ -5597,14 +5596,15 @@
         "type": "fund",
         "date": "2026-09-22"
       }
-    }
-  },
-  "track_pending_short": {
+    },
     "003722": {
-      "entry_candidate": "2026-09-22",
-      "first_seen": "2026-09-22",
+      "entry": "2026-09-22",
+      "last_seen": "2026-09-22",
+      "exit": "2026-10-22",
+      "status": "active",
       "pool": "基金",
       "type": "fund",
+      "first_seen": "2026-09-22",
       "last": {
         "name": "易方达纳斯达克100ETF联接(QDII-LOF)A(美元现汇)",
         "px": 0.68,
@@ -5617,10 +5617,13 @@
       }
     },
     "003721": {
-      "entry_candidate": "2026-09-22",
-      "first_seen": "2026-09-22",
+      "entry": "2026-09-22",
+      "last_seen": "2026-09-22",
+      "exit": "2026-10-22",
+      "status": "active",
       "pool": "基金",
       "type": "fund",
+      "first_seen": "2026-09-22",
       "last": {
         "name": "易方达标普信息科技指数(QDII-LOF)A(美元现汇)",
         "px": 1.04,
@@ -5632,5 +5635,6 @@
         "date": "2026-09-22"
       }
     }
-  }
+  },
+  "track_pending_short": {}
 }
