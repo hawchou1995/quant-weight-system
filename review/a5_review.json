@@ -1,7 +1,7 @@
 {
   "file": "review_a5.md",
-  "as_of": "2026-09-15",
-  "updated": "2026-09-15 18:10:37",
+  "as_of": "2026-09-22",
+  "updated": "2026-09-22 16:28:24",
   "stats": {
     "n": 0,
     "win_rate": null,
@@ -27,7 +27,7 @@
       "note": "0/30"
     }
   },
-  "n_watch": 1,
+  "n_watch": 0,
   "n_avoid": 0,
   "n_pos": 0,
   "n_closed": 12,

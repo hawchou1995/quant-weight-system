@@ -166,7 +166,7 @@ def report(arms, tag):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--arm", required=True, choices=["C", "L3"])
+    ap.add_argument("--arm", required=True, choices=["C", "L3", "P1"])
     ap.add_argument("--topn", type=int, default=5)
     ap.add_argument("--every", type=int, default=13, help="L3 抽样：每 N 个交易日取 1 天")
     a = ap.parse_args()
@@ -181,6 +181,18 @@ def main():
         df.to_csv(BASE / "backtest" / "t293_c_rows.csv", index=False, encoding="utf-8")
         arms = evaluate(df, BASE / "backtest" / "t293_c_summary.json", "C")
         report(arms, "C 臂（动量复刻名单 2024-06→2026-09）")
+    elif a.arm == "P1":
+        days = sorted(ampm["date"].unique())
+        pick = set(days[::a.every])
+        hi = ampm[(ampm["g1430"] >= 0.095) & (ampm["date"].isin(pick))]
+        mid = ampm[(ampm["g1430"] >= 0.05) & (ampm["g1430"] < 0.095) & (ampm["date"].isin(pick))]
+        log(f"P1 抽样 {len(pick)} 天 → ≥9.5% 候选 {len(hi)} 行；相邻档[5%,9.5%) {len(mid)} 行")
+        for nm, cc in (("P1_hi", hi), ("P1_mid", mid)):
+            cand = cc[["code", "date"]]
+            df = screen_and_fetch(cand, ampm, need_g1430=False)
+            df.to_csv(BASE / "backtest" / f"t293_{nm}_rows.csv", index=False, encoding="utf-8")
+            arms = evaluate(df, BASE / "backtest" / f"t293_{nm}_summary.json", nm)
+            report(arms, f"{nm}（{'>=' if nm.endswith('hi') else '5-9.5%'} 档 · 抽样日）")
     else:
         days = sorted(ampm["date"].unique())
         pick = set(days[::a.every])

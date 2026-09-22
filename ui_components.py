@@ -77,9 +77,10 @@ body{padding-top:52px}
 .sidenav .sn-sub{display:none;position:absolute;top:100%;left:0;min-width:154px;margin:0;padding:5px;
   flex-direction:column;gap:1px;background:#232a36;border:1px solid rgba(255,255,255,.10);
   border-radius:0 0 var(--r) var(--r);box-shadow:0 10px 24px rgba(0,0,0,.30);z-index:960}
-.sn-grp:hover .sn-sub{display:flex}
-.sidenav .sn-arrow{margin-left:2px;font-size:10px;color:rgba(255,255,255,.42)}
-.sn-grp:hover .sn-arrow{color:#fff}
+/* 2026-09-22 停用 hover 下拉（R-dash-subtab-0922）：视图内已改为「策略子标签」，两者冲突。
+   保留 .sn-sub DOM（历史锚点仍可点），但不再悬停弹出。 */
+.sn-grp:hover .sn-sub{display:none}
+.sidenav .sn-arrow{display:none}/* 箭头同废（无下拉）*/
 .sidenav .sn-sub a{padding:6px 10px;font-size:12.5px;color:rgba(255,255,255,.72);border-radius:var(--r-sm);
   font-weight:400;white-space:nowrap}
 .sidenav .sn-sub a .dot-sub{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.32);flex:none}

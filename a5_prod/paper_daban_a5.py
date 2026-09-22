@@ -413,6 +413,20 @@ def main():
     if not dates_sorted:
         print('无数据'); return
     D = dates_sorted[-1]
+    REQUEST_DATE = None
+    if "--date" in sys.argv:
+        REQUEST_DATE = sys.argv[sys.argv.index("--date") + 1]
+        if REQUEST_DATE in dates_sorted:
+            D = REQUEST_DATE
+        else:
+            print("请求的日期 %s 不在数据内（可用范围 %s ~ %s）"
+                  % (REQUEST_DATE, dates_sorted[0], dates_sorted[-1]))
+            return
+    else:
+        _rs0 = rev_screen.stats(D)
+        if _rs0.get("stale"):
+            print("  !! 反向筛闸门告警: %s 不在资产覆盖内（资产至 %s，缺口 %d 天）"
+                  % (D, _rs0.get("asset_last"), _rs0.get("gap_days")))
     prev_dates = [d for d in dates_sorted if d < D]
     D1 = prev_dates[-1] if prev_dates else None
     print(f'  最新交易日 D={D}，前一交易日 D-1={D1}')
