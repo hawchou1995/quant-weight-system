@@ -12,6 +12,10 @@ THEME_CSS = """
   --nav-bg:#ffffff; --shadow:0 1px 3px rgba(0,0,0,.08);
   /* #10 皮肤层（2026-09-18）：扁平控制台令牌 —— 圆角收敛 / 密度提升 / 数字等宽 */
   --r:6px; --r-sm:4px; --accent-ink:#20160a; --warn:#b45309;
+  /* #10 第三步（2026-09-22）：字号 6 档 + 浮层阴影（与 --shadow 同族，避免散值） */
+  --fs-xs:11px; --fs-sm:12px; --fs-md:13px; --fs-lg:15px; --fs-xl:20px; --fs-xl2:40px;
+  --shadow-lg:0 8px 26px rgba(0,0,0,.16);
+  --shadow-float:0 2px 8px rgba(0,0,0,.14);
   --mono:ui-monospace,'SF Mono',Menlo,Consolas,'Liberation Mono',monospace;
 }
 [data-theme="dark"]{
@@ -19,6 +23,8 @@ THEME_CSS = """
   --text:#e5e7eb; --sub:#9ca3af; --faint:#6b7280;
   --up:#f87171; --down:#4ade80; --accent:#fbbf24; --accent2:#60a5fa; --warn:#fbbf24;
   --nav-bg:#171a21; --shadow:0 1px 3px rgba(0,0,0,.4);
+  --shadow-lg:0 8px 26px rgba(0,0,0,.22);
+  --shadow-float:0 2px 8px rgba(0,0,0,.30);
 }
 *{box-sizing:border-box}
 body{font-family:-apple-system,'PingFang SC','Microsoft YaHei','Segoe UI',sans-serif;font-size:13px;line-height:1.6;background:var(--bg);color:var(--text);margin:0;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}

@@ -3155,6 +3155,55 @@ _ui_n = len(_ui_re.findall(html))
 html = _ui_re.sub("", html)
 print(f"UI 净化（#10 皮肤层）：清除 {_ui_n} 个 emoji")
 
+# --- #10 第三步（2026-09-22 用户批准）：字号 / 圆角 / 阴影统一（渲染期归一 + 令牌化）---
+# 口径：字号 6 档（11/12/13/15/20/40）、圆角只允许 --r(6px)/--r-sm(4px)/50%、
+#       阴影只允许 --shadow/--shadow-lg/none/inset 系。产物里任何残留数字值 = 例外，便于 grep 审计。
+_FS_SNAP = [("10px", "11px"), ("11.5px", "12px"), ("12.5px", "13px"), ("13.5px", "13px"),
+            ("14px", "15px"), ("16px", "15px"), ("17px", "15px")]
+_fs_hit = 0
+for _o, _t in _FS_SNAP:
+    _n = html.count("font-size:" + _o)
+    if _n:
+        html = html.replace("font-size:" + _o, "font-size:" + _t)
+        _fs_hit += _n
+_FS_TOK = {"11px": "--fs-xs", "12px": "--fs-sm", "13px": "--fs-md",
+           "15px": "--fs-lg", "20px": "--fs-xl", "40px": "--fs-xl2"}
+_fs_tok = [0]
+def _fs_sub(m):
+    v = m.group(1)
+    if v in _FS_TOK:
+        _fs_tok[0] += 1
+        return "font-size:var(%s)" % _FS_TOK[v]
+    return m.group(0)
+html = _re_ui.sub(r"font-size:\s*([0-9.]+px)", _fs_sub, html)
+
+_R_SNAP = {"2px": "var(--r-sm)", "3px": "var(--r-sm)", "4px": "var(--r-sm)",
+           "6px": "var(--r)", "8px": "var(--r)", "10px": "var(--r)", "20px": "var(--r)",
+           "0 8px 8px 0": "0 var(--r) var(--r) 0"}
+_r_hit = 0
+for _o, _t in _R_SNAP.items():
+    _n = html.count("border-radius:" + _o)
+    if _n:
+        html = html.replace("border-radius:" + _o, "border-radius:" + _t)
+        _r_hit += _n
+
+_S_SNAP = {"0 8px 26px rgba(0,0,0,.14)": "--shadow-lg",
+           "0 10px 24px rgba(0,0,0,.30)": "--shadow-lg",
+           "0 12px 48px rgba(0,0,0,.3)": "--shadow-lg",
+           "0 2px 8px rgba(0,0,0,.15)": "--shadow-float"}
+_s_hit = 0
+for _o, _t in _S_SNAP.items():
+    _n = html.count("box-shadow:" + _o)
+    if _n:
+        html = html.replace("box-shadow:" + _o, "box-shadow:var(%s)" % _t)
+        _s_hit += _n
+
+print(f"UI 统一（#10 三步）：字号归一 {_fs_hit} 处 / 令牌化 {_fs_tok[0]} 处；"
+      f"圆角归一 {_r_hit} 处；阴影归一 {_s_hit} 处")
+_rest = _re_ui.findall(r"font-size:\s*[0-9.]+px", html)
+if _rest:
+    print(f"  ⚠ 仍残留数字字号 {len(_rest)} 处（应仅在白名单外，需人工确认）：{sorted(set(_rest))[:6]}")
+
 out = BASE / "dual_system.html"
 out.write_text(html, encoding="utf-8")
 print(f"监控看板已生成: {out} ({out.stat().st_size/1024:.0f} KB)")

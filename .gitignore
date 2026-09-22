@@ -72,3 +72,6 @@ _diag_*
 _dbg_*
 _cov_out.txt
 _commitmsg_*.txt
+
+# 视觉验收截图（工具产物，不入库）
+_shot_*.png

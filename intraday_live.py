@@ -60,7 +60,7 @@ INTRADAY_JS = r"""
     st.textContent = [
       '#live-pill{position:fixed;left:18px;bottom:18px;z-index:940;display:flex;align-items:center;gap:7px;',
       'background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:6px 10px;',
-      'font-size:12px;color:var(--sub);box-shadow:0 2px 10px rgba(0,0,0,.10);cursor:pointer;user-select:none;white-space:nowrap}',
+      'font-size:var(--fs-sm);color:var(--sub);box-shadow:var(--shadow-float);cursor:pointer;user-select:none;white-space:nowrap}',
       '#live-pill:hover{border-color:var(--accent)}',
       '#live-pill .dot{width:7px;height:7px;border-radius:50%;background:var(--faint);flex:none}',
       '#live-pill.on .dot{background:var(--accent)}',
