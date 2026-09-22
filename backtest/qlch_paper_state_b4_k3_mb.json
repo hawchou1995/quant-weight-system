@@ -1,0 +1,58 @@
+{
+ "created": "2026-09-21 23:59:52",
+ "strategy": "超跌低吸（B4 分位滤网）（K=3 单票上限）（真主板）",
+ "variant": "B4",
+ "maxpos": 3,
+ "cash": 1.0,
+ "positions": [],
+ "trades": [],
+ "equity": [
+  {
+   "date": "2026-09-21",
+   "nav": 1.0,
+   "n": 0,
+   "port_ret": 0.0,
+   "cash_ret": 0.0,
+   "n_exit": 0,
+   "n_new": 0
+  }
+ ],
+ "events": [],
+ "last_run": "2026-09-22 11:53:25",
+ "trades_void": [
+  {
+   "code": "sz002965",
+   "name": "祥鑫科技",
+   "entry_date": "2026-09-18",
+   "entry_px": 27.450000762939453,
+   "gap": -0.029349360097363775,
+   "shares": 0,
+   "exit_date": "2026-09-18",
+   "exit_px": 31.110000610351562,
+   "raw_ret": 0.133333324068738,
+   "net_ret": 0.131333324068738,
+   "void": true,
+   "void_reason": "illegal_t0_same_day_roundtrip",
+   "void_by": "R-qlch-t1exit-0922"
+  }
+ ],
+ "equity_void": [
+  {
+   "date": "2026-09-18",
+   "nav": 1.0437777746895793,
+   "n": 1,
+   "port_ret": 0.04377777468957933,
+   "cash_ret": 0.0
+  },
+  {
+   "date": "2026-09-21",
+   "nav": 1.0437777746895793,
+   "n": 0,
+   "port_ret": 0.0,
+   "cash_ret": 0.0
+  }
+ ],
+ "void_note": "⚠ 本账本 2026-09-18 的成交为 T+0 同日回转（entry_date == exit_date），A 股 T+1 交割下不可执行（陷阱 ★198 复发，用户 2026-09-22 抓出）。该笔已移入 trades_void 保留证据，净值贡献已剔除；账本自 2026-09-22 起按 E4 出口（止盈 +15% / 止损 −20% / 上限 20 交易日）重新起算。R-qlch-t1exit-0922",
+ "restart_from": "2026-09-22",
+ "migrated_at": "2026-09-22 11:45:14"
+}

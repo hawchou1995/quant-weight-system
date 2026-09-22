@@ -1,0 +1,22 @@
+{
+ "created": "2026-09-22 13:24:53",
+ "strategy": "超跌低吸（B4 分位滤网）（K=3 单票上限）（全池）",
+ "variant": "B4",
+ "maxpos": 3,
+ "cash": 1.0,
+ "positions": [],
+ "trades": [],
+ "equity": [
+  {
+   "date": "2026-09-21",
+   "nav": 1.0,
+   "n": 0,
+   "port_ret": 0.0,
+   "cash_ret": 0.0,
+   "n_exit": 0,
+   "n_new": 0
+  }
+ ],
+ "events": [],
+ "last_run": "2026-09-22 13:24:53"
+}
