@@ -80,7 +80,8 @@ def tech_indicators(code):
 def market_board(code):
     """按代码判定市场板块（2026-08-28 用户需求：与 v9/短线池共用同一分类标准——board=主板/创业板/科创板）：
     主板（沪 600/601/603/605 + 深 000/001/002/003，±10%）、创业板（300/301，±20%）、
-    科创板（688/689，±20%）、北交所（8/4/92，±30%）。code 形如 sh600345 / sz001309 / bj830799。"""
+    科创板（688/689，±20%）。code 形如 sh600345 / sz001309。
+    2026-09-23（R-no-bj-0923）：北交所（8/4/92，±30%）已从本函数与整个宇宙移除。"""
     if not code or len(code) < 8:
         return "—"
     pref, num = code[:2], code[2:]
@@ -98,8 +99,8 @@ def market_board(code):
         if num.startswith(("300", "301")):
             return "创业板"
         return "深市"
-    if pref == "bj":
-        return "北交所"
+    # 2026-09-23（R-no-bj-0923）：北交所分支已移除（宇宙由 P.is_pool_code 硬排除 bj*）→
+    # 非交易宇宙的代码返回「—」，不再产出「北交所」标签。
     return "—"
 
 
@@ -246,6 +247,9 @@ def build():
         # 现由客户端实时层（intraday_live.py）直接覆盖页面价格，该字段保留但恒为 False
         "intraday": False,
     }
+    # 北交所硬闸（R-no-bj-0923）：池产物含 bj* → 构建中止（不许静默出池；写盘前断言）
+    from no_bj import assert_clean as _assert_clean
+    _assert_clean(out, "a5_pool.js")
     with open(os.path.join(BASE, "a5_pool.js"), "w", encoding="utf-8") as f:
         f.write("window.A5_POOL = " + json.dumps(out, ensure_ascii=False) + ";")
     print(f"✅ a5_pool.js 已生成（as_of={out['as_of']} · 观察清单 {len(out['watchlist'])} 只 · "

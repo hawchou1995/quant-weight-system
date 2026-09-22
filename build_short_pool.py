@@ -139,8 +139,8 @@ def board_of(code):
         return "科创板"
     if code.startswith(("sh5", "sz1")):
         return "ETF"
-    if code.startswith("bj"):          # 2026-09-18 补：原先 fallthrough 到「基金」
-        return "北交所"                 # 会把 bj 当基金套用基金口径打分（防雷）
+    # 2026-09-23（R-no-bj-0923）：北交所分支已移除 —— 宇宙侧硬排除 bj*（short_engine.load_stock_pool:348），
+    # 本函数不再需要「bj 防雷」返回值；万一漏进 bj 码，下游按非交易宇宙处理并触发产物断言。
     return "基金"
 
 def comp_short(r, board):
@@ -1211,6 +1211,9 @@ def build(as_of=None):
         print(f"市况门控关闭：跟踪池股票档位改写「不开新仓·仅跟踪」（{sum(1 for r in track.values() if r.get('type')=='stock')} 只正式 + {sum(1 for r in pending.values() if r.get('type')=='stock')} 只待确认；KHunter 主信号豁免 {len(_kh_gate_exempt)} 只）", flush=True)
     out["track"] = track
     out["track_pending_short"] = pending
+    # 北交所硬闸（R-no-bj-0923）：池产物含 bj* → 构建中止（不许静默出池；写盘前断言）
+    from no_bj import assert_clean as _assert_clean
+    _assert_clean(out, "short_pool.json")
     json.dump(out, open(BASE / "short_pool.json", "w", encoding="utf-8"), ensure_ascii=False, indent=2)
     with open(BASE / "short_pool.js", "w", encoding="utf-8") as f:
         f.write("window.SHORT_POOL = " + json.dumps(out, ensure_ascii=False) + ";")

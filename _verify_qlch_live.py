@@ -32,6 +32,14 @@ gdc = importlib.util.module_from_spec(sp)
 sys.modules["gdc"] = gdc
 sp.loader.exec_module(gdc)
 
+# ---- 各策略自有数据源的代码白名单（R-track-sep-0923）：真值来源 = 产物文件，复用静态检查器的实现 ----
+_sp = importlib.util.spec_from_file_location("vtrack", BASE / "_verify_track_sep_0923.py")
+_vtrack = importlib.util.module_from_spec(_sp)
+_sp.loader.exec_module(_vtrack)          # 该模块只定义函数（断言在 main() 里），import 无副作用
+_wl, _wl_src = _vtrack.whitelists()
+WATCH_WL = {k: sorted(v) for k, v in _wl.items()}
+print("[whitelist] 跟踪池白名单规模: " + ", ".join("%s=%d" % (k, len(v)) for k, v in WATCH_WL.items()))
+
 FILE_URL = ("file:///D:/Documents/Workbuddy/%E8%82%A1%E7%A5%A8%E5%9F%BA%E9%87%91/"
             "quant-weight-system/dual_system.html")
 
@@ -111,10 +119,28 @@ JS = r"""
   /* 2) 参与刷新白名单/守卫收窄的证据：候选表可刷行数 + 已改写格数 */
   const sc = (IN.__scan().tables || []).filter(t => t.id === 'tbl-qlch-cand')[0] || {};
   out.raw.scanCand = sc;
-  A('候选表参与 px/pct 刷新（25 行可刷、25 行改写、无跳过原因）',
-    sc.elig === 25 && sc.live === 25 && !sc.skip, JSON.stringify(sc));
-  A('候选表涨跌幅列已换实时（td.live-cell ≥ 25）', tb.querySelectorAll('td.live-cell').length >= 25,
-    'live-cell=' + tb.querySelectorAll('td.live-cell').length);
+  /* 2b) 现价列（R-qlch-pxcol-0923）：构建期填今收 + data-v=close；盘中层按列头「现价」定位改写 */
+  const ths = Array.from(tb.querySelectorAll('thead th'));
+  const pxI = ths.findIndex(th => (th.textContent || '').replace(/实时|盘中/g, '').trim() === '现价');
+  const pxKey = ths.findIndex(th => (th.getAttribute('data-key') || '').toLowerCase() === 'px');
+  out.raw.pxCol = {pxI: pxI, pxKey: pxKey, nCols: ths.length,
+                   ths: ths.map(th => (th.textContent || '').replace(/实时|盘中/g, '').trim())};
+  A('候选表 15 列（原 14 − 代码/名称合并 + 板块 + 现价）', ths.length === 15, JSON.stringify(out.raw.pxCol.ths));
+  A('存在列头文本正好为「现价」的列（盘中层 PX_HDR 定位依赖）', pxI >= 0, 'pxI=' + pxI);
+  A('现价列即 data-key="px" 的列（构建期 pxI 与盘中层一致）', pxKey >= 0 && pxKey === pxI,
+    'pxKey=' + pxKey + ' pxI=' + pxI);
+  const scPx = (IN.__scan().tables || []).filter(t => t.id === 'tbl-qlch-cand')[0] || {};
+  A('候选表盘中扫描 px 列命中（elig=25 行全部有码、有价列）', scPx.elig === 25 && scPx.live >= 50,
+    JSON.stringify(scPx));
+  A('候选表参与 px/pct 刷新（25 行可刷、每行 2 格 live-cell ≥ 50、无跳过原因）',
+    scPx.elig === 25 && scPx.live >= 50 && !scPx.skip, JSON.stringify(scPx));
+  const pxCells = [].slice.call(tb.querySelectorAll('tbody tr'))
+    .map(tr => tr.children[pxI])
+    .filter(td => td && td.classList.contains('live-cell'));
+  out.raw.pxCells = {n: pxCells.length, text: pxCells.slice(0, 3).map(td => td.textContent.trim()),
+                     dataV: pxCells.slice(0, 3).map(td => td.getAttribute('data-v'))};
+  A('现价格子被写入实时价（25 格 live-cell）', pxCells.length === 25,
+    'live-cell=' + pxCells.length + ' 样例=' + JSON.stringify(out.raw.pxCells.text));
   /* 3) 置顶 / 变色 / 标签 / 幂等 —— 索引一律**实时**算（重排会换元素，快照会失真） */
   const body = tb.querySelector('tbody');
   const idx = el => el ? [].slice.call(body.children).indexOf(el) : -1;
@@ -367,6 +393,49 @@ JS = r"""
     (qb.className || '').indexOf('badge-live') < 0, JSON.stringify(out.raw.badges));
   A('缺陷 2：applyQuotes 后 .qlch-badge 文案未被 markCard 改成「实时 …」',
     /已触发 \d+\/\d+/.test(qbTxt), 'qlch-badge=' + qbTxt);
+  /* 9e) 跟踪池按策略独立（R-track-sep-0923）：5 张卡存在 + 每卡代码集合 ⊆ 本策略白名单 + 跨策略 0 混入
+        白名单由 Python 侧把各策略账本/池文件的代码集合注入 window.WATCH_WL（真值来源=产物文件，不是卡自己）。 */
+  const WL = window.WATCH_WL || {};
+  const allWl = new Set(); Object.keys(WL).forEach(k => (WL[k] || []).forEach(c => allWl.add(c)));
+  const CK = ['st-stk', 'st-qlch', 'st-kh', 'st-etf', 'st-fund'];
+  const cardCodes = k => {
+    const el = document.getElementById('watch-card-' + k);
+    if (!el) return null;
+    const set = new Set();
+    el.querySelectorAll('tbody tr').forEach(tr => {
+      let c = String(tr.getAttribute('data-code') || '').trim();
+      if (!/^(sh|sz|bj)?\d{6}$/.test(c)) {
+        const m = (tr.textContent || '').match(/(?:^|\D)(\d{6})(?:\D|$)/);
+        c = m ? m[1] : '';
+      }
+      if (c) set.add(c);
+    });
+    return set;
+  };
+  out.raw.cards = {};
+  CK.forEach(k => {
+    const el = document.getElementById('watch-card-' + k);
+    const codes = cardCodes(k);
+    const list = codes ? Array.from(codes) : [];
+    const badSub = list.filter(c => (WL[k] || []).indexOf(c) < 0);
+    const foreign = list.filter(c => allWl.has(c) && (WL[k] || []).indexOf(c) < 0);
+    const title = el ? (el.querySelector('h2') || {}).textContent : null;
+    out.raw.cards[k] = {exists: !!el, n: list.length, title: (title || '').replace(/\s+/g, ' ').trim(),
+                        sample: list.slice(0, 4), badSub: badSub.slice(0, 5), foreign: foreign.slice(0, 5),
+                        wlN: (WL[k] || []).length};
+    A('跟踪池卡 ' + k + ' 存在且标题为「跟踪池 · 策略名」',
+      !!el && /跟踪池 · /.test(title || ''), out.raw.cards[k].title);
+    A('卡 ' + k + ' 代码集合 ⊆ 本策略自有数据源白名单（n=' + list.length + '）',
+      badSub.length === 0, JSON.stringify(out.raw.cards[k]));
+    A('卡 ' + k + ' 跨策略代码 0 混入',
+      foreign.length === 0, 'foreign=' + JSON.stringify(foreign.slice(0, 5)));
+  });
+  A('页面级共享卡 #watch-card 已删除（跟踪池不再跨策略共享）',
+    !document.getElementById('watch-card'), 'watch-card=' + !!document.getElementById('watch-card'));
+  A('st-fund 无自有账本 → 渲染「暂无跟踪数据」+ 缺字段清单（不编造数据）',
+    /暂无跟踪数据/.test((document.getElementById('watch-card-st-fund') || {}).textContent || '') &&
+    /缺字段清单/.test((document.getElementById('watch-card-st-fund') || {}).textContent || ''));
+
   /* 10) 切到「短线选股」并把卡片滚到视野内（截图用；用 switchView，不触发盘中层补刷） */
   try { window.switchView('short'); } catch (e) { A('switchView 可用', false, String(e && e.message || e)); }
   await sleep(400);
@@ -407,6 +476,9 @@ async def run_all(ws_url, shot: Path):
                 if m.get("id") == mid[0]:
                     return m.get("result", {})
 
+        # 注入「各策略自有数据源」的代码白名单（真值来源 = 产物文件；供卡内代码集合断言用反例/白名单）
+        await call("Runtime.evaluate",
+                   {"expression": "window.WATCH_WL = %s; 1" % json.dumps(WATCH_WL, ensure_ascii=False)})
         r = await call("Runtime.evaluate", {"expression": JS, "returnByValue": True, "awaitPromise": True})
         if "exceptionDetails" in r:
             return {"__JS_ERROR__": json.dumps(r["exceptionDetails"], ensure_ascii=False)[:1500]}
@@ -453,6 +525,25 @@ async def run_all(ws_url, shot: Path):
         except Exception as e:                  # 截图仍在，只是这层校验不可用
             out["visual"] = {"skipped": str(e)}
         print("[visual] " + json.dumps(out["visual"], ensure_ascii=False))
+        _shots = []
+        for _k in ("st-qlch", "st-kh", "st-etf", "st-stk", "st-fund"):
+            _js = ("(function(){var k=%r;var b=document.querySelector('.subnav .subtab[data-sub=\"'+k+'\"]');"
+                   "if(b)b.click();var c=document.getElementById('watch-card-'+k);"
+                   "if(c)c.scrollIntoView({block:'start'});"
+                   "var act=document.querySelector('#view-short .subview.active');"
+                   "return {sub: act?act.id:null, card: !!c,"
+                   " top: c?Math.round(c.getBoundingClientRect().top):null};})()" % _k)
+            _rr = await call("Runtime.evaluate", {"expression": _js, "returnByValue": True})
+            await asyncio.sleep(1.3)
+            _s = await call("Page.captureScreenshot", {"format": "png"})
+            _d = _rr.get("result", {}).get("value") or {}
+            if _s.get("data"):
+                _p = BASE / ("_shot_track_%s.png" % _k)
+                _p.write_bytes(base64.b64decode(_s["data"]))
+                _shots.append({"key": _k, "activeSub": _d.get("sub"), "cardTop": _d.get("top"),
+                               "file": _p.name, "KB": _p.stat().st_size // 1024})
+        out["trackShots"] = _shots
+        print("[shots] 跟踪池 5 张卡截图: " + json.dumps(_shots, ensure_ascii=False))
         # 清理：本页 localStorage 的触发记录（只读验收，不留痕）
         await call("Runtime.evaluate", {"expression": "localStorage.removeItem('quant_qlch_trig_v1');1"})
         return out

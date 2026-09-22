@@ -477,13 +477,14 @@ try:
 except Exception:
     _ind_map = {}
 def _board_of6(c):
-    """6 位代码 → 板块（与 build_short_pool.board_of 同口径）"""
+    """6 位代码 → 板块。2026-09-23（R-no-bj-0923）：北交所分支已移除 —— 北交所不在任何
+    池宇宙（引擎/短池/A5/qlch 均硬排除 bj*），8/4/92 号段返回「—」（不再渲染「北交所」标签）。"""
     if c.startswith(("688", "689")):
         return "科创板"
     if c.startswith("30"):
         return "创业板"
     if c.startswith(("8", "4", "92")):
-        return "北交所"
+        return "—"                    # 非交易宇宙（原北交所号段）：显式未知，不产出板块文案
     return "主板"
 STOCK_META = {}
 try:
@@ -652,7 +653,9 @@ def _bare(code):
 
 
 def _board_cell(v, ind=None):
-    """市场板块徽章（统一标准：主板/创业板/科创板/北交所）；行业放入悬浮提示"""
+    """市场板块徽章（统一标准：主板/创业板/科创板；行业放入悬浮提示）。
+    四档 class 映射**保留**（含 board-bj，按批准口径沿用四档体系）——但北交所已不在任何池宇宙，
+    实际渲染只会出现 主板 / 创业板 / 科创板（R-no-bj-0923）。"""
     if not v or v == "—":
         return '<span style="color:var(--faint)">—</span>'
     cls = {"主板": "board-sh", "创业板": "board-cy", "科创板": "board-kc", "北交所": "board-bj"}.get(v, "")
@@ -1480,21 +1483,264 @@ def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extr
 </div>'''
 
 
-WATCH_CARD = f'''<div class="card" id="watch-card">
-<h2>📌 全量池短线跟踪 <span class="badge badge-auto">自动 · 保留 30 天</span></h2>
-<div class="sub">上方短线表<b>可买入标的（强买入/买入）</b>上榜次日收盘确认后自动加入跟踪，30 天自动移除（<b>2026-08-18 起新上榜先入「待确认」隔日入池</b>，隔离当日收盘信号）· 卖出规则（与回测一致）：<b>收盘跌破 MA5 → 次日开盘卖出</b> ｜ 掉出信号池 → 下次轮动换出 ｜ 档位减半/清仓 → 按档位操作 · 每次重新上榜刷新【入池/跟踪/出池】时间 · 数据截至 {SHORT_POOL_ASOF}（基金净值 T-1：{SHORT_POOL.get("fund_as_of", "—")}）</div>
-<div id="watch-pending"></div>
-<div id="watch-gate"></div>
-<div class="toolbar" id="watch-bar">
-<input type="text" id="watch-q" name="watch-q" placeholder="🔍 搜索代码 / 名称…" autocomplete="off" spellcheck="false" aria-label="搜索跟踪标的（代码或名称）">
-<select id="watch-f-type" class="flt" title="类型筛选" aria-label="按类型筛选"><option value="">全部类型</option></select>
-<select id="watch-f-inpool" class="flt" title="在池状态筛选" aria-label="按在池状态筛选"><option value="">全部状态</option><option value="1">在池</option><option value="0">已掉出（待轮动换出）</option></select>
-<select id="watch-f-tier" class="flt" title="档位筛选" aria-label="按档位筛选"><option value="">全部档位</option></select>
-<select id="watch-sort" class="flt" title="排序方式" aria-label="排序方式"><option value="entry">加入时间 ↓</option><option value="chg">涨跌 ↓</option><option value="score">短线分 ↓</option><option value="name">名称 ↑</option><option value="left">剩余天数 ↑</option></select>
-<span class="count" id="watch-count"></span>
-</div>
-<div id="watch-table"></div>
-</div>'''
+# ════════════════════════════════════════════════════════════════════
+# 跟踪池卡（R-track-sep-0923 · 2026-09-23 用户批准「跟踪池按策略独立」）
+# 原「页面级共享卡」→ 参数化渲染函数：短线 5 个子视图**各挂一张**，只显示本策略标的。
+#   key         子视图键（st-stk/st-qlch/st-kh/st-etf/st-fund）→ 唯一 DOM id 后缀
+#   title       策略名 → 卡标题「👁 跟踪池 · <title>」
+#   source_kind 'short' = 浏览器端渲染（window.SHORT_POOL.track，带搜索/筛选/排序）
+#               其它   = 构建期渲染（Python **只读**该策略自己的账本/状态文件）
+#   cols        [(表头, 行字典键, 对齐)]；'short' 走 JS 自带表头（传 None）
+# 数据源一律「策略自有」：跨策略文件不上卡（静态断言见 _verify_qlch_live.py）。
+# ════════════════════════════════════════════════════════════════════
+WATCH_NAMES = {}
+try:
+    WATCH_NAMES = json.loads((BASE / "data_full_names.json").read_text(encoding="utf-8"))
+except Exception as _e:
+    print("跟踪池名称表加载失败:", _e)
+
+# 各策略状态文件搜索序（根目录 → dist/ → backtest/）——写作期的路径漂移不静默失败
+WATCH_STATE_DIRS = ("", "dist", "backtest")
+WATCH_NAMES_MISSING = ["code（6 位基金代码）", "name（基金名称）", "signal_date（入选信号日）",
+                       "entry_date（建仓净值日）", "entry_px（建仓单位净值）", "shares（份额）",
+                       "last_nav（最新净值，用于浮动盈亏）", "exit_rule / exit_date（出场：跌破 MA/掉出基金池 Top-N）",
+                       "nav_history（账户净值序列）"]
+
+
+def _watch_state_path(name):
+    for _d in WATCH_STATE_DIRS:
+        p = (BASE / _d / name) if _d else (BASE / name)
+        if p.exists():
+            return p
+    return None
+
+
+def _watch_load(name):
+    p = _watch_state_path(name)
+    if not p:
+        return None
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def _w_tgt(code, name=None):
+    """标的列（与看板其它表同格式：上行名称加粗 / 下行 6 位码）"""
+    c6 = _bare(code)
+    return ('<b>%s</b><br><span style="color:var(--sub);font-size:var(--fs-xs);'
+            'font-variant-numeric:tabular-nums">%s</span>'
+            % (name or WATCH_NAMES.get(code, "") or c6, c6))
+
+
+def _w_board(code):
+    """板块列（四档徽章）。⚠ ETF/场外基金不是「主板」——按资产类型标注，避免误导（不编造板块）。"""
+    c = str(code or "")
+    if c.startswith(("sh5", "sz1")):
+        return _board_cell("ETF")
+    if not c.startswith(("sh6", "sz0", "sz3")):
+        return _board_cell("—")
+    return _board_cell(_board_of6(_bare(c)))
+
+
+def _w_num(v, nd=3):
+    return "—" if not isinstance(v, (int, float)) else (("%%.%df" % nd) % v)
+
+
+def _w_pct(v, nd=2):
+    return "—" if not isinstance(v, (int, float)) else ("%+.*f%%" % (nd, v * 100))
+
+
+def _w_rows_qlch():
+    """超跌低开低吸：六臂账本（backtest/qlch_paper_state*.json）的 positions + trades。
+    列：标的 / 板块 / 轨 / 状态 / 入场日 / 入场价 / 出场日 / 净收益。"""
+    out = []
+    for _key, _label, _fn, _tag in QLCH_TRACKS:
+        d = _watch_load(_fn)
+        if not d:
+            continue
+        arm = _label.split("（")[0]
+        for p in (d.get("positions") or []):
+            c = p.get("code", "")
+            out.append((p.get("entry_date") or "", {
+                "code": c, "name": p.get("name") or WATCH_NAMES.get(c, ""),
+                "tgt": _w_tgt(c, p.get("name")), "board": _w_board(c), "arm": arm,
+                "state": '<span class="up">持仓中</span>',
+                "d0": p.get("entry_date") or "—", "px": _w_num(p.get("entry_px")),
+                "d1": "—", "ret": "—"}))
+        for t in (d.get("trades") or []):
+            c = t.get("code", "")
+            if not c:
+                continue
+            out.append(((t.get("exit_date") or t.get("entry_date") or ""), {
+                "code": c, "name": t.get("name") or WATCH_NAMES.get(c, ""),
+                "tgt": _w_tgt(c, t.get("name")), "board": _w_board(c), "arm": arm,
+                "state": '<span class="sub">已成交</span>',
+                "d0": t.get("entry_date") or "—", "px": _w_num(t.get("entry_px")),
+                "d1": t.get("exit_date") or "—", "ret": _w_pct(t.get("net_ret"))}))
+    out.sort(key=lambda x: x[0], reverse=True)
+    return [r for _d, r in out], []
+
+
+def _w_rows_kh():
+    """超卖伏击：A 轨（标准 · khunter_paper_state.json）+ C 轨（激进 · khunter_paper_state_c.json）
+    的 positions / pending / trades（**只读**账本，不写）。
+    列：标的 / 板块 / 轨 / 状态 / 日期 / 价格 / 最新价 / 持有。"""
+    out = []
+    for fn, arm in (("khunter_paper_state.json", "标准 A"),
+                    ("khunter_paper_state_c.json", "激进 C")):
+        d = _watch_load(fn)
+        if not d:
+            continue
+        _nh = d.get("nav_history") or []
+        _last_d = _nh[-1].get("date", "") if _nh else ""
+        pend_sell = set(d.get("pending_sells") or [])
+        for p in (d.get("positions") or []):
+            c = p.get("code", "")
+            st = ('<span class="warn">待卖出 · T+1 开盘</span>' if c in pend_sell
+                  else '<span class="up">持仓中</span>')
+            out.append((p.get("entry_date") or "", {
+                "code": c, "name": WATCH_NAMES.get(c, ""), "tgt": _w_tgt(c),
+                "board": _w_board(c), "arm": arm, "state": st,
+                "d": p.get("entry_date") or "—", "px": _w_num(p.get("entry_px")),
+                "last": _w_num(p.get("last_close")),
+                "hold": "%s d" % p.get("hold_days", "—")}))
+        for c in (d.get("pending_buys") or []):
+            out.append((_last_d, {
+                "code": c, "name": WATCH_NAMES.get(c, ""), "tgt": _w_tgt(c),
+                "board": _w_board(c), "arm": arm,
+                "state": '<span class="warn">待买入 · T+1 开盘</span>',
+                "d": _last_d or "—", "px": "—", "last": "—", "hold": "—"}))
+        for t in (d.get("trades") or []):
+            c = t.get("code", "")
+            if not c:
+                continue
+            _is_buy = str(t.get("side", "")).lower() == "buy"
+            out.append((t.get("date") or "", {
+                "code": c, "name": WATCH_NAMES.get(c, ""), "tgt": _w_tgt(c),
+                "board": _w_board(c), "arm": arm,
+                "state": ('<span class="up">已买入</span>' if _is_buy
+                          else '<span class="down">已卖出</span>'),
+                "d": t.get("date") or "—", "px": _w_num(t.get("px")),
+                "last": "—", "hold": "—"}))
+    out.sort(key=lambda x: x[0], reverse=True)
+    return [r for _d, r in out], []
+
+
+def _w_rows_etf():
+    """ETF 动量轮动：etf_paper_state.json 的 positions / pending / trades（**只读**）。
+    列：标的 / 板块 / 状态 / 日期 / 入场价 / 最新价 / 权重。"""
+    d = _watch_load("etf_paper_state.json")
+    if not d:
+        return [], []
+    out = []
+    for p in (d.get("positions") or []):
+        c = p.get("code", "")
+        out.append((p.get("entry_date") or "", {
+            "code": c, "name": WATCH_NAMES.get(c, ""), "tgt": _w_tgt(c),
+            "board": _w_board(c), "state": '<span class="up">持仓中</span>',
+            "d": p.get("entry_date") or "—", "px": _w_num(p.get("entry_px")),
+            "last": _w_num(p.get("last_close")),
+            "w": _w_pct(p.get("weight"), 2)}))
+    _pend = d.get("pending")
+    if isinstance(_pend, dict):
+        for c, w in _pend.items():
+            out.append(("", {"code": c, "name": WATCH_NAMES.get(c, ""), "tgt": _w_tgt(c),
+                             "board": _w_board(c),
+                             "state": '<span class="warn">待调仓 · T+1 开盘</span>',
+                             "d": "—", "px": "—", "last": "—", "w": _w_pct(w, 2)}))
+    for t in (d.get("trades") or []):
+        _to = t.get("to") or {}
+        _lab = {"init": "建仓目标", "rebal": "调仓目标"}.get(str(t.get("type")), "调仓目标")
+        for c, w in (_to.items() if isinstance(_to, dict) else []):
+            out.append((t.get("date") or "", {
+                "code": c, "name": WATCH_NAMES.get(c, ""), "tgt": _w_tgt(c),
+                "board": _w_board(c), "state": '<span class="sub">%s</span>' % _lab,
+                "d": t.get("date") or "—", "px": "—", "last": "—", "w": _w_pct(w, 2)}))
+    out.sort(key=lambda x: x[0], reverse=True)
+    return [r for _d, r in out], []
+
+
+def _w_rows_fund():
+    """短线基金池（场外基金动量）：**本策略目前没有独立 paper/持仓状态**（已查全仓）——
+      · backtest/fund_paper.json  = 中线 FB3-H20 基金主仓（轨C），已在「中长线池 · 基金主仓」渲染，
+        与短线基金池不是同一策略 → 不上本卡（否则违反「仅本策略标的」）。
+      · short_pool.json.track     = 短线跟踪池条目（含 type=fund），非账本、无入场价/份额字段。
+    → 返回空行 + 缺字段清单，**不编造数据**（卡内渲染「暂无跟踪数据」）。"""
+    return [], WATCH_NAMES_MISSING
+
+
+WATCH_STATIC = {"qlch": _w_rows_qlch, "kh": _w_rows_kh, "etf": _w_rows_etf, "fund": _w_rows_fund}
+WATCH_COLS = {
+    "qlch": [("标的", "tgt", ""), ("板块", "board", ""), ("轨", "arm", ""), ("状态", "state", ""),
+             ("入场日", "d0", "center"), ("入场价", "px", "right"), ("出场日", "d1", "center"),
+             ("净收益", "ret", "right")],
+    "kh": [("标的", "tgt", ""), ("板块", "board", ""), ("轨", "arm", ""), ("状态", "state", ""),
+           ("日期", "d", "center"), ("价格", "px", "right"), ("最新价", "last", "right"),
+           ("持有", "hold", "center")],
+    "etf": [("标的", "tgt", ""), ("板块", "board", ""), ("状态", "state", ""),
+            ("日期", "d", "center"), ("入场价", "px", "right"), ("最新价", "last", "right"),
+            ("权重", "w", "right")],
+    "fund": [],
+}
+
+
+def watch_card(key, title, source_kind="short", cols=None, note="", empty_msg=None, badge="自动"):
+    """一张「策略自有」跟踪池卡。id 一律带 key 后缀（页面级共享卡已删除）。"""
+    _cid = "watch-card-%s" % key
+    L = ['<div class="card" id="%s">' % _cid,
+         '<h2>👁 跟踪池 · %s <span class="badge badge-auto">%s</span></h2>' % (title, badge),
+         '<div class="sub"><b>仅本策略标的</b> · %s</div>' % note]
+    if source_kind == "short":
+        _s = ('<input type="text" id="watch-q-%(k)s" name="watch-q-%(k)s" placeholder="🔍 搜索代码 / 名称…" '
+              'autocomplete="off" spellcheck="false" aria-label="搜索跟踪标的（代码或名称）">'
+              '<select id="watch-f-type-%(k)s" class="flt" title="类型筛选" aria-label="按类型筛选">'
+              '<option value="">全部类型</option></select>'
+              '<select id="watch-f-inpool-%(k)s" class="flt" title="在池状态筛选" aria-label="按在池状态筛选">'
+              '<option value="">全部状态</option><option value="1">在池</option>'
+              '<option value="0">已掉出（待轮动换出）</option></select>'
+              '<select id="watch-f-tier-%(k)s" class="flt" title="档位筛选" aria-label="按档位筛选">'
+              '<option value="">全部档位</option></select>'
+              '<select id="watch-sort-%(k)s" class="flt" title="排序方式" aria-label="排序方式">'
+              '<option value="entry">加入时间 ↓</option><option value="chg">涨跌 ↓</option>'
+              '<option value="score">短线分 ↓</option><option value="name">名称 ↑</option>'
+              '<option value="left">剩余天数 ↑</option></select>'
+              '<span class="count" id="watch-count-%(k)s"></span>' % {"k": key})
+        L.append('<div id="watch-pending-%s"></div><div id="watch-gate-%s"></div>'
+                 '<div class="toolbar" id="watch-bar-%s">%s</div>'
+                 '<div id="watch-table-%s" class="watch-tbl"></div>'
+                 % (key, key, key, _s, key))
+        L.append('</div>')
+        return "".join(L)
+    rows, missing = WATCH_STATIC[source_kind]()
+    _cols = cols if cols is not None else WATCH_COLS.get(source_kind, [])
+    if rows and _cols:
+        L.append('<div class="tbl-wrap"><table class="tbl watch-tbl" id="tbl-watch-%s">'
+                 '<thead><tr>' % key)
+        for h, _k, _al in _cols:
+            L.append('<th%s>%s</th>' % (' style="text-align:%s"' % _al if _al else '', h))
+        L.append('</tr></thead><tbody>')
+        for r in rows:
+            L.append('<tr data-code="%s" data-search="%s">'
+                     % (r.get("code", ""),
+                        " ".join([str(r.get("name") or ""), _bare(r.get("code", ""))]).strip()))
+            for _h, k2, _al in _cols:
+                L.append('<td%s>%s</td>' % (' style="text-align:%s"' % _al if _al else '',
+                                            r.get(k2, "—")))
+            L.append('</tr>')
+        L.append('</tbody></table></div>')
+        L.append('<div class="sub" style="margin-top:6px;color:var(--faint)">共 <b>%d</b> 行'
+                 '（持仓 + 已成交 / 待执行），按日期降序 · 只读本策略账本，不写回</div>' % len(rows))
+    elif missing:
+        L.append('<div class="sub" style="color:var(--warn)">%s</div>'
+                 % (empty_msg or "暂无跟踪数据（本策略尚无独立 paper/持仓状态）"))
+        L.append('<div class="sub">缺字段清单（补齐后才能上卡）：<b>%s</b></div>'
+                 % "、".join(missing))
+    else:
+        L.append('<div class="sub" style="color:var(--faint)">%s</div>'
+                 % (empty_msg or "暂无成交"))
+    L.append('</div>')
+    return "".join(L)
 
 # ════════════════════════════════════════════════════════════════════
 # ETF 动量轮动（冻结模型）卡片 —— 2026-09-06 用户需求：ETF 选股加进看板
@@ -2003,7 +2249,7 @@ KH_HITS_CARD = f'''<div class="card" id="card-kh-hits">
 <div class="toolbar" id="kh-hits-bar">
 <input type="text" id="kh-hits-q" placeholder="🔍 搜索代码 / 名称 / 策略…" autocomplete="off" spellcheck="false">
 <select id="kh-hits-f-tier" class="flt" title="标准版档位筛选"><option value="">全部档位</option><option>买入</option><option>卖出</option><option>观望</option></select>
-<select id="kh-hits-f-board" class="flt" title="板块筛选"><option value="">全部板块</option><option>主板</option><option>创业板</option><option>科创板</option><option>北交所</option></select>
+<select id="kh-hits-f-board" class="flt" title="板块筛选"><option value="">全部板块</option><option>主板</option><option>创业板</option><option>科创板</option></select>
 <span class="count" id="kh-hits-count"></span>
 </div>
 <table class="tbl" id="kh-hits-table">
@@ -2137,18 +2383,22 @@ def qlch_card():
                 return "—" if v is None else ("%+.*f%%" % (nd, v * 100))
 
             def _row_attrs(r):
-                """行属性（R-qlch-live-0923）：与看板其它表同格式的 data-code / data-search。
-                盘中层靠它认行：候选表的代码是独立一列，缺 data-search 时名称守卫把代码列
-                去掉 6 位数字后剩下的 'sz' 当名称 → 与行情名比对失败、整行拒刷（实测）。"""
+                """行属性（R-qlch-live-0923 / R-qlch-pxcol-0923）：与看板其它表同格式的
+                data-code / data-search。盘中层靠它认行：**data-code 保留带前缀原值**（盘中层
+                剥 sh/sz/bj 后取 6 位）；data-search 首词必须是名称（名称守卫按「去掉 6 位数字
+                及其后」取名），末段补板块供前端搜索。"""
                 _c = r.get("code", "")
                 return ' data-code="%s" data-search="%s"' % (
-                    _c, " ".join([str(r.get("name", "")), _bare(_c), str(r.get("ind") or "")]).strip())
+                    _c, " ".join([str(r.get("name", "")), _bare(_c),
+                                  str(_board_of6(_bare(_c))), str(r.get("ind") or "")]).strip())
 
+            # 列序（15 列 = 原 14 − 代码/名称合并 1 + 板块 1 + 现价 1）：# / 标的 / 板块 / 行业 / 现价 / 涨跌幅 / …
             L.append('<table class="tbl" id="tbl-qlch-cand" style="width:100%;font-size:12px;margin-top:8px">'
                      '<thead><tr>'
-                     '<th data-key="rank">#</th><th data-key="code">代码</th><th data-key="name">名称</th>'
+                     '<th data-key="rank">#</th><th data-key="name">标的</th><th data-key="board">板块</th>'
                      '<th data-key="ind">行业</th>'
-                     '<th data-key="chg">涨跌幅</th>'
+                     '<th data-key="px" style="text-align:right">现价</th>'
+                     '<th data-key="chg" style="text-align:right">涨跌幅</th>'
                      '<th data-key="r20" title="信号核心：T-1 的 20 日收益，越负越超跌，门槛 ≤ −7.31%">超跌深度</th>'
                      '<th data-key="vr" title="量比：当日成交额 / 5 日均量，门槛 ≥1.2">量比</th>'
                      '<th data-key="turn" title="换手率（amount/流通市值），横截面分位带 [.40,.80]">换手</th>'
@@ -2171,6 +2421,9 @@ def qlch_card():
                         % (_lo * (1 + TP), _hi * (1 + TP), _lo * (1 + SL), _hi * (1 + SL), MH))
 
             for r in rows:
+                _c6 = _bare(r.get("code", ""))          # 6 位码：标的列下行 + 板块判定（data-code 仍为带前缀原值）
+                _board = _board_of6(_c6)
+                _cl = r.get("close")
                 _chg = r.get("chg"); _r20 = r.get("r20")
                 _cs = "—" if _chg is None else "%+.2f%%" % (_chg * 100)
                 _col = ("var(--up)" if (_chg is not None and _chg > 0)
@@ -2179,21 +2432,29 @@ def qlch_card():
                 _r20s = "—" if _r20 is None else "%+.2f%%" % (_r20 * 100)
                 _r20col = ("var(--down)" if (_r20 is not None and _r20 <= -0.15)
                            else ("var(--warn)" if _r20 is not None else "var(--faint)"))
+                # 现价（R-qlch-pxcol-0923）：构建期填今收，无则「—」；盘中层按列头文本「现价」定位并改写
+                _pxs = "—" if _cl is None else "%.2f" % _cl
                 L.append(('<tr%s>'
-                          '<td data-v="%s">%s</td><td>%s</td><td><b>%s</b></td>'
-                         '<td style="color:var(--sub)">%s</td>'
-                         '<td data-v="%s" style="color:%s">%s</td>'
-                         '<td data-v="%s" style="color:%s"><b>%s</b></td>'
-                         '<td data-v="%s">%s</td><td data-v="%s">%s</td>'
-                         '<td data-v="%s">%s</td><td data-v="%s">%s</td>'
-                          % (_row_attrs(r), r.get("rank", ""), r.get("rank", ""), r.get("code", ""),
-                            r.get("name", ""), r.get("ind", "") or "—",
-                            "" if _chg is None else _chg, _col, _cs,
-                            "" if _r20 is None else _r20, _r20col, _r20s,
-                            r.get("vr") or "", "—" if r.get("vr") is None else "%.2f" % r["vr"],
-                            r.get("turn") or "", _pct(r.get("turn")),
-                            r.get("pm") or "", "—" if r.get("pm") is None else "%.2f" % r["pm"],
-                            r.get("pt") or "", "—" if r.get("pt") is None else "%.2f" % r["pt"])
+                          '<td data-v="%s">%s</td>'
+                          '<td><b>%s</b><br><span style="color:var(--sub);font-size:var(--fs-xs);'
+                          'font-variant-numeric:tabular-nums">%s</span></td>'
+                          '<td>%s</td><td style="color:var(--sub)">%s</td>'
+                          '<td data-key="px" data-v="%s" style="text-align:right;'
+                          'font-variant-numeric:tabular-nums">%s</td>'
+                          '<td data-v="%s" style="color:%s">%s</td>'
+                          '<td data-v="%s" style="color:%s"><b>%s</b></td>'
+                          '<td data-v="%s">%s</td><td data-v="%s">%s</td>'
+                          '<td data-v="%s">%s</td><td data-v="%s">%s</td>'
+                          % (_row_attrs(r), r.get("rank", ""), r.get("rank", ""),
+                             r.get("name", ""), _c6,
+                             _board_cell(_board, r.get("ind")), r.get("ind", "") or "—",
+                             "" if _cl is None else _cl, _pxs,
+                             "" if _chg is None else _chg, _col, _cs,
+                             "" if _r20 is None else _r20, _r20col, _r20s,
+                             r.get("vr") or "", "—" if r.get("vr") is None else "%.2f" % r["vr"],
+                             r.get("turn") or "", _pct(r.get("turn")),
+                             r.get("pm") or "", "—" if r.get("pm") is None else "%.2f" % r["pm"],
+                             r.get("pt") or "", "—" if r.get("pt") is None else "%.2f" % r["pt"])
                          ) + _buy_td(r.get("close")) + _tpsl(r.get("close")) + '</tr>')
             L.append('</tbody></table>')
     else:
@@ -2301,6 +2562,31 @@ def qlch_card():
     return "".join(L)
 
 
+# ── 5 张「策略自有」跟踪池卡的副标题（R-track-sep-0923：一卡一策略，只列本策略标的）──
+WATCH_NOTE_STK = (
+    '上方短线表<b>可买入标的（强买入/买入）</b>上榜次日收盘确认后自动加入跟踪，30 天自动移除'
+    '（<b>2026-08-18 起新上榜先入「待确认」隔日入池</b>，隔离当日收盘信号）· 卖出规则（与回测一致）：'
+    '<b>收盘跌破 MA5 → 次日开盘卖出</b> ｜ 掉出信号池 → 下次轮动换出 ｜ 档位减半/清仓 → 按档位操作 · '
+    '每次重新上榜刷新【入池/跟踪/出池】时间 · 数据截至 %s（基金净值 T-1：%s）· '
+    '数据源 <code>short_pool.json</code>（track / track_pending_short）'
+    % (SHORT_POOL_ASOF, SHORT_POOL.get("fund_as_of", "—")))
+WATCH_NOTE_QLCH = (
+    '超跌低开低吸六臂账本（B4_K3 在产 + 5 对照臂）的<b>持仓 + 已成交</b>，只读 '
+    '<code>backtest/qlch_paper_state*.json</code>（不写账本、不改收盘链）· '
+    '出场口径：止盈 +15% ／ 止损 −20% ／ 上限 20 交易日')
+WATCH_NOTE_KH = (
+    '超卖伏击 A/C 双轨账本的<b>持仓 + 待买卖 + 已成交</b>，只读 '
+    '<code>khunter_paper_state.json</code>（标准 A · 卖出 RSI&gt;59）与 '
+    '<code>khunter_paper_state_c.json</code>（激进 C · 卖出 RSI&gt;50）')
+WATCH_NOTE_ETF = (
+    'ETF 动量轮动模拟盘的<b>持仓 + 建仓/调仓目标</b>，只读 <code>etf_paper_state.json</code> · '
+    '冻结配置：20 日动量前 2 等权 / 绝对动量保护 / 12% 目标波动率 / 月末调仓')
+WATCH_NOTE_FUND = (
+    '短线基金池（场外基金动量 ≥50 入池）· <b>本策略目前没有独立 paper/持仓状态</b>：'
+    '中线「基金主仓」（FB3-H20 轨C）的 <code>backtest/fund_paper.json</code> 属另一策略、'
+    '已在「中长线池 · 基金主仓」展示，故不在此卡混用；缺字段清单见下')
+
+
 SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
 {subnav("short", [("st-qlch", "超跌低开低吸"), ("st-kh", "超卖伏击"),
                     ("st-etf", "ETF轮动"), ("st-stk", "股票池"), ("st-fund", "基金池")],
@@ -2309,24 +2595,27 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
   "view-short-stk", "sys-short-stk",
   "⚡ 短线 · 股票池", "auto", "主板 超卖伏击主信号 · A59 主卖出 / C50 参考 · 低价≥3元",
   v9_short_stock, "tbl-short-stk", "card-short-stk",
-  "信号池 = 回测买入清单：15 个超卖形态策略信号 + 信号日 RSI&lt;35 超卖 + 收盘≥3元（主板限定·事件独立·有信号即买）· 卖出 = <b>逐股独立</b>：持仓股自身 RSI 确认日 &gt; 标准版阈值（熊 59/牛 75） → T+1 开盘卖（RSI&gt;50 为激进版参考线，标注但<i>不执行</i>，标准/激进判定归模拟盘双轨）· 档位 = 短线买入口径（强买入/买入）· 下方「📌 全量池短线跟踪」自动跟踪可买入标的（保留 30 天）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：不追高，可等盘中回落至 3% 以内再考虑买入（9:30 盘中起生效）</b>",
-  extra_card="", score_sub="动量/量价/通道/波动",
+  "信号池 = 回测买入清单：15 个超卖形态策略信号 + 信号日 RSI&lt;35 超卖 + 收盘≥3元（主板限定·事件独立·有信号即买）· 卖出 = <b>逐股独立</b>：持仓股自身 RSI 确认日 &gt; 标准版阈值（熊 59/牛 75） → T+1 开盘卖（RSI&gt;50 为激进版参考线，标注但<i>不执行</i>，标准/激进判定归模拟盘双轨）· 档位 = 短线买入口径（强买入/买入）· 下方「👁 跟踪池 · 股票池」自动跟踪可买入标的（保留 30 天）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：不追高，可等盘中回落至 3% 以内再考虑买入（9:30 盘中起生效）</b>",
+  extra_card=watch_card("st-stk", "股票池", "short", note=WATCH_NOTE_STK), score_sub="动量/量价/通道/波动",
   head_tags=[SHORT_POOL_GATE, SHORT_KHUNTER_BEAR, SHORT_KHUNTER_BADGE,
              '<span class="badge badge-auto">股票 = 15 个超卖形态策略信号 + RSI&lt;35 超卖 + 熊市MA250（主板限定 · 弃用旧战法）</span>',
              '<span class="badge badge-auto">超卖伏击信号密集期每日可能有几只，稀疏期 0 只属正常（事件驱动）</span>'],
-  head_note=f"<b>🎯 超卖伏击主信号（蓝标）= 主板 15 策略信号命中 + 信号日 RSI&lt;35 超卖 + 收盘≥3元 + 熊市(沪深300&lt;MA250)</b>（2026-09-07 牛熊线 MA250 投产 + ob59 升级：MA60→MA250 回测 total 68.49→75.06%、ob 55→58→59 组合 total 110.15→119.44%/夏普 0.621→0.648；<b>标准版</b> 卖出 RSI&gt;59 主执行 / <b>激进版</b> RSI&gt;50 参考展示；入场两版相同）· 回测：MA250_ob59_oslb32 n=266 资金池(N5)年化 7.96%/回撤 20.91%/夏普 0.648（满窗验证 105.77%/0.660 稳健）· 分年度 11 年 8 正 3 负（2023 -1.92/2026 -0.91 为小样本）· <b>旧战法（反转分）已全量弃用</b>（主板 -35.65% / 全市场 -41.67% 均负期望，不再展示）· 市况门控仅提醒：沪深300 &gt; MA20 才开新仓；超卖伏击买入由 <b>MA250 熊市门控</b>裁决（非熊→不开新仓仅观察/卖出，弱牛域 OSL32 开仓）· 卖出逐股独立走「全量池短线跟踪」· 回测参考见「监控总览」",
+  head_note=f"<b>🎯 超卖伏击主信号（蓝标）= 主板 15 策略信号命中 + 信号日 RSI&lt;35 超卖 + 收盘≥3元 + 熊市(沪深300&lt;MA250)</b>（2026-09-07 牛熊线 MA250 投产 + ob59 升级：MA60→MA250 回测 total 68.49→75.06%、ob 55→58→59 组合 total 110.15→119.44%/夏普 0.621→0.648；<b>标准版</b> 卖出 RSI&gt;59 主执行 / <b>激进版</b> RSI&gt;50 参考展示；入场两版相同）· 回测：MA250_ob59_oslb32 n=266 资金池(N5)年化 7.96%/回撤 20.91%/夏普 0.648（满窗验证 105.77%/0.660 稳健）· 分年度 11 年 8 正 3 负（2023 -1.92/2026 -0.91 为小样本）· <b>旧战法（反转分）已全量弃用</b>（主板 -35.65% / 全市场 -41.67% 均负期望，不再展示）· 市况门控仅提醒：沪深300 &gt; MA20 才开新仓；超卖伏击买入由 <b>MA250 熊市门控</b>裁决（非熊→不开新仓仅观察/卖出，弱牛域 OSL32 开仓）· 卖出逐股独立走「👁 跟踪池 · 股票池」· 回测参考见「监控总览」",
   as_of=SHORT_POOL_ASOF, intraday_note=SHORT_POOL_INTRADAY,
   as_of_min=SHORT_POOL.get("intraday_ts") or SHORT_POOL_ASOF_MIN,
   tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=(), inline=True))}
-{subview("st-qlch", "超跌低开低吸", "短期反转 + 跳空低吸 + 熊市择时 · 次日出场", qlch_card())}
-{subview("st-kh", "超卖伏击", "RSI 超卖 + 15 策略形态 · 标准/激进双轨", KH_HITS_CARD + KH_PAPER_CARD)}
-{subview("st-etf", "ETF轮动", "20 日动量排名 · 目标权重为策略输出", ETF_PAPER_CARD)}
+{subview("st-qlch", "超跌低开低吸", "短期反转 + 跳空低吸 + 熊市择时 · 次日出场",
+         qlch_card() + watch_card("st-qlch", "超跌低开低吸", "qlch", note=WATCH_NOTE_QLCH))}
+{subview("st-kh", "超卖伏击", "RSI 超卖 + 15 策略形态 · 标准/激进双轨",
+         KH_HITS_CARD + KH_PAPER_CARD + watch_card("st-kh", "超卖伏击", "kh", note=WATCH_NOTE_KH))}
+{subview("st-etf", "ETF轮动", "20 日动量排名 · 目标权重为策略输出",
+         ETF_PAPER_CARD + watch_card("st-etf", "ETF轮动", "etf", note=WATCH_NOTE_ETF))}
 {subview("st-fund", "基金池", "场外基金动量（分≥50 才入池）", system_block(
   "view-short-fund", "sys-short-fund",
   "🔵 短线 · 基金池", "auto", "场外基金动量（分≥50 才入池）",
   v9_short_fund, "tbl-short-fund", "card-short-fund",
   "基金池 = 场外基金动量选股（与股票完全独立，资产类别不同）· 现价 = T-1 净值（场外基金净值次日公布）· 基金买入按短线分（≥50）· 与股票池分开展示（2026-09-03 起）",
-  extra_card="", score_sub="动量/趋势",
+  extra_card=watch_card("st-fund", "基金池", "fund", note=WATCH_NOTE_FUND), score_sub="动量/趋势",
   head_tags=['<span class="badge badge-auto">🔵 场外基金动量（分≥50）</span>',
              '<span class="badge badge-auto">现价 = T-1 净值 · 次日公布</span>'],
   head_note="基金池与股票池（超卖伏击 主板信号）完全独立：基金=净值动量轮动，股票=超卖伏击 事件信号；档位口径同为短线买入口径（强买入/买入）",
@@ -2334,7 +2623,8 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
   as_of_min="20:00",
   tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=(), inline=True))}
 {ASSET_HINT}
-{WATCH_CARD}
+<!-- 页面级「全量池短线跟踪」共享卡已于 2026-09-23（R-track-sep-0923）删除：改为 5 张「策略自有」跟踪池卡，
+     分别挂在上方 5 个短线子视图内（id=watch-card-st-*），跨策略标的 0 混入。 -->
 <div class="pool-sec"><b>回测数据</b><span>短线池</span></div>
 {bt_short_html()}
 </div>'''
@@ -2499,9 +2789,10 @@ html = f"""<!doctype html>
 .rev-md p{{margin:6px 0;color:var(--text)}}
 .rev-md blockquote{{background:var(--card2);border-left:3px solid var(--accent);padding:8px 12px;margin:8px 0;border-radius:0 8px 8px 0;color:var(--sub)}}
 /* 持仓跟踪 */
-#watch-table .up{{color:var(--down)}} #watch-table .down{{color:var(--up)}} #watch-table .warn{{color:var(--warn)}}
+/* 跟踪池表配色（R-track-sep-0923：id 带 key 后缀 → 改按 class 选择，5 张卡共用） */
+.watch-tbl .up{{color:var(--down)}} .watch-tbl .down{{color:var(--up)}} .watch-tbl .warn{{color:var(--warn)}}
 #watch-v9-table .up{{color:var(--down)}} #watch-v9-table .down{{color:var(--up)}} #watch-v9-table .warn{{color:var(--warn)}}
-#watch-table td,#watch-v9-table td{{font-variant-numeric:tabular-nums}}
+.watch-tbl td,#watch-v9-table td{{font-variant-numeric:tabular-nums}}
 .bt-short{{background:var(--card2);border:1px dashed var(--border);border-radius:var(--r);padding:22px;text-align:center;margin-top:16px}}
 .bt-short h3{{margin:0 0 6px;color:var(--sub);font-size:13.5px}}
 .bt-short .sub{{color:var(--faint);font-size:12px;line-height:1.8}}
@@ -2654,7 +2945,7 @@ html = f"""<!doctype html>
 window.ENH.nav = [
   ["kxmm","","市场晴雨",[["kxmm-fg","恐贪指数"],["kxmm-heat","热力图"],["hm-card","热力树图"],["crowd-card","大盘拥挤度"],["mkt-weather","市场晴雨表"]]],
   ["sys-auto","","中长线池",[["sat-card","卫星目标持仓"],["sat-paper-b-card","多因子主仓 模拟盘"],["gold-sat-card","黄金对冲"],["ret20-paper-card","动量增强模拟盘"],["fb3-pool-card","FB3 基金池"],["fund-paper-card","基金主仓模拟盘"]]],
-  ["short","","短线选股",[["card-short-stk","股票池 汇总表"],["card-short-stk-detail","股票池 逐标的详情"],["qlch-card","🏷️ 超跌低开低吸"],["card-kh-hits","🏷️ 超卖伏击 · 命中策略"],["card-kh-paper","🏷️ 超卖伏击 · 模拟盘"],["card-etf-paper","ETF 动量轮动"],["card-short-fund","基金池 汇总表"],["card-short-fund-detail","基金池 逐标的详情"],["watch-card","短线跟踪"]]],
+  ["short","","短线选股",[["card-short-stk","股票池 汇总表"],["card-short-stk-detail","股票池 逐标的详情"],["qlch-card","🏷️ 超跌低开低吸"],["card-kh-hits","🏷️ 超卖伏击 · 命中策略"],["card-kh-paper","🏷️ 超卖伏击 · 模拟盘"],["card-etf-paper","ETF 动量轮动"],["card-short-fund","基金池 汇总表"],["card-short-fund-detail","基金池 逐标的详情"],["watch-card-st-qlch","👁 跟踪池 · 超跌低开低吸"],["watch-card-st-kh","👁 跟踪池 · 超卖伏击"],["watch-card-st-etf","👁 跟踪池 · ETF轮动"],["watch-card-st-stk","👁 跟踪池 · 股票池"],["watch-card-st-fund","👁 跟踪池 · 基金池"]]],
   ["a5","","打板专区",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],
   ["qingju","","社区讨论",[],"https://qingju.me/"]
 ];
@@ -2827,14 +3118,18 @@ document.addEventListener('DOMContentLoaded',function(){{
     var html='<option value="">全部档位</option>'+opts.map(function(t){{return '<option value="'+t+'">'+t+'</option>';}}).join('');
     if(sel.innerHTML!==html){{sel.innerHTML=html;if(cur)sel.value=cur;}}
   }}
-  function renderWatch(){{
-    var box=document.getElementById('watch-table');if(!box)return;
+  /* R-track-sep-0923：跟踪池按策略独立 —— 本函数改为**按子视图 key 参数化**渲染。
+     目前只有 st-stk（股票池）走浏览器端渲染（SHORT_POOL.track）；其余 4 张卡由构建期 Python
+     读各自策略账本渲染（见 watch_card()）。页面级共享卡已删除。 */
+  var WATCH_KEYS=['st-stk'];
+  function renderWatchFor(k){{
+    var box=document.getElementById('watch-table-'+k);if(!box)return;
     var S=window.SHORT_SIGNALS;if(!S){{box.innerHTML='<div class="sub">信号数据未加载（缺 short_signals.js）</div>';return;}}
     var track=(window.SHORT_POOL&&window.SHORT_POOL.track)?window.SHORT_POOL.track:{{}};
     // 2026-08-19 市况门控口径统一：门控关闭时跟踪池档位已改写「不开新仓·仅跟踪」，顶部横幅提示
     var _mg=(window.SHORT_POOL&&window.SHORT_POOL.market_gate)||{{}};
     var _gateOpen=_mg.open;
-    var _gateBox=document.getElementById('watch-gate');
+    var _gateBox=document.getElementById('watch-gate-'+k);
     if(_gateBox){{
       if(_gateOpen===false){{
         _gateBox.innerHTML='<div class="sub" style="margin-bottom:6px;color:var(--warn)">⚠ 市况门控关闭（沪深300 '+( _mg.idx_close!=null?_mg.idx_close:'—')+' < MA20 '+( _mg.idx_ma20!=null?_mg.idx_ma20:'—')+'）—— 已入池跟踪标的仅跟踪卖出信号，「不开新仓·仅跟踪」（安全口径，非买入）</div>';
@@ -2842,7 +3137,7 @@ document.addEventListener('DOMContentLoaded',function(){{
     }}
     // 待确认（pending）：当日新上榜、下个收盘确认后入正式池（2026-08-18 用户需求，与中长线一致）
     var pnd=(window.SHORT_POOL&&window.SHORT_POOL.track_pending_short)?window.SHORT_POOL.track_pending_short:{{}};
-    var pendBox=document.getElementById('watch-pending');
+    var pendBox=document.getElementById('watch-pending-'+k);
     var pkeys=Object.keys(pnd);
     if(pendBox){{
       if(pkeys.length){{
@@ -2865,7 +3160,7 @@ document.addEventListener('DOMContentLoaded',function(){{
       if(age>=30)return;   // 30 天过期（前端兜底，与服务端一致）
       base.push({{code:code,entry:t.entry||'—',exit:t.exit||'—',age:age,type:t.type||'',pool:t.pool||''}});
     }});
-    var bar=document.getElementById('watch-bar');
+    var bar=document.getElementById('watch-bar-'+k);
     var topSet={{}};
     if(window.SHORT_POOL){{Object.keys(window.SHORT_POOL.tiers||{{}}).forEach(function(g){{(window.SHORT_POOL.tiers[g]||[]).forEach(function(c){{topSet[c]=1;}});}});}}
     // 解析信号数据（名称/涨跌/分/档位），未找到代码的单独标记
@@ -2903,15 +3198,15 @@ document.addEventListener('DOMContentLoaded',function(){{
     if(bar){{bar.style.display=rows.length?'':'none';}}
     if(!rows.length){{box.innerHTML='<div class="sub" style="color:var(--faint)">暂无跟踪 —— 短线表出现可买入标的（强买入/买入）后自动加入，保留 30 天</div>';return;}}
     // 读筛选/排序（uncontrolled，每次渲染读取 DOM）
-    var q=(document.getElementById('watch-q').value||'').trim().toLowerCase();
-    var ftype=document.getElementById('watch-f-type').value;
-    var fpool=document.getElementById('watch-f-inpool').value;
-    var ftier=document.getElementById('watch-f-tier').value;
-    var sortKey=document.getElementById('watch-sort').value||'entry';
-    fillTierOptions('watch-f-tier', rows.map(function(r){{return r.tierDisp||null;}}));
+    var q=(document.getElementById('watch-q-'+k).value||'').trim().toLowerCase();
+    var ftype=document.getElementById('watch-f-type-'+k).value;
+    var fpool=document.getElementById('watch-f-inpool-'+k).value;
+    var ftier=document.getElementById('watch-f-tier-'+k).value;
+    var sortKey=document.getElementById('watch-sort-'+k).value||'entry';
+    fillTierOptions('watch-f-tier-'+k, rows.map(function(r){{return r.tierDisp||null;}}));
     var seenType={{}};var typeOpts=[];
     rows.forEach(function(r){{if(r.typeName&&!seenType[r.typeName]){{seenType[r.typeName]=1;typeOpts.push(r.typeName);}}}});
-    var tsel=document.getElementById('watch-f-type');
+    var tsel=document.getElementById('watch-f-type-'+k);
     if(tsel){{var tcur=tsel.value;
       var th='<option value="">全部类型</option>'+typeOpts.map(function(t){{return '<option value="'+t+'">'+t+'</option>';}}).join('');
       if(tsel.innerHTML!==th){{tsel.innerHTML=th;if(tcur)tsel.value=tcur;}}}}
@@ -2932,7 +3227,7 @@ document.addEventListener('DOMContentLoaded',function(){{
       var db=b.entry&&b.entry!=='—'?new Date(String(b.entry).replace(/-/g,'/')):null;
       if(!da&&!db)return 0;if(!da)return 1;if(!db)return -1;return db-da;
     }});
-    var cnt=document.getElementById('watch-count');
+    var cnt=document.getElementById('watch-count-'+k);
     if(cnt)cnt.textContent='筛选 '+filtered.length+' / 共 '+rows.length+' 只';
     if(!filtered.length){{box.innerHTML='<div class="sub" style="color:var(--faint)">无匹配标的 —— 调整搜索/筛选条件后重试</div>';return;}}
     var h='<div class="sub" style="margin-bottom:6px;color:var(--sub)">🧭 版本说明：<b>标准版</b>=生产主信号（熊市卖出 RSI&gt;59 / 牛市卖出 RSI&gt;75）；<b>激进版</b>=参考线（RSI&gt;50 卖出，更早止盈高周转）—— 双版本并行对决；卖出为独立信号，不含买入含义</div>'
@@ -2957,11 +3252,14 @@ document.addEventListener('DOMContentLoaded',function(){{
   }}
   // 2026-08-17 用户决策：移除手动补充功能，顺带清理旧 localStorage 残留（含用户误加的"金安国纪"条目）
   try{{localStorage.removeItem('short_watchlist');}}catch(_e){{}}
-  ['watch-q','watch-f-type','watch-f-inpool','watch-f-tier','watch-sort'].forEach(function(id){{
-    var el=document.getElementById(id);if(!el)return;
-    el.addEventListener(id==='watch-q'?'input':'change',renderWatch);
+  /* R-track-sep-0923：逐子视图绑定 + 首渲染（目前只有 st-stk 走 JS；其余 4 张为构建期渲染） */
+  WATCH_KEYS.forEach(function(k){{
+    ['watch-q-'+k,'watch-f-type-'+k,'watch-f-inpool-'+k,'watch-f-tier-'+k,'watch-sort-'+k].forEach(function(id){{
+      var el=document.getElementById(id);if(!el)return;
+      el.addEventListener(id.indexOf('watch-q-'+k)===0?'input':'change',function(){{renderWatchFor(k);}});
+    }});
+    renderWatchFor(k);
   }});
-  renderWatch();
   /* 2026-09-05 用户需求：短线选股池命中策略一览 —— 命中 15 个超卖形态策略全展示，按 RSI 升序，档位/建议区分 */
   /* 2026-09-05 修复（用户反馈）：①表头被 innerHTML 整体替换删除 → 只替换 tbody；②分域问号 = 数据缺 regime → 兜底显示 —；
      ③标准版(A59)/激进版(C50) 混一列打架 → 拆四列独立展示 */

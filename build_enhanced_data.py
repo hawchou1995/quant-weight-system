@@ -837,6 +837,8 @@ out = {
     "details": details,
     "reports": reports,
 }
+from no_bj import assert_clean as _assert_clean      # 北交所硬闸（R-no-bj-0923）：写盘前断言
+_assert_clean(out, "enhanced_data.js")
 js = "window.ENH = " + json.dumps(out, ensure_ascii=False) + ";"
 (BASE / "enhanced_data.js").write_text(js, encoding="utf-8")
 print(f"enhanced_data.js 生成: {len(details)} 只标的 + 2 体系 + {len(reports)} 篇报告 ({(BASE/'enhanced_data.js').stat().st_size/1024:.0f} KB)")

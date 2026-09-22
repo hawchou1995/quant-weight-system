@@ -235,6 +235,9 @@ def save_candidates(D, rows):
         "codes": rows,
     }
     cur["updated"] = time.strftime("%Y-%m-%d %H:%M:%S")
+    sys.path.insert(0, str(BASE))                     # 北交所硬闸（R-no-bj-0923）：写盘前断言
+    from no_bj import assert_clean as _assert_clean
+    _assert_clean(cur, "qlch_candidates.json")
     json.dump(cur, open(CAND_OUT, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
 

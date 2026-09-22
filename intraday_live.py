@@ -757,7 +757,8 @@ QLCH_JS = r"""
       return (fa === fb) ? 0 : (fa < fb ? -1 : 1);
     });
     if (hits.length) {
-      var ncol = tb.querySelectorAll('thead th').length || 14;
+      /* 置顶分组行 colspan = 运行时列数（R-qlch-pxcol-0923：候选表改 15 列，勿写死） */
+      var ncol = tb.querySelectorAll('thead th').length || 15;
       var hr = document.createElement('tr');
       hr.className = 'qlch-trig-hdr';
       hr.innerHTML = '<td colspan="' + ncol + '">\u26a1 已触发买点（' + hits.length

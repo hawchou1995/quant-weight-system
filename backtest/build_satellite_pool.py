@@ -230,6 +230,9 @@ out = {
         "rows": fb3_rows,
     },
 }
+sys.path.insert(0, str(BASE))                         # 北交所硬闸（R-no-bj-0923）：写盘前断言
+from no_bj import assert_clean as _assert_clean       # noqa: E402
+_assert_clean(out, "satellite_pool.json")
 json.dump(out, open(HERE / "satellite_pool.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 print(f"[satellite_pool v2] asof {out['asof']} | 轨A {len(ln_rows)} 只 | 轨B {len(a4_rows)} 只 | 轨C {len(fb3_rows)} 只")
 print("轨A 样例:", {k: ln_rows[0][k] for k in ("code", "name", "industry", "score_txt", "action")})
