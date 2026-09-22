@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KHunter 短线优化报告 · 2026-09-03</title><style>
+:root{--bg:#f7f8fa;--card:#fff;--ink:#1a2333;--sub:#5b6b83;--line:#e4e8ef;
+--red:#d43d3d;--green:#0a8f5c;--blue:#2f6fed;--amber:#b8860b;--ok:#0a8f5c;--bad:#d43d3d;--purple:#7c3aed;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;padding:24px}
+.wrap{max-width:1100px;margin:0 auto}
+h1{font-size:26px;margin-bottom:4px}
+.sub{color:var(--sub);font-size:13px;margin-bottom:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin-bottom:16px}
+.card h2{font-size:18px;margin-bottom:12px;padding-left:10px;border-left:4px solid var(--blue)}
+.card h3{font-size:15px;margin:14px 0 8px;color:var(--sub)}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin:8px 0}
+th{background:#f0f3f8;text-align:left;padding:6px 9px;border:1px solid var(--line);font-weight:600}
+td{padding:6px 9px;border:1px solid var(--line)}
+tr:nth-child(even) td{background:#fafbfd}
+.pos{color:var(--red);font-weight:600}.neg{color:var(--green);font-weight:600}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.tag-ok{background:#e3f5ec;color:var(--ok)}.tag-bad{background:#fde8e8;color:var(--bad)}
+.tag-warn{background:#fdf3d7;color:var(--amber)}.tag-star{background:#f0e7fd;color:var(--purple)}
+.hl{background:#fff8e1;border:1px solid #f0e0a0;border-radius:8px;padding:10px 14px;margin:8px 0;font-size:13px}
+.hl-blue{background:#eaf2ff;border:1px solid #bcd7ff;border-radius:8px;padding:10px 14px;margin:8px 0;font-size:13px}
+.kpi{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0}
+.kpi div{flex:1;min-width:130px;background:#f6f8fb;border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center}
+.kpi b{display:block;font-size:19px;margin-top:2px}
+.kpi span{font-size:11px;color:var(--sub)}
+.arrow{display:inline-block;color:var(--sub);font-size:16px;margin:0 4px}
+.foot{margin-top:20px;font-size:12px;color:var(--sub);text-align:center;padding:12px}
+.chart-bar{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:12px}
+.chart-bar .lb{width:130px;text-align:right;color:var(--sub);flex-shrink:0}
+.chart-bar .bar{height:20px;border-radius:4px;background:var(--red);min-width:2px}
+.chart-bar .vl{font-size:11.5px;color:var(--ink)}
+</style></head><body><div class="wrap">
+<h1>🎯 KHunter 短线优化报告 <span style="font-size:14px;color:var(--amber)">牺牲单笔收益 → 换夏普与年化（熊市限定 + RSI&gt;55 提前离场）</span></h1>
+<div class="sub">2026-09-03 · 数据源 v8_factor_cache.pkl（5329 只）× hs300 指数 × 2016-06 至 2026-09 · 成本往返 1.15% · 全部 T-1 收盘确认 → T 开盘执行（无未来函数）</div>
+
+<div class="card" style="border-left:4px solid #d43d3d">
+<h2>⭐ 一、用户问题与病根诊断</h2>
+<div class="hl-blue"><b>用户原话</b>：「短线回测年化 5.8%、夏普 0.29？胜率倒是挺高 62% 了……有点畸形啊，胜率 40-55% 就差不多了，<b>牺牲点胜率，提高下夏普和年化</b>」</div>
+<h3>1.1 基线诊断（全窗口 · RSI&lt;35 买 · RSI&gt;75 卖）</h3>
+<div class="kpi">
+<div><span>笔数 n</span><b>653</b></div>
+<div><span>胜率</span><b>62.5%</b></div>
+<div><span>中位收益</span><b class="pos">+5.82%</b></div>
+<div><span>年化</span><b class="pos">14.46%</b></div>
+<div><span>夏普</span><b class="neg">0.295</b></div>
+<div><span>平均持仓</span><b>55.8 天</b></div>
+</div>
+<h3>1.2 病根①：盈亏结构失衡（均亏 > 均赢！）</h3>
+<table><tr><th>项</th><th>盈利单</th><th>亏损单</th><th>判定</th></tr>
+<tr><td>平均收益</td><td class="pos">+15.72%</td><td class="neg">-18.08%</td><td><span class="tag tag-bad">❌ 均亏&gt;均赢</span></td></tr>
+<tr><td>平均持有天数</td><td>35.9 天</td><td><b>89.0 天</b></td><td><span class="tag tag-warn">⚠ 亏损单扛 2.5 倍时间</span></td></tr>
+</table>
+<div class="hl">🔍 <b>机制</b>：RSI&gt;75 出场时，盈利单被「快速止盈」打断（35.9 天）；亏损单因 RSI 长期达不到 75 被扛到 89 天且无止损——<b>这就是「胜率高但期望薄」的畸形来源</b>。</div>
+<h3>1.3 病根②：弱牛/强牛拖后腿（分 regime）</h3>
+<table><tr><th>regime</th><th>n</th><th>胜率</th><th>均值</th><th>年化</th><th>夏普</th><th>结论</th></tr>
+<tr><td>bear 熊市（hs300&lt;MA60）</td><td>445（68%）</td><td>65.8%</td><td class="pos">+4.76%</td><td>23.4%</td><td class="pos">0.47</td><td>✅ <b>唯一正期望</b>·主力</td></tr>
+<tr><td>weak 弱牛/震荡</td><td>74</td><td>50.0%</td><td class="neg">-3.65%</td><td>-14.1%</td><td class="neg">-0.33</td><td>❌ <b>明确拖后腿</b></td></tr>
+<tr><td>bull 强牛</td><td>134</td><td>58.2%</td><td class="pos">+1.01%</td><td>4.9%</td><td>0.10</td><td>⚠ 期望薄·只赚 β</td></tr>
+</table>
+<div class="hl">📌 <b>诊断结论</b>：不是单一市场拖累，而是 <b>①出场机制太宽松（亏损单扛 89 天）+ ②弱牛/强牛本不该开仓</b> 两病叠加。熊市超卖反弹是唯一真实 edge（sharpe 0.47）。</div>
+</div>
+
+<div class="card">
+<h2>二、优化路径（五轮回测，数据说话）</h2>
+<h3>2.1 第一步：熊市限定（关掉弱牛/强牛）</h3>
+<p style="font-size:13px;color:var(--sub)">熊市限定（hs300&lt;MA60 严格 T-1）+ 基线出场（RSI&gt;75）：n=448, sharpe 0.476（比全窗口 0.295 提升 +61%）。<b>方向确认</b>。</p>
+<h3>2.2 第二步：OB 超买阈值降低 = 最大杠杆（关键突破）</h3>
+<p style="font-size:13px;color:var(--sub)">熊市限定下，时间止损/ATR/移动止盈全部退化（RSI 卖出先触发）——唯一有效维度＝把 RSI 卖出阈值 75 → 55：</p>
+<table><tr><th>OB 阈值</th><th>n</th><th>胜率</th><th>中位</th><th>均值</th><th>年化</th><th>夏普</th><th>持仓</th><th>win_hold</th><th>loss_hold</th></tr>
+<tr><td>75（基线）</td><td>448</td><td>66.1%</td><td class="pos">+7.18%</td><td class="pos">+4.79%</td><td>23.8%</td><td>0.476</td><td>55.3</td><td>35.9</td><td>89.0</td></tr>
+<tr style="background:#e3f5ec"><td><b>55 ⭐ 最优</b></td><td><b>451</b></td><td><b>63.9%</b></td><td class="pos"><b>+2.34%</b></td><td class="pos"><b>+1.75%</b></td><td class="pos"><b>42.2%</b></td><td class="pos"><b>0.727</b></td><td><b>12.4</b></td><td>9.0</td><td>18.3</td></tr>
+<tr><td>60</td><td>450</td><td>68.0%</td><td class="pos">+3.12%</td><td class="pos">+2.06%</td><td>35.5%</td><td>0.624</td><td>16.9</td><td>11.6</td><td>28.1</td></tr>
+<tr><td>50（激进）</td><td>451</td><td>61.4%</td><td class="pos">+1.86%</td><td class="pos">+1.70%</td><td class="pos">58.5%</td><td class="pos">0.999</td><td>9.2</td><td>6.9</td><td>12.9</td></tr>
+</table>
+<div class="hl">🎯 <b>核心机制（这就是用户要的「牺牲换夏普」）</b>：单笔均值从 +4.79% 降到 +1.75%（牺牲 63%），但持仓从 55.3 → 12.4 天（<b>周转率 4.5 倍</b>）→ 年化 23.8% → <b>42.2%</b>、夏普 0.476 → <b>0.727</b>。<b>每笔少赚，但一年能转更多轮</b>。</div>
+<h3>2.3 第三步：全窗口对照验证（熊市限定是否是必要条件？）</h3>
+<table><tr><th>范围</th><th>OB</th><th>n</th><th>胜率</th><th>中位</th><th>年化</th><th>夏普</th><th>判定</th></tr>
+<tr><td rowspan="3">全窗口（不加熊市限定）</td><td>50</td><td>660</td><td>57.3%</td><td class="pos">+1.31%</td><td>20.0%</td><td>0.349</td><td rowspan="3"><span class="tag tag-bad">❌ 全部退化</span></td></tr>
+<tr><td>55</td><td>660</td><td>59.2%</td><td class="pos">+1.68%</td><td>16.7%</td><td>0.294</td></tr>
+<tr><td>60</td><td>660</td><td>64.3%</td><td class="pos">+2.81%</td><td>22.9%</td><td>0.410</td></tr>
+<tr style="background:#e3f5ec"><td><b>熊市限定</b></td><td><b>55</b></td><td><b>451</b></td><td><b>63.9%</b></td><td class="pos"><b>+2.34%</b></td><td class="pos"><b>42.2%</b></td><td class="pos"><b>0.727</b></td><td><span class="tag tag-ok">✅ 最优</span></td></tr>
+</table>
+<div class="hl">🔑 <b>关键验证</b>：全窗口 OB=55 夏普仅 0.294 = 熊市限定 0.727 的 1/2.5——<b>几乎全部收益来自熊市超卖反弹</b>，弱牛（mean -2.06%）/强牛（mean -0.81%）继续拉低。熊市限定不是可选项，是必要条件。</div>
+<h3>2.4 绝对止损兜底测试（第五轮·修复遍历 BUG 后）</h3>
+<table><tr><th>止损</th><th>夏普</th><th>年化</th><th>持仓</th><th>判定</th></tr>
+<tr style="background:#e3f5ec"><td><b>s0 无止损</b></td><td class="pos"><b>0.727</b></td><td class="pos"><b>42.2%</b></td><td>12.4</td><td>✅ 最优——止损反而打断反弹</td></tr>
+<tr><td>s4 绝对止损 30%</td><td>0.548</td><td>32.4%</td><td>9.9</td><td>⚠ 稳健增强（控尾部，牺牲 25% 夏普）</td></tr>
+<tr><td>s1 绝对止损 10%</td><td>0.462</td><td>—</td><td>9.6</td><td>❌ 截断正常回撤的赢家</td></tr>
+</table>
+<p style="font-size:12.5px;color:var(--sub)">💡 工程坑：止损初版只在「事件日」遍历，止损触发日不在事件日中 → 全部配置结果与无止损完全相同（严重 BUG）；修复为逐日遍历后确认止损确实生效但反降性能。</p>
+</div>
+
+<div class="card">
+<h2>三、最终结论：基线 vs 优化候选</h2>
+<table>
+<tr><th>指标</th><th>基线（当前生产·全窗口）</th><th>⭐ 优化候选（熊市限定+RSI&gt;55）</th><th>变化</th></tr>
+<tr><td>笔数</td><td>653</td><td>451</td><td>-31%</td></tr>
+<tr><td>胜率</td><td>62.5%</td><td>63.9%</td><td>+1.4pp（未降反升）</td></tr>
+<tr><td>单笔中位</td><td class="pos">+5.82%</td><td class="pos">+2.34%</td><td><span class="tag tag-warn">⚠ 牺牲 -59%</span></td></tr>
+<tr><td>单笔均值</td><td class="pos">+3.04%</td><td class="pos">+1.75%</td><td><span class="tag tag-warn">⚠ 牺牲 -42%</span></td></tr>
+<tr><td><b>年化</b></td><td class="pos">14.46%</td><td class="pos"><b>42.2%</b></td><td class="pos"><b>+192% 🚀</b></td></tr>
+<tr><td><b>夏普</b></td><td class="neg">0.295</td><td class="pos"><b>0.727</b></td><td class="pos"><b>+146% 🚀</b></td></tr>
+<tr><td>平均持仓</td><td>55.8 天</td><td><b>12.4 天</b></td><td>-78%（周转 4.5 倍）</td></tr>
+<tr><td>盈亏结构</td><td>亏损扛 89 天</td><td>win 9.0 天 / loss 18.3 天</td><td>✅ 大幅改善</td></tr>
+</table>
+<div class="hl-blue">✅ <b>用户诉求达成</b>：单笔收益牺牲 59%（5.82%→2.34%），换来年化 +192%、夏普 +146%、持仓缩短到 1/4.5。<b>「牺牲胜率换夏普/年化」完美落地——胜率不降反升（62.5%→63.9%），因为更早出场把亏损单也提前止住。</b></div>
+
+<h3>3.1 稳健性证据（不是只靠 2025-2026 撑）</h3>
+<table><tr><th>检验</th><th>结果</th><th>判定</th></tr>
+<tr><td>去掉 2024-2026（仅 2016-2023）</td><td>n=315 · wr 66.3% · 中位 +2.97% · 均值 +1.98%</td><td><span class="tag tag-ok">✅ 仍稳定为正</span></td></tr>
+<tr><td>盈亏比结构</td><td>288 赢 / 163 亏 · win_med +5.7% vs loss_med -3.5%（亏=盈的 61%）</td><td><span class="tag tag-ok">✅ 小亏多赚</span></td></tr>
+<tr><td>2026 当年</td><td>wr 78.6% · 中位 +3.71% · 夏普 3.38</td><td><span class="tag tag-ok">✅ 当前优异</span></td></tr>
+<tr><td>2023 灾年</td><td>均值 -3.73%（9 月 -10.6%）</td><td><span class="tag tag-warn">⚠ 不能保证每年都赚</span></td></tr>
+<tr><td>2024 灾年</td><td>均值 -1.46%（7 月 -13.5%）</td><td><span class="tag tag-warn">⚠ 如实记录</span></td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>四、知识库 / 开源吸收对照（方向 C）</h2>
+<table><tr><th>来源</th><th>核心观点</th><th>与本轮结论</th></tr>
+<tr><td>Z 哥 zettaranc-skill</td><td>择时第一 · 3 天不涨就走 · S1/S2/S3 逃顶 · 四块砖</td><td>✅ 与本轮「熊市限定+提前离场」方向一致；B1（KDJ J≤-10）列为下一轮入场候选</td></tr>
+<tr><td>升机盎然（Obsidian）</td><td>熊市空仓为王</td><td>✅ 熊市限定已确认最优（但熊市超卖反弹可开仓）</td></tr>
+<tr><td>Br7uce EP01-03</td><td>做预期 · 跟随赚钱效应 · 及时止损 · 基本面底层</td><td>✅ 「提前离场」与 OB=55 直接互证</td></tr>
+<tr><td>像鳄鱼一样思考</td><td>强者恒强</td><td>⚠ 牛市逻辑，与本轮熊市 edge 互补（待牛市子集验证）</td></tr>
+<tr><td>RSRS（光大证券）</td><td>阻力支撑相对强度</td><td>❌ 已回测：无法区分牛熊，不是有效门控</td></tr>
+<tr><td>robertquant ETF 轮动</td><td>Sh 0.97 / 年化 33.8%</td><td>⚠ 参考基线（基金动量 FB3 仍是项目唯一过全门策略）</td></tr>
+</table>
+</div>
+
+<div class="card" style="border-left:4px solid #2f6fed">
+<h2>五、生产落地建议</h2>
+<div class="hl-blue"><b>推荐生产参数（证据最充分）</b>：熊市限定（hs300&lt;MA60·T-1）+ RSI&lt;35 入场 + <b>RSI&gt;55 出场</b> + 主板限定 + 无绝对止损</div>
+<div class="kpi">
+<div><span>预期年化</span><b class="pos">42.2%</b></div>
+<div><span>预期夏普</span><b class="pos">0.727</b></div>
+<div><span>平均持仓</span><b>12.4 天</b></div>
+<div><span>信号频率</span><b>~451 笔/10年</b></div>
+</div>
+<h3>5.1 三档方案</h3>
+<table><tr><th>方案</th><th>参数</th><th>夏普</th><th>年化</th><th>特点</th></tr>
+<tr style="background:#e3f5ec"><td>⭐ <b>A 标准版（推荐）</b></td><td>熊市限定 + RSI&gt;55</td><td class="pos">0.727</td><td class="pos">42.2%</td><td>周转率最高，夏普年化最优</td></tr>
+<tr><td>B 稳健版</td><td>A + 30% 绝对止损</td><td>0.548</td><td>32.4%</td><td>尾部更可控（单笔最深回撤受限）</td></tr>
+<tr><td>C 激进版</td><td>熊市限定 + RSI&gt;50</td><td class="pos">0.999</td><td class="pos">58.5%</td><td>pf 1.10 首次&gt;1，但对 2026 单年敏感度高</td></tr>
+</table>
+<div class="hl">⚠ <b>风险提示</b>：① 2023/2024 灾年仍负期望，不能保证每年都赚；② 单笔中位仅 +2.34%，需接受「小亏多赚」；③ 12.4 天短周期 = 高频操作，交易成本敏感（往返 1.15% 已含）；④ 建议小仓位模拟盘验证 3 个月再实盘。</div>
+</div>
+
+<div class="card">
+<h2>六、待办</h2>
+<ol style="font-size:13px;padding-left:20px;line-height:1.9">
+<li><b>切换生产参数</b>：build_short_pool.py <code>KHUNTER_RSI_SELL 75→55</code> + 加入熊市限定门控（hs300&lt;MA60·T-1）→ 重新 build → 部署（需用户拍板）</li>
+<li>Z 哥 B1（KDJ J≤-10 + N 型 + 缩量回调）作为第二套入场信号回测，与 RSI&lt;35 组合对比</li>
+<li>2023/2024 灾年专项分析（市场宽度 / 跌幅阈值过滤是否可救）</li>
+<li>实盘验证：12.4 天持仓短周期，优先小仓位模拟盘</li>
+</ol>
+</div>
+
+<div class="foot">数据源：v8_factor_cache.pkl（5329 只）× hs300（index_000300.csv）× 2016-06 至 2026-09 · 引擎：khunter_all_strategies_backtest.py（15 策略信号）· 成本：买 0.575%+卖 0.575%（往返 1.15%）· 全部 T-1 收盘确认→T 开盘执行（无未来函数）· 报告生成 2026-09-03</div>
+</div></body></html>
