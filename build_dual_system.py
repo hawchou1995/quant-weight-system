@@ -1666,7 +1666,9 @@ def _w_rows_fund():
       · backtest/fund_paper.json  = 中线 FB3-H20 基金主仓（轨C），已在「中长线池 · 基金主仓」渲染，
         与短线基金池不是同一策略 → 不上本卡（否则违反「仅本策略标的」）。
       · short_pool.json.track     = 短线跟踪池条目（含 type=fund），非账本、无入场价/份额字段。
-    → 返回空行 + 缺字段清单，**不编造数据**（卡内渲染「暂无跟踪数据」）。"""
+    2026-09-23（R-track-fund-0923）更新：用户批准「基金池改显示短线跟踪的基金行」→ 该卡改用
+    source_kind="short_fund"（浏览器端读 SHORT_POOL.track 并过滤 type=fund），本函数保留备用、
+    不再被 watch_card 调用（缺字段清单见 WATCH_NAMES_MISSING）。"""
     return [], WATCH_NAMES_MISSING
 
 
@@ -1691,7 +1693,7 @@ def watch_card(key, title, source_kind="short", cols=None, note="", empty_msg=No
     L = ['<div class="card" id="%s">' % _cid,
          '<h2>👁 跟踪池 · %s <span class="badge badge-auto">%s</span></h2>' % (title, badge),
          '<div class="sub"><b>仅本策略标的</b> · %s</div>' % note]
-    if source_kind == "short":
+    if source_kind in ("short", "short_fund"):  # R-track-fund-0923：基金池复用短线跟踪源，按 type=fund 过滤
         _s = ('<input type="text" id="watch-q-%(k)s" name="watch-q-%(k)s" placeholder="🔍 搜索代码 / 名称…" '
               'autocomplete="off" spellcheck="false" aria-label="搜索跟踪标的（代码或名称）">'
               '<select id="watch-f-type-%(k)s" class="flt" title="类型筛选" aria-label="按类型筛选">'
@@ -2582,9 +2584,11 @@ WATCH_NOTE_ETF = (
     'ETF 动量轮动模拟盘的<b>持仓 + 建仓/调仓目标</b>，只读 <code>etf_paper_state.json</code> · '
     '冻结配置：20 日动量前 2 等权 / 绝对动量保护 / 12% 目标波动率 / 月末调仓')
 WATCH_NOTE_FUND = (
-    '短线基金池（场外基金动量 ≥50 入池）· <b>本策略目前没有独立 paper/持仓状态</b>：'
-    '中线「基金主仓」（FB3-H20 轨C）的 <code>backtest/fund_paper.json</code> 属另一策略、'
-    '已在「中长线池 · 基金主仓」展示，故不在此卡混用；缺字段清单见下')
+    '短线基金池（场外基金动量 ≥50 入池）· 与股票池<b>同一跟踪口径</b>，'
+    '本卡<b>只显示 <code>type=基金</code> 行</b>（股票行归「跟踪池 · 股票池」）· '
+    '数据源 <code>short_pool.json</code>（track / track_pending_short）· '
+    '行为变更 2026-09-23（R-track-fund-0923）：原先两池共用同一张表，现按类型分流；'
+    '该策略本身没有独立 paper/持仓账本（<code>backtest/fund_paper.json</code> 属中线 FB3-H20 另一策略，不混用）')
 
 
 SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
@@ -2615,7 +2619,7 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
   "🔵 短线 · 基金池", "auto", "场外基金动量（分≥50 才入池）",
   v9_short_fund, "tbl-short-fund", "card-short-fund",
   "基金池 = 场外基金动量选股（与股票完全独立，资产类别不同）· 现价 = T-1 净值（场外基金净值次日公布）· 基金买入按短线分（≥50）· 与股票池分开展示（2026-09-03 起）",
-  extra_card=watch_card("st-fund", "基金池", "fund", note=WATCH_NOTE_FUND), score_sub="动量/趋势",
+  extra_card=watch_card("st-fund", "基金池", "short_fund", note=WATCH_NOTE_FUND), score_sub="动量/趋势",
   head_tags=['<span class="badge badge-auto">🔵 场外基金动量（分≥50）</span>',
              '<span class="badge badge-auto">现价 = T-1 净值 · 次日公布</span>'],
   head_note="基金池与股票池（超卖伏击 主板信号）完全独立：基金=净值动量轮动，股票=超卖伏击 事件信号；档位口径同为短线买入口径（强买入/买入）",
@@ -3121,7 +3125,11 @@ document.addEventListener('DOMContentLoaded',function(){{
   /* R-track-sep-0923：跟踪池按策略独立 —— 本函数改为**按子视图 key 参数化**渲染。
      目前只有 st-stk（股票池）走浏览器端渲染（SHORT_POOL.track）；其余 4 张卡由构建期 Python
      读各自策略账本渲染（见 watch_card()）。页面级共享卡已删除。 */
-  var WATCH_KEYS=['st-stk'];
+  var WATCH_KEYS=['st-stk','st-fund'];
+  /* R-track-fund-0923：同一份 SHORT_POOL.track 按类型分流 —— 股票池只看 type!=fund，基金池只看 type=fund（待确认列表同规则） */
+  function _isFundRow(o){{ var t=(o&&o.type)||(o&&o.last&&o.last.type)||''; if(t) return t==='fund';
+    var pool=(o&&o.pool)||(o&&o.last&&o.last.pool)||''; return pool==='基金'; }}
+  function _keepRowFor(k,o){{ return (k==='st-fund') ? _isFundRow(o) : !_isFundRow(o); }}
   function renderWatchFor(k){{
     var box=document.getElementById('watch-table-'+k);if(!box)return;
     var S=window.SHORT_SIGNALS;if(!S){{box.innerHTML='<div class="sub">信号数据未加载（缺 short_signals.js）</div>';return;}}
@@ -3143,7 +3151,7 @@ document.addEventListener('DOMContentLoaded',function(){{
       if(pkeys.length){{
         var ph='<div class="sub" style="margin-bottom:6px;color:var(--warn)">⏳ 待确认 '+pkeys.length+' 只 —— 上榜后下一收盘确认在池再入池（隔离当日信号）</div><table class="tbl"><tbody>';
         pkeys.forEach(function(c){{
-          var p=pnd[c]||{{}};var last=p.last||{{}};
+          var p=pnd[c]||{{}};var last=p.last||{{}};if(!_keepRowFor(k,p))return;
           var nm=last.name||c;
           var pt=(last.score!==undefined&&last.score!==null)?last.score:'—';
           var pt2=last.tier||'—';
@@ -3155,7 +3163,8 @@ document.addEventListener('DOMContentLoaded',function(){{
     }}
     var now=new Date();var base=[];
     Object.keys(track).forEach(function(code){{
-      var t=track[code]||{{}};var entry=t.entry?new Date(String(t.entry).replace(/-/g,'/')):null;
+      var t=track[code]||{{}};if(!_keepRowFor(k,t))return;
+      var entry=t.entry?new Date(String(t.entry).replace(/-/g,'/')):null;
       var age=entry?Math.floor((now-entry)/86400000):0;
       if(age>=30)return;   // 30 天过期（前端兜底，与服务端一致）
       base.push({{code:code,entry:t.entry||'—',exit:t.exit||'—',age:age,type:t.type||'',pool:t.pool||''}});
@@ -3557,7 +3566,7 @@ document.addEventListener('DOMContentLoaded',function(){{
 import re as _re_ui
 _UI_EMOJI = ("\U0001F100-\U0001F1FF\U0001F300-\U0001FAFF\u2600-\u27BF"
              "\u2B00-\u2BFF\u23E9-\u23FF\uFE0F")
-_UI_KEEP = "\u2713\u2714\u2715\u2717"
+_UI_KEEP = "\u2713\u2714\u2715\u2717\U0001F441"   # 2026-09-23 用户要求：保留「👁 跟踪池」标题的眼睛图标
 _ui_re = _re_ui.compile("(?![%s])[%s][ \t\u00a0\u2002\u2003]?" % (_UI_KEEP, _UI_EMOJI))
 _ui_n = len(_ui_re.findall(html))
 html = _ui_re.sub("", html)

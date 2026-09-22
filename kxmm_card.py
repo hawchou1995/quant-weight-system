@@ -681,7 +681,7 @@ KXMM_JS = KXMM_JS + r"""
     var a = el('hm-asof'); if(a) a.textContent = '截至 ' + (HD.asof || '—') + ' · ' + (HD.color_src === 'weighted' ? '加权口径' : '指数口径');
     var n = el('hm-note');
     if(n) n.textContent = '行业 ' + (HD.tree || []).length + ' 个 · 个股 ' +
-      (HD.tree || []).reduce(function(s, t){ return s + t.children.length; }, 0) + ' 只（不做北交所）';
+      (HD.tree || []).reduce(function(s, t){ return s + t.children.length; }, 0) + ' 只';
     initBar();
     if(el('view-kxmm') && el('view-kxmm').classList.contains('active')) activate();
     document.querySelectorAll('.sidenav a[data-anchor]').forEach(function(a2){

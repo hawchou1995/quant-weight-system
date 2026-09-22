@@ -218,12 +218,19 @@ def main():
         if hit != ok:
             FAILS.append("st-stk JS 数据源异常：%s" % pat)
 
-    print("\n⑥ st-fund 无自有账本 → 空态 + 缺字段清单（不编造）")
+    print("\n⑥ st-fund 改显示「短线跟踪的基金行」（R-track-fund-0923，用户 2026-09-23 批准）")
     frag = sl.get("st-fund", "")
-    ok = ("暂无跟踪数据" in frag) and ("缺字段清单" in frag) and ("entry_px" in frag)
-    print("   [%s] 渲染「暂无跟踪数据」+ 缺字段清单" % ("ok" if ok else "FAIL"))
-    if not ok:
-        FAILS.append("st-fund 空态/缺字段清单缺失")
+    for desc, cond in (
+        ("卡内含浏览器端工具栏 watch-q-st-fund", "watch-q-st-fund" in frag),
+        ("卡内含 watch-table-st-fund 容器", "watch-table-st-fund" in frag),
+        ("WATCH_KEYS 纳入 st-fund", "'st-stk','st-fund'" in HTML or '"st-stk","st-fund"' in HTML),
+        ("类型分流助手 _isFundRow/_keepRowFor 在位", ("_isFundRow" in HTML) and ("_keepRowFor" in HTML)),
+        ("基金卡判据按 k==='st-fund' 分流", "k==='st-fund'" in HTML),
+        ("备注写明「只显示 type=基金 行」", "只显示" in frag and "type=基金" in frag),
+    ):
+        print("   [%s] %s" % ("ok" if cond else "FAIL", desc))
+        if not cond:
+            FAILS.append("st-fund 新口径缺失：" + desc)
 
     print("\n===== 结果：%d 项失败 =====" % len(FAILS))
     for f in FAILS:
