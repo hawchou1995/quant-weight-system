@@ -106,7 +106,7 @@ def gate_status():
 def load_details():
     """从 enhanced_data.js 读完整数据（details/meta.v9_tiers 等）"""
     js = (BASE / "enhanced_data.js").read_text(encoding="utf-8")
-    return json.loads(js[len("window.ENH = "):-1])
+    return json.loads(js[len("window.ENH = "):].rstrip().rstrip(";"))
 
 
 def pool_codes(details, tag):

@@ -21,7 +21,7 @@ def load_pool():
     if not os.path.exists(JS_F):
         return None
     txt = open(JS_F, encoding="utf-8").read()
-    return json.loads(txt[len("window.A5_POOL = "):-1])
+    return json.loads(txt[len("window.A5_POOL = "):].rstrip().rstrip(";"))
 
 
 def pct(v, nd=2, sign=True):

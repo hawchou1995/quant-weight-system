@@ -11,7 +11,7 @@ import sys
 sys.path.insert(0, str(BASE))
 from ui_components import THEME_CSS, NAV_HTML, COMMON_JS
 
-idx = json.loads((BASE / "monitor" / "snapshots_index.js").read_text(encoding="utf-8")[len("window.SNAPSHOTS = "):-1])
+idx = json.loads((BASE / "monitor" / "snapshots_index.js").read_text(encoding="utf-8")[len("window.SNAPSHOTS = "):].rstrip().rstrip(";"))
 
 groups_html = ""
 for g in idx["months"]:

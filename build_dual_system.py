@@ -153,7 +153,7 @@ def _mkt_status():
 _MKT_STATUS = _mkt_status()
 
 js_src = (BASE / "enhanced_data.js").read_text(encoding="utf-8")
-DATA = json.loads(js_src[len("window.ENH = "):-1])
+DATA = json.loads(js_src[len("window.ENH = "):].rstrip().rstrip(";"))
 details = DATA["details"]
 import datetime as _dt
 build_ts = _dt.datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -178,7 +178,7 @@ v9_items.sort(key=lambda d: -d["score"])
 # 短线信号池（v5.10）：全市场最新交易日短线分 Top 池（股票反转按权限各10【主板/创业板/科创板】 + 基金动量10；2026-08-17 去 ETF）
 try:
     _sp_js = open(BASE / "short_pool.js", encoding="utf-8").read()
-    SHORT_POOL = json.loads(_sp_js[len("window.SHORT_POOL = "):-1])
+    SHORT_POOL = json.loads(_sp_js[len("window.SHORT_POOL = "):].rstrip().rstrip(";"))
     _sp_items = []
     for _grp in ("主板", "创业板", "科创板", "基金"):
         for _c in SHORT_POOL["tiers"].get(_grp, []):
@@ -488,7 +488,7 @@ def _board_of6(c):
 STOCK_META = {}
 try:
     _sig_js = open(BASE / "short_signals.js", encoding="utf-8").read()
-    _sig_data = json.loads(_sig_js[len("window.SHORT_SIGNALS = "):-1])
+    _sig_data = json.loads(_sig_js[len("window.SHORT_SIGNALS = "):].rstrip().rstrip(";"))
     for _c in _sig_data.get("stock", {}):
         STOCK_META[_c] = [_board_of6(_c), _ind_map.get(_c, "—")]
     # 基金（短线跟踪池含基金行）：short_pool.json details 自带行业
@@ -507,7 +507,7 @@ STOCK_META_JS = json.dumps(STOCK_META, ensure_ascii=False, separators=(",", ":")
 # A5_tp8t2 打板实验系统（第三个系统，2026-08-28 接入；数据由 build_a5_pool.py 生成）
 try:
     _a5_js = open(BASE / "a5_pool.js", encoding="utf-8").read()
-    A5 = json.loads(_a5_js[len("window.A5_POOL = "):-1])
+    A5 = json.loads(_a5_js[len("window.A5_POOL = "):].rstrip().rstrip(";"))
     A5_ASOF = A5.get("as_of", "—")
     A5_GATE = A5.get("gate", {})
     A5_STATS = A5.get("stats", {})

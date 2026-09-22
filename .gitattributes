@@ -1,0 +1,20 @@
+# 生成型数据文件：单行 `window.X = {...};`，Python 侧按「前缀切片 + 去尾分号」解析。
+#
+# 为什么必须声明 -text：本机 core.autocrlf=true，git 在检出/合并时会把这些文件的字节改成 CRLF
+# 并在尾部补行尾。读取方（12 处）过去用 [len("window.X = "):-1] 精确吃 1 个尾部字符，
+# 一旦末尾多出 "\r\n" 就会留下 ";" 并在最后一列报 JSONDecodeError: Extra data。
+# 2026-09-22 事故：并发会话的 merge 把 enhanced_data.js 按远端版本重写（CRLF），
+# 收盘链第 8 步 build_short_pool 崩、后续 32 步全被跳过。
+#
+# -text = 不做任何行尾转换 → 工作区字节 = blob 字节，生成物不再被 git 改写。
+# （读取方已同时改为健壮解析 .rstrip().rstrip(";")，此处是第二道防线。）
+enhanced_data.js -text
+short_signals.js -text
+short_pool.js -text
+a5_pool.js -text
+snapshots_index.js -text
+kxmm_data.js -text
+heatmap_data.js -text
+market_breadth.js -text
+market_weather.js -text
+echarts.min.js -text

@@ -30,7 +30,7 @@ def load_pool_syms():
     codes = set()
     try:
         js = (BASE / "enhanced_data.js").read_text(encoding="utf-8")
-        E = json.loads(js[len("window.ENH = "):-1])
+        E = json.loads(js[len("window.ENH = "):].rstrip().rstrip(";"))
         for k in ("details", "track_v9", "track_pending_v9"):
             codes.update(E.get(k, {}).keys())
     except Exception:

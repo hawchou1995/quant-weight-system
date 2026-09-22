@@ -608,7 +608,7 @@ def maintain_track_v9():
     today = str(_as_of_day.date())
     old, old_pending, old_tiers = {}, {}, {}
     try:
-        _old = json.loads((BASE / "enhanced_data.js").read_text(encoding="utf-8")[len("window.ENH = "):-1])
+        _old = json.loads((BASE / "enhanced_data.js").read_text(encoding="utf-8")[len("window.ENH = "):].rstrip().rstrip(";"))
         old = _old.get("track_v9", {}) or {}
         old_pending = _old.get("track_pending_v9", {}) or {}
         old_tiers = _old.get("meta", {}).get("v9_tiers", {}) or {}

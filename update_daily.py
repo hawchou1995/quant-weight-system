@@ -265,7 +265,7 @@ def load_pool_codes():
     codes = set()
     try:
         js = (BASE / "enhanced_data.js").read_text(encoding="utf-8")
-        E = json.loads(js[len("window.ENH = "):-1])
+        E = json.loads(js[len("window.ENH = "):].rstrip().rstrip(";"))
         codes.update(E.get("details", {}).keys())
         codes.update(E.get("track_v9", {}).keys())
         codes.update(E.get("track_pending_v9", {}).keys())

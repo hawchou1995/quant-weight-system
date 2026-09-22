@@ -10,7 +10,7 @@ sys.path.insert(0, str(BASE))
 from ui_components import THEME_CSS, NAV_HTML, COMMON_JS
 
 js_src = (BASE / "enhanced_data.js").read_text(encoding="utf-8")
-DATA = json.loads(js_src[len("window.ENH = "):-1])
+DATA = json.loads(js_src[len("window.ENH = "):].rstrip().rstrip(";"))
 details = DATA["details"]
 
 def tier_pill(t):

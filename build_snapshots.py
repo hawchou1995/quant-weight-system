@@ -109,7 +109,7 @@ td{{padding:9px 10px;border-bottom:1px solid #232833;vertical-align:middle}}
 # 当前快照（从 enhanced_data.js）
 try:
     js_src = (BASE / "enhanced_data.js").read_text(encoding="utf-8")
-    ENH = json.loads(js_src[len("window.ENH = "):-1])
+    ENH = json.loads(js_src[len("window.ENH = "):].rstrip().rstrip(";"))
     dt = ENH["meta"]["as_of"]
     v9_tiers = ENH["meta"]["v9_tiers"]
     v9_rows = []

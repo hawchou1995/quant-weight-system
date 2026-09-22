@@ -22,7 +22,7 @@ import industry_pool as IP   # 2026-08-20：统一行业池（消灭「综合」
 NAMES = json.load(open(BASE / "data_full_names.json", encoding="utf-8"))
 # 现有 80 只详情（复用行业/名称）
 JS = open(BASE / "enhanced_data.js", encoding="utf-8").read()
-ENH = json.loads(JS[len("window.ENH = "):-1])
+ENH = json.loads(JS[len("window.ENH = "):].rstrip().rstrip(";"))
 EXIST = ENH["details"]
 
 # 基金名（akshare；2026-08-31 修复：akshare 拉取失败时回退本地 fund_list.csv 缓存）
