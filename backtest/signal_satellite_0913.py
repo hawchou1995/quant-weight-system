@@ -180,6 +180,38 @@ def main():
               "super": {"last_rebal": "", "holdings": {}}}
         json.dump(st, open(STATE, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
         print("已生成空仓状态模板 holdings_satellite.json（首run为建仓清单）")
+    # 2026-09-22 修（用户批准 R-sat-state-0922）：调仓状态改由**模拟盘账本派生** = 唯一事实来源。
+    #   缺陷：holdings_satellite.json 的 last_rebal/holdings 全库无任何代码推进 → 永远为空
+    #         → due 恒为真 → 每天都输出完整 20 只清单，与 docstring「非调仓日输出无操作」矛盾。
+    #   账本侧：轨A ← satellite_paper_a.json / 轨B ← satellite_paper_b.json。
+    #   ⚠ 黄金腿（GOLD_CODE，B&H 永不卖出）必须**同时**从 last_rebal 与 holdings 剔除，
+    #     否则会被并进 held → 出现在 sell 差集里（会被误读成卖出指令）。
+    try:
+        import satellite_cfg as _SCFG
+        _GOLD = getattr(_SCFG, "GOLD_CODE", "sh518880")
+    except Exception:
+        _GOLD = "sh518880"
+    for _k, _fn in (("ln_atr", "satellite_paper_a.json"), ("super", "satellite_paper_b.json")):
+        _fp = HERE / _fn
+        if not _fp.exists():
+            print(f"  [{_k}] ⚠ 账本 {_fn} 不存在 → 沿用 holdings_satellite.json")
+            continue
+        try:
+            _d = json.load(open(_fp, encoding="utf-8"))
+        except Exception as _e:
+            print(f"  [{_k}] ⚠ 账本 {_fn} 读取失败({_e}) → 沿用 holdings_satellite.json")
+            continue
+        _pos = {c: v for c, v in (_d.get("positions") or {}).items() if c != _GOLD}
+        _buys = [f.get("date") for f in (_d.get("fills") or [])
+                 if f.get("side") == "buy" and f.get("date") and f.get("code") != _GOLD]
+        _lr = max(_buys) if _buys else ""
+        _old = str((st.get(_k) or {}).get("last_rebal") or "")
+        if _lr and _lr > _old:
+            st.setdefault(_k, {})["last_rebal"] = _lr
+        if _pos:
+            st.setdefault(_k, {})["holdings"] = {c: {"shares": (_pos[c] or {}).get("shares")} for c in _pos}
+        print(f"  [{_k}] 调仓状态 ← 账本 {_fn}：last_rebal={st[_k]['last_rebal'] or '—'} "
+              f"持仓 {len(_pos)} 只（已剔黄金腿 {_GOLD}）")
     days_ix = sorted({d for p in px.values() for d in p.index})
     di_last = days_ix.index(LAST_DAY)
     print(f"交易日序号：{di_last}（自 2021-01-04）\n")
