@@ -1,8 +1,8 @@
 {
- "ts_utc": "2026-09-21T13:07:20+00:00",
+ "ts_utc": "2026-09-22T06:33:06+00:00",
  "dry_run": false,
  "ok": true,
- "warn": "stale: 行情时间 16:15 滞后>90min，仍如实 patch",
+ "warn": "",
  "patched": {
   "enh": 30,
   "short": 1,
@@ -10,5 +10,5 @@
  },
  "n_quotes": 32,
  "n_codes": 37,
- "quote_ts_cn": "2026-09-21 16:15:00"
+ "quote_ts_cn": "2026-09-22 14:33:06"
 }
