@@ -74,9 +74,10 @@ body{padding-top:52px}
 .sidenav .sn-sub{display:none;position:absolute;top:100%;left:0;min-width:154px;margin:0;padding:5px;
   flex-direction:column;gap:1px;background:#232a36;border:1px solid rgba(255,255,255,.10);
   border-radius:0 0 var(--r) var(--r);box-shadow:0 10px 24px rgba(0,0,0,.30);z-index:960}
-.sn-grp:hover .sn-sub{display:flex}
-.sidenav .sn-arrow{margin-left:2px;font-size:10px;color:rgba(255,255,255,.42)}
-.sn-grp:hover .sn-arrow{color:#fff}
+/* 2026-09-22 停用 hover 下拉（R-dash-subtab-0922）：视图内已改为「策略子标签」，两者冲突。
+   保留 .sn-sub DOM（历史锚点仍可点），但不再悬停弹出。 */
+.sn-grp:hover .sn-sub{display:none}
+.sidenav .sn-arrow{display:none}/* 箭头同废（无下拉）*/
 .sidenav .sn-sub a{padding:6px 10px;font-size:12.5px;color:rgba(255,255,255,.72);border-radius:var(--r-sm);
   font-weight:400;white-space:nowrap}
 .sidenav .sn-sub a .dot-sub{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.32);flex:none}
@@ -219,7 +220,127 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <h2 style="margin:0">📝 更新日志 <span class="badge badge-auto">GitHub Release 风格</span></h2>
 </div>
 <div class="sub">量化系统版本更新记录：复盘发现设计缺陷 → 启动系统更新 → 在此登记版本/日期/更新内容</div>
-<div class="rel"><div class="rel-head">v5.13.9 - 2026-09-18（顶栏五个标签的空图标占位修复）</div><div class="rel-body">
+<div class="rel"><div class="rel-head">v5.13.13 - 2026-09-22（「明日买点」列上线 · 三表统一 · 修打板排序映射）</div><div class="rel-body">
+
+<p><b>「明日买点」列</b>（R-qlch-buyhint-0922，用户需求：把 <code>开盘跳空 ∈ [−5%, −2%] 才真买</code> 提示进表格，仿打板命中徽章样式）</p>
+
+<div class='lg-item'><b>口径</b>：明日买点 = <b>今收 × [0.95, 0.98]</b> = T+1 开盘跳空 ∈ [−5%,−2%] 才买的价格带。<b>是条件不是承诺</b>。</div>
+<div class='lg-item'><b>三处表格统一</b>（徽章 <code>● 跳空 −5%~−2% 才买</code> + 价格带两行，列均追加在<b>末尾</b>，不动已有列索引）：</div>
+<p>  - 超跌低开低吸<b>候选表</b>（57 行）</p>
+<p>  - 打板<b>今日涨停全景</b> <code>a5-zt</code>（118 行，源 <code>zt_panorama.stocks[].close</code>）</p>
+<p>  - 打板<b>观察清单</b> <code>a5-wl</code>（源 <code>last_close</code>，<code>build_a5_pool.py:tech_indicators</code> 新增该字段）</p>
+<div class='lg-item'><b>回避清单 <code>a5-av</code> 刻意不加</b> —— 那是"别买"清单，加买点提示语义相反。</div>
+<div class='lg-item'><b>候选表动态名额</b>：<code>当前持仓 N 只 → 明日可建新仓 M 只</code>（M = 3 − N，读在产影子盘 <code>qlch_paper_state_b4_k3.json</code> 的 positions）；<b>持满 3 只时整列置灰并打横幅「已持满 → 明日不建新仓，下表仅作观察」</b>——静态写死"最多 3 只"等于没说，这是唯一的执行性信息。</div>
+<div class='lg-item'><b>图例上移</b>：原写在表格<b>下方</b>的「# 列是展示排序不是优先级 / K=3 是随机抽」说明，上移为表格<b>上方</b> <code>.sub</code> 图例，与跳空口径合并成一段（下方重复段删除，避免两处打架）。理由：「# 列不是优先级」必须在看到 # 列<b>之前</b>知道。</div>
+<div class='lg-item'><b>符号选型</b>：构建期净化会删 <code>✅⏳⚠▶⏱</code>（实测全站 0 次），保留区为 <code>✓✕↑↓→▲▼●①②③</code> → 徽章状态点用 <b><code>●</code></b>。</div>
+
+<p><b>顺带修复（超范围，已申报）</b></p>
+
+<div class='lg-item'><b><code>a5-zt</code> / <code>a5-wl</code> 的 <code>initTable</code> 列映射过期</b>（<code>a5-zt</code> 缺 <code>pools</code> 映射且 <code>hit/tier/advice</code> 整体错位 1；<code>a5-wl</code> 13 列只映射 10 列且 <code>sbdate</code> 起错位）→ <b>这两张表点列头排序一直是错的</b>。本次因加列必须动该行，一并修正为完整映射。</div>
+<div class='lg-item'><code>build_a5_pool.py</code>：<code>tech_indicators()</code> 新增 <code>last_close</code>。</div>
+<div class='lg-item'><code>CONTEXT.md</code> 补 2 词条：<b>超跌低开低吸</b>（含 <code>_Avoid_: C1（项目内三处同名，禁止裸用）</code>）、<b>明日买点</b>（含 <code>_Avoid_: 目标价/挂单价</code>）。</div>
+
+</div></div><div class="rel"><div class="rel-head">v5.13.12 - 2026-09-22（候选改表格 + 停用顶栏 hover 下拉 + 跟踪池剔除退休标的）</div><div class="rel-body">
+
+<p>用户三条反馈（附截图）逐条落地。</p>
+
+<p><b>① 超跌低开低吸「今日收盘候选」芯片云 → 标准表格</b></p>
+
+<p>截图问题：114 只挤成 <code>flex-wrap</code> 芯片云，代码+名称两列挤在一起无法读。</p>
+<p>改为标准表格 6 列：<code>代码 / 名称 / 板块 / 行业 / 现价 / 涨跌幅</code>，带 <code>data-key</code>/<code>data-v</code>（可排序），涨跌幅按涨跌着色，按涨跌幅升序排列，底部标注总数与入场条件（gap 区间）。</p>
+
+<p>配套：<code>qlch_paper</code> 候选输出<b>扩字段</b>（新增 <code>board</code> / <code>ind</code> / <code>close</code> / <code>chg</code>），行业取自面板 <code>ind_names</code>+<code>ind_id</code>。</p>
+
+<p><b>② 停用顶栏 hover 下拉</b>（与视图内策略子标签冲突）</p>
+
+<p><code>ui_components.py</code>：<code>.sn-grp:hover .sn-sub{display:flex}</code> → <code>display:none</code>，<code>.sn-arrow</code> 一并隐藏。</p>
+<p><code>.sn-sub</code> DOM 保留（历史锚点仍可点），仅不再悬停弹出。</p>
+
+<p><b>③ 短线跟踪池：剔除退休策略标的</b></p>
+
+<p>实测：<code>short_pool.json</code> 的 <code>track</code> 共 <b>175 条</b>，其中 <code>pool ∈ {创业板 51, 科创板 34}</code> = <b>85 条（48.6%）</b>属已退休的旧战法标的——<b>现行超卖伏击为主板限定，这些标的不可能被它选中</b>。</p>
+<p>处置：构建期清洗（非破坏性，不改源 JSON），<b>175 → 90 条</b>，构建日志打印剔除数。<code>track_pending_short</code> 同规则清洗。</p>
+
+<p><b>自伤与修复记录</b></p>
+
+<div class='lg-item'>候选表补丁<b>漏了闭合 <code></div></code></b> → 构建期 <code>div 平衡 = 1</code> 被校验拦下 → 补上后归零。<b>这是 div 平衡校验第二次实际拦下问题</b>（第一次是 v5.13.11 的锚点断言）。</div>
+<div class='lg-item'>候选输出原本写在幂等守卫<b>之后</b> → 同日期重跑时被守卫提前 return，导致候选陈旧。已移至守卫<b>之前</b>（候选是每日产出，不应受账本状态影响）。</div>
+
+<p><b>构建验收</b>：div 平衡 0 / HTML 转义通过 / 候选表 114 行解析成功 / hover 下拉确认停用 / 跟踪池 175→90。</p>
+
+</div></div><div class="rel"><div class="rel-head">v5.13.11 - 2026-09-22（看板子标签结构改造 + 全局术语通俗化）</div><div class="rel-body">
+
+<p><b>用户需求</b>：做成 i.gushi.in 式「大类 → 策略子标签」结构，全部策略通用；术语改成通俗名；资产配置交用户；选股池表格字段统一。</p>
+
+<p><b>子标签结构（三个策略视图）</b></p>
+
+<div class='lg-item'><b>中长线</b>：<code>多因子主仓</code> / <code>黄金对冲</code> / <code>动量增强</code> / <code>基金主仓</code> / <code>对照臂</code>（零资金对照徽标）</div>
+<div class='lg-item'><b>短线</b>：<code>超跌低开低吸</code>（默认）/ <code>超卖伏击</code> / <code>ETF轮动</code> / <code>股票池</code> / <code>基金池</code></div>
+<div class='lg-item'><b>打板</b>：<code>观察清单</code>（默认）/ <code>回避清单</code> / <code>持仓</code> / <code>已平仓</code> / <code>净值曲线</code></div>
+<div class='lg-item'>实现：新增 <code>ui_subtab.py</code>（<code>SUBNAV_CSS</code> / <code>SUBNAV_JS</code> / <code>subnav()</code> / <code>subview()</code>），复用既有 <code>.view</code> 的 show/hide 模式，<b>不改各卡片内部</b>；子标签 key 带视图前缀防 id 碰撞；支持 <code>data-default</code> 指定默认标签；URL 二级锚点 <code>#<view>/sub-<key></code>。</div>
+
+<p><b>全局术语通俗化（显示层，23+20+15 处）</b></p>
+
+<table>
+<tr><td>旧</td><td>新</td></tr>
+<p>|---|---|</p>
+<tr><td>轨B / SUPER 13因子 Top20</td><td><b>多因子主仓</b></td></tr>
+<tr><td>轨A</td><td><b>三低对照</b></td></tr>
+<tr><td>轨C / FB3-H20</td><td><b>基金主仓</b></td></tr>
+<tr><td>黄金卫星叠加</td><td><b>黄金对冲</b></td></tr>
+<tr><td>ret20 倾斜臂</td><td><b>动量增强</b></td></tr>
+<tr><td>影子轨</td><td><b>对照臂</b></td></tr>
+<tr><td>KHunter</td><td><b>超卖伏击</b></td></tr>
+<tr><td>打板族</td><td><b>首板低吸</b></td></tr>
+</table>
+
+<div class='lg-note'>遗留：数据层历史事件（<code>satellite_pool.json</code> 事件日志）与 changelog 历史条目<b>保留原词不改</b>——它们是"当时叫什么"的存档。CSS 注释内 1 处不改。</div>
+
+<p><b>表格字段统一（同义异名）</b>：<code>当日涨跌</code>→<code>涨跌幅</code>、<code>收盘</code>→<code>现价</code>（其余 4 组本已一致或为数据驱动）。</p>
+
+<p><b>资产配置</b>：三个策略视图各加一行说明——「资产配置由用户决定：本页所有『权重 / 计划金额 / 目标权重』均为<b>策略输出</b>或<b>等权参考</b>，不构成仓位建议」。</p>
+
+<p><b>技术要点与教训</b></p>
+
+<div class='lg-item'>f-string 内<b>不能</b>用 <code>subview(..., <字面 HTML>)</code> 形式包裹——第 4 参数是 Python 字符串，字面 HTML 会让解析器在 <code>"card"</code> 处断开。改用<b>字面 <code><div class="subview"></code> 包裹</b>（视图变量如 <code>SAT_CARD</code> 可直接传参，故中长线/短线视图无此问题，仅打板视图踩到）。</div>
+<div class='lg-item'>锚点唯一性断言再次生效：6 处锚点中 1 处未命中（<code>回测数据</code> 段实际嵌在 <code>a5-curve</code> 卡片内），断言在写入前拦下，<b>文件未被破坏</b>。</div>
+
+<p><b>构建验收</b>：div 平衡 0 / HTML 转义校验通过 / 三个 subnav + 13 个 subview 全部渲染 / 术语残留仅存于数据层与历史条目。</p>
+
+</div></div><div class="rel"><div class="rel-head">v5.13.10 - 2026-09-22（新增「超跌低开低吸」策略 + 短线系统双标签分组）</div><div class="rel-body">
+
+<p><b>新增策略「超跌低开低吸」</b>（R-sharesweb-0921 系列，源自 shares-web 仓库的方向翻转改造）</p>
+
+<div class='lg-item'><b>定义</b>：T 收盘判定 —— 超跌 <code>ret20(T-1) ≤ −7.31%</code> ＋ 熊市门 <code>沪深300(T) < MA20</code> ＋ 非ST ＋ 量比 ≥1.2 ＋ <b>市值/换手横截面分位带</b>（市值 [.20,.70] / 换手 [.40,.80]）；T+1 开盘执行 —— <b>开盘跳空 gap ∈ [−5%,−2%]</b> 才买，<b>单票权重 = min(1/n, 1/3)</b>，未用资金持国债ETF，~~T+1 收盘卖出（一日持股）~~ <b>【已作废：T+0 违法】</b>。</div>
+<div class='lg-item'><b>【已作废·非法口径】</b> ~~<b>投产口径</b>：B4 分位滤网 + 单票上限 1/3。回测（全窗 2016-2026，20bp+国债ETF）：<b>年化 +18.78% / 夏普 1.254 / 最差回撤 −15.12% / 胜率 57.2% / 5,080 笔</b>；<b>50bp 压力档 +8.03% / 夏普 0.609 / 回撤 −21.30%</b>（旧绝对滤网基线的 50bp 档为 −0.44%，已死）。~~</div>
+<div class='lg-item'><b>⚠ 以上数字已于同日作废（非法口径）</b>：原出口是 <b>T+0 当日回转</b>（当日开盘买 → <b>当日</b>收盘卖），A 股 T+1 交割下不可执行——陷阱 ★198 复发，用户 2026-09-22 抓出。复测实测：<b>违法出口相对最优合法臂的虚增只有 10.5%</b>（E0 对照 E2），「收益全靠当日回转撑起来」不成立。</div>
+<div class='lg-item'><b>T+1 合规复测</b>（<code>R-qlch-t1exit-0922</code>，预注册 n_trials=4，训练窗 <b>2018-2021</b>）：<b>E1/E2/E3/E4 全部通过五条主判据</b>。<b>E4（止盈 +15% / 止损 −20% / 上限 20 日）最优</b>——训练窗 年化 +12.63% / 夏普 2.539 / 回撤 −18.38%；50bp 档 年化 +10.63% / 夏普 2.179。<b>登记为候选，零生产变更</b>。⚠ 验证窗（2022 起，仅参照不用于选型）：50bp 档下 <b>E1 −0.175%、E3 −0.135% 双双转负</b>，<b>E4 +1.106% 是唯一为正的合法出口，但夏普仅 0.327</b>。报告：<code>backtest/报告-超跌低开低吸-T+1合规出场复测-20260922.md</code>。</div>
+<div class='lg-item'><b>四轨影子盘</b>（日链第 27–30 步，<code>[软]</code> 执行，首个稳定周后硬化）：旧基线（绝对滤网·全池）/ B4 无上限（全池）/ <b>B4+K3（全池）★投产</b> / B4+K3（真主板，封存集头对头对照）。</div>
+<div class='lg-item'><b>今日收盘候选</b>输出 <code>backtest/qlch_candidates.json</code>（3 轨分列，等次日开盘 gap 判定）。</div>
+
+<div class='lg-item'><b>T+1 合规重跑（熊市门 + TopK）</b>（<code>R-qlch-gate-rank-t1-0922</code>，n_trials=9，累计 87，出口改 E4）：<b>MA60 门夏普 2.936 最优</b>（vs 现状 MA20 2.539；MA200 1.376 / MA250 1.314 / <b>无门 0.420 全臂最差 → 门本身必要</b>；MA200 0.5% 档硬门不过）。<b>TopK 排序：综合分（超跌 z + gap z）夏普 2.854 / 回撤改善 1.14pp 过门</b>；超跌深度回撤劣化 0.62pp、gap 深度夏普 −0.116，均不过。<b>两项只登记候选，生产仍用 MA20 + 随机</b>（重跑属口径修正，但预注册写在跑数之后，已交底）。⚠ 原轮数字（MA20 1.773 / MA200 0.876 / MA250 0.764）为违法口径，已作废。</div>
+<div class='lg-item'><b>影子盘非法成交流水清理 + 生产线出口改 T+1 合规</b>（<code>R-qlch-t1exit-0922</code>）：4 个影子盘各剔除 1 笔 <code>entry_date == exit_date</code> 的 T+0 回转（证据移入 <code>trades_void</code>，净值自 2026-09-22 起重算）；<code>qlch_paper_20260921.py</code> 出口由「当日开盘买→当日收盘卖」改为 <b>E4（止盈 +15% / 止损 −20% / 上限 20 日）</b>，日内触发用 high/low、跳空按 open、同 bar 止损优先。<b>顺带修掉 C1 轨潜伏 bug</b>：<code>_PM, _PT = PM, PT</code> 无条件执行但 PM/PT 只在 B4 分支定义 → C1 轨自加列起一直 UnboundLocalError，日链标 <code>[软]</code> 故静默死亡。**</div>
+<div class='lg-item'><b>组合臂 MA60×综合分 复测</b>（<code>R-qlch-combo-0922</code>，预注册 <code>...d</code>，<b>跑数前立档</b>，n_trials=4，累计 91）：C3 夏普 <b>3.284 全场最高</b>（自助法 B=2000 显著优于 C1 +0.342 / C2 +0.445；vs 现状 +0.767），年化 +19.47% 最高；<b>但回撤 −21.36% vs 现状 −18.38% 劣化 2.99pp → 按预注册 §五 组合否决</b>。交互项：夏普弱协同（+0.397+0.315=0.712 预期 vs +0.745 实测）、回撤正交互（比相加好 1.58pp，排序对冲了门的部分伤害）。验证窗 C3 收益全场最强（0.5% 档年化 +24.09%）但风险全场最差（回撤 −42.98%）。<b>两候选各自保留，生产仍用 MA20 + 随机，零生产变更。</b>预注册缺陷 1 条：判据④写 <code>max(C1,C2)</code> 有二义性，已记台账。</div>
+<div class='lg-item'><b>候选臂挂封存集采集轨</b>（<code>R-qlch-sealed-0922</code>）：<code>qlch_paper_20260921.py</code> 新增 <code>--gate <MA周期></code> / <code>--select <random|depth|gap|combo></code>；日链 <b>28→30 步</b>（<code>[软]</code>）；新增两条前向轨 <code>..._b4_k3_gate60.json</code>（MA60+随机）与 <code>..._b4_k3_combo.json</code>（MA20+综合分），看板已上卡。<b>关键事实</b>：封存集 = <b>2026-09-22 起</b>，今天第 0 天；毕业门要求 <b>≥60 交易日</b> → <b>最早约 2026-12-22 才可验收</b>（预注册 §七 十道门）。⚠ 参照窗（2022+，<b>已烧 OOS</b>）两个候选夏普都不如现状：MA60 <b>0.209</b> / 综合分 0.507 / 现状 0.684，候选① 出现方向反转（训练窗 2.936 第一 → 参照窗 0.209 最低）——<b>不改选型路径，但降低验收期待值</b>。报告：<code>backtest/报告-候选臂封存集验收-挂轨与参照对比-20260922.md</code>。</div>
+<div class='lg-item'><b>OCR 接入 ollama deepseek-v4.1-flash</b>：<code>~/.opencodereview/config.json</code> 配 custom provider (<code>https://ollama.com/v1</code> + <b>openai 协议</b>)。<b>根因</b>：ollama.com <b>只认 <code>Authorization: Bearer</code></b>，连 Anthropic 端点也是——<code>x-api-key</code> 直接 401（此前 404/401 排查卡在这）。首次真实扫描即产出 6 条有效发现。</div>
+<div class='lg-item'><b><code>revscreen_regen.py</code> 四条修复</b>（<code>R-ocr-fix-0922</code>，由 OCR 扫出、我逐条实测证实）：① <b>写盘早于 DRIFT 闸</b>（docstring 承诺「保留旧资产」实际做不到）→ 改<b>事务化提交</b>：先算→先校→全部通过才一次性落盘，失败按备份整体回滚；② 臂信号循环内逐个覆盖 → 全部入队后统一提交；③ <b>fwd 前瞻标签永不回填</b>（追加时未来K线不存在 → 存 NaN → 历史不可变 → 永久 NaN 且逐日累积）→ 加「仅补 NaN、已核验值一格不动」的回填，实测补 <b>22,762 / 22,765 / 22,750 格</b>，全 NaN 行 12/17/27 → <b>6/11/21</b>（恰为理论不可知尾行）；④ 「历史 %d 行逐位一致」在<b>对拍未跑时也无条件打印</b>（审计假阳性）→ 改为只在真比过之后才说一致。另加 <code>--force</code> 自愈重算。<b>验证</b>：三条验收（NaN 行数/回填合法性/14 个非 fwd 键逐位一致）全过 + <b>已知答案烟雾测试</b>（植入 1 格漂移 → 正确中止 + 面板 md5 前后一致 + 无残留备份）。</div>
+<p><b>短线系统分为两个标签组</b>（用户需求）</p>
+
+<div class='lg-item'><code>超跌低开低吸</code> —— 卡片含 <b>策略定义 / 选股结果（今日收盘候选）/ 模拟盘（四轨）/ 跟踪池 / 回测数据</b>（与 Khunter 同等结构）。</div>
+<div class='lg-item'><code>超卖伏击（Khunter 系列）</code> —— 命中策略一览 / 模拟盘 / ETF 动量轮动。</div>
+<div class='lg-item'>导航子项同步改名：<code>超跌低开低吸</code> / <code>超卖伏击 · 命中策略</code> / <code>超卖伏击 · 模拟盘</code>。</div>
+<div class='lg-item'>Khunter 系列定名 <b>「超卖伏击」</b>（4 字）；本策略定名 <b>「超跌低开低吸」</b>。</div>
+
+<p><b>⚠ 同批更正与披露</b></p>
+
+<p>1. <b>命名撞名更正</b>：本策略此前自称「C1」与项目内已有三处冲突（<code>weight_system_backtest_indicator_eval.py</code> 的 C1 筹码因子 / <code>_density_fund_0912.py</code> 的 C1 净利>0 / R-fib-0914 的 C1 入场滤网）→ 对外一律改用「超跌低开低吸」，内部文件前缀 <code>qlch_</code> 保留。</p>
+<p>2. <b>「主板」标注错误更正</b>：面板 glob <code>sh6*/sz0*</code> <b>含科创板 618 只（15.1%，20% 涨跌幅）</b>，此前 8 份报告标「主板」处应读作「全池（含科创板）」。结论结构不受影响，<b>数值归因受影响</b>——剔除科创板后 B4 年化 −10.56pp、旧基线 +3.84pp（逐臂不同）。</p>
+<p>3. <b>回测数据卡内附诚实标注</b>：B4 无上限行标「⚠ 含 248 天单票满仓，收益依赖分配约定，不采信」（该 248 天贡献 43.3% 总收益）。</p>
+<p>4. <b>影子盘状态</b>：全部为模拟轨，<b>不申领实盘资金</b>；毕业门见 <code>PRE-REGISTRATION_20260921_qlch_paper.md</code>（10 门）与 <code>PRE-REGISTRATION_20260921_qlch_mainboard.md</code>（七门）。封存集 = 2026-09-22 起。</p>
+
+<p><b>修掉自身 bug</b>：<code>qlch_paper</code> 模块此前<b>不幂等</b>——同一日期重复运行会把收益重复计入净值（日链 <code>--force</code> 会踩到）→ 已加幂等守卫并验证。</p>
+
+</div></div><div class="rel"><div class="rel-head">v5.13.9 - 2026-09-18（顶栏五个标签的空图标占位修复）</div><div class="rel-body">
 
 <p><b>现象</b>（用户报「顶栏五个标签有 emoji 占位，不协调」）：五 tab 左侧各留着一个 20px 空位，文字偏右、五个标签看着不匀。</p>
 

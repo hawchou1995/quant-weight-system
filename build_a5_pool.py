@@ -58,6 +58,7 @@ def tech_indicators(code):
         else:
             out["ret_1y"] = round(float(close.iloc[-1] / close.iloc[0] - 1) * 100, 1)
         out["rsi"] = round(rsi14(close.values), 1)
+        out["last_close"] = round(float(close.iloc[-1]), 3)   # 明日买点基准（R-qlch-buyhint-0922）
         if len(vol) >= 6:
             vr = float(vol.iloc[-1] / vol.iloc[-6:-1].mean())
             out["vr"] = round(vr, 2)
