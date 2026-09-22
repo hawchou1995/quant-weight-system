@@ -28,7 +28,10 @@ t0 = time.time()
 fails = []
 for name, args in STEPS:
     print(f"\n---------- {name} ----------", flush=True)
-    r = subprocess.run([PY] + args, cwd=str(HERE.parent), capture_output=True, text=True)
+    # 2026-09-22 修复：不传 encoding 时 Python 按 locale(GBK) 解码，而子脚本输出 UTF-8
+    # → 读取线程 UnicodeDecodeError，子进程 stdout/stderr 全部丢弃（日志只剩 rc，看不到原因）。
+    r = subprocess.run([PY] + args, cwd=str(HERE.parent), capture_output=True, text=True,
+                       encoding="utf-8", errors="replace")
     tail = ((r.stdout or "") + (r.stderr or "")).strip().splitlines()
     for ln in tail[-6:]:
         print("  " + ln, flush=True)

@@ -188,6 +188,7 @@ NO_PROXY_ENV = {**_os.environ, "HTTP_PROXY": "", "HTTPS_PROXY": "", "http_proxy"
 
 t0 = time.time()
 fails = []
+soft_fails = []   # [软] 步骤失败清单：只报告、不改退出码（2026-09-22 用户批准补可见性）
 
 
 def _gushi_py():
@@ -226,6 +227,7 @@ for name, args, skip in STEPS:
         sys.exit(0)
     if r.returncode != 0:
         if name.endswith("[软]"):   # 软步骤：失败只告警，不阻断（如 A5 实验盘、影子轨）
+            soft_fails.append(f"{name[:-3]}(exit {r.returncode})")
             print(f"⚠️ {name} 失败（exit {r.returncode}）—— 非致命，继续后续步骤", flush=True)
             continue
         fails.append(name)
@@ -291,5 +293,6 @@ if not fails:
         for ln in ((r.stdout or "") + (r.stderr or "")).strip().splitlines()[-12:]:
             print(ln, flush=True)
 
-print(f"\n{'❌ 失败: ' + ', '.join(fails) if fails else '✅ 全链完成'} · 总耗时 {time.time()-t0:.0f}s", flush=True)
+_soft_note = f" · ⚠️ 软失败 {len(soft_fails)}：{', '.join(soft_fails)}" if soft_fails else ""
+print(f"\n{'❌ 失败: ' + ', '.join(fails) if fails else '✅ 全链完成'}{_soft_note} · 总耗时 {time.time()-t0:.0f}s", flush=True)
 sys.exit(1 if fails else 0)
