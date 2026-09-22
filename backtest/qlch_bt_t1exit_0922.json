@@ -14,7 +14,12 @@
    "mdd": -11.9,
    "wr": 64.2,
    "cagr50": 13.96,
-   "cagr_val": 61.81
+   "cagr_val": 61.81,
+   "cagr_4y": 39.03,
+   "cagr_val_abs_recalc": 62.2,
+   "cagr_val_fix": 22.43,
+   "val_cum_pct": 158.18,
+   "cagr_val_overstate_pp": 39.38
   },
   {
    "name": "E1 次日开盘",
@@ -27,7 +32,12 @@
    "mdd": -13.27,
    "wr": 58.3,
    "cagr50": 5.75,
-   "cagr_val": 31.31
+   "cagr_val": 31.31,
+   "cagr_4y": 24.31,
+   "cagr_val_abs_recalc": 31.64,
+   "cagr_val_fix": 9.33,
+   "val_cum_pct": 51.88,
+   "cagr_val_overstate_pp": 21.98
   },
   {
    "name": "E2 次日收盘",
@@ -40,7 +50,12 @@
    "mdd": -24.92,
    "wr": 54.6,
    "cagr50": 10.9,
-   "cagr_val": 55.05
+   "cagr_val": 55.05,
+   "cagr_4y": 33.46,
+   "cagr_val_abs_recalc": 55.46,
+   "cagr_val_fix": 21.51,
+   "val_cum_pct": 149.22,
+   "cagr_val_overstate_pp": 33.54
   },
   {
    "name": "E3 止盈8%／止损10%",
@@ -53,7 +68,12 @@
    "mdd": -27.8,
    "wr": 61.9,
    "cagr50": 5.48,
-   "cagr_val": 11.13
+   "cagr_val": 11.13,
+   "cagr_4y": 12.9,
+   "cagr_val_abs_recalc": 11.28,
+   "cagr_val_fix": 0.33,
+   "val_cum_pct": 1.55,
+   "cagr_val_overstate_pp": 10.8
   },
   {
    "name": "E4 止盈15%／止损20% ★候选",
@@ -66,7 +86,12 @@
    "mdd": -18.38,
    "wr": 63.1,
    "cagr50": 10.63,
-   "cagr_val": 22.1
+   "cagr_val": 22.1,
+   "cagr_4y": 19.48,
+   "cagr_val_abs_recalc": 22.3,
+   "cagr_val_fix": 5.06,
+   "val_cum_pct": 26.04,
+   "cagr_val_overstate_pp": 17.04
   }
  ],
  "key_facts": [
@@ -80,5 +105,65 @@
   "择时门对比已重跑（R-qlch-gate-rank-t1-0922，合法口径）：<b>MA60 夏普 2.936 最优</b>（vs 现状 MA20 2.539），MA200 1.376 / MA250 1.314 / 无门 0.420；<b>MA60 登记候选，生产仍用 MA20</b>。TopK 排序：<b>综合分（超跌z+gapz）夏普 2.854 / 回撤改善 1.14pp 过门，登记候选</b>；超跌深度回撤劣化、gap 深度夏普降，均不过。",
   "<b>两项候选均不改生产</b>——重跑属口径修正，但预注册文档写在跑数之后（已交底），故一律只作候选登记；组合臂（MA60×综合分）须另立预注册。"
  ],
- "note": "数据源：backtest/报告-超跌低开低吸-T+1合规出场复测-20260922.md · _tmp_0922_t1exit_v2.py / _tmp_0922_t1exit_v2.json · 胜率列 = 按天口径。旧 qlch_bt_summary.json 保留作历史对照，不再上卡。"
+ "note": "数据源：backtest/报告-超跌低开低吸-T+1合规出场复测-20260922.md · _tmp_0922_t1exit_v2.py / _tmp_0922_t1exit_v2.json · 胜率列 = 按天口径。旧 qlch_bt_summary.json 保留作历史对照，不再上卡。 ｜ 2026-09-23 修正（R-qlch-cagrval-0923）：『验证窗年化』原为绝对净值口径，已按窗口内年化修正 —— E4 由 +22.10% 修正为 **+5.06%**（其余臂见 recalib.arms）；训练窗『年化』分母含 2016/2017 两个零成交年，按有成交年份另给 `cagr_4y`（E4 12.63% → 19.48%）。",
+ "recalib": {
+  "id": "R-qlch-cagrval-0923",
+  "what": "cagr_val 口径修正：原算法用**绝对净值水平**年化（v[-1]**(1/yrs)-1），在验证窗（起点净值≈2.04）被放大；修正为**窗口内**年化（(v_end/v_start)**(1/yrs)-1）。训练窗因起点净值=1.0 而不可见该缺陷。",
+  "method": "由 _tmp_0922_t1exit_v2.json 的逐年收益（yr，单位 %）复合：窗口累计 = Π(1+yr)；年化 = 累计**(1/年数)-1",
+  "years_used": {
+   "val": 4.6863,
+   "val_span": "2022-01-04 → 2026-09-22",
+   "train": "2016..2021（含 2016/2017 零成交年；同列另给 cagr_4y = 按有成交年份）"
+  },
+  "arms": {
+   "E0": {
+    "cagr": 24.62,
+    "cagr_4y": 39.03,
+    "card_cagr_val": 61.81,
+    "abs_recalc": 62.2,
+    "fix": 22.43,
+    "val_cum_pct": 158.18,
+    "overstate_pp": 39.38
+   },
+   "E1": {
+    "cagr": 15.65,
+    "cagr_4y": 24.31,
+    "card_cagr_val": 31.31,
+    "abs_recalc": 31.64,
+    "fix": 9.33,
+    "val_cum_pct": 51.88,
+    "overstate_pp": 21.98
+   },
+   "E2": {
+    "cagr": 21.26,
+    "cagr_4y": 33.46,
+    "card_cagr_val": 55.05,
+    "abs_recalc": 55.46,
+    "fix": 21.51,
+    "val_cum_pct": 149.22,
+    "overstate_pp": 33.54
+   },
+   "E3": {
+    "cagr": 8.44,
+    "cagr_4y": 12.9,
+    "card_cagr_val": 11.13,
+    "abs_recalc": 11.28,
+    "fix": 0.33,
+    "val_cum_pct": 1.55,
+    "overstate_pp": 10.8
+   },
+   "E4": {
+    "cagr": 12.63,
+    "cagr_4y": 19.48,
+    "card_cagr_val": 22.1,
+    "abs_recalc": 22.3,
+    "fix": 5.06,
+    "val_cum_pct": 26.04,
+    "overstate_pp": 17.04
+   }
+  },
+  "residual_note": "cagr_val_abs_recalc 与卡上 cagr_val 差 ≤0.4pp，来自年数取整差异（非模型差异）",
+  "script": "backtest/repro_qlch_cagrval_0923.py",
+  "effect": "★候选 E4：验证窗年化由卡上 +22.10% 修正为 **+5.06%**（高估 17.04pp）；E1 +31.31%→+9.33%；E2 +55.05%→+21.51%；E3 +11.13%→+0.33%；E0（违法臂）+61.81%→+22.43%"
+ }
 }

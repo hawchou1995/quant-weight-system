@@ -2538,8 +2538,8 @@ def qlch_card():
     if arms:
         L.append('<table class="tbl" style="width:100%;font-size:12px">'
                  '<thead><tr><th>臂</th><th>池</th><th>单票上限</th><th>笔数</th>'
-                 '<th>年化</th><th>夏普</th><th>回撤</th><th>胜率</th><th>50bp 年化</th>'
-                 '<th title="2022 起，仅参照不用于选型">验证窗年化</th></tr></thead><tbody>')
+                 '<th title="训练窗 2016-2021（2016/2017 无成交，分母含两年 → 另给 cagr_4y 按有成交年份）">年化</th><th>夏普</th><th>回撤</th><th>胜率</th><th>50bp 年化</th>'
+                 '<th title="2022-01-04 起，仅参照不用于选型；2026-09-23 由绝对净值口径修正为窗口内年化（R-qlch-cagrval-0923）">验证窗年化（修正）</th></tr></thead><tbody>')
         for a in arms:
             mp = ("1/%d" % a["maxpos"]) if a.get("maxpos") else "无"
             col = "var(--up)" if a.get("cagr", 0) > 0 else "var(--down)"
@@ -2550,7 +2550,10 @@ def qlch_card():
                         a.get("pool", ""), mp, a.get("n", 0), col,
                         a.get("cagr", 0), a.get("sharpe", 0), a.get("mdd", 0), a.get("wr", 0),
                         a.get("cagr50", 0),
-                        "—" if a.get("cagr_val") is None else "%+.2f%%" % a["cagr_val"]))
+                        ("—" if a.get("cagr_val_fix") is None else
+                          ("<b>%+.2f%%</b>" % a["cagr_val_fix"]) +
+                          ("" if a.get("cagr_val") is None else
+                           "<span style=\"color:var(--faint);font-size:var(--fs-xs)\"> · 原 %+.2f%%</span>" % a["cagr_val"]))))
         L.append('</tbody></table>')
     kf = bt.get("key_facts", [])
     if kf:
@@ -2560,6 +2563,16 @@ def qlch_card():
         L.append('</ul>')
     L.append('<div style="font-size:11.5px;color:var(--faint);margin-top:9px">%s</div>'
              % bt.get("note", ""))
+    if bt.get("recalib"):
+        L.append('<div class="subhint" style="border-left:3px solid var(--warn);'
+                 'background:rgba(255,180,60,.08);padding:8px 10px;margin-top:8px;'
+                 'line-height:1.7;font-size:12px">⚠ <b>验证窗口径修正（%s）</b>：原「验证窗年化」按'
+                 '<b>绝对净值水平</b>年化 → 2022+ 段被放大（起点净值≈2.04）；已改为<b>窗口内年化</b>。'
+                 '★候选 E4：+22.10%% → <b>+5.06%%</b>（窗口累计 +26.04%%）；E1 +31.31%% → +9.33%%；'
+                 'E2 +55.05%% → +21.51%%；E3 +11.13%% → +0.33%%。训练窗「年化」分母含 2016/2017 两个零成交年，'
+                 '按有成交年份另给 cagr_4y（E4 12.63%% → 19.48%%）。复算：'
+                 '<code>backtest/repro_qlch_cagrval_0923.py</code></div>'
+                 % bt["recalib"].get("id", ""))
     L.append('</div>')
     return "".join(L)
 
