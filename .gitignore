@@ -62,3 +62,13 @@ backtest/asts_0916/
 backtest/tz_data/
 *.npz
 *.npy
+
+# ---- 本地草稿/备份/诊断（2026-09-22 用户批准）：不进版本库，避免 git status 被刷屏 ----
+_bak_*
+_backup_*
+_tmp_*
+_probe_*
+_diag_*
+_dbg_*
+_cov_out.txt
+_commitmsg_*.txt

@@ -38,7 +38,8 @@ INTRADAY_JS = r"""
     TIP: '盘中实时（价格/涨跌幅）；评分/档位/RSI/近一年/MACD/KDJ 仍为上一交易日收盘口径'
   };
   var S = { on: null, quotes: {}, name: {}, ts: '', live: false, mktTs: '', idx: null,
-            lastPool: 0, lastTree: 0, lastProbe: 0, busy: false, patched: 0, miss: 0, err: '' };
+            lastPool: 0, lastTree: 0, lastProbe: 0, busy: false, patched: 0, miss: 0, err: '',
+            txBatches: 0, txFail: 0, treeSrc: '' };
 
   function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
   function lsSet(k, v){ try{ localStorage.setItem(k, v); }catch(e){} }
@@ -293,7 +294,67 @@ INTRADAY_JS = r"""
   }
 
   /* ---------- 全市场快照 → 树图 ---------- */
-  function fetchMarket(){
+  /* R-treelive-0922：原实现只走东财 clist（全市场 56 请求）。2026-09-22 实测该端点在本机被
+     **端点级拦截**（TLS 重协商后连接重置；三主机、任意 fs 皆然，而同主机 ulist 正常）
+     → 树图刷新静默返回 0 行（注记与树图都不更新）。
+     改法：代码表取自构建期已内嵌的 window.HEATMAP（全市场 5210 只）→ **腾讯 q= 分批
+     （800 码/请求 = 7 个请求）为主**，东财 clist 保留兜底。实测腾讯上限：800 码 OK，1200 → HTTP 414。
+     收益：① 单一源被封不再静默死 ② 请求数 56 → 7，且优先不占东财配额
+     （与用户约束「不影响收盘全量池拉取」一致 —— 收盘链靠的正是东财）。 */
+  function marketCodes(){
+    var H = window.HEATMAP;
+    var tree = (H && (H.tree || (H.data && H.data.tree))) || [];
+    var out = [], seen = {};
+    for (var i = 0; i < tree.length; i++) {
+      var ch = (tree[i] && tree[i].children) || [];
+      for (var j = 0; j < ch.length; j++) {
+        var c = ch[j] && ch[j].c;
+        if (c && !seen[c]) { seen[c] = 1; out.push(c); }
+      }
+    }
+    return out;
+  }
+  function txRow(f, rows){
+    /* 腾讯 q= 字段：[1]名称 [2]代码 [3]现价 [32]涨跌幅% [37]成交额(万元) [44]总市值(亿) [45]流通市值(亿) */
+    if (f.length < 46) return;
+    /* ⚠ 44/45 顺序经实测对拍（长鑫科技 688825：腾讯[44]=2605.46/[45]=39277.74 == heatmap f=2605.5/m=39277.7）
+       —— [44]=流通市值(亿) [45]=总市值(亿)。单票探针（浦发）两值相等看不出差异，一度写反。 */
+    var c = f[2], p = num(f[32]), a = num(f[37]), fl = num(f[44]), m = num(f[45]);
+    if (!c || c.length !== 6) return;
+    rows.push({c: c, n: f[1] || '', p: isNaN(p) ? 0 : p,
+               a: isNaN(a) ? 0 : a / 1e4, m: isNaN(m) ? 0 : m, f: isNaN(fl) ? 0 : fl});
+  }
+  function fetchMarketTx(codes){
+    var rows = [], i = 0;
+    function step(){
+      if (i >= codes.length) return Promise.resolve(rows);
+      /* R-treelive-0922：批大小必须用 CFG.TX_CHUNK —— 浏览器实测 400 码 OK、800 码 TypeError:
+         Failed to fetch（41ms 快速失败）；curl 能容忍 800（7.2KB URL）但浏览器栈不能。
+         教训：用 curl 测出的上限不可直接搬到浏览器。5210 只 → 14 个请求（仍远少于 clist 的 56）。 */
+      var chunk = codes.slice(i, i + CFG.TX_CHUNK); i += CFG.TX_CHUNK;
+      S.txBatches++;
+      function attempt(left){
+      return getGBK('https://qt.gtimg.cn/q=' + chunk.map(txCode).join(','), 12000)
+        .then(function(txt){
+          txt.trim().split('\n').forEach(function(l){
+            var q = l.indexOf('="'); if (q < 0) return;
+            txRow(l.slice(q + 2).replace(/";?\s*$/, '').split('~'), rows);
+          });
+          return step();
+        }, function(){
+          if (left > 0) {                                 /* 单批失败：退避 400ms 重试一次 */
+            return new Promise(function(r){ setTimeout(r, 400); })
+              .then(function(){ return attempt(left - 1); });
+          }
+          S.txFail++;                                     /* 仍失败：宁缺不瘫，但计数可见 */
+          return step();
+        });
+      }
+      return attempt(1);
+    }
+    return step();
+  }
+  function fetchMarketEm(){
     var FS = 'm:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23';
     var rows = [], conc = 5, pn = 1, done = false;
     function one(p){
@@ -304,42 +365,56 @@ INTRADAY_JS = r"""
         var d = (j.data && j.data.diff) || [];
         if (!d.length) { done = true; return; }
         d.forEach(function(x){
-          var p = num(x.f3), a = num(x.f6), m = num(x.f20), f = num(x.f21);
+          var p = num(x.f3), a = num(x.f6), m = num(x.f20), fl = num(x.f21);
           if (!x.f12) return;
           rows.push({c: x.f12, n: x.f14 || '', p: isNaN(p) ? 0 : p,
-                     a: isNaN(a) ? 0 : a / 1e8, m: isNaN(m) ? 0 : m / 1e8, f: isNaN(f) ? 0 : f / 1e8});
+                     a: isNaN(a) ? 0 : a / 1e8, m: isNaN(m) ? 0 : m / 1e8, f: isNaN(fl) ? 0 : fl / 1e8});
         });
       }, function(){ done = true; });
     }
     function pump(){
       if (done) return Promise.resolve();
       var batch = [];
-      for (var i = 0; i < conc; i++) batch.push(one(pn++));
+      for (var k = 0; k < conc; k++) batch.push(one(pn++));
       return Promise.all(batch).then(function(){ return pump(); });
     }
-    return pump().then(function(){
-      if (!rows.length) return 0;
-      var ts = hhmmss(new Date());
-      var hit = 0;
-      if (typeof window.HM_APPLY === 'function') hit = window.HM_APPLY(rows, ts) || 0;
-      var note = document.getElementById('hm-live');
-      if (!note) {
-        var bar = document.querySelector('#hm-card .hm-bar') || document.querySelector('#hm-card h2');
-        if (bar) { note = document.createElement('span'); note.id = 'hm-live'; note.className = 'hm-hint'; bar.appendChild(note); }
-      }
-      if (note) {
-        note.textContent = (S.live ? '盘中实时' : '实时快照（非交易时段）') +
-                           ' · 更新于 ' + ts + '（全市场 ' + rows.length + ' 只）';
-        note.title = CFG.TIP;
-        note.style.color = '#b45309';
-      }
-      S.lastTree = Date.now();
-      return hit;
+    return pump().then(function(){ return rows; });
+  }
+  function marketDone(rows){
+    if (!rows.length) return 0;
+    var ts = hhmmss(new Date());
+    var hit = 0;
+    if (typeof window.HM_APPLY === 'function') hit = window.HM_APPLY(rows, ts) || 0;
+    var note = document.getElementById('hm-live');
+    if (!note) {
+      var bar = document.querySelector('#hm-card .hm-bar') || document.querySelector('#hm-card h2');
+      if (bar) { note = document.createElement('span'); note.id = 'hm-live'; note.className = 'hm-hint'; bar.appendChild(note); }
+    }
+    if (note) {
+      note.textContent = (S.live ? '盘中实时' : '实时快照（非交易时段）') +
+                         ' · 更新于 ' + ts + '（全市场 ' + rows.length + ' 只 · ' + (S.treeSrc || '—') + ' 源'
+                         + (S.treeSrc === '腾讯' ? ' · 批 ' + (S.txBatches - S.txFail) + '/' + S.txBatches : '')
+                         + (S.txFail ? ' · 失败批 ' + S.txFail : '') + '）';
+      note.title = CFG.TIP;
+      note.style.color = '#b45309';
+    }
+    S.lastTree = Date.now();
+    return hit;
+  }
+  function fetchMarket(){
+    S.txBatches = 0; S.txFail = 0;
+    var codes = marketCodes();
+    var prim = codes.length ? fetchMarketTx(codes) : Promise.resolve([]);
+    return prim.then(function(rows){
+      if (rows && rows.length) { S.treeSrc = '腾讯'; return marketDone(rows); }
+      return fetchMarketEm().then(function(r2){ S.treeSrc = '东财'; return marketDone(r2); });
     });
   }
 
   /* ---------- 刷新与调度 ---------- */
   function refresh(force){
+    if (chainQuiet()) { S.quiet = true; pill(); return Promise.resolve(false); }  /* R-treelive-0922 */
+    S.quiet = false;
     if (S.busy) return Promise.resolve(false);
     S.busy = true;
     var jobs = [];
@@ -354,8 +429,10 @@ INTRADAY_JS = r"""
         S.lastPool = Date.now();
         return r;
       }) : Promise.resolve(null);
+      /* R-treelive-0922：周期性树图刷新**仅开市时段**（S.live）—— 非交易时段只在页内补刷(force)拉一次快照，
+         否则收盘后每 15 分钟仍会打 56 次 clist，与日链抢配额 */
       var needTree = !!document.getElementById('hm-chart') &&
-                     (force || (kxmmActive() && (Date.now() - S.lastTree > CFG.TREE_MS)));
+                     (force || (S.live && kxmmActive() && (Date.now() - S.lastTree > CFG.TREE_MS)));
       var t = needTree ? fetchMarket() : Promise.resolve(null);
       return Promise.all([p, t]);
     }).then(function(rs){
@@ -364,12 +441,23 @@ INTRADAY_JS = r"""
     }, function(e){ S.busy = false; S.err = String(e && e.message || e); pill(); return {err: S.err}; });
   }
 
+  /* 收盘链静默窗（R-treelive-0922 · 用户约束「不影响收盘全量池拉取」）：
+     日链 15:30 起密集打东财（em_bulk / fullpool_guard / fetch_val_*），此时浏览器**一律不发行情请求**，
+     避免与收盘全量池拉取抢配额（近几日 em_bulk 0/3 全败 = RemoteDisconnected）。
+     窗口 15:05–16:45 覆盖收盘后到日链结束；开市时段（09:15–15:05）行为不变。
+     d 可选，仅用于测试。 */
+  function chainQuiet(d){
+    var t = d || new Date();
+    var m = t.getHours() * 60 + t.getMinutes();
+    return m >= 15 * 60 + 5 && m <= 16 * 60 + 45;
+  }
   function kxmmActive(){
     var v = document.getElementById('view-kxmm');
     return !!(v && v.classList.contains('active'));
   }
   function due(){
     if (S.on === false || S.busy) return false;
+    if (chainQuiet()) return false;          /* R-treelive-0922：收盘链静默窗内不轮询 */
     if (document.visibilityState === 'hidden') return false;
     var idle = !S.live ? CFG.IDLE_MS : CFG.POOL_MS;
     return (Date.now() - S.lastPool) > idle;
@@ -401,6 +489,7 @@ INTRADAY_JS = r"""
     });
   });
   window.INTRADAY = {refresh: refresh, applyQuotes: applyQuotes, targets: targets, state: S,
+                     chainQuiet: chainQuiet,
                      __scan: scan, __fetchPool: fetchPool,
                      setOn: setOn, cfg: CFG};
 })();
