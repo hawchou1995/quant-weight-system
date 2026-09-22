@@ -35,6 +35,9 @@ INTRADAY_JS = r"""
     KEY_PX: ['px', 'price', 'close', 'last'],
     KEY_PCT: ['chg', 'pct'],
     LS: 'quant_live_v1',
+    /* R-qlch-live-0923：必须参与 px/pct 刷新的表白名单（其行代码来自构建期内嵌 candidates）。
+       qlch 候选表的「市值分位」曾命中整表估值守卫 → 整表跳过；收窄守卫 + 白名单双保险。 */
+    WL_TBL: {'tbl-qlch-cand': 1},
     TIP: '盘中实时（价格/涨跌幅）；评分/档位/RSI/近一年/MACD/KDJ 仍为上一交易日收盘口径'
   };
   var S = { on: null, quotes: {}, name: {}, ts: '', live: false, mktTs: '', idx: null,
@@ -128,26 +131,37 @@ INTRADAY_JS = r"""
 
   /* ---------- 选股池报价 ---------- */
   function fetchPool(codes){
-    var out = {}, i = 0;
+    var out = {}, i = 0, srcEm = 0, srcTx = 0;
     function step(){
-      if (i >= codes.length) return Promise.resolve(out);
+      if (i >= codes.length) {
+        /* R-qlch-live-0923：登记本批报价的来源（东财主源 / 腾讯兜底）—— qlch 徽标要显示「源 东财/腾讯」，
+           不靠猜。任一片走兜底即如实标注（东财|腾讯）。 */
+        S.poolSrc = srcTx ? (srcEm ? '东财|腾讯' : '腾讯') : (srcEm ? '东财' : '');
+        return Promise.resolve(out);
+      }
       var chunk = codes.slice(i, i + CFG.EM_CHUNK); i += CFG.EM_CHUNK;
       var host = CFG.HOSTS[0];
-      var u = 'https://' + host + '/api/qt/ulist.np/get?fltt=2&invt=2&fields=f2,f3,f12,f14&secids='
+      /* R-qlch-live-0923：fields 增 f17（今开）/f18（昨收）—— qlch 买点判定要 gap = 今开/昨收−1，
+         原 fields 只有 f2 现价 / f3 涨跌幅，跳空判不了。pcl=昨收、opn=今开（下游 QLCH_LIVE 消费）。 */
+      var u = 'https://' + host + '/api/qt/ulist.np/get?fltt=2&invt=2&fields=f2,f3,f12,f14,f17,f18&secids='
             + chunk.map(mktCode).join(',') + '&_=' + Date.now();
       return getJSON(u, 12000).then(function(j){
+        srcEm++;
         ((j.data && j.data.diff) || []).forEach(function(x){
-          var px = num(x.f2), pc = num(x.f3);
-          if (!isNaN(px)) out[x.f12] = {px: px, pct: isNaN(pc) ? 0 : pc, name: x.f14 || ''};
+          var px = num(x.f2), pct = num(x.f3);
+          if (!isNaN(px)) out[x.f12] = {px: px, pct: isNaN(pct) ? 0 : pct, name: x.f14 || '',
+                                        pcl: num(x.f18), opn: num(x.f17)};
         });
         return step();
       }, function(){ /* 本片失败：腾讯兜底 */
+        srcTx++;
         var u2 = 'https://qt.gtimg.cn/q=' + chunk.map(txCode).join(',');
         return getGBK(u2, 12000).then(function(txt){
           txt.trim().split('\n').forEach(function(l){
             var f = l.split('~'); if (f.length < 33) return;
-            var px = num(f[3]), pc = num(f[32]);
-            if (f[2] && !isNaN(px)) out[f[2]] = {px: px, pct: isNaN(pc) ? 0 : pc, name: f[1] || ''};
+            var px = num(f[3]), pct = num(f[32]);
+            if (f[2] && !isNaN(px)) out[f[2]] = {px: px, pct: isNaN(pct) ? 0 : pct, name: f[1] || '',
+                                                 pcl: num(f[4]), opn: num(f[5])};
           });
           return step();
         }, function(){ return step(); });
@@ -175,14 +189,23 @@ INTRADAY_JS = r"""
       }
       if (pxI < 0 && pcI < 0) { info.push({id: tid, rows: nRows, elig: 0, live: 0, skip: '无价格/涨跌列'}); continue; }
       /* 组合估值表：行内有由价格派生的 浮盈/盈亏/市值/净值 列 → 只把价格换实时会让同一行自相矛盾，整表跳过。
-         注意「权重」要限定条件：权重总分 / 权重分 是评分（不是持仓权重），短线选股池正是这种 —— 
-         故仅在「无涨跌幅列」时才把 权重 视为估值列（模拟盘持仓表就是这种）。 */
-      var hdrAll = '';
-      for (var z = 0; z < ths.length; z++) hdrAll += (ths[z].textContent || '');
-      if (/浮盈|盈亏|市值|净值/.test(hdrAll)) {
-        info.push({id: tid, rows: nRows, elig: 0, live: 0, skip: '估值表(浮盈/盈亏/市值/净值)'}); continue;
+         注意「权重」要限定条件：权重总分 / 权重分 是评分（不是持仓权重），短线选股池正是这种 ——
+         故仅在「无涨跌幅列」时才把 权重 视为估值列（模拟盘持仓表就是这种）。
+         R-qlch-live-0923 收窄：原实现把**整表表头文本拼成一个串**再判 /浮盈|盈亏|市值|净值/ ——
+         qlch 候选表的「市值分位」被误命中 → 候选表**整表跳过**、涨跌幅永不刷新
+         （实测：产物 93 张表里唯一被误伤的就是它）。改为**逐列**判定：
+         仅当某列列名整名等于 浮盈/盈亏/市值/净值，或含 浮盈/盈亏/净值 时才跳过。 */
+      var hdrAll = '', estCol = '';
+      for (var z = 0; z < ths.length; z++) {
+        var hz = (ths[z].textContent || '').replace(/\s+/g, '');
+        hdrAll += hz;
+        if (!estCol && (/^(浮盈|盈亏|市值|净值)$/.test(hz) || /浮盈|盈亏|净值/.test(hz))) estCol = hz;
       }
-      if (pcI < 0 && /权重/.test(hdrAll)) {
+      /* 白名单表（qlch 候选表）：行代码来自构建期内嵌 candidates，不靠单元格猜 → 即便命中也照刷 */
+      if (estCol && !CFG.WL_TBL[tb.id]) {
+        info.push({id: tid, rows: nRows, elig: 0, live: 0, skip: '估值表(' + estCol + ')'}); continue;
+      }
+      if (pcI < 0 && /权重/.test(hdrAll) && !CFG.WL_TBL[tb.id]) {
         info.push({id: tid, rows: nRows, elig: 0, live: 0, skip: '估值表(权重列且无涨跌幅列)'}); continue;
       }
       var trs = tb.querySelectorAll('tbody tr');
@@ -315,14 +338,18 @@ INTRADAY_JS = r"""
     return out;
   }
   function txRow(f, rows){
-    /* 腾讯 q= 字段：[1]名称 [2]代码 [3]现价 [32]涨跌幅% [37]成交额(万元) [44]总市值(亿) [45]流通市值(亿) */
+    /* 腾讯 q= 字段：[1]名称 [2]代码 [3]现价 [4]昨收 [5]今开 [32]涨跌幅% [37]成交额(万元)
+       [44]总市值(亿) [45]流通市值(亿)
+       ⚠ 44/45 顺序经实测对拍（长鑫科技 688825：腾讯[44]=2605.46/[45]=39277.74 == heatmap f=2605.5/m=39277.7）
+       —— [44]=流通市值(亿) [45]=总市值(亿)。单票探针（浦发）两值相等看不出差异，一度写反。
+       R-qlch-live-0923：补 pcl=[4] 昨收 / opn=[5] 今开 —— 原实现只取现价与涨跌幅，
+       买点判定（gap = 今开/昨收−1）需要的两个字段被直接丢弃。树图路径不消费这两个字段。 */
     if (f.length < 46) return;
-    /* ⚠ 44/45 顺序经实测对拍（长鑫科技 688825：腾讯[44]=2605.46/[45]=39277.74 == heatmap f=2605.5/m=39277.7）
-       —— [44]=流通市值(亿) [45]=总市值(亿)。单票探针（浦发）两值相等看不出差异，一度写反。 */
     var c = f[2], p = num(f[32]), a = num(f[37]), fl = num(f[44]), m = num(f[45]);
     if (!c || c.length !== 6) return;
     rows.push({c: c, n: f[1] || '', p: isNaN(p) ? 0 : p,
-               a: isNaN(a) ? 0 : a / 1e4, m: isNaN(m) ? 0 : m, f: isNaN(fl) ? 0 : fl});
+               a: isNaN(a) ? 0 : a / 1e4, m: isNaN(m) ? 0 : m, f: isNaN(fl) ? 0 : fl,
+               pcl: num(f[4]), opn: num(f[5])});
   }
   function fetchMarketTx(codes){
     var rows = [], i = 0;
@@ -426,6 +453,12 @@ INTRADAY_JS = r"""
       for (var i = 0; i < tgs.length; i++) { if (!seen[tgs[i].code]) { seen[tgs[i].code] = 1; codes.push(tgs[i].code); } }
       var p = codes.length ? fetchPool(codes).then(function(q){
         var r = applyQuotes(q, hhmmss(new Date()));
+        /* R-qlch-live-0923：报价落地的外部钩子。**必须显式留**：本 IIFE 内部调的是局部函数 applyQuotes，
+           外部改写 window.INTRADAY.applyQuotes 拦不到这里（线上实测：包装版在真实刷新路径上一次都没跑）。
+           无钩子时零开销，行为与原来完全一致；树图腿不经过这里。 */
+        if (typeof window.QLCH_ON_QUOTES === 'function') {
+          try { window.QLCH_ON_QUOTES(q, (r && r.ts) || hhmmss(new Date()), S.poolSrc, S.mktTs); } catch(e) {}
+        }
         S.lastPool = Date.now();
         return r;
       }) : Promise.resolve(null);
@@ -492,5 +525,371 @@ INTRADAY_JS = r"""
                      chainQuiet: chainQuiet,
                      __scan: scan, __fetchPool: fetchPool,
                      setOn: setOn, cfg: CFG};
+})();
+"""
+
+
+# ============ 超跌低开低吸（qlch）盘中买点判定 + 达标置顶 + 盘中净值（R-qlch-live-0923） ============
+# 单列一个注入块（与 INTRADAY_JS 分开）：树图层（热力树图 / HM_APPLY / chainQuiet）一行不动 ——
+# 本块只消费「选股池报价」的结果（fetchPool → applyQuotes 的包装），出事可单独摘掉。
+# 注入点：build_dual_system.py 的 `<script>{QLCH_JS}</script>`（紧跟 INTRADAY_JS 之后）。
+QLCH_JS = r"""
+/* ============ 超跌低开低吸（qlch）：盘中买点判定 + 达标置顶 + 盘中净值（R-qlch-live-0923） ============
+   为什么放浏览器端（ADR-0009）：
+     ① 零落盘：只读行情、只改 DOM —— 不写任何 json / 不碰账本，收盘链的记账口径完全不受影响；
+     ② 复用已验证的盘中层（#4b）：通道、防串码、开市判定、收盘链静默窗一律不重写；
+     ③ 买点是盘中瞬时条件（当日 gap = 今开/昨收−1 盘中恒定；盘中回落 = 现价/昨收−1 逐笔变），
+        服务端要「常驻进程 + 落盘 + 每日部署」才能提供同一信息，代价大于收益。
+   代价：页面没开就没有判定（收盘链照常写候选与账本，历史可回放）。
+   字段：昨收 = 腾讯 [4] / 东财 f18；今开 = 腾讯 [5] / 东财 f17（见 fetchPool / txRow）。
+   置顶 = 价格条件满足的**视图态**：不改 depth rank、不改候选取样、不写任何数据。
+*/
+(function(){
+  'use strict';
+  var Q = window.QLCH;
+  if (!Q) { return; }
+  var CFG = {
+    LS: 'quant_qlch_trig_v1',                    /* 首次触发时间戳（跨日按 QLCH.as_of 作废） */
+    CAND: 'tbl-qlch-cand', PAPER: 'tbl-qlch-paper',
+    EPS: 1e-9,                                   /* 价格带端点容差（浮点比较） */
+    TIP: '盘中估算值，非记账值；记账以收盘链写入为准'
+  };
+  var S = {ts: '', src: '', mktTs: '', mktDate: '', gate: false, hit: 0, n: 0,
+           diag: {}, nav: {}, dropped: 0, err: ''};
+  var META = {}, ORDER = null, TV = null;        /* META: 6 位码→候选元数据；ORDER: 原始行序；TV: 触发记录 */
+
+  function bare(c){ return String(c === null || c === undefined ? '' : c).replace(/^(sh|sz|bj)/i, ''); }
+  function num(v){ var x = (v === null || v === undefined || v === '') ? NaN : parseFloat(v); return isNaN(x) ? NaN : x; }
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+  function ymd(d){ return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function hms(d){ return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()); }
+  /* 行情时间戳（腾讯 [30]，形如 20260923103102）→ 'YYYY-MM-DD'；非法返回 ''（调用方保守处理）。 */
+  function mktDateOf(s){
+    s = String(s || '');
+    return /^[0-9]{8}/.test(s) ? (s.slice(0, 4) + '-' + s.slice(4, 6) + '-' + s.slice(6, 8)) : '';
+  }
+  /* 开仓腿基准（对齐生产记账 qlch_paper_20260921.py:379-384）：
+     entry_date == 行情日 → 入场价（当日新开仓）；否则 → 昨收（行情 pcl）；昨收缺失 → 退回入场价。
+     返回 why 供调用方标注口径（'entry' / 'prevclose' / 'fallback'）。 */
+  function posBase(p, qd, d){
+    var ep = num(p && p.entry_px);
+    if (p && p.entry_date && qd && String(p.entry_date) === qd) return {b: ep, why: 'entry'};
+    var pc = d ? num(d.pcl) : NaN;
+    if (!isNaN(pc) && pc > 0) return {b: pc, why: 'prevclose'};
+    return {b: ep, why: 'fallback'};
+  }
+  function hm(s){ return (s && s.length >= 16) ? s.slice(11, 16) : ''; }
+  (function(){
+    var rs = Q.rows || [];
+    for (var i = 0; i < rs.length; i++) { var r = rs[i]; if (r && r.code) META[bare(r.code)] = r; }
+  })();
+
+  /* ---------- 样式（运行时注入；颜色一律走主题变量，不新增硬编码色值） ---------- */
+  function css(){
+    if (document.getElementById('qlch-live-css')) return;
+    var st = document.createElement('style'); st.id = 'qlch-live-css';
+    st.textContent = [
+      /* 触发行：绿色左边条 + 淡背景。注意本设计系统的「绿」= --down（A股红涨绿跌），不另造色值 */
+      'tr.qlch-trig{background:var(--card2);box-shadow:inset 3px 0 0 var(--down)}',
+      'tr.qlch-trig>td:first-child{color:var(--down);font-weight:600}',
+      /* 盘中回落达标：仅变色（左边条 --warn），不置顶 */
+      'tr.qlch-dip{box-shadow:inset 2px 0 0 var(--warn)}',
+      'tr.qlch-trig-hdr>td{background:var(--card2);color:var(--sub);font-size:var(--fs-sm);',
+      'padding:6px 8px;text-align:left;box-shadow:inset 3px 0 0 var(--down)}',
+      '.qlch-tag{margin-left:6px;font-size:var(--fs-xs);border:1px solid var(--border);',
+      'border-radius:var(--r-sm);padding:0 4px;color:var(--sub);background:var(--card);white-space:nowrap}',
+      'tr.qlch-trig .qlch-tag{color:var(--down);border-color:var(--down)}',
+      'tr.qlch-dip .qlch-tag{color:var(--warn);border-color:var(--warn)}',
+      /* 自己的 pill 样式（**不带 badge-live**：盘中层 markCard 会抢改 .badge-live 的文案为「实时 HH:MM:SS」，
+         线上实测把「已触发 N/25」冲掉了 → 两枚徽标并存、互不覆盖） */
+      '.qlch-badge{background:var(--card2);color:var(--down);border:1px solid var(--down);',
+      'border-radius:var(--r-sm);padding:1px 6px;font-size:var(--fs-xs);font-weight:500;white-space:nowrap}',
+      '.qlch-live-src{margin-left:6px;font-size:var(--fs-xs);color:var(--faint);font-weight:400}',
+      '.qlch-nav-live{font-variant-numeric:tabular-nums}',
+      '.qlch-nav-tip{margin-left:4px;font-size:var(--fs-xs);color:var(--faint)}'
+    ].join('');
+    document.head.appendChild(st);
+  }
+
+  /* ---------- 首次触发时间戳（localStorage，跨日清空） ---------- */
+  function loadTrig(){
+    var raw = null;
+    try { raw = localStorage.getItem(CFG.LS); } catch(e) { return {}; }
+    if (!raw) return {};
+    var o = null;
+    try { o = JSON.parse(raw); } catch(e) { return {}; }
+    if (!o || typeof o !== 'object') return {};
+    var out = {}, k, r, drop = 0;
+    for (k in o) {
+      if (!Object.prototype.hasOwnProperty.call(o, k)) continue;
+      r = o[k];
+      /* 跨日清空：候选集换日（as_of 变）→ 上一天的触发记录作废（比对 window.QLCH.as_of） */
+      if (!r || typeof r !== 'object' || !r.first || r.as_of !== Q.as_of) { drop++; continue; }
+      out[k] = r;
+    }
+    S.dropped = drop;
+    return out;
+  }
+  function saveTrig(t){
+    try { localStorage.setItem(CFG.LS, JSON.stringify(t)); } catch(e) {}
+  }
+
+  /* ---------- 判定 ---------- */
+  function judge(m, d){
+    var C = num(m && m.close);
+    if (isNaN(C) || C <= 0) return {k: 'na', why: '候选无基准收盘'};
+    if (!d) return {k: 'na', why: '无行情'};
+    var px = num(d.px), pcl = num(d.pcl), opn = num(d.opn), pct = num(d.pct);
+    if (isNaN(px) || px <= 0) return {k: 'na', why: '无现价'};
+    if (isNaN(pcl) || pcl <= 0) {                       /* 回退：昨收 ← 现价/(1+涨跌幅) */
+      if (!isNaN(pct) && pct > -99.9) pcl = px / (1 + pct / 100);
+    }
+    if (isNaN(pcl) || pcl <= 0) return {k: 'na', why: '无昨收'};
+    if (Math.abs(px - pcl) <= CFG.EPS && !isNaN(opn) && Math.abs(opn - pcl) <= CFG.EPS)
+      return {k: 'na', why: '停牌/一字（现价=今开=昨收）'};
+    var lo = num(Q.gap_lo), hi = num(Q.gap_hi);
+    if (!isNaN(opn) && opn > 0) {                       /* ① 低开达标（置顶） */
+      var gap = opn / pcl - 1;
+      if (gap >= lo - CFG.EPS && gap <= hi + CFG.EPS) return {k: 'gap', v: gap};
+    }
+    var r = px / pcl - 1;                               /* ② 盘中回落达标（仅变色） */
+    if (r >= lo - CFG.EPS && r <= hi + CFG.EPS) return {k: 'dip', v: r};
+    return {k: 'wait', v: r};
+  }
+  function codeOf(tr){
+    var c = bare(tr.getAttribute('data-code') || '');
+    if (!/^[0-9]{6}$/.test(c)) {
+      var mm = (tr.textContent || '').match(/(?:^|\D)([0-9]{6})(?:\D|$)/);
+      c = mm ? mm[1] : '';
+    }
+    return /^[0-9]{6}$/.test(c) ? c : '';
+  }
+
+  /* ---------- 卡片头徽标 ---------- */
+  function badge(ts, live, gated){
+    var card = document.getElementById('qlch-card');
+    if (!card) return;
+    var h2 = card.querySelector('h2');
+    if (!h2) return;
+    var bd = h2.querySelector('.qlch-badge');
+    if (!bd) {
+      bd = document.createElement('span');
+      bd.className = 'badge qlch-badge';
+      h2.appendChild(bd);
+    }
+    /* 每轮都重写**本枚**徽标的文案与提示（markCard 只动它自己新建的 .badge-live，互不干扰）；
+       本块在 applyQuotes 之后运行（包装），故每轮都重设。两态（待开盘判定 / 已触发）由 gated 决定。 */
+    if (gated) {
+      bd.textContent = '待开盘判定（as_of ' + (Q.as_of || '—') + '）';
+      bd.title = '超跌低开低吸：候选信号日（as_of ' + (Q.as_of || '—') + '）当日及之前不判买点 —— '
+               + '只在行情日期晚于信号日时判定（行情时间戳取自交易所，节假日/补班不误判）。';
+    } else {
+      bd.textContent = '已触发 ' + S.hit + '/' + S.n;
+      bd.title = '超跌低开低吸：盘中「开盘跳空达标」候选数（= 置顶口径）。达标 ≠ 会买：名额 K=3，候选多于空位时随机抽。';
+    }
+    var src = h2.querySelector('.qlch-live-src');
+    if (!src) { src = document.createElement('span'); src.className = 'qlch-live-src'; h2.appendChild(src); }
+    src.textContent = live ? ('刷新于 ' + (ts || '—') + ' · 源 ' + (S.src || '—')
+                             + (S.mktDate ? ' · 行情日 ' + S.mktDate : '')) : '待行情（打开页面自动拉取）';
+  }
+
+  /* ---------- 候选表：判定 + 置顶（幂等：重复触发不重复计数、不重复插入标题行） ---------- */
+  function render(q, ts){
+    var tb = document.getElementById(CFG.CAND);
+    if (!tb) return;
+    var body = tb.querySelector('tbody');
+    if (!body) return;
+    var k, live = false;
+    for (k in q) { if (Object.prototype.hasOwnProperty.call(q, k)) { live = true; break; } }
+    /* 修正 3：买点判定只在「行情日晚于候选 as_of」时生效 —— 盘前 / 竞价 / 信号日当日 / 收盘后（S.live=false）
+       一律视为待开盘判定。**闸门不得依赖 S.live**：收盘后 S.live=false，若让闸门失效就会拿「当日已发生的开盘」
+       去比对「次日买入带」→ 跨日错判、误置顶（线上实测缺陷）。
+       「行情日」取行情时间戳（腾讯 [30] → S.mktTs，来源交易所），不用本地日期，节假日/补班不误判。 */
+    S.mktDate = mktDateOf(S.mktTs);
+    var gated = !S.mktDate || !Q.as_of || !(S.mktDate > String(Q.as_of));
+    S.gate = !!gated;
+    if (!ORDER) {                                  /* 首次抓原始行序（展示序，勿动 rank） */
+      ORDER = [];
+      var all = body.querySelectorAll('tr');
+      for (var a = 0; a < all.length; a++) ORDER.push(all[a]);
+    }
+    /* ① 还原原始行序 + 摘掉上次的标题行/类/标签 —— 保证重复刷新不叠加 */
+    var oldHdr = body.querySelector('tr.qlch-trig-hdr');
+    if (oldHdr && oldHdr.parentNode) oldHdr.parentNode.removeChild(oldHdr);
+    for (var o = 0; o < ORDER.length; o++) {
+      var tr0 = ORDER[o];
+      body.appendChild(tr0);
+      tr0.classList.remove('qlch-trig'); tr0.classList.remove('qlch-dip');
+      tr0.removeAttribute('data-qlch');
+      var oldT = tr0.querySelectorAll('.qlch-tag');
+      for (var x = 0; x < oldT.length; x++) oldT[x].parentNode.removeChild(oldT[x]);
+    }
+    /* ② 判定（还没行情时只建徽标，不误贴「无法判定」） */
+    var trig = TV || (TV = loadTrig()), hits = [], res = [], changed = false, i;
+    S.diag = {rows: 0, gap: 0, dip: 0, wait: 0, na: 0, noquote: 0, gated: 0};
+    for (i = 0; i < ORDER.length; i++) {
+      var tr = ORDER[i], code = codeOf(tr), m = META[code];
+      if (!m) continue;
+      S.diag.rows++;
+      if (!live) { S.diag.noquote++; continue; }        /* 还没行情：只建徽标，不误判 */
+      if (gated) { S.diag.gated++; continue; }          /* 修正 3：待开盘判定 → 不判定/不记录/不贴标 */
+      var d = q[code];
+      if (!d) S.diag.noquote++;
+      var v = judge(m, d);
+      if (v.k === 'gap') S.diag.gap++;
+      else if (v.k === 'dip') S.diag.dip++;
+      else if (v.k === 'na') S.diag.na++;
+      else S.diag.wait++;
+      if (v.k === 'gap' || v.k === 'dip') {
+        var rec = trig[code];
+        if (!rec) {                                /* 首次触发：记下时间与类型；此后永不覆盖时间 */
+          rec = trig[code] = {first: ymd(new Date()) + ' ' + hms(new Date()), kind: v.k, as_of: Q.as_of};
+          changed = true;
+        } else if (v.k === 'gap' && rec.kind !== 'gap') { rec.kind = 'gap'; changed = true; }
+      }
+      res.push({tr: tr, v: v, rec: trig[code] || null});
+    }
+    if (changed) saveTrig(trig);
+    /* ③ 置顶：只对「低开达标」，按首次触发时间升序；N=0 时无标题行 */
+    for (i = 0; i < res.length; i++) if (res[i].v.k === 'gap') hits.push(res[i]);
+    hits.sort(function(A, B){
+      var fa = A.rec ? A.rec.first : '', fb = B.rec ? B.rec.first : '';
+      return (fa === fb) ? 0 : (fa < fb ? -1 : 1);
+    });
+    if (hits.length) {
+      var ncol = tb.querySelectorAll('thead th').length || 14;
+      var hr = document.createElement('tr');
+      hr.className = 'qlch-trig-hdr';
+      hr.innerHTML = '<td colspan="' + ncol + '">\u26a1 已触发买点（' + hits.length
+        + '）· 置顶=价格条件满足的视图态，不改变 depth rank 与随机取样</td>';
+      body.insertBefore(hr, body.firstChild);
+      var anchor = hr;
+      for (i = 0; i < hits.length; i++) {
+        hits[i].tr.classList.add('qlch-trig');
+        hits[i].tr.setAttribute('data-qlch', 'gap');
+        body.insertBefore(hits[i].tr, anchor.nextSibling);
+        anchor = hits[i].tr;
+      }
+    }
+    /* ④ 行尾标签：时间 + 类型（低开达标 / 盘中回落 / 无法判定） */
+    for (i = 0; i < res.length; i++) {
+      var it = res[i], vv = it.v, lab = '';
+      if (vv.k === 'gap') lab = (it.rec ? hm(it.rec.first) + ' ' : '') + '低开达标';
+      else if (vv.k === 'dip') { it.tr.classList.add('qlch-dip'); lab = (it.rec ? hm(it.rec.first) + ' ' : '') + '盘中回落'; }
+      else if (vv.k === 'na') lab = '无法判定';
+      if (!lab) continue;
+      var cells = it.tr.children;
+      if (!cells.length) continue;
+      var sp = document.createElement('span');
+      sp.className = 'qlch-tag'; sp.textContent = lab;
+      sp.title = (vv.k === 'na')
+        ? '无法判定：' + (vv.why || '')
+        : ((vv.k === 'gap' ? '开盘跳空 ' : '现价/昨收 ') + (isNaN(vv.v) ? '—' : (vv.v * 100).toFixed(2) + '%')
+           + ' ∈ [' + (num(Q.gap_lo) * 100).toFixed(2) + '%, ' + (num(Q.gap_hi) * 100).toFixed(2) + '%]（盘中口径）');
+      cells[cells.length - 1].appendChild(sp);
+    }
+    S.hit = hits.length; S.n = Q.n || (Q.rows || []).length;
+    badge(ts, live, gated);
+  }
+
+  /* ---------- 模拟盘：盘中净值（估算，只读；不写回任何账本） ----------
+     口径**对齐生产记账**（backtest/qlch_paper_20260921.py:371-418）：
+       · 开仓腿当日收益 = w × (现价/基准 − 1)，COST_RT **不作用于开仓腿**（生产只在出场腿 :391 扣）
+       · 基准（:379-384）：entry_date == 行情日 → 入场价（当日新开仓）；否则 = **上一交易日收盘**
+         （盘中取行情昨收 pcl；昨收缺失才退回入场价，并在该格标注「昨收缺失，按入场价粗估」）
+       · nav_now = nav_prev × (1 + Σ w_i × (现价_i/基准_i − 1))，nav_prev = 账本 equity[-1].nav
+     修正 2：账本 equity[-1].date == 行情日 → 当日已由收盘链记账，**不再叠加**（显示账本净值 + 「已收盘记账」） */
+  function navUpdate(q){
+    var tb = document.getElementById(CFG.PAPER);
+    if (!tb || !Q.accounts) return;
+    var live = false, kk;
+    for (kk in q) { if (Object.prototype.hasOwnProperty.call(q, kk)) { live = true; break; } }
+    if (!live) return;                       /* 还没行情：保留构建期占位（nav + 「—」），不写「时间戳缺失」噪音 */
+    var qd = mktDateOf(S.mktTs);
+    var trs = tb.querySelectorAll('tbody tr');
+    for (var i = 0; i < trs.length; i++) {
+      var tr = trs[i], tk = tr.getAttribute('data-track');
+      var td = tr.querySelector('td.qlch-nav-live');
+      if (!td) continue;
+      td.title = CFG.TIP;
+      var a = (tk && Q.accounts[tk]) || null;
+      if (!a) continue;
+      var prev = num(a.nav); if (isNaN(prev)) prev = 1;
+      var ps = a.positions || [], j;
+      if (!ps.length) { td.textContent = prev.toFixed(3) + '（无持仓）'; S.nav[tk] = prev; continue; }
+      /* 修正 2：当日已记账 / 无法判断行情日 → 一律不叠加（宁可少算，绝不把已记账的收益再算一遍） */
+      var booked = (a.nav_date && qd) ? (String(a.nav_date) === qd) : null;
+      if (booked !== false) {
+        td.textContent = prev.toFixed(4);
+        var t1 = document.createElement('span');
+        t1.className = 'qlch-nav-tip';
+        t1.textContent = (booked === true) ? '已收盘记账' : '行情时间戳缺失·未叠加';
+        t1.title = (booked === true) ? (CFG.TIP + ' · 当日（' + a.nav_date + '）已由收盘链记账') : CFG.TIP;
+        td.appendChild(t1);
+        S.nav[tk] = prev;
+        continue;
+      }
+      var sum = 0, miss = 0, fb = 0;
+      for (j = 0; j < ps.length; j++) {
+        var p = ps[j], d = q[bare(p.code)] || null;
+        var px = d ? num(d.px) : NaN;
+        var bs = posBase(p, qd, d);
+        if (!(bs.b > 0) || isNaN(px) || px <= 0) { miss++; continue; }
+        if (bs.why === 'fallback') fb++;
+        sum += (isNaN(num(p.w)) ? 0 : num(p.w)) * (px / bs.b - 1);     /* 开仓腿不扣成本 */
+      }
+      if (miss) { td.textContent = prev.toFixed(4) + ' —'; S.nav[tk] = null; continue; }
+      var nav = prev * (1 + sum);
+      td.textContent = nav.toFixed(4);
+      var tip = document.createElement('span');
+      tip.className = 'qlch-nav-tip';
+      tip.textContent = fb ? '估算（昨收缺失）' : '估算';
+      tip.title = CFG.TIP;
+      td.appendChild(tip);
+      if (fb) { td.title = CFG.TIP + ' · 昨收缺失，按入场价粗估'; tip.title = td.title; }
+      S.nav[tk] = nav;
+    }
+  }
+
+  /* ---------- 入口（每次行情落地后重算一次；幂等） ---------- */
+  /* ---------- 入口（每次行情落地后重算一次；幂等） ---------- */
+  /* mktTs = 行情时间戳（腾讯 [30]：YYYYMMDDHHMMSS）—— 修正 2/3 的「今天」一律以它为准，不用本地日期
+     （节假日/补班时本地日期会误判；行情时间戳来自交易所）。 */
+  function run(q, ts, src, mktTs){
+    if (!document.getElementById(CFG.CAND)) return null;
+    css();
+    if (ts) S.ts = ts;
+    if (src) S.src = src;
+    if (mktTs) S.mktTs = mktTs;
+    try { render(q, ts); } catch(e) { S.err = 'render:' + (e && e.message || e); }
+    try { navUpdate(q); } catch(e) { S.err = (S.err ? S.err + ' | ' : '') + 'nav:' + (e && e.message || e); }
+    return {hit: S.hit, n: S.n, gate: S.gate, mktDate: S.mktDate, diag: S.diag, nav: S.nav, err: S.err};
+  }
+
+  /* 接线（两条路都要接，缺一不可）：
+     ① 盘中层 refresh 的**内部**报价落地 → window.QLCH_ON_QUOTES（intraday_live.py 显式留的钩子；
+        线上实测：只包 applyQuotes 的话真实刷新路径一次都进不来，因为 IIFE 内部调的是局部函数）；
+     ② 外部/验证脚本手动调 applyQuotes → 包装它（同一次调用不会双跑：内部路径不经过属性）。 */
+  window.QLCH_ON_QUOTES = function(q, ts, src, mktTs){ return run(q, ts, src, mktTs); };
+  var IN = window.INTRADAY;
+  if (IN && typeof IN.applyQuotes === 'function') {
+    var orig = IN.applyQuotes;
+    IN.applyQuotes = function(q, ts, opt){
+      var out = orig(q, ts, opt);
+      opt = opt || {};
+      run(q, ts, opt.src || (IN.state && IN.state.poolSrc), opt.mktTs || (IN.state && IN.state.mktTs));
+      return out;
+    };
+  }
+  /* 导出（含诊断口：trig/reload/reset —— 触发记录是 localStorage + 内存缓存双层，
+     验证脚本要能把「缓存」与「落盘」分开断，否则清空 localStorage 后仍会看到缓冲里的旧记录） */
+  window.QLCH_LIVE = {run: run, state: S, meta: META, cfg: CFG, judge: judge, store: loadTrig,
+                      base: posBase, mktDateOf: mktDateOf,
+                      trig: function(){ return TV; },
+                      reload: function(){ TV = loadTrig(); return TV; },
+                      reset: function(){ TV = {}; try { localStorage.removeItem(CFG.LS); } catch(e) {} },
+                      order: function(){ return ORDER; }, wrapped: !!(IN && IN.applyQuotes)};
+  /* 首屏：先把徽标/样式建起来（还没行情 → 不判定、不贴标签） */
+  run(null, '');
 })();
 """

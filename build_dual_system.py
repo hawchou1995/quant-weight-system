@@ -17,7 +17,7 @@ sys.path.insert(0, str(BASE))
 from ui_components import THEME_CSS, NAV_HTML, COMMON_JS
 from kxmm_card import KXMM_CSS, KXMM_VIEW_HTML, KXMM_JS
 from ui_subtab import SUBNAV_CSS, SUBNAV_JS, subnav, subview, ASSET_HINT
-from intraday_live import INTRADAY_JS
+from intraday_live import INTRADAY_JS, QLCH_JS
 
 
 def _crowding():
@@ -2135,7 +2135,16 @@ def qlch_card():
             # 2026-09-22 用户：表格太简单、指标没体现、排名没体现 → 补 7 个信号驱动指标 + 排名列
             def _pct(v, nd=2):
                 return "—" if v is None else ("%+.*f%%" % (nd, v * 100))
-            L.append('<table class="tbl" style="width:100%;font-size:12px;margin-top:8px">'
+
+            def _row_attrs(r):
+                """行属性（R-qlch-live-0923）：与看板其它表同格式的 data-code / data-search。
+                盘中层靠它认行：候选表的代码是独立一列，缺 data-search 时名称守卫把代码列
+                去掉 6 位数字后剩下的 'sz' 当名称 → 与行情名比对失败、整行拒刷（实测）。"""
+                _c = r.get("code", "")
+                return ' data-code="%s" data-search="%s"' % (
+                    _c, " ".join([str(r.get("name", "")), _bare(_c), str(r.get("ind") or "")]).strip())
+
+            L.append('<table class="tbl" id="tbl-qlch-cand" style="width:100%;font-size:12px;margin-top:8px">'
                      '<thead><tr>'
                      '<th data-key="rank">#</th><th data-key="code">代码</th><th data-key="name">名称</th>'
                      '<th data-key="ind">行业</th>'
@@ -2170,14 +2179,14 @@ def qlch_card():
                 _r20s = "—" if _r20 is None else "%+.2f%%" % (_r20 * 100)
                 _r20col = ("var(--down)" if (_r20 is not None and _r20 <= -0.15)
                            else ("var(--warn)" if _r20 is not None else "var(--faint)"))
-                L.append(('<tr>'
+                L.append(('<tr%s>'
                           '<td data-v="%s">%s</td><td>%s</td><td><b>%s</b></td>'
                          '<td style="color:var(--sub)">%s</td>'
                          '<td data-v="%s" style="color:%s">%s</td>'
                          '<td data-v="%s" style="color:%s"><b>%s</b></td>'
                          '<td data-v="%s">%s</td><td data-v="%s">%s</td>'
                          '<td data-v="%s">%s</td><td data-v="%s">%s</td>'
-                          % (r.get("rank", ""), r.get("rank", ""), r.get("code", ""),
+                          % (_row_attrs(r), r.get("rank", ""), r.get("rank", ""), r.get("code", ""),
                             r.get("name", ""), r.get("ind", "") or "—",
                             "" if _chg is None else _chg, _col, _cs,
                             "" if _r20 is None else _r20, _r20col, _r20s,
@@ -2193,8 +2202,10 @@ def qlch_card():
 
     L.append('<div class="etf-sec" style="margin-top:14px">💼 模拟盘（对照臂，'
              '<b>不申领实盘资金</b> · 毕业门见预注册）</div>')
-    L.append('<table class="tbl" style="width:100%;font-size:12.5px">'
-             '<thead><tr><th>轨</th><th>净值</th><th>已成交</th><th>最近信号日</th><th>状态</th></tr></thead><tbody>')
+    L.append('<table class="tbl" id="tbl-qlch-paper" style="width:100%;font-size:12.5px">'
+             '<thead><tr><th>轨</th><th>净值</th>'
+             '<th title="盘中估算值，非记账值；记账以收盘链写入为准">盘中净值（估算）</th>'
+             '<th>已成交</th><th>最近信号日</th><th>状态</th></tr></thead><tbody>')
     anyrow = False
     for key, label, fn, tag in QLCH_TRACKS:
         f = B / fn
@@ -2208,11 +2219,15 @@ def qlch_card():
         eq = d.get("equity", [])
         nav = eq[-1]["nav"] if eq else 1.0
         lastd = eq[-1]["date"] if eq else "—"
-        L.append('<tr><td>%s</td><td><b>%.4f</b></td><td>%d 笔</td><td>%s</td>'
+        # 盘中净值（R-qlch-live-0923）：构建期只放账本净值 + 「—」占位；真实估算由浏览器端按
+        # nav_prev × (1 + Σ w×(现价/入场价−1−成本)) 算（数据来自 window.QLCH.accounts）。
+        L.append('<tr data-track="%s"><td>%s</td><td><b>%.4f</b></td>'
+                 '<td class="qlch-nav-live" title="盘中估算值，非记账值；记账以收盘链写入为准">%.4f <span class="qlch-nav-tip">—</span></td>'
+                 '<td>%d 笔</td><td>%s</td>'
                  '<td style="color:var(--sub)">%s</td></tr>'
-                 % (label, nav, len(d.get("trades", [])), lastd, tag))
+                 % (key, label, nav, nav, len(d.get("trades", [])), lastd, tag))
     if not anyrow:
-        L.append('<tr><td colspan="5" style="color:var(--faint)">尚未初始化</td></tr>')
+        L.append('<tr><td colspan="6" style="color:var(--faint)">尚未初始化</td></tr>')
     L.append('</tbody></table>')
 
     L.append('<div class="etf-sec" style="margin-top:14px">👁 跟踪池（超跌低开低吸 · 已成交 / 待判定）</div>')
@@ -2232,7 +2247,7 @@ def qlch_card():
                               t.get("entry_px"), t.get("entry_date")))
     alltr.sort(key=lambda x: x[0], reverse=True)
     if alltr:
-        L.append('<table class="tbl" style="width:100%;font-size:12.5px">'
+        L.append('<table class="tbl" id="tbl-qlch-track" style="width:100%;font-size:12.5px">'
                  '<thead><tr><th>日期</th><th>代码</th><th>名称</th><th>轨</th><th>gap</th><th>净收益</th>'
                  '<th title="策略止盈点：买入价 ×(1+TP)，TP 从 qlch 生产脚本解析">止盈点 +15%</th>'
                  '<th title="策略止损点：买入价 ×(1+SL)">止损点 −20%</th>'
@@ -2324,6 +2339,97 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
 {bt_short_html()}
 </div>'''
 
+def qlch_live_payload():
+    """构建期把「盘中买点判定」需要的东西一次性内嵌成 window.QLCH（R-qlch-live-0923）。
+
+    为什么在浏览器端判定（ADR-0009）：判定只读行情、只改 DOM —— 零落盘（不写任何 json / 不碰账本）、
+    不占收盘链配额、复用已验证的盘中层（#4b）。本函数因此**只读**两个既有产物：
+      · backtest/qlch_candidates.json   —— 候选（B4_K3 在产轨）与今收
+      · backtest/qlch_paper_state*.json —— 六臂账本（nav 取 equity[-1]、持仓 entry_px/w）
+    参数口径与 qlch_card() 同源：单一来源 = qlch 生产脚本 qlch_paper_20260921.py。
+    """
+    import json as _j
+    B = BASE / "backtest"
+    _QP = B / "qlch_paper_20260921.py"
+    try:
+        _src = _QP.read_text(encoding="utf-8") if _QP.exists() else ""
+    except Exception:
+        _src = ""
+
+    def _g(pat, cast, dflt):
+        _m = re.search(pat, _src) if _src else None
+        try:
+            return cast(_m.group(1)) if _m else dflt
+        except Exception:
+            return dflt
+
+    # 允许跳空区间（低开达标带）：GAP_LO, GAP_HI = -0.05, -0.02
+    GAP_LO = _g(r"GAP_LO\s*,\s*GAP_HI\s*=\s*(-?[\d.]+)", float, -0.05)
+    GAP_HI = _g(r"GAP_LO\s*,\s*GAP_HI\s*=\s*-?[\d.]+\s*,\s*(-?[\d.]+)", float, -0.02)
+    # 出场：TP_PCT, SL_PCT, MAXHOLD = 0.15, -0.20, 20
+    TP = _g(r"TP_PCT,\s*SL_PCT,\s*MAXHOLD\s*=\s*([\d.]+)", float, 0.15)
+    SL = _g(r"TP_PCT,\s*SL_PCT,\s*MAXHOLD\s*=\s*[\d.]+,\s*(-?[\d.]+)", float, -0.20)
+    MH = _g(r"TP_PCT,\s*SL_PCT,\s*MAXHOLD\s*=\s*[\d.]+,\s*-?[\d.]+,\s*(\d+)", int, 20)
+    # 往返成本：生产脚本 COST_RT = 0.002（往返 20bp，成本档见预注册，50bp 为压力档）。
+    # 解析不到才退回 0.0015（该值**只**用于盘中估算的显示，不影响任何记账/回测数值）。
+    COST_RT = _g(r"COST_RT\s*=\s*([\d.]+)", float, 0.0015)
+
+    _cand = {}
+    _fp = B / "qlch_candidates.json"
+    if _fp.exists():
+        try:
+            _cand = _j.load(open(_fp, encoding="utf-8"))
+        except Exception:
+            _cand = {}
+    _ck = (_cand.get("by_track") or {}).get("B4_K3", {})
+    _crows = _ck.get("rows") or _ck.get("codes") or []
+
+    def _band2(c):
+        """与卡片 _band() 同口径：买点带 = 今收 × [0.95, 0.98]，三位小数。"""
+        if not isinstance(c, (int, float)) or c <= 0:
+            return None, None
+        return round(c * 0.95, 3), round(c * 0.98, 3)
+
+    _rows = []
+    for _r in _crows:
+        _lo, _hi = _band2(_r.get("close"))
+        _it = {"rank": _r.get("rank"), "code": _bare(_r.get("code", "")), "name": _r.get("name", ""),
+               "ind": _r.get("ind") or "", "close": _r.get("close"),
+               "band_lo": _lo, "band_hi": _hi, "chg": _r.get("chg"), "r20": _r.get("r20")}
+        if _lo is not None:      # 止盈/止损点按买点带区间预折算（命中不到就只放 band）
+            _it["tp_lo"] = round(_lo * (1 + TP), 3); _it["tp_hi"] = round(_hi * (1 + TP), 3)
+            _it["sl_lo"] = round(_lo * (1 + SL), 3); _it["sl_hi"] = round(_hi * (1 + SL), 3)
+        _rows.append(_it)
+
+    _acc = {}
+    for _key, _label, _fn, _tag in QLCH_TRACKS:
+        _f = B / _fn
+        if not _f.exists():
+            continue
+        try:
+            _d = _j.load(open(_f, encoding="utf-8"))
+        except Exception:
+            continue
+        _eq = _d.get("equity", [])
+        # nav_date = 账本 equity[-1].date：盘中净值判「当日是否已由收盘链记账」（修正 2，避免叠加两次）
+        _acc[_key] = {"label": _label, "nav": (_eq[-1]["nav"] if _eq else 1.0),
+                      "nav_date": (_eq[-1].get("date") if _eq else None),
+                      "cash": _d.get("cash"),
+                      "positions": [{"code": _bare(_p.get("code", "")), "name": _p.get("name", ""),
+                                     "entry_px": _p.get("entry_px"), "w": _p.get("w"),
+                                     "entry_date": _p.get("entry_date")}
+                                    for _p in (_d.get("positions") or [])]}
+    return {"as_of": _ck.get("as_of", ""), "n": _ck.get("n", len(_rows)), "pool": _ck.get("pool", ""),
+            "gap_lo": GAP_LO, "gap_hi": GAP_HI, "tp": TP, "sl": SL, "max_hold": MH, "cost_rt": COST_RT,
+            "cost_rt_src": ("%s:COST_RT" % _QP.name) if _src else "fallback 0.0015",
+            "rows": _rows, "accounts": _acc}
+
+
+QLCH_LIVE = qlch_live_payload()
+QLCH_JSON = json.dumps(QLCH_LIVE, ensure_ascii=False, separators=(",", ":"))
+print("  盘中买点数据: window.QLCH 候选 %d 行 / 六臂账本 %d 臂 / cost_rt=%s / gap=[%s, %s]"
+      % (len(QLCH_LIVE["rows"]), len(QLCH_LIVE["accounts"]), QLCH_LIVE["cost_rt"],
+         QLCH_LIVE["gap_lo"], QLCH_LIVE["gap_hi"]))
 html = f"""<!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -2540,6 +2646,9 @@ html = f"""<!doctype html>
 <script>window.ETF_SNAP = {ETF_SNAP_JS};</script>
 <script>window.KH_SNAP = {KH_SNAP_JS};</script>
 <script>window.STOCK_META = {STOCK_META_JS};</script>
+<!-- 盘中买点判定数据（R-qlch-live-0923）：qlch 候选 + 策略参数 + 六臂账本净值，构建期一次性内嵌。
+     只读快照：判定与盘中净值都在浏览器端算（ADR-0009），不落盘、不写账本、不改收盘链。 -->
+<script>window.QLCH = {QLCH_JSON};</script>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
 window.ENH.nav = [
@@ -3140,6 +3249,7 @@ document.addEventListener('DOMContentLoaded',function(){{
 </script>
 <script>{KXMM_JS}</script>
 <script>{INTRADAY_JS}</script>
+<script>{QLCH_JS}</script>
 </body></html>"""
 
 # --- #10 皮肤层（2026-09-18）：渲染期统一去 emoji ---
