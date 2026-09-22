@@ -247,6 +247,16 @@ def main():
     T, N = C.shape
     d2i = {d: i for i, d in enumerate(cal)}
     D = FORCE_DATE or cal[-1]
+    # R-qlch-stale-0922 防复发闸：面板未延展时必须响亮失败。
+    # 事故：2026-09-22 上游 revscreen_regen 因相对路径崩溃 → 面板延展未落盘 →
+    #       D 停在 09-21 → 六臂全部「已在账本中 → 幂等跳过」→ 看板该段静默陈旧一天。
+    #       此后「D 滞后于交易日」= 硬错误（退 3），不再进入幂等跳过分支。
+    if FORCE_DATE is None and IDX.exists():
+        _td = pd.read_csv(IDX, dtype={"date": str})["date"].iloc[-1]
+        if D != _td:
+            log("!! 面板未延展：面板末 %s != 交易日 %s —— 上游 revscreen_regen 的延展未落盘；"
+                "拒绝静默陈旧，本次不产出信号（修上游后重跑）" % (D, _td))
+            sys.exit(3)
     if D not in d2i:
         log("日期 %s 不在面板内（末 %s）" % (D, cal[-1])); return
     t = d2i[D]

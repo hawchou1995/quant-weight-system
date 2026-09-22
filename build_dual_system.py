@@ -2124,7 +2124,33 @@ def qlch_card():
                      '<th data-key="pm" title="流通市值横截面分位，分位带 [.20,.70]">市值分位</th>'
                      '<th data-key="pt" title="换手率横截面分位，分位带 [.40,.80]">换手分位</th>'
                      '<th data-key="buy" title="明日开盘跳空落在 [今收×0.95, 今收×0.98] 才买——这是条件不是承诺；名单按 K=3 随机抽">明日买点</th>'
+                     '<th data-key="tp" title="策略止盈点：买入价 ×(1+TP)，TP 从 qlch 生产脚本解析；价格按明日买点区间折算">止盈点 +15%</th>'
+                     '<th data-key="sl" title="策略止损点：买入价 ×(1+SL)，SL 从 qlch 生产脚本解析；价格按明日买点区间折算">止损点 −20%</th>'
+                     '<th data-key="rot" title="轮动点：最长持有 MAXHOLD 个交易日，到期轮动（未触发止盈/止损时）">轮动点 20 交易日</th>'
                      '</tr></thead><tbody>')
+            # 2026-09-22 用户需求：加三列（策略止盈点 +15% / 止损点 −20% / 轮动点 20 交易日）
+            # 参数单一来源：从 qlch 生产脚本解析，**不硬编码**（脚本改了看板自动跟）。
+            _QP = B / "qlch_paper_20260921.py"
+            _mm = re.search(r"TP_PCT,\s*SL_PCT,\s*MAXHOLD\s*=\s*([\d.]+),\s*(-?[\d.]+),\s*(\d+)",
+                            _QP.read_text(encoding="utf-8")) if _QP.exists() else None
+            if _mm:
+                TP, SL, MH = float(_mm.group(1)), float(_mm.group(2)), int(_mm.group(3))
+            else:
+                TP, SL, MH = 0.15, -0.20, 20
+                L.append('<div class="sub" style="color:var(--warn)">⚠ 未能从 qlch 脚本解析'
+                         '止盈/止损/轮动参数，下表按默认 15% / −20% / 20 交易日 展示</div>')
+
+            def _tpsl(c):
+                _lo, _hi = _band(c)
+                if _lo is None:
+                    return '<td>—</td><td>—</td><td>—</td>'
+                return ('<td style="font-variant-numeric:tabular-nums;color:var(--up)">'
+                        '%.3f ~ %.3f</td>'
+                        '<td style="font-variant-numeric:tabular-nums;color:var(--down)">'
+                        '%.3f ~ %.3f</td>'
+                        '<td style="color:var(--sub)">≤ %d 个交易日</td>'
+                        % (_lo * (1 + TP), _hi * (1 + TP), _lo * (1 + SL), _hi * (1 + SL), MH))
+
             for r in rows:
                 _chg = r.get("chg"); _r20 = r.get("r20")
                 _cs = "—" if _chg is None else "%+.2f%%" % (_chg * 100)
@@ -2149,7 +2175,7 @@ def qlch_card():
                             r.get("turn") or "", _pct(r.get("turn")),
                             r.get("pm") or "", "—" if r.get("pm") is None else "%.2f" % r["pm"],
                             r.get("pt") or "", "—" if r.get("pt") is None else "%.2f" % r["pt"])
-                         ) + _buy_td(r.get("close")) + '</tr>')
+                         ) + _buy_td(r.get("close")) + _tpsl(r.get("close")) + '</tr>')
             L.append('</tbody></table>')
     else:
         L.append('<div style="font-size:12.5px;color:var(--faint)">候选数据未生成'

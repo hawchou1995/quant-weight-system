@@ -174,7 +174,13 @@ sys.path.insert(0, str(BK))
 import factor_gate as FG
 import _tmp_0919_g52_arms as AR
 
-P = FG.load_panel()
+# 2026-09-22 修（第 2 个潜伏 bug）：原为 P = FG.load_panel() —— 读的是**磁盘上延展前**的面板
+#   （n_old 行），而 full 用延展后的 T → 第 5 段 full |= active(sig) 广播失败
+#   ValueError: (2606,4087) vs (2605,4087)（此前被相对路径崩溃挡住，未暴露）。
+#   改为从延展后的 out 取臂输入，与 T 对齐；历史行已逐位保留，故既有 DRIFT 闸仍能兜底。
+P = {k: np.asarray(out[k]) for k in ("open", "high", "low", "close", "amount", "mask")}
+P["mask"] = P["mask"].astype(bool)
+assert P["close"].shape[0] == T, "臂输入面板行数 %d != 延展行数 %d" % (P["close"].shape[0], T)
 sigs = {}
 for arm, K in ARMS.items():
     sig = np.asarray(getattr(AR, arm)(P), dtype=bool)
