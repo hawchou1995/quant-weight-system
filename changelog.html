@@ -219,7 +219,46 @@ table.tbl tbody tr:hover td{background:var(--card2)}
 <h2 style="margin:0">📝 更新日志 <span class="badge badge-auto">GitHub Release 风格</span></h2>
 </div>
 <div class="sub">量化系统版本更新记录：复盘发现设计缺陷 → 启动系统更新 → 在此登记版本/日期/更新内容</div>
-<div class="rel"><div class="rel-head">v5.13.10 - 2026-09-22（新增「超跌低开低吸」策略 + 短线系统双标签分组）</div><div class="rel-body">
+<div class="rel"><div class="rel-head">v5.13.11 - 2026-09-22（看板子标签结构改造 + 全局术语通俗化）</div><div class="rel-body">
+
+<p><b>用户需求</b>：做成 i.gushi.in 式「大类 → 策略子标签」结构，全部策略通用；术语改成通俗名；资产配置交用户；选股池表格字段统一。</p>
+
+<p><b>子标签结构（三个策略视图）</b></p>
+
+<div class='lg-item'><b>中长线</b>：<code>多因子主仓</code> / <code>黄金对冲</code> / <code>动量增强</code> / <code>基金主仓</code> / <code>对照臂</code>（零资金对照徽标）</div>
+<div class='lg-item'><b>短线</b>：<code>超跌低开低吸</code>（默认）/ <code>超卖伏击</code> / <code>ETF轮动</code> / <code>股票池</code> / <code>基金池</code></div>
+<div class='lg-item'><b>打板</b>：<code>观察清单</code>（默认）/ <code>回避清单</code> / <code>持仓</code> / <code>已平仓</code> / <code>净值曲线</code></div>
+<div class='lg-item'>实现：新增 <code>ui_subtab.py</code>（<code>SUBNAV_CSS</code> / <code>SUBNAV_JS</code> / <code>subnav()</code> / <code>subview()</code>），复用既有 <code>.view</code> 的 show/hide 模式，<b>不改各卡片内部</b>；子标签 key 带视图前缀防 id 碰撞；支持 <code>data-default</code> 指定默认标签；URL 二级锚点 <code>#<view>/sub-<key></code>。</div>
+
+<p><b>全局术语通俗化（显示层，23+20+15 处）</b></p>
+
+<table>
+<tr><td>旧</td><td>新</td></tr>
+<p>|---|---|</p>
+<tr><td>轨B / SUPER 13因子 Top20</td><td><b>多因子主仓</b></td></tr>
+<tr><td>轨A</td><td><b>三低对照</b></td></tr>
+<tr><td>轨C / FB3-H20</td><td><b>基金主仓</b></td></tr>
+<tr><td>黄金卫星叠加</td><td><b>黄金对冲</b></td></tr>
+<tr><td>ret20 倾斜臂</td><td><b>动量增强</b></td></tr>
+<tr><td>影子轨</td><td><b>对照臂</b></td></tr>
+<tr><td>KHunter</td><td><b>超卖伏击</b></td></tr>
+<tr><td>打板族</td><td><b>首板低吸</b></td></tr>
+</table>
+
+<div class='lg-note'>遗留：数据层历史事件（<code>satellite_pool.json</code> 事件日志）与 changelog 历史条目<b>保留原词不改</b>——它们是"当时叫什么"的存档。CSS 注释内 1 处不改。</div>
+
+<p><b>表格字段统一（同义异名）</b>：<code>当日涨跌</code>→<code>涨跌幅</code>、<code>收盘</code>→<code>现价</code>（其余 4 组本已一致或为数据驱动）。</p>
+
+<p><b>资产配置</b>：三个策略视图各加一行说明——「资产配置由用户决定：本页所有『权重 / 计划金额 / 目标权重』均为<b>策略输出</b>或<b>等权参考</b>，不构成仓位建议」。</p>
+
+<p><b>技术要点与教训</b></p>
+
+<div class='lg-item'>f-string 内<b>不能</b>用 <code>subview(..., <字面 HTML>)</code> 形式包裹——第 4 参数是 Python 字符串，字面 HTML 会让解析器在 <code>"card"</code> 处断开。改用<b>字面 <code><div class="subview"></code> 包裹</b>（视图变量如 <code>SAT_CARD</code> 可直接传参，故中长线/短线视图无此问题，仅打板视图踩到）。</div>
+<div class='lg-item'>锚点唯一性断言再次生效：6 处锚点中 1 处未命中（<code>回测数据</code> 段实际嵌在 <code>a5-curve</code> 卡片内），断言在写入前拦下，<b>文件未被破坏</b>。</div>
+
+<p><b>构建验收</b>：div 平衡 0 / HTML 转义校验通过 / 三个 subnav + 13 个 subview 全部渲染 / 术语残留仅存于数据层与历史条目。</p>
+
+</div></div><div class="rel"><div class="rel-head">v5.13.10 - 2026-09-22（新增「超跌低开低吸」策略 + 短线系统双标签分组）</div><div class="rel-body">
 
 <p><b>新增策略「超跌低开低吸」</b>（R-sharesweb-0921 系列，源自 shares-web 仓库的方向翻转改造）</p>
 
