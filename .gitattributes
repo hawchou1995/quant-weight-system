@@ -18,3 +18,5 @@ heatmap_data.js -text
 market_breadth.js -text
 market_weather.js -text
 echarts.min.js -text
+# 本文件自身也不做转换（否则 CRLF 会影响 git 解析模式）
+.gitattributes -text
