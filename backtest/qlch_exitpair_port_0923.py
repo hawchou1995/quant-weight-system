@@ -162,7 +162,7 @@ def main():
         for ck in COST_TIERS:
             a0, a1 = rr(r0, ck), rr(r1, ck)
             for w, (lo, hi) in SL.items():
-                s, en = lo + 1, hi + 1
+                s, en = lo, hi
                 dd = a1[s:en] - a0[s:en]
                 b = block_boot(dd, a.bootstrap)
                 m0, m1 = runs["%s|%s" % (r0, ck)]["met"][w], runs["%s|%s" % (r1, ck)]["met"][w]
@@ -174,7 +174,7 @@ def main():
                           "dmdd_pp": round(m1["mdd"] - m0["mdd"], 4),
                           "n_pairs": int(m1["n"] - m0["n"])})
                 if w == "full":
-                    k2 = hi + 1 - TAIL_DROP
+                    k2 = hi - TAIL_DROP
                     b["tail_trunc"] = block_boot(a1[s:k2] - a0[s:k2], min(a.bootstrap, 2000))
                 res["paired"]["%s->%s|%s|%s" % (r0, r1, w, ck)] = b
 
@@ -182,7 +182,7 @@ def main():
     tgt = res["paired"]["%s->%s|full|P20" % TARGET]
     a0, a1 = rr("X0", "P20"), rr("X4", "P20")
     lo, hi = SL["full"]
-    dd = a1[lo + 1:hi + 1] - a0[lo + 1:hi + 1]
+    dd = a1[lo:hi] - a0[lo:hi]
     yrs = np.array([cal[t][:4] for t in range(lo + 1, hi + 1)])
     for y in sorted(set(yrs.tolist())):
         m = yrs == y
