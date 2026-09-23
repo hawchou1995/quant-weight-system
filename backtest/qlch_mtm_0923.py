@@ -57,7 +57,7 @@ def met(nav,i0):
 out={"meta":{"title":"R-qlch-mtm-0923","mode":"mtm","pool":"全池(B4_K3)","K":3,"seeds":5,"run_at":time.strftime("%Y-%m-%d %H:%M:%S")},"arms":{},"paired":{}}
 navs={}
 for kind in ("X0","X4","E2"):
-    for ck,cv in (("P20",0.0020),("S60",0.0060)):
+    for ck,cv in (("P20",0.0020),("S60",0.0060),("REAL",0.00070)):
         nav,i0,nev=mtm_nav(kind,cv); m,rr=met(nav,i0); m["n_events"]=nev
         out["arms"]["%s|%s"%(kind,ck)]=m; navs[(kind,ck)]=(nav,i0,rr)
         print("  MTM %-3s %s 夏普 %6.3f 年化%+7.2f%% 回撤%+7.2f%% 日波动%.4f%%" % (kind,ck,m["sharpe"],m["cagr"],m["mdd"],m["vol_d"]), flush=True)
@@ -68,7 +68,7 @@ def boot(dd,nb=2000,L=21,seed=20260923,chunk=200):
         o[got:got+m]=dd[idx].mean(axis=1); got+=m
     return round(float(o.mean())*100*244,3), round(float(np.percentile(o,2.5))*100*244,3), round(float(np.percentile(o,97.5))*100*244,3)
 print("\n=== MTM 逐日配对差（Δ年化，块 bootstrap）===")
-for a,b in (("X4","X0"),("E2","X4"),("E2","X0")):
+for a,b in ():
     na,ia,ra=navs[(a,"P20")]; nb_,ib,rb=navs[(b,"P20")]
     lo=max(ia,ib); ra2=ra[lo-ia-1:]; rb2=rb[lo-ib-1:]
     n=min(ra2.size,rb2.size); dd=ra2[:n]-rb2[:n]
