@@ -92,8 +92,9 @@
  "pooled": {
   "n": 720,
   "mean_net_pct": 3.3998,
-  "amt_mean": 0.566326,
-  "amt_weighted_ret_pct": 3.0036
+  "amt_weighted_ret_pct": 3.0036,
+  "alloc_mean_nav_units": 0.566326,
+  "note": "pooled.amt_mean 原为『平均配置额(净值单位)』，已更名；逐笔金额见 per_seed[*].amt_mean/amt_win/amt_loss"
  },
  "sharpe": {
   "per_seed": [
@@ -118,6 +119,19 @@
    "mdd": -43.2932,
    "turn": 10.761,
    "inv": 71.538
+  }
+ },
+ "headline": {
+  "对外口径_组合级_单笔均值_pct": 3.3998,
+  "对外口径_金额加权_pct": 3.0036,
+  "事件级_全集_单笔均值_pct": 9.292,
+  "取中率_pct": 3.71,
+  "pooled_n": 720,
+  "sharpe_seedavg": 2.4626,
+  "sharpe_ci95": {
+   "lo": 0.226,
+   "hi": 4.629,
+   "sd_of_sharpe": 1.127
   }
  }
 }
