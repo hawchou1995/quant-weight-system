@@ -502,6 +502,8 @@ def main():
     # 1. 探样 + 多源自动降级（2026-08-19 修复：新浪滞后未检测 → 20 分钟无输出卡死）
     #    ⚠ 2026-09-08 提速：TickFlow 批量源优先（一次 100 只，7419 只约 8-10 秒 vs akshare 88 分钟）
     fetchers = {"sina": F.fetch_sina_daily, "tx": fetch_tx_qfq}
+    # 2026-09-23 用户要求：**逐票**数据源兜底（源级回退只解决"整源滞后"，解决不了"单票被主源限流"）
+    src_fallback = fetchers["tx"] if source != "tx" else fetchers["sina"]
     if source == "auto":
         # TickFlow 优先：单只探样即验证可用性与新鲜度
         try:
@@ -586,6 +588,7 @@ def main():
         _syms = [x[0] for x in lag]
         _batches = [_syms[i:i + 100] for i in range(0, len(_syms), 100)]
         fails, ok = [], 0
+        FB_OK = []   # 2026-09-23 逐票兜底源成功清单
         _done = 0
 
         def _tf_work(batch):
@@ -650,9 +653,24 @@ def main():
                 return (sym, str(df["date"].iloc[-1]), None)
             if attempt < UPD_RETRIES:
                 F._backoff(attempt)          # 2s/4s/8s 指数退避
+        # 2026-09-23 用户要求：主源重试耗尽 → 换备用源再试 2 次（**逐票**兜底，解决单票被主源限流）
+        if src_fallback is not None:
+            for attempt in range(1, 3):
+                try:
+                    df = src_fallback(sym)
+                except Exception as e:
+                    last_err = "fallback:" + str(e)[:50]
+                    df = None
+                if df is not None and len(df) > 0:
+                    merge_save(sym, df, "")
+                    FB_OK.append(sym)
+                    return (sym, str(df["date"].iloc[-1]), None)
+                if attempt < 2:
+                    F._backoff(attempt)
         return (sym, None, last_err)
 
     fails, ok = [], 0
+    FB_OK = []   # 2026-09-23 逐票兜底源成功清单
     _lock = __import__("threading").Lock()
     with ThreadPoolExecutor(max_workers=workers) as ex:
         futs = {ex.submit(_update_one, x): x for x in lag}
@@ -668,6 +686,8 @@ def main():
                     print(f"  [{i}/{len(lag)}] 已更新 {ok} 只（{sym} → {last}）耗时 {time.time()-t0:.0f}s", flush=True)
     pd.DataFrame(fails, columns=["sym", "name", "src", "err"]).to_csv(FAIL_FILE, index=False)
     print(f"✅ 增量更新完成（源 {source} 并行{workers}）：成功 {ok} / 滞后 {len(lag)} / 失败 {len(fails)}，总耗时 {(time.time()-t0)/60:.1f} 分钟", flush=True)
+    if FB_OK:
+        print(f"   ↻ 逐票兜底源成功 {len(FB_OK)} 只（主源失败 → 备用源；样例 {FB_OK[:5]}）", flush=True)
     _flush_index()
     # 滞后更新完成后：复权基准漂移检测兜底（fresh 文件除权假缺口）
     run_rebase_check(target_date, source)
