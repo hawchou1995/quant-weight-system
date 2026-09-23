@@ -1,23 +1,23 @@
 {
- "ts": "2026-09-22 19:11",
- "trade_day": "2026-09-22",
+ "ts": "2026-09-23 21:28",
+ "trade_day": "2026-09-23",
  "total": 7540,
- "fresh": 6859,
- "stale": 680,
+ "fresh": 7197,
+ "stale": 342,
  "nodate": 1,
- "stale_pct": 9.0,
- "stale_tradable": 14,
- "stale_stock": 13,
- "stale_etf": 1,
+ "stale_pct": 4.5,
+ "stale_tradable": 0,
+ "stale_stock": 0,
+ "stale_etf": 0,
  "stock_total": 5533,
- "stock_fresh": 5202,
- "stock_fresh_pct": 94.0,
+ "stock_fresh": 5533,
+ "stock_fresh_pct": 100.0,
  "by_kind": {
   "其他": {
    "total": 32,
-   "fresh": 26,
-   "stale": 5,
-   "delisted": 5
+   "fresh": 31,
+   "stale": 0,
+   "delisted": 0
   },
   "未使用-北交所": {
    "total": 342,
@@ -27,21 +27,21 @@
   },
   "ETF/基金-沪": {
    "total": 902,
-   "fresh": 900,
-   "stale": 2,
-   "delisted": 1
+   "fresh": 902,
+   "stale": 0,
+   "delisted": 0
   },
   "A股-沪市": {
    "total": 2452,
-   "fresh": 2309,
-   "stale": 143,
-   "delisted": 136
+   "fresh": 2452,
+   "stale": 0,
+   "delisted": 0
   },
   "A股-深市": {
    "total": 3081,
-   "fresh": 2893,
-   "stale": 188,
-   "delisted": 182
+   "fresh": 3081,
+   "stale": 0,
+   "delisted": 0
   },
   "ETF/基金-深": {
    "total": 731,

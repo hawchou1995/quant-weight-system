@@ -1,20 +1,8 @@
 {
-  "cash": 80704.68625,
-  "positions": [
-    {
-      "code": "sz002364",
-      "entry_date": "2026-09-07",
-      "entry_px": 38.5906,
-      "shares": 500,
-      "rsi_entry": 29.920814479637997,
-      "hold_days": 11,
-      "last_close": 36.6
-    }
-  ],
+  "cash": 98894.48999999999,
+  "positions": [],
   "pending_buys": [],
-  "pending_sells": [
-    "sz002364"
-  ],
+  "pending_sells": [],
   "nav_history": [
     {
       "date": "2026-09-02",
@@ -119,6 +107,14 @@
       "pos_val": 18300.0,
       "n_pos": 1,
       "bear": true
+    },
+    {
+      "date": "2026-09-23",
+      "nav": 98894.49,
+      "cash": 98894.49,
+      "pos_val": 0,
+      "n_pos": 0,
+      "bear": true
     }
   ],
   "trades": [
@@ -128,6 +124,15 @@
       "date": "2026-09-07",
       "px": 38.5906,
       "reason": "khunter_hit_rsibear"
+    },
+    {
+      "code": "sz002364",
+      "side": "sell",
+      "date": "2026-09-23",
+      "px": 36.3796,
+      "ret": -0.0573,
+      "reason": "rsi>50",
+      "hold_days": 11
     }
   ],
   "start": "2026-09-02",
