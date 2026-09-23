@@ -1,0 +1,170 @@
+name: 收盘刷新（云端）
+
+# ⑤ 自动更新迁移云端 · Phase 1（只写 gh-pages，不写 main）
+# ---------------------------------------------------------------------------
+# 触发：
+#   schedule        周一~五 12:30 UTC = 北京 20:30（收盘后数据已就位）
+#   workflow_dispatch  mode=probe（默认，只验云端管道，不跑链）
+#                      mode=chain（跑云端子集全链，需数据缓存/种子就位）
+# 数据：data_full/ data_hist/ fund_nav_cache/ data_fundamental/ 均被 .gitignore 排除，
+#       故用 actions/cache（key 带 run_id，仓库 10GB 上限按 LRU 自淘汰）
+#       + 每周日把四个目录各自打包上传 release `data-seed` 兜底
+#       （分目录打包：单资产 2GB 上限，合计约 4.5GB 原始体积不可单包）
+# 发布：cloud_refresh.py 组装 _cloud_dist/ 并过三道门禁，publish=true 才 peaceiris 写 gh-pages
+#       keep_files:true → 盘中 rt_snapshot.yml 产出的文件不会被本 workflow 删除
+# 退出码：0 成功（含 no-new-data）/ 1 链失败 / 2 门禁拒发 / 3 数据未就位（本 workflow 视为告警不红）
+on:
+  schedule:
+    - cron: '30 12 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'probe=只验管道（不跑链）；chain=跑云端子集全链'
+        type: choice
+        options:
+          - probe
+          - chain
+        default: probe
+
+concurrency:
+  group: close-refresh
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # ---- 0 判定模式：schedule 恒为 chain，手工触发用输入值 ----
+      - name: 判定模式
+        id: mode
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then M=chain; else M="${{ inputs.mode }}"; fi
+          [ -z "$M" ] && M=probe
+          echo "mode=$M" >> "$GITHUB_OUTPUT"
+          echo "云模式：$M（触发：${{ github.event_name }}）"
+
+      # ---- 1 数据缓存（未命中回落种子 release）----
+      - name: 恢复数据缓存
+        id: cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            data_full
+            data_hist
+            fund_nav_cache
+            data_fundamental
+          key: qws-data-${{ github.run_id }}
+          restore-keys: |
+            qws-data-
+
+      - name: 回落种子包（缓存未命中时）
+        if: steps.cache.outputs.cache-hit != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          mkdir -p "$RUNNER_TEMP/seed"
+          if gh release download data-seed -p 'qws_seed_*.tar.gz' -D "$RUNNER_TEMP/seed" --clobber; then
+            for f in "$RUNNER_TEMP/seed"/qws_seed_*.tar.gz; do
+              echo "解包 $(basename "$f")"
+              tar -xzf "$f" -C .
+            done
+          else
+            echo "::warning::种子包尚未就位（release data-seed 缺失）—— chain 模式将 rc=3 no-data-cache"
+          fi
+
+      - name: 安装依赖（chain 模式）
+        if: steps.mode.outputs.mode == 'chain'
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r .github/cloud/requirements.txt
+
+      # ---- 2 组装 + 门禁（必要时先跑链）----
+      - name: 云端刷新（组装/门禁/可选跑链）
+        id: refresh
+        run: |
+          set +e
+          python -X utf8 .github/cloud/cloud_refresh.py --mode ${{ steps.mode.outputs.mode }}
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          echo "退出码 rc=$rc（0 成功｜1 链失败｜2 门禁拒发｜3 数据未就位）"
+          if [ "$rc" = "0" ]; then exit 0; fi
+          if [ "$rc" = "3" ]; then
+            echo "::warning::云端数据未就位（no-data-cache / 端点不可用），本次不发布"
+            exit 0
+          fi
+          exit $rc
+
+      # ---- 3 发布 gh-pages（仅门禁全过）----
+      - name: 发布 gh-pages
+        if: steps.refresh.outputs.publish == 'true'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_cloud_dist
+          publish_branch: gh-pages
+          keep_files: true
+          commit_message: "chore(cloud): ${{ steps.mode.outputs.mode }} 收盘刷新 ${{ github.run_id }}"
+
+      # ---- 4 线上回读（验收；CDN ~10min，读旧属正常）----
+      - name: 线上回读
+        if: steps.refresh.outputs.publish == 'true'
+        run: |
+          CB=$(date +%s)
+          BASE="https://hawchou1995.github.io/quant-weight-system"
+          echo "--- 线上 _cloud_manifest.json（cache-bust）---"
+          curl -fsS "$BASE/_cloud_manifest.json?cb=$CB" | head -c 800 || echo "（尚未传播，CDN 缓存约 10 分钟）"
+          echo
+          echo "--- 线上 index.html 首 3 行 ---"
+          curl -fsS "$BASE/index.html?cb=$CB" | head -3 || true
+
+      # ---- 5 回写数据缓存（chain 模式，供次日增量）----
+      - name: 保存数据缓存
+        if: always() && steps.mode.outputs.mode == 'chain'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            data_full
+            data_hist
+            fund_nav_cache
+            data_fundamental
+          key: qws-data-${{ github.run_id }}
+
+      # ---- 6 每周日种子备份（仅 chain 且周日）----
+      - name: 每周种子备份
+        if: always() && steps.mode.outputs.mode == 'chain'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$(date -u +%u)" != "7" ]; then echo "非周日，跳过种子备份"; exit 0; fi
+          cd "$GITHUB_WORKSPACE"
+          for d in data_full data_hist fund_nav_cache data_fundamental; do
+            [ -d "$d" ] || continue
+            echo "打包 $d ..."
+            tar -czf "$RUNNER_TEMP/qws_seed_$d.tar.gz" "$d"
+            ls -lh "$RUNNER_TEMP/qws_seed_$d.tar.gz"
+          done
+          gh release view data-seed >/dev/null 2>&1 \
+            || gh release create data-seed --title "量化数据种子" --notes "云端收盘刷新数据种子（每周日全量更新）"
+          gh release upload data-seed "$RUNNER_TEMP"/qws_seed_*.tar.gz --clobber
+
+      # ---- 7 摘要 ----
+      - name: 摘要
+        if: always()
+        run: |
+          echo "mode=${{ steps.mode.outputs.mode }} status=${{ steps.refresh.outputs.status }} publish=${{ steps.refresh.outputs.publish }} rc=${{ steps.refresh.outputs.rc }}"
+          [ -f _cloud_dist/_cloud_manifest.json ] && cat _cloud_dist/_cloud_manifest.json || true
