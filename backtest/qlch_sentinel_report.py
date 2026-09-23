@@ -15,7 +15,8 @@ BK = Path(__file__).resolve().parent
 LEDGER = BK / "qlch_paper_state_b4_k3.json"
 STATE = BK / "qlch_sentinel_state.json"
 PREREG = "backtest/PRE-REGISTRATION_20260923_qlch_sentinel.md"
-BT = {"mean_net_pct": 9.292, "mdd_pct": -40.99, "val_cagr_pct": 10.49, "stop_share_pct": 2.7}
+# 2026-09-23 阈值改按 MTM（真实盯市）口径：amort 口径回撤 -40.99% -> MTM -50.51%（R-qlch-amort-0923）
+BT = {"mean_net_pct": 9.292, "mdd_pct": -50.51, "val_cagr_pct": 10.49, "stop_share_pct": 2.7}
 V = {"V1_min_trades": 20, "V2_mdd_mult": 1.5, "V3_min_days": 60, "V3_cagr_floor": -5.0, "V4_stop_mult": 2.0}
 
 
