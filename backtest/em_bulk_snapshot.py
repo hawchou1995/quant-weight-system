@@ -87,6 +87,28 @@ def pull_all(_fs=FS):
     return rows, total, time.time() - t0
 
 
+def probe_hosts(timeout=6):
+    """端点探活（省请求）：clist 被限流/被拦时，最多 3 次单发探测就退出，
+    不再带着「4 重试 × 56 页」去硬敲——既省时间，也避免把限流窗口越拉越长。
+    返回可用主机名；三台全败返回 None。"""
+    params = {"pn": "1", "pz": "2", "po": "1", "np": "1",
+              "ut": "bd1d9ddb04089700cf9c27f6f7426281", "fltt": "2", "invt": "2",
+              "fid": "f12", "fs": FS, "fields": FIELDS, "_": int(time.time() * 1000)}
+    for host in HOSTS:
+        u = "https://" + host + "/api/qt/clist/get?" + urllib.parse.urlencode(params)
+        try:
+            with urllib.request.urlopen(urllib.request.Request(u, headers=HEADERS),
+                                        timeout=timeout) as resp:
+                d = json.loads(resp.read().decode("utf-8", "ignore"))
+            if (d.get("data") or {}).get("diff"):
+                print(f"[probe] clist 端点可用：{host}")
+                return host
+            print(f"[probe] {host} 端点通但 data 为空")
+        except Exception as e:
+            print(f"[probe] {host} 失败 {type(e).__name__}: {e}")
+    return None
+
+
 
 def sym_of(r):
     """东财 f12/f13 → 本地文件名 sh600519 / sz000001 / bj920000"""
@@ -140,6 +162,10 @@ def main():
     use_etf = "--etf" in sys.argv
     _fs = FS_ETF if use_etf else FS
     print(f"[cal] 目标交易日 {trade_day} | 通道 {'ETF/基金' if use_etf else 'A股'}")
+
+    if not probe_hosts():
+        print("[skip] clist 端点当前不可用（限流/被拦）→ 本步不做，交 ③ulist 兜底；rc=3")
+        return 3
 
     rows, total, el = pull_all(_fs)
     print(f"[em] 拉取 {len(rows)}/{total} 只（{el:.2f}s）")

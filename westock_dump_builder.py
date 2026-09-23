@@ -15,6 +15,7 @@
 """
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
@@ -22,7 +23,7 @@ from datetime import date
 from pathlib import Path
 
 BASE = Path(__file__).resolve().parent
-WESTOCK = r"C:\Users\Admin\.local\bin\westock.exe"
+WESTOCK = os.environ.get("WESTOCK_EXE", r"C:\Users\Admin\.local\bin\westock.exe")
 COLS = ["date", "open", "last", "high", "low", "volume", "amount"]
 
 
@@ -70,7 +71,16 @@ def main():
     if a.codes:
         codes = [c.strip() for c in a.codes.split(",") if c.strip()]
     elif a.lag_list:
-        codes = [ln.split(",")[0].strip() for ln in Path(a.lag_list).read_text(encoding="utf-8").splitlines() if ln.strip()]
+        # 2026-09-23 修复：data_lag_list.csv 首行是表头（sym,name,src,tail），旧版会把 "sym" 当代码送给 CLI，
+        # 导致整批调用失败（每次"需补 N 只"实际 0 行）。这里只保留形如 sh600000 / 000001 / bj430047 的标的行。
+        _rows = [ln.split(",")[0].strip() for ln in
+                 Path(a.lag_list).read_text(encoding="utf-8").splitlines() if ln.strip()]
+        codes = [c for c in _rows
+                 if (len(c) == 6 and c.isdigit())
+                 or (len(c) == 8 and c[:2] in ("sh", "sz", "bj") and c[2:].isdigit())]
+        _skip = len(_rows) - len(codes)
+        if _skip:
+            print(f"[lag-list] {a.lag_list}：跳过 {_skip} 行非标的行（表头/杂质）", flush=True)
         if a.limit:
             codes = codes[:a.limit]
     else:

@@ -2949,7 +2949,6 @@ html = f"""<!doctype html>
 <script src="market_weather.js"></script>
 <script src="echarts.min.js"></script>
 <script src="kxmm_data.js"></script>
-<script src="heatmap_data.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/artalk@2/dist/Artalk.css">
 <script src="https://unpkg.com/artalk@2/dist/Artalk.js"></script>
 <script>window.SHORT_POOL = {SHORT_POOL_SLIM};</script>
@@ -2962,7 +2961,7 @@ html = f"""<!doctype html>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
 window.ENH.nav = [
-  ["kxmm","","市场晴雨",[["kxmm-fg","恐贪指数"],["kxmm-heat","热力图"],["hm-card","热力树图"],["crowd-card","大盘拥挤度"],["mkt-weather","市场晴雨表"]]],
+  ["kxmm","","市场晴雨",[["kxmm-fg","恐贪指数"],["kxmm-heat","热力图"],["crowd-card","大盘拥挤度"],["mkt-weather","市场晴雨表"]]],
   ["sys-auto","","中长线池",[["sat-card","卫星目标持仓"],["sat-paper-b-card","多因子主仓 模拟盘"],["gold-sat-card","黄金对冲"],["ret20-paper-card","动量增强模拟盘"],["fb3-pool-card","FB3 基金池"],["fund-paper-card","基金主仓模拟盘"]]],
   ["short","","短线选股",[["card-short-stk","股票池 汇总表"],["card-short-stk-detail","股票池 逐标的详情"],["qlch-card","🏷️ 超跌低开低吸"],["card-kh-hits","🏷️ 超卖伏击 · 命中策略"],["card-kh-paper","🏷️ 超卖伏击 · 模拟盘"],["card-etf-paper","ETF 动量轮动"],["card-short-fund","基金池 汇总表"],["card-short-fund-detail","基金池 逐标的详情"],["watch-card-st-qlch","👁 跟踪池 · 超跌低开低吸"],["watch-card-st-kh","👁 跟踪池 · 超卖伏击"],["watch-card-st-etf","👁 跟踪池 · ETF轮动"],["watch-card-st-stk","👁 跟踪池 · 股票池"],["watch-card-st-fund","👁 跟踪池 · 基金池"]]],
   ["a5","","打板专区",[["a5-watchlist","观察清单"],["a5-avoid","回避清单"],["a5-positions","持仓"],["a5-closed","已平仓"],["a5-curve","净值曲线"]]],

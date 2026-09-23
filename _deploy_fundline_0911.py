@@ -22,7 +22,6 @@ SYNC = [
     "review_log.html",
     # kxmm 市场情绪（R-kxmm-0917）：数据文件（每日链抓取）+ ECharts 本地化
     "kxmm_data.js",
-    "heatmap_data.js",
     "echarts.min.js",
     # ⚠ 2026-09-21 修复（用户报「看板还是旧的」）：index.html 的运行期 <script src> 依赖漏进 SYNC。
     #   漏点：dist 只被 `git add -A` 打包——**不覆盖就不更新**，SYNC 才是 repo→dist 刷新的唯一入口。
@@ -36,11 +35,13 @@ SYNC = [
 ]
 DUAL = ["dual_system.html", "index.html"]
 
-# 运行期依赖守卫（2026-09-21 新增）：index.html 里每个本地 <script src> 必须在 SYNC 内，
+# 运行期依赖守卫（2026-09-21 新增）：构建产物里每个本地 <script src> 必须在 SYNC 内，
 # 否则部署会「成功」但继续发旧文件。缺一个就在部署前直接中止，不让静默陈旧再发生。
+# 2026-09-23 修：输入源从 repo/index.html 改为 dual_system.html——index.html 是**本脚本 L100 才生成**
+# 的副本，读它等于用「上次部署的产物」校验「这次要发的 SYNC」（热力树图下架时直接误报中止）。
 _RUNTIME_DEPS = list(dict.fromkeys(re.findall(
     r'<script src="([^":/]+\.js)"',
-    (REPO / "index.html").read_text(encoding="utf-8", errors="replace"))))
+    (REPO / "dual_system.html").read_text(encoding="utf-8", errors="replace"))))
 _MISSING_DEPS = [d for d in _RUNTIME_DEPS if d not in SYNC]
 assert not _MISSING_DEPS, f"index.html 运行期依赖未纳入 SYNC（部署会静默发旧文件）：{_MISSING_DEPS}"
 print(f"运行期依赖守卫 ✅ {len(_RUNTIME_DEPS)} 个本地 <script src> 全部在 SYNC：{'、'.join(_RUNTIME_DEPS)}")

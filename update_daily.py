@@ -498,6 +498,9 @@ def main():
     if "--source" in args:
         source = args[args.index("--source") + 1]
     force = "--force" in args
+    bulk_source = "auto"   # 2026-09-23 ③：批量通道源 auto|tx|westock（auto=腾讯失败/残缺自动降级 westock CLI）
+    if "--bulk-source" in args:
+        bulk_source = args[args.index("--bulk-source") + 1]
 
     # 1. 探样 + 多源自动降级（2026-08-19 修复：新浪滞后未检测 → 20 分钟无输出卡死）
     #    ⚠ 2026-09-08 提速：TickFlow 批量源优先（一次 100 只，7419 只约 8-10 秒 vs akshare 88 分钟）
@@ -581,6 +584,82 @@ def main():
         return
     print(f"滞后清单已存 {LAG_FILE}（含跟踪池掉榜标的——只要在 data_full 就会一并补齐）", flush=True)
     pd.DataFrame(lag, columns=["sym", "name", "src", "tail"]).to_csv(LAG_FILE, index=False)
+
+    # 3-pre. 【2026-09-23 用户批准】批量通道先行（EM clist 持久被拦后的主力补齐路径）
+    #   --bulk-source auto|tx|westock（默认 auto：腾讯失败/残缺 → 自动降级 westock CLI）
+    #   实现单一来源：腾讯 = backtest/em_tencent_fill.py（--syms-file 限定）；
+    #                westock = westock_dump_builder.py + fetch_close_westock.py（复用解析，不重写）
+    #   ① 传「过滤后的 lag syms」→ --limit/--only/--pools-only 语义不被绕过（防意外全市场写盘）
+    #   ② 收盘硬门由子脚本保证（时间戳==交易日且 ≥15:00）；写盘后回写 manifest（腾讯子脚本自带、westock 由本块补）
+    #   ③ 写后重扫 + 剩余走慢通道：批量失败/部分成功都不会让标的静默丢失（--no-bulk 可整体关闭）
+    if lag and "--no-bulk" not in args:
+        import subprocess as _sp
+        import tempfile as _tfm
+        if bulk_source not in ("auto", "tx", "westock"):
+            print(f"  ⚠️ 未知 --bulk-source {bulk_source!r} → 回退 auto", flush=True)
+            bulk_source = "auto"
+        print(f"批量通道（--bulk-source={bulk_source}）：{len(lag)} 只滞后", flush=True)
+
+        # 3-pre-1. 腾讯批量快照（主力：400 码/请求，全市场约 6s）
+        if bulk_source in ("auto", "tx"):
+            print(f"  腾讯批量（400 码/请求）：{len(lag)} 只", flush=True)
+            try:
+                _sf = BASE / "_bulk_syms.txt"
+                _sf.write_text("\n".join(str(x[0]) for x in lag) + "\n", encoding="utf-8")
+                _r = _sp.run([sys.executable, str(BASE / "backtest" / "em_tencent_fill.py"),
+                              "--syms-file", str(_sf)],
+                             cwd=str(BASE), capture_output=True, text=True,
+                             encoding="utf-8", errors="replace")
+                for _ln in ((_r.stdout or "") + (_r.stderr or "")).strip().splitlines()[-4:]:
+                    print("  " + _ln, flush=True)
+            except Exception as _e:
+                print(f"  ⚠️ 腾讯批量异常（软降级）：{type(_e).__name__}: {_e}", flush=True)
+            _filled = [x for x in lag if (tail_date(OUT_DIR / f"{x[0]}.csv") or "") >= str(target_date)]
+            if _filled:
+                lag = [x for x in lag if x not in _filled]
+                print(f"  腾讯补齐 {len(_filled)} 只；剩余 {len(lag)} 只", flush=True)
+                pd.DataFrame(lag, columns=["sym", "name", "src", "tail"]).to_csv(LAG_FILE, index=False)
+
+        # 3-pre-2. westock CLI 批量（auto 下腾讯失败/残缺时降级；亦可用 --bulk-source westock 显式指定）
+        #   路径可被环境变量 WESTOCK_EXE 覆盖（默认 C:\Users\Admin\.local\bin\westock.exe）
+        if lag and bulk_source in ("auto", "westock"):
+            print(f"  westock 批量（100 码/批次，全量约 2-3 分钟）：{len(lag)} 只", flush=True)
+            _wfilled = []
+            try:
+                _tmpd = Path(_tfm.gettempdir())
+                _lagcsv = _tmpd / "wd_bulk_lag.csv"
+                _dump = _tmpd / "wd_bulk_dump.json"
+                if _dump.exists():
+                    _dump.unlink()
+                pd.DataFrame(lag, columns=["sym", "name", "src", "tail"]).to_csv(_lagcsv, index=False, header=False)
+                _rb = _sp.run([sys.executable, str(BASE / "westock_dump_builder.py"),
+                               "--lag-list", str(_lagcsv), "--out", str(_dump)],
+                              cwd=str(BASE), capture_output=True, text=True,
+                              encoding="utf-8", errors="replace")
+                for _ln in ((_rb.stdout or "") + (_rb.stderr or "")).strip().splitlines()[-4:]:
+                    print("  " + _ln, flush=True)
+                if _dump.exists():
+                    _rf = _sp.run([sys.executable, str(BASE / "fetch_close_westock.py"), "--dump", str(_dump)],
+                                  cwd=str(BASE), capture_output=True, text=True,
+                                  encoding="utf-8", errors="replace")
+                    for _ln in ((_rf.stdout or "") + (_rf.stderr or "")).strip().splitlines()[-4:]:
+                        print("  " + _ln, flush=True)
+                _wfilled = [x for x in lag if (tail_date(OUT_DIR / f"{x[0]}.csv") or "") >= str(target_date)]
+                if _wfilled:
+                    try:
+                        DI.update_entries([(x[0], str(target_date), 0) for x in _wfilled])
+                    except Exception as _e2:
+                        print(f"  ⚠️ manifest 回写失败（软，仅影响下轮滞后判定）：{type(_e2).__name__}: {_e2}", flush=True)
+            except Exception as _e:
+                print(f"  ⚠️ westock 批量异常（软降级）：{type(_e).__name__}: {_e}", flush=True)
+            if _wfilled:
+                lag = [x for x in lag if x not in _wfilled]
+                print(f"  westock 补齐 {len(_wfilled)} 只；剩余 {len(lag)} 只走慢通道", flush=True)
+                pd.DataFrame(lag, columns=["sym", "name", "src", "tail"]).to_csv(LAG_FILE, index=False)
+    if not lag:
+        print("✅ 全部已是最新（批量通道生效），无需慢通道更新", flush=True)
+        run_rebase_check(target_date, source)
+        return
 
     # 3. 更新（2026-09-08：TickFlow 批量 100 只/批 ≈ 8-10 秒；回退源走并行单只）
     if source == "tickflow":

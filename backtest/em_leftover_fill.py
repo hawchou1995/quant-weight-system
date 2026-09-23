@@ -7,6 +7,7 @@
 本脚本用单只端点补，**先与 clist 交叉验证口径**（同一只票两个端点必须一致）再写盘。
 """
 import json
+import statistics
 import sys
 import time
 import urllib.parse
@@ -22,22 +23,32 @@ H = {"User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.3
      "Accept": "application/json, text/javascript, */*",
      "Referer": "https://quote.eastmoney.com/"
      }
+HOSTS_GET = ["push2delay.eastmoney.com", "push2.eastmoney.com", "82.push2.eastmoney.com"]
 CLIST = "https://push2delay.eastmoney.com/api/qt/clist/get"
-GET = "https://push2delay.eastmoney.com/api/qt/stock/get"
+GET = "https://{host}/api/qt/stock/get"
 F_GET = "f43,f44,f45,f46,f47,f48,f58,f60"      # 现价/高/低/开/量/额/名/昨收
 
 
+_GOOD = {"host": None}
+
+
 def get_one(secid):
+    """单只报价（f47=量「手」、f48=额「元」）。
+    2026-09-23 改：三台主机轮换、每台 1 次（原来死钉 push2delay 且同主机重试 3 次，
+    端点一被限流就白敲 3 次）；主机可达即记住复用。返回 data 或 None。"""
+    hosts = [_GOOD["host"]] if _GOOD["host"] else HOSTS_GET
     P = {"secid": secid, "ut": "fa5fd1943c7b386f172d6893dbfba10b", "invt": "2",
          "fltt": "2", "fields": F_GET, "_": str(int(time.time() * 1000))}
-    for i in range(3):
+    for h in hosts:
         try:
             d = json.loads(urllib.request.urlopen(
-                urllib.request.Request(GET + "?" + urllib.parse.urlencode(P), headers=H),
+                urllib.request.Request(GET.format(host=h) + "?" + urllib.parse.urlencode(P),
+                                       headers=H),
                 timeout=12).read().decode("utf-8", "ignore"))
+            _GOOD["host"] = h          # 主机可达（该标的有无数据另说）
             return d.get("data")
         except Exception:
-            time.sleep(1.0)
+            continue
     return None
 
 
@@ -71,58 +82,97 @@ def last_row(p):
         return None
 
 
-# ---- ① 口径交叉验证：拿「刚由 clist 补好的」sz158000 当基准（本地行即 clist 写的）----
-print("=== 口径交叉验证（clist 已写入的本地行 vs 单只端点）===")
-lr = last_row(DATA / "sz158000.csv")
-g = get_one("0.158000")
-print(f"  本地(clist源): {lr}")
-if g:
-    print(f"  单只端点     : 开={g.get('f46')} 高={g.get('f44')} 低={g.get('f45')} "
-          f"现价={g.get('f43')} 量={g.get('f47')} 额={g.get('f48')} 名={g.get('f58')!r}")
-    same = (lr and abs(lr[1] - float(g.get("f46") or -1)) < 0.02
-            and abs(lr[4] - float(g.get("f43") or -1)) < 0.02
-            and float(g.get("f47") or 0) > 0
-            and abs(lr[5] - float(g.get("f47")) * 100.0) <= max(1.0, float(g["f47"]) * 100.0 * 0.01))
-    print("  （量需 ×100：单只端点 f47 同为「手」，本地存「股」——实测 38041 vs 本地 3,804,100）")
-else:
-    same = False
-print(f"  两端口径一致 = {same}")
-if not same:
-    print("!! 口径不一致 → 放弃（先人工核对）")
-    sys.exit(2)
+# ---- ① 干活闸 + 端点探活 + 口径共识（2026-09-23 重写）----
+# 旧版把口径校验硬编码在单只 sz158000 上：端点一被限流（返回空）就误报「口径不一致」
+# 并 sys.exit(2) 整步退出，日志还误导人去核对口径。现改为：
+#   ① 先扫「残余陈旧 ETF/基金」：没有 → 一个请求都不发，直接成功退出
+#   ② 多样本（≤8 只本地已新鲜的 ETF/基金）中位比 → 因子 fac（100 / 10000，±5% 收口）
+#   ③ 首样本无响应 = 端点不可用 → rc=3（与「口径问题 rc=2」分开报）
+ETF_SH = ("510", "511", "512", "513", "515", "516", "517", "518", "520", "521", "522", "523",
+          "526", "560", "561", "562", "563", "588", "589", "501", "502", "506", "508")
+
+
+def is_etf(s):
+    cc = s[2:]
+    return (s.startswith("sh") and cc[:3] in ETF_SH) \
+        or (s.startswith("sz") and cc[:2] in ("15", "16", "18"))
+
 
 trade_day = open(CAL, encoding="utf-8").read().strip().splitlines()[-1].split(",")[0][:10]
 dry = "--dry" in sys.argv
 
-# ---- ② 找残余陈旧 ETF/基金 ----
+# ---- ② 找残余陈旧 ETF/基金（没有 → 零请求直接成功退出）----
 stale = []
 for f in sorted(DATA.glob("*.csv")):
     s = f.stem
-    cc = s[2:]
-    isetf = (s.startswith("sh") and cc[:3] in ("510", "511", "512", "513", "515", "516", "517", "518",
-                                               "520", "521", "522", "523", "526", "560", "561", "562",
-                                               "563", "588", "589", "501", "502", "506", "508")) \
-        or (s.startswith("sz") and cc[:2] in ("15", "16", "18"))
-    if not isetf:
+    if not is_etf(s):
         continue
     r = last_row(f)
     if r and r[0] < trade_day:
         stale.append((s, r[0]))
-print(f"\n[stale] {len(stale)} 只待补（末行 < {trade_day}）")
+print(f"[stale] {len(stale)} 只待补（末行 < {trade_day}）")
+if not stale:
+    print("[skip] 无残余陈旧 → 一个请求都不发；本步完成")
+    sys.exit(0)
 
-# ---- ③ 单只端点补 ----
+# ---- ①′ 口径共识：≤8 只本地已新鲜的 ETF/基金，比「本地量 / 端点量」中位比 ----
+print("=== 口径共识（本地已新鲜 ETF/基金 vs 单只端点，多样本中位比）===")
+cand = []
+for f in sorted(DATA.glob("*.csv")):
+    s = f.stem
+    if not is_etf(s):
+        continue
+    r = last_row(f)
+    if r and r[0] >= trade_day and r[5] > 0:
+        cand.append((s, r))
+    if len(cand) >= 8:
+        break
+ratios, nodata, noresp = [], 0, 0
+for i, (s, lr) in enumerate(cand):
+    mk = "1" if s.startswith("sh") else "0"
+    d = get_one(f"{mk}.{s[2:]}")
+    if not d:
+        if i == 0:
+            print("!! 首样本无响应 → 单只端点当前不可用（限流/被拦）；本步不做；rc=3")
+            sys.exit(3)
+        noresp += 1
+        continue
+    v = d.get("f47")
+    if not isinstance(v, (int, float)) or v <= 0:
+        nodata += 1
+        continue
+    ratios.append(lr[5] / float(v))
+    print(f"   {s}: 本地量 {lr[5]:.0f} / 端点量 {v:.0f} = {lr[5] / float(v):.2f}")
+if not ratios:
+    print(f"!! 端点无有效样本（无响应 {noresp} / 无成交 {nodata}）"
+          f"→ 单只端点当前不可用；本步不做；rc=3")
+    sys.exit(3)
+med = statistics.median(ratios)
+fac = 100.0 if abs(med - 100.0) <= 5 else (10000.0 if abs(med - 10000.0) <= 500 else None)
+ins = sum(1 for x in ratios if abs(x - fac) <= fac * 0.05) if fac else 0
+print(f"   中位比 {med:.2f}（n={len(ratios)}）→ 因子 fac={fac}；±5% 内 {ins}/{len(ratios)}")
+if fac is None or ins < max(2, int(len(ratios) * 0.6)):
+    print("!! 口径未达成共识 → 放弃写盘（先人工核对）；rc=2")
+    sys.exit(2)
+
+# ---- ③ 单只端点补（量「手」× fac → 股；再用均价夹逼校验）----
 wrote, skipped = 0, []
 for s, lastd in stale:
     mk = "1" if s.startswith("sh") else "0"
     d = get_one(f"{mk}.{s[2:]}")
     if not d:
         skipped.append((s, "端点无返回")); continue
-    o, h, l, cl, v, a = d.get("f46"), d.get("f44"), d.get("f45"), d.get("f43"), d.get("f47"), d.get("f48")
+    o, h, l, cl, v, a = (d.get("f46"), d.get("f44"), d.get("f45"),
+                         d.get("f43"), d.get("f47"), d.get("f48"))
     if not all(isinstance(x, (int, float)) and x > 0 for x in (o, h, l, cl)):
         skipped.append((s, "今日无成交（停牌/未开盘）")); continue
-    v = v * 100.0 if isinstance(v, (int, float)) else 0.0      # 手 → 股（与 clist 通道同口径）
-    row = (f"{trade_day},{o},{h},{l},{cl},{v},"
-           f"{a if isinstance(a, (int, float)) else 0}")
+    if not isinstance(v, (int, float)) or v <= 0:
+        skipped.append((s, "端点量缺失")); continue
+    vv = v * fac                                   # 手 → 股（与 clist/ulist 通道同口径）
+    aa = a if isinstance(a, (int, float)) else 0.0
+    if aa > 0 and not (l * 0.97 <= aa / vv <= h * 1.03):
+        skipped.append((s, f"均价离群 {aa / vv:.4f} 不在 [{l},{h}]")); continue
+    row = f"{trade_day},{o},{h},{l},{cl},{vv},{aa}"
     if dry:
         print(f"  [dry] {s} ← {row}")
     else:

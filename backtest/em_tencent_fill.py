@@ -30,6 +30,8 @@
     python backtest/em_tencent_fill.py                    # 补全部（股票+ETF）
     python backtest/em_tencent_fill.py --only etf         # 只补 ETF/基金
     python backtest/em_tencent_fill.py --limit 5          # 只补前 5 只（冒烟）
+  - ⚠ manifest：写盘后回写 `data_full/_index.csv`（data_index.update_entries，2026-09-23 接链前置）——
+    否则 update_daily 下次仍按旧 manifest 末行判定「滞后」→ 退回 1.4s/只 慢补（快通道白跑）。
 退出码：0 = 正常（含"无待补"）；1 = 参数/环境错
 """
 import glob
@@ -42,6 +44,12 @@ import urllib.parse
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(BASE, "data_full")
 CAL = os.path.join(BASE, "index_000300.csv")
+
+sys.path.insert(0, BASE)          # data_index 在项目根（manifest 回写用）
+try:
+    import data_index as DI       # 写盘后回写 _index.csv；导入失败则退化为"下次全量扫描"（无害）
+except Exception:
+    DI = None
 CHUNK = 400          # 腾讯 q= 批量上限（实测；800 会被拒）
 HOST = "https://qt.gtimg.cn/q="
 ETF_PRE = ("51", "56", "58", "15", "16")
@@ -108,6 +116,17 @@ def main():
     limit = None
     if "--limit" in args:
         limit = int(args[args.index("--limit") + 1])
+    allow = None
+    if "--syms-file" in args:
+        _sfp = args[args.index("--syms-file") + 1]
+        try:
+            with open(_sfp, encoding="utf-8") as _f:
+                allow = {ln.strip()[-6:] for ln in _f if ln.strip()}
+        except Exception as _e:
+            print(f"[err] 读 --syms-file 失败：{type(_e).__name__}: {_e}")
+            return 1
+        print(f"[filter] --syms-file 限定 {len(allow)} 只")
+
 
     day = trade_day()
     files = sorted(glob.glob(os.path.join(DATA, "*.csv")))
@@ -124,6 +143,8 @@ def main():
         if only == "etf" and not etf:
             continue
         if only == "stock" and etf:
+            continue
+        if allow is not None and c6 not in allow:
             continue
         if last_date(p) >= day:
             continue
@@ -184,6 +205,14 @@ def main():
             wrote += 1
         except Exception as e:
             print(f"   !! {c6} 写失败 {type(e).__name__}: {e}")
+    # 2026-09-23 接链前置（PI 复核）：写盘后必须回写 manifest —— data_index.load_index() 只校验
+    #   manifest 全局过期(>3天)/文件数，**不校验单条 mtime/size**；不回写则 update_daily 下次
+    #   仍按旧末行判定「滞后」→ 退回 1.4s/只 慢补，快通道白跑。rows 传 0 = 保留原值（update_entries 语义）。
+    if DI is not None and wrote:
+        try:
+            DI.update_entries([(os.path.basename(p)[:-4], day, 0) for c6, p in tgt if c6 in good])
+        except Exception as e:
+            print(f"   !! manifest 回写失败（下次 scan_lag 退回全量扫描）：{type(e).__name__}: {e}")
     print(f"[done] 补齐 {wrote}/{len(tgt)} 只 → {day}（无有效行情 {miss} 只）")
     return 0
 

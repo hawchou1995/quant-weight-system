@@ -32,7 +32,7 @@ STEPS = [
     ("数据更新 update_daily", ["update_daily.py"], "--skip-data" in sys.argv),
     # HS300 指数行维护 + 交易日闸门（R-gate-0917）：exit 3 = 今日行情不可得（非交易日/未就绪）→ 主链跳过后续
     # 2026-09-21 修：**必须紧跟在数据更新之后**——它是唯一写入 index_000300 当日行的步骤，
-    # 而 fullpool_guard / em_bulk / heatmap 都靠该文件末行判定「今日」。原先排在它们之后
+    # 而 fullpool_guard / em_bulk 都靠该文件末行判定「今日」。原先排在它们之后
     # → 三步拿到上一交易日做基准：freshness 误报新鲜、guard 漏补、em_bulk 口径校验拒写(rc=2)。
     ("HS300 索引行 ensure_index_row", ["backtest/ensure_index_row.py"], False),
     # 全量池守卫（R-fullpool-0917，2026-09-17 建）：降级源只补池内子集（如 440/7539）→ 全市场口径
@@ -43,10 +43,10 @@ STEPS = [
     # → 单只端点兜底。全部幂等（只补「本地末行 < 交易日」），正常日待补 0；三源同时滞后时是唯一
     # 能十几秒补齐全市场的通道。实测：A股 4191 只、ETF 704 只、残余 26 只一次补全。
     # [软]=失败不阻断主链；--skip-embulk 跳过。
+    # 2026-09-23 起本机实测：东财 push2* 家族持久被拦（clist/stock/ulist 502 / 握手超时，出口无关、非指纹）
+    # → 本步定位为「完整性兜底」且 [软]：被拦时每步 ≤3 次单发探测即退（秒级），不阻断当日数据；
+    #   当日补齐主力已移到 update_daily.py 内的「批量通道」（腾讯快照 400 码/请求，全市场 ≈6s）。
     ("东财批量补齐 em_bulk[软]", ["backtest/em_bulk_all.py"], "--skip-embulk" in sys.argv),
-    # 热力树图数据（#4）：东财快照 + stock_industry 申万一级 → heatmap_data.js。
-    # [软]=失败不阻断（页面保留上一份）；--skip-heatmap 跳过。
-    ("热力树图数据 heatmap[软]", ["backtest/build_heatmap.py"], "--skip-heatmap" in sys.argv),
     # 估值日更（2026-09-17 建，R-valfreeze-0917）：根因=旧管道只写 4 列快照、从不扩展 val_em 主表
     # → 主表冻结 → factorlab/oss 面板冻结 → 生产轨B 目标清单冻结（asof 谎报）。[软]=失败不阻断。
     ("估值日更 fetch_val_em_daily[软]", ["fetch_val_em_daily.py"], "--skip-val" in sys.argv),
@@ -258,9 +258,12 @@ if not fails:
                           "backtest/ensure_index_row.py", "index_000300.csv",
                           # 2026-09-17 补：三个生产源文件此前从未进过链的 git 白名单（链只 add 产物）
                           "build_dual_system.py", "fetch_full_universe.py", "update_daily.py",
-                          "kxmm_card.py", "kxmm_data.js", "heatmap_data.js",
-                          "backtest/build_heatmap.py", "echarts.min.js", "daily_refresh.py",
-                          "backtest/rebuild_v8cache.py"],
+                          "kxmm_card.py", "kxmm_data.js",
+                          "echarts.min.js", "daily_refresh.py",
+                          # 2026-09-23 补：EM 批量兜底链的生产源文件（同样从未进链白名单 → 补丁不会被链提交）
+                          "backtest/em_bulk_all.py", "backtest/em_bulk_snapshot.py",
+                          "backtest/em_ulist_bulk.py", "backtest/em_leftover_fill.py",
+                          "backtest/em_tencent_fill.py", "backtest/rebuild_v8cache.py"],
                          cwd=str(BASE), capture_output=True)
     if git.returncode == 0:
         c = subprocess.run(["git", "commit", "-m", f"chore(daily): {date.today()} 收盘刷新（池/信号/看板/复盘日志）"],
