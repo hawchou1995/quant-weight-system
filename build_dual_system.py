@@ -2407,9 +2407,9 @@ def qlch_card():
                      '<th data-key="pm" title="流通市值横截面分位，分位带 [.20,.70]">市值分位</th>'
                      '<th data-key="pt" title="换手率横截面分位，分位带 [.40,.80]">换手分位</th>'
                      '<th data-key="buy" title="明日开盘跳空落在 [今收×0.95, 今收×0.98] 才买——这是条件不是承诺；名单按 K=3 随机抽">明日买点</th>'
-                     '<th data-key="tp" title="策略止盈点：买入价 ×(1+TP)，TP 从 qlch 生产脚本解析；价格按明日买点区间折算">止盈点 +15%</th>'
-                     '<th data-key="sl" title="策略止损点：买入价 ×(1+SL)，SL 从 qlch 生产脚本解析；价格按明日买点区间折算">止损点 −20%</th>'
-                     '<th data-key="rot" title="轮动点：最长持有 MAXHOLD 个交易日，到期轮动（未触发止盈/止损时）">轮动点 20 交易日</th>'
+                     f'<th data-key="tp" title="策略止盈点：买入价 ×(1+TP)，TP 从 qlch 生产脚本解析；价格按明日买点区间折算">止盈点 +{TP*100:.0f}%</th>'
+                     f'<th data-key="sl" title="策略止损点：买入价 ×(1+SL)，SL 从 qlch 生产脚本解析；价格按明日买点区间折算">止损点 −{abs(SL)*100:.0f}%</th>'
+                     f'<th data-key="rot" title="轮动点：最长持有 MAXHOLD 个交易日，到期轮动（未触发止盈/止损时）">轮动点 {MH} 交易日</th>'
                      '</tr></thead><tbody>')
             def _tpsl(c):
                 _lo, _hi = _band(c)
@@ -2512,8 +2512,8 @@ def qlch_card():
     if alltr:
         L.append('<table class="tbl" id="tbl-qlch-track" style="width:100%;font-size:12.5px">'
                  '<thead><tr><th>日期</th><th>代码</th><th>名称</th><th>轨</th><th>gap</th><th>净收益</th>'
-                 '<th title="策略止盈点：买入价 ×(1+TP)，TP 从 qlch 生产脚本解析">止盈点 +15%</th>'
-                 '<th title="策略止损点：买入价 ×(1+SL)">止损点 −20%</th>'
+                 f'<th title="策略止盈点：买入价 ×(1+TP)，TP 从 qlch 生产脚本解析">止盈点 +{TP*100:.0f}%</th>'
+                 f'<th title="策略止损点：买入价 ×(1+SL)">止损点 −{abs(SL)*100:.0f}%</th>'
                  '<th title="轮动点：入场日 + MAXHOLD 个交易日（未触发止盈/止损时到期轮动）">轮动点</th>'
                  '</tr></thead><tbody>')
         for d0, c0, n0, lab, gp, nr, epx, ed in alltr[:30]:
