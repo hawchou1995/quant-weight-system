@@ -1,0 +1,7 @@
+# 云端收盘刷新依赖（⑤ Phase 1）
+# 依据：update_daily / build_short_pool / review_daily / build_dual_system 等的顶层 import 汇总
+pandas
+numpy
+requests
+PyYAML
+akshare

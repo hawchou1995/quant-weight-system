@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """每日收盘后一键刷新（三轨体系·全量）：数据 → 池 → 复盘 → 信号 → 看板 → 部署 → 同步 main
-用法：python daily_refresh.py [--skip-deploy] [--skip-data] [--force]
+用法：python daily_refresh.py [--skip-deploy] [--skip-data] [--force] [--no-main-push] [--skip-gushi]
 非交易日自动跳过（index_000300.csv 最后日期 != 今天 时，除非 --force）。
 """
 import subprocess
@@ -14,6 +14,9 @@ import pandas as pd
 BASE = Path(__file__).resolve().parent
 PY = sys.executable
 FORCE = "--force" in sys.argv
+# ---- 云端复用开关（2026-09-24 新增；默认行为不变，仅显式传参时生效）----
+NO_MAIN_PUSH = "--no-main-push" in sys.argv   # 云端不 push main（Phase 1：发布走 peaceiris → gh-pages）
+SKIP_GUSHI = "--skip-gushi" in sys.argv       # 云端无本机 Chrome 自动化 profile → 跳过采集（故也不续费）
 
 # ---- 交易日闸门（R-gate-0917 重构：数据步后置 + HS300 行自动维护）----
 # 旧逻辑以「index_000300.csv 末行==今天」判交易日，但该文件仓库无写手（长期靠人工"补 HS300 指数行"，
@@ -235,7 +238,7 @@ for name, args, skip in STEPS:
         break
 
 # ---- main 源码同步（看板产物，失败不阻断）----
-if not fails:
+if not fails and not NO_MAIN_PUSH:   # ⑤ 云端 Phase 1：只写 gh-pages，不写 main
     git = subprocess.run(["git", "add", "dual_system.html", "index.html", "short_pool.json",
                           "short_pool.js", "enhanced_data.js", "short_signals.js", "a5_pool.js",
                           "changelog.md", "changelog.html", "review_log.html",
@@ -286,7 +289,7 @@ if not fails:
 # 位置依据：链首试采（~15:31）大概率早于站点当日数据上线时刻（实测最早 16:22）；
 #           链尾实测落在 ~16:38，落在「数据已上线」且「VIP 未到期」的窗口内。
 # 扣分护栏全部在采集脚本内：_renewed_today() 每日 1 次上限 + 余额不足不扣分 + 非 vip 不落盘。
-if not fails:
+if not fails and not SKIP_GUSHI:
     _gp2 = _gushi_py()
     if _gp2:
         print(f"\n========== gushi 策略股池采集 collect_gushi（链尾·正式，可续费）==========", flush=True)
