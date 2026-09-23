@@ -1,0 +1,106 @@
+{
+  "run_id": "35935983002",
+  "sha": "fea796c1f1aaef3763ca259912f46c5e2a9b0a1c",
+  "mode": "probe",
+  "status": "published-candidate",
+  "ts_cn": "2026-09-24 07:55:55",
+  "today_cn": "2026-09-24",
+  "chain_rc": null,
+  "g2_fresh": false,
+  "runtime_deps": [
+    "enhanced_data.js",
+    "short_signals.js",
+    "a5_pool.js",
+    "market_breadth.js",
+    "market_weather.js",
+    "echarts.min.js",
+    "kxmm_data.js"
+  ],
+  "skipped_newer": [],
+  "files": [
+    {
+      "name": "dual_system.html",
+      "md5": "7689df2b860f",
+      "bytes": 1135563,
+      "as_of": "2026-09-23"
+    },
+    {
+      "name": "short_v3_fund_slip20_summary.json",
+      "md5": "15bb7d84f75e",
+      "bytes": 361,
+      "as_of": null
+    },
+    {
+      "name": "short_v3_fund_summary.json",
+      "md5": "23fa87bbe9bd",
+      "bytes": 354,
+      "as_of": null
+    },
+    {
+      "name": "changelog.md",
+      "md5": "da7169338f89",
+      "bytes": 71372,
+      "as_of": null
+    },
+    {
+      "name": "changelog.html",
+      "md5": "bfa52434f684",
+      "bytes": 125936,
+      "as_of": null
+    },
+    {
+      "name": "review_log.html",
+      "md5": "ea7f591c4a3c",
+      "bytes": 47250,
+      "as_of": null
+    },
+    {
+      "name": "kxmm_data.js",
+      "md5": "4d2be26534d2",
+      "bytes": 1437895,
+      "as_of": null
+    },
+    {
+      "name": "echarts.min.js",
+      "md5": "ef12c5c63df2",
+      "bytes": 1030855,
+      "as_of": null
+    },
+    {
+      "name": "short_signals.js",
+      "md5": "e415d52b5038",
+      "bytes": 1809497,
+      "as_of": "2026-09-23"
+    },
+    {
+      "name": "enhanced_data.js",
+      "md5": "49acf00e8d4c",
+      "bytes": 425966,
+      "as_of": "2026-09-23"
+    },
+    {
+      "name": "a5_pool.js",
+      "md5": "fe5f068bd650",
+      "bytes": 29862,
+      "as_of": "2026-09-23"
+    },
+    {
+      "name": "market_breadth.js",
+      "md5": "309e11e8c772",
+      "bytes": 1307,
+      "as_of": "2026-09-15"
+    },
+    {
+      "name": "market_weather.js",
+      "md5": "7ca959d8d49b",
+      "bytes": 17918,
+      "as_of": null
+    },
+    {
+      "name": "index.html",
+      "md5": "7689df2b860f",
+      "bytes": 1135563,
+      "as_of": null
+    }
+  ]
+}
