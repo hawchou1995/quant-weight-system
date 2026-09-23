@@ -1,0 +1,49 @@
+{
+ "meta": {
+  "title": "R-qlch-amort-0923",
+  "pool": "全池(B4_K3)",
+  "arm": "X4",
+  "window": [
+   "2018-02-02",
+   "2026-09-22"
+  ]
+ },
+ "modes": {
+  "amort|P20": {
+   "sharpe": 2.749,
+   "cagr": 15.485,
+   "mdd": -40.99,
+   "vol_daily_pct": 0.3386
+  },
+  "amort|S60": {
+   "sharpe": 2.363,
+   "cagr": 13.102,
+   "mdd": -43.293,
+   "vol_daily_pct": 0.3374
+  },
+  "realized|P20": {
+   "sharpe": 0.771,
+   "cagr": 15.067,
+   "mdd": -43.115,
+   "vol_daily_pct": 1.3536
+  },
+  "realized|S60": {
+   "sharpe": 0.672,
+   "cagr": 12.665,
+   "mdd": -45.311,
+   "vol_daily_pct": 1.3526
+  },
+  "mtm|P20": {
+   "sharpe": 0.659,
+   "cagr": 15.049,
+   "mdd": -50.506,
+   "vol_daily_pct": 1.7129
+  },
+  "mtm|S60": {
+   "sharpe": 0.58,
+   "cagr": 12.667,
+   "mdd": -52.343,
+   "vol_daily_pct": 1.7141
+  }
+ }
+}
