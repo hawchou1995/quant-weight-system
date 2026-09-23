@@ -332,7 +332,10 @@ def main():
             _px, _why = _sl, "止损触发"          # 同 bar：止损优先于止盈
         elif np.isfinite(_h) and _h >= _tp:
             _px, _why = _tp, "止盈触发"
-        elif (t - _e) >= MAXHOLD:
+        elif (t - _e) >= MAXHOLD - 1:
+            # 2026-09-23 口径对齐（用户授权）：到期日 = 入场日 + MAXHOLD − 1，即持有 ≤ MAXHOLD 个交易日。
+            # 原实现为 (t-e) >= MAXHOLD → 实际持有 MAXHOLD+1 日，与回测/网格（exit_plan 的 k_eff=H-1）
+            # 差一天；到期平仓占成交 47%~65%，故必须对齐（证据口径见 生产变更-qlch出场参数-20260923.md）。
             _px, _why = _c, "到期平仓"
         if _px is None or not np.isfinite(_px):
             _still.append(_p); continue

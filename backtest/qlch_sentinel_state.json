@@ -1,0 +1,35 @@
+{
+ "prereg": "backtest/PRE-REGISTRATION_20260923_qlch_sentinel.md",
+ "bt_ref": {
+  "mean_net_pct": 9.292,
+  "mdd_pct": -40.99,
+  "val_cagr_pct": 10.49,
+  "stop_share_pct": 2.7
+ },
+ "rules": {
+  "V1_min_trades": 20,
+  "V2_mdd_mult": 1.5,
+  "V3_min_days": 60,
+  "V3_cagr_floor": -5.0,
+  "V4_stop_mult": 2.0
+ },
+ "snapshots": [
+  {
+   "date": "2026-09-22",
+   "recorded_at": "2026-09-23 09:07:59",
+   "n_trades": 0,
+   "days": 1,
+   "mean_net_pct": null,
+   "wr_pct": null,
+   "mean_hold": null,
+   "cum_ret_pct": 0.0,
+   "mdd_pct": 0.0,
+   "stop_share_pct": null,
+   "expiry_share_pct": null,
+   "cagr_pct": null,
+   "V4_diag_stop_share_mult": null,
+   "triggered": [],
+   "verdict": "记录中（未达判定条件：n_trades=0/20, days=1/60）"
+  }
+ ]
+}

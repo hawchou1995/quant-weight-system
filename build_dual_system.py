@@ -2300,7 +2300,7 @@ def qlch_card():
         """轮动点 = 入场日 + MH 个交易日；日历不足则退回参数口径。"""
         if not _cal or not ed or ed not in _cal:
             return "≤ %d 个交易日" % MH
-        j = _cal.index(ed) + MH
+        j = _cal.index(ed) + MH - 1   # 2026-09-23 对齐：到期日 = 入场日 + MH − 1（持有 ≤ MH 日）
         return _cal[j] if j < len(_cal) else "≤ %d 个交易日（未到期）" % MH
 
     cand = {}
