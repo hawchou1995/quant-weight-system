@@ -52,7 +52,7 @@ def local_close(code, day):
     return None
 
 
-def tx_close(code, day):
+def _tx_kline_close(code, day):
     """腾讯 K 线收盘（不复权）；前缀优先取本机文件名，其次按代码段推断（6/5/9=沪，4/8=北）"""
     pre = None
     for cand in ("sh", "sz", "bj"):
@@ -73,6 +73,37 @@ def tx_close(code, day):
     except Exception:
         return None
     return None
+
+
+def tx_snapshot_close(code, day):
+    """腾讯行情快照（qt.gtimg.cn）——K 线接口被拦/限流时的同源兜底；须快照日期 == 目标日"""
+    pre = None
+    for cand in ("sh", "sz", "bj"):
+        if (REPO / "data_full" / (cand + code + ".csv")).exists():
+            pre = cand
+            break
+    if pre is None:
+        pre = "sh" if code[0] in "569" else ("bj" if code[0] in "48" else "sz")
+    sym = pre + code
+    try:
+        txt = get("https://qt.gtimg.cn/q=%s" % sym, timeout=20).decode("gbk", "replace")
+        if '="' not in txt:
+            return None
+        f = txt.split('="', 1)[1].rstrip('";\n').split("~")
+        ts = f[30] if len(f) > 30 else ""
+        if ts[:8] != str(day).replace("-", ""):
+            return None
+        return float(f[3])
+    except Exception:
+        return None
+
+
+def tx_close(code, day):
+    """腾讯收盘价：K 线优先、快照兜底（判据与容差不变）"""
+    v = _tx_kline_close(code, day)
+    if v is None:
+        v = tx_snapshot_close(code, day)
+    return v
 
 
 def sina_close(code, day):

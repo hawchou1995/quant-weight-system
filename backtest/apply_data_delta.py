@@ -81,7 +81,8 @@ def _prefix(code):
     return "sh" if code[0] in "569" else ("bj" if code[0] in "48" else "sz")
 
 
-def tx_close(code, day):
+def _tx_kline_close(code, day):
+    """腾讯 K 线接口（web.ifzq.gtimg.cn）——首选源"""
     import urllib.request
     sym = _prefix(code) + code
     url = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=%s,day,,,60," % sym
@@ -96,6 +97,35 @@ def tx_close(code, day):
     except Exception:
         return None
     return None
+
+
+def tx_snapshot_close(code, day):
+    """腾讯行情快照（qt.gtimg.cn）——K 线接口被网络层拦截/限流时的**同源兜底**。
+    仅当快照时间戳（field30）日期 == 目标日才命中，避免误用其它交易日的价。"""
+    import urllib.request
+    sym = _prefix(code) + code
+    url = "https://qt.gtimg.cn/q=%s" % sym
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=20) as r:
+            txt = r.read().decode("gbk", "replace")
+        if '="' not in txt:
+            return None
+        f = txt.split('="', 1)[1].rstrip('";\n').split("~")
+        ts = f[30] if len(f) > 30 else ""
+        if ts[:8] != str(day).replace("-", ""):
+            return None
+        return float(f[3])
+    except Exception:
+        return None
+
+
+def tx_close(code, day):
+    """腾讯收盘价：K 线优先、快照兜底（任一命中即可；仍受 0.5% 容差门禁约束，判据不放松）"""
+    v = _tx_kline_close(code, day)
+    if v is None:
+        v = tx_snapshot_close(code, day)
+    return v
 
 
 def load_delta(src):
@@ -277,7 +307,7 @@ def main():
             c = codes[i]; picked.append(c)
             if len(picked) >= a.sample:
                 break
-        print("  多源校验（腾讯 K 线 %s）：" % newest)
+        print("  多源校验（腾讯 K线→快照兜底 %s）：" % newest)
         for c in picked:
             dv = float(rows[newest][c]["close"]); tv = tx_close(c, newest)
             hit = tv is not None and abs(dv - tv) / tv <= 0.005
