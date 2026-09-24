@@ -1,7 +1,10 @@
 # 云端收盘刷新依赖（⑤ Phase 1）
-# 依据：update_daily / build_short_pool / review_daily / build_dual_system 等的顶层 import 汇总
+# 依据：update_daily / build_short_pool / review_daily / build_dual_system / factor_gate 等的 import 汇总
 pandas
 numpy
 requests
 PyYAML
 akshare
+scipy          # factor_gate.py:12 `from scipy.ndimage import maximum_filter1d, minimum_filter1d`
+               # ↑ qlch 六臂（qlch_paper_20260921.py:129 import factor_gate）与 factor_gate_daily 共用；
+               #   缺它会让「超跌低开低吸」6 臂全部 [软] 失败 → 看板该卡片停更（2026-09-24 实测根因）
