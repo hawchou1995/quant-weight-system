@@ -6,7 +6,7 @@
 """
 import numpy as np, pandas as pd, pickle, os, time
 
-BASE = r"D:/Documents/Workbuddy/股票基金/quant-weight-system"
+BASE = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))  # 仓库根（2026-09-24 云端可移植；本机解析恒等）
 OUT = os.path.join(BASE, "backtest", "oss_0913")
 os.makedirs(OUT, exist_ok=True)
 t0 = time.time()

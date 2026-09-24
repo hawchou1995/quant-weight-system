@@ -7,7 +7,7 @@
 import numpy as np, pandas as pd, pickle, json, os
 from pathlib import Path
 
-BASE = Path(r"D:/Documents/Workbuddy/股票基金/quant-weight-system")
+BASE = Path(__file__).resolve().parents[2]  # 仓库根（调用方均注入 __file__ / import 天然有）
 FL = BASE / "backtest" / "factorlab_0913"
 OUT = BASE / "backtest" / "oss_0913"
 

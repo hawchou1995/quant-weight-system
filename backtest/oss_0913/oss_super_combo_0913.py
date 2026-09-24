@@ -6,7 +6,23 @@
 """
 import numpy as np, pandas as pd, pickle, json, os, math, time
 
-BASE = r"D:/Documents/Workbuddy/股票基金/quant-weight-system"
+def _oss_base():
+    """仓库根解析（2026-09-24 云端可移植；本机解析恒等）。exec 注入场景可能无 __file__ → 自 cwd 向上找 index_000300.csv 标记回退。"""
+    _c = []
+    if "__file__" in globals():
+        _c.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+    _p = os.getcwd()
+    for _ in range(6):
+        _c.append(_p)
+        _q = os.path.dirname(_p)
+        if _q == _p:
+            break
+        _p = _q
+    for _d in _c:
+        if _d and os.path.isfile(os.path.join(_d, "index_000300.csv")) and os.path.isdir(os.path.join(_d, "backtest", "oss_0913")):
+            return _d
+    return _c[0]
+BASE = _oss_base()
 OUT = os.path.join(BASE, "backtest", "oss_0913")
 FL = os.path.join(BASE, "backtest", "factorlab_0913")
 CASH0 = 170_000.0
