@@ -35,13 +35,12 @@ SYNC = [
 ]
 
 # ---- 新增策略产物的「软发布」层（2026-09-24 · R-short-strategy-isolation-0924）----
-# 短线板块两个新子标签（左侧捡漏 / 热榜哨兵）的产物由 daily_refresh.py 的 **[软] 步**产出
+# 短线板块新子标签（热榜哨兵）的产物由 daily_refresh.py 的 **[软] 步**产出
 # （失败只告警、不阻断主链）。把它们并入 SYNC → 一并发到 gh-pages（用户可从网上直接取池文件），
 # 但**不纳入硬存在门**：否则新策略一次偶发失败就会 assert 直接中止部署，把「新增 2 个子标签」
 # 变成「整个看板不再发布」——不可接受的回归。
 # 语义：存在就发；不存在则跳过并明确打印（不静默、也不阻断）。
 SYNC_SOFT = [
-    "zuoce_jianlou_pool.js", "zuoce_jianlou_track.js",
     "sentinel_pool.js", "sentinel_track.js",
 ]
 SYNC = SYNC + [n for n in SYNC_SOFT if n not in SYNC]

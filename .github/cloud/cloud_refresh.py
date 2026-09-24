@@ -56,14 +56,12 @@ SYNC = [
     "a5_pool.js",
     "market_breadth.js",
     "market_weather.js",
-    # 2026-09-24 新增：短线板块两个新子标签的产物（见下方 SYNC_SOFT 说明）
-    "zuoce_jianlou_pool.js", "zuoce_jianlou_track.js",
+    # 2026-09-24 新增：短线板块新子标签的产物（见下方 SYNC_SOFT 说明）
     "sentinel_pool.js", "sentinel_track.js",
 ]
 # [软] 发布项：由 daily_refresh.py 的 [软] 步产出 → 一并发布，但**不进 G1 硬存在门**。
 # 理由同 _deploy_fundline_0911.py：新策略偶发失败不得阻断整条云端发布。
-SYNC_SOFT = ["zuoce_jianlou_pool.js", "zuoce_jianlou_track.js",
-             "sentinel_pool.js", "sentinel_track.js"]
+SYNC_SOFT = ["sentinel_pool.js", "sentinel_track.js"]
 # 看板 HTML：dual_system.html 为准，index.html 由本脚本复制（与本地部署同口径）
 HTML = "dual_system.html"
 

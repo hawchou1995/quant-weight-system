@@ -165,16 +165,13 @@ STEPS = [
     # ② finite-check 于日链状态 JSON 的数字叶子（拦 inf/NaN 静默污染，陷阱 ★178）
     # 仅 FAIL 时非零（FAIL 会打印到日志，但 [软] 语义下不阻断主链）；--skip-gate 跳过。
     ("因子检查闸 factor_gate_daily[软]", ["backtest/factor_gate_daily.py"], "--skip-gate" in sys.argv),
-    # 短线板块两个新子标签（R-short-strategy-isolation-0924 · 2026-09-24 用户批准）：
-    #   ① 左侧捡漏 = bt520「纯左侧簿」(wB=1.0)，**留出门已跑完且未通过** → 只上回测、不开模拟盘；
-    #   ② 热榜哨兵 = jiandi top30 共振哨兵（影子账本，只记账不成交）。
-    # 两者产物**各自独立**，严禁与既有 5 个子标签共用（契约点⑤）；
-    # 必须排在 build_dual_system 之前——看板直接读它们的 pool.js/track.js/state.json。
-    # 回测参考卡由 build_zuoce_backtest_ref.py 从已审计的 bt520_holdout_0924.json **投影**生成
-    # （只投影、不重算；来源缺失即 rc=3，绝不编数字）。
-    # [软]=失败不阻断主链；--skip-zuoce / --skip-sentinel 跳过。
-    ("左侧捡漏-单日信号 zuoce_jianlou_daily[软]", ["backtest/zuoce_jianlou_daily.py"], "--skip-zuoce" in sys.argv),
-    ("左侧捡漏-回测参考卡 build_zuoce_backtest_ref[软]", ["backtest/build_zuoce_backtest_ref.py"], "--skip-zuoce" in sys.argv),
+    # 短线板块新子标签（R-short-strategy-isolation-0924 · 2026-09-24 用户批准）：
+    #   热榜哨兵 = jiandi top30 共振哨兵（影子账本，只记账不成交）。
+    # 产物与既有 5 个子标签严格隔离（契约点⑤）；必须排在 build_dual_system 之前——
+    # 看板直接读它的 pool.js / track.js / state.json。
+    # [软]=失败不阻断主链；--skip-sentinel 跳过。
+    # ⚠ 2026-09-24 二次决策：原「左侧捡漏」(bt520 纯左侧簿) 复测门未过 → 按用户指示**整体下架**
+    #   （见 ADR-0010 D14）；其 STEPS / git 白名单 / 校验清单条目已一并移除，不留悬空引用。
     ("热榜哨兵-单日信号 sentinel_daily[软]", ["backtest/sentinel_daily.py"], "--skip-sentinel" in sys.argv),
     ("看板重建 build_dual_system", ["build_dual_system.py"], False),
     ("部署 gh-pages", ["_deploy_fundline_0911.py"], "--skip-deploy" in sys.argv),
@@ -259,15 +256,11 @@ if not fails:
     import json as _json
     _expect = str(date.today())
     for _rel, _var, _keys in [
-        ("zuoce_jianlou_pool.js", "window.ZUOCE_POOL", ("as_of",)),
-        ("zuoce_jianlou_track.js", "window.ZUOCE_TRACK", ("as_of",)),
-        ("backtest/zuoce_jianlou_paper_state.json", None, ("as_of",)),
         ("sentinel_pool.js", "window.SENTINEL_POOL", ("as_of",)),
         ("sentinel_track.js", "window.SENTINEL_TRACK", ("as_of",)),
         # sentinel_state.json 的日期字段按影子账本设计叫 last_scan（不是 as_of）——
         # 这里接受两者；**改校验器、不改生产脚本 schema**（否则是拿 schema 迁就检查）。
         ("backtest/sentinel_state.json", None, ("as_of", "last_scan")),
-        ("backtest/zuoce_jianlou_backtest.json", None, ("gate",)),
     ]:
         _p = BASE / _rel
         if not _p.exists():
@@ -334,12 +327,9 @@ if not fails and not NO_MAIN_PUSH:   # ⑤ 云端 Phase 1：只写 gh-pages，�
                           "backtest/em_tencent_fill.py", "backtest/rebuild_v8cache.py",
                           # 2026-09-24 补：短线板块两个新策略的**生产源 + 产物**
                           # （此前新脚本不进链白名单 → 改动不会被链提交，同 09-17/09-23 两次同类漏项）
-                          "backtest/zuoce_jianlou_daily.py", "backtest/build_zuoce_backtest_ref.py",
-                          "backtest/bt520_holdout_0924.json", "backtest/zuoce_jianlou_backtest.json",
-                          "backtest/zuoce_jianlou_paper_state.json",
+                          "backtest/bt520_holdout_0924.json",
                           "backtest/sentinel_daily.py", "backtest/sentinel_backtest.json",
                           "backtest/sentinel_state.json",
-                          "zuoce_jianlou_pool.js", "zuoce_jianlou_track.js",
                           "sentinel_pool.js", "sentinel_track.js",
                           # 隔离校验器 + A5 竞价夹具 + 派出脚本 + 工作单（本轮新增的取证件）
                           "_verify_track_sep_0924.py",
