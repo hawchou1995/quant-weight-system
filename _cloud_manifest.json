@@ -1,12 +1,12 @@
 {
-  "run_id": "35935983002",
-  "sha": "fea796c1f1aaef3763ca259912f46c5e2a9b0a1c",
-  "mode": "probe",
+  "run_id": "35972597440",
+  "sha": "b352ed06f65551976ad706e26a9b825abfd48b41",
+  "mode": "chain",
   "status": "published-candidate",
-  "ts_cn": "2026-09-24 07:55:55",
+  "ts_cn": "2026-09-24 16:53:56",
   "today_cn": "2026-09-24",
-  "chain_rc": null,
-  "g2_fresh": false,
+  "chain_rc": 0,
+  "g2_fresh": true,
   "runtime_deps": [
     "enhanced_data.js",
     "short_signals.js",
@@ -20,9 +20,9 @@
   "files": [
     {
       "name": "dual_system.html",
-      "md5": "7689df2b860f",
-      "bytes": 1135563,
-      "as_of": "2026-09-23"
+      "md5": "ea00f813c63b",
+      "bytes": 1114012,
+      "as_of": "2026-09-24"
     },
     {
       "name": "short_v3_fund_slip20_summary.json",
@@ -50,8 +50,8 @@
     },
     {
       "name": "review_log.html",
-      "md5": "ea7f591c4a3c",
-      "bytes": 47250,
+      "md5": "a64589760839",
+      "bytes": 46822,
       "as_of": null
     },
     {
@@ -68,20 +68,20 @@
     },
     {
       "name": "short_signals.js",
-      "md5": "e415d52b5038",
-      "bytes": 1809497,
-      "as_of": "2026-09-23"
+      "md5": "1d0ca64b8dda",
+      "bytes": 1811217,
+      "as_of": "2026-09-24"
     },
     {
       "name": "enhanced_data.js",
-      "md5": "49acf00e8d4c",
-      "bytes": 425966,
-      "as_of": "2026-09-23"
+      "md5": "5edec39d4caa",
+      "bytes": 428803,
+      "as_of": "2026-09-24"
     },
     {
       "name": "a5_pool.js",
-      "md5": "fe5f068bd650",
-      "bytes": 29862,
+      "md5": "658c3fac971e",
+      "bytes": 27063,
       "as_of": "2026-09-23"
     },
     {
@@ -98,8 +98,8 @@
     },
     {
       "name": "index.html",
-      "md5": "7689df2b860f",
-      "bytes": 1135563,
+      "md5": "ea00f813c63b",
+      "bytes": 1114012,
       "as_of": null
     }
   ]
