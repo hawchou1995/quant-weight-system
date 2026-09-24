@@ -1,20 +1,20 @@
 {
   "event_name": "schedule",
   "runner": "Linux",
-  "ts_utc": "2026-09-24T04:44:35.243861+00:00",
+  "ts_utc": "2026-09-24T09:34:03.621084+00:00",
   "tests": {
     "qt_quote": {
       "ok": true,
-      "sec": 1.1,
+      "sec": 1.2,
       "attempts": 1,
       "code": "sh600000",
       "name": "�ַ�����",
       "px": 9.0,
-      "len": 507
+      "len": 515
     },
     "tx_kline": {
       "ok": true,
-      "sec": 1.6,
+      "sec": 1.4,
       "attempts": 1,
       "rows": 6,
       "last": [
@@ -23,12 +23,12 @@
         "9.00",
         "9.05",
         "8.97",
-        "297248"
+        "528364"
       ]
     },
     "ak_sina_spot": {
       "ok": true,
-      "sec": 52.1,
+      "sec": 65.9,
       "attempts": 1,
       "rows": 5568,
       "cols": [
@@ -42,7 +42,7 @@
     },
     "ak_tx_hist": {
       "ok": true,
-      "sec": 2.4,
+      "sec": 2.5,
       "attempts": 1,
       "rows": 7,
       "last_date": "2026-08-28",
