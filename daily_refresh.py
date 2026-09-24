@@ -171,6 +171,9 @@ STEPS = [
     #     ≥40 笔；该哨兵 1 个扫描日 / 0 笔，且预注册自述「只可否决 · 不构成通过性证据」）
     #     → 整体下架（ADR-0010 D16）
     #   两者的 STEPS / git 白名单 / 校验清单条目均已移除，不留悬空引用。
+    # ⚠ 2026-09-25 三度决策（用户「执行复测再否定」）：热榜哨兵**已跑稳健性复测且 B1–B8 全过**
+    #   （backtest/jiandi_sentinel_retest_0924.json）→ 装回看板。左侧捡漏仍下架（复测门确为不通过）。
+    ("热榜哨兵-单日信号 sentinel_daily[软]", ["backtest/sentinel_daily.py"], "--skip-sentinel" in sys.argv),
     ("看板重建 build_dual_system", ["build_dual_system.py"], False),
     ("部署 gh-pages", ["_deploy_fundline_0911.py"], "--skip-deploy" in sys.argv),
 ]
@@ -252,11 +255,26 @@ if not fails:
     print("", flush=True)
     print("========== 新策略产物校验清单 ==========", flush=True)
     import json as _json
-    _expect = str(date.today())
+    # 期望值 = **最新交易日**（读 index_000300.csv 末行），不是日历日——
+    # 否则非交易日/午夜后到下一交易日之间会恒定假日误报。读不到就退回日历日。
+    _expect = None
+    try:
+        with open(BASE / "index_000300.csv", encoding="utf-8-sig") as _fh:
+            for _ln in _fh:
+                _p = _ln.split(",")[0].strip()
+                if len(_p) >= 10 and _p[:4].isdigit():
+                    _expect = _p
+    except Exception:
+        _expect = None
+    _expect = _expect or str(date.today())
     for _rel, _var, _keys in [
         # 2026-09-24：新增策略已全部下架（ADR-0010 D14 左侧捡漏 / D16 热榜哨兵）
         # → 本清单暂无条目；结构保留，供下一次策略接入时直接填
         #（判据仍是「文件在盘 + 可解析 + 日期字段 == 当日」）。
+        ("sentinel_pool.js", "window.SENTINEL_POOL", ("as_of",)),
+        ("sentinel_track.js", "window.SENTINEL_TRACK", ("as_of",)),
+        # sentinel_state.json 的日期字段按影子账本设计叫 last_scan（不是 as_of）——接受两者
+        ("backtest/sentinel_state.json", None, ("as_of", "last_scan")),
     ]:
         _p = BASE / _rel
         if not _p.exists():
@@ -325,6 +343,12 @@ if not fails and not NO_MAIN_PUSH:   # ⑤ 云端 Phase 1：只写 gh-pages，�
                           # （此前新脚本不进链白名单 → 改动不会被链提交，同 09-17/09-23 两次同类漏项）
                           "backtest/bt520_holdout_0924.json",
                           "backtest/sentinel_backtest.json",
+                          "backtest/sentinel_daily.py",
+                          "backtest/sentinel_state.json",
+                          "sentinel_pool.js", "sentinel_track.js",
+                          "backtest/jiandi_sentinel_retest_0924.py",
+                          "backtest/jiandi_sentinel_retest_0924.json",
+                          "backtest/PRE-REGISTRATION_20260924b_jiandi_sentinel_retest.md",
                           # 隔离校验器 + A5 竞价夹具 + 派出脚本 + 工作单（本轮新增的取证件）
                           "_verify_track_sep_0924.py",
                           "backtest/a5_auction_judge_fixture.js",

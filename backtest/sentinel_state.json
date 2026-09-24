@@ -1,0 +1,70 @@
+{
+ "schema": "sentinel_state/v1",
+ "strategy": "热榜哨兵",
+ "strategy_key": "sentinel",
+ "rule_version": "R-jiandi-top30-0924/v1",
+ "shadow_start": "2026-09-24",
+ "created": "2026-09-24 22:58:01",
+ "last_run": "2026-09-24 23:54:39",
+ "last_scan": "2026-09-24",
+ "trading_enabled": false,
+ "trading_enabled_note": "影子账本不执行成交（预注册：只可否决）；恒 false",
+ "status": "COLLECTING",
+ "n_scans": 1,
+ "last_result": {
+  "as_of": "2026-09-24",
+  "triggered": false,
+  "reason": "no_resonance_day",
+  "as_of_resonance": 0,
+  "threshold": 30,
+  "n_pool": 0,
+  "last_trigger_date": "2026-08-04",
+  "last_trigger_resonance": 73,
+  "data_last_bar": "2026-09-24",
+  "universe_n": 3404,
+  "n_with_as_of_bar": 3133
+ },
+ "outputs": {
+  "sentinel_pool_js": {
+   "path": "sentinel_pool.js",
+   "bytes": 31790,
+   "sha256": "a9d809113b33d747acc66faa7527de5d79125f41bf97813d4b1ef77349f42355",
+   "content_sha256": "d0e98900dd208dd7c6e2d2b56104a24ab67cb336f058bf85fb0928c1b0de5896"
+  },
+  "sentinel_track_js": {
+   "path": "sentinel_track.js",
+   "bytes": 2417,
+   "sha256": "0c64d549cd227901c818cb1486b1acfdf6ac9ab7ee18965d64bb56727d11f8ab",
+   "content_sha256": "a338f0b25289c5c1591261ffffc1817b811744546b7946ed6db1c42542bade0f"
+  }
+ },
+ "scan_log": [
+  {
+   "date": "2026-09-24",
+   "resonance": 0,
+   "threshold": 30,
+   "triggered": false,
+   "n_pool": 0,
+   "reason": "no_resonance_day",
+   "action": "NO_TRADE",
+   "at": "2026-09-24 23:54:39"
+  }
+ ],
+ "positions": [],
+ "closed": [],
+ "equity": [],
+ "n_events_done": 0,
+ "veto_state": {
+  "V1": false,
+  "V2": false,
+  "V3": false,
+  "V4_diag": null,
+  "note": "预注册 V1–V4；本影子账本 1 个扫描日 / 0 笔成交 → 全部未触发"
+ },
+ "notes": [
+  "影子账本只记录扫描与计划；不伪造成交（positions/closed/equity 恒空数组）",
+  "shadow_start 由预注册冻结（2026-09-24），脚本拒绝改写为其它值",
+  "回测摘要（backtest/sentinel_backtest.json）只在 --refresh-backtest 时刷新，属静态回测产物"
+ ],
+ "content_sha256": "b9b465f986731f17b3e2b21b923aebf1da6f9f0c9162b54f2c5f863efdf4c00d"
+}

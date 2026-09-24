@@ -1,0 +1,173 @@
+{
+ "task": "R-jiandi-retest-0924b",
+ "prereg": "backtest/PRE-REGISTRATION_20260924b_jiandi_sentinel_retest.md",
+ "readonly": true,
+ "n_trials": 168,
+ "cost_selfcheck": {
+  "n": 10994,
+  "mean_pp": 1.191,
+  "median_pp": 1.1839,
+  "p5_pp": 1.0465,
+  "p95_pp": 1.3449,
+  "min_pp": 0.7069,
+  "max_pp": 2.0023,
+  "declared_roundtrip_pct": 1.15,
+  "center_tolerance_pp": 0.1,
+  "center_pass": true,
+  "rejected_statistic": {
+   "name": "per_row_max_abs_deviation",
+   "value_pp": 2.0023,
+   "old_tolerance_pp": 0.5,
+   "old_verdict": "FAIL",
+   "why_rejected": "行级偏差含合法舍入噪声，取最大值不构成口径正确性判据"
+  },
+  "note": "口径 = 引擎自出净收益 ret_s1_pct（实际档 ~1.15% 往返）；毛收益 = net + 实测均值"
+ },
+ "B1_rolling_244d_annual": {
+  "n_windows": 2252,
+  "median_pct": 10.76,
+  "mean_pct": 18.97,
+  "worst_pct": -22.39,
+  "best_pct": 132.55,
+  "pos_ratio_pct": 78.3,
+  "pass": true
+ },
+ "B2_single_path_annual": {
+  "span": "2017-01-18 -> 2026-08-12",
+  "years": 10.23,
+  "annual_pct": 14.1,
+  "pass": true
+ },
+ "B3_mdd": {
+  "mdd_pct": -25.6,
+  "threshold_pct": -40.0,
+  "pass": true
+ },
+ "B4_theta_neighborhood": {
+  "cells": {
+   "theta_ge_20": {
+    "n": 10994,
+    "net_mean_pct": 2.971,
+    "net_median_pct": 2.349,
+    "win_pct": 64.7,
+    "pass": true
+   },
+   "theta_ge_30": {
+    "n": 9833,
+    "net_mean_pct": 3.352,
+    "net_median_pct": 2.611,
+    "win_pct": 67.0,
+    "pass": true
+   },
+   "theta_ge_40": {
+    "n": 9168,
+    "net_mean_pct": 3.431,
+    "net_median_pct": 2.707,
+    "win_pct": 67.4,
+    "pass": true
+   },
+   "theta_ge_50": {
+    "n": 8546,
+    "net_mean_pct": 3.665,
+    "net_median_pct": 2.896,
+    "win_pct": 68.9,
+    "pass": true
+   },
+   "theta_ge_75": {
+    "n": 7298,
+    "net_mean_pct": 3.909,
+    "net_median_pct": 3.147,
+    "win_pct": 70.7,
+    "pass": true
+   },
+   "theta_ge_100": {
+    "n": 6537,
+    "net_mean_pct": 4.22,
+    "net_median_pct": 3.472,
+    "win_pct": 72.1,
+    "pass": true
+   },
+   "theta_ge_150": {
+    "n": 5644,
+    "net_mean_pct": 4.812,
+    "net_median_pct": 4.17,
+    "win_pct": 75.6,
+    "pass": true
+   }
+  },
+  "pass": true,
+  "failed_cells": []
+ },
+ "B5_cost_x3": {
+  "roundtrip_pct": 3.4499999999999997,
+  "n": 10994,
+  "net_mean_pct_declared": 0.671,
+  "net_mean_pct_measured": 0.712,
+  "net_median_pct_measured": 0.091,
+  "pass": true
+ },
+ "B6_half_split": {
+  "split_date": "2018-07-06",
+  "h1": {
+   "n": 5497,
+   "net_mean_pct": 2.853,
+   "span": "2018-06-29 -> 2018-06-29"
+  },
+  "h2": {
+   "n": 5497,
+   "net_mean_pct": 3.088,
+   "span": "2018-07-06 -> 2026-07-31"
+  },
+  "pass": true
+ },
+ "B7_overfit_bonferroni": {
+  "n_trials": 168,
+  "t_stat": 30.385,
+  "p_one_sided": 4.3825145509662796e-203,
+  "p_bonferroni": 7.36262444562335e-201,
+  "threshold": 0.05,
+  "pass": true
+ },
+ "per_year_seed_distribution": {
+  "arm": "A2 固定55",
+  "config": "6万×2",
+  "per_year_med_pct": {
+   "2016": 0.0,
+   "2017": 21.28,
+   "2018": 32.14,
+   "2019": 7.41,
+   "2020": 1.23,
+   "2021": 5.63,
+   "2022": 7.93,
+   "2023": 0.18,
+   "2024": 2.33,
+   "2025": 1.96,
+   "2026": 8.42
+  },
+  "ev_yearly_mean_gross_pct": {
+   "2016": null,
+   "2017": 2.9954945314101638,
+   "2018": 2.883122057668237,
+   "2019": 3.4031889096446757,
+   "2020": 4.663768279312443,
+   "2021": 3.5291198580657412,
+   "2022": 4.639990935073113,
+   "2023": 0.4803245213155101,
+   "2024": 8.169226642399888,
+   "2025": 3.0562491411333816,
+   "2026": 2.4538129656127188
+  }
+ },
+ "B8_per_year": {
+  "years": 11,
+  "positive_years": 10,
+  "positive_share_pct": 90.9,
+  "note": "200 随机选股种子分布的中位收益（非单一实现）"
+ },
+ "verdict": {
+  "rule": "B1–B7 全满足=通过；任一不满足=不通过",
+  "failed": [],
+  "total": "通过",
+  "scope_warning": "稳健性复测，非干净 OOS（2016-06-01 起全样本已用于选参）；不得被读作「已证明可投产」"
+ }
+}

@@ -40,8 +40,10 @@ SYNC = [
 # 但**不纳入硬存在门**：否则新策略一次偶发失败就会 assert 直接中止部署，把「新增 2 个子标签」
 # 变成「整个看板不再发布」——不可接受的回归。
 # 语义：存在就发；不存在则跳过并明确打印（不静默、也不阻断）。
-# 2026-09-24：新增策略已全部下架（ADR-0010 D14/D16）→ 暂无软发布项；分层结构保留待复用。
-SYNC_SOFT = []
+# 2026-09-25：热榜哨兵经稳健性复测（B1–B8 通过）装回看板；左侧捡漏仍下架（复测门不通过）。
+SYNC_SOFT = [
+    "sentinel_pool.js", "sentinel_track.js",
+]
 SYNC = SYNC + [n for n in SYNC_SOFT if n not in SYNC]
 DUAL = ["dual_system.html", "index.html"]
 

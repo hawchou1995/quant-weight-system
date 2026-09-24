@@ -22,32 +22,34 @@ BASE = pathlib.Path(__file__).resolve().parent
 HTML = BASE / "dual_system.html"
 
 # R0：构建产物内必须为 0 的下架 token
-GONE_TOKENS = ["st-zuoce", "zuoce_jianlou", "ZUOCE_POOL", "ZUOCE_TRACK", "左侧捡漏",
-               "st-sentinel", "sentinel_pool.js", "sentinel_track.js",
-               "SENTINEL_POOL", "SENTINEL_TRACK", "热榜哨兵"]
+GONE_TOKENS = ["st-zuoce", "zuoce_jianlou", "ZUOCE_POOL", "ZUOCE_TRACK", "左侧捡漏"]
 # R0：文件系统层面必须已移除
 GONE_FILES = ["zuoce_jianlou_pool.js", "zuoce_jianlou_track.js",
               "backtest/zuoce_jianlou_paper_state.json", "backtest/zuoce_jianlou_backtest.json",
-              "backtest/zuoce_jianlou_daily.py", "backtest/build_zuoce_backtest_ref.py",
-              "sentinel_pool.js", "sentinel_track.js",
-              "backtest/sentinel_state.json", "backtest/sentinel_daily.py",
-              "backtest/sentinel_0924"]
+              "backtest/zuoce_jianlou_daily.py", "backtest/build_zuoce_backtest_ref.py"]
 # R0：配置层「接线标识符」必须为 0（中文名可能合法出现在「已下架」注释里，故不查）
-GONE_WIRING = ["st-zuoce", "zuoce_jianlou", "ZUOCE_", "build_zuoce_backtest_ref",
-               "st-sentinel", "sentinel_pool.js", "sentinel_track.js",
-               "sentinel_daily.py", "backtest/sentinel_state.json",
-               "SENTINEL_POOL", "SENTINEL_TRACK"]
+GONE_WIRING = ["st-zuoce", "zuoce_jianlou", "ZUOCE_", "build_zuoce_backtest_ref"]
 GONE_CONFIGS = ["daily_refresh.py", ".github/cloud/cloud_refresh.py",
                 "_deploy_fundline_0911.py", "build_dual_system.py"]
 # K：刻意保留的证据（必须仍在盘）
 KEPT_FILES = ["backtest/bt520_holdout_0924.json",
               "backtest/sentinel_backtest.json",
               "backtest/PRE-REGISTRATION_20260924_jiandi_top30_sentinel.md",
-              "backtest/jiandi_top_grid_0924_out/top1_nav_daily_0924.csv"]
+              "backtest/jiandi_top_grid_0924_out/top1_nav_daily_0924.csv",
+              "backtest/jiandi_sentinel_retest_0924.json",
+              "backtest/jiandi_sentinel_retest_0924.py",
+              "backtest/PRE-REGISTRATION_20260924b_jiandi_sentinel_retest.md",
+              "sentinel_pool.js", "sentinel_track.js", "backtest/sentinel_state.json"]
 
 ORIG_SUBS = [("st-qlch", "超跌低开低吸"), ("st-kh", "超卖伏击"), ("st-etf", "ETF轮动"),
              ("st-stk", "股票池"), ("st-fund", "基金池")]
+NEW_SUBS = [("st-sentinel", "热榜哨兵")]
+OWNED = {"st-sentinel": {"js": ["sentinel_pool.js", "sentinel_track.js"],
+                         "state_json": "backtest/sentinel_state.json",
+                         "bt_json": "backtest/sentinel_backtest.json",
+                         "key": "sentinel", "producer": "backtest/sentinel_daily.py"}}
 ALLOWED_CARDS = {
+    "st-sentinel": ["bt-st-sentinel", "bt-sentinel"],
     "st-qlch": ["bt-st-qlch", "bt-qlch"],
     "st-kh": ["bt-short-stock-main-c", "bt-short-stock-hybrid"],
     "st-etf": ["bt-st-etf", "bt-etf"],
@@ -149,7 +151,7 @@ def foreign_cards(sub, ids):
 
 
 def check_r0(html):
-    print("\n① R0 · 两次下架是否彻底（产物 / 文件 / 配置三面）")
+    print("\n① R0 · 左侧捡漏下架是否彻底（产物 / 文件 / 配置三面；热榜哨兵复测通过已装回）")
     for t in GONE_TOKENS:
         n = html.count(t)
         (ok if n == 0 else bad)("构建产物内 %-18s 出现 %d 次（须为 0）" % (t, n))
@@ -172,14 +174,34 @@ def check_kept():
         (ok if p.exists() else bad)("保留 %-62s %s" % (f, "✓" if p.exists() else "缺失 !!"))
 
 
+def check_owned(html):
+    """装回后：哨兵子视图只引用自己的产物 + 不含已下架策略 token。"""
+    print("")
+    print("(3b) 哨兵子视图只引用自己的产物（装回后仍须隔离）")
+    for sub, meta in OWNED.items():
+        i = html.find('id="sv-%s"' % sub)
+        if i < 0:
+            bad("找不到子视图 #sv-%s" % sub)
+            continue
+        j = html.find('<div class="subview"', i + 10)
+        seg = html[i:j] if j > i else html[i:i + 6000]
+        (ok if ('id="own-%s"' % meta["key"]) in seg else bad)(
+            "#sv-%s 含自有资产卡 #own-%s" % (sub, meta["key"]))
+        for n in meta["js"] + [meta["state_json"]]:
+            (ok if n in seg else bad)("#sv-%s 引用自有产物 %s" % (sub, n))
+        leak = [x for x in GONE_TOKENS if x in seg]
+        (ok if not leak else bad)("#sv-%s 未混入已下架策略 token%s"
+                                 % (sub, "" if not leak else " %s" % leak))
+
+
 def check_d(html):
-    print("\n③ 子导航回到原 5 项（不得有新增子标签残留）")
+    print("\n③ 子导航 = 原 5 项 + 热榜哨兵（装回后）")
     subs = nav_items(html)
-    (ok if subs == ORIG_SUBS else bad)("短线子导航 = %s" % (subs,))
+    (ok if subs == ORIG_SUBS + NEW_SUBS else bad)("短线子导航 = %s" % (subs,))
 
     print("\n④ data-bt-sub 与子导航 1:1")
     ks = bt_keys(html)
-    want = sorted(k for k, _ in ORIG_SUBS)
+    want = sorted(k for k, _ in ORIG_SUBS + NEW_SUBS)
     (ok if sorted(ks) == want else bad)("data-bt-sub 块 = %d → %s" % (len(ks), ks))
 
     print("\n⑤ 每个 bt-sub 块只渲染自己那一块（不得跨标签）")
@@ -192,12 +214,12 @@ def check_d(html):
 
     print("\n⑥ 任意两个 bt-sub 块不得同文（共用即同文）")
     seen, dup = {}, []
-    for k, _t in ORIG_SUBS:
+    for k, _t in ORIG_SUBS + NEW_SUBS:
         h = hash(norm(slice_bt_sub(html, k)))
         if h in seen:
             dup.append((seen[h], k))
         seen[h] = k
-    (ok if not dup else bad)("5 个 bt-sub 块内容两两不同" if not dup else "发现同文块 %s" % dup)
+    (ok if not dup else bad)("6 个 bt-sub 块内容两两不同" if not dup else "发现同文块 %s" % dup)
 
 
 def _selftest_cross_reads():
@@ -218,6 +240,7 @@ def _selftest_cross_reads():
 def run_all(html):
     check_r0(html)
     check_kept()
+    check_owned(html)
     check_d(html)
     return len(oks), len(fails), list(fails)
 
@@ -245,14 +268,12 @@ neg1 = any(("st-zuoce" in f) or ("左侧捡漏" in f) for f in fails)
 print("   -> 负对照 1：%s（失败项 %d）" % ("已检出" if neg1 else "漏检", len(fails)))
 
 print("\n" + "=" * 78)
-print("【负对照 2】把已下架的 st-sentinel 回注子导航 -> R0 必须检出")
+print("【负对照 2】把哨兵子导航项删掉 -> 子导航/1:1 判据必须检出")
 print("=" * 78)
-N2 = HTML_TXT.replace('<button class="subtab" data-sub="st-fund"',
-                      '<button class="subtab" data-sub="st-sentinel">热榜哨兵</button>'
-                      '<button class="subtab" data-sub="st-fund"', 1)
+N2 = HTML_TXT.replace('<button class="subtab" data-sub="st-sentinel" type="button">热榜哨兵</button>', "", 1)
 assert N2 != HTML_TXT, "负对照 2 未改动输入"
 run_all(N2)
-neg2 = any(("st-sentinel" in f) or ("热榜哨兵" in f) for f in fails)
+neg2 = len(fails) > 0
 print("   -> 负对照 2：%s（失败项 %d）" % ("已检出" if neg2 else "漏检", len(fails)))
 
 print("\n" + "=" * 78)
