@@ -970,12 +970,21 @@ def bt_card(cid, title, tag, s, curve_id, color="var(--warn)", sub="2016-01~2026
     """回测 KPI 卡（收益/年化/回撤·夏普 + 净值曲线容器）"""
     if not s:
         return f'<div class="bt-card" id="{cid}"><div class="bt-head"><b>{title}</b><span class="bt-tag">{tag}</span></div><div class="kpis"><div class="kpi"><div class="l">回测收益</div><div class="v">—</div><div class="s">回测中…</div></div></div><div class="bt-curve" id="{curve_id}"></div></div>'
+    # 2026-09-24 统一到回测卡层级：主带（年化/最大回撤/胜率）→ 次级带（回测收益/夏普/交易数）→ 区间元数据行。
+    # 本函数的数据源无「单笔平均/中位」字段 → 主带只有 3 格，不补 0、不外推。
+    _c_up = "var(--up)" if s["annual_return_pct"] >= 0 else "var(--down)"
     return f'''<div class="bt-card" id="{cid}">
 <div class="bt-head"><b>{title}</b><span class="bt-tag">{tag}</span></div>
-<div class="kpis">
-<div class="kpi"><div class="l">回测收益</div><div class="v" style="color:{color}">{s["total_return_pct"]:+.1f}%</div><div class="s">{sub}</div></div>
-<div class="kpi"><div class="l">年化</div><div class="v">{s["annual_return_pct"]:.1f}%</div><div class="s">胜率 {s.get("win_rate_pct",0):.0f}%</div></div>
-<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:var(--up)">{s["max_drawdown_pct"]:.1f}%</div><div class="s">夏普 {s["sharpe"]:.2f} · {s.get("total_trades",0)} 笔</div></div>
+<div class="bt-meta">回测区间 · {sub}</div>
+<div class="bt-band">
+<div class="kpi bt-hero"><div class="l">年化</div><div class="v" style="color:{_c_up}">{s["annual_return_pct"]:.1f}%</div></div>
+<div class="kpi bt-hero"><div class="l">最大回撤</div><div class="v">{s["max_drawdown_pct"]:.1f}%</div></div>
+<div class="kpi bt-hero"><div class="l">胜率</div><div class="v">{s.get("win_rate_pct",0):.0f}%</div></div>
+</div>
+<div class="bt-band" style="margin-top:10px">
+<div class="kpi bt-sm"><div class="l">回测收益</div><div class="v" style="color:{color}">{s["total_return_pct"]:+.1f}%</div></div>
+<div class="kpi bt-sm"><div class="l">夏普</div><div class="v">{s["sharpe"]:.2f}</div></div>
+<div class="kpi bt-sm"><div class="l">交易数</div><div class="v">{s.get("total_trades",0)}</div></div>
 </div>
 <div class="bt-curve" id="{curve_id}"></div>
 </div>'''
@@ -1022,40 +1031,60 @@ def bt_short_html(only=None):
                     f'<div class="s">主板卡以 超卖伏击 全窗口回测为准</div></div></div></div>')
         # 超卖伏击 卡是自定义结构（dict 字段与 summary 不同），单独渲染
         if "ex_m" in s:
+            # 2026-09-24 统一到回测卡层级：单笔中位/单笔平均 进主带（这张卡是唯一有逐笔口径的短线卡）。
             _pool = s.get("pool_mdd") is not None
+            _cup = "var(--up)" if s["med"] >= 0 else "var(--down)"
+            _cmn = "var(--up)" if s["mean"] >= 0 else "var(--down)"
             if _pool:
-                _kpi3 = (f'<div class="kpi"><div class="l">资金池(N5) 回撤</div>'
-                         f'<div class="v" style="color:var(--up)">{s["pool_mdd"]:.1f}%</div>'
-                         f'<div class="s">资金池(N5) 年化 {s["pool_ann"]:+.2f}% · 夏普 {s["pool_sharpe"]:.2f}</div></div>')
+                _sec3 = (f'<div class="kpi bt-sm"><div class="l">资金池(N5) 回撤</div>'
+                         f'<div class="v">{s["pool_mdd"]:.1f}%</div></div>'
+                         f'<div class="kpi bt-sm"><div class="l">资金池(N5) 年化</div>'
+                         f'<div class="v">{s["pool_ann"]:+.2f}%</div></div>'
+                         f'<div class="kpi bt-sm"><div class="l">夏普</div>'
+                         f'<div class="v">{s["pool_sharpe"]:.2f}</div></div>')
                 _kpi2s = f'2024 灾年 {s["y2024"]:+.2f}%' if s.get("y2024") is not None else f'均值 {s["mean"]:+.2f}%'
             else:
-                _kpi3 = (f'<div class="kpi"><div class="l">超额(中位基准)</div>'
-                         f'<div class="v" style="color:var(--up)">{s["ex_m"]:+.2f}%</div>'
-                         f'<div class="s">夏普 {s["sharpe"]:.2f} · PF {s["pf"]:.2f} · 持有 {s["hold"]:.0f} 天</div></div>')
+                _sec3 = (f'<div class="kpi bt-sm"><div class="l">超额(中位基准)</div>'
+                         f'<div class="v">{s["ex_m"]:+.2f}%</div></div>'
+                         f'<div class="kpi bt-sm"><div class="l">夏普</div><div class="v">{s["sharpe"]:.2f}</div></div>'
+                         f'<div class="kpi bt-sm"><div class="l">PF</div><div class="v">{s["pf"]:.2f}</div></div>'
+                         f'<div class="kpi bt-sm"><div class="l">持有</div><div class="v">{s["hold"]:.0f} 天</div></div>')
                 _kpi2s = f'均值 {s["mean"]:+.2f}%'
             return (f'<div class="bt-card" id="{cid}">'
                     f'<div class="bt-head"><b>{title}</b><span class="bt-tag">{tag}</span></div>'
-                    f'<div class="kpis">'
-                    f'<div class="kpi"><div class="l">交易口径 中位</div><div class="v" style="color:var(--up)">{s["med"]:+.1f}%</div><div class="s">n={s["n"]} · 均值 {s["mean"]:+.2f}%</div></div>'
-                    f'<div class="kpi"><div class="l">胜率</div><div class="v">{s["wr"]:.1f}%</div><div class="s">{_kpi2s}</div></div>'
-                    f'{_kpi3}'
-                    f'</div></div>')
+                    f'<div class="bt-band">'
+                    f'<div class="kpi bt-hero"><div class="l">单笔中位</div><div class="v" style="color:{_cup}">{s["med"]:+.1f}%</div></div>'
+                    f'<div class="kpi bt-hero"><div class="l">单笔平均</div><div class="v" style="color:{_cmn}">{s["mean"]:+.2f}%</div></div>'
+                    f'<div class="kpi bt-hero"><div class="l">胜率</div><div class="v">{s["wr"]:.1f}%</div></div>'
+                    f'</div>'
+                    f'<div class="bt-band" style="margin-top:10px">{_sec3}</div>'
+                    f'<div class="bt-note">n={s["n"]} · {_kpi2s}</div>'
+                    f'</div>')
         return bt_card(cid, title, tag, s, curve_id, color=color)
     _c_cards = (f'{_card("bt-short-stock-main-c", "📈 短线 纯主板 · 激进版(OB50 参考)", ss_stk_tag["main_c"], ss_stk["main_c"], "curve-short-stock-main-c", color="#64748b")}'
                 if KH_BT_C else "")
     # 🌟 MA250 牛熊分域总卡（生产口径 · 组合化资金 · Phase 11 · 2026-09-07 投产 · ob59 最终版）
-    _hybrid_card = ('''<div class="bt-card" id="bt-short-stock-hybrid" style="border-color:rgba(37,99,235,.5)">
+    _hybrid_card = ("""<div class="bt-card" id="bt-short-stock-hybrid" style="border-color:rgba(37,99,235,.5)">
 <div class="bt-head"><b>🌟 生产口径：牛熊分域 MA250 总卡（ob59）</b><span class="bt-tag">组合化资金 · 正在用的就是它</span></div>
-<div class="kpis">
-<div class="kpi"><div class="l">组合总收益</div><div class="v" style="color:var(--up)">+119.4%</div><div class="s">n=266 · 胜率 62.4% · ob59 定稿</div></div>
-<div class="kpi"><div class="l">最大回撤</div><div class="v" style="color:var(--up)">-20.91%</div><div class="s">夏普 0.648 · 均值 +3.08%/笔 · 满窗验证</div></div>
-<div class="kpi"><div class="l">牛(>MA20)</div><div class="v" style="color:var(--up)">med +4.67%</div><div class="s">n=65 · wr 62% · 独立过闸</div></div>
-<div class="kpi"><div class="l">熊(&lt;MA250)</div><div class="v" style="color:var(--up)">med +2.78%</div><div class="s">n=201 · wr 62% · 独立过闸</div></div>
+<div class="bt-meta">口径 · 组合化资金（非单票口径）· ob59 定稿 · 满窗验证</div>
+<div class="bt-band">
+<div class="kpi bt-hero"><div class="l">最大回撤</div><div class="v">-20.91%</div></div>
+<div class="kpi bt-hero"><div class="l">胜率</div><div class="v">62.4%</div></div>
+<div class="kpi bt-hero"><div class="l">单笔平均</div><div class="v" style="color:var(--up)">+3.08%</div></div>
 </div>
-<div class="kpis">
-<div class="kpi"><div class="l">前后半双过</div><div class="v" style="color:var(--up)">med +2.93/+2.92</div><div class="s">h1/h2 · 11 年 8 正 3 负</div></div>
-<div class="kpi"><div class="l">弱牛回调(MA20下/MA250上)</div><div class="v" style="color:var(--up)">med +2.95%</div><div class="s">n=28 · wr 57.1% · 近四闸(n&lt;30) · 2026-09-04 投产</div></div>
-</div></div>''')
+<div class="bt-band" style="margin-top:10px">
+<div class="kpi bt-sm"><div class="l">组合总收益</div><div class="v" style="color:var(--up)">+119.4%</div></div>
+<div class="kpi bt-sm"><div class="l">夏普</div><div class="v">0.648</div></div>
+<div class="kpi bt-sm"><div class="l">交易数</div><div class="v">266</div></div>
+</div>
+<div class="bt-band" style="margin-top:10px">
+<div class="kpi bt-sm"><div class="l">牛(MA20上) 单笔中位</div><div class="v" style="color:var(--up)">+4.67%</div><div class="s">n=65 · wr 62% · 独立过闸</div></div>
+<div class="kpi bt-sm"><div class="l">熊(MA250下) 单笔中位</div><div class="v" style="color:var(--up)">+2.78%</div><div class="s">n=201 · wr 62% · 独立过闸</div></div>
+<div class="kpi bt-sm"><div class="l">前后半双过</div><div class="v" style="color:var(--up)">+2.93 / +2.92</div><div class="s">h1 / h2 单笔中位</div></div>
+<div class="kpi bt-sm"><div class="l">弱牛回调 单笔中位</div><div class="v" style="color:var(--up)">+2.95%</div><div class="s">n=28 · wr 57.1%</div></div>
+</div>
+<div class="bt-note">11 年 8 正 3 负 · 牛/熊各域**独立过闸**（不是合并读数）· 弱牛回调(MA20 下 / MA250 上) 近四闸但 n=28 &lt; 30，2026-09-04 投产</div>
+</div>""")
     _cards = {
         "stock": "".join([
             _card("bt-short-stock-all", "📈 短线 股票 一体", ss_stk_tag["all"], ss_stk["all"], "curve-short-stock-all"),
@@ -2661,20 +2690,25 @@ def _bt_ref_card(sub_key, title, tag, json_rel, note, hero=None):
         return ('<div class="bt-card" id="bt-%s"><div class="bt-head"><b>%s</b><span class="bt-tag">%s</span></div>'
                 '<div class="bt-empty">%s</div></div>' % (sub_key, _esc(title), _esc(tag), _esc(note)))
 
-    hero = hero or [("年化", "ann_return", "%"), ("最大回撤", "max_drawdown", "%"), ("胜率", "win_rate", "%")]
+    # 主指标带 = 用户 2026-09-24 指定：年化 / 最大回撤 / 胜率 / 单笔平均 / 单笔中位。
+    # 缺字段的那一项**不渲染**（例如槽位口径产物只给均值不给中位时，主带就少一格，绝不补 0）。
+    hero = hero or [("年化", "ann_return", "%"), ("最大回撤", "max_drawdown", "%"),
+                    ("胜率", "win_rate", "%"),
+                    ("单笔平均", "mean_per_trade", "%"), ("单笔中位", "med_per_trade", "%")]
     hero_keys = [k for _l, k, _s in hero]
     METRICS = [("总收益", "total_return", "%"), ("最大回撤", "max_drawdown", "%"),
                ("夏普", "sharpe", ""), ("交易数", "n_trades", ""),
-               ("胜率", "win_rate", "%"), ("单笔中位", "med_per_trade", "%"),
-               ("年化", "ann_return", "%")]
+               ("胜率", "win_rate", "%"), ("单笔平均", "mean_per_trade", "%"),
+               ("单笔中位", "med_per_trade", "%"), ("年化", "ann_return", "%")]
     hero_html = []
     for lbl, k, suf in hero:
         v = d.get(k)
         if v is None:
             continue
         col = None
-        # 只给**损益类**指标着色：胜率/交易数/夏普不是损益方向，着色会把红绿噪音抬到内容之上
-        if k in ("ann_return", "total_return", "max_drawdown", "med_per_trade") and isinstance(v, (int, float)):
+        # 只给**方向明确**的逐期损益着色（年化/总收益/单笔平均/单笔中位）；
+        # 回撤是「幅度」不是「方向」，胜率/交易数/夏普同理 → 一律中性，避免红绿噪音盖过内容。
+        if k in ("ann_return", "total_return", "mean_per_trade", "med_per_trade") and isinstance(v, (int, float)):
             col = "var(--up)" if v >= 0 else "var(--down)"
         hero_html.append(_kpi(lbl, _fmt(v, suf), "bt-hero", col))
     sec_html = []
@@ -2705,162 +2739,6 @@ def _bt_sub(key, inner, on=False):
     return '<div class="bt-sub%s" data-bt-sub="%s">%s</div>' % (" on" if on else "", key, inner)
 
 
-def _strategy_assets_card(strategy_key, title, tag, pool_js, track_js, state_json, note="",
-                          pool_var="SENTINEL_POOL", track_var="SENTINEL_TRACK", pool_rows=8):
-    """某策略**独占**的选股池 / 跟踪池 / 模拟盘（R-strategy-isolation-0924）。
-
-    只读该策略自己的三个产物：池文件缺失即如实显示「未到盘」，
-    **函数内没有任何跨策略的默认值或兜底源**（这是「严禁共用」在渲染层的体现）。
-    只展示真实字段；缺字段即整段不渲染。
-    """
-    import json as _j
-
-    def _load_js(rel, var):
-        p = BASE / rel
-        if not p.exists():
-            return None, "缺文件 %s" % rel
-        try:
-            t = p.read_text(encoding="utf-8")
-            k = t.find("window.%s" % var)
-            if k < 0:
-                return None, "%s 内无 window.%s" % (rel, var)
-            b = t[t.index("{", k):]
-            return _j.loads(b[:b.rfind("}") + 1]), None
-        except Exception as e:
-            return None, "%s 解析失败 %r" % (rel, e)
-
-    def _load_json(rel):
-        p = BASE / rel
-        if not p.exists():
-            return None, "缺文件 %s" % rel
-        try:
-            return _j.loads(p.read_text(encoding="utf-8")), None
-        except Exception as e:
-            return None, "%s 解析失败 %r" % (rel, e)
-
-    def _esc(t):
-        return str(t).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-
-    def _md(t):
-        out = _esc(t)
-        while "**" in out:
-            a = out.find("**")
-            b = out.find("**", a + 2)
-            if b < 0:
-                break
-            out = out[:a] + "<b>" + out[a + 2:b] + "</b>" + out[b + 2:]
-        return out
-
-    def _kpi(lbl, val, cls=""):
-        return '<div class="kpi %s"><div class="l">%s</div><div class="v">%s</div></div>' % (cls, lbl, _esc(val))
-
-    def _sec(head, inner, sub=""):
-        return ('<div class="bt-sec"><h4>%s%s</h4>%s</div>'
-                % (head, (' <em>%s</em>' % _esc(sub)) if sub else "", inner))
-
-    pool, e_pool = _load_js(pool_js, pool_var)
-    track, e_track = _load_js(track_js, track_var)
-    state, e_state = _load_json(state_json)
-    as_of = ((pool or {}).get("as_of") or (track or {}).get("as_of")
-             or (state or {}).get("as_of") or (state or {}).get("last_scan") or "—")
-
-    out = ['<div class="bt-card" id="own-%s">' % strategy_key]
-    out.append('<div class="bt-head"><b>%s</b><span class="bt-tag">%s</span></div>' % (_esc(title), _esc(tag)))
-    out.append('<div class="bt-meta">as_of %s · 数据只读自 %s / %s / %s</div>'
-               % (_esc(as_of), _esc(pool_js), _esc(track_js), _esc(state_json)))
-
-    # ---- ① 选股池 ----
-    if pool:
-        hk = [_kpi("as_of", as_of, "bt-sm"), _kpi("选股池", "%s 只" % pool.get("n_pool"), "bt-sm")]
-        if pool.get("triggered") is not None:
-            hk.append(_kpi("触发", "是" if pool.get("triggered") else "否", "bt-sm"))
-        if pool.get("as_of_resonance") is not None:
-            hk.append(_kpi("今日共振", pool.get("as_of_resonance"), "bt-sm"))
-        if pool.get("threshold") is not None:
-            hk.append(_kpi("θ 阈值", pool.get("threshold"), "bt-sm"))
-        body = ['<div class="bt-band">%s</div>' % "".join(hk)]
-        if pool.get("reason_text"):
-            body.append('<div class="bt-empty" style="margin-top:10px">%s</div>' % _esc(pool["reason_text"]))
-        ltp = pool.get("last_trigger_pool") or {}
-        ent = ltp.get("entries") or []
-        if ent:
-            rows = []
-            for e in ent[:pool_rows]:
-                nm = _esc(e.get("name") or "")
-                cd = _esc((e.get("code") or "")[2:] if len(str(e.get("code") or "")) > 2 else e.get("code"))
-                lab = "%s %s" % (nm, cd)
-                tail = []
-                if e.get("cnt") is not None:
-                    tail.append("%s 项共振" % e.get("cnt"))
-                if e.get("ret_net_pct") is not None:
-                    tail.append("净 %+.2f%%" % e["ret_net_pct"])
-                rows.append('<div><i>%s</i><em>%s</em></div>' % (lab, _esc(" · ".join(tail))))
-            body.append('<div class="bt-meta" style="margin:14px 0 6px">'
-                        '上次触发池 · 前 %d / 共 %d 只 · 触发日 %s（共振 %s 家 · 买入 %s）</div>'
-                        % (min(pool_rows, len(ent)), len(ent), _esc(ltp.get("trigger_date")),
-                           _esc(ltp.get("n_resonance")), _esc(ltp.get("buy_date_all"))))
-            body.append('<div class="bt-list">%s</div>' % "".join(rows))
-        if ltp.get("cnt_dist"):
-            body.append('<div class="bt-meta" style="margin:10px 0 0">分项共振家数分布 · %s</div>'
-                        % _esc(" · ".join("%s 项 %s 家" % (k, v) for k, v in sorted(ltp["cnt_dist"].items()))))
-        out.append(_sec("选股池", "".join(body)))
-    else:
-        out.append(_sec("选股池", '<div class="bt-empty">未到盘 · %s</div>' % _esc(e_pool)))
-
-    # ---- ② 跟踪池 ----
-    if track:
-        cnt = []
-        for lbl, k in [("持仓", "holdings"), ("待入场", "pending_entry"), ("已平", "closed"), ("观察", "watch")]:
-            v = track.get(k)
-            if isinstance(v, list):
-                cnt.append(_kpi(lbl, "%d 只" % len(v), "bt-sm"))
-        if track.get("n_holdings") is not None:
-            cnt.append(_kpi("账本持仓", track.get("n_holdings"), "bt-sm"))
-        tb = ['<div class="bt-band">%s</div>' % "".join(cnt)] if cnt else []
-        ep = track.get("entry_plan") or {}
-        if ep.get("next_action"):
-            tb.append('<div class="bt-empty" style="margin-top:10px"><b>下一步</b> · %s</div>' % _esc(ep["next_action"]))
-        if ep.get("rule"):
-            tb.append('<div class="bt-meta" style="margin:8px 0 0">入场 · %s</div>' % _esc(ep["rule"]))
-        if ep.get("exit"):
-            tb.append('<div class="bt-meta" style="margin:4px 0 0">出场 · %s</div>' % _esc(ep["exit"]))
-        out.append(_sec("跟踪池", "".join(tb)))
-    else:
-        out.append(_sec("跟踪池", '<div class="bt-empty">未到盘 · %s</div>' % _esc(e_track)))
-
-    # ---- ③ 模拟盘（影子账本）----
-    if track or state:
-        src = track or {}
-        sk = [_kpi("交易开关", "开" if src.get("trading_enabled") else "关", "bt-sm")]
-        if src.get("status"):
-            sk.append(_kpi("状态", src.get("status"), "bt-sm"))
-        if track and track.get("days_since_shadow_start") is not None:
-            sk.append(_kpi("影子天数", track["days_since_shadow_start"], "bt-sm"))
-        if src.get("nav") is None:
-            sk.append(_kpi("净值", "—（未开仓）", "bt-sm"))
-        else:
-            sk.append(_kpi("净值", src.get("nav"), "bt-sm"))
-        sb = ['<div class="bt-band">%s</div>' % "".join(sk)]
-        vs = src.get("veto_state") or {}
-        if vs:
-            sb.append('<div class="bt-meta" style="margin:10px 0 0">否决位 V1/V2/V3 = %s / %s / %s（任一触发即人工复核）· V4 诊断 %s</div>'
-                      % (vs.get("V1"), vs.get("V2"), vs.get("V3"),
-                         "—" if vs.get("V4_diag") is None else vs.get("V4_diag")))
-        if src.get("trading_enabled_note"):
-            sb.append('<div class="bt-meta" style="margin:4px 0 0">%s</div>' % _esc(src["trading_enabled_note"]))
-        out.append(_sec("模拟盘", "".join(sb)))
-    else:
-        out.append(_sec("模拟盘", '<div class="bt-empty">未到盘 · %s</div>' % _esc(e_state)))
-
-    if note:
-        out.append('<div class="bt-note">%s</div>' % _md(note))
-    out.append('</div>')
-    return "".join(out)
-
-
-SENTINEL_CARD = _bt_ref_card("sentinel", "📡 热榜哨兵", "jiandi top30 共振哨兵 · 影子 · 只可否决 · 不构成通过性证据",
-                             "backtest/sentinel_backtest.json",
-                             "池数据由 backtest/sentinel_daily.py 产出（sentinel_pool.js / sentinel_track.js / sentinel_state.json）")
 BT_SHORT_SUB_BLOCKS = ('<div class="card" id="bt-short">'
     '<h2>⚡ 短线回测参考 <span class="badge badge-auto">按当前子标签分流 · R-btshort-param-0924</span></h2>'
     + _bt_sub("st-qlch", _bt_ref_card("st-qlch", "📉 超跌低开低吸 · 回测参考", "自有口径（qlch 生产脚本）",
@@ -2872,23 +2750,13 @@ BT_SHORT_SUB_BLOCKS = ('<div class="card" id="bt-short">'
               "本子标签暂无独立回测产物；ETF 模拟盘见上方「ETF轮动」子视图卡片（不与其他子标签共用）"))
     + _bt_sub("st-stk", bt_short_html("stock"))
     + _bt_sub("st-fund", bt_short_html("fund"))
-    + _bt_sub("st-sentinel", _bt_ref_card("st-sentinel", "📡 热榜哨兵 · 回测参考",
-              "jiandi top30 共振哨兵 · 影子账本 · 只可否决 · 无通过性门（待 ≥120 交易日 / ≥300 事件首次判定）",
-              "backtest/sentinel_backtest.json",
-              "本子标签自有回测产物（不与其他子标签共用）"))
     + '</div>')
 
 
 SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
 {subnav("short", [("st-qlch", "超跌低开低吸"), ("st-kh", "超卖伏击"),
-                    ("st-etf", "ETF轮动"), ("st-stk", "股票池"), ("st-fund", "基金池"),
-                    ("st-sentinel", "热榜哨兵")],
+                    ("st-etf", "ETF轮动"), ("st-stk", "股票池"), ("st-fund", "基金池")],
         default_key="st-qlch")}
-{subview("st-sentinel", "热榜哨兵", "jiandi top30 共振哨兵 · 影子跟踪（shadow_start 2026-09-24）", SENTINEL_CARD + _strategy_assets_card(
-  "sentinel", "📡 热榜哨兵 · 自有资产", "独占：sentinel_pool.js / sentinel_track.js / sentinel_state.json",
-  "sentinel_pool.js", "sentinel_track.js", "backtest/sentinel_state.json",
-  "影子账本只记账不成交（trading_enabled 恒 false）。预注册冻结口径：本哨兵**只可否决**、"
-  "**不构成通过性证据**，判定节奏 = ≥300 完成事件 或 ≥120 交易日，此前每日只记录。"))}
 {subview("st-stk", "股票池", "全量池短线 · 主板信号 · 有信号即买", system_block(
   "view-short-stk", "sys-short-stk",
   "⚡ 短线 · 股票池", "auto", "主板 超卖伏击主信号 · A59 主卖出 / C50 参考 · 低价≥3元",
