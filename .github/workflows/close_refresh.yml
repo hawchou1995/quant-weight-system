@@ -3,7 +3,7 @@ name: 收盘刷新（云端）
 # ⑤ 自动更新迁移云端 · Phase 1（只写 gh-pages，不写 main）
 # ---------------------------------------------------------------------------
 # 触发：
-#   schedule        周一~五 12:30 UTC = 北京 20:30（收盘后数据已就位）
+#   schedule        周一~五 07:05 UTC = 北京 15:05（与本地链同步启动）
 #   workflow_dispatch  mode=probe（默认，只验云端管道，不跑链）
 #                      mode=chain（跑云端子集全链，需数据缓存/种子就位）
 # 数据：data_full/ data_hist/ fund_nav_cache/ data_fundamental/ 均被 .gitignore 排除，
@@ -15,7 +15,7 @@ name: 收盘刷新（云端）
 # 退出码：0 成功（含 no-new-data）/ 1 链失败 / 2 门禁拒发 / 3 数据未就位（本 workflow 视为告警不红）
 on:
   schedule:
-    - cron: '30 12 * * 1-5'
+    - cron: '5 7 * * 1-5'
   workflow_dispatch:
     inputs:
       mode:
