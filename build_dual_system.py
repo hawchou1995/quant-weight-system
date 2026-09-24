@@ -1022,13 +1022,12 @@ def bt_short_html(only=None):
     def _card(cid, title, tag, s, curve_id, color="var(--warn)"):
         if not s:
             # 说明卡（创业板/科创板未回测等）
+            # 2026-09-24 统一：无数据的「说明卡」不再套 .kpis（那是给指标用的容器），
+            # 改成与其它回测卡同一条层级线（卡头 + 空态行 + 脚注）。
             return (f'<div class="bt-card" id="{cid}" style="border-color:rgba(120,113,108,.3)">'
                     f'<div class="bt-head"><b>{title}</b><span class="bt-tag">{tag}</span></div>'
-                    f'<div class="kpis"><div class="kpi"><div class="l">回测收益</div>'
-                    f'<div class="v" style="color:var(--faint)">未回测</div>'
-                    f'<div class="s">用户仅可买主板；超卖伏击主信号仅按主板回测</div></div>'
-                    f'<div class="kpi"><div class="l">说明</div><div class="v" style="font-size:15px;color:var(--faint)">—</div>'
-                    f'<div class="s">主板卡以 超卖伏击 全窗口回测为准</div></div></div></div>')
+                    f'<div class="bt-empty">未回测 —— 用户仅可买主板；超卖伏击主信号仅按主板回测。</div>'
+                    f'<div class="bt-note">主板卡以「超卖伏击」全窗口回测为准。</div></div>')
         # 超卖伏击 卡是自定义结构（dict 字段与 summary 不同），单独渲染
         if "ex_m" in s:
             # 2026-09-24 统一到回测卡层级：单笔中位/单笔平均 进主带（这张卡是唯一有逐笔口径的短线卡）。
