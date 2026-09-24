@@ -1,9 +1,9 @@
 {
-  "run_id": "35972597440",
-  "sha": "b352ed06f65551976ad706e26a9b825abfd48b41",
+  "run_id": "35981259623",
+  "sha": "4392296504c2e3d12c9de8f0ebdfb1e62fb21031",
   "mode": "chain",
   "status": "published-candidate",
-  "ts_cn": "2026-09-24 16:53:56",
+  "ts_cn": "2026-09-24 19:15:50",
   "today_cn": "2026-09-24",
   "chain_rc": 0,
   "g2_fresh": true,
@@ -20,8 +20,8 @@
   "files": [
     {
       "name": "dual_system.html",
-      "md5": "ea00f813c63b",
-      "bytes": 1114012,
+      "md5": "3950a31bc641",
+      "bytes": 1111577,
       "as_of": "2026-09-24"
     },
     {
@@ -68,21 +68,21 @@
     },
     {
       "name": "short_signals.js",
-      "md5": "1d0ca64b8dda",
-      "bytes": 1811217,
+      "md5": "a6a8234c92e1",
+      "bytes": 1811621,
       "as_of": "2026-09-24"
     },
     {
       "name": "enhanced_data.js",
-      "md5": "5edec39d4caa",
-      "bytes": 428803,
+      "md5": "e969d406331d",
+      "bytes": 429027,
       "as_of": "2026-09-24"
     },
     {
       "name": "a5_pool.js",
-      "md5": "658c3fac971e",
-      "bytes": 27063,
-      "as_of": "2026-09-23"
+      "md5": "ec3fea89a7b0",
+      "bytes": 29211,
+      "as_of": "2026-09-24"
     },
     {
       "name": "market_breadth.js",
@@ -98,8 +98,8 @@
     },
     {
       "name": "index.html",
-      "md5": "ea00f813c63b",
-      "bytes": 1114012,
+      "md5": "3950a31bc641",
+      "bytes": 1111577,
       "as_of": null
     }
   ]
