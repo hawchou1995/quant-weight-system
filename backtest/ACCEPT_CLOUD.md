@@ -31,3 +31,19 @@ powershell -NoProfile -File <scratch>\analyze_run.ps1 -RunId <id>    # 日志 5 
 - 本机链定时任务已于 2026-09-24 停用 → 本机 `index_000300.csv`、`data_full/*.csv` **不再自动更新**（当前止于 2026-09-23）。
 - 若要让本机 K 线也"吃云端数据"，需在 `.github/workflows/close_refresh.yml` 增加一个「当日数据 delta 工件」上传步骤（约 400KB/日：每只票当日 OHLCV 一行），本机下载后 append + 多源抽查校验。该改动属 workflow 文件 → 只能走 web UI 提交（token 无 workflow scope）。
 - 相关脚本：`backtest/cloud_accept_data.py`（本手册主体）、`backtest/gushi_data_guard.py`（gushi 采集体检）。
+
+## 4. 本机 K 线同步（云端 data-delta 工件，2026-09-24 起）
+云端链跑完后额外产出 `_cloud_delta/`（`delta_bars.csv` = 最近 3 个交易日全市场日线，约 1.3MB；
++ `index_000300_tail.csv` + `delta_meta.json`），由 workflow 用 `actions/upload-artifact` 上传
+（artifact 名 `data-delta`，保留 45 天；步骤用 `always()`，链失败也产出）。
+
+本机合并（**先校验、后写盘**）：
+```powershell
+& $PY -X utf8 backtest\apply_data_delta.py --latest                 # 下载 + 多源校验（抽样 vs 腾讯K线，需100%一致）+ 幂等 append
+& $PY -X utf8 backtest\apply_data_delta.py --src <dir> --dry-run    # 只算不写
+& $PY -X utf8 backtest\apply_data_delta.py --rollback 2026-09-24    # 撤掉某日追加的行
+```
+- 校验不过（rc=3）**绝不写盘**（实测：构建器早期 bug 正是被这道门拦下）。
+- 日志 `_cloud_local/delta_applied.json`（近 60 次）；`--dry-run` 不写日志。
+- 沙盒实测：构建 7197 只 / 20916 行 / 1.3MB → 抽样 10/10 与腾讯K线一致 → 写入 60 票 + 1 指数行
+  → 二次运行 0 行（幂等）→ 回滚干净。
