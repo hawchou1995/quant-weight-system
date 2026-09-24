@@ -57,7 +57,7 @@ jobs:
           echo "mode=$M" >> "$GITHUB_OUTPUT"
           echo "云模式：$M（触发：${{ github.event_name }}）"
 
-      # ---- 1 数据缓存（未命中回落种子 release）----
+      # ---- 1 数据缓存（**完全**未命中才回落种子 release；restore-keys 部分命中不回落）----
       - name: 恢复数据缓存
         id: cache
         uses: actions/cache/restore@v4
@@ -71,8 +71,10 @@ jobs:
           restore-keys: |
             qws-data-
 
-      - name: 回落种子包（缓存未命中时）
-        if: steps.cache.outputs.cache-hit != 'true'
+      - name: 回落种子包（无任何缓存命中时）
+        # F6 修复（2026-09-24）：cache-hit 在 restore-keys 部分命中时为 false，
+        # 旧条件会用周种子覆盖刚恢复的较新缓存；cache-matched-key 为空才表示真的没有缓存。
+        if: steps.cache.outputs.cache-matched-key == ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -81,7 +83,7 @@ jobs:
           if gh release download data-seed -p 'qws_seed_*.tar.gz' -D "$RUNNER_TEMP/seed" --clobber; then
             for f in "$RUNNER_TEMP/seed"/qws_seed_*.tar.gz; do
               echo "解包 $(basename "$f")"
-              tar -xzf "$f" -C .
+              tar -xzf "$f" -C . --skip-old-files || echo "::warning::$(basename "$f") 解包时跳过已存在文件（非 0 退出已忽略）"
             done
           else
             echo "::warning::种子包尚未就位（release data-seed 缺失）—— chain 模式将 rc=3 no-data-cache"
