@@ -25,9 +25,13 @@ $PY = "C:/Users/Admin/.workbuddy/binaries/python/envs/default/Scripts/python.exe
 powershell -NoProfile -File <scratch>\analyze_run.ps1 -RunId <id>    # 日志 5 段分析
 ```
 判据：`publish=true` / `status=ok` / `chain rc=0` / `G1 结构门禁` 通过 / `G2 新鲜度` fresh / staging 13 项。
-已知可接受软失败：`factor_gate_daily`（缺 scipy）、`em-bulk-all` clist 被拦。
+已知可接受软失败：**只剩 `em-bulk-all` clist 被拦**；`kxmm` 的 `[skip] kxmm 凭证不存在` 属计划内跳过（不算软失败）。
+`factor_gate_daily` 的 scipy 已补齐（2026-09-24 commit `dbcc302`，`.github/cloud/requirements.txt`）→ 该步已转绿；**若再出现「缺 scipy」＝硬问题**。
 2026-09-24 已修：kv 共振面板改由 `rebuild_panels.py` 每轮自建（不再依赖 498MB 的 `panel_kv_0913.npz` 种子），
 `recreenscreen_regen` 与 6 个 qlch 臂随之不再软失败；A5 三步也已从"跳过"改为真实执行（`--skip-a5` 已移除）。
+**实测（run `35992226836` @`dbcc302`，2026-09-24）：15 步全绿、全日志 0 条 `[软] 失败`、`chain rc=0`、`publish=true`、
+staging 14 文件 / 7119 KB；kv 面板 `saved panel_kv_0913.npz 498 MB`；6 臂各 `QLCH PAPER DONE …（已写盘）`；
+A5 三步（扫描 / `A5 PAPER OK` / `a5_pool.js as_of=2026-09-24`）+ `revscreen_regen` + `factor_gate_daily` 全绿。**
 
 ## 3. 前提与限制（重要）
 - 云端**只发布看板产物**（js/json/html）。K 线原始数据（`data_full/`、`index_000300.csv`）在云端 runner 的 cache 里，
@@ -94,3 +98,13 @@ powershell -NoProfile -File <scratch>\analyze_run.ps1 -RunId <id>    # 日志 5 
 **回归测试**（2026-09-24，隔离沙箱 46 项，只用复制品，真实仓库零改动）：
 干跑零改动 → 正跑写入两处 A5 + 6+1 qlch + 新报告归档（旧报告未覆盖）→ 同 delta 二次幂等（md5 全等）→
 更旧 delta 不回退（md5 全等 + skip 日志）→ 坏价 delta rc=3 且 K 线/状态零写盘 → `--no-state` 不打包状态。
+
+## 6. 时长基线（2026-09-24，run `35992226836` @`dbcc302`）
+整轮 job **105m25s**（11:18:11Z→13:03:36Z）；链内 `11:19:22→13:02:56` = **6215s**。阶段耗时（秒，相邻段落时间戳差）：
+`update_daily 2644` → `fetch_val_em_daily 1415` → `fund_nav_update 699` → `build_short_pool 229` → `review_daily 244` →
+`市值快照 89` → `rebuild_panels 61`（内含 kv 19.5s）→ `shadow_ret20 32` → `build_satellite_pool 48` → `signal_satellite 42` →
+`khunter_paper 167` → `khunter_paper_c 162` → `a5_paper 23` → `revscreen_regen 0.36` → **6×qlch ≈130** →
+**A5 三步 ≈11** → `factor_gate_daily 0.45` → `build_dual_system 0.87`。
+**结论**：>90 分钟的原因 100% 是既有数据抓取（2644+1415+699 = 4758s = 链的 **77%**）；
+本次新解锁的 kv 面板 19.5s + qlch 六臂 ≈130s + A5 ≈34s ≈ **184s（占链 3.0%）** →
+**不构成拖垮 15:05 cron，kv 面板无需纳入 actions/cache**（该判断只作结论，未改缓存策略）。
