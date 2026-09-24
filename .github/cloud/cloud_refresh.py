@@ -137,9 +137,26 @@ def ensure_win_path_shim() -> None:
 def run_chain(timeout: int) -> int:
     ensure_win_path_shim()
     cmd = [sys.executable, "daily_refresh.py"] + CHAIN_FLAGS
-    log(f"[chain] {' '.join(cmd)}  (timeout {timeout}s)")
+    env = os.environ.copy()
+    # 云端专属 env（2026-09-24 加；本机链不经此处 → 本机行为一律不变）：
+    #  A. REBASE_BUDGET_S：update_daily.py L401 的「复权基准漂移检测」相位预算（默认 2400s）。
+    #     实测 run 35943548423：单步 40.4min 全烧在此（云端 17.3s/只 → 只处理 156/400；本机 4.5s/只
+    #     同预算内能跑完）。云端压到 600s（≈34 只）省 ~35min；本机仍 2400s。
+    #  B. FUND_NAV_WORKERS：fund_nav_update.py 并发（默认 8）。基金净值是链上第二大单点
+    #     （3038 只 × 全历史下载），云端延迟高 → 提到 12（该脚本 docstring 的实测值）。
+    #  C. FUND_NAV_BUDGET_S：同上基金净值步的硬时间预算（默认 0=不限）。实测 run 35943548423：
+    #     该步 02:36:57 起 ≥29.2min 连一条 [200/N] 进度行都没有（云端完成 <200/3038 只，US
+    #     runner 上 pingzhongdata 极慢）→ 无界等待=整链被拖死。压到 1800s：超预算即收工，已
+    #     落盘的保留（每只独立整文件覆盖，幂等）、未跑的下一轮按「最陈旧优先」续补。
+    #     本机不设此变量 → 全量刷，行为不变。
+    # 三者都走 setdefault：workflow 若自己设了同名变量，以 workflow 为准。
+    env.setdefault("REBASE_BUDGET_S", "600")
+    env.setdefault("FUND_NAV_WORKERS", "12")
+    env.setdefault("FUND_NAV_BUDGET_S", "1800")
+    log(f"[chain] {' '.join(cmd)}  (timeout {timeout}s · REBASE_BUDGET_S={env['REBASE_BUDGET_S']}"
+        f" · FUND_NAV_WORKERS={env['FUND_NAV_WORKERS']} · FUND_NAV_BUDGET_S={env['FUND_NAV_BUDGET_S']})")
     try:
-        r = subprocess.run(cmd, cwd=str(REPO), timeout=timeout)
+        r = subprocess.run(cmd, cwd=str(REPO), timeout=timeout, env=env)
         return r.returncode
     except subprocess.TimeoutExpired:
         log(f"[chain] ⏱ 超时（{timeout}s）—— 视为失败")
@@ -166,7 +183,8 @@ def emit(**kw) -> None:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--mode", choices=["probe", "chain"], default="probe")
-    ap.add_argument("--chain-timeout", type=int, default=5400)
+    ap.add_argument("--chain-timeout", type=int, default=7200,
+                    help="链超时秒数（默认 7200=120min；job 上限 150min，留余量给门禁/组装）")
     ap.add_argument("--no-live-check", action="store_true", help="本地干跑时跳过线上比对")
     a = ap.parse_args()
 
