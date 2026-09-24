@@ -22,6 +22,9 @@ BASE = Path(__file__).resolve().parent.parent          # quant-weight-system/
 REPO = BASE
 DIST = BASE.parent / "dist"
 AUTH_FILE = Path(r"D:/Documents/Obsidian/personal/kxmm-auth.json")
+if not AUTH_FILE.exists():   # 2026-09-24 云端可移植：云端无本机凭证 → 干净跳过（保留上一份 kxmm_data.js）
+    print(f"[skip] kxmm 凭证不存在（{AUTH_FILE}）——本次跳过抓取，保留上一份 kxmm_data.js，退出 0")
+    sys.exit(0)
 OUT_JS = REPO / "kxmm_data.js"
 SITE = "https://kxmm.online"
 TIMEOUT = 40

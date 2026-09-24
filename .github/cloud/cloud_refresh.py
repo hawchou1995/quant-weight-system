@@ -111,7 +111,31 @@ def live_text(name: str, timeout=30):
         return None
 
 
+def ensure_win_path_shim() -> None:
+    """Linux runner 路径兼容垫片（2026-09-24 加）。
+
+    背景：链内 15 个脚本写死 Windows 绝对路径（D:/Documents/Workbuddy/股票基金/quant-weight-system，
+    实测清单见 handoff）。POSIX 下该串不含前导 / 即为**相对路径**，而链内每一步都以仓库根为 cwd
+    （daily_refresh.py 的 subprocess cwd=BASE，cloud_refresh 自身 cwd=REPO）→ 解析成 <repo>/D:/…
+    → 必然找不到文件（实测 run 35938088628：市值快照 fetch_val_daily exit 1 → 中止后续步骤）。
+    做法：在仓库根逐级建目录，末级软链回仓库自身 → 写死路径自动落到真文件。
+    幂等；仅非 Windows 生效（Windows 不能建名为 "D:" 的目录，且本机原路径本就存在）。
+    """
+    if os.name == "nt":
+        return
+    link = REPO / "D:" / "Documents" / "Workbuddy" / "股票基金" / "quant-weight-system"
+    try:
+        if link.is_symlink() or link.exists():
+            return
+        link.parent.mkdir(parents=True, exist_ok=True)
+        link.symlink_to(REPO, target_is_directory=True)
+        log(f"[shim] 兼容软链已建：{link} → {REPO}")
+    except Exception as e:
+        log(f"  ⚠ 兼容软链创建失败（不阻断；写死 D:/ 路径的步骤可能仍失败）：{type(e).__name__}: {e}")
+
+
 def run_chain(timeout: int) -> int:
+    ensure_win_path_shim()
     cmd = [sys.executable, "daily_refresh.py"] + CHAIN_FLAGS
     log(f"[chain] {' '.join(cmd)}  (timeout {timeout}s)")
     try:

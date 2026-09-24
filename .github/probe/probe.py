@@ -26,15 +26,23 @@ def http_get(url, timeout=20):
         return r.read().decode("utf-8", errors="replace")
 
 
-def t(name, fn):
+def t(name, fn, tries=1, backoff=8.0):
+    """单发即退；tries>1 时对间歇性超时做重试+退避（2026-09-24 降噪：Sina 端点偶发 Read timeout）"""
     t0 = time.time()
-    try:
-        res = fn()
-        rep["tests"][name] = {"ok": True, "sec": round(time.time() - t0, 1), **res}
-        print(f"[OK] {name} ({time.time()-t0:.1f}s) {res}", flush=True)
-    except Exception as e:
-        rep["tests"][name] = {"ok": False, "sec": round(time.time() - t0, 1), "err": str(e)[:300]}
-        print(f"[FAIL] {name}: {str(e)[:200]}", flush=True)
+    last = None
+    for k in range(tries):
+        try:
+            res = fn()
+            rep["tests"][name] = {"ok": True, "sec": round(time.time() - t0, 1), "attempts": k + 1, **res}
+            print(f"[OK] {name} ({time.time()-t0:.1f}s, {k+1}/{tries}) {res}", flush=True)
+            return
+        except Exception as e:
+            last = e
+            if k < tries - 1:
+                print(f"[RETRY] {name} {k+1}/{tries} 失败: {str(e)[:150]} —— {backoff:.0f}s 后重试", flush=True)
+                time.sleep(backoff)
+    rep["tests"][name] = {"ok": False, "sec": round(time.time() - t0, 1), "attempts": tries, "err": str(last)[:300]}
+    print(f"[FAIL] {name}: {str(last)[:200]}", flush=True)
 
 
 # ---- Probe 1: qt 行情 ----
@@ -77,8 +85,8 @@ def p_tx_hist():
 
 t("qt_quote", p_qt)
 t("tx_kline", p_tx_kline)
-t("ak_sina_spot", p_sina_spot)
-t("ak_tx_hist", p_tx_hist)
+t("ak_sina_spot", p_sina_spot, tries=3, backoff=8.0)
+t("ak_tx_hist", p_tx_hist, tries=3, backoff=8.0)
 
 with open(os.path.join(OUT_DIR, "probe_report.json"), "w", encoding="utf-8") as f:
     json.dump(rep, f, ensure_ascii=False, indent=2)

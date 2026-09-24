@@ -12,7 +12,7 @@ import os, sys, json
 from pathlib import Path
 import pandas as pd
 
-BASE = Path(r"D:\Documents\Workbuddy\股票基金\quant-weight-system")
+BASE = Path(__file__).resolve().parent  # 2026-09-24 云端可移植（原写死 D:\…，本机解析恒等）
 OUT = BASE / "dist" / "khunter_paper_snapshot.json"
 
 NAMES = {}

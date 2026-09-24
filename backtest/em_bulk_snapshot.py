@@ -25,7 +25,7 @@ import urllib.request
 from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8")
-BASE = Path(r"D:/Documents/Workbuddy/股票基金/quant-weight-system")
+BASE = Path(__file__).resolve().parent.parent  # 2026-09-24 云端可移植（原写死 D:/…，本机解析恒等）
 DATA = BASE / "data_full"
 CAL = BASE / "index_000300.csv"
 

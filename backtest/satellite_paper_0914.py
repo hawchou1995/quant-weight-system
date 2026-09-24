@@ -15,7 +15,7 @@ import json, math, sys
 from pathlib import Path
 import pandas as pd
 
-BASE = Path(r"D:/Documents/Workbuddy/股票基金/quant-weight-system")
+BASE = Path(__file__).resolve().parent.parent  # 2026-09-24 云端可移植（原写死 D:/…，本机解析恒等）
 STATE = BASE / "backtest" / "satellite_paper.json"          # 旧单文件（仅迁移兼容）
 STATE_A = BASE / "backtest" / "satellite_paper_a.json"      # 轨A 独立账户（对照轨）
 STATE_B = BASE / "backtest" / "satellite_paper_b.json"      # 轨B 独立账户（主轨）

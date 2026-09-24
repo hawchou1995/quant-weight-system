@@ -806,8 +806,19 @@ v_auto = _a80_json["eq"]   # A80_M80 equity（绝对值，直接取值）
 v_lite = load_curve("v8_lite_equity.csv")
 
 # 历史报告列表
+# 历史报告列表
+# 2026-09-24 云端可移植：本目录只在本机存在。云端 runner 上 is_dir()=False → 复用上一份
+# enhanced_data.js 的 reports 字段（否则云端发布会把看板「历史报告」列表清空）。本机分支行为不变。
 REPORTS_DIR = Path("D:/Documents/Obsidian/WorkBuddy/wiki/02-投资研究-Investment")
-reports = sorted([f.name for f in REPORTS_DIR.glob("research-*.md")], reverse=True)
+if REPORTS_DIR.is_dir():
+    reports = sorted([f.name for f in REPORTS_DIR.glob("research-*.md")], reverse=True)
+else:
+    reports = []
+    try:
+        _txt = (BASE / "enhanced_data.js").read_text(encoding="utf-8")
+        reports = list(json.loads(_txt[_txt.index("{"):_txt.rindex("}") + 1]).get("reports") or [])
+    except Exception as _e:
+        print(f"  ⚠ 复用旧 reports 失败（按空列表处理）：{type(_e).__name__}: {_e}")
 
 # 2026-08-18 as_of 口径修复：数据截至 = 池内标的实际最新交易日（取 max(ddf.index[-1])），
 # 而非 index_000300.csv 硬编码尾行（该指数文件手工维护易滞后，曾致 as_of 显示 08-17 但个股已含 08-18）

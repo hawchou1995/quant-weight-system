@@ -9,7 +9,7 @@ import json, time
 from pathlib import Path
 import numpy as np, pandas as pd
 
-BASE = Path(r"D:/Documents/Workbuddy/股票基金/quant-weight-system")
+BASE = Path(__file__).resolve().parent.parent  # 2026-09-24 云端可移植（原写死 D:/…，本机解析恒等）
 HERE = BASE / "backtest"
 PAPER = HERE / "satellite_paper.json"          # 旧单文件（兼容）
 PAPER_A = HERE / "satellite_paper_a.json"      # 2026-09-15 起双账户
