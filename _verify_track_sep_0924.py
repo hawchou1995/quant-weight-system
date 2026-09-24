@@ -39,6 +39,7 @@ KEPT_FILES = ["backtest/bt520_holdout_0924.json",
               "backtest/jiandi_sentinel_retest_0924.json",
               "backtest/jiandi_sentinel_retest_0924.py",
               "backtest/PRE-REGISTRATION_20260924b_jiandi_sentinel_retest.md",
+              "docs/adr/0010-short-board-new-strategies-onboarding.md",
               "sentinel_pool.js", "sentinel_track.js", "backtest/sentinel_state.json"]
 
 ORIG_SUBS = [("st-qlch", "超跌低开低吸"), ("st-kh", "超卖伏击"), ("st-etf", "ETF轮动"),

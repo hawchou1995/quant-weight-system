@@ -349,6 +349,9 @@ if not fails and not NO_MAIN_PUSH:   # ⑤ 云端 Phase 1：只写 gh-pages，�
                           "backtest/jiandi_sentinel_retest_0924.py",
                           "backtest/jiandi_sentinel_retest_0924.json",
                           "backtest/PRE-REGISTRATION_20260924b_jiandi_sentinel_retest.md",
+                          # docs/adr/ 在 .gitignore:136 被整目录忽略，但 0006-0009 是已跟踪的；
+                          # 0010 此前从未入库（本轮才补）→ 必须显式进白名单，否则链也不会提交它。
+                          "docs/adr/0010-short-board-new-strategies-onboarding.md",
                           # 隔离校验器 + A5 竞价夹具 + 派出脚本 + 工作单（本轮新增的取证件）
                           "_verify_track_sep_0924.py",
                           "backtest/a5_auction_judge_fixture.js",
