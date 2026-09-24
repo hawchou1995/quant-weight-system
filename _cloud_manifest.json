@@ -1,9 +1,9 @@
 {
-  "run_id": "35992226836",
-  "sha": "dbcc3029afa13ce423de841c16183112379d6db6",
+  "run_id": "36000574481",
+  "sha": "6ffb9288c13a5f177f5fe23f246acf33e0f128ca",
   "mode": "chain",
   "status": "published-candidate",
-  "ts_cn": "2026-09-24 21:02:56",
+  "ts_cn": "2026-09-24 22:42:29",
   "today_cn": "2026-09-24",
   "chain_rc": 0,
   "g2_fresh": true,
@@ -20,8 +20,8 @@
   "files": [
     {
       "name": "dual_system.html",
-      "md5": "43106a5040b2",
-      "bytes": 1142771,
+      "md5": "f9c7d597e26f",
+      "bytes": 1143289,
       "as_of": "2026-09-24"
     },
     {
@@ -50,7 +50,7 @@
     },
     {
       "name": "review_log.html",
-      "md5": "f1363d25ba07",
+      "md5": "8f46ddbe75da",
       "bytes": 46822,
       "as_of": null
     },
@@ -68,19 +68,19 @@
     },
     {
       "name": "short_signals.js",
-      "md5": "a0f5b80a7963",
-      "bytes": 1812813,
+      "md5": "6a30d6cac4ac",
+      "bytes": 1813199,
       "as_of": "2026-09-24"
     },
     {
       "name": "enhanced_data.js",
-      "md5": "a82bf3eebec0",
-      "bytes": 429011,
+      "md5": "48cbe5f20895",
+      "bytes": 419168,
       "as_of": "2026-09-24"
     },
     {
       "name": "a5_pool.js",
-      "md5": "d4cfb94c1b16",
+      "md5": "a15edbaa5bfe",
       "bytes": 29211,
       "as_of": "2026-09-24"
     },
@@ -98,8 +98,8 @@
     },
     {
       "name": "index.html",
-      "md5": "43106a5040b2",
-      "bytes": 1142771,
+      "md5": "f9c7d597e26f",
+      "bytes": 1143289,
       "as_of": null
     }
   ]
