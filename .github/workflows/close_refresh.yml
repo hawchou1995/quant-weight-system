@@ -144,6 +144,20 @@ jobs:
             data_fundamental
           key: qws-data-${{ github.run_id }}
 
+      # ---- 5b 当日数据 delta（供本机同步 K 线；链失败也产出，故用 always）----
+      - name: 当日数据 delta
+        if: always() && steps.mode.outputs.mode == 'chain'
+        run: python -X utf8 backtest/build_data_delta.py --out _cloud_delta
+
+      - name: 上传数据 delta
+        if: always() && steps.mode.outputs.mode == 'chain'
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-delta
+          path: _cloud_delta/
+          retention-days: 45
+          if-no-files-found: warn
+
       # ---- 6 每周日种子备份（仅 chain 且周日）----
       - name: 每周种子备份
         if: always() && steps.mode.outputs.mode == 'chain'
