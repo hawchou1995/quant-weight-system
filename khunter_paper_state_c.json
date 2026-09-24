@@ -115,6 +115,14 @@
       "pos_val": 0,
       "n_pos": 0,
       "bear": true
+    },
+    {
+      "date": "2026-09-24",
+      "nav": 98894.49,
+      "cash": 98894.49,
+      "pos_val": 0,
+      "n_pos": 0,
+      "bear": true
     }
   ],
   "trades": [

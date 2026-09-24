@@ -258,14 +258,16 @@ if not fails:
     print("========== 新策略产物校验清单 ==========", flush=True)
     import json as _json
     _expect = str(date.today())
-    for _rel, _var, _key in [
-        ("zuoce_jianlou_pool.js", "window.ZUOCE_POOL", "as_of"),
-        ("zuoce_jianlou_track.js", "window.ZUOCE_TRACK", "as_of"),
-        ("backtest/zuoce_jianlou_paper_state.json", None, "as_of"),
-        ("sentinel_pool.js", "window.SENTINEL_POOL", "as_of"),
-        ("sentinel_track.js", "window.SENTINEL_TRACK", "as_of"),
-        ("backtest/sentinel_state.json", None, "as_of"),
-        ("backtest/zuoce_jianlou_backtest.json", None, "gate"),
+    for _rel, _var, _keys in [
+        ("zuoce_jianlou_pool.js", "window.ZUOCE_POOL", ("as_of",)),
+        ("zuoce_jianlou_track.js", "window.ZUOCE_TRACK", ("as_of",)),
+        ("backtest/zuoce_jianlou_paper_state.json", None, ("as_of",)),
+        ("sentinel_pool.js", "window.SENTINEL_POOL", ("as_of",)),
+        ("sentinel_track.js", "window.SENTINEL_TRACK", ("as_of",)),
+        # sentinel_state.json 的日期字段按影子账本设计叫 last_scan（不是 as_of）——
+        # 这里接受两者；**改校验器、不改生产脚本 schema**（否则是拿 schema 迁就检查）。
+        ("backtest/sentinel_state.json", None, ("as_of", "last_scan")),
+        ("backtest/zuoce_jianlou_backtest.json", None, ("gate",)),
     ]:
         _p = BASE / _rel
         if not _p.exists():
@@ -279,17 +281,24 @@ if not fails:
                 _t = _t[_t.index("{", _i):]
                 _t = _t[:_t.rfind("}") + 1]
             _d = _json.loads(_t)
-            _got = _d.get(_key)
         except Exception as _e:
             soft_fails.append(f"校验清单:解析失败 {_rel}")
             print(f"  ✗ {_rel} 解析失败 {_e!r}", flush=True)
             continue
+        _key, _got = None, None
+        for _k in _keys:
+            if isinstance(_d, dict) and _d.get(_k) is not None:
+                _key, _got = _k, _d[_k]
+                break
         if _key == "gate":
             _ok = _got in ("holdout_gate_failed", "pending_holdout_audit")
             print(f"  {'✓' if _ok else '✗'} {_rel} gate={_got}", flush=True)
+        elif _key is None:
+            _ok = False
+            print(f"  ✗ {_rel} 无任一候选日期字段 {_keys}", flush=True)
         else:
             _ok = (str(_got) == _expect)
-            print(f"  {'✓' if _ok else '✗'} {_rel} as_of={_got}（期望 {_expect}）", flush=True)
+            print(f"  {'✓' if _ok else '✗'} {_rel} {_key}={_got}（期望 {_expect}）", flush=True)
         if not _ok:
             soft_fails.append(f"校验清单:不符 {_rel}={_got}")
 

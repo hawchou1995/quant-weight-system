@@ -272,6 +272,22 @@
    "paper": null,
    "n_held": 19,
    "skipped_pct40": 0
+  },
+  {
+   "date": "2026-09-24",
+   "track": "track_a",
+   "control": -126.03,
+   "paper": null,
+   "n_held": 8,
+   "skipped_pct40": 0
+  },
+  {
+   "date": "2026-09-24",
+   "track": "track_b",
+   "control": 2522.77,
+   "paper": null,
+   "n_held": 19,
+   "skipped_pct40": 0
   }
  ]
 }

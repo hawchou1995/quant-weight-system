@@ -3,7 +3,7 @@
   "strategy": "左侧捡漏",
   "strategy_key": "zuoce_jianlou",
   "rule_version": "zuoce-jianlou.leftbook.bt520.v1",
-  "generated_at": "2026-09-24 23:22:35",
+  "generated_at": "2026-09-24 23:53:58",
   "generated_by": "backtest/build_zuoce_backtest_ref.py（投影 bt520_holdout_0924.json，不含任何重算）",
   "period": "面板区间 2016-01-04 → 2026-09-22（全期 40-draw 主口径）｜留出门 2016-01-04 → 2017-12-29",
   "total_return": null,
