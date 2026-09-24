@@ -17,7 +17,9 @@ import os, sys, json, glob, time
 import numpy as np
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-A5_DIR = r"D:/Documents/Workbuddy/股票基金/打板系统A5实验_20260827"
+_EXT_A5 = r"D:/Documents/Workbuddy/股票基金/打板系统A5实验_20260827"
+_REPO_A5 = os.path.join(BASE, "backtest", "a5_experiment")
+A5_DIR = _EXT_A5 if os.path.isdir(_EXT_A5) else _REPO_A5   # 2026-09-24 云端可移植
 sys.path.insert(0, A5_DIR)
 import paper_daban_a5 as P  # 复用 read_tail/compute_tail_features/scan_avoid_list/is_pool_code
 

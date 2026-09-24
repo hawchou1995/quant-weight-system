@@ -65,7 +65,7 @@ AS_OF_RE = re.compile(r'"as_of"\s*:\s*"(\d{4}-\d{2}-\d{2})"')
 # G2 硬门只看这两个（看板标题「数据截至 X」与命中一览都读它们）
 G2_FILES = ("enhanced_data.js", "short_signals.js")
 
-CHAIN_FLAGS = ["--skip-deploy", "--skip-fullguard", "--skip-a5",
+CHAIN_FLAGS = ["--skip-deploy", "--skip-fullguard",
                "--no-main-push", "--skip-gushi"]
 
 

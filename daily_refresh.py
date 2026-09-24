@@ -12,6 +12,7 @@ from pathlib import Path
 import pandas as pd
 
 BASE = Path(__file__).resolve().parent
+_A5_EXT = BASE.parent / "打板系统A5实验_20260827"   # 本机实验目录；云端不存在 → 回落仓库内 backtest/a5_experiment
 PY = sys.executable
 FORCE = "--force" in sys.argv
 # ---- 云端复用开关（2026-09-24 新增；默认行为不变，仅显式传参时生效）----
@@ -153,7 +154,7 @@ STEPS = [
     #   ⚠ 只采集不申领资金；[软]=失败不阻断主链；--skip-qlchg60 / --skip-qlchcb 跳过
     ("超跌低开低吸-候选MA60门 qlch_paper_g60[软]", ["backtest/qlch_paper_20260921.py", "--variant", "B4", "--maxpos", "3", "--gate", "60"], "--skip-qlchg60" in sys.argv),
     ("超跌低开低吸-候选综合分 qlch_paper_cb[软]", ["backtest/qlch_paper_20260921.py", "--variant", "B4", "--maxpos", "3", "--select", "combo"], "--skip-qlchcb" in sys.argv),
-    ("A5 打板实验盘扫描 paper_daban_a5[软]", [str(BASE.parent / "打板系统A5实验_20260827" / "paper_daban_a5.py")], "--skip-a5" in sys.argv),
+    ("A5 打板实验盘扫描 paper_daban_a5[软]", [str(_A5_EXT / "paper_daban_a5.py") if _A5_EXT.is_dir() else str(BASE / "backtest" / "a5_experiment" / "paper_daban_a5.py")], "--skip-a5" in sys.argv),
     ("A5 看板数据 build_a5_pool[软]", ["build_a5_pool.py"], "--skip-a5" in sys.argv),
     ("A5 复盘日志 build_a5_review[软]", ["build_a5_review.py"], "--skip-a5" in sys.argv),
     # kxmm 市场情绪（恐贪指数+热力图）数据抓取——看板「市场情绪」视图数据源；[软]=失败不阻断，

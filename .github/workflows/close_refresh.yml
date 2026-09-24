@@ -67,6 +67,7 @@ jobs:
             data_hist
             fund_nav_cache
             data_fundamental
+            backtest/a5_experiment
           key: qws-data-${{ github.run_id }}
           restore-keys: |
             qws-data-
@@ -144,6 +145,7 @@ jobs:
             data_hist
             fund_nav_cache
             data_fundamental
+            backtest/a5_experiment
           key: qws-data-${{ github.run_id }}
 
       # ---- 5b 当日数据 delta（供本机同步 K 线；链失败也产出，故用 always）----

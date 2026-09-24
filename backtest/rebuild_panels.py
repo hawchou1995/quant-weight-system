@@ -15,6 +15,7 @@ if not Path(PY).exists():                       # 云端无此解释器 → 退�
     PY = sys.executable
 FL = BASE / "backtest" / "factorlab_0913" / "panel_0913.pkl"
 OSSP = BASE / "backtest" / "oss_0913" / "oss_panel_0913.pkl"
+KVP = BASE / "backtest" / "kv_resonance_0913" / "panel_kv_0913.npz"   # 2026-09-24：qlch/recreenscreen 输入面板（498MB，可再生，不备份）
 t0 = time.time()
 def log(*a): print(f"[{time.time()-t0:6.1f}s]", *a, flush=True)
 
@@ -36,12 +37,13 @@ import pandas as _pd
 _idx = _pd.read_csv(BASE / "index_000300.csv", parse_dates=["date"])
 _expect = _idx["date"].dt.strftime("%Y-%m-%d").max()
 import pickle as _pk
+_kv_fresh = KVP.exists() and KVP.stat().st_mtime >= (BASE / "index_000300.csv").stat().st_mtime   # kv 面板新鲜度
 if OSSP.exists():
     with open(OSSP, "rb") as _fh:
         _p = _pk.load(_fh)
     _last = str(_p["cal"][-1])[:10]
     del _p
-    if _last == _expect:
+    if _last == _expect and _kv_fresh:
         log(f"[skip] 面板已最新（末日 {_last} == 日历末日）——无需重建")
         sys.exit(0)
     log(f"[需要重建] 面板末日 {_last} < 日历末日 {_expect}")
@@ -55,6 +57,8 @@ for p in (FL, OSSP):
 
 run(BASE / "backtest" / "factorlab_0913" / "build_factor_panel_0913.py")
 run(BASE / "backtest" / "oss_0913" / "build_oss_panel_0913.py")
+if not _kv_fresh:
+    run(BASE / "backtest" / "kv_resonance_0913" / "build_panel_kv.py")
 
 # 验证
 import pickle
@@ -70,4 +74,6 @@ E = P["ext"]
 import numpy as np
 cov = {k: round(float(np.isfinite(v).mean()), 3) for k, v in list(E.items())[:6]}
 log(f"[验证] ext 因子覆盖（前6）: {cov}")
+assert KVP.exists(), "kv 面板未生成"
+log(f"[验证] kv 面板 {KVP.stat().st_size/2**20:.0f}MB（{KVP.name}）")
 log("[完成] 面板已刷新")
