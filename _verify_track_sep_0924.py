@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import pathlib
+import re
 import sys
 
 BASE = pathlib.Path(__file__).resolve().parent
@@ -186,8 +187,20 @@ def check_owned(html):
             continue
         j = html.find('<div class="subview"', i + 10)
         seg = html[i:j] if j > i else html[i:i + 6000]
-        (ok if ('id="own-%s"' % meta["key"]) in seg else bad)(
-            "#sv-%s 含自有资产卡 #own-%s" % (sub, meta["key"]))
+        # 标准形态判据（2026-09-25 用户指出「像样的表格都没有」后新增）：哨兵子页必须
+        # 与其它子页同形 —— 真 <table class="tbl"> + 工具栏（搜索/筛选/计数），不得只有 KPI 带。
+        for cid in ["card-sentinel-pool", "tbl-sentinel-pool", "card-sentinel-track",
+                    "tbl-sentinel-track", "card-sentinel-paper", "tbl-sentinel-paper"]:
+            (ok if ('id="%s"' % cid) in seg else bad)("#sv-%s 含标准块 #%s" % (sub, cid))
+        tbls = seg.count('<table class="tbl"')
+        (ok if tbls >= 3 else bad)("#sv-%s 真表格数 = %d（须 ≥3：选股池/跟踪池/模拟盘）" % (sub, tbls))
+        (ok if 'id="tbl-sentinel-pool-q"' in seg else bad)("#sv-%s 有选股池搜索框" % sub)
+        (ok if 'id="tbl-sentinel-pool-tier"' in seg else bad)("#sv-%s 有分项数筛选" % sub)
+        ths = len(re.findall(r"<th data-key", seg))
+        (ok if ths >= 10 else bad)("#sv-%s 可排序表头数 = %d（须 ≥10）" % (sub, ths))
+        # 真表格必须真的落了行（不是空壳）
+        rows = seg.count("<tr data-tier")
+        (ok if rows >= 50 else bad)("#sv-%s 选股池表数据行 = %d（须 ≥50）" % (sub, rows))
         for n in meta["js"] + [meta["state_json"]]:
             (ok if n in seg else bad)("#sv-%s 引用自有产物 %s" % (sub, n))
         leak = [x for x in GONE_TOKENS if x in seg]

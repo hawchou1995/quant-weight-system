@@ -2738,158 +2738,231 @@ def _bt_sub(key, inner, on=False):
     return '<div class="bt-sub%s" data-bt-sub="%s">%s</div>' % (" on" if on else "", key, inner)
 
 
-def _strategy_assets_card(strategy_key, title, tag, pool_js, track_js, state_json, note="",
-                          pool_var="SENTINEL_POOL", track_var="SENTINEL_TRACK", pool_rows=8):
-    """某策略**独占**的选股池 / 跟踪池 / 模拟盘（R-strategy-isolation-0924）。
+def _sentinel_block(pool_js="sentinel_pool.js", track_js="sentinel_track.js",
+                    state_json="backtest/sentinel_state.json"):
+    """热榜哨兵子页主体（2026-09-25 重做：板内标准形态 = 卡 + 工具栏 + 真表格）。
 
-    只读该策略自己的三个产物：池文件缺失即如实显示「未到盘」，
-    **函数内没有任何跨策略的默认值或兜底源**（这是「严禁共用」在渲染层的体现）。
-    只展示真实字段；缺字段即整段不渲染。
+    形态对齐其它子页：系统头徽章 → 工具栏（搜索/筛选/计数）→ <table class="tbl"> 汇总表 → 空态行。
+    **排序与搜索由板内通用 JS 自动接管**（`querySelectorAll('table.tbl')` 自动发现 +
+    `th[data-key]` 排序 + `#<tblId>-q` 搜索 + `#<tblId>-tier` 筛选），新表无需额外脚本。
+    隔离约束：只读 sentinel_pool.js / sentinel_track.js / sentinel_state.json；
+    **不用 watch_card**（它读 SHORT_POOL.track，属别的策略）。
     """
     import json as _j
 
     def _load_js(rel, var):
         p = BASE / rel
         if not p.exists():
-            return None, "缺文件 %s" % rel
+            return None
         try:
             t = p.read_text(encoding="utf-8")
-            k = t.find("window.%s" % var)
-            if k < 0:
-                return None, "%s 内无 window.%s" % (rel, var)
-            b = t[t.index("{", k):]
-            return _j.loads(b[:b.rfind("}") + 1]), None
-        except Exception as e:
-            return None, "%s 解析失败 %r" % (rel, e)
+            i = t.find("window.%s" % var)
+            b = t[t.index("{", i):]
+            return _j.loads(b[:b.rfind("}") + 1])
+        except Exception:
+            return None
 
     def _load_json(rel):
-        p = BASE / rel
-        if not p.exists():
-            return None, "缺文件 %s" % rel
         try:
-            return _j.loads(p.read_text(encoding="utf-8")), None
-        except Exception as e:
-            return None, "%s 解析失败 %r" % (rel, e)
+            return _j.loads((BASE / rel).read_text(encoding="utf-8"))
+        except Exception:
+            return None
 
-    def _esc(t):
+    def _e(t):
         return str(t).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
-    def _md(t):
-        out = _esc(t)
-        while "**" in out:
-            a = out.find("**")
-            b = out.find("**", a + 2)
-            if b < 0:
-                break
-            out = out[:a] + "<b>" + out[a + 2:b] + "</b>" + out[b + 2:]
-        return out
+    pool = _load_js(pool_js, "SENTINEL_POOL")
+    track = _load_js(track_js, "SENTINEL_TRACK")
+    state = _load_json(state_json)
+    if not pool and not track:
+        return ('<div class="card" id="card-sentinel-pool"><h2>📡 热榜哨兵 · 选股池</h2>'
+                '<div class="sub">产物未到盘：%s / %s（先跑 backtest/sentinel_daily.py）</div></div>'
+                % (_e(pool_js), _e(track_js)))
 
-    def _kpi(lbl, val, cls=""):
-        return '<div class="kpi %s"><div class="l">%s</div><div class="v">%s</div></div>' % (cls, lbl, _esc(val))
+    ltp = (pool or {}).get("last_trigger_pool") or {}
+    ent = ltp.get("entries") or []
+    as_of = (pool or {}).get("as_of") or (track or {}).get("as_of") or "—"
+    thr = (pool or {}).get("threshold")
+    res = (pool or {}).get("as_of_resonance")
+    out = []
 
-    def _sec(head, inner, sub=""):
-        return ('<div class="bt-sec"><h4>%s%s</h4>%s</div>'
-                % (head, (' <em>%s</em>' % _esc(sub)) if sub else "", inner))
-
-    pool, e_pool = _load_js(pool_js, pool_var)
-    track, e_track = _load_js(track_js, track_var)
-    state, e_state = _load_json(state_json)
-    as_of = ((pool or {}).get("as_of") or (track or {}).get("as_of")
-             or (state or {}).get("as_of") or (state or {}).get("last_scan") or "—")
-
-    out = ['<div class="bt-card" id="own-%s">' % strategy_key]
-    out.append('<div class="bt-head"><b>%s</b><span class="bt-tag">%s</span></div>' % (_esc(title), _esc(tag)))
-    out.append('<div class="bt-meta">as_of %s · 数据只读自 %s / %s / %s</div>'
-               % (_esc(as_of), _esc(pool_js), _esc(track_js), _esc(state_json)))
-
-    # ---- ① 选股池 ----
-    if pool:
-        hk = [_kpi("as_of", as_of, "bt-sm"), _kpi("选股池", "%s 只" % pool.get("n_pool"), "bt-sm")]
-        if pool.get("triggered") is not None:
-            hk.append(_kpi("触发", "是" if pool.get("triggered") else "否", "bt-sm"))
-        if pool.get("as_of_resonance") is not None:
-            hk.append(_kpi("今日共振", pool.get("as_of_resonance"), "bt-sm"))
-        if pool.get("threshold") is not None:
-            hk.append(_kpi("θ 阈值", pool.get("threshold"), "bt-sm"))
-        body = ['<div class="bt-band">%s</div>' % "".join(hk)]
-        if pool.get("reason_text"):
-            body.append('<div class="bt-empty" style="margin-top:10px">%s</div>' % _esc(pool["reason_text"]))
-        ltp = pool.get("last_trigger_pool") or {}
-        ent = ltp.get("entries") or []
-        if ent:
-            rows = []
-            for e in ent[:pool_rows]:
-                nm = _esc(e.get("name") or "")
-                cd = _esc((e.get("code") or "")[2:] if len(str(e.get("code") or "")) > 2 else e.get("code"))
-                lab = "%s %s" % (nm, cd)
-                tail = []
-                if e.get("cnt") is not None:
-                    tail.append("%s 项共振" % e.get("cnt"))
-                if e.get("ret_net_pct") is not None:
-                    tail.append("净 %+.2f%%" % e["ret_net_pct"])
-                rows.append('<div><i>%s</i><em>%s</em></div>' % (lab, _esc(" · ".join(tail))))
-            body.append('<div class="bt-meta" style="margin:14px 0 6px">'
-                        '上次触发池 · 前 %d / 共 %d 只 · 触发日 %s（共振 %s 家 · 买入 %s）</div>'
-                        % (min(pool_rows, len(ent)), len(ent), _esc(ltp.get("trigger_date")),
-                           _esc(ltp.get("n_resonance")), _esc(ltp.get("buy_date_all"))))
-            body.append('<div class="bt-list">%s</div>' % "".join(rows))
-        if ltp.get("cnt_dist"):
-            body.append('<div class="bt-meta" style="margin:10px 0 0">分项共振家数分布 · %s</div>'
-                        % _esc(" · ".join("%s 项 %s 家" % (k, v) for k, v in sorted(ltp["cnt_dist"].items()))))
-        out.append(_sec("选股池", "".join(body)))
+    out.append('<div class="card" id="card-sentinel-pool">')
+    out.append('<h2>📡 热榜哨兵 · 选股池 <span class="badge badge-auto">as_of %s</span></h2>' % _e(as_of))
+    out.append('<div class="sub"><span class="badge badge-auto">入场 = K≥2 见底信号共振 且当日共振家数 θ≥%s</span> '
+               '<span class="badge badge-auto">主板 sh60/sz00 · T 收盘确认 → T+1 开盘买</span> '
+               '<span class="badge badge-auto">影子只读 · 只可否决 · 不构成通过性证据</span></div>' % _e(thr))
+    out.append('<div class="sub" style="color:var(--faint)">%s</div>' % _e((pool or {}).get("reason_text") or ""))
+    if ent:
+        cnt_opts = sorted({str(e.get("cnt")) for e in ent if e.get("cnt") is not None}, reverse=True)
+        out.append('<div class="toolbar">'
+                   '<input type="text" id="tbl-sentinel-pool-q" placeholder="🔍 搜索名称 / 代码…">'
+                   '<select id="tbl-sentinel-pool-tier" class="flt" title="按共振分项数筛选">'
+                   '<option value="">全部分项数</option>'
+                   + "".join('<option value="%s">%s 项共振</option>' % (c, c) for c in cnt_opts)
+                   + '</select><span class="count" id="tbl-sentinel-pool-count"></span></div>')
+        out.append('<div class="tbl-wrap"><table class="tbl" id="tbl-sentinel-pool">')
+        out.append('<thead><tr>'
+                   '<th data-key="rank" style="text-align:center">#</th>'
+                   '<th data-key="code">代码</th><th data-key="name">名称</th>'
+                   '<th data-key="cnt" style="text-align:center">共振分项</th>'
+                   '<th data-key="close" style="text-align:right">触发日收盘</th>'
+                   '<th data-key="amt" style="text-align:right">成交额(亿)</th>'
+                   '<th data-key="buy" style="text-align:center">买入日</th>'
+                   '<th data-key="sell" style="text-align:center">卖出日</th>'
+                   '<th data-key="bop" style="text-align:right">买入开盘</th>'
+                   '<th data-key="spx" style="text-align:right">卖出价</th>'
+                   '<th data-key="rg" style="text-align:right">毛收益</th>'
+                   '<th data-key="rn" style="text-align:right">净收益(1.15%往返)</th>'
+                   '</tr></thead><tbody>')
+        for e in ent:
+            c6 = str(e.get("code") or "")
+            c6 = c6[2:] if len(c6) > 2 else c6
+            amt = e.get("amount")
+            amtv = round(amt / 1e8, 2) if isinstance(amt, (int, float)) else "—"
+            rg, rn = e.get("ret_gross_pct"), e.get("ret_net_pct")
+            out.append(
+                '<tr data-tier="%s"><td data-v="%s" style="text-align:center">%s</td>'
+                '<td class="mono">%s</td><td>%s</td>'
+                '<td data-v="%s" style="text-align:center">%s 项</td>'
+                '<td data-v="%s" style="text-align:right">%s</td>'
+                '<td data-v="%s" style="text-align:right">%s</td>'
+                '<td style="text-align:center">%s</td><td style="text-align:center">%s</td>'
+                '<td data-v="%s" style="text-align:right">%s</td>'
+                '<td data-v="%s" style="text-align:right">%s</td>'
+                '<td data-v="%s" style="text-align:right" class="%s">%s</td>'
+                '<td data-v="%s" style="text-align:right" class="%s">%s</td></tr>'
+                % (_e(e.get("cnt")), _e(e.get("rank")), _e(e.get("rank")), _e(c6), _e(e.get("name")),
+                   _e(e.get("cnt")), _e(e.get("cnt")), _e(e.get("close")), _e(e.get("close")),
+                   _e(amtv), _e(amtv), _e(e.get("buy_date")), _e(e.get("sell_date")),
+                   _e(e.get("buy_open")), _e(e.get("buy_open")), _e(e.get("sell_px")), _e(e.get("sell_px")),
+                   _e(rg), "up" if (rg or 0) >= 0 else "down", ("%+.2f%%" % rg) if rg is not None else "—",
+                   _e(rn), "up" if (rn or 0) >= 0 else "down", ("%+.2f%%" % rn) if rn is not None else "—"))
+        out.append('</tbody></table></div>')
+        out.append('<div class="sub" style="color:var(--faint)">上表 = <b>上次触发池</b> %s（共振 %s 家 · 买入 %s）；'
+                   '今日为<b>非触发日</b>（共振 %s 家 &lt; θ%s）→ 当日池为空。分项共振分布 %s。</div>'
+                   % (_e(ltp.get("trigger_date")), _e(ltp.get("n_resonance")), _e(ltp.get("buy_date_all")),
+                      _e(res), _e(thr),
+                      _e(" · ".join("%s 项 %s 家" % (k, v) for k, v in sorted((ltp.get("cnt_dist") or {}).items())))))
     else:
-        out.append(_sec("选股池", '<div class="bt-empty">未到盘 · %s</div>' % _esc(e_pool)))
-
-    # ---- ② 跟踪池 ----
-    if track:
-        cnt = []
-        for lbl, k in [("持仓", "holdings"), ("待入场", "pending_entry"), ("已平", "closed"), ("观察", "watch")]:
-            v = track.get(k)
-            if isinstance(v, list):
-                cnt.append(_kpi(lbl, "%d 只" % len(v), "bt-sm"))
-        if track.get("n_holdings") is not None:
-            cnt.append(_kpi("账本持仓", track.get("n_holdings"), "bt-sm"))
-        tb = ['<div class="bt-band">%s</div>' % "".join(cnt)] if cnt else []
-        ep = track.get("entry_plan") or {}
-        if ep.get("next_action"):
-            tb.append('<div class="bt-empty" style="margin-top:10px"><b>下一步</b> · %s</div>' % _esc(ep["next_action"]))
-        if ep.get("rule"):
-            tb.append('<div class="bt-meta" style="margin:8px 0 0">入场 · %s</div>' % _esc(ep["rule"]))
-        if ep.get("exit"):
-            tb.append('<div class="bt-meta" style="margin:4px 0 0">出场 · %s</div>' % _esc(ep["exit"]))
-        out.append(_sec("跟踪池", "".join(tb)))
-    else:
-        out.append(_sec("跟踪池", '<div class="bt-empty">未到盘 · %s</div>' % _esc(e_track)))
-
-    # ---- ③ 模拟盘（影子账本）----
-    if track or state:
-        src = track or {}
-        sk = [_kpi("交易开关", "开" if src.get("trading_enabled") else "关", "bt-sm")]
-        if src.get("status"):
-            sk.append(_kpi("状态", src.get("status"), "bt-sm"))
-        if track and track.get("days_since_shadow_start") is not None:
-            sk.append(_kpi("影子天数", track["days_since_shadow_start"], "bt-sm"))
-        if src.get("nav") is None:
-            sk.append(_kpi("净值", "—（未开仓）", "bt-sm"))
-        else:
-            sk.append(_kpi("净值", src.get("nav"), "bt-sm"))
-        sb = ['<div class="bt-band">%s</div>' % "".join(sk)]
-        vs = src.get("veto_state") or {}
-        if vs:
-            sb.append('<div class="bt-meta" style="margin:10px 0 0">否决位 V1/V2/V3 = %s / %s / %s（任一触发即人工复核）· V4 诊断 %s</div>'
-                      % (vs.get("V1"), vs.get("V2"), vs.get("V3"),
-                         "—" if vs.get("V4_diag") is None else vs.get("V4_diag")))
-        if src.get("trading_enabled_note"):
-            sb.append('<div class="bt-meta" style="margin:4px 0 0">%s</div>' % _esc(src["trading_enabled_note"]))
-        out.append(_sec("模拟盘", "".join(sb)))
-    else:
-        out.append(_sec("模拟盘", '<div class="bt-empty">未到盘 · %s</div>' % _esc(e_state)))
-
-    if note:
-        out.append('<div class="bt-note">%s</div>' % _md(note))
+        out.append('<div class="sub">选股池为空（%s）</div>' % _e((pool or {}).get("reason") or "no_pool"))
+    out.append('<div class="sub" style="color:var(--faint)">产物来源 · <code>%s</code>'
+               '（本页只读该策略自己的产物，不读其它子标签的池文件）</div>' % _e(pool_js))
     out.append('</div>')
     return "".join(out)
 
+
+def _sentinel_track_card(track_js="sentinel_track.js"):
+    """热榜哨兵 · 跟踪池（真表格；空池给空态行）。只读 sentinel_track.js。"""
+    import json as _j
+    p = BASE / track_js
+    tr = None
+    if p.exists():
+        try:
+            t = p.read_text(encoding="utf-8")
+            i = t.find("window.SENTINEL_TRACK")
+            b = t[t.index("{", i):]
+            tr = _j.loads(b[:b.rfind("}") + 1])
+        except Exception:
+            tr = None
+
+    def _e(x):
+        return str(x).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+    if not tr:
+        return ('<div class="card" id="card-sentinel-track"><h2>👁 跟踪池 · 热榜哨兵</h2>'
+                '<div class="sub">产物未到盘：%s</div></div>' % _e(track_js))
+    ep = tr.get("entry_plan") or {}
+    hd = tr.get("holdings") or []
+    pe = tr.get("pending_entry") or []
+    rows = []
+    for e in hd:
+        rows.append(("持仓", e))
+    for e in pe:
+        rows.append(("待入场", e))
+    out = ['<div class="card" id="card-sentinel-track">',
+           '<h2>👁 跟踪池 · 热榜哨兵 <span class="badge badge-auto">影子账本 · 只记账不成交</span></h2>',
+           '<div class="sub"><span class="badge badge-auto">持仓 %d</span> '
+           '<span class="badge badge-auto">待入场 %d</span> '
+           '<span class="badge badge-auto">已平 %d</span> '
+           '<span class="badge badge-auto">观察 %d</span></div>'
+           % (len(hd), len(pe), len(tr.get("closed") or []), len(tr.get("watch") or [])),
+           '<div class="toolbar"><input type="text" id="tbl-sentinel-track-q" placeholder="🔍 搜索名称 / 代码…">'
+           '<span class="count" id="tbl-sentinel-track-count"></span></div>',
+           '<div class="tbl-wrap"><table class="tbl" id="tbl-sentinel-track">',
+           '<thead><tr><th data-key="st" style="text-align:center">状态</th>'
+           '<th data-key="code">代码</th><th data-key="name">名称</th>'
+           '<th data-key="sig" style="text-align:center">信号日</th>'
+           '<th data-key="plan">买入计划</th></tr></thead><tbody>']
+    if rows:
+        for tag, e in rows:
+            out.append('<tr><td style="text-align:center">%s</td><td class="mono">%s</td><td>%s</td>'
+                       '<td style="text-align:center">%s</td><td>%s</td></tr>'
+                       % (_e(tag), _e(e.get("code") or e.get("code6") or ""), _e(e.get("name") or ""),
+                          _e(e.get("signal_date") or ""),
+                          _e(e.get("plan") or e.get("entry_planned") or "")))
+    else:
+        out.append('<tr><td colspan="5">空 —— %s</td></tr>'
+                   % _e(ep.get("next_action") or "非触发日不建仓"))
+    out += ['</tbody></table></div>',
+            '<div class="sub" style="color:var(--faint)">入场 · %s</div>' % _e(ep.get("rule") or ""),
+            '<div class="sub" style="color:var(--faint)">出场 · %s</div>' % _e(ep.get("exit") or ""),
+            '<div class="sub" style="color:var(--faint)">产物来源 · <code>%s</code>'
+            '（本页只读该策略自己的产物）</div>' % _e(track_js),
+            '</div>']
+    return "".join(out)
+
+
+def _sentinel_paper_card(track_js="sentinel_track.js", state_json="backtest/sentinel_state.json"):
+    """热榜哨兵 · 模拟盘（影子账本）表 —— 形态对齐 qlch 的 tbl-qlch-paper。"""
+    import json as _j
+
+    def _load(rel, var=None):
+        p = BASE / rel
+        if not p.exists():
+            return None
+        try:
+            t = p.read_text(encoding="utf-8")
+            if var:
+                i = t.find("window.%s" % var)
+                b = t[t.index("{", i):]
+                return _j.loads(b[:b.rfind("}") + 1])
+            return _j.loads(t)
+        except Exception:
+            return None
+
+    def _e(x):
+        return str(x).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+    tr = _load(track_js, "SENTINEL_TRACK") or {}
+    stt = _load(state_json) or {}
+    vs = tr.get("veto_state") or {}
+    rows = [
+        ("净值 NAV", "—（未开仓）" if tr.get("nav") is None else tr.get("nav"),
+         "影子账本不执行成交；空仓期无净值（不伪造）"),
+        ("交易开关 trading_enabled", "关" if not tr.get("trading_enabled") else "开",
+         _e(tr.get("trading_enabled_note") or "恒 false")),
+        ("状态", tr.get("status") or "—",
+         "影子起点 shadow_start = %s" % _e(tr.get("shadow_start") or stt.get("shadow_start") or "—")),
+        ("扫描日数 / 成交笔数",
+         "%s 日 / %s 笔" % (tr.get("days_since_shadow_start"), tr.get("n_holdings")),
+         "预注册判定节奏 = ≥300 完成事件 或 ≥120 交易日（此前每日只记录）"),
+        ("否决位 V1 / V2 / V3",
+         "%s / %s / %s" % (vs.get("V1"), vs.get("V2"), vs.get("V3")),
+         "任一触发即人工复核；V4 诊断 = %s" % ("—" if vs.get("V4_diag") is None else vs.get("V4_diag"))),
+    ]
+    out = ['<div class="card" id="card-sentinel-paper">',
+           '<h2>💰 模拟盘 · 热榜哨兵 <span class="badge badge-auto">影子账本 · 只记账不成交</span></h2>',
+           '<div class="tbl-wrap"><table class="tbl" id="tbl-sentinel-paper">',
+           '<thead><tr><th data-key="k">项目</th><th data-key="v">当前值</th>'
+           '<th data-key="n">说明</th></tr></thead><tbody>']
+    for k, v, n in rows:
+        out.append('<tr><td>%s</td><td class="mono">%s</td><td style="color:var(--faint)">%s</td></tr>'
+                   % (_e(k), _e(v), _e(n)))
+    out.append('</tbody></table></div>')
+    out.append('<div class="sub" style="color:var(--faint)">产物来源 · <code>%s</code> / <code>%s</code>'
+               '（本页只读该策略自己的产物）</div>' % (_e(track_js), _e(state_json)))
+    out.append('</div>')
+    return "".join(out)
 
 
 SENTINEL_CARD = _bt_ref_card("sentinel", "📡 热榜哨兵",
@@ -2921,14 +2994,11 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
                     ("st-fund", "基金池"), ("st-sentinel", "热榜哨兵")],
         default_key="st-qlch")}
 {subview("st-sentinel", "热榜哨兵", "jiandi top30 共振哨兵 · 影子跟踪（shadow_start 2026-09-24）",
-  SENTINEL_CARD + _strategy_assets_card(
-  "sentinel", "📡 热榜哨兵 · 自有资产", "独占：sentinel_pool.js / sentinel_track.js / sentinel_state.json",
-  "sentinel_pool.js", "sentinel_track.js", "backtest/sentinel_state.json",
-  "影子账本只记账不成交（trading_enabled 恒 false）。预注册冻结口径：**只可否决**、**不构成通过性证据**，"
-  "判定节奏 = ≥300 完成事件 或 ≥120 交易日。2026-09-24 稳健性复测 B1–B8 **通过**"
-  "（滚动 244 日中位年化 +10.76% / 单路径 +14.10% / MDD −25.60% / θ 邻域七档全正 / 成本×3 +0.67% / "
-  "前后半双正 / Bonferroni 修正后显著 / 正年 10-11）——但**不是干净 OOS**（全样本已用于选参），"
-  "不得读作已证明可投产。"))}
+  _sentinel_block() + _sentinel_track_card() + _sentinel_paper_card() + SENTINEL_CARD + '''<div class="sub" style="color:var(--faint)">'''
+  +'''2026-09-24 稳健性复测 <b>B1–B8 通过</b>（滚动 244 日中位年化 +10.76% / 单路径 +14.10% / MDD −25.60% / '''
+  +'θ 邻域七档全正 / 成本×3 +0.67% / 前后半双正 / Bonferroni 修正后显著 / 正年 10-11）——'''
+  +'<b>但不是干净 OOS</b>（2016-06-01 起全样本已用于选参），不得读作已证明可投产；'''
+  +'读数见 <code>backtest/jiandi_sentinel_retest_0924.json</code>，边界声明见 ADR-0010 D18。</div>''')}
 {subview("st-stk", "股票池", "全量池短线 · 主板信号 · 有信号即买", system_block(
   "view-short-stk", "sys-short-stk",
   "⚡ 短线 · 股票池", "auto", "主板 超卖伏击主信号 · A59 主卖出 / C50 参考 · 低价≥3元",
