@@ -1,0 +1,169 @@
+{
+ "generated_at": "2026-09-24 13:31:52",
+ "rule_version": "R-jiandi-top30-0924/v1",
+ "status": "COLLECTING",
+ "judgement_ready": false,
+ "shadow_start": "2026-09-24",
+ "last_data_date": "2026-09-23",
+ "window": {
+  "start": "2026-09-24",
+  "end": "2026-09-23",
+  "n_cal_days": 0
+ },
+ "config": {
+  "theta": 30,
+  "K": 5,
+  "fallback_days": 5,
+  "seed": 20260921,
+  "seeds_used": [
+   20260921
+  ],
+  "cost_tiers": [
+   "0.20%",
+   "1.15%"
+  ],
+  "regime": "生产 MA60_3（T-1）"
+ },
+ "frequency": {
+  "trigger_days_window": 0,
+  "events_total_window": 0,
+  "backtest_reference": {
+   "trigger_days_all": 88,
+   "events_all": 9833,
+   "span_years": 10.31,
+   "trigger_days_per_year": 8.5,
+   "events_per_year": 954.0
+  }
+ },
+ "arms": {
+  "A1 基线(纯持5日)": {
+   "n_total": 0,
+   "n_done": 0,
+   "mean_gross_pct": null,
+   "mean_net_pct_020": null,
+   "mean_net_pct_115": null,
+   "wr_pct": null,
+   "med_net_pct_020": null,
+   "sim_020": null,
+   "sim_115": null,
+   "conc_115_top10": null,
+   "V1": {
+    "min_n": 300,
+    "tier": "net@0.20%",
+    "metric": null,
+    "triggered": false
+   },
+   "V2": {
+    "thr": -30.2,
+    "metric": null,
+    "triggered": false
+   },
+   "V3": {
+    "min_days": 120,
+    "thr": -10.0,
+    "metric": null,
+    "triggered": false
+   },
+   "V4_diag": {
+    "thr": 60.0,
+    "metric": null,
+    "elevated": false
+   }
+  },
+  "A2 RSI固定55(主假设)": {
+   "n_total": 0,
+   "n_done": 0,
+   "mean_gross_pct": null,
+   "mean_net_pct_020": null,
+   "mean_net_pct_115": null,
+   "wr_pct": null,
+   "med_net_pct_020": null,
+   "sim_020": null,
+   "sim_115": null,
+   "conc_115_top10": null,
+   "V1": {
+    "min_n": 300,
+    "tier": "net@0.20%",
+    "metric": null,
+    "triggered": false
+   },
+   "V2": {
+    "thr": -30.2,
+    "metric": null,
+    "triggered": false
+   },
+   "V3": {
+    "min_days": 120,
+    "thr": -10.0,
+    "metric": null,
+    "triggered": false
+   },
+   "V4_diag": {
+    "thr": 60.0,
+    "metric": null,
+    "elevated": false
+   }
+  },
+  "A3 RSI域55/65/65(次假设)": {
+   "n_total": 0,
+   "n_done": 0,
+   "mean_gross_pct": null,
+   "mean_net_pct_020": null,
+   "mean_net_pct_115": null,
+   "wr_pct": null,
+   "med_net_pct_020": null,
+   "sim_020": null,
+   "sim_115": null,
+   "conc_115_top10": null,
+   "V1": {
+    "min_n": 300,
+    "tier": "net@0.20%",
+    "metric": null,
+    "triggered": false
+   },
+   "V2": {
+    "thr": -30.2,
+    "metric": null,
+    "triggered": false
+   },
+   "V3": {
+    "min_days": 120,
+    "thr": -10.0,
+    "metric": null,
+    "triggered": false
+   },
+   "V4_diag": {
+    "thr": 60.0,
+    "metric": null,
+    "elevated": false
+   }
+  }
+ },
+ "notes": [
+  "事件在 5 日窗口闭合且价格门控通过后才会出现（对齐回测构造）；窗口起点为空仓（不含跨窗口持仓）",
+  "V1 用 net@0.20% 档（精确回测参照 net@0.20% = 4.27~4.35、net@1.15% = 3.32~3.40）；net@1.15% 同时记录于 mean_net_pct_115",
+  "V2/V3 用 1.15% 保守档；V4 仅诊断不设门",
+  "--start 重放仅限 --dry（防污染正式窗口）；重放校验见报告 §13"
+ ],
+ "history": [
+  {
+   "at": "2026-09-24 13:31:52",
+   "status": "COLLECTING",
+   "days": 0,
+   "per_arm": {
+    "A1 基线(纯持5日)": {
+     "n_done": 0,
+     "mean_net020": null
+    },
+    "A2 RSI固定55(主假设)": {
+     "n_done": 0,
+     "mean_net020": null
+    },
+    "A3 RSI域55/65/65(次假设)": {
+     "n_done": 0,
+     "mean_net020": null
+    }
+   }
+  }
+ ]
+}

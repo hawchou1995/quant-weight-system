@@ -1,0 +1,16 @@
+{
+ "task": "NAV 市场阈值补充诊断（JIANDI-TOP-GRID-0924 附属）",
+ "generated_at": "2026-09-24",
+ "method": "共振 K>=2 事件 + 当日共振家数>=thresh 过滤；两段式等权 NAV（与主脚本同方法）",
+ "rows": [
+  {"N": 2, "thresh": null, "n": 15623, "total": -99.97, "cagr": -53.9, "maxdd": -99.97, "sharpe": -2.151},
+  {"N": 2, "thresh": 5, "n": 13921, "total": -90.67, "cagr": -20.99, "maxdd": -91.84, "sharpe": -1.131},
+  {"N": 2, "thresh": 10, "n": 12636, "total": -49.98, "cagr": -6.99, "maxdd": -66.82, "sharpe": -0.339},
+  {"N": 2, "thresh": 20, "n": 10995, "total": 85.54, "cagr": 6.69, "maxdd": -23.46, "sharpe": 0.529},
+  {"N": 5, "thresh": null, "n": 15616, "total": -99.11, "cagr": -36.83, "maxdd": -99.12, "sharpe": -1.272},
+  {"N": 5, "thresh": 5, "n": 13920, "total": -73.43, "cagr": -12.32, "maxdd": -84.84, "sharpe": -0.443},
+  {"N": 5, "thresh": 10, "n": 12635, "total": 12.57, "cagr": 1.25, "maxdd": -57.96, "sharpe": 0.161},
+  {"N": 5, "thresh": 20, "n": 10994, "total": 277.2, "cagr": 14.89, "maxdd": -25.6, "sharpe": 0.799}
+ ],
+ "note": "thresh=null 行与主网格 K>=2 对应档一致；本诊断仅覆盖 K>=2"
+}

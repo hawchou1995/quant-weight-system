@@ -1,0 +1,549 @@
+{
+ "generated_at": "2026-09-24 13:05:49",
+ "D_portfolio_baseline": [
+  {
+   "cost": "rt1.15%",
+   "K": 3,
+   "seed": 20260921,
+   "total": 97.15,
+   "cagr": 6.81,
+   "maxdd": -25.34,
+   "sharpe": 0.507,
+   "traded": 219,
+   "take_rate": 1.99,
+   "invested_avg": 17.5
+  },
+  {
+   "cost": "rt1.15%",
+   "K": 3,
+   "seed": 20260922,
+   "total": 84.42,
+   "cagr": 6.12,
+   "maxdd": -28.58,
+   "sharpe": 0.464,
+   "traded": 211,
+   "take_rate": 1.92,
+   "invested_avg": 16.8
+  },
+  {
+   "cost": "rt1.15%",
+   "K": 3,
+   "seed": 20260923,
+   "total": 97.35,
+   "cagr": 6.82,
+   "maxdd": -28.65,
+   "sharpe": 0.492,
+   "traded": 219,
+   "take_rate": 1.99,
+   "invested_avg": 17.5
+  },
+  {
+   "cost": "rt1.15%",
+   "K": 3,
+   "seed": 20260924,
+   "total": 87.16,
+   "cagr": 6.27,
+   "maxdd": -28.05,
+   "sharpe": 0.465,
+   "traded": 219,
+   "take_rate": 1.99,
+   "invested_avg": 17.5
+  },
+  {
+   "cost": "rt1.15%",
+   "K": 3,
+   "seed": 20260925,
+   "total": 181.64,
+   "cagr": 10.56,
+   "maxdd": -21.19,
+   "sharpe": 0.748,
+   "traded": 215,
+   "take_rate": 1.96,
+   "invested_avg": 17.2
+  },
+  {
+   "cost": "rt1.15%",
+   "K": 5,
+   "seed": 20260921,
+   "total": 44.68,
+   "cagr": 3.65,
+   "maxdd": -27.61,
+   "sharpe": 0.323,
+   "traded": 358,
+   "take_rate": 3.26,
+   "invested_avg": 17.1
+  },
+  {
+   "cost": "rt1.15%",
+   "K": 5,
+   "seed": 20260922,
+   "total": 42.21,
+   "cagr": 3.47,
+   "maxdd": -30.34,
+   "sharpe": 0.313,
+   "traded": 357,
+   "take_rate": 3.25,
+   "invested_avg": 17.1
+  },
+  {
+   "cost": "rt1.15%",
+   "K": 5,
+   "seed": 20260923,
+   "total": 59.14,
+   "cagr": 4.61,
+   "maxdd": -24.01,
+   "sharpe": 0.393,
+   "traded": 361,
+   "take_rate": 3.28,
+   "invested_avg": 17.3
+  },
+  {
+   "cost": "rt1.15%",
+   "K": 5,
+   "seed": 20260924,
+   "total": 57.13,
+   "cagr": 4.48,
+   "maxdd": -26.65,
+   "sharpe": 0.37,
+   "traded": 363,
+   "take_rate": 3.3,
+   "invested_avg": 17.4
+  },
+  {
+   "cost": "rt1.15%",
+   "K": 5,
+   "seed": 20260925,
+   "total": 95.48,
+   "cagr": 6.72,
+   "maxdd": -32.69,
+   "sharpe": 0.517,
+   "traded": 360,
+   "take_rate": 3.27,
+   "invested_avg": 17.2
+  },
+  {
+   "cost": "rt1.15%",
+   "K": 10,
+   "seed": 20260921,
+   "total": 41.8,
+   "cagr": 3.45,
+   "maxdd": -26.11,
+   "sharpe": 0.32,
+   "traded": 714,
+   "take_rate": 6.49,
+   "invested_avg": 17.1
+  },
+  {
+   "cost": "rt1.15%",
+   "K": 10,
+   "seed": 20260922,
+   "total": 140.33,
+   "cagr": 8.88,
+   "maxdd": -22.47,
+   "sharpe": 0.702,
+   "traded": 713,
+   "take_rate": 6.49,
+   "invested_avg": 17.1
+  },
+  {
+   "cost": "rt1.15%",
+   "K": 10,
+   "seed": 20260923,
+   "total": 125.65,
+   "cagr": 8.21,
+   "maxdd": -20.79,
+   "sharpe": 0.646,
+   "traded": 720,
+   "take_rate": 6.55,
+   "invested_avg": 17.2
+  },
+  {
+   "cost": "rt1.15%",
+   "K": 10,
+   "seed": 20260924,
+   "total": 62.74,
+   "cagr": 4.84,
+   "maxdd": -21.6,
+   "sharpe": 0.422,
+   "traded": 719,
+   "take_rate": 6.54,
+   "invested_avg": 17.2
+  },
+  {
+   "cost": "rt1.15%",
+   "K": 10,
+   "seed": 20260925,
+   "total": 116.47,
+   "cagr": 7.78,
+   "maxdd": -19.33,
+   "sharpe": 0.632,
+   "traded": 722,
+   "take_rate": 6.57,
+   "invested_avg": 17.3
+  },
+  {
+   "cost": "rt0.20%",
+   "K": 3,
+   "seed": 20260921,
+   "total": 295.53,
+   "cagr": 14.27,
+   "maxdd": -24.62,
+   "sharpe": 0.955,
+   "traded": 219,
+   "take_rate": 1.99,
+   "invested_avg": 17.5
+  },
+  {
+   "cost": "rt0.20%",
+   "K": 3,
+   "seed": 20260922,
+   "total": 260.46,
+   "cagr": 13.24,
+   "maxdd": -24.35,
+   "sharpe": 0.891,
+   "traded": 211,
+   "take_rate": 1.92,
+   "invested_avg": 16.8
+  },
+  {
+   "cost": "rt0.20%",
+   "K": 3,
+   "seed": 20260923,
+   "total": 296.35,
+   "cagr": 14.29,
+   "maxdd": -27.71,
+   "sharpe": 0.922,
+   "traded": 219,
+   "take_rate": 1.99,
+   "invested_avg": 17.5
+  },
+  {
+   "cost": "rt0.20%",
+   "K": 3,
+   "seed": 20260924,
+   "total": 275.97,
+   "cagr": 13.71,
+   "maxdd": -23.2,
+   "sharpe": 0.902,
+   "traded": 219,
+   "take_rate": 1.99,
+   "invested_avg": 17.5
+  },
+  {
+   "cost": "rt0.20%",
+   "K": 3,
+   "seed": 20260925,
+   "total": 457.92,
+   "cagr": 18.14,
+   "maxdd": -18.06,
+   "sharpe": 1.204,
+   "traded": 215,
+   "take_rate": 1.96,
+   "invested_avg": 17.2
+  },
+  {
+   "cost": "rt0.20%",
+   "K": 5,
+   "seed": 20260921,
+   "total": 186.6,
+   "cagr": 10.75,
+   "maxdd": -24.91,
+   "sharpe": 0.792,
+   "traded": 358,
+   "take_rate": 3.26,
+   "invested_avg": 17.1
+  },
+  {
+   "cost": "rt0.20%",
+   "K": 5,
+   "seed": 20260922,
+   "total": 181.13,
+   "cagr": 10.54,
+   "maxdd": -22.12,
+   "sharpe": 0.787,
+   "traded": 357,
+   "take_rate": 3.25,
+   "invested_avg": 17.1
+  },
+  {
+   "cost": "rt0.20%",
+   "K": 5,
+   "seed": 20260923,
+   "total": 217.03,
+   "cagr": 11.84,
+   "maxdd": -21.86,
+   "sharpe": 0.879,
+   "traded": 361,
+   "take_rate": 3.28,
+   "invested_avg": 17.3
+  },
+  {
+   "cost": "rt0.20%",
+   "K": 5,
+   "seed": 20260924,
+   "total": 214.53,
+   "cagr": 11.75,
+   "maxdd": -20.06,
+   "sharpe": 0.832,
+   "traded": 363,
+   "take_rate": 3.3,
+   "invested_avg": 17.4
+  },
+  {
+   "cost": "rt0.20%",
+   "K": 5,
+   "seed": 20260925,
+   "total": 288.46,
+   "cagr": 14.07,
+   "maxdd": -26.62,
+   "sharpe": 0.978,
+   "traded": 360,
+   "take_rate": 3.27,
+   "invested_avg": 17.2
+  },
+  {
+   "cost": "rt0.20%",
+   "K": 10,
+   "seed": 20260921,
+   "total": 180.45,
+   "cagr": 10.52,
+   "maxdd": -21.02,
+   "sharpe": 0.822,
+   "traded": 714,
+   "take_rate": 6.49,
+   "invested_avg": 17.1
+  },
+  {
+   "cost": "rt0.20%",
+   "K": 10,
+   "seed": 20260922,
+   "total": 374.38,
+   "cagr": 16.3,
+   "maxdd": -21.72,
+   "sharpe": 1.208,
+   "traded": 713,
+   "take_rate": 6.49,
+   "invested_avg": 17.1
+  },
+  {
+   "cost": "rt0.20%",
+   "K": 10,
+   "seed": 20260923,
+   "total": 348.19,
+   "cagr": 15.66,
+   "maxdd": -19.21,
+   "sharpe": 1.144,
+   "traded": 720,
+   "take_rate": 6.55,
+   "invested_avg": 17.2
+  },
+  {
+   "cost": "rt0.20%",
+   "K": 10,
+   "seed": 20260924,
+   "total": 223.15,
+   "cagr": 12.05,
+   "maxdd": -17.42,
+   "sharpe": 0.933,
+   "traded": 719,
+   "take_rate": 6.54,
+   "invested_avg": 17.2
+  },
+  {
+   "cost": "rt0.20%",
+   "K": 10,
+   "seed": 20260925,
+   "total": 330.98,
+   "cagr": 15.22,
+   "maxdd": -17.4,
+   "sharpe": 1.149,
+   "traded": 722,
+   "take_rate": 6.57,
+   "invested_avg": 17.3
+  }
+ ],
+ "F_arms_portfolio": [
+  {
+   "arm": "baseline",
+   "K": 5,
+   "rt": "0.20%",
+   "sim_seed_mean": {
+    "total": 194.92,
+    "cagr": 11.043,
+    "maxdd": -22.963,
+    "sharpe": 0.819,
+    "take_rate": 3.263,
+    "invested_avg": 17.167
+   },
+   "event_stats": {
+    "n": 10994,
+    "wr": 64.72,
+    "med": 2.349,
+    "mean": 2.971,
+    "pf": 1.49
+   }
+  },
+  {
+   "arm": "A1 熊市门",
+   "K": 5,
+   "rt": "0.20%",
+   "sim_seed_mean": {
+    "total": 204.547,
+    "cagr": 11.38,
+    "maxdd": -20.683,
+    "sharpe": 0.949,
+    "take_rate": 3.01,
+    "invested_avg": 13.2
+   },
+   "event_stats": {
+    "n": 9157,
+    "wr": 65.93,
+    "med": 2.599,
+    "mean": 3.222,
+    "pf": 1.52
+   }
+  },
+  {
+   "arm": "A2 RSI域出场5",
+   "K": 5,
+   "rt": "0.20%",
+   "sim_seed_mean": {
+    "total": 288.207,
+    "cagr": 14.043,
+    "maxdd": -20.993,
+    "sharpe": 1.039,
+    "take_rate": 3.303,
+    "invested_avg": 17.0
+   },
+   "event_stats": {
+    "n": 10994,
+    "wr": 64.78,
+    "med": 2.351,
+    "mean": 2.947,
+    "pf": 1.48
+   }
+  },
+  {
+   "arm": "A3 RSI域出场20",
+   "K": 5,
+   "rt": "0.20%",
+   "sim_seed_mean": {
+    "total": 289.85,
+    "cagr": 13.72,
+    "maxdd": -29.73,
+    "sharpe": 0.821,
+    "take_rate": 1.967,
+    "invested_avg": 26.367
+   },
+   "event_stats": {
+    "n": 10990,
+    "wr": 77.72,
+    "med": 6.685,
+    "mean": 6.858,
+    "pf": 1.31
+   }
+  },
+  {
+   "arm": "A5 RSI固定55出场5",
+   "K": 5,
+   "rt": "0.20%",
+   "sim_seed_mean": {
+    "total": 313.44,
+    "cagr": 14.693,
+    "maxdd": -21.057,
+    "sharpe": 1.066,
+    "take_rate": 3.373,
+    "invested_avg": 16.9
+   },
+   "event_stats": {
+    "n": 10994,
+    "wr": 64.56,
+    "med": 2.325,
+    "mean": 2.904,
+    "pf": 1.47
+   }
+  }
+ ],
+ "D_qlch_portfolio": {
+  "K": 3,
+  "rt": "0.20%",
+  "seed_mean": {
+   "total": 597.376,
+   "cagr": 20.638,
+   "maxdd": -34.426,
+   "sharpe": 0.86,
+   "take_rate": 29.86,
+   "invested_avg": 30.9
+  },
+  "per_seed": [
+   {
+    "total": 516.04,
+    "cagr": 19.28,
+    "maxdd": -32.49,
+    "sharpe": 0.821,
+    "traded": 1162,
+    "take_rate": 29.86,
+    "invested_avg": 30.9
+   },
+   {
+    "total": 527.93,
+    "cagr": 19.51,
+    "maxdd": -33.11,
+    "sharpe": 0.82,
+    "traded": 1162,
+    "take_rate": 29.86,
+    "invested_avg": 30.9
+   },
+   {
+    "total": 525.48,
+    "cagr": 19.46,
+    "maxdd": -34.04,
+    "sharpe": 0.84,
+    "traded": 1162,
+    "take_rate": 29.86,
+    "invested_avg": 30.9
+   },
+   {
+    "total": 686.95,
+    "cagr": 22.15,
+    "maxdd": -33.45,
+    "sharpe": 0.897,
+    "traded": 1162,
+    "take_rate": 29.86,
+    "invested_avg": 30.9
+   },
+   {
+    "total": 730.48,
+    "cagr": 22.79,
+    "maxdd": -39.04,
+    "sharpe": 0.92,
+    "traded": 1162,
+    "take_rate": 29.86,
+    "invested_avg": 30.9
+   }
+  ]
+ },
+ "G_corr": {
+  "corr_top1_qlch": 0.386,
+  "corr_top1_hs300": 0.227,
+  "corr_qlch_hs300": 0.333,
+  "top1": {
+   "total": 186.6,
+   "cagr": 10.75,
+   "maxdd": -24.91,
+   "sharpe": 0.792
+  },
+  "qlch": {
+   "total": 516.04,
+   "cagr": 19.28,
+   "maxdd": -32.49,
+   "sharpe": 0.821
+  },
+  "blend_5050": {
+   "total": 354.07,
+   "cagr": 15.81,
+   "maxdd": -24.54,
+   "sharpe": 0.957
+  }
+ }
+}
