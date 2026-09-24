@@ -6,6 +6,7 @@ cd D:\Documents\Workbuddy\股票基金\quant-weight-system
 $PY = "C:/Users/Admin/.workbuddy/binaries/python/envs/default/Scripts/python.exe"
 & $PY -X utf8 backtest\cloud_accept_data.py --sample 12              # 只读验收（下载到 _cloud_local\ + 五项判据）
 & $PY -X utf8 backtest\cloud_accept_data.py --sample 12 --inplace    # 校验 rc=0 且 as_of 已推进到今天 → 落地（旧件备份 *.bak-cloudsync-<ts>）
+& $PY -X utf8 backtest\apply_data_delta.py --latest                  # 回灌云端 K 线 delta + A5/qlch 策略状态（见 §4 / §5）
 ```
 退出码：`0` 全过 / `3` 有失败项 / `4` 环境异常。报告：`_cloud_local\accept_report.json`。
 
@@ -24,18 +25,23 @@ $PY = "C:/Users/Admin/.workbuddy/binaries/python/envs/default/Scripts/python.exe
 powershell -NoProfile -File <scratch>\analyze_run.ps1 -RunId <id>    # 日志 5 段分析
 ```
 判据：`publish=true` / `status=ok` / `chain rc=0` / `G1 结构门禁` 通过 / `G2 新鲜度` fresh / staging 13 项。
-已知可接受软失败：kv_resonance npz 相关（recreenscreen + 6 个 qlch 臂）、factor_gate 缺 scipy、em-bulk-all clist 被拦。
+已知可接受软失败：`factor_gate_daily`（缺 scipy）、`em-bulk-all` clist 被拦。
+2026-09-24 已修：kv 共振面板改由 `rebuild_panels.py` 每轮自建（不再依赖 498MB 的 `panel_kv_0913.npz` 种子），
+`recreenscreen_regen` 与 6 个 qlch 臂随之不再软失败；A5 三步也已从"跳过"改为真实执行（`--skip-a5` 已移除）。
 
 ## 3. 前提与限制（重要）
-- 云端**只发布看板产物**（js/json/html）。**K 线原始数据（`data_full/`、`index_000300.csv`）在云端 runner 的 cache 里，本机取不到**。
-- 本机链定时任务已于 2026-09-24 停用 → 本机 `index_000300.csv`、`data_full/*.csv` **不再自动更新**（当前止于 2026-09-23）。
-- 若要让本机 K 线也"吃云端数据"，需在 `.github/workflows/close_refresh.yml` 增加一个「当日数据 delta 工件」上传步骤（约 400KB/日：每只票当日 OHLCV 一行），本机下载后 append + 多源抽查校验。该改动属 workflow 文件 → 只能走 web UI 提交（token 无 workflow scope）。
-- 相关脚本：`backtest/cloud_accept_data.py`（本手册主体）、`backtest/gushi_data_guard.py`（gushi 采集体检）。
+- 云端**只发布看板产物**（js/json/html）。K 线原始数据（`data_full/`、`index_000300.csv`）在云端 runner 的 cache 里，
+  本机取不到 → 通过 §4 的 `data-delta` 工件回流。
+- 本机链定时任务已于 2026-09-24 停用 → 本机 `data_full/*.csv`、`index_000300.csv` 不再本地自更新，
+  改由 §4 云端回灌（当前尾行 2026-09-24）。
+- `.github/workflows/*` 现在可直接 push：gh token 已含 `workflow` scope（B 方案，2026-09-24 起）。
+- 相关脚本：`backtest/cloud_accept_data.py`（本手册主体）、`backtest/build_data_delta.py` + `backtest/apply_data_delta.py`（数据/状态回流）、
+  `backtest/gushi_data_guard.py`（gushi 采集体检）。
 
 ## 4. 本机 K 线同步（云端 data-delta 工件，2026-09-24 起）
 云端链跑完后额外产出 `_cloud_delta/`（`delta_bars.csv` = 最近 3 个交易日全市场日线，约 1.3MB；
-+ `index_000300_tail.csv` + `delta_meta.json`），由 workflow 用 `actions/upload-artifact` 上传
-（artifact 名 `data-delta`，保留 45 天；步骤用 `always()`，链失败也产出）。
++ `index_000300_tail.csv` + `delta_meta.json` + `state_meta.json` + 状态目录，见 §5），
+由 workflow 用 `actions/upload-artifact` 上传（artifact 名 `data-delta`，保留 45 天；步骤用 `always()`，链失败也产出）。
 
 本机合并（**先校验、后写盘**）：
 ```powershell
@@ -43,7 +49,48 @@ powershell -NoProfile -File <scratch>\analyze_run.ps1 -RunId <id>    # 日志 5 
 & $PY -X utf8 backtest\apply_data_delta.py --src <dir> --dry-run    # 只算不写
 & $PY -X utf8 backtest\apply_data_delta.py --rollback 2026-09-24    # 撤掉某日追加的行
 ```
-- 校验不过（rc=3）**绝不写盘**（实测：构建器早期 bug 正是被这道门拦下）。
-- 日志 `_cloud_local/delta_applied.json`（近 60 次）；`--dry-run` 不写日志。
-- 沙盒实测：构建 7197 只 / 20916 行 / 1.3MB → 抽样 10/10 与腾讯K线一致 → 写入 60 票 + 1 指数行
+- 校验不过（rc=3）**绝不写盘**（K 线与策略状态都不写）。
+- 日志 `_cloud_local/delta_applied.json`（近 60 次，含 `state` 段）；`--dry-run` 不写日志。
+- 实测：构建 7197 只 / 20916 行 / 1.3MB → 抽样 10/10 与腾讯K线一致 → 写入 60 票 + 1 指数行
   → 二次运行 0 行（幂等）→ 回滚干净。
+
+## 5. 策略状态回灌：A5（打板族）+ qlch（超跌低开低吸）
+看板两组池的数据源是**策略状态文件**（不是 K 线）：A5 走 `paper_state.json`，qlch 走 6 个
+`qlch_paper_state*.json` + `qlch_candidates.json`。云端在仓库内副本上跑，状态随 actions/cache 滚动，
+本机拿不到 → 若不同步，本机实验目录会永久停在旧日期。故随 §4 同一工件 `data-delta` 一起回流
+（体积小：A5 状态 ~35KB、qlch 六臂 ~10KB、candidates ~19KB）。
+
+**工件内容**（云端 `build_data_delta.py --a5-dir/--backtest-dir` 产出）：
+| 工件内路径 | kind | 日期键 |
+|---|---|---|
+| `a5/paper_state.json` | `a5-state` | `last_scan` |
+| `a5/reports/report_*.md`（最近 3 份） | `a5-report` | 文件名内日期 |
+| `qlch/qlch_paper_state*.json`（6 臂） | `qlch-state` | `last_run` |
+| `qlch/qlch_candidates.json` | `qlch-candidates` | `updated` |
+| `state_meta.json` | 逐文件清单：rel/kind/date/bytes/src | — |
+
+**本机落点**（`apply_data_delta.py → dest_paths()`）：
+- `a5-state` → ① 仓库 `backtest/a5_experiment/paper_state.json`（周种子保鲜）
+  ② `D:/Documents/Workbuddy/股票基金/打板系统A5实验_20260827/paper_state.json`（可用 `--a5-ext` 改）
+- `a5-report` → 上述两处的 `reports/`
+- `qlch-*` → 仓库 `backtest/`
+
+**覆盖规则**：只前进不回退（本地日期 ≥ 云端日期 → skip）｜写前备份旧件 `.bak-a5sync-<ts>`（A5）/`.bak-statesync-<ts>`（qlch）｜
+报告已存在不覆盖｜同一 delta 重跑幂等｜`--dry-run` 不动盘｜`--no-state` 只并 K 线不回灌状态。
+
+```powershell
+& $PY -X utf8 backtest\apply_data_delta.py --latest --dry-run       # 先看计划（含 [state] 段）
+& $PY -X utf8 backtest\apply_data_delta.py --latest                 # 落地
+& $PY -X utf8 backtest\apply_data_delta.py --latest --no-state      # 只并 K 线
+& $PY -X utf8 backtest\build_data_delta.py --out _cloud_delta --no-state   # 本地调试：只产 K 线 delta
+```
+
+**判据**：日志 `[state] 工件内 N 个状态文件：写入 x / 跳过 y / 报告归档 z`；
+两处 A5 `last_scan` == 运行当日；6 个 qlch `last_run` + `qlch_candidates.updated` == 运行当日；
+两处旧件均出现 `.bak-a5sync-<ts>`、qlch 出现 `.bak-statesync-<ts>`。
+
+**回退**：把 `.bak-a5sync-<ts>` / `.bak-statesync-<ts>` 复制回原名即可（不删任何备份）。
+
+**回归测试**（2026-09-24，隔离沙箱 46 项，只用复制品，真实仓库零改动）：
+干跑零改动 → 正跑写入两处 A5 + 6+1 qlch + 新报告归档（旧报告未覆盖）→ 同 delta 二次幂等（md5 全等）→
+更旧 delta 不回退（md5 全等 + skip 日志）→ 坏价 delta rc=3 且 K 线/状态零写盘 → `--no-state` 不打包状态。

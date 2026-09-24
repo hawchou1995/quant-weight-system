@@ -1,15 +1,26 @@
 # -*- coding: utf-8 -*-
-"""本机：把云端 data-delta 工件合并进本机 K 线（data_full/ + index_000300.csv）。
+"""本机：把云端 data-delta 工件合并进本机 K 线（data_full/ + index_000300.csv）+ 回灌策略状态。
 
 流程：取工件（gh run download 或 --src 指定目录）→ 解析 delta_bars.csv →
       **先做多源校验**（抽样代码的 delta 收盘 vs 腾讯 K 线，可加新浪）→ 通过才写盘 →
-      逐票 append 本地缺失的交易日（幂等）→ 写 _cloud_local/delta_applied.json 日志。
+      逐票 append 本地缺失的交易日（幂等）→ 回灌策略状态（A5 打板族 + qlch 超跌低开低吸）→
+      写 _cloud_local/delta_applied.json 日志。
+
+策略状态回灌（2026-09-24 起，用户要求）：A5 与 qlch 在云端跑仓库内副本、状态随 actions/cache
+滚动，本机拿不到 → 本机 A5 实验目录与 backtest/qlch_* 会永久停在旧日期。故云端
+build_data_delta.py 把状态打进同一工件（附 state_meta.json 逐文件清单）：
+  a5/paper_state.json + a5/reports/*.md          → 本机 backtest/a5_experiment/ 与 A5 实验目录（--a5-ext）
+  qlch/qlch_paper_state*.json + qlch_candidates.json → 本机 backtest/
+覆盖规则：云端状态日期键（last_scan / last_run / updated）必须**严格新于**本机现值才写；
+旧件先备份 <名字>.bak-a5sync-<ts>（qlch 为 .bak-statesync-<ts>）；相同或更旧一律 skip（只前进不回退）；
+报告类文件已存在则不覆盖。校验不过（rc=3）时 K 线与状态都不写。
 
 用法：
-  python backtest/apply_data_delta.py --latest                 # 取最近一次 close_refresh 的工件（dry-run 由 --dry-run 控制）
+  python backtest/apply_data_delta.py --latest                 # 取最近一次 close_refresh 的工件
   python backtest/apply_data_delta.py --run-id 35999999999
   python backtest/apply_data_delta.py --src _cloud_local/delta --dry-run
   python backtest/apply_data_delta.py --rollback 2026-09-24    # 撤掉某个日期追加的行（只动末行匹配的票）
+  python backtest/apply_data_delta.py --latest --no-state      # 只并 K 线，不回灌策略状态
 退出码：0 成功/无操作 · 3 校验失败（未写盘）· 4 环境异常
 """
 import argparse, csv, io, json, os, shutil, subprocess, sys
@@ -22,6 +33,8 @@ sys.path.insert(0, str(HERE))
 GH = r"C:\Users\Admin\.workbuddy\binaries\gh\gh.exe"
 REPO_SLUG = "hawchou1995/quant-weight-system"
 JOURNAL = REPO / "_cloud_local" / "delta_applied.json"
+# 本机 A5 实验目录（与仓库同级）：云端状态回灌的第二个落点
+A5_EXT_DEFAULT = REPO.parent / "打板系统A5实验_20260827"
 
 
 def gh(args, timeout=300):
@@ -110,6 +123,104 @@ def load_delta(src):
     return rows, meta, itail
 
 
+# ===================== 策略状态回灌（云端 → 本机） =====================
+
+def _state_date(path):
+    """状态文件自身的日期键（与云端 build_data_delta.obj_date 同优先级）。"""
+    try:
+        obj = json.loads(Path(path).read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    if not isinstance(obj, dict):
+        return None
+    for k in ("last_scan", "last_run", "updated", "as_of", "date"):
+        v = obj.get(k)
+        if isinstance(v, str) and len(v) >= 10:
+            return v
+    days = []
+    for k in ("equity", "trades", "events"):
+        v = obj.get(k)
+        if isinstance(v, list):
+            for e in v:
+                if isinstance(e, dict):
+                    d = e.get("date") or e.get("day") or e.get("sb_date")
+                    if isinstance(d, str) and len(d) >= 10:
+                        days.append(d)
+    return max(days) if days else None
+
+
+def load_state_meta(src):
+    """读工件的 state_meta.json（云端产出）；缺则回落到任意 paper_state.json（老工件兼容）。"""
+    src = Path(src)
+    for mp in sorted(src.rglob("state_meta.json")):
+        try:
+            d = json.loads(mp.read_text(encoding="utf-8"))
+            if isinstance(d.get("files"), list):
+                return d["files"], mp.parent
+        except Exception:
+            continue
+    for sp in sorted(src.rglob("paper_state.json")):
+        return [{"rel": str(sp.relative_to(src)).replace("\\", "/"), "kind": "a5-state",
+                 "date": _state_date(sp)}], src
+    return [], src
+
+
+def dest_paths(kind, name, a5_ext):
+    """状态文件在本机的落点：a5 = 仓库副本 + 本机实验目录；qlch = 仓库 backtest/。"""
+    if kind == "a5-state":
+        return [(REPO / "backtest" / "a5_experiment" / "paper_state.json", "a5sync"),
+                (Path(a5_ext) / "paper_state.json", "a5sync")]
+    if kind == "a5-report":
+        return [(REPO / "backtest" / "a5_experiment" / "reports" / name, "a5sync"),
+                (Path(a5_ext) / "reports" / name, "a5sync")]
+    return [(REPO / "backtest" / name, "statesync")]
+
+
+def sync_state_back(src, a, dry_run=False):
+    """策略状态回灌：云端 → 本机（只前进不回退 + 旧件备份 + 幂等 + 报告不覆盖）。"""
+    files, root_dir = load_state_meta(src)
+    res = {"artifact": str(root_dir), "files": len(files), "written": [], "skipped": [],
+           "reports": [], "status": "ok" if files else "no-state-in-artifact"}
+    if a.no_state:
+        res["status"] = "disabled(--no-state)"
+        return res
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    for f in files:
+        rel, kind = f.get("rel"), f.get("kind")
+        if not rel or not kind:
+            continue
+        sp = Path(root_dir) / rel
+        if not sp.exists():
+            res["skipped"].append("%s（工件内缺失）" % rel)
+            continue
+        name = Path(rel).name
+        cloud_date = f.get("date") or _state_date(sp)
+        for dest, tag in dest_paths(kind, name, a.a5_ext):
+            if kind.endswith("report"):
+                if dest.exists():
+                    res["skipped"].append("%s（报告已存在）" % dest.name)
+                    continue
+                if not dry_run:
+                    dest.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(sp, dest)
+                res["reports"].append(str(dest))
+                continue
+            local_date = _state_date(dest) if dest.exists() else None
+            if local_date and cloud_date and local_date >= cloud_date:
+                res["skipped"].append("%s（本地 %s ≥ 云端 %s，不回退）" % (dest.name, local_date, cloud_date))
+                continue
+            if not dry_run:
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                if dest.exists():
+                    try:
+                        shutil.copy2(dest, Path(str(dest) + ".bak-%s-%s" % (tag, ts)))
+                    except Exception as e:
+                        print("[warn] 备份失败 %s：%s" % (dest, e))
+                shutil.copy2(sp, dest)
+            res["written"].append("%s ← %s（云端 %s）" % (str(dest), rel, cloud_date))
+    return res
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--run-id", default="latest")
@@ -121,6 +232,9 @@ def main():
     ap.add_argument("--no-validate", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--rollback", default=None, help="撤掉该日期追加的行")
+    ap.add_argument("--no-state", action="store_true", help="不回灌策略状态（A5/qlch），只并 K 线")
+    ap.add_argument("--a5-ext", default=str(A5_EXT_DEFAULT),
+                    help="本机 A5 实验目录（默认仓库同级 打板系统A5实验_20260827）")
     a = ap.parse_args()
     if a.latest:
         a.run_id = "latest"
@@ -173,7 +287,7 @@ def main():
             print("    %-8s delta=%-9s 腾讯=%-9s %s" % (c, dv, tv, "OK" if hit else "不一致"))
         print("  一致率 %d/%d" % (ok, len(picked)))
         if bad:
-            print("!! 多源校验未通过 → **不写盘**：%s" % bad)
+            print("!! 多源校验未通过 → **不写盘**（K 线与策略状态都不写）：%s" % bad)
             return 3
 
     # ---- 写盘（append 缺失交易日）----
@@ -208,11 +322,20 @@ def main():
     print("[%s] data_full：%d 只票 / %d 行；index：%d 行；本地缺文件的代码跳过 %d 行" % (
         "dry-run" if a.dry_run else "已写入", added_codes, added_rows, idx_added, skipped_missing))
 
+    # ---- 策略状态回灌（云端 → 本机；只前进不回退 + 备份 + 幂等）----
+    st = sync_state_back(src, a, dry_run=a.dry_run)
+    print("[state] 工件内 %d 个状态文件：写入 %d / 跳过 %d / 报告归档 %d（%s）" % (
+        st["files"], len(st["written"]), len(st["skipped"]), len(st["reports"]), st["status"]))
+    for w in st["written"]:
+        print("    + %s" % w)
+    for s in st["skipped"]:
+        print("    - %s" % s)
+
     if not a.dry_run:
         JOURNAL.parent.mkdir(parents=True, exist_ok=True)
         rec = {"ts": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "run": str(a.run_id), "src": str(src),
                "dates": dates, "codes_added": added_codes, "rows_added": added_rows,
-               "index_rows_added": idx_added, "skipped_missing_codes": skipped_missing}
+               "index_rows_added": idx_added, "skipped_missing_codes": skipped_missing, "state": st}
         hist = []
         if JOURNAL.exists():
             try:
