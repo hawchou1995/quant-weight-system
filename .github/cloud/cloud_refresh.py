@@ -56,7 +56,14 @@ SYNC = [
     "a5_pool.js",
     "market_breadth.js",
     "market_weather.js",
+    # 2026-09-24 新增：短线板块两个新子标签的产物（见下方 SYNC_SOFT 说明）
+    "zuoce_jianlou_pool.js", "zuoce_jianlou_track.js",
+    "sentinel_pool.js", "sentinel_track.js",
 ]
+# [软] 发布项：由 daily_refresh.py 的 [软] 步产出 → 一并发布，但**不进 G1 硬存在门**。
+# 理由同 _deploy_fundline_0911.py：新策略偶发失败不得阻断整条云端发布。
+SYNC_SOFT = ["zuoce_jianlou_pool.js", "zuoce_jianlou_track.js",
+             "sentinel_pool.js", "sentinel_track.js"]
 # 看板 HTML：dual_system.html 为准，index.html 由本脚本复制（与本地部署同口径）
 HTML = "dual_system.html"
 
@@ -211,7 +218,11 @@ def main() -> int:
 
     # ---------- 2 G1 结构门禁 ----------
     deps, deps_missing = runtime_deps()
-    missing = [n for n in [HTML] + SYNC if not (REPO / n).exists()]
+    missing = [n for n in [HTML] + SYNC
+               if not (REPO / n).exists() and n not in SYNC_SOFT]
+    missing_soft = [n for n in SYNC_SOFT if not (REPO / n).exists()]
+    if missing_soft:
+        log(f"  [软] 新策略产物缺失 {missing_soft}（跳过发布，不阻断）")
     if deps_missing or missing:
         log(f"❌ G1 结构门禁不过 —— 缺文件 {missing} · 依赖未入清单 {deps_missing}")
         emit(publish="false", status="structure-fail", live_url=LIVE_BASE)
@@ -252,7 +263,7 @@ def main() -> int:
     STAGING.mkdir(parents=True)
     files = []
     for n in [HTML] + SYNC:
-        if n in skipped_newer:
+        if n in skipped_newer or not (REPO / n).exists():
             continue
         dst = STAGING / n
         dst.parent.mkdir(parents=True, exist_ok=True)

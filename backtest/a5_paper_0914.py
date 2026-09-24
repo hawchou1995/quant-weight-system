@@ -54,7 +54,7 @@ for code, df in pool.items():
     pc = feat["prev_close"][i]
     if not np.isfinite(pc) or pc <= 0: continue
     gap = df["open"].iloc[i] / pc - 1
-    if not (GAP[0] < gap < GAP[1]): continue                   # 低开区间
+    if not (GAP[0] <= gap <= GAP[1]): continue                 # 低开区间（闭区间，对齐生产 paper_daban_a5.py:55；ADR-0010 D7）
     rp = feat["rel_pos"][i]
     if not np.isfinite(rp) or rp > RP_MAX: continue            # 相对位置
     cands.append(dict(code=code, name=NAMES.get(code[2:], ""), gap=float(gap), rp=float(rp),

@@ -3,7 +3,7 @@
  "strategy": "超跌低吸（绝对滤网）（全池）",
  "variant": "C1",
  "maxpos": null,
- "cash": 0.0,
+ "cash": 1.0,
  "positions": [],
  "trades": [
   {
@@ -49,10 +49,19 @@
    "cash_ret": 0.0,
    "n_exit": 1,
    "n_new": 0
+  },
+  {
+   "date": "2026-09-24",
+   "nav": 1.0536793931489385,
+   "n": 0,
+   "port_ret": 0.0,
+   "cash_ret": 0.0,
+   "n_exit": 0,
+   "n_new": 0
   }
  ],
  "events": [],
- "last_run": "2026-09-23 21:49:13",
+ "last_run": "2026-09-24 21:00:53",
  "equity_void": [
   {
    "date": "2026-09-18",

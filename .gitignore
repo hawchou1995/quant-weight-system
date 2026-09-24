@@ -575,3 +575,6 @@ zettaranc_吸收评估_20260902.md
 _bulk_syms.txt
 # ⑤ 云端发布会话产物（.github/cloud/cloud_refresh.py 的 staging，不进版本库）
 _cloud_dist/
+
+# 2026-09-24：本地云端组装干跑暂存目录（与 _cloud_dist 同类，不应入库）
+_cloud_local/

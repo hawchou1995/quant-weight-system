@@ -184,17 +184,28 @@ async def navigate(ws_url, url):
 
 
 async def wait_clear(ws_url, tries=15):
+    """等 CF/挑战放行。
+
+    判据 B 修复（2026-09-24）：原判据只查中文「请稍候」，导致 Cloudflare 英文挑战页
+    (document.title == "Just a moment...") 被**误判为已放行**，随后 fetch 得到 403 HTML，
+    JSON.parse 抛 "Unexpected token '<'" → 当日整档采集失败（health.json GAP_ALL）。
+    新判据三重：① 标题既不含中文「请稍候」也不含英文 "just a moment"；
+    ② 页面不挂 CF 挑战元素；③ **轮询 /api.php?action=me 能解析成 JSON**（真正的放行信号）。
+    """
     for _ in range(tries):
         try:
             state = json.loads(await ev(ws_url, "JSON.stringify({t: document.title, cf: !!document.querySelector('#challenge-form, .cf-turnstile, [name=cf-turnstile-response]')})"))
-            if not state.get("cf") and "请稍候" not in (state.get("t") or ""):
-                return True
+            title = state.get("t") or ""
+            if (not state.get("cf")
+                    and "请稍候" not in title
+                    and "just a moment" not in title.lower()):
+                probe = await ev(ws_url, "(async()=>{try{const r=await fetch('/api.php?action=me',{credentials:'same-origin'});const t=await r.text();try{JSON.parse(t);return 'json';}catch(e){return 'not-json:'+t.length;}}catch(e){return 'err';}})()")
+                if probe == "json":
+                    return True
         except Exception:
             pass
         await asyncio.sleep(3)
     return False
-
-
 async def ev(ws_url, js):
     async with websockets.connect(ws_url, max_size=256 * 1024 * 1024, open_timeout=10) as ws:
         await ws.send(json.dumps({"id": 1, "method": "Runtime.evaluate",

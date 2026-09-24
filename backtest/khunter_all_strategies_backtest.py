@@ -24,6 +24,9 @@ COST = 0.0115
 WIN_RATE_MIN = 0.40  # 用户口径：胜率>40%
 STOCK_LIMIT = int(os.environ.get("STOCK_LIMIT", "0"))  # 0=全量，>0=冒烟测试
 
+# 2026-09-24 修复：诊断容器（原先失败/空集策略被静默丢弃，summary 中整行缺失）
+SIG_ERR = {}
+
 # ---------- 指标 ----------
 def calc_indicators(d):
     """d: 正序 DataFrame（date/open/high/low/close/volume），返回加指标列"""
@@ -64,7 +67,7 @@ def calc_indicators(d):
     r['boll_lower'] = r['boll_mid'] - 2 * r['boll_std']
     r['boll_width'] = r['boll_upper'] - r['boll_lower']
     # 前60日最高（阻力位）
-    r['res_60'] = h.rolling(60, min_periods=1).max()
+    r['res_60'] = h.shift(1).rolling(60, min_periods=1).max()   # 2026-09-24 修复：前60日（不含当日）
     # 前40日最低
     r['low_40'] = l.rolling(40, min_periods=1).min()
     # 前20日最低
@@ -239,7 +242,7 @@ def sig_resistance_breakout(r):
     # 最近3日内有突破
     b3 = breakout.rolling(3, min_periods=1).max().astype(bool)
     # 突破日与阻力高点日间隔 ≥30 天（近似：突破日收盘 ≥ 前60日最高，且前30日最高 < 突破收盘）
-    gap_ok = r['high'].rolling(30, min_periods=1).max() < r['close']
+    gap_ok = r['high'].shift(1).rolling(30, min_periods=1).max() < r['close']   # 2026-09-24 修复：不含当日
     # 突破后回踩不破阻力 98%（近似：今日最低 ≥ 前60日最高 98%）
     pullback_ok = r['low'] >= r['res_60'] * 0.98
     # 均线多头
@@ -310,7 +313,7 @@ def sig_w_bottom(r):
     low20 = r['low_20']
     bottom_ok = (low20 / low40.replace(0, np.nan) - 1).abs() <= 0.03
     # 颈线 = 两低点之间最高点（近似：40日最高）
-    neckline = r['high'].rolling(40, min_periods=1).max()
+    neckline = r['high'].shift(1).rolling(40, min_periods=1).max()   # 2026-09-24 修复：前40日（不含当日）
     # 最近5日内放量突破：涨幅>8% + 量≥1.2倍 + 收盘≥颈线101% + 前日收盘<颈线
     surge = (r['pct'] > 0.08) & (r['volume'] / r['vol_ma5_prev'].replace(0, np.nan) >= 1.2)
     break_ok = surge & (r['close'] >= neckline * 1.01) & (r['close'].shift(1) < neckline)
@@ -397,7 +400,8 @@ def main():
         for name, fn in SIGNALS.items():
             try:
                 sig = fn(r)
-            except Exception:
+            except Exception as ex:              # 2026-09-24 修复：不再静默丢弃
+                SIG_ERR.setdefault(name, []).append((code, repr(ex)))
                 continue
             if not sig.any():
                 continue
@@ -457,6 +461,21 @@ def main():
     df_out.to_csv(os.path.join(OUT_DIR, 'khunter_all_strategies_summary.csv'), index=False)
     with open(os.path.join(OUT_DIR, 'khunter_all_strategies_results.json'), 'w', encoding='utf-8') as f:
         json.dump({name: res for name, res in results.items()}, f, ensure_ascii=False, indent=1, default=str)
+
+    # 2026-09-24 修复：诊断输出（原先失败/空集策略被静默丢弃，summary 中整行缺失、不报错）
+    # 空集判定 = 全池 0 事件（不是逐股无信号 —— 后者对多数策略是常态）
+    _EMPTY_LIST = sorted(n for n in SIGNALS if not events.get(n))
+    if SIG_ERR or _EMPTY_LIST:
+        log("信号诊断：")
+        for _n in _EMPTY_LIST:
+            log(f"    空集（全池 0 信号）：{_n}")
+        for _n, _errs in sorted(SIG_ERR.items()):
+            log(f"    异常（{len(_errs)} 只股票，示例 {_errs[0][0]}）：{_n} → {_errs[0][1]}")
+    with open(os.path.join(OUT_DIR, 'khunter_all_strategies_diagnostics.json'), 'w', encoding='utf-8') as f:
+        json.dump({'empty': _EMPTY_LIST,
+                   'errors': {k: v[:5] for k, v in SIG_ERR.items()},
+                   'note': '2026-09-24 修复前这些策略被 except/any() 静默丢弃，summary 中整行缺失'},
+                  f, ensure_ascii=False, indent=1, default=str)
     log("完成")
 
 

@@ -1,0 +1,396 @@
+{
+ "schema": "sentinel_backtest/v1",
+ "strategy": "热榜哨兵",
+ "strategy_key": "sentinel",
+ "rule_version": "R-jiandi-top30-0924/v1",
+ "generated_at": "2026-09-24 23:07:05",
+ "generated_by": "backtest/sentinel_daily.py --refresh-backtest",
+ "scope": "「热榜哨兵」子标签独占的回测摘要（个人 17 万槽位口径 + 预注册组合级参照）",
+ "period": "2016-06-01 → 2026-09-23",
+ "period_start": "2016-06-01",
+ "period_end": "2026-09-23",
+ "period_note": "回测数据尾 = 共享缓存 v8_factor_cache.pkl 末行 2026-09-23；当日池数据另见 sentinel_pool.js(as_of=2026-09-24)",
+ "note": "口径 = 个人 17 万槽位引擎（主假设臂 RSI 固定 55）· 2 槽 × 6 万 · 日限 2 笔 · 逐元记账整手撮合 · 含费（佣金 8.6bp 双边底 5 元 / 印花税 5bp 卖出 / 过户费 1bp 双边）· 交易数 = 槽位引擎实际成交笔数（全事件池 9833 笔中的可执行子集）",
+ "total_return": 141.96,
+ "ann_return": 8.95,
+ "max_drawdown": -6.71,
+ "n_trades": 111,
+ "win_rate": 67.57,
+ "med_per_trade": null,
+ "med_per_trade_note": "17 万槽位产物未输出「单笔收益中位数」（只输出均值 avg_trade_ret_pct=3.682）；事件级均值/胜率见 event_ref，不在此处换算，避免与槽位口径混淆",
+ "sharpe": null,
+ "sharpe_note": "17 万槽位产物未输出 Sharpe（拿不到 → null）；预注册组合级参照 Sharpe=0.921 @K=5·1.15% 成本，属另一口径（见 reference_preregistered），不得与本卡字段混用",
+ "n_trigger_days": 88,
+ "n_trigger_days_note": "触发日 = 当日全市场（主板 ≥2 共振）家数 ≥30 的交易日；由历年汇总精确求和",
+ "n_picks": 9833,
+ "n_picks_note": "= 事件笔数（触发日 × 当日 ≥2 共振主板标的），毛收益口径；槽位引擎受 2 槽/日限 2 约束只成交其子集",
+ "entry_rule": "K>=2 共振 且当日共振家数 θ>=30；T 收盘确认 → T+1 开盘买（本脚本不下单）",
+ "exit_rule": "RSI(14) 域 55/65/65（熊 55 / 非熊 65），兜底满 5 日；次日开盘卖",
+ "universe": "沪深主板（sh60/sz00/sz002）· len(df)>=400 · 排除 sh5/sz1/bj",
+ "trigger_threshold": 30,
+ "hold_days": 5,
+ "capital": 170000.0,
+ "arm": "A2 固定55 | 2槽x6万·日限2",
+ "event_ref": {
+  "n": 9833,
+  "mean_gross_pct": 4.47,
+  "win_pct": 73.2,
+  "note": "事件级毛收益（未扣费）· 来源 top1_personal_170k_0924.json event_ref['A2 固定55']"
+ },
+ "arms_17w": {
+  "A2 固定55 | 2槽x6万·日限2": {
+   "total_ret_pct": 141.96,
+   "annual_pct": 8.95,
+   "mdd_pct": -6.71,
+   "trades": 111,
+   "win_pct": 67.57
+  },
+  "A2 固定55 | 2槽x6万·日限1": {
+   "total_ret_pct": 67.84,
+   "annual_pct": 5.15,
+   "mdd_pct": -11.39,
+   "trades": 81,
+   "win_pct": 60.49
+  },
+  "A2 固定55 | 3槽x5.6万·日限2": {
+   "total_ret_pct": 131.71,
+   "annual_pct": 8.49,
+   "mdd_pct": -7.48,
+   "trades": 135,
+   "win_pct": 62.96
+  },
+  "A2 固定55 | 2槽x8.5万·日限2": {
+   "total_ret_pct": 201.1,
+   "annual_pct": 11.28,
+   "mdd_pct": -8.35,
+   "trades": 111,
+   "win_pct": 67.57
+  },
+  "A3 域55/65/65 | 2槽x6万·日限2": {
+   "total_ret_pct": 142.92,
+   "annual_pct": 8.99,
+   "mdd_pct": -6.89,
+   "trades": 111,
+   "win_pct": 68.47
+  },
+  "A3 域55/65/65 | 2槽x6万·日限1": {
+   "total_ret_pct": 64.77,
+   "annual_pct": 4.96,
+   "mdd_pct": -11.59,
+   "trades": 81,
+   "win_pct": 60.49
+  },
+  "A3 域55/65/65 | 3槽x5.6万·日限2": {
+   "total_ret_pct": 132.65,
+   "annual_pct": 8.53,
+   "mdd_pct": -7.61,
+   "trades": 135,
+   "win_pct": 63.7
+  },
+  "A3 域55/65/65 | 2槽x8.5万·日限2": {
+   "total_ret_pct": 202.51,
+   "annual_pct": 11.33,
+   "mdd_pct": -8.63,
+   "trades": 111,
+   "win_pct": 68.47
+  },
+  "A1 基线(纯持5日) | 2槽x6万·日限2": {
+   "total_ret_pct": 113.63,
+   "annual_pct": 7.64,
+   "mdd_pct": -7.24,
+   "trades": 108,
+   "win_pct": 67.59
+  },
+  "A1 基线(纯持5日) | 2槽x6万·日限1": {
+   "total_ret_pct": 71.57,
+   "annual_pct": 5.38,
+   "mdd_pct": -10.15,
+   "trades": 81,
+   "win_pct": 61.73
+  },
+  "A1 基线(纯持5日) | 3槽x5.6万·日限2": {
+   "total_ret_pct": 110.92,
+   "annual_pct": 7.51,
+   "mdd_pct": -8.16,
+   "trades": 133,
+   "win_pct": 63.91
+  },
+  "A1 基线(纯持5日) | 2槽x8.5万·日限2": {
+   "total_ret_pct": 160.32,
+   "annual_pct": 9.72,
+   "mdd_pct": -9.19,
+   "trades": 108,
+   "win_pct": 67.59
+  }
+ },
+ "seed_dist": {
+  "source": "top1_personal_170k_0924.json results['A2 固定55 | 2槽x6万·日限2'].random_dist",
+  "annual_pct": {
+   "median": 8.42,
+   "p5": 6.902,
+   "p95": 9.982
+  },
+  "mdd_pct": {
+   "median": -7.99,
+   "p5": -12.673,
+   "p95": -5.768
+  },
+  "trades": {
+   "median": 111.0,
+   "p5": 109.0,
+   "p95": 113.0
+  },
+  "trades_per_year": {
+   "median": 10.8,
+   "p5": 10.6,
+   "p95": 11.0
+  },
+  "avg_trade_ret_pct": {
+   "median": 3.359,
+   "p5": 2.55,
+   "p95": 4.29
+  },
+  "win_pct": {
+   "median": 65.77,
+   "p5": 58.912,
+   "p95": 71.183
+  },
+  "pnl_yuan": {
+   "median": 221280.0,
+   "p5": 168222.8,
+   "p95": 283248.8
+  },
+  "equity_end": {
+   "median": 391280.0,
+   "p5": 338222.8,
+   "p95": 453248.8
+  },
+  "avg_util_pct": {
+   "median": 4.5,
+   "p5": 4.1,
+   "p95": 5.3
+  }
+ },
+ "portfolio": {
+  "end_median_eq": {
+   "6万×2": {
+    "med": 389053.0,
+    "p5": 319825.0,
+    "p95": 452192.0
+   },
+   "8.5万×2": {
+    "med": 481825.0,
+    "p5": 383070.0,
+    "p95": 572566.0
+   },
+   "按35%比例": {
+    "med": 587049.0,
+    "p5": 386933.0,
+    "p95": 843598.0
+   }
+  },
+  "end_median_eq_meaning": "200 个随机起始日 / 随机选股种子的期末权益中位数（个人 17 万口径）",
+  "trades_per_year": {
+   "6万×2": {
+    "2016": 0.0,
+    "2017": 14.0,
+    "2018": 23.0,
+    "2019": 8.0,
+    "2020": 4.0,
+    "2021": 12.0,
+    "2022": 12.0,
+    "2023": 2.0,
+    "2024": 18.0,
+    "2025": 4.0,
+    "2026": 14.0
+   },
+   "8.5万×2": {
+    "2016": 0.0,
+    "2017": 14.0,
+    "2018": 23.0,
+    "2019": 8.0,
+    "2020": 4.0,
+    "2021": 12.0,
+    "2022": 12.0,
+    "2023": 2.0,
+    "2024": 18.0,
+    "2025": 4.0,
+    "2026": 14.0
+   },
+   "按35%比例": {
+    "2016": 0.0,
+    "2017": 14.0,
+    "2018": 23.0,
+    "2019": 8.0,
+    "2020": 4.0,
+    "2021": 12.0,
+    "2022": 12.0,
+    "2023": 2.0,
+    "2024": 18.0,
+    "2025": 4.0,
+    "2026": 14.0
+   }
+  }
+ },
+ "reference_preregistered": {
+  "source": "backtest/jiandi_top_grid_0924_out/报告-见底共振×高点警示-网格回测-20260924.md §11D（预注册引用）",
+  "config": "θ30 · A6(域55/65/65) · K=5 等权 · 1.15% 往返成本",
+  "cagr_pct": 11.5,
+  "sharpe": 0.921,
+  "mdd_pct": -20.1,
+  "note": "组合级 K=5 等权 NAV 口径；与本卡 total_return/ann_return/max_drawdown（个人 17 万槽位引擎）不同口径，勿混用"
+ },
+ "derived_from_nav_series": {
+  "source": "backtest/jiandi_top_grid_0924_out/top1_nav_daily_0924.csv",
+  "nav_start": "2017-01-18",
+  "nav_end": "2026-08-12",
+  "nav_first": 0.9788,
+  "nav_last": 3.772,
+  "n_rows": 2496,
+  "mdd_pct": -25.6,
+  "mdd_date": "2026-07-30",
+  "sharpe_ann_daily_selfcomputed": 0.798,
+  "sharpe_convention": "mean/std(日净值收益) × sqrt(244) —— 本脚本现算，非既有产物字段"
+ },
+ "per_year": [
+  {
+   "year": 2016,
+   "trigger_days": 0,
+   "events": 0,
+   "mean_gross_pct": null,
+   "win_pct": null,
+   "trades_med": 0.0,
+   "ret_med_pct": 0.0,
+   "ret_p5_pct": 0.0,
+   "ret_p95_pct": 0.0
+  },
+  {
+   "year": 2017,
+   "trigger_days": 7,
+   "events": 550,
+   "mean_gross_pct": 3.0,
+   "win_pct": 74.2,
+   "trades_med": 14.0,
+   "ret_med_pct": 21.28,
+   "ret_p5_pct": 14.11,
+   "ret_p95_pct": 31.16
+  },
+  {
+   "year": 2018,
+   "trigger_days": 20,
+   "events": 2052,
+   "mean_gross_pct": 2.88,
+   "win_pct": 70.5,
+   "trades_med": 23.0,
+   "ret_med_pct": 32.14,
+   "ret_p5_pct": 20.22,
+   "ret_p95_pct": 44.72
+  },
+  {
+   "year": 2019,
+   "trigger_days": 6,
+   "events": 422,
+   "mean_gross_pct": 3.4,
+   "win_pct": 72.5,
+   "trades_med": 8.0,
+   "ret_med_pct": 7.41,
+   "ret_p5_pct": 2.23,
+   "ret_p95_pct": 14.42
+  },
+  {
+   "year": 2020,
+   "trigger_days": 2,
+   "events": 268,
+   "mean_gross_pct": 4.66,
+   "win_pct": 79.1,
+   "trades_med": 4.0,
+   "ret_med_pct": 1.23,
+   "ret_p5_pct": -1.4,
+   "ret_p95_pct": 5.18
+  },
+  {
+   "year": 2021,
+   "trigger_days": 9,
+   "events": 384,
+   "mean_gross_pct": 3.53,
+   "win_pct": 64.8,
+   "trades_med": 12.0,
+   "ret_med_pct": 5.63,
+   "ret_p5_pct": -1.4,
+   "ret_p95_pct": 13.82
+  },
+  {
+   "year": 2022,
+   "trigger_days": 9,
+   "events": 1685,
+   "mean_gross_pct": 4.64,
+   "win_pct": 79.5,
+   "trades_med": 12.0,
+   "ret_med_pct": 7.93,
+   "ret_p5_pct": 1.2,
+   "ret_p95_pct": 16.17
+  },
+  {
+   "year": 2023,
+   "trigger_days": 1,
+   "events": 30,
+   "mean_gross_pct": 0.48,
+   "win_pct": 46.7,
+   "trades_med": 2.0,
+   "ret_med_pct": 0.18,
+   "ret_p5_pct": -1.74,
+   "ret_p95_pct": 2.94
+  },
+  {
+   "year": 2024,
+   "trigger_days": 14,
+   "events": 2339,
+   "mean_gross_pct": 8.17,
+   "win_pct": 80.8,
+   "trades_med": 18.0,
+   "ret_med_pct": 2.33,
+   "ret_p5_pct": -6.28,
+   "ret_p95_pct": 9.69
+  },
+  {
+   "year": 2025,
+   "trigger_days": 3,
+   "events": 368,
+   "mean_gross_pct": 3.06,
+   "win_pct": 74.2,
+   "trades_med": 4.0,
+   "ret_med_pct": 1.96,
+   "ret_p5_pct": 0.15,
+   "ret_p95_pct": 5.68
+  },
+  {
+   "year": 2026,
+   "trigger_days": 17,
+   "events": 1735,
+   "mean_gross_pct": 2.45,
+   "win_pct": 61.0,
+   "trades_med": 14.0,
+   "ret_med_pct": 8.42,
+   "ret_p5_pct": 1.1,
+   "ret_p95_pct": 16.18
+  }
+ ],
+ "quality_gate": {
+  "data_bar_checked": "data_full/*.csv 末行日期直读；池产物 as_of 与末行日期对照（见 sentinel_pool.js universe/data）",
+  "lookahead": "T 收盘确认 → T+1 开盘买；出场次日开盘；无未来函数（与预注册冻结口径一致）",
+  "empty_pool": "2026-09-24 共振 0 家（非缺数据）→ 空池，非失败",
+  "no_fabrication": "缺失字段一律 null + note；净值/持仓不伪造（影子账本空仓）"
+ },
+ "sources": {
+  "personal_170k": "backtest\\jiandi_top_grid_0924_out\\top1_personal_170k_0924.json",
+  "yearly": "backtest\\jiandi_top_grid_0924_out\\top1_personal_yearly_0924.json",
+  "nav": "backtest\\jiandi_top_grid_0924_out\\top1_nav_daily_0924.csv",
+  "prereg": "backtest/PRE-REGISTRATION_20260924_jiandi_top30_sentinel.md"
+ },
+ "caveats": [
+  "逐年收益 = 200 种子中位数 [p5~p95]，非单一路径；2016 年 0 笔因窗口内无满足阈值事件",
+  "逐年触发日/事件按信号日归年；收益按年末权益归年",
+  "MDD 三处口径不同：槽位引擎规则路径（本卡 max_drawdown）、NAV 日序（derived_from_nav_series）、预注册 K=5 组合级（reference_preregistered）"
+ ],
+ "content_sha256": "bbd7145d14dd4e299c98950da5823caf9d8455d97056d3aa03f9720f31e177f7"
+}

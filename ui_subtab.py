@@ -33,6 +33,9 @@ SUBNAV_CSS = """
 .subview{display:none}
 .subview.active{display:block}
 .subview > .pool-sec:first-child{margin-top:2px}
+/* 子标签自有回测块（R-btshort-param-0924）：默认隐藏，由 SUBNAV_JS 按 data-sub 打开 */
+.bt-sub{display:none}
+.bt-sub.on{display:block}
 .subhint{font-size:11.5px;color:var(--faint);margin:6px 2px 12px;line-height:1.7}
 """
 
@@ -50,6 +53,12 @@ SUBNAV_JS = r"""
       var hit = (sv.id === 'sv-' + key);
       sv.classList.toggle('active', hit);
       if (hit) ok = true;
+    });
+    /* 子标签自有「回测数据」块：与 .subview 同一把 key，控制 [data-bt-sub] 的显隐
+       （R-btshort-param-0924：消掉 #bt-short 被多子标签共用） */
+    view.querySelectorAll('[data-bt-sub]').forEach(function (bs) {
+      var k2 = bs.getAttribute('data-bt-sub');
+      if (k2) bs.classList.toggle('on', k2 === key);
     });
     if (!ok) return false;
     bar.querySelectorAll('.subtab').forEach(function (b) {

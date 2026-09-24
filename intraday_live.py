@@ -459,6 +459,11 @@ INTRADAY_JS = r"""
         if (typeof window.QLCH_ON_QUOTES === 'function') {
           try { window.QLCH_ON_QUOTES(q, (r && r.ts) || hhmmss(new Date()), S.poolSrc, S.mktTs); } catch(e) {}
         }
+        /* R-a5-auction-0924：打板族（A5）竞价/开盘判定的**第二个**钩子。同理必须显式留在这里 ——
+           IIFE 内部调的是局部 applyQuotes，外部包装拦不到；无钩子时零开销，行为与原来完全一致。 */
+        if (typeof window.A5_ON_QUOTES === 'function') {
+          try { window.A5_ON_QUOTES(q, (r && r.ts) || hhmmss(new Date()), S.poolSrc, S.mktTs); } catch(e) {}
+        }
         S.lastPool = Date.now();
         return r;
       }) : Promise.resolve(null);
@@ -891,6 +896,246 @@ QLCH_JS = r"""
                       reset: function(){ TV = {}; try { localStorage.removeItem(CFG.LS); } catch(e) {} },
                       order: function(){ return ORDER; }, wrapped: !!(IN && IN.applyQuotes)};
   /* 首屏：先把徽标/样式建起来（还没行情 → 不判定、不贴标签） */
+  run(null, '');
+})();
+"""
+
+
+A5_JUDGE_JS = r"""
+/* ============= 打板族 A5「竞价 / 开盘买点」判定 —— 纯函数（R-a5-auction-0924） =============
+   为什么单独拆成纯函数（判据 C 的夹具要求）：
+     ① 页面驱动块（A5_JS）与 node 夹具**跑同一份代码原文** —— 夹具不复制判定逻辑，杜绝「复刻式假证据」；
+     ② 无 DOM / 无 window / 无 Date / 无 Math.random 依赖 → 同一输入必然同一输出，可确定性重放。
+   判定口径 = 生产记账 backtest/a5_experiment/paper_daban_a5.py（L455-494 入场段）逐条对齐：
+     gap = 今开/昨收 − 1 ∈ [gap_lo, gap_hi] = [−5%, −2%]   ← **闭区间**（端点判命中）
+     rel_pos ≤ 0.5 · amt ≥ 5e7 元 · room_pct ≥ 20（F3 空间 = 首板日距前高）
+     三项静态条件都取自「首板日收盘」（构建期内嵌），唯一盘中变量 = 今开 → 判定放浏览器端算（ADR-0009）。
+   phase 由**交易所行情时间戳**分级（不用本地日期 → 节假日 / 补班不误判）：
+     'auction' 09:15–09:25 集合竞价未成交 → 只有竞价参考价，**一律不出命中**（页面只挂灰标「竞价预判」）
+     'open'    09:25–15:05 有真实今开 → 判命中（页面置顶）
+     'pre'     行情日 ≤ 候选 as_of（盘前 / 信号日当日）或时刻不可定 → 待开盘判定，不判
+     'closed'  收盘后 → 不判
+   返回 {k, v, why}：k ∈ 'hit' | 'no' | 'pre'
+   缺静态条件（rel_pos / amt / room_pct 任一为 NaN）→ **不判命中**（保守，宁可漏判不可误置顶）。 */
+function a5Judge(row, d, thr, phase){
+  var EPS = 1e-9;
+  var R = row || {}, D = d || {}, T = thr || {};
+  function N(v){ var x = (v === null || v === undefined || v === '') ? NaN : parseFloat(v); return isNaN(x) ? NaN : x; }
+  var lo = N(T.gap_lo), hi = N(T.gap_hi);
+  if (isNaN(lo)) lo = -0.05;
+  if (isNaN(hi)) hi = -0.02;
+  if (phase !== 'open') {
+    /* 竞价预判：给「竞价参考价/昨收 − 1」作**预判值**，只展示、绝不置顶、绝不计命中 */
+    var px0 = N(D.px), pc0 = N(D.pcl);
+    var g0 = (px0 > 0 && pc0 > 0) ? (px0 / pc0 - 1) : NaN;
+    return {k: 'pre', v: g0, why: (phase === 'auction') ? '集合竞价未成交（仅竞价参考价）' : '非开盘判定时段'};
+  }
+  var pcl = N(D.pcl);
+  if (!(pcl > 0)) pcl = N(R.last_close);              /* 昨收缺失 → 退回首板日收盘 */
+  var opn = N(D.opn);
+  if (!(opn > 0)) return {k: 'pre', v: NaN, why: '无真实今开（09:25 前 / 行情缺失）'};
+  if (!(pcl > 0)) return {k: 'pre', v: NaN, why: '无昨收，无法算 gap'};
+  var gap = opn / pcl - 1;
+  if (!(gap >= lo - EPS && gap <= hi + EPS))
+    return {k: 'no', v: gap, why: 'gap ' + (gap * 100).toFixed(2) + '% 不在 ['
+            + (lo * 100).toFixed(2) + '%, ' + (hi * 100).toFixed(2) + '%]'};
+  var rp = N(R.rel_pos), amt = N(R.amt), room = N(R.room_pct);
+  var rpMax = N(T.rel_pos_max); if (isNaN(rpMax)) rpMax = 0.5;
+  var amtMin = N(T.amt_min);    if (isNaN(amtMin)) amtMin = 5e7;
+  var roomMin = N(T.room_min);  if (isNaN(roomMin)) roomMin = 20.0;
+  if (isNaN(rp))   return {k: 'no', v: gap, why: '缺相对位置数据，不判命中'};
+  if (isNaN(amt))  return {k: 'no', v: gap, why: '缺成交额数据，不判命中'};
+  if (isNaN(room)) return {k: 'no', v: gap, why: '缺 F3 空间数据，不判命中'};
+  if (rp > rpMax + EPS)       return {k: 'no', v: gap, why: '相对位置 ' + rp.toFixed(2) + ' > ' + rpMax};
+  if (amt < amtMin - EPS)     return {k: 'no', v: gap, why: '成交额 ' + (amt / 1e4).toFixed(0) + ' 万 < 5000 万'};
+  if (room < roomMin - EPS)   return {k: 'no', v: gap, why: 'F3 空间 ' + room.toFixed(1) + '% < ' + roomMin + '%'};
+  return {k: 'hit', v: gap, why: '命中'};
+}
+"""
+
+
+A5_JS = r"""
+/* ============= 打板族 A5 竞价 / 开盘判定**驱动块**（R-a5-auction-0924） =============
+   对齐「超跌低开低吸」(QLCH_JS) 的交互范式（用户要求「就和超跌低开低吸所做的那样」）：
+     09:15–09:25 集合竞价 → 每行挂**灰标「竞价预判」**（显示竞价参考价 gap，仅供观察），
+                            **不置顶、不计命中**（契约 C 明确）；
+     09:25 起       → 用**真实今开**跑 a5Judge，命中者加绿标 + 插入分组行并重排 DOM 到表顶；
+     其它时段       → 「待开盘判定（as_of …）」，不判、不贴标。
+   闸门与 QLCH 同一把：判定只在「行情日 > 候选 as_of」时生效，行情日取**交易所时间戳**（腾讯 [30]），
+   不用本地日期 → 节假日 / 补班不误判。
+   置顶 = **视图态**：只改 DOM 顺序，不改信号池、不动模拟盘账本、不写盘（ADR-0009）。
+   幂等：每轮先按 ORDER 还原原始行序 + 摘掉上次的类 / 标签 / 分组行，再重新判定 → 重复刷新不叠加。 */
+(function(){
+  var A = window.A5_AUCTION;
+  if (!A) return;                                   /* 无数据 → 完全不动页面 */
+  var CFG = { TBL: 'a5-wl', CARD: 'a5-watchlist', EPS: 1e-9,
+              TIP: '竞价/开盘判定是盘中瞬时视图态：不写盘、不改账本；记账以收盘链写入为准' };
+  var THR = A.thr || {}, ASOF = String(A.as_of || '');
+  var META = {}, ORDER = null;
+  var S = {phase: '', hit: 0, n: 0, rows: 0, ts: '', src: '', mktDate: '', err: ''};
+
+  function bare(c){ return String(c === null || c === undefined ? '' : c).replace(/^(sh|sz|bj)/i, ''); }
+  function N(v){ var x = (v === null || v === undefined || v === '') ? NaN : parseFloat(v); return isNaN(x) ? NaN : x; }
+  (function(){
+    var rs = A.rows || [];
+    for (var i = 0; i < rs.length; i++) { var r = rs[i]; if (r && r.code) META[bare(r.code)] = r; }
+  })();
+
+  /* 交易所行情时间戳（腾讯 [30]，形如 20260924103102）→ {date:'YYYY-MM-DD', min:分钟数|-1} */
+  function mktOf(s){
+    s = String(s || '');
+    if (!/^[0-9]{8}/.test(s)) return null;
+    var d = s.slice(0, 4) + '-' + s.slice(4, 6) + '-' + s.slice(6, 8);
+    if (/^[0-9]{12}/.test(s)) {
+      var hh = parseInt(s.slice(8, 10), 10), mm = parseInt(s.slice(10, 12), 10);
+      if (isNaN(hh) || isNaN(mm)) return {date: d, min: -1};
+      return {date: d, min: hh * 60 + mm};
+    }
+    return {date: d, min: -1};
+  }
+  /* 相位：09:15–09:25 竞价 / 09:25–15:05 开盘 / 其余 盘前|收盘；行情日 ≤ as_of 一律 'pre' */
+  function phaseOf(mkt){
+    if (!mkt || mkt.min < 0) return 'pre';
+    if (ASOF && !(mkt.date > ASOF)) return 'pre';
+    var m = mkt.min;
+    if (m >= 9 * 60 + 15 && m < 9 * 60 + 25) return 'auction';
+    if (m >= 9 * 60 + 25 && m <= 15 * 60 + 5) return 'open';
+    return m < 9 * 60 + 15 ? 'pre' : 'closed';
+  }
+  function codeOf(tr){
+    var c = bare(tr.getAttribute('data-code') || '');
+    if (!/^[0-9]{6}$/.test(c)) {
+      var mm = (tr.textContent || '').match(/(?:^|\D)([0-9]{6})(?:\D|$)/);
+      c = mm ? mm[1] : '';
+    }
+    return /^[0-9]{6}$/.test(c) ? c : '';
+  }
+  function css(){
+    if (document.getElementById('a5-live-css')) return;
+    var st = document.createElement('style'); st.id = 'a5-live-css';
+    st.textContent = [
+      'tr.a5-hit{background:var(--card2);box-shadow:inset 3px 0 0 var(--down)}',
+      'tr.a5-hit>td:first-child{color:var(--down);font-weight:600}',
+      'tr.a5-pre{box-shadow:inset 2px 0 0 var(--warn)}',
+      'tr.a5-hit-hdr>td{background:var(--card2);color:var(--down);font-weight:600;font-size:12px}',
+      '.a5-tag{display:inline-block;margin-left:6px;padding:0 6px;border-radius:8px;font-size:11px;white-space:nowrap}',
+      '.a5-tag.hit{background:var(--down);color:#fff}',
+      '.a5-tag.pre{background:transparent;border:1px dashed var(--faint);color:var(--faint)}',
+      '.a5-auction-badge{font-weight:400}'
+    ].join('\n');
+    document.head.appendChild(st);
+  }
+  function badge(live){
+    var card = document.getElementById(CFG.CARD);
+    if (!card) return;
+    var h2 = card.querySelector('h2');
+    if (!h2) return;
+    var bd = h2.querySelector('.a5-auction-badge');
+    if (!bd) { bd = document.createElement('span'); bd.className = 'badge a5-auction-badge'; h2.appendChild(bd); }
+    if (!live || S.phase === 'pre')       bd.textContent = '待开盘判定（as_of ' + (ASOF || '—') + '）';
+    else if (S.phase === 'auction')       bd.textContent = '竞价预判中 · 09:25 后判命中';
+    else if (S.phase === 'open')          bd.textContent = '已命中 ' + S.hit + '/' + S.n;
+    else                                  bd.textContent = '今日判定结束（' + (S.mktDate || '—') + '）';
+    bd.title = CFG.TIP
+      + ' · 判定口径：今开/昨收−1 ∈ [' + ((N(THR.gap_lo) || -0.05) * 100).toFixed(2) + '%, '
+      + ((N(THR.gap_hi) || -0.02) * 100).toFixed(2) + '%]（闭区间）'
+      + ' + 相对位置 ≤ ' + (N(THR.rel_pos_max) || 0.5)
+      + ' + 成交额 ≥ ' + ((N(THR.amt_min) || 5e7) / 1e4).toFixed(0) + ' 万'
+      + ' + F3 空间 ≥ ' + (N(THR.room_min) || 20) + '%';
+  }
+  function render(q, ts, src, mktTs){
+    var tb = document.getElementById(CFG.TBL);
+    if (!tb) return null;
+    var body = tb.querySelector('tbody');
+    if (!body) return null;
+    css();
+    var live = false, k, i;
+    for (k in q) { if (Object.prototype.hasOwnProperty.call(q, k)) { live = true; break; } }
+    var mkt = mktOf(mktTs);
+    S.ts = ts || ''; S.src = src || ''; S.mktDate = mkt ? mkt.date : '';
+    S.phase = live ? phaseOf(mkt) : 'pre';
+    S.hit = 0; S.n = 0; S.rows = 0;
+    if (!ORDER) { ORDER = []; var all = body.querySelectorAll('tr'); for (var a = 0; a < all.length; a++) ORDER.push(all[a]); }
+    /* ① 还原：摘分组行 / 摘类 / 摘标签 / 复位原始行序（幂等关键 —— 重复刷新不叠加） */
+    var oldHdr = body.querySelector('tr.a5-hit-hdr');
+    if (oldHdr && oldHdr.parentNode) oldHdr.parentNode.removeChild(oldHdr);
+    for (var o = 0; o < ORDER.length; o++) {
+      var tr0 = ORDER[o];
+      body.appendChild(tr0);
+      tr0.classList.remove('a5-hit'); tr0.classList.remove('a5-pre');
+      var oldT = tr0.querySelectorAll('.a5-tag');
+      for (var x = 0; x < oldT.length; x++) oldT[x].parentNode.removeChild(oldT[x]);
+    }
+    /* ② 判定（还没行情 → 只建徽标，不误贴「竞价预判」） */
+    var res = [], hits = [];
+    for (i = 0; i < ORDER.length; i++) {
+      var tr = ORDER[i], code = codeOf(tr), m = META[code];
+      if (!m) continue;
+      S.rows++;
+      if (!live || S.phase === 'pre' || S.phase === 'closed') continue;
+      S.n++;
+      var v = a5Judge(m, q[code], THR, S.phase);
+      res.push({tr: tr, v: v});
+      if (v.k === 'hit') { S.hit++; hits.push({tr: tr, v: v}); }
+    }
+    /* ③ 命中者置顶：分组行 colspan = 运行时列数（勿写死），按 gap 升序（越低开越靠前） */
+    if (hits.length) {
+      hits.sort(function(X, Y){ return X.v.v - Y.v.v; });
+      var ncol = tb.querySelectorAll('thead th').length || 14;
+      var hr = document.createElement('tr');
+      hr.className = 'a5-hit-hdr';
+      hr.innerHTML = '<td colspan="' + ncol + '">\u26a1 已命中买点（' + hits.length
+        + '）· 置顶 = 价格条件满足的视图态，不改信号池与模拟盘账本</td>';
+      body.insertBefore(hr, body.firstChild);
+      var anchor = hr;
+      for (i = 0; i < hits.length; i++) {
+        hits[i].tr.classList.add('a5-hit');
+        body.insertBefore(hits[i].tr, anchor.nextSibling);
+        anchor = hits[i].tr;
+      }
+    }
+    /* ④ 行尾标签：命中（绿，含 gap） / 竞价预判（灰，含预判 gap） */
+    for (i = 0; i < res.length; i++) {
+      var tds = res[i].tr.querySelectorAll('td');
+      var td = tds.length ? tds[tds.length - 1] : null;
+      if (!td) continue;
+      var g = res[i].v.v, gs = isNaN(g) ? '—' : ((g * 100).toFixed(2) + '%');
+      var isHit = res[i].v.k === 'hit', isPre = res[i].v.k === 'pre';
+      var txt = isHit ? ('命中 ' + gs) : (isPre ? (S.phase === 'auction' ? ('竞价预判 ' + gs) : '待今开') : '');
+      if (!txt) continue;
+      var sp = document.createElement('span');
+      sp.className = 'a5-tag ' + (isHit ? 'hit' : 'pre');
+      sp.textContent = txt;
+      sp.title = CFG.TIP + ' · ' + (res[i].v.why || '');
+      if (isPre) res[i].tr.classList.add('a5-pre');
+      td.appendChild(sp);
+    }
+    badge(live);
+    return {phase: S.phase, hit: S.hit, n: S.n, rows: S.rows, mktDate: S.mktDate, err: S.err};
+  }
+  function run(q, ts, src, mktTs){
+    try { return render(q || {}, ts || '', src || '', mktTs || ''); }
+    catch(e) { S.err = String(e && e.message || e); return null; }
+  }
+  /* 接线（两条路都要接，缺一不可 —— 同 QLCH 的教训：IIFE 内部走局部函数，只包 applyQuotes 拦不到）：
+     ① 盘中层 refresh 内部报价落地 → window.A5_ON_QUOTES（intraday_live.py 显式留的钩子）；
+     ② 外部/验证脚本手动调 applyQuotes → 包装它（同一次调用不双跑）。 */
+  window.A5_ON_QUOTES = function(q, ts, src, mktTs){ return run(q, ts, src, mktTs); };
+  var IN = window.INTRADAY;
+  if (IN && typeof IN.applyQuotes === 'function') {
+    var orig = IN.applyQuotes;
+    IN.applyQuotes = function(q, ts, opt){
+      var out = orig(q, ts, opt);
+      opt = opt || {};
+      run(q, ts, opt.src || (IN.state && IN.state.poolSrc), opt.mktTs || (IN.state && IN.state.mktTs));
+      return out;
+    };
+  }
+  window.A5_LIVE = {run: run, state: S, meta: META, cfg: CFG, thr: THR, asOf: ASOF,
+                    judge: a5Judge, phaseOf: phaseOf, mktOf: mktOf,
+                    order: function(){ return ORDER; },
+                    wrapped: !!(IN && IN.applyQuotes)};
+  /* 首屏：先把样式/徽标建起来（还没行情 → 不判定、不贴标） */
   run(null, '');
 })();
 """

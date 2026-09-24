@@ -1,0 +1,117 @@
+{
+  "schema": "zuoce_jianlou_backtest/v1",
+  "strategy": "左侧捡漏",
+  "strategy_key": "zuoce_jianlou",
+  "rule_version": "zuoce-jianlou.leftbook.bt520.v1",
+  "generated_at": "2026-09-24 23:22:35",
+  "generated_by": "backtest/build_zuoce_backtest_ref.py（投影 bt520_holdout_0924.json，不含任何重算）",
+  "period": "面板区间 2016-01-04 → 2026-09-22（全期 40-draw 主口径）｜留出门 2016-01-04 → 2017-12-29",
+  "total_return": null,
+  "max_drawdown": -27.62,
+  "sharpe": null,
+  "n_trades": 234.0,
+  "win_rate": 61.13,
+  "med_per_trade": 5.09,
+  "ann_return": 11.25,
+  "note": "⚠ 留出门未过（A1/A2 为负）→ 只上回测数据、不开模拟盘、不写净值。上列区间/回撤/交易数/胜率/单笔中位/年化均为**全期**（非留出段）读数，仅作策略形态参考，**不代表可交易**；留出段复测门【未通过】：A1 中位年化 -8.24%、A2 单路径年化 -6.59%（均为负，禁标可交易）；A3 回撤 -22.06% 通过；A4 全样本口径 +9.91% 通过 / 留出段口径 -3.59% 未通过；A5 成本×3 +10.70% 通过。判定规则 = A1–A5 全满足才通过 → 总判定「不通过」。",
+  "trading_enabled": false,
+  "gate": "holdout_gate_failed",
+  "gate_note": "留出段复测门【未通过】：A1 中位年化 -8.24%、A2 单路径年化 -6.59%（均为负，禁标可交易）；A3 回撤 -22.06% 通过；A4 全样本口径 +9.91% 通过 / 留出段口径 -3.59% 未通过；A5 成本×3 +10.70% 通过。判定规则 = A1–A5 全满足才通过 → 总判定「不通过」。",
+  "kpi_scope": "full-sample (非留出段)",
+  "deploy_object": "wB=1.0,KB=5",
+  "prereg_object": "wB=0.8,KB=5",
+  "full_sample": {
+    "caliber": "全样本 40-draw 年化中位数（seed=20260926+d, d=0..39, 244 日/年）",
+    "object": "wB=1.0,KB=5",
+    "median_annual": 11.25,
+    "mean_annual": 11.81,
+    "worst_draw": 8.6,
+    "best_draw": 15.55,
+    "pos_ratio": 100.0,
+    "mdd_median": -27.62,
+    "mdd_worst": -44.37,
+    "n_trades_median": 234.0,
+    "single_path_annual": 11.35,
+    "single_path_wr": 61.13,
+    "single_path_med_pct": 5.09,
+    "prereg_object_median_annual": 11.94
+  },
+  "holdout_gate": {
+    "caliber": "留出段 2016-01-04 → 2017-12-29（488 交易日声明，实测可交易 239 日）· 40 draws",
+    "rule": "A1–A5 全部满足 ⟹ 通过；任一不满足 ⟹ 不通过",
+    "total": "不通过",
+    "reason": "A1、A2 不满足（留出段主口径中位年化 −5.13%、单路径 −4.08%，均为负）；A3、A5 满足；A4 视口径读法不同（全样本 PASS +9.91% / 留出段 FAIL −3.59%）。任一不满足即不通过。",
+    "unaffected_by_readings": "即使把对象换成与第 1.1 节读数逐项吻合的 宽放·no_vol 变体，A1/A2 仍为负（A1 −8.71%、A2 −6.96%）；换成纯 Book B（wB=1.0）A1=−8.24%、A2=−6.59%。三条臂的 A1/A2 全部为负，总判定不变。",
+    "A1_median_annual": {
+      "deploy_object": -8.24,
+      "prereg_object": -5.13,
+      "threshold": 0.0,
+      "pass": false
+    },
+    "A2_single_path_annual": {
+      "deploy_object": -6.59,
+      "prereg_object": -4.08,
+      "threshold": 0.0,
+      "pass": false
+    },
+    "A3_mdd": {
+      "deploy_object": -22.06,
+      "threshold": -40.0,
+      "pass": true
+    },
+    "A4_neighborhood": {
+      "full_sample_reading": {
+        "value": 9.91,
+        "threshold": 7.22,
+        "pass": true,
+        "caliber": "full-sample（A4 主读数；阈值 7.22% 本身 = 全样本 10.31% × 70%，故按全样本口径执行）"
+      },
+      "holdout_reading": {
+        "value": -3.59,
+        "pass": false
+      },
+      "note": "预注册未明写 A4 的口径（全样本 or 留出段）。主读数取全样本（与阈值来源一致，PASS）；另附留出段读数（FAIL）。两种读法结论相反，必须并列披露。"
+    },
+    "A5_cost_x3": {
+      "value": 10.7,
+      "threshold": 0.0,
+      "pass": true,
+      "caliber": "全样本（2018-01-02→2026-09-22）40-draw 主口径，全部成本分项 ×3"
+    },
+    "warmup_degeneracy": [
+      "nvalid = 面板内累计有效收盘天数；tradable 要求 nvalid≥250 ⇒ 面板首个可交易日 = index 249 = 2017-01-10。",
+      "2016 全部 244 个交易日的可交易格 = 0（TR 全 False），故预注册声称的 488 日留出段实际只有 239 个可交易日。",
+      "A1 的 40 draws 起点全在 2016-01-26..2016-12-28（36 个不同日期），交易完全相同（笔数恒 35），draw 间离散只是年化窗口长度的算术产物。",
+      "即：预注册第 3 节把面板 warm-up 段当成了干净留出段，这是预注册设计缺陷，非本次执行口径偏离。"
+    ],
+    "known_limitations": [
+      "留出段有效长度仅 239 个可交易日（非预注册声称的 488），统计功效极低；A1/A2 为负是『被留出段打死』的直接读数。",
+      "2016 段不可交易 ⇒ 本次测试无法回答『策略在 2016 熔断余波中的表现』，那段数据在本体系里进不了成交。",
+      "A4 主读数仍是全样本口径，对『留出段稳健性』没有信息量；留出段口径下 9 格中位数 −3.59%（FAIL）。",
+      "参数选择偏差（从 3063+ 臂中选出）与多重比较问题不因本测试消失；本次不做 DSR/PBO/Haircut 审计。",
+      "留出段低频次（22–35 笔）使 MDD/胜率等二阶统计量极不稳。",
+      "成本×3 是压力测试，不是实盘成本估计；未建模冲击成本与容量。",
+      "未做：剔前 10 笔贡献敏感性、容量/滑点、T+1 集合竞价可成交量对齐（预注册第 6 节各项）。"
+    ]
+  },
+  "source": {
+    "artifact": "bt520_holdout_0924.json",
+    "artifact_sha256": "636d36829c689203fb8781428d671678cbf5c2a9b605a6a6d55343ec07fd7d12",
+    "artifact_bytes": 348480,
+    "prereg_file": "PRE-REGISTRATION_20260924_final_candidate.md",
+    "prereg_sha256": "4101d6e624bd59fcd1d9d1a57c6dcd351e129ce8567d97b7883628e388c7c7a9",
+    "engine_sha256": "656c6f4982f6465858e68cc59976549c5f13a0de383110c217ac6f592d58700b",
+    "arm_impl_sha256": "745a147ba4ddb0c238743f75899ce659af52f1a695aa5082408a83e3f9bb298d",
+    "panel_span": "2016-01-04 → 2026-09-22",
+    "parity_vs_frozen_repo": [
+      "中放·full·wB=0.8·KB=5  : 年化 +12.77% / MDD −26.13% / 394 笔 —— 与 E 盘 out_r16/yearly.json 逐位一致",
+      "宽放·no_vol·wB=0.8·KB=5: 年化 +15.60% / MDD −27.29% / 391 笔 —— 逐位一致",
+      "宽放·no_vol·wB=1.0·KB=5: 年化 +11.35% / MDD −27.62% / 247 笔 —— 逐位一致",
+      "结论：harness 里的 arm_s 逐字副本无口径漂移。"
+    ],
+    "frozen_repo_readonly": "sha256_frozen = 本次工作开始前记录的冻结值（3 个核心文件）；sha256_now = 2026-09-24 交付时的重算值。mtime_now 全部早于本次首次运行时刻 2026-09-24 22:23:08，独立佐证 E 盘仓未被写入。untouched=False 只可能是记录值抄写错误，脚本会 assert 失败而非静默通过。"
+  },
+  "gate_pass": false,
+  "paper_state_as_of": "2026-09-24",
+  "paper_state_gate": "holdout_gate_failed"
+}

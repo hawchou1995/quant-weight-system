@@ -33,6 +33,18 @@ SYNC = [
     "market_breadth.js",
     "market_weather.js",
 ]
+
+# ---- 新增策略产物的「软发布」层（2026-09-24 · R-short-strategy-isolation-0924）----
+# 短线板块两个新子标签（左侧捡漏 / 热榜哨兵）的产物由 daily_refresh.py 的 **[软] 步**产出
+# （失败只告警、不阻断主链）。把它们并入 SYNC → 一并发到 gh-pages（用户可从网上直接取池文件），
+# 但**不纳入硬存在门**：否则新策略一次偶发失败就会 assert 直接中止部署，把「新增 2 个子标签」
+# 变成「整个看板不再发布」——不可接受的回归。
+# 语义：存在就发；不存在则跳过并明确打印（不静默、也不阻断）。
+SYNC_SOFT = [
+    "zuoce_jianlou_pool.js", "zuoce_jianlou_track.js",
+    "sentinel_pool.js", "sentinel_track.js",
+]
+SYNC = SYNC + [n for n in SYNC_SOFT if n not in SYNC]
 DUAL = ["dual_system.html", "index.html"]
 
 # 运行期依赖守卫（2026-09-21 新增）：构建产物里每个本地 <script src> 必须在 SYNC 内，
@@ -68,9 +80,12 @@ def line(t="-", n=78):
 line("=")
 print("STEP 0  前置校验")
 line()
-for n in DUAL + SYNC:
+for n in DUAL + [x for x in SYNC if x not in SYNC_SOFT]:
     p = REPO / n
     assert p.exists(), f"缺 {n}"
+_missing_soft = [n for n in SYNC_SOFT if not (REPO / n).exists()]
+print(f"  [软] 新策略产物：{len(SYNC_SOFT) - len(_missing_soft)}/{len(SYNC_SOFT)} 在盘"
+      + (f"，缺 {_missing_soft}（跳过发布，不阻断）" if _missing_soft else " ✅"))
 summ = (REPO / "short_v3_fund_slip20_summary.json").read_text(encoding="utf-8")
 assert "FB3-H20" in summ, "repo 基金 summary 未含 FB3-H20（先跑 finalize_short_v3.py --asset fund）"
 html = (REPO / "dual_system.html").read_text(encoding="utf-8", errors="replace")
@@ -85,6 +100,9 @@ line()
 copied = []
 for rel in SYNC:
     s = REPO / rel
+    if not s.exists():
+        print(f"  跳过  {rel}（[软] 产物缺失，不阻断）")
+        continue
     d = DIST / rel
     if d.exists() and md5(s) == md5(d):
         print(f"  未变  {rel}")

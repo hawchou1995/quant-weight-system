@@ -17,7 +17,7 @@ sys.path.insert(0, str(BASE))
 from ui_components import THEME_CSS, NAV_HTML, COMMON_JS
 from kxmm_card import KXMM_CSS, KXMM_VIEW_HTML, KXMM_JS
 from ui_subtab import SUBNAV_CSS, SUBNAV_JS, subnav, subview, ASSET_HINT
-from intraday_live import INTRADAY_JS, QLCH_JS
+from intraday_live import INTRADAY_JS, QLCH_JS, A5_JUDGE_JS, A5_JS
 
 
 def _crowding():
@@ -1003,7 +1003,7 @@ def bt_all_html():
             '<div class="bt-grid">' + cards + '</div>\n' + _ret + '\n</div>')
 
 
-def bt_short_html():
+def bt_short_html(only=None):
     """短线回测参考 5+1 卡
     2026-09-02 晚修复：旧战法弃用 → 纯主板卡改接 超卖伏击主信号回测（全窗口无门控 · 四闸 PASS）；
     一体卡=旧战法修正版 -41.67%（标注弃用）；创业板/科创板=用户不可买，明确说明卡
@@ -1056,16 +1056,20 @@ def bt_short_html():
 <div class="kpi"><div class="l">前后半双过</div><div class="v" style="color:var(--up)">med +2.93/+2.92</div><div class="s">h1/h2 · 11 年 8 正 3 负</div></div>
 <div class="kpi"><div class="l">弱牛回调(MA20下/MA250上)</div><div class="v" style="color:var(--up)">med +2.95%</div><div class="s">n=28 · wr 57.1% · 近四闸(n&lt;30) · 2026-09-04 投产</div></div>
 </div></div>''')
-    cards = "".join([
-        _card("bt-short-stock-all", "📈 短线 股票 一体", ss_stk_tag["all"], ss_stk["all"], "curve-short-stock-all"),
-        _card("bt-short-stock-main", "📈 短线 纯主板 · 标准版(主卖出 RSI>59)", ss_stk_tag["main"], ss_stk["main"], "curve-short-stock-main", color="var(--warn)"),
-        _c_cards,
-        _hybrid_card,
-        _card("bt-short-stock-gem", "📈 短线 纯创业板", ss_stk_tag["gem"], ss_stk["gem"], "curve-short-stock-gem"),
-        _card("bt-short-stock-star", "📈 短线 纯科创板", ss_stk_tag["star"], ss_stk["star"], "curve-short-stock-star"),
-        bt_card("bt-short-fund", "🔵 短线 基金", ss_fund_tag, ss_fund, "curve-short-fund", color="#3b82f6"),
-    ])
-    return ('<div class="card" id="bt-short">\n'
+    _cards = {
+        "stock": "".join([
+            _card("bt-short-stock-all", "📈 短线 股票 一体", ss_stk_tag["all"], ss_stk["all"], "curve-short-stock-all"),
+            _card("bt-short-stock-main", "📈 短线 纯主板 · 标准版(主卖出 RSI>59)", ss_stk_tag["main"], ss_stk["main"], "curve-short-stock-main", color="var(--warn)"),
+            _card("bt-short-stock-gem", "📈 短线 纯创业板", ss_stk_tag["gem"], ss_stk["gem"], "curve-short-stock-gem"),
+            _card("bt-short-stock-star", "📈 短线 纯科创板", ss_stk_tag["star"], ss_stk["star"], "curve-short-stock-star"),
+        ]),
+        # 超卖伏击子标签只拿「生产口径」两卡（MA250 牛熊分域总卡 + 激进版参考），不与「股票池」子标签共用
+        "kh": _c_cards + _hybrid_card,
+        "fund": bt_card("bt-short-fund", "🔵 短线 基金", ss_fund_tag, ss_fund, "curve-short-fund", color="#3b82f6"),
+    }
+    cards = "".join(v for k, v in _cards.items() if (only is None or k == only))
+    _id = "bt-short-wrap-%s" % (only or "all")
+    return ('<div class="card" id="' + _id + '">\n'
             '<h2>⚡ 短线回测参考 <span class="badge badge-auto">生产主信号=超卖伏击 · 修正引擎 T+1 · 2026-09-07 牛熊分域(MA250) + 09-04 弱牛域</span></h2>\n'
             '''<div class="sub">📊 <b>短线「在用什么」= 牛熊分域(进场) + 标准版/激进版(卖出线)，外加 H6 动量强弱切换(打分)</b>——三个独立维度，别混：
 ① <b>牛熊分域（MA250 买入框架 + 09-04 弱牛域）</b>：🐻 熊市(沪深300&lt;MA250)：超卖伏击信号+RSI&lt;35+收盘≥3元 → 可买；🌞 牛市(&gt;MA20)：信号+RSI&lt;32+无低价 → 可买；🌙 弱牛回调(MA20 下/MA250 上)：<b>RSI&lt;32+无低价 → 可买</b>（2026-09-04 专项投产，2026-09-07 MA250 定稿总收益 +119.4%）。
@@ -1359,7 +1363,7 @@ def a5_view_html():
 <div class="pool-sec"><b>观察清单</b><span>今日首板 · 明日低开 2-5% 则入场</span></div>
 <div class="card" id="a5-watchlist">
 <h2>📋 观察清单 <span class="badge badge-auto">{len(wl)} 只</span></h2>
-<div class="sub">今日首板 · 双池至少命中其一（池A 超跌 / 池B 趋势）· 明日低开 2-5% 则入场 · 当日涨跌幅为实时数据，近一年/RSI/量比/MA5偏离为收盘口径</div>
+<div class="sub">今日首板 · 双池至少命中其一（池A 超跌 / 池B 趋势）· 明日低开 2-5% 则入场 · 当日涨跌幅为实时数据，近一年/RSI/量比/MA5偏离为收盘口径<br><b>竞价 / 开盘判定</b>（与「超跌低开低吸」同范式）：09:15–09:25 集合竞价只挂灰标「竞价预判」（不置顶、不计命中）；<b>09:25 起用真实今开判定</b>，命中（今开/昨收−1 ∈ [−5%,−2%] 且 相对位置≤0.5 且 成交额≥5000万 且 F3空间≥20%）者置顶。置顶是视图态，不改信号池与模拟盘账本。</div>
 {_a5_tbl_full("a5-wl", [("name","标的"),("board","板块"),("ind","行业"),("sbdate","首板日"),("pools","滤网池"),("relpos","相对位置"),("amt","成交额(万)"),("gate","过闸"),("chg","涨跌幅"),("ret1y","近一年"),("rsi","RSI"),("vr","量比"),("ma5dev","MA5偏离"),("buy","明日买点")], wl_rows, "（无观察标的）")}
 </div>
 </div>
@@ -2606,10 +2610,159 @@ WATCH_NOTE_FUND = (
     '该策略本身没有独立 paper/持仓账本（<code>backtest/fund_paper.json</code> 属中线 FB3-H20 另一策略，不混用）')
 
 
+# ===== 回测数据按子标签分流（R-btshort-param-0924）=====
+# 契约点⑤：`#bt-short` 原先是一整块，被 `#view-short` 的 5 个子标签**共用**。
+# 现值 = 每个子标签只渲染**自己的**回测参考（由 .bt-sub[data-bt-sub] 控显隐，SUBNAV_JS 同步）；
+# 同一份回测内容不再出现在两个子标签里。
+def _bt_ref_card(sub_key, title, tag, json_rel, note):
+    """某子标签**自有**的回测参考卡：从 REPO 相对路径 json 读字段；缺字段/缺文件就只显示说明，绝不编数字"""
+    import json as _j
+    kpis = []
+    p = BASE / json_rel
+    if p.exists():
+        try:
+            d = _j.loads(p.read_text(encoding="utf-8"))
+        except Exception:
+            d = {}
+        for lbl, k, suf in [("区间", "period", ""), ("总收益", "total_return", "%"),
+                            ("最大回撤", "max_drawdown", "%"), ("夏普", "sharpe", ""),
+                            ("交易数", "n_trades", ""), ("胜率", "win_rate", "%"),
+                            ("单笔中位", "med_per_trade", "%"), ("年化", "ann_return", "%")]:
+            v = d.get(k)
+            if v is None:
+                continue
+            s = v if isinstance(v, str) else ("%.2f%s" % (v, suf))
+            kpis.append('<div class="kpi"><div class="l">%s</div><div class="v">%s</div></div>' % (lbl, s))
+        if d.get("note"):
+            kpis.append('<div class="kpi"><div class="l">说明</div><div class="v" style="font-size:13px;color:var(--faint)">%s</div></div>' % d["note"])
+    if not kpis:
+        kpis = ['<div class="kpi"><div class="l">回测数据</div><div class="v" style="font-size:15px;color:var(--faint)">—</div><div class="s">%s</div></div>' % note]
+    return ('<div class="bt-card" id="bt-%s"><div class="bt-head"><b>%s</b><span class="bt-tag">%s</span></div>'
+            '<div class="kpis">%s</div></div>' % (sub_key, title, tag, "".join(kpis)))
+
+
+def _bt_sub(key, inner, on=False):
+    """一个子标签的回测块；on = 服务端标记默认激活（与 subnav 的 default_key 一致）"""
+    return '<div class="bt-sub%s" data-bt-sub="%s">%s</div>' % (" on" if on else "", key, inner)
+
+
+def _owned_assets_card(strategy_key, title, tag, pool_js, track_js, state_json, note=""):
+    """某策略**独占**的选股池 / 跟踪池 / 模拟盘状态（R-strategy-isolation-0924）。
+
+    只读该策略自己的三个产物；任一缺失 → 如实显示「未到盘」，**绝不回退读别人的数据**
+    （这正是「严禁共用」的可视化约束：本函数没有任何跨策略的默认值或兜底源）。
+    """
+    import json as _j
+
+    def _load_js(rel, var):
+        p = BASE / rel
+        if not p.exists():
+            return None, "缺文件 %s" % rel
+        try:
+            t = p.read_text(encoding="utf-8")
+            i = t.find("window.%s" % var)
+            if i < 0:
+                return None, "%s 内无 window.%s" % (rel, var)
+            s = t[t.index("{", i):]
+            return _j.loads(s[:s.rfind("}") + 1]), None
+        except Exception as e:
+            return None, "%s 解析失败 %r" % (rel, e)
+
+    def _load_json(rel):
+        p = BASE / rel
+        if not p.exists():
+            return None, "缺文件 %s" % rel
+        try:
+            return _j.loads(p.read_text(encoding="utf-8")), None
+        except Exception as e:
+            return None, "%s 解析失败 %r" % (rel, e)
+
+    pool, e_pool = _load_js(pool_js, "ZUOCE_POOL" if strategy_key == "zuoce_jianlou" else "SENTINEL_POOL")
+    track, e_track = _load_js(track_js, "ZUOCE_TRACK" if strategy_key == "zuoce_jianlou" else "SENTINEL_TRACK")
+    state, e_state = _load_json(state_json)
+    as_of = (pool or {}).get("as_of") or (track or {}).get("as_of") or (state or {}).get("as_of") or "—"
+
+    k = []
+    k.append('<div class="kpi"><div class="l">as_of</div><div class="v">%s</div></div>' % as_of)
+    if pool:
+        c = pool.get("counts") or {}
+        n = c.get("pool", pool.get("n_pool"))
+        if n is not None:
+            k.append('<div class="kpi"><div class="l">选股池</div><div class="v">%s 只</div></div>' % n)
+        if c.get("slots_used") is not None:
+            k.append('<div class="kpi"><div class="l">槽位</div><div class="v">%s/%s</div></div>'
+                     % (c.get("slots_used"), c.get("slots")))
+        if pool.get("triggered") is not None:
+            k.append('<div class="kpi"><div class="l">触发</div><div class="v">%s</div></div>'
+                     % ("是" if pool.get("triggered") else "否（%s）" % (pool.get("reason") or "—")))
+    else:
+        k.append('<div class="kpi"><div class="l">选股池</div><div class="v" style="font-size:15px;color:var(--faint)">未到盘</div><div class="s">%s</div></div>' % e_pool)
+    if track:
+        ents = track.get("entries")
+        holds = track.get("holdings")
+        if ents is not None:
+            k.append('<div class="kpi"><div class="l">跟踪池</div><div class="v">%d 只</div></div>' % len(ents))
+        elif holds is not None:
+            k.append('<div class="kpi"><div class="l">跟踪池</div><div class="v">%d 只</div></div>' % len(holds))
+    else:
+        k.append('<div class="kpi"><div class="l">跟踪池</div><div class="v" style="font-size:15px;color:var(--faint)">未到盘</div><div class="s">%s</div></div>' % e_track)
+    if state:
+        k.append('<div class="kpi"><div class="l">模拟盘</div><div class="v">%s</div></div>'
+                 % ("已开仓" if state.get("trading_enabled") else "未开（gate=%s）" % (state.get("gate") or "—")))
+        k.append('<div class="kpi"><div class="l">净值</div><div class="v">%s</div></div>'
+                 % ("—" if state.get("nav") is None else state.get("nav")))
+    else:
+        k.append('<div class="kpi"><div class="l">模拟盘</div><div class="v" style="font-size:15px;color:var(--faint)">未到盘</div><div class="s">%s</div></div>' % e_state)
+    k.append('<div class="kpi"><div class="l">产物来源</div><div class="v" style="font-size:13px;color:var(--faint)">%s</div></div>'
+             % (pool_js + " · " + track_js + " · " + state_json))
+    if note:
+        k.append('<div class="kpi"><div class="l">说明</div><div class="v" style="font-size:13px;color:var(--faint)">%s</div></div>' % note)
+    return ('<div class="bt-card" id="own-%s"><div class="bt-head"><b>🗂 自有资产</b><span class="bt-tag">%s</span></div>'
+            '<div class="kpis">%s</div></div>' % (strategy_key, tag, "".join(k)))
+
+
+
+ZUOCE_CARD = _bt_ref_card("zuoce", "🪤 左侧捡漏", "bt520 纯左侧簿 · KB=5 · wB=1.0 · 留出门未过（A1/A2 负）→ 只上回测·不开模拟盘",
+                          "backtest/zuoce_jianlou_backtest.json",
+                          "池数据由 backtest/zuoce_jianlou_daily.py 产出（zuoce_jianlou_pool.js / _track.js / paper_state.json）")
+SENTINEL_CARD = _bt_ref_card("sentinel", "📡 热榜哨兵", "jiandi top30 共振哨兵 · 影子（shadow_start 2026-09-24）",
+                             "backtest/sentinel_backtest.json",
+                             "池数据由 backtest/sentinel_daily.py 产出（sentinel_pool.js / sentinel_track.js / sentinel_state.json）")
+BT_SHORT_SUB_BLOCKS = ('<div class="card" id="bt-short">'
+    '<h2>⚡ 短线回测参考 <span class="badge badge-auto">按当前子标签分流 · R-btshort-param-0924</span></h2>'
+    + _bt_sub("st-qlch", _bt_ref_card("st-qlch", "📉 超跌低开低吸 · 回测参考", "自有口径（qlch 生产脚本）",
+              "backtest/qlch_bt_ref.json",
+              "本子标签暂无独立回测产物；口径见上方「超跌低开低吸」子视图内卡片（不与其他子标签共用）"), on=True)
+    + _bt_sub("st-kh", bt_short_html("kh"))
+    + _bt_sub("st-etf", _bt_ref_card("st-etf", "🔄 ETF轮动 · 回测参考", "自有口径",
+              "backtest/etf_bt_ref.json",
+              "本子标签暂无独立回测产物；ETF 模拟盘见上方「ETF轮动」子视图卡片（不与其他子标签共用）"))
+    + _bt_sub("st-stk", bt_short_html("stock"))
+    + _bt_sub("st-fund", bt_short_html("fund"))
+    + _bt_sub("st-zuoce", _bt_ref_card("st-zuoce", "🪤 左侧捡漏 · 回测参考",
+              "bt520 纯左侧簿 KB=5 · wB=1.0 · 留出门未过 → 只上回测",
+              "backtest/zuoce_jianlou_backtest.json",
+              "本子标签自有回测产物由 backtest/build_zuoce_backtest_ref.py 投影生成（不与其他子标签共用）"))
+    + _bt_sub("st-sentinel", _bt_ref_card("st-sentinel", "📡 热榜哨兵 · 回测参考",
+              "jiandi top30 共振哨兵（影子账本·只可否决不自动动作）",
+              "backtest/sentinel_backtest.json",
+              "本子标签自有回测产物（不与其他子标签共用）"))
+    + '</div>')
+
+
 SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
 {subnav("short", [("st-qlch", "超跌低开低吸"), ("st-kh", "超卖伏击"),
-                    ("st-etf", "ETF轮动"), ("st-stk", "股票池"), ("st-fund", "基金池")],
+                    ("st-etf", "ETF轮动"), ("st-stk", "股票池"), ("st-fund", "基金池"),
+                    ("st-zuoce", "左侧捡漏"), ("st-sentinel", "热榜哨兵")],
         default_key="st-qlch")}
+{subview("st-zuoce", "左侧捡漏", "bt520 纯左侧簿 · KB=5 · wB=1.0 · 跳空低吸入场", ZUOCE_CARD + _owned_assets_card(
+  "zuoce_jianlou", "🪤 左侧捡漏 · 自有资产", "独占：zuoce_jianlou_pool.js / _track.js / _paper_state.json",
+  "zuoce_jianlou_pool.js", "zuoce_jianlou_track.js", "backtest/zuoce_jianlou_paper_state.json",
+  "三个产物均由 backtest/zuoce_jianlou_daily.py 单独产出；本卡不读任何其他策略的池文件。留出门未过 → 模拟盘恒不开、净值为空。"))}
+{subview("st-sentinel", "热榜哨兵", "jiandi top30 共振哨兵 · 影子跟踪（shadow_start 2026-09-24）", SENTINEL_CARD + _owned_assets_card(
+  "sentinel", "📡 热榜哨兵 · 自有资产", "独占：sentinel_pool.js / sentinel_track.js / sentinel_state.json",
+  "sentinel_pool.js", "sentinel_track.js", "backtest/sentinel_state.json",
+  "三个产物均由 backtest/sentinel_daily.py 单独产出；本卡不读任何其他策略的池文件。影子账本只记账不成交，trading_enabled 恒 false。"))}
 {subview("st-stk", "股票池", "全量池短线 · 主板信号 · 有信号即买", system_block(
   "view-short-stk", "sys-short-stk",
   "⚡ 短线 · 股票池", "auto", "主板 超卖伏击主信号 · A59 主卖出 / C50 参考 · 低价≥3元",
@@ -2644,8 +2797,8 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
 {ASSET_HINT}
 <!-- 页面级「全量池短线跟踪」共享卡已于 2026-09-23（R-track-sep-0923）删除：改为 5 张「策略自有」跟踪池卡，
      分别挂在上方 5 个短线子视图内（id=watch-card-st-*），跨策略标的 0 混入。 -->
-<div class="pool-sec"><b>回测数据</b><span>短线池</span></div>
-{bt_short_html()}
+<div class="pool-sec"><b>回测数据</b><span>短线池 · 按当前子标签分流（R-btshort-param-0924）</span></div>
+{BT_SHORT_SUB_BLOCKS}
 </div>'''
 
 def qlch_live_payload():
@@ -2739,6 +2892,40 @@ QLCH_JSON = json.dumps(QLCH_LIVE, ensure_ascii=False, separators=(",", ":"))
 print("  盘中买点数据: window.QLCH 候选 %d 行 / 六臂账本 %d 臂 / cost_rt=%s / gap=[%s, %s]"
       % (len(QLCH_LIVE["rows"]), len(QLCH_LIVE["accounts"]), QLCH_LIVE["cost_rt"],
          QLCH_LIVE["gap_lo"], QLCH_LIVE["gap_hi"]))
+
+
+def a5_auction_payload():
+    """判据 C（R-a5-auction-0924）：打板族「竞价/开盘买点」判定的数据载荷。
+
+    构建期一次性内嵌，判定在浏览器端算（与 ADR-0009 同一范式）：
+      · 行 = 首板日收盘的**静态条件**（rel_pos / amt / F3 空间）；唯一盘中变量 = 今开；
+      · 阈值与生产记账逐条对齐 —— backtest/a5_experiment/paper_daban_a5.py L455-494
+        （gap = o/pc − 1，**闭区间**；ROOM_MIN = 0.20），并与看板既有 `_buyhit_td`
+        的 0.95/0.98（= −5% / −2%）同口径；
+      · room_pct 单位 = **百分数**（对齐 `_gate_cell` 的 `dh >= 20`，不是 0.20）。
+    诚实原则：字段缺失就原样带 None，交给 a5Judge 判「不命中」，**绝不补数**。"""
+    rows = []
+    for w in (A5.get("watchlist") or []):
+        dh = w.get("dist_high")
+        if dh is None:
+            dh = w.get("dist_high60")
+        rows.append({"code": w.get("code"), "name": w.get("name"),
+                     "last_close": w.get("last_close"), "rel_pos": w.get("rel_pos"),
+                     "amt": w.get("amt"), "room_pct": dh})
+    return {
+        "as_of": A5_ASOF, "built_at": A5.get("built_at"), "rows": rows,
+        "thr": {"gap_lo": -0.05, "gap_hi": -0.02, "rel_pos_max": 0.5,
+                "amt_min": 5e7, "room_min": 20.0,
+                "src": "backtest/a5_experiment/paper_daban_a5.py L455-494"
+                       "（gap = o/pc − 1 闭区间 · ROOM_MIN = 0.20）"},
+    }
+
+
+A5_AUCTION = a5_auction_payload()
+A5_AUCTION_JS = json.dumps(A5_AUCTION, ensure_ascii=False, separators=(",", ":"))
+print("  打板族竞价判定: window.A5_AUCTION 标的 %d 行 / as_of %s / gap=[%s, %s]"
+      % (len(A5_AUCTION["rows"]), A5_AUCTION["as_of"],
+         A5_AUCTION["thr"]["gap_lo"], A5_AUCTION["thr"]["gap_hi"]))
 html = f"""<!doctype html>
 <html lang="zh"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -2958,6 +3145,9 @@ html = f"""<!doctype html>
 <!-- 盘中买点判定数据（R-qlch-live-0923）：qlch 候选 + 策略参数 + 六臂账本净值，构建期一次性内嵌。
      只读快照：判定与盘中净值都在浏览器端算（ADR-0009），不落盘、不写账本、不改收盘链。 -->
 <script>window.QLCH = {QLCH_JSON};</script>
+<!-- 打板族竞价/开盘判定数据（R-a5-auction-0924）：行 = 首板日收盘的静态条件 + 判定阈值，
+     唯一盘中变量（今开）由 a5Judge 在浏览器端判（ADR-0009），只读快照、不写盘、不动账本。 -->
+<script>window.A5_AUCTION = {A5_AUCTION_JS};</script>
 <script>
 /* 三视图导航（覆盖默认 4 项） */
 window.ENH.nav = [
@@ -3571,6 +3761,8 @@ document.addEventListener('DOMContentLoaded',function(){{
 <script>{KXMM_JS}</script>
 <script>{INTRADAY_JS}</script>
 <script>{QLCH_JS}</script>
+<script>{A5_JUDGE_JS}</script>
+<script>{A5_JS}</script>
 </body></html>"""
 
 # --- #10 皮肤层（2026-09-18）：渲染期统一去 emoji ---
