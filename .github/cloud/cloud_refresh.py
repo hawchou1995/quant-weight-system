@@ -8,7 +8,7 @@
          子集 = 本地全链 − 本机专有步骤：
            --skip-deploy    发布交给 peaceiris（本机 _deploy_fundline_0911.py 写死 D:/ 路径）
            --skip-fullguard 全量补数 1-2h，超云端预算
-           --skip-a5        A5 扫描器在仓库外（../打板系统A5实验_20260827）
+           --skip-a5        A5 三步（扫描/看板数据/复盘）；2026-09-24 起已放开（A5 实验副本入库 backtest/a5_experiment）
            --no-main-push   Phase 1 约定：云端不写 main
            --skip-gushi     依赖本机 Chrome 自动化 profile，云端 Phase 1 不接管
 
