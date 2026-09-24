@@ -53,8 +53,14 @@ def local_close(code, day):
 
 
 def tx_close(code, day):
-    """腾讯 K 线收盘（不复权）"""
-    pre = "sh" if code[0] in "59" else ("bj" if code[0] in "48" else "sz")
+    """腾讯 K 线收盘（不复权）；前缀优先取本机文件名，其次按代码段推断（6/5/9=沪，4/8=北）"""
+    pre = None
+    for cand in ("sh", "sz", "bj"):
+        if (REPO / "data_full" / (cand + code + ".csv")).exists():
+            pre = cand
+            break
+    if pre is None:
+        pre = "sh" if code[0] in "569" else ("bj" if code[0] in "48" else "sz")
     sym = pre + code
     url = ("https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=%s,day,,,60," % sym)
     try:
@@ -187,6 +193,9 @@ def main():
                 bad.append((c, px, lc, tc))
             print("  %-8s %-9s %-9s %-9s %-9s %s" % (
                 c, px, lc, tc, ("%.3f%%" % (100*dev)) if dev is not None else "-", "OK" if ok else "偏差超限"))
+        if not picked:
+            print("  ⚠️ 本机 data_full 缺 %s 的数据 → 三方校验无法进行（先跑 backtest\\apply_data_delta.py --latest 合并云端 K 线）" % as_of)
+            warns.append("三方校验跳过：本机缺 %s 数据" % as_of)
         if picked:
             print("  三方一致率：%d/%d" % (ok_n, len(picked)))
             if bad:

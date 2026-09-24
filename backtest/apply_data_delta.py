@@ -31,6 +31,8 @@ def gh(args, timeout=300):
 
 def fetch_delta(run_id, dest):
     dest = Path(dest)
+    if dest.exists():
+        shutil.rmtree(dest, ignore_errors=True)   # gh run download 不会覆盖已存在文件 → 先清空
     dest.mkdir(parents=True, exist_ok=True)
     if run_id in (None, "latest"):
         rc, out, err = gh(["run", "list", "-R", REPO_SLUG, "--workflow", "close_refresh.yml",
@@ -47,17 +49,28 @@ def fetch_delta(run_id, dest):
     else:
         picked = run_id
     print("[delta] 下载 artifact（run %s）…" % picked)
-    rc, out, err = gh(["run", "download", str(picked), "-R", REPO_SLUG, "-n", "data-delta", "-D", str(dest), "--clobber"])
+    rc, out, err = gh(["run", "download", str(picked), "-R", REPO_SLUG, "-n", "data-delta", "-D", str(dest)])
     if rc != 0:
-        print("[ERR] 工件下载失败（可能该轮没有 data-delta，属正常——本步只在加了 delta 步骤后才有）：%s" % err.strip()[:200])
-        return None
+        low = (err or "").lower()
+        if ("no valid artifacts" in low) or ("no artifacts" in low) or ("not found" in low):
+            print("[skip] 该轮没有 data-delta 工件（正常：工件步骤可能刚加 / 当日非 chain）")
+            return None
+        print("[ERR] 工件下载命令失败：%s" % err.strip()[:220])
+        return "ERR"
     return dest
+
+
+def _prefix(code):
+    """真实交易所前缀：优先看本机 data_full 文件名，其次按代码段推断（6/5/9=沪，4/8=北，其余=深）"""
+    for pre in ("sh", "sz", "bj"):
+        if (REPO / "data_full" / (pre + code + ".csv")).exists():
+            return pre
+    return "sh" if code[0] in "569" else ("bj" if code[0] in "48" else "sz")
 
 
 def tx_close(code, day):
     import urllib.request
-    pre = "sh" if code[0] in "59" else ("bj" if code[0] in "48" else "sz")
-    sym = pre + code
+    sym = _prefix(code) + code
     url = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=%s,day,,,60," % sym
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
@@ -100,6 +113,7 @@ def load_delta(src):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--run-id", default="latest")
+    ap.add_argument("--latest", action="store_true", help="取最近一次 close_refresh 运行的工件（等价 --run-id latest，默认行为）")
     ap.add_argument("--src", default=None, help="直接用已有 delta 目录（跳过下载）")
     ap.add_argument("--data-dir", default=str(REPO / "data_full"))
     ap.add_argument("--index", default=str(REPO / "index_000300.csv"))
@@ -108,6 +122,8 @@ def main():
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--rollback", default=None, help="撤掉该日期追加的行")
     a = ap.parse_args()
+    if a.latest:
+        a.run_id = "latest"
 
     dd = Path(a.data_dir); ip = Path(a.index)
 
@@ -126,6 +142,8 @@ def main():
         return 0
 
     src = Path(a.src) if a.src else fetch_delta(a.run_id, REPO / "_cloud_local" / "delta")
+    if src == "ERR":
+        return 4
     if src is None:
         return 4 if a.src else 0
     rows, meta, itail = load_delta(src)
