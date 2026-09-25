@@ -13,6 +13,9 @@ name: 收盘刷新（云端）
 # 发布：cloud_refresh.py 组装 _cloud_dist/ 并过三道门禁，publish=true 才 peaceiris 写 gh-pages
 #       keep_files:true → 盘中 rt_snapshot.yml 产出的文件不会被本 workflow 删除
 # 退出码：0 成功（含 no-new-data）/ 1 链失败 / 2 门禁拒发 / 3 数据未就位（本 workflow 视为告警不红）
+# 2026-09-25 改名为 close_refresh_cloud.yml（R-cloudsync-0925）：cron 曾于 09-24 改为 07:05 UTC，
+#   但 GitHub 旧注册未刷新——09-24 12:40 / 09-25 12:42 UTC 两轮仍按旧 12:30 UTC 触发（延迟 10–12 分钟特征一致）。
+#   同路径改文件不生效 → 改名 = 新建 workflow 实体，强制重新注册 schedule。（旧名 close_refresh.yml 已废弃）
 on:
   schedule:
     - cron: '5 7 * * 1-5'

@@ -48,11 +48,16 @@ def fetch_delta(run_id, dest):
         shutil.rmtree(dest, ignore_errors=True)   # gh run download 不会覆盖已存在文件 → 先清空
     dest.mkdir(parents=True, exist_ok=True)
     if run_id in (None, "latest"):
-        rc, out, err = gh(["run", "list", "-R", REPO_SLUG, "--workflow", "close_refresh.yml",
-                           "--limit", "12", "--json", "databaseId,status,conclusion,createdAt,event"])
-        if rc != 0:
+        # 2026-09-25 R-cloudsync-0925：workflow 文件已改名（close_refresh.yml → close_refresh_cloud.yml，
+        # 用于强制 GitHub 重新注册 schedule）→ 主用新名、兼容旧名，避免按文件名过滤失效。
+        runs = None
+        for _wf in ("close_refresh_cloud.yml", "close_refresh.yml"):
+            rc, out, err = gh(["run", "list", "-R", REPO_SLUG, "--workflow", _wf,
+                               "--limit", "12", "--json", "databaseId,status,conclusion,createdAt,event"])
+            if rc == 0:
+                runs = json.loads(out); break
+        if runs is None:
             print("[ERR] gh run list 失败：%s" % err.strip()[:200]); return None
-        runs = json.loads(out)
         picked = None
         for r in runs:                     # 取最近一次 chain 运行（schedule 或 dispatch）
             if r.get("status") == "completed" and r.get("event") in ("schedule", "workflow_dispatch"):
