@@ -1,0 +1,24 @@
+{
+ "task": "sentinel-nav-level-halves",
+ "window": 244,
+ "res": {
+  "h1": {
+   "span": "2017-01-18 → 2021-10-29",
+   "days": 1248,
+   "n_windows": 1004,
+   "median_pct": 12.38,
+   "pos_ratio_pct": 98.8,
+   "worst_pct": -1.47,
+   "single_path_pct": 27.97
+  },
+  "h2": {
+   "span": "2021-11-01 → 2026-08-12",
+   "days": 1248,
+   "n_windows": 1004,
+   "median_pct": 4.33,
+   "pos_ratio_pct": 61.3,
+   "worst_pct": -22.39,
+   "single_path_pct": 1.65
+  }
+ }
+}

@@ -1,0 +1,37 @@
+{
+ "task": "bt520-halves-0924",
+ "why": "B6 前后半轴（原产物缺此轴）；用于判断留出段为负是否只是退化段产物",
+ "harness": "派生自 scratch/holdout_run.py，OUTJSON 重定向 → **未改动已审计产物 bt520_holdout_0924.json**",
+ "arm": "中放·full·wB=1.0·KB=5（部署支）",
+ "window_days": 244,
+ "h1": {
+  "span": "2018-01-02 -> 2022-05-17",
+  "days": 1059,
+  "median_annual": -0.72,
+  "worst_draw": -6.74,
+  "best_draw": 5.89,
+  "pos_ratio": 40.0,
+  "mdd_median": -26.35,
+  "n_trades_median": 115,
+  "single_path_annual": 0.15,
+  "single_path_n": 128,
+  "single_path_wr": 60.94,
+  "n_starts": 40
+ },
+ "h2": {
+  "span": "2022-05-18 -> 2026-09-22",
+  "days": 1059,
+  "median_annual": 24.26,
+  "worst_draw": 16.42,
+  "best_draw": 29.95,
+  "pos_ratio": 100.0,
+  "mdd_median": -20.47,
+  "n_trades_median": 104,
+  "single_path_annual": 27.65,
+  "single_path_n": 118,
+  "single_path_wr": 66.95,
+  "n_starts": 40
+ },
+ "B6_pass": false,
+ "conclusion": "h1（2018-01→2022-05，1059 日 / 128 笔，不退化）中位年化 −0.72%、仅 40% draws 为正 → FAIL。故留出段为负**不能**仅用退化解释；策略存在明显时域依赖（2022-2026 强 / 2018-2022 平）。"
+}
