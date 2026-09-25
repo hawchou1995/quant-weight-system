@@ -120,6 +120,24 @@ assert md5(DIST / "dual_system.html") == md5(DIST / "index.html"), "双同步失
 shutil.copy2(REPO / "dual_system.html", REPO / "index.html")
 assert md5(REPO / "dual_system.html") == md5(REPO / "index.html"), "repo 双同步失败"
 
+# 2026-09-25 修（R-cloudsync-0925）：gh-pages 云端清单必须常驻。
+# 根因：本脚本用「空临时 index + git add -A -f（work-tree=dist）→ write-tree」生成**只含 dist 的完整树**，
+#       再以 gh-pages HEAD 为父提交 → gh-pages 上凡不在 dist 的文件会被整树删除。
+#       实测事故：commit bfe2d324（deploy(fundline) 2026-09-24 23:28）removed _cloud_manifest.json，
+#       导致 backtest/cloud_accept_data.py 第①步 404 → rc=4，当日云端验收直接中断（09-25 复核实测）。
+#       清单是云端验收的第一入口 → 每次部署都补写最新清单。
+_MANIFEST_CANDS = [REPO / "_cloud_local" / "_cloud_manifest.json", REPO / "_cloud_manifest.json"]
+for _mp in _MANIFEST_CANDS:
+    if _mp.exists():
+        _dst = DIST / "_cloud_manifest.json"
+        _old = md5(_dst)[:12] if _dst.exists() else "无"
+        shutil.copy2(_mp, _dst)
+        assert md5(_mp) == md5(_dst), "清单同步校验失败"
+        print(f"  同步  _cloud_manifest.json（源 {_mp.relative_to(REPO)}） {_old} -> {md5(_dst)[:12]}")
+        break
+else:
+    print("  ⚠ 未找到 _cloud_manifest.json（repo/_cloud_local 与 repo 根均无）——线上清单将继续缺失，验收脚本会 rc=4")
+
 line("=")
 print("STEP 2  发布 gh-pages")
 line()

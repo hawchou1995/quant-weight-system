@@ -135,7 +135,19 @@ def main():
     try:
         raw = get(BASE + "_cloud_manifest.json?cb=" + cb)
     except Exception as e:
-        print("[ERR] 取不到云端清单：%s" % str(e)[:160]); return 4
+        # 2026-09-25 加固（R-cloudsync-0925）：gh-pages 清单可能被第三方部署整树覆盖删除
+        #   （实测 commit bfe2d324 removed _cloud_manifest.json）→ 不再直接 rc=4，
+        #   改用本机最近一次验收清单作「名册 + 运行期依赖」基准，md5 比对降级为存在性判定，
+        #   新鲜度/同份/多源价格/本地差异四节照常全跑，并在末尾显式告警。
+        _man_fallback = False
+        _local_man = out / "_cloud_manifest.json"
+        if _local_man.exists():
+            print("⚠ 云端清单 404（%s）→ 回退本机清单 %s（md5 比对降级）" % (str(e)[:80], _local_man))
+            raw = _local_man.read_bytes()
+            _man_fallback = True
+            warns.append("云端清单 404：已回退本机清单，md5 比对降级（线上清单待下次云端发布补回）")
+        else:
+            print("[ERR] 取不到云端清单：%s" % str(e)[:160]); return 4
     man = json.loads(raw.decode("utf-8", "replace"))
     (out / "_cloud_manifest.json").write_bytes(raw)
     print("=== 云端发布清单 ===")
@@ -153,8 +165,12 @@ def main():
         except Exception as e:
             print("%-38s %10s %-14s 下载失败 %s" % (nm, f.get("bytes"), f.get("md5"), str(e)[:60])); fails.append(nm); continue
         h = md5_12(b)
-        ok = (h == f.get("md5"))
-        note = "OK" if ok else "MD5 不符(清单 %s)" % f.get("md5")
+        if _man_fallback:
+            ok = True   # 回退模式：清单是历史的，其 md5 不对应当前线上版本 → 只判存在性
+            note = "存在性 OK（清单回退，md5 降级）"
+        else:
+            ok = (h == f.get("md5"))
+            note = "OK" if ok else "MD5 不符(清单 %s)" % f.get("md5")
         lp0 = REPO / nm
         if not ok and lp0.exists() and md5_12(lp0.read_bytes()) == h:
             # 该文件已被 rt 盘中快照 workflow 覆盖到 gh-pages → 清单过期，而非数据损坏
