@@ -55,9 +55,14 @@ def fetch_delta(run_id, dest):
             rc, out, err = gh(["run", "list", "-R", REPO_SLUG, "--workflow", _wf,
                                "--limit", "12", "--json", "databaseId,status,conclusion,createdAt,event"])
             if rc == 0:
-                runs = json.loads(out); break
-        if runs is None:
-            print("[ERR] gh run list 失败：%s" % err.strip()[:200]); return None
+                _runs = json.loads(out)
+                if _runs:            # 新名在改名后首跑前为空 → 继续用旧名（历史运行仍按旧名可查）
+                    if _wf != "close_refresh_cloud.yml":
+                        print("[info] 新名 close_refresh_cloud.yml 尚无运行记录 → 取旧名历史运行")
+                    runs = _runs
+                    break
+        if not runs:
+            print("[ERR] gh run list 无可用运行（新名未首跑且旧名无历史）：%s" % err.strip()[:160]); return None
         picked = None
         for r in runs:                     # 取最近一次 chain 运行（schedule 或 dispatch）
             if r.get("status") == "completed" and r.get("event") in ("schedule", "workflow_dispatch"):

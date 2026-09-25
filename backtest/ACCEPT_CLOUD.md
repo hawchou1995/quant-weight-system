@@ -22,6 +22,8 @@ $PY = "C:/Users/Admin/.workbuddy/binaries/python/envs/default/Scripts/python.exe
 ## 2. 云端运行侧（发布是否真的发生）
 ```powershell
 & "C:\Users\Admin\.workbuddy\binaries\gh\gh.exe" run list -R hawchou1995/quant-weight-system --workflow close_refresh_cloud.yml --limit 3 --json databaseId,status,conclusion,event,createdAt,headSha
+# 注：workflow 已于 2026-09-25 由 close_refresh.yml 改名为 close_refresh_cloud.yml（强制重注册 schedule）。
+#     新名在首跑（2026-09-28 15:05 北京）前无运行记录，此时查历史改用 --workflow close_refresh.yml。
 powershell -NoProfile -File <scratch>\analyze_run.ps1 -RunId <id>    # 日志 5 段分析
 ```
 判据：`publish=true` / `status=ok` / `chain rc=0` / `G1 结构门禁` 通过 / `G2 新鲜度` fresh / staging 13 项。
