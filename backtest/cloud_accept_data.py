@@ -36,6 +36,12 @@ def md5_12(b):
     return hashlib.md5(b).hexdigest()[:12]
 
 
+def md5_12_lf(b):
+    """CRLF 归一化后的 md5(12)：清单由云端 Linux 链生成（LF），仓库内 HTML 类文件为 CRLF，
+    原始字节 md5 必然不同但内容一致（实测 2026-09-25：dual_system/index/review_log/changelog.html 4/14 属此类）"""
+    return hashlib.md5(b.replace(b"\r\n", b"\n")).hexdigest()[:12]
+
+
 def local_close(code, day):
     """本机 data_full 日线收盘（raw）"""
     for pre in ("sh", "sz", "bj"):
@@ -131,6 +137,7 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     cb = str(int(time.time()))
     fails, warns = [], []
+    _man_fallback = False   # 2026-09-25 R-cloudsync-0925：云端清单 404 时置 True（回退本机清单做名册）
 
     try:
         raw = get(BASE + "_cloud_manifest.json?cb=" + cb)
@@ -139,7 +146,6 @@ def main():
         #   （实测 commit bfe2d324 removed _cloud_manifest.json）→ 不再直接 rc=4，
         #   改用本机最近一次验收清单作「名册 + 运行期依赖」基准，md5 比对降级为存在性判定，
         #   新鲜度/同份/多源价格/本地差异四节照常全跑，并在末尾显式告警。
-        _man_fallback = False
         _local_man = out / "_cloud_manifest.json"
         if _local_man.exists():
             print("⚠ 云端清单 404（%s）→ 回退本机清单 %s（md5 比对降级）" % (str(e)[:80], _local_man))
@@ -171,8 +177,15 @@ def main():
         else:
             ok = (h == f.get("md5"))
             note = "OK" if ok else "MD5 不符(清单 %s)" % f.get("md5")
+            if not ok and md5_12_lf(b) == f.get("md5"):
+                # 2026-09-25 R-cloudsync-0925：行尾差异非损坏（线上 LF / 仓库 CRLF）→ 归一化后一致即通过
+                ok = True
+                note = "OK（CRLF 归一化后一致）"
         lp0 = REPO / nm
-        if not ok and lp0.exists() and md5_12(lp0.read_bytes()) == h:
+        # 2026-09-25 R-cloudsync-0925：加 CRLF 归一化 —— 仓库内 HTML 类文件为 CRLF、线上为 LF，
+        # 原始字节 md5 必然不同，旧判据导致「清单过期(同版)」豁免永不成立（实测 3 件每日误判 FAIL）
+        if not ok and lp0.exists() and (md5_12(lp0.read_bytes()) == h
+                                        or md5_12_lf(lp0.read_bytes()) == h):
             # 该文件已被 rt 盘中快照 workflow 覆盖到 gh-pages → 清单过期，而非数据损坏
             ok = True
             note += " → 与仓库同版（gh-pages 被 rt 盘中快照覆盖，清单过期，非损坏）"
@@ -263,7 +276,7 @@ def main():
         lp = REPO / nm
         if lp.exists():
             lb = lp.read_bytes()
-            if md5_12(lb) != info["md5"]:
+            if md5_12(lb) != info["md5"] and md5_12_lf(lb) != info["md5"]:
                 diff.append((nm, len(lb), info["bytes"]))
     if diff:
         for nm, lb, cb2 in diff:

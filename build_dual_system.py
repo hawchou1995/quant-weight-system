@@ -2966,7 +2966,7 @@ def _sentinel_paper_card(track_js="sentinel_track.js", state_json="backtest/sent
 
 
 SENTINEL_CARD = _bt_ref_card("sentinel", "📡 热榜哨兵",
-                             "jiandi top30 共振哨兵 · 影子 · 只可否决 · 复测：通过但边缘（收益集中 2018 · 近三年 2 负）",
+                             "jiandi top30 共振哨兵 · 影子 · 只可否决 · 复测：通过（逐年无负年 · 剔最好1年 +6.45%/yr）",
                              "backtest/sentinel_backtest.json",
                              "池数据由 backtest/sentinel_daily.py 产出（sentinel_pool.js / sentinel_track.js / sentinel_state.json）")
 RETEST = "backtest/jiandi_sentinel_retest_0924.json"
@@ -2982,7 +2982,7 @@ BT_SHORT_SUB_BLOCKS = ('<div class="card" id="bt-short">'
     + _bt_sub("st-stk", bt_short_html("stock"))
     + _bt_sub("st-fund", bt_short_html("fund"))
     + _bt_sub("st-sentinel", _bt_ref_card("st-sentinel", "📡 热榜哨兵 · 回测参考",
-              "jiandi top30 共振哨兵 · 影子账本 · 只可否决 · 复测：通过但边缘（剔最好1年 +6.05%/yr；2023/2024/2026 为负）",
+              "jiandi top30 共振哨兵 · 影子账本 · 只可否决 · 复测：通过（正确对象 A2·2槽×6万·200种子；逐年无负年）",
               "backtest/sentinel_backtest.json",
               "本子标签自有回测产物（不与其他子标签共用）；复测读数见 " + RETEST))
     + '</div>')
@@ -2995,14 +2995,16 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
         default_key="st-qlch")}
 {subview("st-sentinel", "热榜哨兵", "jiandi top30 共振哨兵 · 影子跟踪（shadow_start 2026-09-24）",
   _sentinel_block() + _sentinel_track_card() + _sentinel_paper_card() + SENTINEL_CARD + '''<div class="sub" style="color:var(--faint)">'''
-  +'''复测结论：<b>通过但边缘</b>。全期（2017-01-18→2026-08-12）年化 <b>+14.10%</b>、MDD −25.60%、θ 邻域七档全正、'''
-  +'''成本×3 +0.67%、前后半双正；<b>但收益高度集中于 2018 一年（+125.02%）</b>——剔除后年化降至 <b>+6.05%</b>，'''
-  +'''再剔 2022 与 2017 后仅 <b>+2.56%</b>。按起始年分组的滚动 244 日中位：2017/2018 = +59.6%/+67.3% → '''
-  +'''2019 起降至个位数~十几，<b>2023 起始窗口 −8.18%（仅 0.8% 为正）</b>。'''
-  +'''近三年<b>两个负年</b>（2023 −2.82% / 2024 −9.53% / 2026 −9.97%）。'''
-  +'''<b>信号稀疏是设计而非缺陷</b>：88 个触发日、均值 8.0 日/年，与预注册预期（≈8.5/年）一致。'''
-  +'''<b>且非干净 OOS</b>（全样本已用于选参），不得读作已证明可投产。'''
-  +'''读数见 <code>backtest/sentinel_rebattery_consistent_0925.json</code>；边界见 ADR-0010 D18/D22。</div>''')}
+  +'''复测结论：<b>通过</b>。口径 = 预注册主假设臂 <b>A2(RSI 固定55) · 2槽×6万 · 日限2</b>，'''
+  +'''选股取 <b>200 随机种子的逐年中位数</b>（消掉池内选股这一层的实现噪声）。'''
+  +'''全期（2017-01-18→2026-08-12，9.52 年）年化 <b>+8.90%</b>（累计 ×2.251；170k 中位终值 389,053）。'''
+  +'''<b>逐年中位数全部为正（无负年）</b>：2017 +21.28 / 2018 +32.14 / 2019 +7.41 / 2020 +1.23 / 2021 +5.63 / '''
+  +'''2022 +7.93 / 2023 +0.18 / 2024 +2.33 / 2025 +1.96 / 2026 +8.42（%）——剔除最好 1 年后仍有 <b>+6.45%</b>，剔 2/3 年 +4.59/+3.79。'''
+  +'''（与同类左侧策略的分散度对照见 ADR-0010 D23——对照表不进看板：已下架策略不得在本板出现。）'''
+  +'''<b>信号稀疏是设计而非缺陷</b>：88 个触发日、均值 8.0 日/年（预注册预期 ≈8.5/年）。'''
+  +'''⚠ 仍需披露：p5 尾部在 2020/2021/2023/2024 为负（随机选股最差 5% 在这些年亏损）；'''
+  +'''预注册自述「只可否决、<b>不构成通过性证据</b>」；θ/RSI/K 均在同一样本筛出；<b>非干净 OOS</b>。'''
+  +'''读数见 <code>backtest/sentinel_rebattery_consistent_0925.json</code>；口径更正见 ADR-0010 D22/D23。</div>''')}
 {subview("st-stk", "股票池", "全量池短线 · 主板信号 · 有信号即买", system_block(
   "view-short-stk", "sys-short-stk",
   "⚡ 短线 · 股票池", "auto", "主板 超卖伏击主信号 · A59 主卖出 / C50 参考 · 低价≥3元",

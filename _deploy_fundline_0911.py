@@ -120,23 +120,26 @@ assert md5(DIST / "dual_system.html") == md5(DIST / "index.html"), "双同步失
 shutil.copy2(REPO / "dual_system.html", REPO / "index.html")
 assert md5(REPO / "dual_system.html") == md5(REPO / "index.html"), "repo 双同步失败"
 
-# 2026-09-25 修（R-cloudsync-0925）：gh-pages 云端清单必须常驻。
+# 2026-09-25 修（R-cloudsync-0925）：gh-pages 云端清单必须常驻，且**内容只能由云端链生成**。
 # 根因：本脚本用「空临时 index + git add -A -f（work-tree=dist）→ write-tree」生成**只含 dist 的完整树**，
 #       再以 gh-pages HEAD 为父提交 → gh-pages 上凡不在 dist 的文件会被整树删除。
 #       实测事故：commit bfe2d324（deploy(fundline) 2026-09-24 23:28）removed _cloud_manifest.json，
 #       导致 backtest/cloud_accept_data.py 第①步 404 → rc=4，当日云端验收直接中断（09-25 复核实测）。
-#       清单是云端验收的第一入口 → 每次部署都补写最新清单。
-_MANIFEST_CANDS = [REPO / "_cloud_local" / "_cloud_manifest.json", REPO / "_cloud_manifest.json"]
-for _mp in _MANIFEST_CANDS:
-    if _mp.exists():
-        _dst = DIST / "_cloud_manifest.json"
-        _old = md5(_dst)[:12] if _dst.exists() else "无"
-        shutil.copy2(_mp, _dst)
-        assert md5(_mp) == md5(_dst), "清单同步校验失败"
-        print(f"  同步  _cloud_manifest.json（源 {_mp.relative_to(REPO)}） {_old} -> {md5(_dst)[:12]}")
-        break
+#       ⚠ 首版修复（22:15 实测）误把本机 _cloud_local 的**历史清单副本**当线上清单发布
+#         → 清单与线上文件大面积不符，验收反而 rc=3（4 项 MD5 不符）。故此处**只从 gh-pages 取回原清单**，
+#         绝不用本机副本改写内容；gh-pages 无清单时显式告警、保持缺失（不伪造）。
+_gd = sh(["git", "rev-parse", "--absolute-git-dir"])[1]
+_rcf, _, _ = sh(["git", "fetch", "origin", "gh-pages"])
+if _rcf == 0:
+    _r = subprocess.run(["git", "--git-dir", _gd, "show", "FETCH_HEAD:_cloud_manifest.json"],
+                        capture_output=True, cwd=str(REPO))
+    if _r.returncode == 0 and _r.stdout:
+        (DIST / "_cloud_manifest.json").write_bytes(_r.stdout)
+        print(f"  保留  _cloud_manifest.json（取自 gh-pages {len(_r.stdout)}B · 内容由云端链生成，本机不改写）")
+    else:
+        print("  ⚠ gh-pages 无 _cloud_manifest.json（云端链尚未发布过）——跳过，不伪造")
 else:
-    print("  ⚠ 未找到 _cloud_manifest.json（repo/_cloud_local 与 repo 根均无）——线上清单将继续缺失，验收脚本会 rc=4")
+    print(f"  ⚠ fetch gh-pages 失败 rc={_rcf} —— 清单未保留（云端验收可能 rc=4）")
 
 line("=")
 print("STEP 2  发布 gh-pages")
