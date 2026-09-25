@@ -1,0 +1,118 @@
+{
+ "task": "sentinel-strict-drop-year",
+ "caliber": "per-seed paths (n=200), rule=random, arm=A2, config=2槽x6万·日限2",
+ "derived_script": "scratch/sent_strict_run.py (derived from backtest/top1_personal_170k_0924.py; OUT redirected to scratch)",
+ "full": {
+  "median": 8.42,
+  "p5": 6.9,
+  "p95": 9.98,
+  "min": 5.64
+ },
+ "drop_fixed_2018": {
+  "median": 6.15,
+  "p5": 4.73,
+  "p95": 7.93,
+  "min": 3.76
+ },
+ "drop_own_best1": {
+  "median": 6.03,
+  "p5": 4.68,
+  "p95": 7.78,
+  "min": 3.2
+ },
+ "drop_own_best2": {
+  "median": 4.3,
+  "p5": 2.84,
+  "p95": 6.24,
+  "min": 0.88
+ },
+ "drop_own_best3": {
+  "median": 3.23,
+  "p5": 1.67,
+  "p95": 5.02,
+  "min": 0.15
+ },
+ "neg_years": {
+  "median": 1.0,
+  "p5": 0.0,
+  "p95": 3.0,
+  "min": 0.0
+ },
+ "seeds_without_neg_year": 51,
+ "mdd": {
+  "median": -7.99,
+  "p5": -12.67,
+  "p95": -5.77,
+  "min": -15.74
+ },
+ "seeds_le0_after_drop_best1": 0,
+ "seeds_le0_after_drop_best3": 0,
+ "per_year": {
+  "2016": {
+   "median": 0.0,
+   "p5": 0.0,
+   "p95": 0.0,
+   "neg_seeds": 0
+  },
+  "2017": {
+   "median": 22.15,
+   "p5": 14.5,
+   "p95": 31.3,
+   "neg_seeds": 0
+  },
+  "2018": {
+   "median": 31.55,
+   "p5": 19.34,
+   "p95": 46.13,
+   "neg_seeds": 0
+  },
+  "2019": {
+   "median": 7.9,
+   "p5": 2.09,
+   "p95": 15.51,
+   "neg_seeds": 1
+  },
+  "2020": {
+   "median": 1.9,
+   "p5": -1.6,
+   "p95": 6.42,
+   "neg_seeds": 41
+  },
+  "2021": {
+   "median": 5.35,
+   "p5": -0.72,
+   "p95": 13.01,
+   "neg_seeds": 14
+  },
+  "2022": {
+   "median": 8.05,
+   "p5": 2.1,
+   "p95": 15.72,
+   "neg_seeds": 1
+  },
+  "2023": {
+   "median": 0.0,
+   "p5": -1.9,
+   "p95": 2.71,
+   "neg_seeds": 95
+  },
+  "2024": {
+   "median": 2.4,
+   "p5": -5.3,
+   "p95": 9.8,
+   "neg_seeds": 62
+  },
+  "2025": {
+   "median": 1.9,
+   "p5": 0.0,
+   "p95": 5.3,
+   "neg_seeds": 8
+  },
+  "2026": {
+   "median": 8.25,
+   "p5": 2.29,
+   "p95": 15.5,
+   "neg_seeds": 4
+  }
+ }
+}
