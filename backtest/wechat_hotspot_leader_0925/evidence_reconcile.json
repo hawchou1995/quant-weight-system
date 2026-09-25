@@ -1,0 +1,20 @@
+{
+ "V4_base": {
+  "ev_n": 6081,
+  "ev_mean": -1.1807,
+  "tr_n": 1159,
+  "tr_mean": -1.0056,
+  "maxdiff_common": 0.0,
+  "miss_mean": -1.207,
+  "miss_n": 4926
+ },
+ "V7_firstbrk_lowret20": {
+  "ev_n": 3221,
+  "ev_mean": -0.61,
+  "tr_n": 1080,
+  "tr_mean": -0.876,
+  "maxdiff_common": 0.0,
+  "miss_mean": -0.4473,
+  "miss_n": 2148
+ }
+}

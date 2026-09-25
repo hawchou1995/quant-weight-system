@@ -1,0 +1,52 @@
+{
+ "nsig": 6163,
+ "census": {
+  "slot_full": 0,
+  "invalid_open": 17,
+  "already_held": 2097,
+  "ok": 4028
+ },
+ "coverage_by_year": {
+  "2017": {
+   "traded": 369,
+   "signals": 577
+  },
+  "2018": {
+   "traded": 292,
+   "signals": 427
+  },
+  "2019": {
+   "traded": 398,
+   "signals": 643
+  },
+  "2020": {
+   "traded": 439,
+   "signals": 678
+  },
+  "2021": {
+   "traded": 476,
+   "signals": 694
+  },
+  "2022": {
+   "traded": 426,
+   "signals": 653
+  },
+  "2023": {
+   "traded": 448,
+   "signals": 679
+  },
+  "2024": {
+   "traded": 415,
+   "signals": 640
+  },
+  "2025": {
+   "traded": 458,
+   "signals": 698
+  },
+  "2026": {
+   "traded": 307,
+   "signals": 474
+  }
+ },
+ "entry_open_invalid_pct": 0.343
+}
