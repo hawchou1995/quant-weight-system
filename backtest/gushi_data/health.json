@@ -1,5 +1,5 @@
 {
- "ts": "2026-09-24 22:50:21",
+ "ts": "2026-09-25 18:45:15",
  "days": 5,
  "rows": [
   {
@@ -46,6 +46,15 @@
    "bytes": 431818,
    "jsonl_rows": 632,
    "status": "OK"
+  },
+  {
+   "date": "2026-09-25",
+   "exists": false,
+   "nf": 0,
+   "nr": 0,
+   "bytes": 0,
+   "jsonl_rows": 0,
+   "status": "GAP_ALL"
   }
  ],
  "gaps": [
@@ -60,9 +69,20 @@
    "status": "GAP_RESON",
    "nf": 48,
    "nr": 0
+  },
+  {
+   "date": "2026-09-25",
+   "status": "GAP_ALL",
+   "nf": 0,
+   "nr": 0
   }
  ],
  "jsonl": "D:\\Documents\\Workbuddy\\股票基金\\quant-weight-system\\backtest\\gushi_data\\picks_daily.jsonl",
- "dedupe": null,
+ "dedupe": {
+  "lines_before": 4843,
+  "lines_after": 4843,
+  "dropped": 0,
+  "backup": null
+ },
  "note": "GAP_RESON=该日共振永久缺失（站点共振接口仅支持最新交易日）；GAP_ALL=可回补"
 }
