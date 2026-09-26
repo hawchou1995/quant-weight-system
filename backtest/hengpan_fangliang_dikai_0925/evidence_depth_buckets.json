@@ -1,0 +1,258 @@
+{
+ "explain": "入场 T+1 开盘 -> 出场 T+2 尾盘, 无成本无槽位; band 单位 %; 左闭右开 (a, b]",
+ "pool_lowopen": [
+  {
+   "band": [
+    -99,
+    -3
+   ],
+   "n": 140923,
+   "mean": 0.1317,
+   "med": -0.2745,
+   "wr": 47.82
+  },
+  {
+   "band": [
+    -3,
+    -2
+   ],
+   "n": 169448,
+   "mean": 0.4875,
+   "med": 0.2488,
+   "wr": 51.48
+  },
+  {
+   "band": [
+    -2,
+    -1
+   ],
+   "n": 639020,
+   "mean": 0.3919,
+   "med": 0.2207,
+   "wr": 51.61
+  },
+  {
+   "band": [
+    -1,
+    -0.5
+   ],
+   "n": 1064562,
+   "mean": 0.2639,
+   "med": 0.0812,
+   "wr": 50.33
+  },
+  {
+   "band": [
+    -0.5,
+    0
+   ],
+   "n": 3085999,
+   "mean": 0.0862,
+   "med": 0.0,
+   "wr": 47.48
+  }
+ ],
+ "configB_lowopen": [
+  {
+   "band": [
+    -99,
+    -3
+   ],
+   "n": 2313,
+   "mean": 0.0701,
+   "med": 0.0,
+   "wr": 48.85
+  },
+  {
+   "band": [
+    -3,
+    -2
+   ],
+   "n": 3977,
+   "mean": 0.4205,
+   "med": 0.2841,
+   "wr": 51.65
+  },
+  {
+   "band": [
+    -2,
+    -1
+   ],
+   "n": 17376,
+   "mean": 0.4529,
+   "med": 0.2193,
+   "wr": 51.91
+  },
+  {
+   "band": [
+    -1,
+    -0.5
+   ],
+   "n": 27370,
+   "mean": 0.3555,
+   "med": 0.1254,
+   "wr": 50.84
+  },
+  {
+   "band": [
+    -0.5,
+    0
+   ],
+   "n": 68850,
+   "mean": 0.2559,
+   "med": 0.0,
+   "wr": 48.82
+  }
+ ],
+ "sample_days": [
+  {
+   "date": "2019-12-05",
+   "pool": 2245,
+   "flat": 504,
+   "flat_spk": 26,
+   "spk_lowopen": 15,
+   "names": [
+    {
+     "sym": "sh600199",
+     "volbr": 6.09,
+     "range_prev_pct": 10.29,
+     "absret20_pct": 3.25,
+     "gap_pct": -1.0,
+     "ret_t2close_pct": 1.51
+    },
+    {
+     "sym": "sh600470",
+     "volbr": 3.59,
+     "range_prev_pct": 7.21,
+     "absret20_pct": 0.0,
+     "gap_pct": -0.24,
+     "ret_t2close_pct": 0.49
+    },
+    {
+     "sym": "sh600699",
+     "volbr": 3.13,
+     "range_prev_pct": 10.14,
+     "absret20_pct": 3.69,
+     "gap_pct": -0.73,
+     "ret_t2close_pct": 0.27
+    }
+   ]
+  },
+  {
+   "date": "2021-07-29",
+   "pool": 3139,
+   "flat": 440,
+   "flat_spk": 12,
+   "spk_lowopen": 11,
+   "names": [
+    {
+     "sym": "sh603328",
+     "volbr": 3.87,
+     "range_prev_pct": 6.94,
+     "absret20_pct": 5.67,
+     "gap_pct": -1.41,
+     "ret_t2close_pct": 0.29
+    },
+    {
+     "sym": "sh603398",
+     "volbr": 2.03,
+     "range_prev_pct": 15.28,
+     "absret20_pct": 0.65,
+     "gap_pct": -1.87,
+     "ret_t2close_pct": -0.11
+    },
+    {
+     "sym": "sz002348",
+     "volbr": 3.89,
+     "range_prev_pct": 15.94,
+     "absret20_pct": 7.53,
+     "gap_pct": -1.17,
+     "ret_t2close_pct": -0.39
+    }
+   ]
+  },
+  {
+   "date": "2023-03-24",
+   "pool": 4119,
+   "flat": 700,
+   "flat_spk": 32,
+   "spk_lowopen": 11,
+   "names": [
+    {
+     "sym": "sh600186",
+     "volbr": 4.93,
+     "range_prev_pct": 8.78,
+     "absret20_pct": 3.72,
+     "gap_pct": -0.36,
+     "ret_t2close_pct": 0.36
+    },
+    {
+     "sym": "sh600655",
+     "volbr": 4.88,
+     "range_prev_pct": 6.67,
+     "absret20_pct": 3.6,
+     "gap_pct": -0.14,
+     "ret_t2close_pct": -2.65
+    },
+    {
+     "sym": "sz002314",
+     "volbr": 2.68,
+     "range_prev_pct": 9.01,
+     "absret20_pct": 1.65,
+     "gap_pct": -0.28,
+     "ret_t2close_pct": -5.62
+    }
+   ]
+  },
+  {
+   "date": "2024-11-19",
+   "pool": 4882,
+   "flat": 176,
+   "flat_spk": 1,
+   "spk_lowopen": 1,
+   "names": [
+    {
+     "sym": "sh601997",
+     "volbr": 2.05,
+     "range_prev_pct": 9.63,
+     "absret20_pct": 3.27,
+     "gap_pct": -0.53,
+     "ret_t2close_pct": -1.41
+    }
+   ]
+  },
+  {
+   "date": "2026-07-15",
+   "pool": 4973,
+   "flat": 912,
+   "flat_spk": 59,
+   "spk_lowopen": 45,
+   "names": [
+    {
+     "sym": "sh600035",
+     "volbr": 2.32,
+     "range_prev_pct": 8.17,
+     "absret20_pct": 0.56,
+     "gap_pct": -0.56,
+     "ret_t2close_pct": 0.0
+    },
+    {
+     "sym": "sh600037",
+     "volbr": 2.82,
+     "range_prev_pct": 12.62,
+     "absret20_pct": 1.95,
+     "gap_pct": -0.15,
+     "ret_t2close_pct": -2.21
+    },
+    {
+     "sym": "sh600056",
+     "volbr": 2.03,
+     "range_prev_pct": 13.58,
+     "absret20_pct": 7.11,
+     "gap_pct": -0.41,
+     "ret_t2close_pct": -1.46
+    }
+   ]
+  }
+ ]
+}
