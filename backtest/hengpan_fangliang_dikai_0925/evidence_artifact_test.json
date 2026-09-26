@@ -1,0 +1,13 @@
+{
+ "legs": {
+  "T1_intraday": 0.7439,
+  "T1c_T2c": 0.0478,
+  "full": 0.7958,
+  "T2open_T2close": 0.1444
+ },
+ "pool_legs": {
+  "T1_intraday": 0.4257,
+  "T1c_T2c": -0.0128,
+  "full": 0.412
+ }
+}

@@ -1,0 +1,17 @@
+{
+ "early_names": 18,
+ "early_pct": 0.35,
+ "picks_live": {
+  "n": 23409,
+  "mean": 0.7935,
+  "med": 0.7067,
+  "wr": 58.46
+ },
+ "picks_dead": {
+  "n": 125,
+  "mean": 1.2123,
+  "med": 0.7299,
+  "wr": 52.8
+ },
+ "pool_dead_share_pct": 0.144
+}
