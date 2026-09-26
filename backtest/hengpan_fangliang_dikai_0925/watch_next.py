@@ -14,7 +14,7 @@ import json, pathlib, sys, numpy as np, pandas as pd
 R = pathlib.Path(__file__).resolve().parents[2]
 UNI = R/"backtest/wechat_hotspot_leader_0925/universe.json"
 DEAD = R/"backtest/_delisted_universe/delisted_bars.csv.gz"
-P = dict(P1=0.01, P2=0.03, K=10, KSLOT=20, MINAMT=2e7, MINPX=2.0, LISTED=250, COST_SIDE=0.000346)
+P = dict(P1=0.01, P2=0.03, K=10, KSLOT=20, MINAMT=2e7, MINPX=3.0, LISTED=250, COST_SIDE=0.000346)
 U = json.loads(UNI.read_text(encoding="utf-8"))
 cal = list(U["calendar"]); live = [u["sym"] for u in U["universe"]]
 dead = sorted(pd.read_csv(DEAD)["sym"].unique().tolist()) if DEAD.exists() else []
@@ -48,6 +48,34 @@ VOLBR = V/np.where(VMA20_prev>0, VMA20_prev, np.nan)
 RET20 = np.full((T,N),np.nan,dtype=np.float32); RET20[20:] = Cv[20:]/Cv[:-20] - 1.0
 NV = np.cumsum(VALID,axis=0).astype(np.int32)
 GAP = np.full((T,N),np.nan,dtype=np.float32); GAP[:-1] = O[1:]/np.where(C[:-1]>0, C[:-1], np.nan) - 1.0
+
+# ===== 过滤件（2026-09-26 用户要求，预注册 E-6）: 剔ST/*ST + 股价>=3元 + 每股净资产>=3元 =====
+_NAMES = json.loads((R/"data_full_names.json").read_text(encoding="utf-8"))
+STNOW = np.array([(("ST" in (_NAMES.get(_s,"") or "").upper()) or ("退" in (_NAMES.get(_s,"") or "")))
+                  for _s in syms], dtype=bool)
+_Cv = np.where(VALID, C, np.nan)
+_r1 = np.full((T, N), np.nan, dtype=np.float32); _r1[1:] = _Cv[1:]/_Cv[:-1] - 1.0
+_MX = pd.DataFrame(np.abs(_r1)).rolling(250, min_periods=60).max().to_numpy(dtype=np.float32)
+STP = np.isfinite(_MX) & (_MX <= 0.056)          # 期内 ST 代理: 250日最大绝对日收益<=5.6% (即 ±5% 限价制度)
+BPSA = np.full((T, N), np.nan, dtype=np.float32)
+_bp = pd.read_csv(R/"backtest/_fundamentals/bps_quarterly.csv.gz")
+_bp["report_date"] = pd.to_datetime(_bp["report_date"], errors="coerce")
+_bp = _bp[_bp["report_date"].notna()]
+_bp["usable_from"] = (_bp["report_date"] + pd.DateOffset(months=4)).dt.strftime("%Y-%m-%d")
+_c2i = {s_: i for i, s_ in enumerate(syms)}
+for _s, _g in _bp.groupby("sym"):
+    _j = _c2i.get(_s)
+    if _j is None: continue
+    _g = _g.sort_values("usable_from")
+    _idx = np.array([lut.get(d, -1) for d in _g["usable_from"]], dtype=np.int64)
+    _v = _g["bps"].to_numpy(dtype=np.float32); _ok = _idx >= 0; _idx = _idx[_ok]; _v = _v[_ok]
+    if not _idx.size: continue
+    _pos = np.searchsorted(_idx, np.arange(T), side="right") - 1; _gd = _pos >= 0
+    BPSA[_gd, _j] = _v[_pos[_gd]]
+def FILT(t):
+    """返回可交易掩码: 非ST(期内代理+当前名) 且 股价>=3 且 每股净资产>=3(报告期+4个月后方可用)"""
+    return (~STP[t]) & (~STNOW) & (C[t] >= 3.0) & np.isfinite(BPSA[t]) & (BPSA[t] >= 3.0)
+
 def zs(x):
     x = np.asarray(x,float); mu = np.nanmean(x); sd = np.nanstd(x)
     return (x-mu)/sd if np.isfinite(sd) and sd>0 else np.zeros_like(x)
@@ -72,7 +100,7 @@ Td = args[0] if args else cal[-1]
 assert Td in lut, "T=%s 不在交易日历内" % Td
 t = lut[Td]; next_td = cal[t+1] if t+1 < T else "(尚未发生)"
 print("信号日 T = %s  ->  买入日 T+1 = %s" % (Td, next_td))
-elig = VALID[t]&(NV[t]>=P["LISTED"])&(C[t]>=P["MINPX"])&np.isfinite(AMT20[t])&(AMT20[t]>=P["MINAMT"])
+elig = VALID[t]&(NV[t]>=P["LISTED"])&(C[t]>=P["MINPX"])&np.isfinite(AMT20[t])&(AMT20[t]>=P["MINAMT"])&FILT(t)
 ix_all = np.nonzero(elig)[0]
 comp_all = zs(-np.log(AMT20[t][ix_all]))+zs(-np.log(VOLBR[t][ix_all]))+zs(-RET20[t][ix_all])
 df = pd.DataFrame(dict(sym=[syms[j] for j in ix_all], close=np.round(C[t][ix_all],3),

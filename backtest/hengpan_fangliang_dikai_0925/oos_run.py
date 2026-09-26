@@ -10,7 +10,7 @@ UNI = R/"backtest/wechat_hotspot_leader_0925/universe.json"
 DEAD = R/"backtest/_delisted_universe/delisted_bars.csv.gz"
 STATE_F = OUT/"oos_state.json"; TRADES_F = OUT/"oos_trades.jsonl"; REPORT_F = OUT/"oos_report.json"
 # ---- 冻结参数（不得修改）----
-P = dict(P1=0.01, P2=0.03, K=10, KSLOT=20, MINAMT=2e7, MINPX=2.0, LISTED=250,
+P = dict(P1=0.01, P2=0.03, K=10, KSLOT=20, MINAMT=2e7, MINPX=3.0, LISTED=250,
          COST_SIDE=0.000346, SHADOW_START="2026-09-25", WORST_CASE_WIPEOUT=True)
 FROZEN_SHA = hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest()
 def log(*a): print(*a, flush=True)
@@ -66,12 +66,41 @@ def main():
     NV = np.cumsum(VALID, axis=0).astype(np.int32)
     GAP = np.full((T,N), np.nan, dtype=np.float32); GAP[:-1] = O[1:]/np.where(C[:-1] > 0, C[:-1], np.nan) - 1.0
     GAP = GAP.astype(np.float32)
+
+    lut = {d: i for i, d in enumerate(cal)}
+    # ===== 过滤件（2026-09-26 用户要求，预注册 E-6）: 剔ST/*ST + 股价>=3元 + 每股净资产>=3元 =====
+    _NAMES = json.loads((R/"data_full_names.json").read_text(encoding="utf-8"))
+    STNOW = np.array([(("ST" in (_NAMES.get(_s,"") or "").upper()) or ("退" in (_NAMES.get(_s,"") or "")))
+                      for _s in syms], dtype=bool)
+    _Cv = np.where(VALID, C, np.nan)
+    _r1 = np.full((T, N), np.nan, dtype=np.float32); _r1[1:] = _Cv[1:]/_Cv[:-1] - 1.0
+    _MX = pd.DataFrame(np.abs(_r1)).rolling(250, min_periods=60).max().to_numpy(dtype=np.float32)
+    STP = np.isfinite(_MX) & (_MX <= 0.056)          # 期内 ST 代理: 250日最大绝对日收益<=5.6% (即 ±5% 限价制度)
+    BPSA = np.full((T, N), np.nan, dtype=np.float32)
+    _bp = pd.read_csv(R/"backtest/_fundamentals/bps_quarterly.csv.gz")
+    _bp["report_date"] = pd.to_datetime(_bp["report_date"], errors="coerce")
+    _bp = _bp[_bp["report_date"].notna()]
+    _bp["usable_from"] = (_bp["report_date"] + pd.DateOffset(months=4)).dt.strftime("%Y-%m-%d")
+    _c2i = {s_: i for i, s_ in enumerate(syms)}
+    for _s, _g in _bp.groupby("sym"):
+        _j = _c2i.get(_s)
+        if _j is None: continue
+        _g = _g.sort_values("usable_from")
+        _idx = np.array([lut.get(d, -1) for d in _g["usable_from"]], dtype=np.int64)
+        _v = _g["bps"].to_numpy(dtype=np.float32); _ok = _idx >= 0; _idx = _idx[_ok]; _v = _v[_ok]
+        if not _idx.size: continue
+        _pos = np.searchsorted(_idx, np.arange(T), side="right") - 1; _gd = _pos >= 0
+        BPSA[_gd, _j] = _v[_pos[_gd]]
+    def FILT(t):
+        """返回可交易掩码: 非ST(期内代理+当前名) 且 股价>=3 且 每股净资产>=3(报告期+4个月后方可用)"""
+        return (~STP[t]) & (~STNOW) & (C[t] >= 3.0) & np.isfinite(BPSA[t]) & (BPSA[t] >= 3.0)
+
     def zs(x):
         x = np.asarray(x, float); mu = np.nanmean(x); sd = np.nanstd(x)
         return (x-mu)/sd if np.isfinite(sd) and sd > 0 else np.zeros_like(x)
     def elig(t):
         return (VALID[t] & (NV[t] >= P["LISTED"]) & (C[t] >= P["MINPX"]) &
-                np.isfinite(AMT20[t]) & (AMT20[t] >= P["MINAMT"]))
+                np.isfinite(AMT20[t]) & (AMT20[t] >= P["MINAMT"]) & FILT(t))
     def signal(t):
         b = elig(t); g = GAP[t]
         m = b & np.isfinite(g) & (g <= -P["P1"]) & (g >= -P["P2"]) & np.isfinite(RET20[t]) & np.isfinite(VOLBR[t])
