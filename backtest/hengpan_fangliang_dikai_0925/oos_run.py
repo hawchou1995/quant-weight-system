@@ -60,7 +60,8 @@ def main():
     Cv = np.where(VALID, C, np.nan); Vv = np.where(VALID, V, np.nan); Av = np.where(VALID, A, np.nan)
     AMT20 = pd.DataFrame(Av).rolling(20, min_periods=10).mean().to_numpy(dtype=np.float32)
     VMA20 = pd.DataFrame(Vv).rolling(20, min_periods=10).mean().to_numpy(dtype=np.float32)
-    VOLBR = V / np.where(VMA20 > 0, VMA20, np.nan)
+    VMA20_prev = np.full_like(VMA20, np.nan); VMA20_prev[1:] = VMA20[:-1]   # 只用 <=T-1 的均量（与预注册 / 样本内一致）
+    VOLBR = V / np.where(VMA20_prev > 0, VMA20_prev, np.nan)
     RET20 = np.full((T,N), np.nan, dtype=np.float32); RET20[20:] = Cv[20:]/Cv[:-20] - 1.0
     NV = np.cumsum(VALID, axis=0).astype(np.int32)
     GAP = np.full((T,N), np.nan, dtype=np.float32); GAP[:-1] = O[1:]/np.where(C[:-1] > 0, C[:-1], np.nan) - 1.0

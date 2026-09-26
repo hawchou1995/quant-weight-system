@@ -1,7 +1,7 @@
 {
  "shadow_start": "2026-09-25",
  "last_scan_date": "2026-09-24",
- "frozen_script_sha256": "53040b9c9c225a1d572273fe5024775d824c93320eb260dee9dd9ce1dc29a6fe",
+ "frozen_script_sha256": "32d35f71b7f338bd9908e590d049c03e8af861bfa2888da21595e4c15c971e18",
  "params": {
   "P1": 0.01,
   "P2": 0.03,
@@ -18,5 +18,5 @@
  "last_data_date": "2026-09-24",
  "n_settled": 0,
  "n_pending": 0,
- "updated_at": "2026-09-26 19:38:45"
+ "updated_at": "2026-09-26 20:16:41"
 }
