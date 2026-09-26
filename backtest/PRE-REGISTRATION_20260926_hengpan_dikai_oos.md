@@ -218,10 +218,14 @@ python backtest/hengpan_fangliang_dikai_0925/oos_run.py
   - **不计入 OOS 主统计** —— 主统计仍自 `shadow_start` 生效日（信号 09-28、买入 09-29）起算，以保持「纯样本外」的洁净度；
   - 若要留痕，单独写入 `boundary_trades.jsonl` 并**单列**报告，**绝不并入** `oos_trades.jsonl`。
 - **盘前产物（已生成）**：`watchlist_2026-09-24.csv`（4,923 只全量合格候选，含 close / AMT20 / 量比 / RET20 / provisional 复合分）。
-- **09-28 早上出精确前 10 的命令**：
+- **09-28 早上出精确前 10 的命令**（二选一，`--syms` 最省事）：
   ```bash
+  # 方式一（推荐）：行情软件筛「开盘跌幅 1%~3%」→ 导出代码清单（一列 sym）
+  python backtest/hengpan_fangliang_dikai_0925/watch_next.py 2026-09-24 --syms qual.csv
+
+  # 方式二：手工填候选表的开盘价（两列 sym,open）
   python backtest/hengpan_fangliang_dikai_0925/watch_next.py 2026-09-24 --opens opens.csv
-  # opens.csv 两列: sym,open  （填候选表里的票即可，未填的视为无跳空信息、自动落选）
   ```
-  **已验证**：该手工路径与「数据驱动精确模式」在 T=2026-09-23 上产出**完全一致**的前 10（同一批代码、同一批 gap、同一批 comp 分）。
+  > 为什么 `--syms` 够用：**跳空只做筛选、不参与排序**（复合分只用 AMT20 / 量比 / RET20），所以只要知道「哪些票低开 1%~3%」即可定位精确前 10，无需提供价格。
+  **已验证**：三条路径（数据驱动精确模式、`--opens`、`--syms`）在 T=2026-09-23 上产出**完全一致**的前 10（同一批代码、同一批 comp 分、同一顺序）。
 - **注意**：09-24 的信号要等 09-28 开盘价才知道哪些票真的低开 1%~3%；在此之前任何「前 10」都只是**候选**，不是结论。
