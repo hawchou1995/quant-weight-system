@@ -1,0 +1,22 @@
+{
+ "shadow_start": "2026-09-25",
+ "last_scan_date": "2026-09-24",
+ "frozen_script_sha256": "53040b9c9c225a1d572273fe5024775d824c93320eb260dee9dd9ce1dc29a6fe",
+ "params": {
+  "P1": 0.01,
+  "P2": 0.03,
+  "K": 10,
+  "KSLOT": 20,
+  "MINAMT": 20000000.0,
+  "MINPX": 2.0,
+  "LISTED": 250,
+  "COST_SIDE": 0.000346,
+  "SHADOW_START": "2026-09-25",
+  "WORST_CASE_WIPEOUT": true
+ },
+ "names_loaded": 5460,
+ "last_data_date": "2026-09-24",
+ "n_settled": 0,
+ "n_pending": 0,
+ "updated_at": "2026-09-26 19:38:45"
+}

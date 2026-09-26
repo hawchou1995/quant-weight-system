@@ -1,0 +1,24 @@
+{
+ "frozen_script_sha256": "53040b9c9c225a1d572273fe5024775d824c93320eb260dee9dd9ce1dc29a6fe",
+ "shadow_start": "2026-09-25",
+ "last_data_date": "2026-09-24",
+ "n_pending": 0,
+ "acceptance": {
+  "n": 0,
+  "mean_pct": null,
+  "med_pct": null,
+  "wr_pct": null
+ },
+ "gates": {
+  "n": false,
+  "days": false,
+  "mean": false,
+  "wr": false,
+  "med": false
+ },
+ "exec_dev_pct": {
+  "n": 0,
+  "mean": null
+ },
+ "verdict": "尚未开始（无已完成样本）"
+}
