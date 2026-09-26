@@ -1,7 +1,7 @@
 {
  "shadow_start": "2026-09-25",
  "last_scan_date": "2026-09-24",
- "frozen_script_sha256": "788e8b4fefaecb32c1e02ba12d6a6628e5ab18d0c4caed7c9ec481a260701000",
+ "frozen_script_sha256": "a43d97bc30717d1f8784c9373c232ccc359c39cc91e39e5a7b0be11581c1e50b",
  "params": {
   "P1": 0.01,
   "P2": 0.03,
@@ -10,6 +10,7 @@
   "MINAMT": 20000000.0,
   "MINPX": 3.0,
   "LISTED": 250,
+  "TP": 0.02,
   "COST_SIDE": 0.000346,
   "SHADOW_START": "2026-09-25",
   "WORST_CASE_WIPEOUT": true
@@ -18,5 +19,5 @@
  "last_data_date": "2026-09-24",
  "n_settled": 0,
  "n_pending": 0,
- "updated_at": "2026-09-26 23:58:08"
+ "updated_at": "2026-09-27 01:06:12"
 }

@@ -154,3 +154,42 @@ else:
 o3 = R/"backtest/hengpan_fangliang_dikai_0925"/("watchlist_%s.csv" % Td)
 df.to_csv(o3, index=False, encoding="utf-8-sig")
 print("\n全量候选已写出: %s (%d 行)" % (o3.name, len(df)))
+
+# ===== 挂单清单 (09:15 前盲挂限价单用; 批准项2) =====
+def _argval(flag, default=None):
+    return sys.argv[sys.argv.index(flag)+1] if flag in sys.argv else default
+N_ORD = int(_argval("--orders", 20)); CAP = float(_argval("--capital", 0)); KS = int(_argval("--kslot", 4))
+top = df.head(N_ORD).copy()
+top["limit_099"] = (top["close"]*0.99).round(2)
+if CAP > 0:
+    per = CAP/KS
+    top["shares"] = (((per/top["limit_099"])//100)*100).astype(int)
+    top["amount_yuan"] = (top["shares"]*top["limit_099"]).round(0)
+    top["pct_of_cap"] = (100*top["amount_yuan"]/CAP).round(1)
+top["adv_limit_yuan"] = (top["amt20_wan"]*1e4*0.01).round(0)   # 单票上限 = ADV 的 1% (集合竞价深度约束)
+if CAP > 0:
+    top["over_adv"] = (top["amount_yuan"] > top["adv_limit_yuan"]).map({True:"⚠超限", False:""})
+cols = ["rank_prov","sym","close","limit_099"] + (["shares","amount_yuan","adv_limit_yuan","over_adv"] if CAP>0 else []) + ["volbr","ret20_pct","amt20_wan","comp_prov"]
+if CAP > 0:
+    _cap_max = KS * float(top["amt20_wan"].median()) * 1e4 * 0.01
+    print("\n【容量校验】选中标的 ADV 中位 %.0f 万 -> 单票上限(ADV 1%%) %.1f 万 -> KSLOT=%d 时账户上限 ≈ %.0f 万元" %
+          (top["amt20_wan"].median(), top["amt20_wan"].median()*1e4*0.01/1e4, KS, _cap_max/1e4))
+    print("           当前设置 每只 %.1f 万; 超限标的 %d/%d 只 -> %s" %
+          (CAP/KS/1e4, int((top["amount_yuan"]>top["adv_limit_yuan"]).sum()), len(top),
+           "⚠ 建议下调总资金或提高 KSLOT" if (top["amount_yuan"]>top["adv_limit_yuan"]).any() else "✅ 全部在限内"))
+print("\n" + "="*104)
+print("挂单清单 | 信号日 T=%s -> 买入日 T+1 | 限价 = 前收x0.99 (=低开1%%的价位, 覆盖-1%%~-3%%低开)" % Td)
+print("仓位: 资金 %.1f 万 / KSLOT=%d -> 每只 %.1f 万 ; 历史实际成交 1.7~2.8 只/日" % (CAP/1e4, KS, CAP/KS/1e4) if CAP>0 else "未给 --capital, 只出代码与限价")
+print("="*104)
+print(top[cols].to_string(index=False))
+o4 = R/"backtest/hengpan_fangliang_dikai_0925"/("orderlist_%s.csv" % Td)
+top[cols].to_csv(o4, index=False, encoding="utf-8-sig")
+print("\n已写出挂单清单: %s (%d 行)" % (o4.name, len(top)))
+print("\n【当日流程】")
+print("  前一晚/09:15 前 : 按上表挂 前收x0.99 的限价买单")
+print("  09:15-09:20    : 【可撤单窗口】按虚拟开盘价, 撤掉「跌幅>3%%」的标的 (历史占选中 16.2%%, 该组毛均为负)")
+print("  09:25          : 集合竞价撮合, 开盘在 -1%%~-3%% 的自动以开盘价成交")
+print("  T+2 09:15 前   : 对持仓挂 买入价x1.02 的限价卖单 (止盈, 限价卖出成交可靠)")
+print("  T+2 14:55      : 未成交的市价卖出 (未达标尾盘离场)")
+print("  T+1 当日不可卖 (T+1 制度)")
+

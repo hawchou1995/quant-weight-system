@@ -10,7 +10,7 @@ UNI = R/"backtest/wechat_hotspot_leader_0925/universe.json"
 DEAD = R/"backtest/_delisted_universe/delisted_bars.csv.gz"
 STATE_F = OUT/"oos_state.json"; TRADES_F = OUT/"oos_trades.jsonl"; REPORT_F = OUT/"oos_report.json"
 # ---- 冻结参数（不得修改）----
-P = dict(P1=0.01, P2=0.03, K=10, KSLOT=20, MINAMT=2e7, MINPX=3.0, LISTED=250,
+P = dict(P1=0.01, P2=0.03, K=10, KSLOT=20, MINAMT=2e7, MINPX=3.0, LISTED=250, TP=0.02,
          COST_SIDE=0.000346, SHADOW_START="2026-09-25", WORST_CASE_WIPEOUT=True)
 FROZEN_SHA = hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest()
 def log(*a): print(*a, flush=True)
@@ -55,7 +55,7 @@ def main():
     log("universe: live=%d dead=%d total=%d ; calendar %s..%s" % (len(live), len(dead), len(syms), cal[0], cal[-1]))
     F, done = build(cal, syms)
     T, N = F["C"].shape
-    O, C, V, A = F["O"], F["C"], F["V"], F["A"]
+    O, H, C, V, A = F["O"], F["H"], F["C"], F["V"], F["A"]
     VALID = (C > 0) & np.isfinite(C) & (O > 0)
     Cv = np.where(VALID, C, np.nan); Vv = np.where(VALID, V, np.nan); Av = np.where(VALID, A, np.nan)
     AMT20 = pd.DataFrame(Av).rolling(20, min_periods=10).mean().to_numpy(dtype=np.float32)
@@ -109,6 +109,8 @@ def main():
         comp = zs(-np.log(AMT20[t][ix])) + zs(-np.log(VOLBR[t][ix])) + zs(-RET20[t][ix])
         k = min(P["K"], ix.size)
         return [[int(ix[q]), float(comp[q])] for q in np.argsort(-comp)[:k]]
+    def _ret_of(entry, x):
+        return -100.0 if x == 0 else (x*(1-P["COST_SIDE"])/(entry*(1+P["COST_SIDE"])) - 1)*100
     st = json.loads(STATE_F.read_text(encoding="utf-8")) if STATE_F.exists() else {}
     st.setdefault("shadow_start", P["SHADOW_START"]); st.setdefault("last_scan_date", None)
     st["frozen_script_sha256"] = FROZEN_SHA; st["params"] = P
@@ -135,17 +137,26 @@ def main():
             ex_t = t+2
             if ex_t >= T:
                 n_pending += 1; continue
-            ex = C[ex_t][j]; used = ex_t; flag = 0
-            if not (np.isfinite(ex) and ex > 0):
+            # --- 对照口径: 纯 T+2 尾盘 (v1.2 原规则) ---
+            exC = C[ex_t][j]; usedC = ex_t; flagC = 0
+            if not (np.isfinite(exC) and exC > 0):
                 for k in range(ex_t+1, min(ex_t+6, T)):
-                    if np.isfinite(C[k][j]) and C[k][j] > 0: ex, used, flag = C[k][j], k, 1; break
+                    if np.isfinite(C[k][j]) and C[k][j] > 0: exC, usedC, flagC = C[k][j], k, 1; break
                 else:
-                    if P["WORST_CASE_WIPEOUT"]: ex, used, flag = 0.0, ex_t, 2
-            ret = -100.0 if ex == 0 else (ex*(1-P["COST_SIDE"])/(entry*(1+P["COST_SIDE"])) - 1)*100
+                    if P["WORST_CASE_WIPEOUT"]: exC, usedC, flagC = 0.0, ex_t, 2
+            # --- 主口径(v1.3): 止盈 +TP%, 不止损; 未达标 -> T+2 尾盘 ---
+            tp_lv = entry * (1.0 + P["TP"]); o2 = O[ex_t][j]; h2 = H[ex_t][j]
+            exT, usedT, flagT, tp_hit = exC, usedC, flagC, 0
+            if np.isfinite(h2) and h2 > 0 and np.isfinite(o2):
+                if o2 >= tp_lv: exT, usedT, flagT, tp_hit = o2, ex_t, 0, 1
+                elif h2 >= tp_lv: exT, usedT, flagT, tp_hit = tp_lv, ex_t, 0, 1
             settled.append(dict(signal_date=cal[t], sym=sym, gap_pct=round(float(g)*100,3),
-                entry_date=cal[t+1], entry_open=round(float(entry),4), exit_date=cal[used],
-                exit_px=round(float(ex),4), exit_flag=flag,
-                ret_pct=round(float(ret),4), real_fill_px=None, real_ret_pct=None))
+                entry_date=cal[t+1], entry_open=round(float(entry),4),
+                exit_date=cal[usedT], exit_px=round(float(exT),4), exit_flag=flagT, tp_hit=int(tp_hit),
+                ret_pct=round(float(_ret_of(entry, exT)),4),
+                close_exit_date=cal[usedC], close_exit_px=round(float(exC),4),
+                ret_pct_close=round(float(_ret_of(entry, exC)),4),
+                real_fill_px=None, real_ret_pct=None, order_size=None, auction_volume=None))
             have.add((cal[t], sym)); n_new += 1
     if n_new:
         with TRADES_F.open("w", encoding="utf-8") as fh:
@@ -156,12 +167,19 @@ def main():
     acc = dict(n=int(reps.size), mean_pct=round(float(reps.mean()),4) if reps.size else None,
                med_pct=round(float(np.median(reps)),4) if reps.size else None,
                wr_pct=round(float(100*(reps>0).mean()),2) if reps.size else None)
+    repsC = np.array([x.get("ret_pct_close", x["ret_pct"]) for x in settled], float)
+    accC = dict(n=int(repsC.size), mean_pct=round(float(repsC.mean()),4) if repsC.size else None,
+                med_pct=round(float(np.median(repsC)),4) if repsC.size else None,
+                wr_pct=round(float(100*(repsC>0).mean()),2) if repsC.size else None)
+    tpr = [x.get("tp_hit",0) for x in settled]
     gaps = {"n": (acc["n"] >= 300), "days": (len({x["signal_date"] for x in settled}) >= 120),
             "mean": bool(acc["mean_pct"] and acc["mean_pct"] > 0), "wr": bool(acc["wr_pct"] and acc["wr_pct"] >= 46),
             "med": bool(acc["med_pct"] and acc["med_pct"] > 0)}
     exec_dev = [ (x["real_fill_px"]/x["entry_open"]-1)*100 for x in settled if x.get("real_fill_px")]
     rep = dict(frozen_script_sha256=FROZEN_SHA, shadow_start=P["SHADOW_START"], last_data_date=last_cal,
-               n_pending=n_pending, acceptance=acc, gates=gaps,
+               exit_rule="v1.3 主口径: 止盈 +%.2f%% / 不止损 / 未达标 T+2 尾盘; 对照口径: 纯 T+2 尾盘" % (P["TP"]*100),
+               n_pending=n_pending, acceptance=acc, acceptance_close_only=accC,
+               tp_hit_pct=round(100*sum(tpr)/max(1,len(tpr)),1), gates=gaps,
                exec_dev_pct=dict(n=len(exec_dev), mean=round(float(np.mean(exec_dev)),4) if exec_dev else None),
                verdict="尚未开始（无已完成样本）" if acc["n"]==0 else ("继续观察" if not all(gaps.values()) else "四闸+样本量达标，可评估"))
     REPORT_F.write_text(json.dumps(rep, ensure_ascii=False, indent=1), encoding="utf-8")
