@@ -17,8 +17,8 @@
  "sim_rule": "预注册 §1.5–10：每日按复合分降序取前 K；单票 = min(前一日净值/KSLOT, 可用现金)；最多 KSLOT 只并发；同一标的持仓期内不重复买入；逐日收盘盯市；单边成本 COST_SIDE（买 entry×(1+c)、卖 exit×(1−c)）",
  "panel": {
   "T": 2852,
-  "N": 5460,
-  "names_loaded": 5460
+  "N": 5442,
+  "names_loaded": 5442
  },
  "variants": {
   "base": {
