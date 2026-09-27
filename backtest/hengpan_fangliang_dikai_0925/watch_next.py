@@ -101,6 +101,11 @@ assert Td in lut, "T=%s 不在交易日历内" % Td
 t = lut[Td]; next_td = cal[t+1] if t+1 < T else "(尚未发生)"
 print("信号日 T = %s  ->  买入日 T+1 = %s" % (Td, next_td))
 elig = VALID[t]&(NV[t]>=P["LISTED"])&(C[t]>=P["MINPX"])&np.isfinite(AMT20[t])&(AMT20[t]>=P["MINAMT"])&FILT(t)
+# 2026-09-27 用户要求：只买主板（与 oos_run.py v1.4 的 _MBUSE 同口径）
+_MB = np.array([(s_[:2] == "sh" and s_[2:5] in ("600", "601", "603", "605")) or
+                (s_[:2] == "sz" and s_[2:5] in ("000", "001", "002", "003"))
+                for s_ in syms], dtype=bool)
+elig = elig & _MB
 ix_all = np.nonzero(elig)[0]
 comp_all = zs(-np.log(AMT20[t][ix_all]))+zs(-np.log(VOLBR[t][ix_all]))+zs(-RET20[t][ix_all])
 df = pd.DataFrame(dict(sym=[syms[j] for j in ix_all], close=np.round(C[t][ix_all],3),

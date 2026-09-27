@@ -378,6 +378,15 @@ if not fails and not NO_MAIN_PUSH:   # ⑤ 云端 Phase 1：只写 gh-pages，�
                           "backtest/hpdk_oos_view.json",
                           "backtest/hpdk_bt_ref.json",
                           "_verify_hpdk_live.py",
+                          "backtest/hengpan_fangliang_dikai_0925/x3_board.py",
+                          "backtest/hengpan_fangliang_dikai_0925/universe_maint.py",
+                          "backtest/hengpan_fangliang_dikai_0925/watch_next.py",
+                          "backtest/hengpan_fangliang_dikai_0925/oos_run.py",
+                          "backtest/hengpan_fangliang_dikai_0925/evidence_board.json",
+                          "backtest/hengpan_fangliang_dikai_0925/oos_state.json",
+                          "backtest/hengpan_fangliang_dikai_0925/oos_report.json",
+                          "backtest/hengpan_fangliang_dikai_0925/oos_trades.jsonl",
+                          "backtest/wechat_hotspot_leader_0925/universe.json",
                           "docs/adr/0010-short-board-new-strategies-onboarding.md"],
                          cwd=str(BASE), capture_output=True)
     if git.returncode == 0:

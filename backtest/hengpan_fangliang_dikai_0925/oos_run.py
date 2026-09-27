@@ -11,7 +11,8 @@ DEAD = R/"backtest/_delisted_universe/delisted_bars.csv.gz"
 STATE_F = OUT/"oos_state.json"; TRADES_F = OUT/"oos_trades.jsonl"; REPORT_F = OUT/"oos_report.json"
 # ---- 冻结参数（不得修改）----
 P = dict(P1=0.01, P2=0.03, K=10, KSLOT=20, MINAMT=2e7, MINPX=3.0, LISTED=250, TP=0.02,
-         COST_SIDE=0.000346, SHADOW_START="2026-09-25", WORST_CASE_WIPEOUT=True)
+         COST_SIDE=0.000346, SHADOW_START="2026-09-25", WORST_CASE_WIPEOUT=True,
+         MAINBOARD=True)   # 2026-09-27 用户要求：只买主板（见 E-12）
 FROZEN_SHA = hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest()
 def log(*a): print(*a, flush=True)
 def load_universe():
@@ -95,12 +96,20 @@ def main():
         """返回可交易掩码: 非ST(期内代理+当前名) 且 股价>=3 且 每股净资产>=3(报告期+4个月后方可用)"""
         return (~STP[t]) & (~STNOW) & (C[t] >= 3.0) & np.isfinite(BPSA[t]) & (BPSA[t] >= 3.0)
 
+    # ---- 板块掩码（2026-09-27 用户要求「只买主板，其他板块去掉」）----
+    # 真主板 = sh600/601/603/605 + sz000/001/002/003
+    #   （剔创业板 sz300/301/302、科创板 sh688；北交所 bj* 本就已在池外）
+    _MB = np.array([(s_[:2] == "sh" and s_[2:5] in ("600", "601", "603", "605")) or
+                    (s_[:2] == "sz" and s_[2:5] in ("000", "001", "002", "003"))
+                    for s_ in syms], dtype=bool)
+    _MBUSE = _MB if P.get("MAINBOARD", True) else np.ones(N, dtype=bool)
+
     def zs(x):
         x = np.asarray(x, float); mu = np.nanmean(x); sd = np.nanstd(x)
         return (x-mu)/sd if np.isfinite(sd) and sd > 0 else np.zeros_like(x)
     def elig(t):
         return (VALID[t] & (NV[t] >= P["LISTED"]) & (C[t] >= P["MINPX"]) &
-                np.isfinite(AMT20[t]) & (AMT20[t] >= P["MINAMT"]) & FILT(t))
+                np.isfinite(AMT20[t]) & (AMT20[t] >= P["MINAMT"]) & FILT(t) & _MBUSE)
     def signal(t):
         b = elig(t); g = GAP[t]
         m = b & np.isfinite(g) & (g <= -P["P1"]) & (g >= -P["P2"]) & np.isfinite(RET20[t]) & np.isfinite(VOLBR[t])
