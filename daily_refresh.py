@@ -180,6 +180,9 @@ STEPS = [
     # 缓存落在系统临时目录（不污染仓库：A14 要求工作区无新增未跟踪文件）。--skip-hpdk 跳过。
     ("横盘低开-当日候选 hpdk_candidates[软]",
      ["backtest/hengpan_fangliang_dikai_0925/hpdk_candidates.py"], "--skip-hpdk" in sys.argv),
+    # 模拟盘账户 + 跟踪池（从冻结 OOS 台账派生；与台账对拍不一致会 exit 3）——同样必须在 build 之前。
+    ("横盘低开-模拟盘/跟踪池 hpdk_paper[软]",
+     ["backtest/hengpan_fangliang_dikai_0925/hpdk_paper.py"], "--skip-hpdkpaper" in sys.argv),
 
     ("看板重建 build_dual_system", ["build_dual_system.py"], False),
     ("部署 gh-pages", ["_deploy_fundline_0911.py"], "--skip-deploy" in sys.argv),
@@ -285,6 +288,8 @@ if not fails:
         ("backtest/hpdk_candidates.json", None, ("as_of",)),
         # OOS 台账投影的日期字段叫 last_scan_date（与 sentinel_state 同设计）
         ("backtest/hpdk_oos_view.json", None, ("last_scan_date",)),
+        # 模拟盘账户的日期字段 = 数据末日（as_of）
+        ("backtest/hpdk_paper.json", None, ("as_of",)),
     ]:
         _p = BASE / _rel
         if not _p.exists():
@@ -389,6 +394,8 @@ if not fails and not NO_MAIN_PUSH:   # ⑤ 云端 Phase 1：只写 gh-pages，�
                           "backtest/wechat_hotspot_leader_0925/universe.json",
                           "backtest/hengpan_fangliang_dikai_0925/x5_gates.py",
                           "backtest/hengpan_fangliang_dikai_0925/evidence_gates_scan.json",
+                          "backtest/hengpan_fangliang_dikai_0925/hpdk_paper.py",
+                          "backtest/hpdk_paper.json",
                           "backtest/hengpan_fangliang_dikai_0925/gen_gates_report.py",
                           "docs/adr/0010-short-board-new-strategies-onboarding.md"],
                          cwd=str(BASE), capture_output=True)

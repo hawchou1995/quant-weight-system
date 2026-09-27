@@ -77,6 +77,20 @@ def main():
         "5.12 表带 class=tbl（板内通用排序/搜索/筛选自动接管）")
     chk('id="hpdk-oos-card"' in html, "5.13 前向 OOS 进度卡")
     chk('id="hpdk-card"' in html, "5.14 策略主卡")
+    chk('id="hpdk-paper-card"' in html, "5.14b 模拟盘卡")
+    chk('id="hpdk-track-card"' in html, "5.14c 跟踪池卡")
+    chk('id="tbl-hpdk-track"' in html and 'id="tbl-hpdk-track-q"' in html
+        and 'id="tbl-hpdk-track-tier"' in html, "5.14d 跟踪池表 + 搜索 + 状态筛选")
+    _pk = R / "backtest/hpdk_paper.json"
+    chk(_pk.exists(), "5.14e 模拟盘产物在盘")
+    if _pk.exists():
+        import json as _j
+        _d = _j.loads(_pk.read_text(encoding="utf-8"))
+        chk(bool(_d.get("config")) and "account" in _d and "track" in _d,
+            "5.14f 产物含 config/account/track")
+        chk((_d.get("reconcile") or {}).get("mismatches") == [],
+            "5.14g 模拟盘与冻结台账零不一致",
+            str(len((_d.get("reconcile") or {}).get("mismatches") or [])))
     chk("window.HPDK = " in html and 'window.HPDK = null' not in html,
         "5.15 内嵌 window.HPDK payload")
     chk('"gap_lo"' in html and '"buy_date"' in html, "5.16 payload 含 gap_lo / buy_date")
@@ -106,7 +120,8 @@ def main():
            "backtest/hpdk_bt_ref.json"}
     reads = set(re.findall(r'"backtest"\s*/\s*"([^"]+)"', src_card)) | \
             set(re.findall(r'backtest/([A-Za-z0-9_\-]+\.(?:json|js|csv))', src_card))
-    cross = sorted(reads - {"hpdk_candidates.json", "hpdk_oos_view.json"})
+    cross = sorted(reads - {"hpdk_candidates.json", "hpdk_oos_view.json",
+                                "hpdk_paper.json"})
     chk(not cross, "7.1 hpdk_card.py 只读本策略自有产物", "越界=%s" % cross if cross else "")
     OTHER = ["backtest/qlch_candidates.json", "backtest/qlch_paper_state.json",
              "backtest/qlch_paper_state_b4_k3.json", "backtest/qlch_paper_state_b4_k3_mb.json",

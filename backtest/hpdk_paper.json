@@ -1,0 +1,53 @@
+{
+ "as_of": "2026-09-24",
+ "updated_at": "2026-09-27 13:02:50",
+ "frozen_script_sha256": "b3748ca36f83d70589a17cb9324b561a4bc52a26e59e39c60355fb32ea019225",
+ "config": {
+  "capital": 1000000.0,
+  "kslot": 4,
+  "cost_side": 0.000346,
+  "cost_rt_bp": 6.92,
+  "tp": 0.02,
+  "adv_frac": 0.01,
+  "mainboard": true,
+  "gap_band": [
+   -0.03,
+   -0.01
+  ],
+  "K": 10,
+  "shadow_start": "2026-09-25",
+  "exit_rule": "止盈 +2% ／ 未达标 T+2 尾盘"
+ },
+ "account": {
+  "nav": 1.0,
+  "nav_yuan": 1000000.0,
+  "capital": 1000000.0,
+  "ret_pct": 0.0,
+  "cash": 1000000.0,
+  "n_positions": 0,
+  "n_settled": 0,
+  "win_rate": null,
+  "mean_per_trade": null,
+  "med_per_trade": null,
+  "total_pnl": 0.0,
+  "nav_series_len": 0
+ },
+ "nav_daily": [],
+ "positions": [],
+ "settled": [],
+ "track": [],
+ "reconcile": {
+  "ledger_n": 0,
+  "replay_settleable": 0,
+  "mismatches": []
+ },
+ "pool_now": {
+  "as_of": "2026-09-24",
+  "buy_date": "2026-09-28",
+  "exit_date": "2026-09-29",
+  "n": 2212,
+  "boards": {
+   "主板": 2212
+  }
+ }
+}

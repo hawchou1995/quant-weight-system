@@ -58,7 +58,8 @@ ALLOWED_CARDS = {
     "st-stk": ["bt-short-stock-all", "bt-short-stock-main"],
     "st-fund": ["bt-short-fund"],
     "st-fund": ["bt-short-fund"],
-    "st-hpdk": ["bt-st-hpdk", "hpdk-card", "hpdk-oos-card"],
+    "st-hpdk": ["bt-st-hpdk", "hpdk-card", "hpdk-oos-card",
+                "hpdk-paper-card", "hpdk-track-card"],
 }
 fails, oks = [], []
 

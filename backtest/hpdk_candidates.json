@@ -3,7 +3,7 @@
  "buy_date": "2026-09-28",
  "exit_date": "2026-09-29",
  "calendar_fallback": false,
- "frozen_sha256": "4a6fe5f794ea0d1b50f4964a7a65f5702edc9dfc6b0606c7f3399b83d35d88e4",
+ "frozen_sha256": "b3748ca36f83d70589a17cb9324b561a4bc52a26e59e39c60355fb32ea019225",
  "params": {
   "P1": 0.01,
   "P2": 0.03,

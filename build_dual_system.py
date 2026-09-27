@@ -2982,6 +2982,14 @@ def hpdk_oos_card():
     return _HPDK.hpdk_oos_card(BASE)
 
 
+def hpdk_paper_card():
+    return _HPDK.hpdk_paper_card(BASE)
+
+
+def hpdk_track_card():
+    return _HPDK.hpdk_track_card(BASE)
+
+
 HP_HPDK_BT = _bt_ref_card("st-hpdk", "🎯 横盘低开·两日 · 回测参考",
                           "冻结 OOS 规格（K=10 / KSLOT=20 / 止盈+2% / 成本 6.92bp 往返）",
                           "backtest/hpdk_bt_ref.json",
@@ -3061,7 +3069,7 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
 {subview("st-qlch", "超跌低开低吸", "短期反转 + 跳空低吸 + 熊市择时 · 次日出场",
          qlch_card() + watch_card("st-qlch", "超跌低开低吸", "qlch", note=WATCH_NOTE_QLCH))}
 {subview("st-hpdk", "横盘低开·两日", "缩量超跌 + 次日低开低吸 + 固定持有 2 日 · 前向 OOS 冻结核验",
-         hpdk_card() + hpdk_oos_card())}
+         hpdk_card() + hpdk_paper_card() + hpdk_track_card() + hpdk_oos_card())}
 {subview("st-kh", "超卖伏击", "RSI 超卖 + 15 策略形态 · 标准/激进双轨",
          KH_HITS_CARD + KH_PAPER_CARD + watch_card("st-kh", "超卖伏击", "kh", note=WATCH_NOTE_KH))}
 {subview("st-etf", "ETF轮动", "20 日动量排名 · 目标权重为策略输出",

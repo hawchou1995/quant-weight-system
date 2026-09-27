@@ -1,7 +1,7 @@
 {
  "shadow_start": "2026-09-25",
  "last_scan_date": "2026-09-24",
- "frozen_script_sha256": "4a6fe5f794ea0d1b50f4964a7a65f5702edc9dfc6b0606c7f3399b83d35d88e4",
+ "frozen_script_sha256": "b3748ca36f83d70589a17cb9324b561a4bc52a26e59e39c60355fb32ea019225",
  "params": {
   "P1": 0.01,
   "P2": 0.03,
@@ -14,11 +14,14 @@
   "COST_SIDE": 0.000346,
   "SHADOW_START": "2026-09-25",
   "WORST_CASE_WIPEOUT": true,
-  "MAINBOARD": true
+  "MAINBOARD": true,
+  "VOLBR_MIN": 0.0,
+  "VOLBR_MAX": 1000000000.0,
+  "RR_MIN": 0.0
  },
  "names_loaded": 5442,
  "last_data_date": "2026-09-24",
  "n_settled": 0,
  "n_pending": 0,
- "updated_at": "2026-09-27 12:07:00"
+ "updated_at": "2026-09-27 12:56:08"
 }

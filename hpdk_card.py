@@ -271,3 +271,157 @@ def hpdk_oos_card(BASE):
         L.append('</tbody></table>')
     L.append('</div>')
     return "".join(L)
+
+
+def _hpdk_paper_read(BASE):
+    return _read(BASE / "backtest" / "hpdk_paper.json")
+
+
+def hpdk_paper_card(BASE):
+    """💼 模拟盘（前向账户）—— 只读 backtest/hpdk_paper.json（由 hpdk_paper.py 从冻结 OOS 台账派生）。"""
+    d = _hpdk_paper_read(BASE)
+    L = ['<div class="card" id="hpdk-paper-card">']
+    if not d:
+        L.append('<h2>💼 模拟盘 · 横盘低开·两日 <span class="view-badge auto">产物未生成</span></h2>'
+                 '<div class="sub" style="color:var(--faint)">跑 <code>'
+                 'backtest/hengpan_fangliang_dikai_0925/hpdk_paper.py</code> 写入 '
+                 '<code>backtest/hpdk_paper.json</code> 后本卡自动出现。</div></div>')
+        return "".join(L)
+    cfg = d.get("config") or {}
+    acc = d.get("account") or {}
+    rec = d.get("reconcile") or {}
+    started = (acc.get("n_settled") or 0) > 0 or (acc.get("n_positions") or 0) > 0
+    L.append('<h2>💼 模拟盘 · 横盘低开·两日 <span class="view-badge auto">%s</span></h2>'
+             % ("运行中 · as_of " + str(d.get("as_of")) if started
+                else "未开始（首个信号日 %s）" % cfg.get("shadow_start")))
+    L.append('<div class="sub"><b>口径（操作档，与「建议股数／单票可买」同源）</b>：'
+             '本金 <b>%.0f 万</b> · KSLOT <b>%s</b> · 单票 = min(前一日净值/KSLOT, 可用现金, 该股 20日均额×1%%) · '
+             '止盈 <b>+%.0f%%</b>（未达标 T+2 尾盘）· 成本 <b>%.2f bp</b> 往返 · 池 = <b>%s</b>'
+             '<br><b>台账来源</b>：冻结前瞻 OOS 台账 <code>oos_trades.jsonl</code>（脚本 SHA <code>%s…</code>）；'
+             '本卡由 <code>hpdk_paper.py</code> 重放派生，并与台账<b>对拍</b>：台账 <b>%s</b> 笔 / 重放可了结 '
+             '<b>%s</b> 笔 / 不一致 <b style="color:%s">%s</b> 项。</div>'
+             % ((cfg.get("capital", 0) or 0) / 1e4, cfg.get("kslot", "—"),
+                (cfg.get("tp", 0.02) or 0) * 100, cfg.get("cost_rt_bp", 0),
+                "主板（剔创业板/科创板）" if cfg.get("mainboard") else "全池",
+                (d.get("frozen_script_sha256") or "—")[:16],
+                rec.get("ledger_n", "—"), rec.get("replay_settleable", "—"),
+                "var(--down)" if rec.get("mismatches") else "var(--up)",
+                len(rec.get("mismatches") or [])))
+    band = []
+    for lbl, val, col in (("净值", "%.4f" % (acc.get("nav") or 1.0), None),
+                          ("累计收益", "%+.2f%%" % (acc.get("ret_pct") or 0.0),
+                           "var(--up)" if (acc.get("ret_pct") or 0) >= 0 else "var(--down)"),
+                          ("持有", "%s 只" % (acc.get("n_positions") or 0), None),
+                          ("已了结", "%s 笔" % (acc.get("n_settled") or 0), None),
+                          ("胜率", "%s%%" % acc["win_rate"] if acc.get("win_rate") is not None else "—", None),
+                          ("单笔净均", "%+.4f%%" % acc["mean_per_trade"] if acc.get("mean_per_trade") is not None else "—", None),
+                          ("单笔净中位", "%+.4f%%" % acc["med_per_trade"] if acc.get("med_per_trade") is not None else "—", None),
+                          ("累计盈亏", "{:+,.0f} 元".format(acc.get("total_pnl") or 0), None)):
+        st = ' style="color:%s"' % col if col else ""
+        band.append('<span><span style="color:var(--faint)">%s</span> <b%s>%s</b></span>' % (lbl, st, val))
+    L.append('<div class="sub" style="display:flex;gap:20px;flex-wrap:wrap;margin-top:8px">'
+             + "".join(band) + '</div>')
+    if not started:
+        L.append('<div class="sub" style="margin-top:8px;color:var(--warn)">'
+                 '<b>账户自 2026-09-28 起逐日累积</b>：该日收盘出信号 → 09-29 集合竞价买入 → 09-30 了结。'
+                 '在此之前净值为 1.0000、无持仓、无成交。'
+                 '<b>本策略的前向证据 = 冻结 OOS 台账</b>，本卡只是把台账按操作档本金记账后的钱账视图；'
+                 '投产判定请看上方「前向 OOS」卡。</div>')
+    tr = d.get("track") or []
+    st = [x for x in tr if x.get("state") == "已了结"]
+    if st:
+        L.append('<div class="etf-sec" style="margin-top:14px">已了结明细（最近 %d 笔）</div>' % min(len(st), 40))
+        L.append('<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-paper" style="width:100%;font-size:12px">'
+                 '<thead><tr><th>信号日</th><th>标的</th><th>买日</th><th style="text-align:right">买入价</th>'
+                 '<th>了结日</th><th style="text-align:right">卖出价</th><th style="text-align:right">净收益</th>'
+                 '<th style="text-align:right">股数</th><th style="text-align:right">分配额</th></tr></thead><tbody>')
+        for x in st[-40:]:
+            rc = "var(--up)" if (x.get("ret_pct") or 0) > 0 else "var(--down)"
+            L.append('<tr><td>%s</td><td>%s %s</td><td>%s</td><td style="text-align:right">%s</td>'
+                     '<td>%s</td><td style="text-align:right">%s</td>'
+                     '<td style="text-align:right;color:%s">%+.4f%%</td>'
+                     '<td style="text-align:right">%s</td><td style="text-align:right">%s</td></tr>'
+                     % (x.get("signal_date"), x.get("code"), x.get("name"), x.get("entry_date"),
+                        x.get("entry_open"), x.get("exit_date"), x.get("exit_px"), rc,
+                        x.get("ret_pct"), "{:,}".format(x.get("shares") or 0),
+                        "{:,.0f}".format(x.get("alloc") or 0)))
+        L.append('</tbody></table></div>')
+    L.append('</div>')
+    return "".join(L)
+
+
+def hpdk_track_card(BASE):
+    """👁 跟踪池 · 状态 = 待买入 / 持有中 / 已了结（只读 hpdk_paper.json）。"""
+    d = _hpdk_paper_read(BASE)
+    L = ['<div class="card" id="hpdk-track-card">']
+    if not d:
+        L.append('<h2>👁 跟踪池 · 横盘低开·两日</h2><div class="sub" style="color:var(--faint)">'
+                 '产物未生成（见模拟盘卡说明）</div></div>')
+        return "".join(L)
+    tr = d.get("track") or []
+    ho = [x for x in tr if x.get("state") == "持有中"]
+    se = [x for x in tr if x.get("state") == "已了结"]
+    pe = [x for x in tr if x.get("state") == "待判定"]
+    L.append('<h2>👁 跟踪池 · 横盘低开·两日 <span class="view-badge auto">影子跟踪 · 只记账不成交</span></h2>')
+    L.append('<div class="sub"><span class="badge badge-auto">持有中 %d</span> '
+             '<span class="badge badge-auto">已了结 %d</span> '
+             '<span class="badge badge-auto">待判定 %d</span>'
+             '<br><b>状态含义</b>：<b>待判定</b> = 信号日已过、买入日未到（09:25 用真实今开筛出低开 1~3%% 的子集后才定榜）；'
+             '<b>持有中</b> = 已按买入日开盘价成交、但还没到 T+2 了结日；<b>已了结</b> = 已出场（止盈或 T+2 尾盘）。'
+             '%s</div>'
+             % (len(ho), len(se), len(pe),
+                ("当前资格池：信号日 <b>%s</b> → 买日 <b>%s</b> → 了结日 <b>%s</b>，共 <b>%s</b> 只（"
+                 "<span style='color:var(--faint)'>这只是待筛选全体，不是买入名单</span>）"
+                 % ((d.get("pool_now") or {}).get("as_of"), (d.get("pool_now") or {}).get("buy_date"),
+                    (d.get("pool_now") or {}).get("exit_date"), (d.get("pool_now") or {}).get("n")))
+                if d.get("pool_now") else ""))
+    L.append('<div class="toolbar">'
+             '<input type="text" id="tbl-hpdk-track-q" placeholder="🔍 搜索名称 / 代码 / 板块…" '
+             'autocomplete="off" spellcheck="false">'
+             '<select id="tbl-hpdk-track-tier" class="flt" title="按状态筛选">'
+             '<option value="">全部状态</option><option value="hold">持有中</option>'
+             '<option value="settled">已了结</option><option value="pending">待判定</option></select>'
+             '<span class="count" id="tbl-hpdk-track-count"></span></div>')
+    L.append('<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-track" style="width:100%;font-size:12px">'
+             '<thead><tr><th data-key="state">状态</th><th data-key="sig">信号日</th>'
+             '<th data-key="name">标的</th><th data-key="board">板块</th><th data-key="ind">行业</th>'
+             '<th data-key="gap" style="text-align:right">低开</th>'
+             '<th data-key="ed">买日</th><th data-key="epx" style="text-align:right">买入价</th>'
+             '<th data-key="xd">了结日</th><th data-key="xpx" style="text-align:right">卖出价</th>'
+             '<th data-key="ret" style="text-align:right">净收益</th>'
+             '<th data-key="qty" style="text-align:right">建议股数</th>'
+             '</tr></thead><tbody>')
+    TIER = {"持有中": "hold", "已了结": "settled", "待判定": "pending"}
+    if not tr:
+        L.append('<tr><td colspan="12" style="text-align:center;color:var(--faint)">'
+                 '跟踪池为空 —— 首个信号日 <b>2026-09-28</b>，首批买入 09-29，首批了结 09-30；'
+                 '本表随日链自动填充。</td></tr>')
+    for x in tr:
+        stt = x.get("state")
+        col = {"持有中": "var(--warn)", "已了结": "var(--faint)", "待判定": "var(--sub)"}.get(stt, "")
+        gap = x.get("gap")
+        L.append('<tr data-tier="%s" data-code="%s" data-search="%s">'
+                 '<td data-key="state" style="color:%s">%s</td>'
+                 '<td data-key="sig">%s</td><td data-key="name">%s %s</td>'
+                 '<td data-key="board">%s</td><td data-key="ind" style="color:var(--sub)">%s</td>'
+                 '<td data-key="gap" style="text-align:right">%s</td>'
+                 '<td data-key="ed">%s</td><td data-key="epx" style="text-align:right">%s</td>'
+                 '<td data-key="xd">%s</td><td data-key="xpx" style="text-align:right">%s</td>'
+                 '<td data-key="ret" style="text-align:right">%s</td>'
+                 '<td data-key="qty" style="text-align:right">%s</td></tr>'
+                 % (TIER.get(stt, ""), x.get("code") or "",
+                    " ".join([str(x.get("name") or ""), str(x.get("code") or ""),
+                              str(x.get("board") or "")]).strip(),
+                    col, stt, x.get("signal_date") or "—", x.get("code") or "", x.get("name") or "",
+                    x.get("board") or "—", x.get("ind") or "—",
+                    ("%+.2f%%" % gap) if gap is not None else "—",
+                    x.get("entry_date") or "—",
+                    ("%.3f" % x["entry_open"]) if x.get("entry_open") else "—",
+                    x.get("exit_date") or ("待 T+2" if stt == "持有中" else "—"),
+                    ("%.3f" % x["exit_px"]) if x.get("exit_px") else "—",
+                    ("%+.4f%%" % x["ret_pct"]) if x.get("ret_pct") is not None else "—",
+                    "{:,}".format(x.get("shares") or 0)))
+    L.append('</tbody></table></div>')
+    L.append('</div>')
+    return "".join(L)
+
