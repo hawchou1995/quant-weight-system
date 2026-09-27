@@ -97,8 +97,25 @@ def zs(x):
     return (x - mu) / sd if np.isfinite(sd) and sd > 0 else np.zeros_like(x)
 
 def next_trade_days(after, n=2):
-    """返回 after 之后的 n 个交易日。优先权威日历 ak.tool_trade_date_hist_sina()；
-    取不到（离线）则退回「跳周末」近似，并把 fallback 标记写进产物供看板披露。"""
+    """返回 after 之后的 n 个交易日。优先级：
+      ① **仓库内置日历** trade_cal_sina.csv（由 gen_trade_cal.py 从 akshare 生成，含未来日期）
+         —— 离线可用；云端不依赖联网即可跨过中秋/国庆等休市窗口；
+      ② akshare 权威日历（内置文件过期时兜底）；
+      ③ 「跳周末」近似（并把 fallback 标记写进产物供看板披露）。
+    2026-09-27 加固原因：原实现只靠 ②，云端一旦取不到就会把 2026-09-24 的次一交易日算成
+    09-25（实为中秋休市），买日/了结日全错。"""
+    _f = R / "trade_cal_sina.csv"
+    if _f.exists():
+        try:
+            _ds = [ln.split(",")[0].strip() for ln in
+                   _f.read_text(encoding="utf-8-sig").splitlines()[1:] if ln.strip()]
+            _ds = [d for d in _ds if len(d) >= 10]
+            _nxt = [d for d in _ds if d > after][:n]
+            if len(_nxt) == n:
+                return _nxt, False
+            log("[warn] 内置日历不含 %s 之后 %d 个交易日（文件过期？跑 gen_trade_cal.py 刷新）" % (after, n))
+        except Exception as e:
+            log("[warn] 内置交易日历读失败：%r" % (e,))
     try:
         import akshare as ak
         t = ak.tool_trade_date_hist_sina()

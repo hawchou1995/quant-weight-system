@@ -255,6 +255,37 @@ def main() -> int:
         emit(publish="false", status="no-new-data", live_url=LIVE_BASE)
         return 0
 
+    # ---------- 4b 新策略产物新鲜度（**软检查**：只告警 + 记进清单，不阻断发布）----------
+    # 语义同 SYNC_SOFT：新策略一次偶发失败不得阻断整条云端发布；但必须**可见** ——
+    # 否则会静默发布一个「横盘低开」卡片显示「产物未生成」的页面，而无人察觉。
+    hpdk = {}
+    _expect = None
+    try:
+        for _ln in (REPO / "index_000300.csv").read_text(encoding="utf-8-sig").splitlines():
+            _q = _ln.split(",")[0].strip()
+            if len(_q) >= 10 and _q[:4].isdigit():
+                _expect = _q
+    except Exception:
+        _expect = None
+    for _rel, _keys in (("backtest/hpdk_candidates.json", ("as_of",)),
+                        ("backtest/hpdk_paper.json", ("as_of",)),
+                        ("backtest/hpdk_oos_view.json", ("last_scan_date",))):
+        _p = REPO / _rel
+        if not _p.exists():
+            hpdk[_rel] = "missing"
+            continue
+        try:
+            _d = json.loads(_p.read_text(encoding="utf-8"))
+        except Exception as _e:
+            hpdk[_rel] = "unparsable:%s" % type(_e).__name__
+            continue
+        _got = next((_d.get(k) for k in _keys if _d.get(k) is not None), None)
+        hpdk[_rel] = "ok" if (_expect and str(_got) == _expect) else "stale(%s!=%s)" % (_got, _expect)
+    _bad = {k: v for k, v in hpdk.items() if v != "ok"}
+    for _k, _v in _bad.items():
+        log(f"::warning::新策略产物不新鲜 {_k} = {_v}")
+    log(f"{'✅' if not _bad else '⚠'} 新策略产物新鲜度（软，不阻断）：{hpdk} · 期望 {_expect}")
+
     # ---------- 5 组装 staging ----------
     if STAGING.exists():
         shutil.rmtree(STAGING)
@@ -279,6 +310,7 @@ def main() -> int:
         "ts_cn": datetime.now().strftime("%Y-%m-%d %H:%M:%S") if not a.no_live_check else "n/a",
         "today_cn": today, "chain_rc": chain_rc, "g2_fresh": fresh,
         "runtime_deps": deps, "skipped_newer": skipped_newer, "files": files,
+        "hpdk_fresh": hpdk, "hpdk_expect": _expect,
     }
     (STAGING / "_cloud_manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
