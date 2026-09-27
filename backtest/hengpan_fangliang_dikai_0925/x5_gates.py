@@ -11,7 +11,9 @@
   盈亏比 RR   = P["TP"] / ATR20%                       （止盈距离 ÷ 20 日平均真实波幅占收盘比）
   止盈 +2% ⇒ RR = 2% / ATR20% ；ATR20 越大 ⇒ RR 越小（波动越大越难在 2 日内到达 +2%）
 
-基线等价性：base 臂读数必须与 v1.4（未加门槛时）逐位相同，否则视为口径漂移，脚本非零退出。
+基线等价性：base 臂读数必须与**当前冻结口径**（v1.5 参数 + 2026-09-27 T+0 资金时序修正，勘误 E-15）
+逐位相同，否则视为口径漂移，脚本非零退出。E-15 前的基线读数为 ann=+47.77 / mdd=-29.13 / sharpe=2.12
+（全窗）与 ann=+64.24 / mdd=-29.13 / sharpe=2.44（2018+），见报告 §勘误。
 
 用法: python x5_gates.py [--cache DIR]
 """
@@ -22,8 +24,10 @@ OUT = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(OUT))
 import x2_sens as X                                     # noqa: E402
 
-V4_BASE_ALL = dict(ann=47.77, mdd=-29.13, sharpe=2.12, n_trades=23759, mean_per_trade=0.4028, win_rate=60.63)
-V4_BASE_2018 = dict(ann=64.24, mdd=-29.13, sharpe=2.44, n_trades=21146, mean_per_trade=0.4264, win_rate=60.71)
+# E-15 前（旧序，含同日资金重复使用）：ann=47.77, mdd=-29.13, sharpe=2.12
+V4_BASE_ALL = dict(ann=47.17, mdd=-26.81, sharpe=2.19, n_trades=23759, mean_per_trade=0.4028, win_rate=60.63)
+# E-15 前（旧序）：ann=64.24, mdd=-29.13, sharpe=2.44
+V4_BASE_2018 = dict(ann=63.86, mdd=-26.81, sharpe=2.54, n_trades=21146, mean_per_trade=0.4264, win_rate=60.71)
 
 ARMS = [("base 基线(无门槛)", {})]
 for v in (0.5, 0.8, 1.0, 1.2, 1.5):

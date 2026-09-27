@@ -20,6 +20,9 @@
   · 每个信号日按复合分降序取前 K 只；单票分配 = min(前一日净值 / KSLOT, 可用现金)
   · 最多同时持有 KSLOT 只；同一标的持仓期内不重复买入
   · 净值 = 现金 + Σ 持仓×当日收盘（逐日盯市）；出场日按实际出场价结算
+  · **资金时序（2026-09-27 修正，E-15）**：同一交易日内「先入场（09:25，只能用开盘前已有现金）
+    → 后出场（15:00 收盘结算）」；修正前为「先出场→再入场」，等于同一笔资本在同一天被使用两次，
+    对高资金占用档（低 KSLOT）显著高估收益。缺陷顺序保留为 order="exit_first" 仅供审计复现。
   · 成本：单边 COST_SIDE（买入 entry×(1+c)，卖出 exit×(1−c)）
   · 另报**资金占用率**（Σ持仓市值 / 净值 的日均值）——冻结规格 KSLOT=20 而实际并发仅约 10 只，
     故占用率是本策略读数必须随报表披露的口径。
@@ -102,7 +105,12 @@ def run_variant(mod, cache, cal, F, done, tag, overrides=None, mutate=None):
     return recs, P
 
 
-def sim_portfolio(recs, cal, syms, F, K, KSLOT, cost_side, start=None):
+def sim_portfolio(recs, cal, syms, F, K, KSLOT, cost_side, start=None, order="entry_first"):
+    """组合记账（预注册 §1.5–10）。order 指定**同一交易日内的资金时序**：
+      · "entry_first"（默认，正确口径）：09:25 先入场（只能用开盘前已有现金）→ 15:00 后出场结算；
+      · "exit_first"（2026-09-27 前的缺陷实现，仅供审计复现，见 E-15）：先出场再入场
+        ⇒ 同一笔资本在同一天被使用两次（用当天尚未卖出的持仓资金建仓）。
+    """
     T = len(cal)
     jof = {s: j for j, s in enumerate(syms)}
     C = F["C"]
@@ -112,29 +120,42 @@ def sim_portfolio(recs, cal, syms, F, K, KSLOT, cost_side, start=None):
     nav = np.full(T, np.nan)
     depl = np.full(T, np.nan)
     cash, pos, n_in = 1.0, [], 0
-    for t in range(T):
-        d = cal[t]
-        for p in list(pos):                          # 1) 出场（收盘价结算）
+    def do_entry(t, d):                              # 入场（09:25，只能用开盘前已有现金）
+        nonlocal cash, n_in
+        if not (start is None or d >= start):
+            return
+        for r in by_entry.get(d, [])[:K]:            # recs 顺序 = 复合分降序
+            if len(pos) >= KSLOT:
+                break
+            if any(q["sym"] == r["sym"] for q in pos):
+                continue                              # 同一标的持仓期内不重复买入
+            navprev = nav[t - 1] if (t > 0 and np.isfinite(nav[t - 1])) else 1.0
+            alloc = min(navprev / KSLOT, cash)
+            if alloc <= 1e-12:
+                break
+            px = r["entry_open"]
+            if not (np.isfinite(px) and px > 0):
+                continue
+            cash -= alloc
+            pos.append(dict(sym=r["sym"], shares=alloc / (px * (1.0 + cost_side)),
+                            entry_px=px, exit_date=r["exit_date"], exit_px=r["exit_px"]))
+            n_in += 1
+
+    def do_exit(d):                                  # 出场（15:00 收盘价结算）
+        nonlocal cash
+        for p in list(pos):
             if p["exit_date"] == d:
                 cash += p["shares"] * p["exit_px"] * (1.0 - cost_side)
                 pos.remove(p)
-        if start is None or d >= start:              # 2) 入场
-            for r in by_entry.get(d, [])[:K]:
-                if len(pos) >= KSLOT:
-                    break
-                if any(q["sym"] == r["sym"] for q in pos):
-                    continue                          # 同一标的持仓期内不重复买入
-                navprev = nav[t - 1] if (t > 0 and np.isfinite(nav[t - 1])) else 1.0
-                alloc = min(navprev / KSLOT, cash)
-                if alloc <= 1e-12:
-                    break
-                px = r["entry_open"]
-                if not (np.isfinite(px) and px > 0):
-                    continue
-                cash -= alloc
-                pos.append(dict(sym=r["sym"], shares=alloc / (px * (1.0 + cost_side)),
-                                entry_px=px, exit_date=r["exit_date"], exit_px=r["exit_px"]))
-                n_in += 1
+
+    for t in range(T):
+        d = cal[t]
+        if order == "entry_first":                   # 正确：先入场（09:25）→ 后出场（15:00）
+            do_entry(t, d)
+            do_exit(d)
+        else:                                        # 缺陷顺序（仅供审计复现，见 E-15）
+            do_exit(d)
+            do_entry(t, d)
         mv = 0.0                                     # 3) 盯市
         for p in pos:
             j = jof.get(p["sym"]); c = C[t, j] if j is not None else np.nan
@@ -240,7 +261,13 @@ def main():
     payload = dict(frozen_script_sha256=sha, base_params=BASE_P, ann_factor=ANN,
                    sim_rule=("预注册 §1.5–10：每日按复合分降序取前 K；单票 = min(前一日净值/KSLOT, 可用现金)；"
                              "最多 KSLOT 只并发；同一标的持仓期内不重复买入；逐日收盘盯市；"
-                             "单边成本 COST_SIDE（买 entry×(1+c)、卖 exit×(1−c)）"),
+                             "单边成本 COST_SIDE（买 entry×(1+c)、卖 exit×(1−c)）；"
+
+
+
+                             "资金时序 = 先入场（09:25，用开盘前现金）→ 后出场（15:00）"
+
+                             "（2026-09-27 修正 T+0 资金时序，见勘误 E-15；旧实现为先出场后入场）"),
                    panel=dict(T=int(F["C"].shape[0]), N=int(F["C"].shape[1]), names_loaded=done),
                    variants=res, subwindow_2018=sub)
     (outdir / "evidence_sensitivity.json").write_text(json.dumps(payload, ensure_ascii=False, indent=1),
@@ -249,6 +276,20 @@ def main():
     # ---- 看板「回测参考卡」主指标带读数（_bt_ref_card 读的字段名）----
     bs = sub.get("base") or {}
     if bs:
+        yb_ = bs.get("yearly") or {}
+        def seg_ann(years):
+            tt, nn = 1.0, 0
+            for y in years:
+                if y in yb_ and yb_[y] is not None:
+                    tt *= (1 + yb_[y] / 100.0); nn += 1
+            return ((tt ** (1.0 / nn)) - 1) * 100 if nn else 0.0
+        pv0 = res["base"]["metrics"]["ann"]
+        pv1 = res["P1_0.005"]["metrics"]["ann"]
+        pv2 = res["P1_0.02"]["metrics"]["ann"]
+        lag = res["lag_VA"]["metrics"]["ann"]
+        fwd = res["fwd_VA"]["metrics"]["ann"]
+        t1821 = seg_ann(["2018", "2019", "2020", "2021"])
+        t2226 = seg_ann(["2022", "2023", "2024", "2025", "2026"])
         tot = 1.0
         for v in (bs.get("yearly") or {}).values():
             tot *= (1 + v / 100.0)
@@ -260,32 +301,37 @@ def main():
             total_return=round((tot - 1) * 100, 2), sharpe=bs["sharpe"], n_trades=bs["n_trades"],
             note=(
                 f"口径 = 冻结 OOS 规格：**只买主板**（sh600/601/603/605 ＋ sz000/001/002/003）/ K=10 / KSLOT=20 / "
-                f"止盈+2%（未达标 T+2 尾盘）/ 成本 6.92bp 往返 / 全池含 253 只退市股。"
-                f"**资金占用率仅 {bs.get('deploy_pct', 0.0):.1f}%** —— 每日实际只有约 10 只并发（买 T+1、卖 T+2），"
-                f"而 KSLOT=20 ⇒ 每只只分配到净值的 1/20。**KSLOT 是杠杆旋钮而非 alpha**：笔数/胜率/单笔中位随 KSLOT "
-                f"完全不变，只有年化随占用率单调变化（KSLOT=4 ⇒ 占用 84.0% ⇒ 全窗年化 +189.75%；KSLOT=20 ⇒ +47.77%）。"
+                f"止盈+2%（未达标 T+2 尾盘）/ 成本 6.92bp 往返 / 池 = 现存 5,189 ＋ 退市 253 = 5,442（含退市股）。"
+                f"**资金时序（2026-09-27 修正，勘误 E-15）**：同一交易日内 = 先入场（09:25，只能用开盘前已有现金）"
+                f"→ 后出场（15:00 收盘结算）；旧实现为「先出场→再入场」，等于用当天尚未卖出的持仓资金建仓，"
+                f"**同一笔资本在同一天被使用两次**。修正后：全窗年化 +47.17%（旧序 +47.77%）、最大回撤 -26.81%"
+                f"（旧序 −29.13%）、夏普 2.19。低 KSLOT 档被高估得多得多（KSLOT=4 全窗 +189.75% → +76.61%）。"
+                f"**KSLOT 是集中度旋钮而非杠杆**：笔数 / 胜率 / 单笔净均 / 单笔中位随 KSLOT 完全不变（选股完全相同），"
+                f"变的只是单票权重（KSLOT=4 ⇒ 1/4；KSLOT=20 ⇒ 1/20）；修正后两档资金占用已接近（42.8% vs {bs.get('deploy_pct', 0.0):.1f}%）。"
+                f"集中在前 4 名把全窗年化从 +47.17% 抬到 +76.61%，代价是回撤从 -26.81% 放大到 -33.63%（夏普 2.29）。"
                 f"**年化不可线性外推**：单票 ≤ 该股 ADV×1% ⇒ 账户容量约 101 万元。"
+                f"**10 万本金口径**（整手 100 股 ＋ 买卖两端最低佣金 5 元/笔）：KSLOT=20 ⇒ 全窗 +40.77%/年、"
+                f"KSLOT=4 ⇒ +49.09%/年（val 2022+ 段 +91.72%）；10 万不受容量约束（ADV 上限仅偶发触发）。"
                 f"**板块限定的代价（用户 2026-09-27 决定只买主板）**：同一面板、同一记账规则下全池 vs 主板 —— "
-                f"全窗年化 +72.59% vs +47.77%（**−24.82pp**）、夏普 2.79 vs 2.12、最大回撤 −32.29% vs **−29.13%（改善 3.16pp）**、"
-                f"净胜率 63.14% vs 60.63%、单笔净均 +0.5574% vs +0.4028%；2018+ 年化 +105.38% vs +64.24%。"
+                f"全窗年化 +69.37% vs +47.17%（**22.20pp**）、夏普 2.79 vs 2.19、"
+                f"最大回撤 -28.88% vs **-26.81%（改善 -2.07pp）**、净胜率 63.14% vs 60.63%、"
+                f"单笔净均 +0.5574% vs +0.4028%；2018+ 年化 +101.16% vs +63.86%。"
                 f"选股集合仅 **55.5% 重合**（Jaccard 0.384）—— 横截面 z 在候选池内标准化，缩池后标准分整体改变。"
-                f"**结论：主板限定是用年化换回撤，风险调整后更差（夏普 −0.67）。**逐项读数见 evidence_board.json。"
-                f"**参数敏感性**：P1（低开下限）是唯一窄甜点（全池口径 0.5%→+60.35% / 1%→+72.59% / 2%→+24.95%）；"
-                f"其余参数单调或不敏感，逐项见 evidence_sensitivity.json。"
-                f"**未来函数**：量能特征滞后 1 日与取未来 1 日**均低于现值**、降幅方向对称 ⇒ 否证而非嫌疑"
-                f"（逐值见 evidence_sensitivity.json 的 lag_VA / fwd_VA）。"
-                f"**幸存者偏差**：已含 253 只退市股（不含时年化虚高 15.15pp）。"
-                f"**数据源口径**：双源交叉（新浪 vs 腾讯，19,813 对）>5% 分歧 0.000%、>0.5% 为 5.189%；"
-                f"偏差为**单边台阶**（前复权因子史差异），单只最差 ≤1.95%。**残留风险**：该差异时变、会在跳变日注入伪收益；"
-                f"本策略只用比率（C[t]/C[t−20]、O[t+1]/C[t]），常数级水平差相消，故未触发熔断，但无法靠双源交叉消除。"
-                f"**股票池**：2026-09-27 维护后 现存 5,189 ＋ 退市 253 = **5,442**（唯一标的数 = 面板列数）。"
-                f"**⚠ 时段依赖（2026-09-27 证伪测试新增披露）**：本卡 2018+ 年化被**训练段占据**。"
-                f"分窗实测（带内池 350,394 笔 / 2,119 天）：train 2018-2021 低开池均值 +0.163%/日、复合分前 10 +0.469%/日"
-                f"（选股额外 +0.298pp）；val 2022-2026 低开池均值 **−0.004%/日（裸「低开反弹」已归零）**、"
-                f"复合分前 10 +0.309%/日（选股额外 **+0.329pp，未衰减**）。⇒ 收益已**全部来自选股**"
-                f"（缩量＋低成交额＋超跌）；分窗 NAV 复合 train≈+74%/年、val≈+50~56%/年。"
-                f"**前瞻预期请锚定 val ≈ +50%/年，不要用本卡的 2018+ 全窗年化。**"
-                f"详见 backtest/报告-证伪-横盘低开百分百多年化-20260927.md。"
+                f"**结论：主板限定是用年化换回撤，风险调整后更差（夏普 0.60）。**逐项读数见 evidence_t0_audit.json。"
+                f"**参数敏感性**（同一次运行、同一口径，全窗）：P1（低开下限）是唯一窄甜点（0.5%→{pv1:+.2f}% / "
+                f"1%→{pv0:+.2f}% / 2%→{pv2:+.2f}%）；其余参数单调或不敏感，逐项见 evidence_sensitivity.json。"
+                f"**未来函数**：量能特征滞后 1 日 {lag:+.2f}%、取未来 1 日 {fwd:+.2f}%，**均低于现值 {pv0:+.2f}%**、"
+                f"降幅方向对称 ⇒ 否证而非嫌疑。**幸存者偏差**：已含 253 只退市股（不含时年化虚高 15.15pp）。"
+                f"**数据源口径**：双源交叉（新浪 vs 腾讯，19,813 对）>5% 分歧 0.000%、>0.5% 为 5.189%；偏差为**单边台阶**"
+                f"（前复权因子史差异），单只最差 ≤1.95%。**残留风险**：该差异时变、会在跳变日注入伪收益；本策略只用比率"
+                f"（C[t]/C[t−20]、O[t+1]/C[t]），常数级水平差相消，故未触发熔断，但无法靠双源交叉消除。"
+                f"**⚠ 时段依赖（2026-09-27 证伪测试披露）**：本卡 2018+ 年化被**训练段占据**。分窗实测（带内池 350,394 笔 / "
+                f"2,119 天，选股增量不受资金时序影响）：train 2018-2021 复合分前 10 +0.469%/日（选股额外 +0.298pp）；"
+                f"val 2022-2026 低开池均值 **−0.004%/日（裸「低开反弹」已归零）**、复合分前 10 +0.309%/日（选股额外 "
+                f"**+0.329pp，未衰减**）⇒ 收益已**全部来自选股**（缩量＋低成交额＋超跌）。"
+                f"修正后同口径分窗组合读数（主板 KSLOT=20）：2018-2021 段 {t1821:+.2f}%/年、2022-2026 段 {t2226:+.2f}%/年。"
+                f"**前瞻预期请锚定 val 段 {t2226:+.2f}%/年（旧序读数为 +50~56%）**，不要用全窗或本卡的 2018+ 年化。"
+                f"详见 backtest/报告-缺陷-T+0资金时序-20260927.md。"
                 f"**前向 OOS 尚未开始**（首个信号日 2026-09-28），本卡为样本内读数，**不构成投产依据**。"
             ))
         (R / "backtest" / "hpdk_bt_ref.json").write_text(
