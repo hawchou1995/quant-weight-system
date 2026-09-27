@@ -1187,7 +1187,7 @@ HPDK_JS = r"""
     AUC_MIN: 9 * 60 + 15,                      /* 09:15 集合竞价开始（只灰标，不剔除） */
     OPEN_MIN: 9 * 60 + 25,                     /* 09:25 集合竞价撮合：出现第一笔真实今开 */
     ADV_FRAC: 0.01,                            /* 单票上限 = 该股 20 日均额 × 1%（= 生产者 ADV_FRAC） */
-    HDR_EVENT: ['事件标签', '事件', '买点', '信号'],
+    HDR_EVENT: ['状态', '事件标签', '事件', '买点', '信号'],   /* 2026-09-27 新增「状态」列 */
     HDR_BUY: ['买入价', '买价'],
     HDR_TP: ['止盈价', '止盈'],
     HDR_QTY: ['建议股数', '股数', '委托股数'],
@@ -1367,6 +1367,11 @@ HPDK_JS = r"""
     if (prepend && td.firstChild) td.insertBefore(sp, td.firstChild);
     else td.appendChild(sp);
     return sp;
+  }
+  /* 2026-09-27：行内标记统一入口 —— 有「状态」列就写列里（标的格保持干净），否则退回行内标签 */
+  function tagInto(tr, txt, cls, tip){
+    if (colOf('event') >= 0) return writeCell(tr, 'event', txt, tip, null);
+    return tagTo(tr, 'name', txt, cls, tip, true);
   }
   function stripTags(tr){
     var ts = tr.querySelectorAll('.hpdk-tag'), i;
@@ -1557,12 +1562,16 @@ HPDK_JS = r"""
               + ' · 单票分配 ' + alloc.toFixed(0) + ' 元（min(本金/KSLOT=' + slot.toFixed(0) + ', ADV×1%=' + capv.toFixed(0) + ')）'
               + ' · 买日 ' + (buy || '—') + '；' + CFG.TIP;
       var lab = '\u2705 今日买入候选 #' + rank;
-      if (colOf('event') >= 0) writeCell(it.tr, 'event', lab, tip, null);
-      else tagTo(it.tr, 'name', lab, 'buy', tip, true);
+      tagInto(it.tr, lab, 'buy', tip);
       if (colOf('buy') >= 0) writeCell(it.tr, 'buy', opn.toFixed(3), tip, opn);
       if (colOf('tp') >= 0) writeCell(it.tr, 'tp', tpPx.toFixed(3), tip, Math.round(tpPx * 1000) / 1000);
       if (colOf('qty') >= 0) writeCell(it.tr, 'qty', fmtQty(qty), tip, qty);
-      if (colOf('cap') >= 0) writeCell(it.tr, 'cap', limited ? '⚠ 受 ADV×1% 限' : '未触限', tip, limited ? 0 : 1);
+      if (colOf('cap') >= 0) writeCell(it.tr, 'cap', limited ? ('限至 ' + fmtWan(capv)) : '足额',
+        '单票可买 = min(本金/KSLOT, 该股 20日均额×1%)。' + (limited
+          ? '**标「限」不是不能买**：该股流动性只装得下 ' + fmtWan(capv) + '，装不满计划额 '
+            + fmtWan(slot) + '，所以少买一点 —— 「建议股数」已按缩小后的规模折算好。'
+          : '该股 20日均额×1% = ' + fmtWan(capv) + ' ≥ 计划额 ' + fmtWan(slot) + '，可按计划额足额买入。')
+        + '；' + CFG.TIP, limited ? 0 : 1);
       it.tr.classList.add('hpdk-buy');
       it.tr.setAttribute('data-hpdk', 'buy#' + rank);
       if (!rec[it.code]) {
@@ -1574,12 +1583,12 @@ HPDK_JS = r"""
     for (i = K; i < keepRank.length; i++) {
       var it2 = keepRank[i];
       it2.tr.classList.add('hpdk-keep');
-      tagTo(it2.tr, 'name', '留存 · F 第 ' + (i + 1) + ' 位', 'keep',
+      tagInto(it2.tr, '留存 · F 第 ' + (i + 1) + ' 位', 'keep',
             'F = ' + it2.F.toFixed(3) + '，排名在 k=' + K + ' 之后：本日不买，仍留在清单里。' + CFG.TIP, true);
     }
     /* ⑥ 判定不明的行（本次报价缺失该码）：保守留存 + 灰标签（绝不因「没数据」剔除） */
     for (i = 0; i < keepNa.length; i++)
-      tagTo(keepNa[i].tr, 'name', '待行情（保守留存）', 'pre',
+      tagInto(keepNa[i].tr, '待行情（保守留存）', 'pre',
             '本次报价缺该码 → 不剔除（宁可漏剔，不可误剔）。' + CFG.TIP, true);
     S.kept = keepRank.length + keepNa.length;
     S.hit = top.length;
@@ -1595,18 +1604,17 @@ HPDK_JS = r"""
       var anchor = hr;
       for (i = 0; i < top.length; i++) { body.insertBefore(top[i].tr, anchor.nextSibling); anchor = top[i].tr; }
     }
-    /* ⑧ 非判定时段：只挂灰标（一行都不剔除）—— 竞价 09:15–09:24 显示竞价预判 gap */
-    if (live && !enforce) {
-      var tip0 = CFG.TIP + ' · 非判定时段：**不剔除任何标的**。'
-               + (buy ? ('买日 ' + buy + '，09:25 起用真实今开判定。') : '');
+    /* ⑧ 非判定时段：一行都不剔除。**只有集合竞价 09:15–09:24 挂逐行灰标**（那时 gap 预判有信息量）；
+       盘前 / 非买日 / 买日已过 / 无行情 → **不挂任何逐行标签**，相位一律由卡头徽章表达。
+       2026-09-27 用户反馈：在「标的」格里每行重复「非买日」很蠢 ⇒ 改为只在有信息量时标记，
+       并把标记写进「状态」列（标的格保持干净）。 */
+    if (live && !enforce && S.phase === 'auction') {
+      var tip0 = CFG.TIP + ' · 集合竞价预判：以竞价参考价 px/昨收−1 估算，**不剔除任何标的**；'
+               + '09:25 起用真实今开判定。' + (buy ? ('买日 ' + buy + '。') : '');
       for (i = 0; i < pend.length; i++) {
-        var d2 = q[pend[i].code] || {}, px2 = num(d2.px), pcl2 = num(d2.pcl), t2;
-        if (S.phase === 'auction')     t2 = '竞价预判 ' + fmtPct((px2 > 0 && pcl2 > 0) ? (px2 / pcl2 - 1) : NaN);
-        else if (S.phase === 'pre')    t2 = '待今开判定（09:25 起）';
-        else if (S.phase === 'past')   t2 = '买日已过（' + (buy || '—') + '）';
-        else if (S.phase === 'prebuy') t2 = '非买日 · 待 ' + (buy || '—');
-        else                           t2 = '待今开判定（09:25 起）';
-        tagTo(pend[i].tr, 'name', t2, 'pre', tip0, true);
+        var d2 = q[pend[i].code] || {}, px2 = num(d2.px), pcl2 = num(d2.pcl);
+        var t2 = '竞价预判 ' + fmtPct((px2 > 0 && pcl2 > 0) ? (px2 / pcl2 - 1) : NaN);
+        tagInto(pend[i].tr, t2, 'pre', tip0);
       }
     }
     if (changed) saveRec(rec);

@@ -12,7 +12,9 @@ STATE_F = OUT/"oos_state.json"; TRADES_F = OUT/"oos_trades.jsonl"; REPORT_F = OU
 # ---- 冻结参数（不得修改）----
 P = dict(P1=0.01, P2=0.03, K=10, KSLOT=20, MINAMT=2e7, MINPX=3.0, LISTED=250, TP=0.02,
          COST_SIDE=0.000346, SHADOW_START="2026-09-25", WORST_CASE_WIPEOUT=True,
-         MAINBOARD=True)   # 2026-09-27 用户要求：只买主板（见 E-12）
+         MAINBOARD=True,   # 2026-09-27 用户要求：只买主板（见 E-12）
+         # ---- 2026-09-27 研究用门槛开关（默认值 = 完全无操作，见 E-13）----
+         VOLBR_MIN=0.0, VOLBR_MAX=1e9, RR_MIN=0.0)
 FROZEN_SHA = hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest()
 def log(*a): print(*a, flush=True)
 def load_universe():
@@ -68,6 +70,15 @@ def main():
     GAP = np.full((T,N), np.nan, dtype=np.float32); GAP[:-1] = O[1:]/np.where(C[:-1] > 0, C[:-1], np.nan) - 1.0
     GAP = GAP.astype(np.float32)
 
+    # ---- 研究用因子：盈亏比 RR = 止盈距离 / ATR20%（2026-09-27, 见 E-13）----
+    # ATR20% = mean(TR)/close，TR = max(H−L, |H−C_prev|, |L−C_prev|)；仅当 P["RR_MIN"]>0 时参与筛选
+    _L = F["L"]        # main() 只解包了 O/H/C/V/A，low 要单独取（2026-09-27 自查修复）
+    _Cp = np.full((T, N), np.nan, dtype=np.float32); _Cp[1:] = C[:-1]
+    _tr = np.maximum(H - _L, np.maximum(np.abs(H - _Cp), np.abs(_L - _Cp)))
+    _ATR20 = pd.DataFrame(np.where(VALID, _tr, np.nan)).rolling(20, min_periods=10).mean().to_numpy(np.float32)
+    _ATRp = _ATR20 / np.where(C > 0, C, np.nan)
+    RR = (P["TP"] / np.where(_ATRp > 0, _ATRp, np.nan)).astype(np.float32)
+
     lut = {d: i for i, d in enumerate(cal)}
     # ===== 过滤件（2026-09-26 用户要求，预注册 E-6）: 剔ST/*ST + 股价>=3元 + 每股净资产>=3元 =====
     _NAMES = json.loads((R/"data_full_names.json").read_text(encoding="utf-8"))
@@ -108,8 +119,16 @@ def main():
         x = np.asarray(x, float); mu = np.nanmean(x); sd = np.nanstd(x)
         return (x-mu)/sd if np.isfinite(sd) and sd > 0 else np.zeros_like(x)
     def elig(t):
-        return (VALID[t] & (NV[t] >= P["LISTED"]) & (C[t] >= P["MINPX"]) &
-                np.isfinite(AMT20[t]) & (AMT20[t] >= P["MINAMT"]) & FILT(t) & _MBUSE)
+        m = (VALID[t] & (NV[t] >= P["LISTED"]) & (C[t] >= P["MINPX"]) &
+             np.isfinite(AMT20[t]) & (AMT20[t] >= P["MINAMT"]) & FILT(t) & _MBUSE)
+        # ---- 研究用门槛：**默认值下完全不生效**（保证与 v1.4 逐位等价）----
+        if P.get("VOLBR_MIN", 0.0) > 0:
+            m = m & np.isfinite(VOLBR[t]) & (VOLBR[t] >= P["VOLBR_MIN"])
+        if P.get("VOLBR_MAX", 1e9) < 1e8:
+            m = m & np.isfinite(VOLBR[t]) & (VOLBR[t] <= P["VOLBR_MAX"])
+        if P.get("RR_MIN", 0.0) > 0:
+            m = m & np.isfinite(RR[t]) & (RR[t] >= P["RR_MIN"])
+        return m
     def signal(t):
         b = elig(t); g = GAP[t]
         m = b & np.isfinite(g) & (g <= -P["P1"]) & (g >= -P["P2"]) & np.isfinite(RET20[t]) & np.isfinite(VOLBR[t])

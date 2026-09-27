@@ -16,7 +16,7 @@
      gap = 今开/昨收 − 1 ∈ [−3%, −1%]（闭区间）· amt20 ≥ 2e7 · close ≥ 3.0 ·
      F = zs(−ln amt20) + zs(−ln volbr) + zs(−ret20)（存活子集内，zs 用总体标准差 = np.nanstd ddof=0）
    闸门（本夹具的核心断言）：**只有**「行情日 === buy_date 且 时刻 ≥ 09:25」才剔除；
-     盘前 / 集合竞价 09:15–09:24 / 非买日 / 买日之后 / 无行情 → 一行都不剔除，只挂灰标。
+     盘前 / 非买日 / 买日之后 / 无行情 → 一行都不剔除、且**不挂任何逐行标签**（相位由卡头徽章表达）；集合竞价 09:15–09:24 → 不剔除，但挂「竞价预判」逐行灰标（写进「状态」列）。
    ===================================================================================== */
 'use strict';
 const fs = require('fs');
@@ -172,12 +172,12 @@ function buildPayload(rows, k) {
   };
 }
 
-/* 真实卡片（hpdk_card.py）的表头；可选变体多一列「事件标签」 */
+/* 真实卡片（hpdk_card.py）的表头；可选变体多一列『状态』（= 生产列名，2026-09-27 新增） */
 const HEADS_BASE = ['#', '标的', '板块', '行业', '现价', '涨跌幅', '成交额20', '量比', '20日涨幅',
-                    '买入价', '止盈价 +2%', '卖出时点', '建议股数', '容量'];
-const HEADS_EVENT = ['#', '标的', '事件标签', '板块', '行业', '现价', '涨跌幅', '成交额20', '量比', '20日涨幅',
-                     '买入价', '止盈价 +2%', '卖出时点', '建议股数', '容量'];
-const PH_BUY = '● 低开 1%~3% 才买', PH_TP = '9.894 ~ 10.098', PH_QTY = '25,500 股', PH_CAP = '✓', PH_PX = '—';
+                    '买入价', '止盈价 +2%', '卖出时点', '建议股数', '单票可买（上限）'];
+const HEADS_EVENT = ['#', '标的', '状态', '板块', '行业', '现价', '涨跌幅', '成交额20', '量比', '20日涨幅',
+                     '买入价', '止盈价 +2%', '卖出时点', '建议股数', '单票可买（上限）'];
+const PH_BUY = '● 低开 1%~3% 才买', PH_TP = '9.894 ~ 10.098', PH_QTY = '25,500 股', PH_CAP = '足额', PH_PX = '—';
 
 function buildDom(payload, withEvent) {
   const heads = (withEvent ? HEADS_EVENT : HEADS_BASE).slice();
@@ -217,7 +217,7 @@ function buildDom(payload, withEvent) {
       else if (h === '止盈价 +2%') { td.textContent = PH_TP; td.setAttribute('data-v', '9.894'); }
       else if (h === '卖出时点') td.textContent = 'T+2 ' + payload.exit_date + ' 尾盘';
       else if (h === '建议股数') { td.textContent = PH_QTY; td.setAttribute('data-v', '25500'); }
-      else if (h === '容量') { td.textContent = PH_CAP; td.setAttribute('data-v', '1'); }
+      else if (h === '单票可买（上限）') { td.textContent = PH_CAP; td.setAttribute('data-v', '1'); }
       tr.appendChild(td);
     });
     tbody.appendChild(tr);
@@ -306,7 +306,7 @@ ok('600001 买入价 = 9.800（实际今开 · 三位小数）', cellText(dom, '
 ok('600001 止盈价 = 今开×(1+tp) = ' + p1.tpPx.toFixed(3), cellText(dom, '600001', '止盈价 +2%') === p1.tpPx.toFixed(3), cellText(dom, '600001', '止盈价 +2%'));
 ok('600001 建议股数 = ' + p1.qtyText + '（min(本金/KSLOT, ADV×1%) ÷ 9.800 → 整手）',
    cellText(dom, '600001', '建议股数') === p1.qtyText, cellText(dom, '600001', '建议股数'));
-ok('600001 容量 = 未触限（ADV×1% = 50 万 ≥ 单票 25 万）', cellText(dom, '600001', '容量') === '未触限', cellText(dom, '600001', '容量'));
+ok('600001 单票可买 = 足额（ADV×1% = 50 万 ≥ 单票 25 万）', cellText(dom, '600001', '单票可买（上限）') === '足额', cellText(dom, '600001', '单票可买（上限）'));
 ok('现价列未被本块改写（仍归主盘中层按列头「现价」改）', cellText(dom, '600001', '现价') === '—', cellText(dom, '600001', '现价'));
 ok('排序键 data-v 同步为实际今开（面板按 data-v 排序）', cell(dom, '600001', '买入价').getAttribute('data-v') === '9.8', cell(dom, '600001', '买入价').getAttribute('data-v'));
 
@@ -349,8 +349,8 @@ ok('无候选 / 无置顶分组行 / 无 hpdk-keep',
    dom.tbody.querySelectorAll('tr.hpdk-buy').length === 0 && !hdrRow(dom) && dom.tbody.querySelectorAll('tr.hpdk-keep').length === 0);
 ok('单元格已还原：买入价回到构建期 badge 文本 + 两个子节点（结构没被拍平）',
    cell(dom, '600001', '买入价').children.length === 2 && cell(dom, '600001', '买入价').children[1].textContent === '9.700 ~ 9.900', 'children=' + cell(dom, '600001', '买入价').children.length);
-ok('单元格已还原：建议股数 / 容量回到构建期文本', cellText(dom, '600001', '建议股数') === PH_QTY && cellText(dom, '600001', '容量') === PH_CAP,
-   cellText(dom, '600001', '建议股数') + ' / ' + cellText(dom, '600001', '容量'));
+ok('单元格已还原：建议股数 / 单票可买 回到构建期文本', cellText(dom, '600001', '建议股数') === PH_QTY && cellText(dom, '600001', '单票可买（上限）') === PH_CAP,
+   cellText(dom, '600001', '建议股数') + ' / ' + cellText(dom, '600001', '单票可买（上限）'));
 ok('竞价不落盘（localStorage 无新增写）', env.writes.length === wAuc, env.writes.length + ' vs ' + wAuc);
 ok('徽标 = 「竞价预判中 · 09:25 后判定剔除」', String(badgeText(dom)).indexOf('竞价预判中') === 0, badgeText(dom));
 
@@ -360,11 +360,11 @@ console.log('[6] 盘前 09:05（买日）/ 非买日 as_of 当天 10:00 / 周末
 const wPre = env.writes.length;
 const rPre = L.run(q, '09:05:00', 'auto', '20260928090500');
 ok('买日盘前 09:05：phase = pre，removed = 0，12 行全在', rPre.phase === 'pre' && rPre.removed === 0 && dataCodes(dom).length === 12, JSON.stringify(rPre));
-ok('买日盘前 09:05：只挂灰标「待今开判定（09:25 起）」', tagsAll(dom).every((t) => t.length === 1 && t[0].indexOf('待今开判定') === 0), JSON.stringify(tagsAll(dom)[0]));
+ok('买日盘前 09:05：不挂任何逐行标签（相位由卡头徽章表达；标的格保持干净）', tagsAll(dom).every((t) => t.length === 0), JSON.stringify(tagsAll(dom).slice(0, 3)));
 const rAsOf = L.run(q, '10:00:00', 'auto', '20260924100000');
 ok('非买日（as_of = 2026-09-24 10:00）：phase = prebuy，removed = 0，12 行全在',
    rAsOf.phase === 'prebuy' && rAsOf.removed === 0 && dataCodes(dom).length === 12, JSON.stringify(rAsOf));
-ok('非买日：灰标 = 「非买日 · 待 2026-09-28」', tagsAll(dom).every((t) => t.length === 1 && t[0].indexOf('非买日 · 待 ' + BUY_DATE) === 0), JSON.stringify(tagsAll(dom)[0]));
+ok('非买日：不挂任何逐行标签（原「非买日 · 待 X」逐行重复已删——用户反馈很蠢）', tagsAll(dom).every((t) => t.length === 0), JSON.stringify(tagsAll(dom).slice(0, 3)));
 const rWeekend = L.run(q, '10:00:00', 'auto', '20260926100000');
 ok('周末（2026-09-26 周六）：removed = 0，12 行全在', rWeekend.removed === 0 && dataCodes(dom).length === 12);
 const rPast = L.run(q, '10:00:00', 'auto', '20260929100000');
@@ -403,13 +403,13 @@ ok('幂等：分组行仍 1 个 / 候选行仍 9 个 / 行序不变',
    && candCodes(dom).join(',') === got.join(','), candCodes(dom).join(','));
 ok('幂等：每个候选行恰好 1 个行内 .hpdk-tag.buy（不叠加）',
    dom.tbody.querySelectorAll('tr.hpdk-buy').every((tr) => tr.querySelectorAll('.hpdk-tag.buy').length === 1));
-ok('容量边界 600012（ADV×1% = 25 万 == 单票分配）→ 未触限', exp.some((e) => e.code === '600012') && cellText(dom, '600012', '容量') === '未触限', cellText(dom, '600012', '容量'));
-ok('容量受限 600008（ADV×1% = 22 万 < 25 万）→ 「⚠ 受 ADV×1% 限」', cellText(dom, '600008', '容量') === '⚠ 受 ADV×1% 限', cellText(dom, '600008', '容量'));
+ok('容量边界 600012（ADV×1% = 25 万 == 单票分配）→ 足额', exp.some((e) => e.code === '600012') && cellText(dom, '600012', '单票可买（上限）') === '足额', cellText(dom, '600012', '单票可买（上限）'));
+ok('容量受限 600008（ADV×1% = 22 万 < 25 万）→ 「限至 22.0万」（**不是不能买**，只是买不满）', String(cellText(dom, '600008', '单票可买（上限）')).indexOf('限至') === 0, cellText(dom, '600008', '单票可买（上限）'));
 ok('600008 股数按 ADV×1% 折算 = ' + planOf('600008', 9.80).qtyText, cellText(dom, '600008', '建议股数') === planOf('600008', 9.80).qtyText, cellText(dom, '600008', '建议股数'));
 
 /* ============ [8] 变体：k=2（截断）+ 表头多一列「事件标签」 ============ */
 line();
-console.log('[8] 变体：k=2（前 2 名之外只能「留存」）+ 表头多一列「事件标签」');
+console.log('[8] 变体：k=2（前 2 名之外只能「留存」）+ 表头多一列「状态」');
 const env2 = makeEnv();
 const payload2 = buildPayload(ROWS, 2);
 const dom2 = buildDom(payload2, true);
@@ -420,13 +420,13 @@ const r2 = L2.run(quotesAll(), '10:00:03', 'auto', '20260928100003');
 ok('k=2：剔 3 / 存活 9 / 命中 2', r2.removed === 3 && r2.kept === 9 && r2.hit === 2, JSON.stringify(r2));
 ok('k=2：候选顺序 = F 前 2（' + exp.slice(0, 2).map((e) => e.code).join(',') + '）',
    candCodes(dom2).join(',') === exp.slice(0, 2).map((e) => e.code).join(','), candCodes(dom2).join(','));
-ok('k=2：事件标签写进「事件标签」列（有该列时用单元格文本，不退化行内标签）',
-   cellText(dom2, exp[0].code, '事件标签') === '✅ 今日买入候选 #1' && cellText(dom2, exp[1].code, '事件标签') === '✅ 今日买入候选 #2',
-   JSON.stringify([cellText(dom2, exp[0].code, '事件标签'), cellText(dom2, exp[1].code, '事件标签')]));
+ok('k=2：标记写进「状态」列（有该列时用单元格文本，不退化行内标签）',
+   cellText(dom2, exp[0].code, '状态') === '✅ 今日买入候选 #1' && cellText(dom2, exp[1].code, '状态') === '✅ 今日买入候选 #2',
+   JSON.stringify([cellText(dom2, exp[0].code, '状态'), cellText(dom2, exp[1].code, '状态')]));
 ok('k=2：候选行不再挂行内 .hpdk-tag.buy',
    dom2.tbody.querySelectorAll('tr.hpdk-buy').every((tr) => tr.querySelectorAll('.hpdk-tag.buy').length === 0));
 ok('k=2：第 3 名起的 7 只存活者挂「留存 · F 第 n 位」且不置顶',
-   dom2.tbody.querySelectorAll('tr.hpdk-keep').length === 7 && tags(dom2, exp[2].code).join('|') === '留存 · F 第 3 位',
+   dom2.tbody.querySelectorAll('tr.hpdk-keep').length === 7 && cellText(dom2, exp[2].code, '状态') === '留存 · F 第 3 位',
    'keep=' + dom2.tbody.querySelectorAll('tr.hpdk-keep').length + ' / ' + JSON.stringify(tags(dom2, exp[2].code)));
 ok('k=2：徽标计数 = 「已剔除 3 只 · 命中 2 只」', badgeText(dom2) === '已剔除 3 只 · 命中 2 只', badgeText(dom2));
 ok('k=2：分组行 colspan = 15（运行时列数，非写死）', hdrRow(dom2).innerHTML.indexOf('colspan="15"') > 0, hdrRow(dom2).innerHTML);

@@ -94,6 +94,9 @@ def run_variant(mod, cache, cal, F, done, tag, overrides=None, mutate=None):
     mod.build = lambda _c, _s: (_F, done)          # 运行期替换（不改文件）
     t0 = time.time()
     mod.main()
+    if not mod.TRADES_F.exists():
+        log("  [%s] 该臂零成交（门槛过严）→ 空集" % tag)
+        return [], P
     recs = [json.loads(x) for x in mod.TRADES_F.read_text(encoding="utf-8").splitlines() if x.strip()]
     log("  [%s] %d 笔（%.1fs）" % (tag, len(recs), time.time() - t0))
     return recs, P

@@ -137,6 +137,14 @@ def hpdk_card(BASE):
         '代理分是在<b>全体资格池</b>内标准化的，与正式排名不同。搜索 / 排序 / 板块筛选由板内通用脚本接管；'
         '09:25 后本表按真实今开自动剔除并置顶命中者。</span></div>')
     L.append('<div class="sub" style="margin-top:6px;color:var(--warn)"><b>板块限定（2026-09-27 用户决定：只买主板）</b> —— 同一面板、同一记账规则下的同尺子对比：全窗 年化 <b>+72.59% → +47.77%</b>（−24.82pp）、夏普 <b>2.79 → 2.12</b>、最大回撤 <b>−32.29% → −29.13%</b>（<b>改善 3.16pp</b>）、净胜率 63.14% → 60.63%、单笔净均 +0.5574% → +0.4028%；2018+ 年化 +105.38% → +64.24%。选股集合仅 <b>55.5% 重合</b>（横截面 z 在候选池内标准化 ⇒ 缩池后标准分整体改变）。<b>代价明确：用年化换回撤，风险调整后更差。</b>完整逐项读数见 <code>backtest/报告-只买主板-回测对比-20260927.md</code> 与 <code>backtest/hengpan_fangliang_dikai_0925/evidence_board.json</code>（另有：全池 KSLOT=4 口径 +249.67%、主板 KSLOT=4 +189.75%，操作档见上）。</div>')
+    L.append('<div class="sub" style="margin-top:6px;color:var(--warn)">'
+             '<b>准入门槛扫描（2026-09-27）</b> —— 用户问「量比要多于多少 / 盈亏比要大于多少会不会改善」：'
+             '<b>三个方向全部为负优化，未采纳任何门槛</b>。量比下限单调恶化（≥0.5 +43.59% → ≥1.5 +13.46%，'
+             '基线 +47.77%）；量比上限越紧越差；盈亏比下限 ≥1.0 直接把年化打到 <b>−4.32%</b>、'
+             '样本从 23,759 砍到 <b>3,272 笔</b>（≥3.0 零成交）。原因：复合分里的 z(−ln 量比)'
+             '<b>已经软性偏好缩量</b>，加硬门槛只截断有用样本；且任何门槛都会改变当日候选池 ⇒ '
+             '横截面 z 重算 ⇒ 选股整体重排。完整 18 臂读数见 '
+             '<code>backtest/报告-准入门槛扫描-量比与盈亏比-20260927.md</code>。</div>')
     L.append('<div class="toolbar">'
              '<input type="text" id="tbl-hpdk-cand-q" '
              'placeholder="🔍 搜索名称 / 代码 / 板块 / 行业…" autocomplete="off" spellcheck="false">'
@@ -147,7 +155,10 @@ def hpdk_card(BASE):
     L.append('<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-cand" style="width:100%;font-size:12px">'
              '<thead><tr>'
              '<th data-key="rank" style="text-align:center">#</th>'
-             '<th data-key="name">标的</th><th data-key="board">板块</th><th data-key="ind">行业</th>'
+             '<th data-key="name">标的</th>'
+             '<th data-key="status" style="text-align:center" '
+             'title="盘中判定结果：竞价预判 / 今日买入候选 #n / 留存 · F 第 n 位；买日 09:25 后不达标的行会被移除">状态</th>'
+             '<th data-key="board">板块</th><th data-key="ind">行业</th>'
              '<th data-key="px" style="text-align:right">现价</th>'
              '<th data-key="chg" style="text-align:right">涨跌幅</th>'
              '<th data-key="amt" style="text-align:right" title="20 日均额 —— 复合分第一项">成交额20</th>'
@@ -161,7 +172,8 @@ def hpdk_card(BASE):
              'title="未触止盈则 T+2（买日次一交易日）尾盘卖出">卖出时点</th>'
              '<th data-key="qty" style="text-align:right" '
              'title="按操作口径本金/KSLOT 与该股 ADV×1% 取小后折算的整手股数">建议股数</th>'
-             '<th data-key="cap" style="text-align:center" title="该股 ADV×1% 是否够放满单票分配">容量</th>'
+             '<th data-key="cap" style="text-align:center" '
+             'title="单票可买 = min(本金/KSLOT, 该股 20日均额×1%)。标「限至 X万」= 该股流动性装不下单票计划额，只能少买一点（建议股数已按缩小后规模折算）——不是不能买。">单票可买（上限）</th>'
              '</tr></thead><tbody>')
     for r in shown:
         c = r.get("close")
@@ -179,6 +191,7 @@ def hpdk_card(BASE):
             f'{r.get("proxy_rank")}</td>'
             f'<td data-key="name"><b>{r.get("name")}</b><br><span style="color:var(--sub);'
             f'font-size:var(--fs-xs);font-variant-numeric:tabular-nums">{r.get("code")}</span></td>'
+            f'<td data-key="status" style="text-align:center;color:var(--faint)">—</td>'
             f'<td data-key="board">{r.get("board")}</td>'
             f'<td data-key="ind" style="color:var(--sub)">{r.get("ind") or "—"}</td>'
             f'<td data-key="px" data-v="{"" if c is None else c}" '
@@ -201,8 +214,11 @@ def hpdk_card(BASE):
             f'T+2<br>{d.get("exit_date")} 尾盘</td>'
             f'<td data-key="qty" data-v="{qty}" style="text-align:right;'
             f'font-variant-numeric:tabular-nums">{qty:,} 股</td>'
-            f'<td data-key="cap" data-v="{1 if r.get("cap_ok") else 0}" style="text-align:center">'
-            f'{"✓" if r.get("cap_ok") else "<span style=\'color:var(--warn)\'>⚠ 受限</span>"}</td>'
+            f'<td data-key="cap" data-v="{1 if r.get("cap_ok") else 0}" style="text-align:center" '
+            f'title="（构建期预览；买日盘中按真实今开与本金额重算）「限至 X万」= 只能按该股 20日均额×1% 少买，不是不能买">'
+            + ("足额" if r.get("cap_ok") else
+               "<span style='color:var(--warn)'>限至 %.1f万</span>" % ((r.get("cap_single") or 0) / 1e4))
+            + '</td>'
             '</tr>')
     L.append('</tbody></table></div>')
     L.append('<div class="sub" style="color:var(--faint)">当日流程：① 前一晚 / 09:15 前按上表挂 '

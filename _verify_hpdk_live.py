@@ -61,7 +61,7 @@ def main():
     chk('data-bt-sub="st-hpdk"' in html, "5.3 回测参考子块 data-bt-sub=st-hpdk")
     chk('id="tbl-hpdk-cand"' in html, "5.4 明日买点表 tbl-hpdk-cand")
     heads = re.findall(r'<th[^>]*>([^<]*)</th>', html)
-    need = ["标的", "板块", "行业", "现价", "涨跌幅", "买入价", "止盈价", "卖出时点", "建议股数", "容量"]
+    need = ["标的", "状态", "板块", "行业", "现价", "涨跌幅", "买入价", "止盈价", "卖出时点", "建议股数", "单票可买"]
     for nm in need:
         chk(any(nm in h for h in heads), "5.5 表头含「%s」" % nm)
     t_idx = html.find('id="tbl-hpdk-cand"')
