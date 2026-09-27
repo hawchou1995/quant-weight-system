@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """verify: mechanical cross-check of report numbers against evidence artifacts."""
-import json, pathlib
+import json, pathlib, sys
 D = pathlib.Path(r"D:/Documents/Workbuddy/股票基金/quant-weight-system/backtest/hengpan_fangliang_dikai_0925")
 rep = (D.parent/"报告-横盘放量次日低开隔日卖-回测-20260925.md").read_text(encoding="utf-8").replace("\u2212","-").replace("\u2014","-")
 L = lambda n: json.loads((D/n).read_text(encoding="utf-8"))
@@ -38,13 +38,24 @@ checks = [
  ("B@20bp 净中 -0.1998",    g11["B_网格 Pq0.40/K1.5|20bp"]["med"], -0.1998, "-0.1998%"),
 ]
 bad=0
+def has_num(text, needle):
+    """报告里含该字符串即可。**容忍正号省略**：中文报告常写 13.35 而不写 +13.35，
+    旧版直接 `needle in rep` 会把这类正确项误判为 FAIL（2026-09-27 修）。"""
+    return (needle in text) or (needle.startswith("+") and needle[1:] in text)
 for name, actual, expect, needle in checks:
     ok_val = abs(float(actual)-float(expect)) < 1e-6
-    ok_txt = needle in rep
-    flag = "OK " if (ok_val and ok_txt) else "FAIL"
-    if not (ok_val and ok_txt): bad+=1
-    print("  %s %-34s json=%-10s 报告含%-12s" % (flag, name, actual, needle))
+    ok_txt = has_num(rep, needle)
+    ok = ok_val and ok_txt
+    if not ok: bad+=1
+    print("  %s %-34s json=%-10s 报告含%-12s %s" % (
+        "OK " if ok else "FAIL", name, actual, needle,
+        "值✓文✓" if ok else ("值✗" if not ok_val else "文✗")))
 # 仅低开层 t_exc 从 marginal 表核对
 m1 = [r for r in marg["layers"] if r["tag"].startswith("1 ")][0]
-print("  %s 仅低开层 t_exc=%.2f (marginal) 报告含 +15.75=%s" % ("OK " if m1["t_exc"]==15.75 and "+15.75" in rep else "FAIL", m1["t_exc"], "+15.75" in rep))
-print("\n%s  共 %d 项, 失败 %d 项" % ("ALL PASS" if bad==0 else "HAS FAILURES", len(checks), bad))
+ok_m = (m1["t_exc"] == 15.75) and has_num(rep, "+15.75")
+if not ok_m: bad += 1
+print("  %s 仅低开层 t_exc=%.2f (marginal) 报告含 +15.75=%s" % ("OK " if ok_m else "FAIL", m1["t_exc"], ok_m))
+# 计数修正（旧版印 len(checks)=27，实际跑 28 项 —— 少算 1）；失败必须非零退出，使 exit 0 成为有效判据
+n_tot = len(checks) + 1
+print("\n%s  共 %d 项, 失败 %d 项" % ("ALL PASS" if bad==0 else "HAS FAILURES", n_tot, bad))
+sys.exit(0 if bad == 0 else 1)

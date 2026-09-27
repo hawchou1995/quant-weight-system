@@ -174,6 +174,13 @@ STEPS = [
     # ⚠ 2026-09-25 三度决策（用户「执行复测再否定」）：热榜哨兵**已跑稳健性复测且 B1–B8 全过**
     #   （backtest/jiandi_sentinel_retest_0924.json）→ 装回看板。左侧捡漏仍下架（复测门确为不通过）。
     ("热榜哨兵-单日信号 sentinel_daily[软]", ["backtest/sentinel_daily.py"], "--skip-sentinel" in sys.argv),
+    # 横盘低开·两日 当日候选（看板「横盘低开·两日」子标签的数据源）——**必须在 build_dual_system 之前跑**；
+    # [软]=失败不阻断主链（看板退回上一份候选，卡片显示「产物未生成」，不会静默显示假数据）。
+    # 幂等：只读行情/面板、只写自己的两个产物；与冻结脚本 oos_run.py 的 A11 逐位对拍失败会 exit 2。
+    # 缓存落在系统临时目录（不污染仓库：A14 要求工作区无新增未跟踪文件）。--skip-hpdk 跳过。
+    ("横盘低开-当日候选 hpdk_candidates[软]",
+     ["backtest/hengpan_fangliang_dikai_0925/hpdk_candidates.py"], "--skip-hpdk" in sys.argv),
+
     ("看板重建 build_dual_system", ["build_dual_system.py"], False),
     ("部署 gh-pages", ["_deploy_fundline_0911.py"], "--skip-deploy" in sys.argv),
 ]
@@ -274,7 +281,10 @@ if not fails:
         ("sentinel_pool.js", "window.SENTINEL_POOL", ("as_of",)),
         ("sentinel_track.js", "window.SENTINEL_TRACK", ("as_of",)),
         # sentinel_state.json 的日期字段按影子账本设计叫 last_scan（不是 as_of）——接受两者
-        ("backtest/sentinel_state.json", None, ("as_of", "last_scan")),
+        # 2026-09-27 新增：横盘低开·两日（候选产物的日期字段 = 信号日 T，等于最新交易日）
+        ("backtest/hpdk_candidates.json", None, ("as_of",)),
+        # OOS 台账投影的日期字段叫 last_scan_date（与 sentinel_state 同设计）
+        ("backtest/hpdk_oos_view.json", None, ("last_scan_date",)),
     ]:
         _p = BASE / _rel
         if not _p.exists():
@@ -358,6 +368,16 @@ if not fails and not NO_MAIN_PUSH:   # ⑤ 云端 Phase 1：只写 gh-pages，�
                           "backtest/jiandi_top30_watchlist_0924.py",
                           "backtest/top1_personal_yearly_0924.py",
                           "backtest/WORKORDER_short_board_0924.md",
+                          # 2026-09-27 补：横盘低开·两日（新策略）的生产源 + 产物 + 校验器
+                          # （新脚本不进链白名单 → 改动不会被链提交：本项目已犯过 09-17/09-23/09-24 三次同类漏项）
+                          "hpdk_card.py",
+                          "backtest/hengpan_fangliang_dikai_0925/hpdk_candidates.py",
+                          "backtest/hengpan_fangliang_dikai_0925/x1_overlap.py",
+                          "backtest/hengpan_fangliang_dikai_0925/x2_sens.py",
+                          "backtest/hpdk_candidates.json",
+                          "backtest/hpdk_oos_view.json",
+                          "backtest/hpdk_bt_ref.json",
+                          "_verify_hpdk_live.py",
                           "docs/adr/0010-short-board-new-strategies-onboarding.md"],
                          cwd=str(BASE), capture_output=True)
     if git.returncode == 0:

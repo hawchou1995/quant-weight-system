@@ -464,6 +464,13 @@ INTRADAY_JS = r"""
         if (typeof window.A5_ON_QUOTES === 'function') {
           try { window.A5_ON_QUOTES(q, (r && r.ts) || hhmmss(new Date()), S.poolSrc, S.mktTs); } catch(e) {}
         }
+        /* R-hpdk-dash-0927：横盘低开·两日（HPDK）竞价/开盘判定的**第三个**钩子。同理必须显式留在这里
+           —— IIFE 内部调的是局部 applyQuotes，外部包装拦不到；无钩子时零开销，行为与原来完全一致。
+           本钩子做三件事：09:25 后按真实今开算 gap，把 A/B/C 不满足的标的**从清单移除**，
+           并对存活子集按冻结复合分定榜前置顶。零落盘（不写 json / 不碰账本 / 不发请求）。 */
+        if (typeof window.HPDK_ON_QUOTES === 'function') {
+          try { window.HPDK_ON_QUOTES(q, (r && r.ts) || hhmmss(new Date()), S.poolSrc, S.mktTs); } catch(e) {}
+        }
         S.lastPool = Date.now();
         return r;
       }) : Promise.resolve(null);
@@ -1136,6 +1143,505 @@ A5_JS = r"""
                     order: function(){ return ORDER; },
                     wrapped: !!(IN && IN.applyQuotes)};
   /* 首屏：先把样式/徽标建起来（还没行情 → 不判定、不贴标） */
+  run(null, '');
+})();
+"""
+
+
+# ============ 横盘低开·两日（hpdk）盘中买点判定 + 不达标自动剔除（R-hpdk-live-0927） ============
+# 单列一个注入块（与 INTRADAY_JS 分开）：树图层与 QLCH / A5 两块一行不动 —— 本块只消费「选股池报价」的结果
+# （主盘中层 fetchPool → applyQuotes 的钩子）。注入点：build_dual_system.py 的 `<script>{HPDK_JS}</script>`
+# （紧跟 A5_JS 之后；payload 由 `<script>window.HPDK = …</script>` 内嵌）。
+HPDK_JS = r"""
+/* ============ 横盘低开·两日（hpdk）：买日 09:25 买点判定 + 不达标自动剔除（R-hpdk-live-0927） ============
+   为什么放浏览器端（ADR-0009）：
+     ① 零落盘：只读行情（主盘中层已拉好的选股池报价）与 window.HPDK，只改 DOM —— 不写 json / 不发请求 / 不碰账本；
+     ② 复用已验证的盘中层（R-live-0918）：通道、防串码、开市判定、收盘链静默窗一律不重写；
+     ③ 判定是盘中瞬时条件：gap = 今开/昨收−1 与「低开子集内的横截面排名」都要等 09:25 集合竞价撮合后才成立，
+        服务端要「常驻进程 + 落盘 + 每日部署」才能给出同一信息，代价大于收益。
+   代价：页面没开就没有判定（收盘链与冻结 OOS 台账照常，历史可回放）。
+   判定口径（= 生产者 backtest/hengpan_fangliang_dikai_0925/hpdk_candidates.py；冻结 SHA 见 HPDK.frozen_sha256）：
+     C 准入件：T 日 amt20 ≥ HPDK.minamt 且 close ≥ HPDK.minpx（构建期内嵌字段的防御性复核，静态，不需要行情）；
+     B 可交易：现价 / 昨收 / 今开 三者 > 0，且不是停牌/一字（px == pcl == opn）
+               —— **先于 A 判**（同 QLCH_JS judge 的顺序；否则一字板的 gap = 0 会被误报成「A 不在带内」）；
+     A 低开带：gap = 今开/昨收 − 1 ∈ [HPDK.gap_lo, HPDK.gap_hi]（**闭区间**，端点算命中，容差 1e-9）；
+     F 排名：在**存活子集**内做横截面 z 标准化，F = z(−ln amt20) + z(−ln volbr) + z(−ret20)（ret20 是小数，
+              如 −0.065 表示跌 6.5%）—— 与生产者 :190-193 同式，标准差取总体口径（np.nanstd = ddof 0）；
+     任一不满足 → 把该行**从表格移除**（不是置灰）；存活者按 F 降序取前 HPDK.k 只 → 置顶 + 标注当日买入候选。
+   闸门（唯一开关；**不得依赖 S.live**：收盘后 S.live=false，若让闸门失效就会拿「当日已发生的开盘」去误剔）：
+     只有「行情日 === HPDK.buy_date 且 时刻 ≥ 09:25」才执行剔除；盘前 / 集合竞价 09:15–09:24 / 非买日 /
+     周末（行情时间戳不落在买日）/ 无行情 → **一行都不剔除**，只挂灰标「竞价预判」。
+     行情日取**交易所时间戳**（腾讯 [30]，形如 20260928103012），不用本地日期 → 节假日 / 补班不误判。
+   置顶 = 视图态：只改 DOM 顺序与文本，不改信号池、不改 depth rank、不碰任何账本；每轮先按 ORDER 还原 → 幂等且可逆。
+   字段：现价 px / 昨收 pcl / 今开 opn（腾讯 [3][4][5]、东财 f2/f18/f17，见 INTRADAY_JS fetchPool）。
+        现价 / 涨跌幅两列由主盘中层按列头文本定位改写，本块**不碰**（互不抢改）。
+*/
+(function(){
+  'use strict';
+  var H = window.HPDK;
+  if (!H) { return; }                          /* 无 payload → 完全不动页面（与 QLCH_JS / A5_JS 同一约定） */
+  var CFG = {
+    TBL: 'tbl-hpdk-cand',
+    LS: 'quant_hpdk_trig_v1',                  /* 首次判定时间戳（跨日按 HPDK.as_of 作废） */
+    EPS: 1e-9,                                 /* 价格带端点容差（浮点比较） */
+    AUC_MIN: 9 * 60 + 15,                      /* 09:15 集合竞价开始（只灰标，不剔除） */
+    OPEN_MIN: 9 * 60 + 25,                     /* 09:25 集合竞价撮合：出现第一笔真实今开 */
+    ADV_FRAC: 0.01,                            /* 单票上限 = 该股 20 日均额 × 1%（= 生产者 ADV_FRAC） */
+    HDR_EVENT: ['事件标签', '事件', '买点', '信号'],
+    HDR_BUY: ['买入价', '买价'],
+    HDR_TP: ['止盈价', '止盈'],
+    HDR_QTY: ['建议股数', '股数', '委托股数'],
+    HDR_CAP: ['容量标记', '容量', '上限'],
+    HDR_NAME: ['标的', '名称'],
+    TIP: '盘中判定是视图态：只读行情、只改 DOM；不写盘、不发请求、不改账本 —— 记账以收盘链与冻结 OOS 台账为准'
+  };
+  var S = {ts: '', src: '', mktTs: '', mktDate: '', mmin: -1, phase: 'none', gate: false, live: false,
+           rows: 0, pool: 0, removed: 0, hit: 0, kept: 0, noquote: 0, calls: 0, err: '', diag: []};
+  var META = {}, ORDER = null, TV = null, COLS = null, NCOL = 0;
+
+  function num(v){ var x = (v === null || v === undefined || v === '') ? NaN : parseFloat(v); return isNaN(x) ? NaN : x; }
+  function numOr(v, d){ var x = num(v); return isNaN(x) ? d : x; }
+  function bare(c){ return String(c === null || c === undefined ? '' : c).replace(/^(sh|sz|bj)/i, ''); }
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+  function ymd(d){ return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function hms(d){ return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()); }
+  function fmtPct(v){ return isNaN(v) ? '—' : ((v > 0 ? '+' : '') + (v * 100).toFixed(2) + '%'); }
+  function fmtWan(v){ return isNaN(v) ? '—' : (v / 1e4).toFixed(0) + ' 万'; }
+  function fmtQty(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' 股'; }
+
+  /* 交易所行情时间戳（腾讯 [30]，形如 20260928103012）→ {date:'YYYY-MM-DD', min:分钟数|-1}；非法 → null */
+  function mktOf(s){
+    s = String(s || '');
+    if (!/^[0-9]{8}/.test(s)) return null;
+    var d = s.slice(0, 4) + '-' + s.slice(4, 6) + '-' + s.slice(6, 8);
+    if (!/^[0-9]{12}/.test(s)) return {date: d, min: -1};
+    var hh = parseInt(s.slice(8, 10), 10), mm = parseInt(s.slice(10, 12), 10);
+    if (isNaN(hh) || isNaN(mm)) return {date: d, min: -1};
+    return {date: d, min: hh * 60 + mm};
+  }
+  /* 相位只决定**文案**；是否剔除只由 render 里的 enforce 决定：
+     none 无行情时间戳 / prebuy 行情日早于买日 / pre 买日盘前（<09:15）
+     auction 买日集合竞价 09:15–09:24（只灰标） / open 买日 09:25 起（判定剔除） / past 行情日晚于买日 */
+  function phaseOf(mkt, buy){
+    if (!mkt || !mkt.date || !buy) return 'none';
+    if (mkt.date < buy) return 'prebuy';
+    if (mkt.date > buy) return 'past';
+    if (mkt.min < 0) return 'pre';
+    if (mkt.min < CFG.AUC_MIN) return 'pre';
+    if (mkt.min < CFG.OPEN_MIN) return 'auction';
+    return 'open';
+  }
+  /* 资格池 → 6 位码 → 元数据（列序取 H.cols，不写死下标；cols 缺失 → 退回内嵌约定顺序） */
+  function colIdx(name, def){
+    var cs = H.cols || [], i;
+    for (i = 0; i < cs.length; i++) if (String(cs[i]) === name) return i;
+    return def;
+  }
+  (function(){
+    var C = colIdx('code', 0), N = colIdx('name', 1), I = colIdx('ind', 2), B = colIdx('board', 3),
+        CL = colIdx('close', 4), A = colIdx('amt20', 5), V = colIdx('volbr', 6), R = colIdx('ret20', 7);
+    var rs = H.rows || [], i;
+    for (i = 0; i < rs.length; i++) {
+      var r = rs[i];
+      if (!r) continue;
+      var c = bare(r[C]);
+      if (!/^[0-9]{6}$/.test(c)) continue;
+      META[c] = {code: c, name: r[N], ind: r[I], board: r[B], close: num(r[CL]),
+                 amt20: num(r[A]), volbr: num(r[V]), ret20: num(r[R]), i: i};
+    }
+    S.pool = 0;
+    for (i in META) { if (Object.prototype.hasOwnProperty.call(META, i)) S.pool++; }
+  })();
+  /* ---------- 样式（运行时注入；颜色一律走主题变量，不新增硬编码色值） ---------- */
+  function css(){
+    if (document.getElementById('hpdk-live-css')) return;
+    var st = document.createElement('style'); st.id = 'hpdk-live-css';
+    st.textContent = [
+      /* 今日买入候选：绿色左边条 + 淡背景。注意本设计系统的「绿」= --down（A 股红涨绿跌），不另造色值 */
+      'tr.hpdk-buy{background:var(--card2);box-shadow:inset 3px 0 0 var(--down)}',
+      'tr.hpdk-buy>td:first-child{color:var(--down);font-weight:600}',
+      /* 存活但 F 排名在 k 之后：只留细左条（视图提示，不置顶、不标注） */
+      'tr.hpdk-keep{box-shadow:inset 2px 0 0 var(--border)}',
+      'tr.hpdk-buy-hdr>td{background:var(--card2);color:var(--down);font-weight:600;padding:6px 8px;text-align:left;',
+      'box-shadow:inset 3px 0 0 var(--down)}',
+      '.hpdk-tag{display:inline-block;margin-left:6px;padding:0 6px;border-radius:8px;font-size:11px;white-space:nowrap}',
+      '.hpdk-tag.buy{background:var(--down);color:#fff;margin-left:0;margin-right:6px}',
+      '.hpdk-tag.keep,.hpdk-tag.pre{background:transparent;border:1px dashed var(--faint);color:var(--faint)}',
+      /* 自己的 pill 样式（**不带 badge-live**：盘中层 markCard 每轮把 .badge-live 的文案抢改为「实时 HH:MM:SS」，
+         两枚徽标并存、互不覆盖 —— 与 QLCH_JS 的处理一致） */
+      '.hpdk-badge{background:var(--card2);color:var(--down);border:1px solid var(--down);border-radius:var(--r-sm);',
+      'padding:1px 6px;font-size:var(--fs-xs);font-weight:500;white-space:nowrap}',
+      '.hpdk-live-src{margin-left:6px;font-size:var(--fs-xs);color:var(--faint);font-weight:400}',
+      'td.hpdk-live-cell{color:var(--down);font-variant-numeric:tabular-nums}'
+    ].join('');
+    document.head.appendChild(st);
+  }
+
+  /* ---------- 首次判定时间戳（localStorage，跨日按 HPDK.as_of 作废） ---------- */
+  function loadRec(){
+    var raw = null;
+    try { raw = localStorage.getItem(CFG.LS); } catch(e) { return {}; }
+    if (!raw) return {};
+    var o = null;
+    try { o = JSON.parse(raw); } catch(e) { return {}; }
+    if (!o || typeof o !== 'object') return {};
+    var out = {}, k, r;
+    for (k in o) {
+      if (!Object.prototype.hasOwnProperty.call(o, k)) continue;
+      r = o[k];
+      /* 跨日清空：资格池换信号日（as_of 变）→ 上一天的判定记录作废 */
+      if (!r || typeof r !== 'object' || !r.first || r.as_of !== H.as_of) continue;
+      out[k] = r;
+    }
+    return out;
+  }
+  function saveRec(t){ try { localStorage.setItem(CFG.LS, JSON.stringify(t)); } catch(e) {} }
+
+  /* ---------- 列定位（按列头文本：整名优先、再包含 —— 同主盘中层 scan 的做法；找不到 → -1，退化为行内标签） ---------- */
+  function hdrIdx(ths, names){
+    var i, j, tx, hit = -1;
+    for (i = 0; i < ths.length; i++) {
+      tx = (ths[i].textContent || '').replace(/\s+/g, '');
+      for (j = 0; j < names.length; j++) if (tx === names[j]) return i;
+    }
+    for (i = 0; i < ths.length; i++) {
+      tx = (ths[i].textContent || '').replace(/\s+/g, '');
+      for (j = 0; j < names.length; j++) if (tx.indexOf(names[j]) >= 0 && hit < 0) hit = i;
+    }
+    return hit;
+  }
+  function cols(tb){
+    var ths = tb.querySelectorAll('thead th');
+    NCOL = ths.length || 0;
+    return {event: hdrIdx(ths, CFG.HDR_EVENT), buy: hdrIdx(ths, CFG.HDR_BUY),
+            tp: hdrIdx(ths, CFG.HDR_TP), qty: hdrIdx(ths, CFG.HDR_QTY),
+            cap: hdrIdx(ths, CFG.HDR_CAP), name: hdrIdx(ths, CFG.HDR_NAME)};
+  }
+  function colOf(key){ return (COLS && COLS[key] >= 0) ? COLS[key] : -1; }
+  function cellAt(tr, idx){
+    if (idx < 0 || !tr || !tr.children) return null;
+    return tr.children[idx] || null;
+  }
+  /* 行内单元格：首次改写前快照原文 / 原排序键，之后每轮先还原（幂等 + 可逆的关键） */
+  function snapCell(td){
+    if (!td) return;
+    if (td._hpdkOrig === undefined) {
+      td._hpdkOrig = td.textContent || '';
+      td._hpdkOrigV = td.getAttribute('data-v');
+      td._hpdkOrigT = td.title || '';
+      /* 构建期渲染的子节点（badge / div 结构）：整体留存，还原时放回 —— 只存 textContent 会把结构拍平 */
+      td._hpdkKids = [];
+      for (var i = 0; i < td.children.length; i++) td._hpdkKids.push(td.children[i]);
+    }
+  }
+  function restoreCell(td){
+    if (!td || td._hpdkOrig === undefined) return;
+    if (td._hpdkKids && td._hpdkKids.length) {
+      while (td.firstChild) td.removeChild(td.firstChild);      /* 清掉我们写的文本 / 标签 */
+      for (var i = 0; i < td._hpdkKids.length; i++) td.appendChild(td._hpdkKids[i]);
+    } else td.textContent = td._hpdkOrig;
+    if (td._hpdkOrigV === null || td._hpdkOrigV === undefined) {
+      if (td.removeAttribute) td.removeAttribute('data-v');
+    } else td.setAttribute('data-v', td._hpdkOrigV);
+    td.classList.remove('hpdk-live-cell');
+  }
+  function writeCell(tr, key, txt, title, dv){
+    var td = cellAt(tr, colOf(key));
+    if (!td) return null;
+    snapCell(td);
+    td.textContent = txt;
+    if (title) td.title = title;
+    if (dv !== undefined && dv !== null) td.setAttribute('data-v', String(dv));   /* 排序键同步（面板按 data-v 排） */
+    if (!td.classList.contains('hpdk-live-cell')) td.classList.add('hpdk-live-cell');
+    return td;
+  }
+  /* 行内小标签：事件列不存在时退化为标签（插到标的列行首；列也找不到 → 兜底插到本行末列） */
+  function tagTo(tr, key, txt, cls, title, prepend){
+    var td = cellAt(tr, colOf(key));
+    if (!td && tr && tr.children && tr.children.length) td = tr.children[tr.children.length - 1];
+    if (!td) return null;
+    var sp = document.createElement('span');
+    sp.className = 'hpdk-tag ' + (cls || '');
+    sp.textContent = txt;
+    if (title) sp.title = title;
+    if (prepend && td.firstChild) td.insertBefore(sp, td.firstChild);
+    else td.appendChild(sp);
+    return sp;
+  }
+  function stripTags(tr){
+    var ts = tr.querySelectorAll('.hpdk-tag'), i;
+    for (i = 0; i < ts.length; i++) if (ts[i].parentNode) ts[i].parentNode.removeChild(ts[i]);
+  }
+  function resetRow(tr){
+    tr.classList.remove('hpdk-buy'); tr.classList.remove('hpdk-keep');
+    if (tr.removeAttribute) tr.removeAttribute('data-hpdk');
+    stripTags(tr);
+    if (!COLS) return;
+    var ks = ['event', 'buy', 'tp', 'qty', 'cap'], i;
+    for (i = 0; i < ks.length; i++) restoreCell(cellAt(tr, colOf(ks[i])));
+  }
+  function codeOf(tr){
+    var c = bare(tr.getAttribute('data-code') || '');
+    if (!/^[0-9]{6}$/.test(c)) {
+      var mm = (tr.textContent || '').match(/(?:^|\D)([0-9]{6})(?:\D|$)/);
+      c = mm ? mm[1] : '';
+    }
+    return /^[0-9]{6}$/.test(c) ? c : '';
+  }
+
+  /* ---------- 判定：C（静态准入）→ B（可交易）→ A（低开带）→ F（排名字段） ----------
+     返回 {k:'keep'|'drop'|'na', gate:'A'|'B'|'C'|'F'|'na', why, gap?}
+     · k='na'（该码本次报价缺失 / 三个价格字段全无）→ **保守留存**：不剔除任何判不了的行（宁可漏剔，不可误剔）。 */
+  function judge(m, d){
+    var A20 = num(m && m.amt20), C = num(m && m.close);
+    var minamt = numOr(H.minamt, 0), minpx = numOr(H.minpx, 0);
+    if (!(A20 > 0 && A20 >= minamt - CFG.EPS))
+      return {k: 'drop', gate: 'C', why: 'C: 20 日均额 ' + fmtWan(A20) + ' < ' + fmtWan(minamt)};
+    if (!(C >= minpx - CFG.EPS))
+      return {k: 'drop', gate: 'C', why: 'C: T 日收盘 ' + (isNaN(C) ? '缺失' : C.toFixed(2)) + ' < ' + minpx.toFixed(2)};
+    var px = d ? num(d.px) : NaN, pcl = d ? num(d.pcl) : NaN, opn = d ? num(d.opn) : NaN;
+    if (!(px > 0) && !(pcl > 0) && !(opn > 0)) return {k: 'na', gate: 'na', why: '无行情（保守留存）'};
+    if (!(px > 0)) return {k: 'drop', gate: 'B', why: 'B: 无现价'};
+    if (!(pcl > 0)) return {k: 'drop', gate: 'B', why: 'B: 无昨收'};
+    if (!(opn > 0)) return {k: 'drop', gate: 'B', why: 'B: 无今开（09:25 前 / 行情缺失）'};
+    if (Math.abs(px - pcl) <= CFG.EPS && Math.abs(opn - pcl) <= CFG.EPS)
+      return {k: 'drop', gate: 'B', why: 'B: 停牌/一字（现价=今开=昨收）'};
+    var gap = opn / pcl - 1;
+    var lo = numOr(H.gap_lo, -0.03), hi = numOr(H.gap_hi, -0.01);
+    if (!(gap >= lo - CFG.EPS && gap <= hi + CFG.EPS))
+      return {k: 'drop', gate: 'A', gap: gap,
+              why: 'A: 今开/昨收−1 = ' + fmtPct(gap) + ' 不在 [' + fmtPct(lo) + ', ' + fmtPct(hi) + ']'};
+    if (!(num(m.volbr) > 0)) return {k: 'drop', gate: 'F', gap: gap, why: 'F: 缺量比数据（算不出复合分）'};
+    if (isNaN(num(m.ret20))) return {k: 'drop', gate: 'F', gap: gap, why: 'F: 缺 20 日涨幅数据（算不出复合分）'};
+    return {k: 'keep', gap: gap};
+  }
+  /* ---------- 复合分：存活子集内横截面 z 标准化（生产者 :190-193 同式；np.nanstd = 总体标准差 ddof 0） ---------- */
+  function score(keep){
+    var i, n = keep.length, s1 = 0, s2 = 0, s3 = 0, d1 = 0, d2 = 0, d3 = 0, v, m1, m2, m3, sd1, sd2, sd3;
+    for (i = 0; i < n; i++) {
+      v = keep[i];
+      v.x1 = -Math.log(num(v.m.amt20));        /* amt20 > 0 由判据 C 保证 */
+      v.x2 = -Math.log(num(v.m.volbr));        /* volbr > 0 由判据 F 保证 */
+      v.x3 = -num(v.m.ret20);                  /* ret20 是小数（−0.065 = 跌 6.5%）→ 取 z(−ret20) */
+      s1 += v.x1; s2 += v.x2; s3 += v.x3;
+    }
+    m1 = n ? s1 / n : 0; m2 = n ? s2 / n : 0; m3 = n ? s3 / n : 0;
+    for (i = 0; i < n; i++) {
+      v = keep[i];
+      d1 += (v.x1 - m1) * (v.x1 - m1);
+      d2 += (v.x2 - m2) * (v.x2 - m2);
+      d3 += (v.x3 - m3) * (v.x3 - m3);
+    }
+    sd1 = n ? Math.sqrt(d1 / n) : 0; sd2 = n ? Math.sqrt(d2 / n) : 0; sd3 = n ? Math.sqrt(d3 / n) : 0;
+    for (i = 0; i < n; i++) {
+      v = keep[i];
+      v.z1 = sd1 > 0 ? (v.x1 - m1) / sd1 : 0;    /* 退化（子集内全同值）→ z = 0，与生产者 zs() 的 if sd>0 同口径 */
+      v.z2 = sd2 > 0 ? (v.x2 - m2) / sd2 : 0;
+      v.z3 = sd3 > 0 ? (v.x3 - m3) / sd3 : 0;
+      v.F = v.z1 + v.z2 + v.z3;
+    }
+    return keep;
+  }
+  /* ---------- 卡片/表头徽标（自己的 pill；判定时段显示计数「已剔除 N 只 · 命中 M 只」） ---------- */
+  function badge(live){
+    var tb = document.getElementById(CFG.TBL);
+    var card = (tb && tb.closest) ? tb.closest('.card') : null;
+    var h2 = card ? card.querySelector('h2') : null;
+    var bd = null;
+    if (h2) {
+      bd = h2.querySelector('.hpdk-badge');
+      if (!bd) { bd = document.createElement('span'); bd.className = 'badge hpdk-badge'; h2.appendChild(bd); }
+    } else {                                     /* 卡片结构不认识（模板改了）→ 退化为表前一条 pill */
+      bd = document.getElementById('hpdk-live-badge');
+      if (!bd) {
+        bd = document.createElement('div'); bd.id = 'hpdk-live-badge'; bd.className = 'hpdk-badge';
+        if (tb && tb.parentNode) tb.parentNode.insertBefore(bd, tb);
+      }
+    }
+    var txt;
+    if (!live)                       txt = '待行情（打开页面自动拉取）';
+    else if (S.phase === 'open')     txt = '已剔除 ' + S.removed + ' 只 · 命中 ' + S.hit + ' 只';
+    else if (S.phase === 'auction')  txt = '竞价预判中 · 09:25 后判定剔除';
+    else if (S.phase === 'pre')      txt = '待今开判定（09:25 起）';
+    else if (S.phase === 'past')     txt = '买日已过（' + (H.buy_date || '—') + '）';
+    else                             txt = '待买日判定（买日 ' + (H.buy_date || '—') + '）';
+    bd.textContent = txt;
+    bd.title = CFG.TIP + ' · 口径：今开/昨收−1 ∈ [' + fmtPct(numOr(H.gap_lo, -0.03)) + ', ' + fmtPct(numOr(H.gap_hi, -0.01))
+             + ']（闭区间）＋ 可交易（现价/昨收/今开 > 0 且非停牌一字）＋ 20 日均额 ≥ ' + fmtWan(numOr(H.minamt, 0))
+             + ' ＋ 收盘 ≥ ' + numOr(H.minpx, 0).toFixed(2) + ' 元；取复合分 F 前 ' + numOr(H.k, 10) + ' 只（F 在**存活子集**内标准化）。';
+    if (h2) {
+      var srcEl = h2.querySelector('.hpdk-live-src');
+      if (!srcEl) { srcEl = document.createElement('span'); srcEl.className = 'hpdk-live-src'; h2.appendChild(srcEl); }
+      srcEl.textContent = live
+        ? ('刷新于 ' + (S.ts || '—') + ' · 源 ' + (S.src || '—') + (S.mktDate ? ' · 行情日 ' + S.mktDate : '')
+           + (H.buy_date ? ' · 买日 ' + H.buy_date : ''))
+        : '待行情';
+      srcEl.title = CFG.TIP;
+    }
+  }
+
+  /* ---------- 主流程（幂等：每轮先还原再判定 → 重复刷新不叠加、不重复计数） ---------- */
+  function render(q, ts, src, mktTs){
+    var tb = document.getElementById(CFG.TBL);
+    if (!tb) return null;                     /* 表不在本页（未渲染）→ 什么都不做（首屏也会走到这里） */
+    var body = tb.querySelector('tbody');
+    if (!body) return null;
+    css();
+    if (ts) S.ts = ts;
+    if (src) S.src = src;
+    if (mktTs) S.mktTs = mktTs;
+    var live = false, k;
+    for (k in q) { if (Object.prototype.hasOwnProperty.call(q, k)) { live = true; break; } }
+    S.live = live;
+    if (live) S.calls++;
+    var mkt = mktOf(S.mktTs);
+    S.mktDate = mkt ? mkt.date : ''; S.mmin = mkt ? mkt.min : -1;
+    var buy = String(H.buy_date || '');
+    /* 闸门 = 唯一开关（用**交易所时间戳**，不用本地日期）：只有「行情日 === 买日 且 时刻 ≥ 09:25」才剔除 */
+    var enforce = !!(live && mkt && buy && mkt.date === buy && mkt.min >= CFG.OPEN_MIN);
+    S.gate = enforce;
+    S.phase = phaseOf(mkt, buy);
+    S.rows = 0; S.removed = 0; S.hit = 0; S.kept = 0; S.noquote = 0; S.diag = []; S.err = '';
+    if (!COLS) COLS = cols(tb);
+    if (!ORDER) {                            /* 首次抓原始行序（= 盘前代理分序，勿动） */
+      ORDER = [];
+      var all = body.querySelectorAll('tr');
+      for (var a = 0; a < all.length; a++) ORDER.push(all[a]);
+    }
+    /* ① 还原：摘置顶分组行 → 按 ORDER 复位行序 → 摘类 / 摘标签 / 复位写过的单元格 */
+    var oldHdr = body.querySelector('tr.hpdk-buy-hdr');
+    if (oldHdr && oldHdr.parentNode) oldHdr.parentNode.removeChild(oldHdr);
+    for (var o = 0; o < ORDER.length; o++) { body.appendChild(ORDER[o]); resetRow(ORDER[o]); }
+    /* ② 逐行判定（还没行情 → 只建徽标，不判不剔） */
+    var rec = TV || (TV = loadRec()), changed = false;
+    var keepRank = [], keepNa = [], drops = [], pend = [], i;
+    for (i = 0; i < ORDER.length; i++) {
+      var tr = ORDER[i], code = codeOf(tr), m = META[code];
+      if (!m) continue;                      /* 不在资格池内嵌行（过滤器提示行等）→ 一行不动 */
+      S.rows++;
+      if (!live) { S.noquote++; continue; }
+      if (!enforce) { pend.push({tr: tr, code: code}); continue; }   /* 盘前 / 竞价 / 非买日：只灰标，绝不剔除 */
+      var v = judge(m, q[code]);
+      if (!q[code]) S.noquote++;
+      if (v.k === 'keep') keepRank.push({tr: tr, code: code, m: m, gap: v.gap});
+      else if (v.k === 'na') keepNa.push({tr: tr, code: code, m: m});
+      else drops.push({tr: tr, code: code, m: m, v: v});
+    }
+    /* ③ 剔除（只在 enforce 时）：把不达标行**从表格摘掉**，不是置灰 */
+    for (i = 0; i < drops.length; i++) {
+      var dr = drops[i];
+      if (dr.tr.parentNode) dr.tr.parentNode.removeChild(dr.tr);
+      S.diag.push({code: dr.code, gate: dr.v.gate, gap: (dr.v.gap === undefined ? null : dr.v.gap), why: dr.v.why});
+      if (!rec[dr.code]) {                   /* 首次判定时间戳（此后永不覆盖） */
+        rec[dr.code] = {first: ymd(new Date()) + ' ' + hms(new Date()), kind: 'drop', gate: dr.v.gate,
+                        why: dr.v.why, as_of: H.as_of, buy_date: buy};
+        changed = true;
+      }
+    }
+    S.removed = drops.length;
+    /* ④ 存活者排名（存活子集内 z 标准化）→ 取前 k 只置顶 + 写入单元格 */
+    score(keepRank);
+    keepRank.sort(function(X, Y){ return (Y.F !== X.F) ? (Y.F - X.F) : (X.m.i - Y.m.i); });  /* 同分按资格池原序 */
+    var K = numOr(H.k, 10); if (!(K >= 1)) K = 10;
+    var slot = numOr(H.capital, 0) / Math.max(1, numOr(H.kslot, 1));    /* 单票分配上限 = 本金 / KSLOT */
+    var top = keepRank.slice(0, K);
+    for (i = 0; i < top.length; i++) {
+      var it = top[i], dq = q[it.code] || {}, opn = num(dq.opn);
+      var amt = num(it.m.amt20), capv = amt * CFG.ADV_FRAC, alloc = Math.min(slot, capv);
+      var qty = (opn > 0 && alloc > 0) ? Math.floor(alloc / opn / 100) * 100 : 0;
+      var tpPx = opn * (1 + numOr(H.tp, 0.02));
+      var limited = capv < slot - CFG.EPS;                 /* 该股 ADV×1% 放不满单票分配 → 容量受限 */
+      var rank = i + 1;
+      var tip = 'F = ' + it.F.toFixed(3) + '（z: ' + it.z1.toFixed(2) + ' / ' + it.z2.toFixed(2) + ' / ' + it.z3.toFixed(2)
+              + '）· 今开/昨收−1 = ' + fmtPct(it.gap) + ' · 20 日均额 ' + fmtWan(amt)
+              + ' · 单票分配 ' + alloc.toFixed(0) + ' 元（min(本金/KSLOT=' + slot.toFixed(0) + ', ADV×1%=' + capv.toFixed(0) + ')）'
+              + ' · 买日 ' + (buy || '—') + '；' + CFG.TIP;
+      var lab = '\u2705 今日买入候选 #' + rank;
+      if (colOf('event') >= 0) writeCell(it.tr, 'event', lab, tip, null);
+      else tagTo(it.tr, 'name', lab, 'buy', tip, true);
+      if (colOf('buy') >= 0) writeCell(it.tr, 'buy', opn.toFixed(3), tip, opn);
+      if (colOf('tp') >= 0) writeCell(it.tr, 'tp', tpPx.toFixed(3), tip, Math.round(tpPx * 1000) / 1000);
+      if (colOf('qty') >= 0) writeCell(it.tr, 'qty', fmtQty(qty), tip, qty);
+      if (colOf('cap') >= 0) writeCell(it.tr, 'cap', limited ? '⚠ 受 ADV×1% 限' : '未触限', tip, limited ? 0 : 1);
+      it.tr.classList.add('hpdk-buy');
+      it.tr.setAttribute('data-hpdk', 'buy#' + rank);
+      if (!rec[it.code]) {
+        rec[it.code] = {first: ymd(new Date()) + ' ' + hms(new Date()), kind: 'keep', as_of: H.as_of, buy_date: buy};
+        changed = true;
+      }
+    }
+    /* ⑤ 存活但未入选（F 排名在 k 之后）：细左条 + 灰标签，不置顶 */
+    for (i = K; i < keepRank.length; i++) {
+      var it2 = keepRank[i];
+      it2.tr.classList.add('hpdk-keep');
+      tagTo(it2.tr, 'name', '留存 · F 第 ' + (i + 1) + ' 位', 'keep',
+            'F = ' + it2.F.toFixed(3) + '，排名在 k=' + K + ' 之后：本日不买，仍留在清单里。' + CFG.TIP, true);
+    }
+    /* ⑥ 判定不明的行（本次报价缺失该码）：保守留存 + 灰标签（绝不因「没数据」剔除） */
+    for (i = 0; i < keepNa.length; i++)
+      tagTo(keepNa[i].tr, 'name', '待行情（保守留存）', 'pre',
+            '本次报价缺该码 → 不剔除（宁可漏剔，不可误剔）。' + CFG.TIP, true);
+    S.kept = keepRank.length + keepNa.length;
+    S.hit = top.length;
+    /* ⑦ 置顶：分组行 colspan = 运行时列数（勿写死），按 F 降序（#1 在最上） */
+    if (top.length) {
+      var hr = document.createElement('tr');
+      hr.className = 'hpdk-buy-hdr';
+      hr.innerHTML = '<td colspan="' + (NCOL || 14) + '">\u26a1 今日买入候选（' + top.length
+        + '）· 已剔除 ' + S.removed + ' 只 · 置顶=视图态：不改信号池、不改 depth rank、不写盘'
+        + (S.pool > S.rows ? ' · 注：资格池 ' + S.pool + ' 只，本表只渲染 ' + S.rows + ' 行，F 排名在本表存活行内算' : '')
+        + '</td>';
+      body.insertBefore(hr, body.firstChild);
+      var anchor = hr;
+      for (i = 0; i < top.length; i++) { body.insertBefore(top[i].tr, anchor.nextSibling); anchor = top[i].tr; }
+    }
+    /* ⑧ 非判定时段：只挂灰标（一行都不剔除）—— 竞价 09:15–09:24 显示竞价预判 gap */
+    if (live && !enforce) {
+      var tip0 = CFG.TIP + ' · 非判定时段：**不剔除任何标的**。'
+               + (buy ? ('买日 ' + buy + '，09:25 起用真实今开判定。') : '');
+      for (i = 0; i < pend.length; i++) {
+        var d2 = q[pend[i].code] || {}, px2 = num(d2.px), pcl2 = num(d2.pcl), t2;
+        if (S.phase === 'auction')     t2 = '竞价预判 ' + fmtPct((px2 > 0 && pcl2 > 0) ? (px2 / pcl2 - 1) : NaN);
+        else if (S.phase === 'pre')    t2 = '待今开判定（09:25 起）';
+        else if (S.phase === 'past')   t2 = '买日已过（' + (buy || '—') + '）';
+        else if (S.phase === 'prebuy') t2 = '非买日 · 待 ' + (buy || '—');
+        else                           t2 = '待今开判定（09:25 起）';
+        tagTo(pend[i].tr, 'name', t2, 'pre', tip0, true);
+      }
+    }
+    if (changed) saveRec(rec);
+    badge(live);
+    return {phase: S.phase, gate: S.gate, rows: S.rows, pool: S.pool, removed: S.removed, hit: S.hit,
+            kept: S.kept, noquote: S.noquote, mktDate: S.mktDate, mmin: S.mmin, diag: S.diag, err: S.err};
+  }
+  function run(q, ts, src, mktTs){
+    if (!document.getElementById(CFG.TBL)) return null;   /* 表不存在 → 零开销 */
+    try { return render(q, ts, src, mktTs); }
+    catch(e) { S.err = String(e && e.message || e); return null; }
+  }
+
+  /* 接线（两条路都要接，缺一不可 —— 同 QLCH_JS 的线上教训：IIFE 内部调的是局部函数 applyQuotes，
+     只包 window.INTRADAY.applyQuotes 在**真实刷新路径**上一次都拦不到；真实路径靠 intraday_live.py
+     applyQuotes 调用点显式留的 window.HPDK_ON_QUOTES 钩子）： */
+  window.HPDK_ON_QUOTES = function(q, ts, src, mktTs){ return run(q, ts, src, mktTs); };
+  var IN = window.INTRADAY;
+  if (IN && typeof IN.applyQuotes === 'function') {
+    var orig = IN.applyQuotes;
+    IN.applyQuotes = function(q, ts, opt){
+      var out = orig(q, ts, opt);
+      opt = opt || {};
+      run(q, ts, opt.src || (IN.state && IN.state.poolSrc), opt.mktTs || (IN.state && IN.state.mktTs));
+      return out;
+    };
+  }
+  /* 导出（供 _verify_* 脚本断状态；判定 / 排名 / 列定位都可单独驱动） */
+  window.HPDK_LIVE = {run: run, state: S, meta: META, cfg: CFG, judge: judge, score: score, cols: cols,
+                      mktOf: mktOf, phaseOf: phaseOf, order: function(){ return ORDER; },
+                      rec: function(){ return TV; },
+                      reload: function(){ TV = loadRec(); return TV; },
+                      reset: function(){ TV = {}; try { localStorage.removeItem(CFG.LS); } catch(e) {} },
+                      wrapped: !!(IN && IN.applyQuotes)};
+  /* 首屏：先把样式 / 徽标建起来（还没行情 → 不判定、不剔除、不贴标） */
   run(null, '');
 })();
 """

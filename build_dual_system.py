@@ -17,7 +17,7 @@ sys.path.insert(0, str(BASE))
 from ui_components import THEME_CSS, NAV_HTML, COMMON_JS
 from kxmm_card import KXMM_CSS, KXMM_VIEW_HTML, KXMM_JS
 from ui_subtab import SUBNAV_CSS, SUBNAV_JS, subnav, subview, ASSET_HINT
-from intraday_live import INTRADAY_JS, QLCH_JS, A5_JUDGE_JS, A5_JS
+from intraday_live import INTRADAY_JS, QLCH_JS, HPDK_JS, A5_JUDGE_JS, A5_JS
 
 
 def _crowding():
@@ -2965,6 +2965,31 @@ def _sentinel_paper_card(track_js="sentinel_track.js", state_json="backtest/sent
     return "".join(out)
 
 
+# ============ 横盘低开·两日 子视图接线（2026-09-27 新增，R-hpdk-dash-0927） ============
+# 卡片 HTML 在独立模块 hpdk_card.py（只读本策略自己的产物，不读别的策略文件）。
+import hpdk_card as _HPDK
+
+
+def hpdk_payload():
+    return _HPDK.hpdk_payload(BASE)
+
+
+def hpdk_card():
+    return _HPDK.hpdk_card(BASE)
+
+
+def hpdk_oos_card():
+    return _HPDK.hpdk_oos_card(BASE)
+
+
+HP_HPDK_BT = _bt_ref_card("st-hpdk", "🎯 横盘低开·两日 · 回测参考",
+                          "冻结 OOS 规格（K=10 / KSLOT=20 / 止盈+2% / 成本 6.92bp 往返）",
+                          "backtest/hpdk_bt_ref.json",
+                          "本子标签**自有**回测产物（不与其他子标签共用）。主读数取 2018-01-02 起"
+                          "（BPS 覆盖度 >0.70；2016/2017 因每股净资产数据覆盖不足被过度剔除，"
+                          "故不计入主读数，全窗读数并列披露）。")
+
+
 SENTINEL_CARD = _bt_ref_card("sentinel", "📡 热榜哨兵",
                              "jiandi top30 共振哨兵 · 影子 · 只可否决 · 复测：通过（严格版 200 路径，剔最好1年仍 >0）",
                              "backtest/sentinel_backtest.json",
@@ -2975,6 +3000,7 @@ BT_SHORT_SUB_BLOCKS = ('<div class="card" id="bt-short">'
     + _bt_sub("st-qlch", _bt_ref_card("st-qlch", "📉 超跌低开低吸 · 回测参考", "自有口径（qlch 生产脚本）",
               "backtest/qlch_bt_ref.json",
               "本子标签暂无独立回测产物；口径见上方「超跌低开低吸」子视图内卡片（不与其他子标签共用）"), on=True)
+    + _bt_sub("st-hpdk", HP_HPDK_BT)
     + _bt_sub("st-kh", bt_short_html("kh"))
     + _bt_sub("st-etf", _bt_ref_card("st-etf", "🔄 ETF轮动 · 回测参考", "自有口径",
               "backtest/etf_bt_ref.json",
@@ -3015,7 +3041,7 @@ SENTINEL_FOOT = ("""<div class="sub" style="color:var(--faint)">"""
 SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
 {subnav("short", [("st-qlch", "超跌低开低吸"), ("st-kh", "超卖伏击"),
                     ("st-etf", "ETF轮动"), ("st-stk", "股票池"),
-                    ("st-fund", "基金池"), ("st-sentinel", "热榜哨兵")],
+                     ("st-fund", "基金池"), ("st-hpdk", "横盘低开·两日"), ("st-sentinel", "热榜哨兵")],
         default_key="st-qlch")}
 {subview("st-sentinel", "热榜哨兵", "jiandi top30 共振哨兵 · 影子跟踪（shadow_start 2026-09-24）",
   _sentinel_block() + _sentinel_track_card() + _sentinel_paper_card() + SENTINEL_CARD + SENTINEL_FOOT)}
@@ -3034,6 +3060,8 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
   tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=(), inline=True))}
 {subview("st-qlch", "超跌低开低吸", "短期反转 + 跳空低吸 + 熊市择时 · 次日出场",
          qlch_card() + watch_card("st-qlch", "超跌低开低吸", "qlch", note=WATCH_NOTE_QLCH))}
+{subview("st-hpdk", "横盘低开·两日", "缩量超跌 + 次日低开低吸 + 固定持有 2 日 · 前向 OOS 冻结核验",
+         hpdk_card() + hpdk_oos_card())}
 {subview("st-kh", "超卖伏击", "RSI 超卖 + 15 策略形态 · 标准/激进双轨",
          KH_HITS_CARD + KH_PAPER_CARD + watch_card("st-kh", "超卖伏击", "kh", note=WATCH_NOTE_KH))}
 {subview("st-etf", "ETF轮动", "20 日动量排名 · 目标权重为策略输出",
@@ -3145,6 +3173,9 @@ def qlch_live_payload():
 
 QLCH_LIVE = qlch_live_payload()
 QLCH_JSON = json.dumps(QLCH_LIVE, ensure_ascii=False, separators=(",", ":"))
+HPDK_LIVE = hpdk_payload()
+HPDK_JSON = (json.dumps(HPDK_LIVE, ensure_ascii=False, separators=(",", ":"))
+             if HPDK_LIVE else "null")
 print("  盘中买点数据: window.QLCH 候选 %d 行 / 六臂账本 %d 臂 / cost_rt=%s / gap=[%s, %s]"
       % (len(QLCH_LIVE["rows"]), len(QLCH_LIVE["accounts"]), QLCH_LIVE["cost_rt"],
          QLCH_LIVE["gap_lo"], QLCH_LIVE["gap_hi"]))
@@ -3419,6 +3450,7 @@ html = f"""<!doctype html>
 <!-- 盘中买点判定数据（R-qlch-live-0923）：qlch 候选 + 策略参数 + 六臂账本净值，构建期一次性内嵌。
      只读快照：判定与盘中净值都在浏览器端算（ADR-0009），不落盘、不写账本、不改收盘链。 -->
 <script>window.QLCH = {QLCH_JSON};</script>
+<script>window.HPDK = {HPDK_JSON};</script>
 <!-- 打板族竞价/开盘判定数据（R-a5-auction-0924）：行 = 首板日收盘的静态条件 + 判定阈值，
      唯一盘中变量（今开）由 a5Judge 在浏览器端判（ADR-0009），只读快照、不写盘、不动账本。 -->
 <script>window.A5_AUCTION = {A5_AUCTION_JS};</script>
@@ -4035,6 +4067,7 @@ document.addEventListener('DOMContentLoaded',function(){{
 <script>{KXMM_JS}</script>
 <script>{INTRADAY_JS}</script>
 <script>{QLCH_JS}</script>
+<script>{HPDK_JS}</script>
 <script>{A5_JUDGE_JS}</script>
 <script>{A5_JS}</script>
 </body></html>"""

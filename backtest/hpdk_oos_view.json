@@ -1,0 +1,34 @@
+{
+ "script_sha256": "a43d97bc30717d1f8784c9373c232ccc359c39cc91e39e5a7b0be11581c1e50b",
+ "shadow_start": "2026-09-25",
+ "last_scan_date": "2026-09-24",
+ "n_settled": 0,
+ "n_pending": 0,
+ "acceptance": {
+  "n": 0,
+  "mean_pct": null,
+  "med_pct": null,
+  "wr_pct": null
+ },
+ "acceptance_close_only": {
+  "n": 0,
+  "mean_pct": null,
+  "med_pct": null,
+  "wr_pct": null
+ },
+ "gates": {
+  "n": false,
+  "days": false,
+  "mean": false,
+  "wr": false,
+  "med": false
+ },
+ "exec_dev_pct": {
+  "n": 0,
+  "mean": null
+ },
+ "tp_hit_pct": 0.0,
+ "verdict": "尚未开始（无已完成样本）",
+ "exit_rule": "v1.3 主口径: 止盈 +2.00% / 不止损 / 未达标 T+2 尾盘; 对照口径: 纯 T+2 尾盘",
+ "last": []
+}
