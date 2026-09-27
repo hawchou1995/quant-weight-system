@@ -302,7 +302,11 @@ backtest/jiandi_cost_sens_0906.py
 backtest/jiandi_final_config_0906.py
 backtest/jiandi_opt_grid_0906.py
 backtest/jiandi_rsi_exit_0906.py
-backtest/jiandi_signal_0906.py
+# 2026-09-27（R-cloud-imports-0927）：backtest/sentinel_daily.py（**链步骤、已入库**）import 本文件。
+#   原先此处直接忽略它 → 云端 checkout 无此文件 → sentinel_daily ImportError →
+#   热榜哨兵云端产数据长期停更（实测 2026-09-27 云端 run 36299613739 报 ModuleNotFoundError，[软] 失败）。
+#   改为否定规则：文件照常入库；其余 jiandi_*_0906.py 仍按下列规则忽略。
+!backtest/jiandi_signal_0906.py
 backtest/jiandi_signal_0906_out/
 backtest/kb5_cond_features_0916.py
 backtest/kb_batch2_pca_increment_0917.json
