@@ -1,0 +1,5015 @@
+{
+  "meta": {
+    "generated_at": "2026-09-27T10:34:49",
+    "generated_by": "net_checks pipeline (explorer subagent)",
+    "script_dir": "C:\\Users\\Admin\\.pi-desktop\\scratch\\d40abb6e-dc12-4d27-8ed2-f290de0a6c5c\\x2net",
+    "scripts": [
+      "check_calendar.py",
+      "check_dataset_vs_sources.py",
+      "check_deviation_profile.py",
+      "check_dual_source.py",
+      "check_qfq.py",
+      "common.py",
+      "net_fetch.py",
+      "run_all.py",
+      "scan_data.py",
+      "scan_extra.py",
+      "scan_tails.py"
+    ],
+    "main_scripts": {
+      "fetch_layer": "net_fetch.py",
+      "item1_dual_source": "check_dual_source.py",
+      "item2_qfq": "check_qfq.py",
+      "item3_calendar": "check_calendar.py",
+      "item4_outliers": "scan_data.py",
+      "item4_supplement": "scan_extra.py",
+      "tail_scan": "scan_tails.py",
+      "dataset_vs_sources": "check_dataset_vs_sources.py",
+      "deviation_profile": "check_deviation_profile.py",
+      "merger": "run_all.py"
+    },
+    "third_party_sources_used": {
+      "sina": "ak.stock_zh_a_daily(symbol, adjust)  [only allowed source A]",
+      "tencent": "ak.stock_zh_a_hist_tx(symbol, start_date, end_date, adjust)  [only allowed source B]",
+      "eastmoney": "NOT USED (blocked on this host on purpose)",
+      "calendar": "ak.tool_trade_date_hist_sina()"
+    },
+    "rate_limit": {
+      "min_interval_sec": 0.5,
+      "max_retries_after_first_attempt": 2,
+      "request_timeout_sec": 20,
+      "watchdog_per_akshare_call_sec": 90
+    },
+    "random_seed": 20260926,
+    "sample_size_requested": 120,
+    "window_trade_days": 250,
+    "env": {
+      "python": "3.13.14",
+      "akshare": "1.18.91",
+      "pandas": "3.0.5"
+    },
+    "data_full_dir": "D:\\Documents\\Workbuddy\\股票基金\\quant-weight-system\\data_full",
+    "data_full_file_count": {
+      "csv_files_total": 7540,
+      "symbol_like_files": 7539,
+      "unclassified": [
+        "_index"
+      ],
+      "by_exchange": {
+        "sh": 3385,
+        "sz": 3812,
+        "bj": 342
+      },
+      "by_universe_class": {
+        "bj_stock": 342,
+        "sh_fund_or_other": 928,
+        "sh_stock": 2452,
+        "b_share": 5,
+        "sz_stock": 3081,
+        "sz_fund_or_other": 731
+      },
+      "task_brief_claimed_count": 5207,
+      "discrepancy_note": "the brief said ~5,207 symbols; the directory actually holds 7539 symbol-like CSVs (3385 sh + 3812 sz + 342 bj) of which 1665 are NOT ordinary A shares (<= sh5xxxxx/sz159xxx ETFs, sh900xxx B shares). Ordinary A-share-like codes = 5875."
+    },
+    "repo_files_modified": false,
+    "scratch_only": true
+  },
+  "dual_source": {
+    "window": {
+      "start": "2025-09-15",
+      "end": "2026-09-24",
+      "trade_days": 250,
+      "note": "last 250 official SSE trade dates <= today"
+    },
+    "sources": {
+      "sina": "ak.stock_zh_a_daily(adjust='qfq')",
+      "tencent": "ak.stock_zh_a_hist_tx(adjust='qfq')"
+    },
+    "compare_field": "close",
+    "deviation_definition": "abs(close_sina - close_tx) / close_tx",
+    "n_symbols_sampled": 120,
+    "n_symbols_compared": 80,
+    "n_symbols_fetch_fail": 40,
+    "fetch_fail": [
+      {
+        "sym": "bj920171",
+        "sina_rows": 250,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": null,
+        "tx_error": "KeyError: 'day'",
+        "universe_class": "bj_stock"
+      },
+      {
+        "sym": "bj920195",
+        "sina_rows": 250,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": null,
+        "tx_error": "KeyError: 'day'",
+        "universe_class": "bj_stock"
+      },
+      {
+        "sym": "bj920418",
+        "sina_rows": 250,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": null,
+        "tx_error": "KeyError: 'day'",
+        "universe_class": "bj_stock"
+      },
+      {
+        "sym": "bj920809",
+        "sina_rows": 250,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": null,
+        "tx_error": "KeyError: 'day'",
+        "universe_class": "bj_stock"
+      },
+      {
+        "sym": "bj920914",
+        "sina_rows": 250,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": null,
+        "tx_error": "KeyError: 'day'",
+        "universe_class": "bj_stock"
+      },
+      {
+        "sym": "bj920964",
+        "sina_rows": 250,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": null,
+        "tx_error": "KeyError: 'day'",
+        "universe_class": "bj_stock"
+      },
+      {
+        "sym": "sh510590",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh511810",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh512560",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh512680",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh515030",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh515990",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh516830",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh530100",
+        "sina_rows": 0,
+        "tx_rows": 229,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh560180",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh560350",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh560950",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh561220",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh562010",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh562550",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh562860",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh589220",
+        "sina_rows": 0,
+        "tx_rows": 163,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh600190",
+        "sina_rows": 0,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": "RuntimeError: empty dataframe",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh600357",
+        "sina_rows": 0,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": "RuntimeError: empty dataframe",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh600701",
+        "sina_rows": 0,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": "RuntimeError: empty dataframe",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sz000003",
+        "sina_rows": 0,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": "RuntimeError: empty dataframe",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz159011",
+        "sina_rows": 0,
+        "tx_rows": 72,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159226",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159266",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159297",
+        "sina_rows": 0,
+        "tx_rows": 245,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159312",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159397",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159552",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159680",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159726",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159780",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159916",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159971",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz300064",
+        "sina_rows": 0,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": "RuntimeError: empty dataframe",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz300495",
+        "sina_rows": 0,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": "RuntimeError: empty dataframe",
+        "universe_class": "sz_stock"
+      }
+    ],
+    "total_pairs": 19813,
+    "pairs_gt_0.5pct": 1028,
+    "pairs_gt_0.5pct_ratio": 0.05188512592742139,
+    "pairs_gt_5pct": 0,
+    "pairs_gt_5pct_ratio": 0.0,
+    "pairs_exact_equal": 11868,
+    "pairs_exact_equal_ratio": 0.599000656134861,
+    "mean_rel_dev_all_pairs": 0.0010648314367040365,
+    "top10_max_deviation": [
+      {
+        "sym": "sh600782",
+        "max_rel_dev": 0.019512195121951237,
+        "date": "2025-09-15",
+        "close_sina": 4.02,
+        "close_tx": 4.1,
+        "pairs": 250,
+        "pairs_gt_0.5pct": 158,
+        "pairs_gt_5pct": 0,
+        "mean_rel_dev": 0.00983865727716013,
+        "n_exact_equal": 80
+      },
+      {
+        "sym": "sh600000",
+        "max_rel_dev": 0.014604150653343544,
+        "date": "2025-09-15",
+        "close_sina": 12.82,
+        "close_tx": 13.01,
+        "pairs": 250,
+        "pairs_gt_0.5pct": 90,
+        "pairs_gt_5pct": 0,
+        "mean_rel_dev": 0.004516972183342766,
+        "n_exact_equal": 67
+      },
+      {
+        "sym": "sh603579",
+        "max_rel_dev": 0.01443037974683545,
+        "date": "2025-09-17",
+        "close_sina": 38.93,
+        "close_tx": 39.5,
+        "pairs": 250,
+        "pairs_gt_0.5pct": 103,
+        "pairs_gt_5pct": 0,
+        "mean_rel_dev": 0.004277532271519023,
+        "n_exact_equal": 79
+      },
+      {
+        "sym": "sh600848",
+        "max_rel_dev": 0.01152959262106075,
+        "date": "2025-11-18",
+        "close_sina": 12.86,
+        "close_tx": 13.01,
+        "pairs": 250,
+        "pairs_gt_0.5pct": 138,
+        "pairs_gt_5pct": 0,
+        "mean_rel_dev": 0.005334932450375388,
+        "n_exact_equal": 67
+      },
+      {
+        "sym": "sz002406",
+        "max_rel_dev": 0.010613207547169793,
+        "date": "2026-05-28",
+        "close_sina": 8.39,
+        "close_tx": 8.48,
+        "pairs": 250,
+        "pairs_gt_0.5pct": 130,
+        "pairs_gt_5pct": 0,
+        "mean_rel_dev": 0.004347934134447129,
+        "n_exact_equal": 59
+      },
+      {
+        "sym": "sz002969",
+        "max_rel_dev": 0.008875739644970487,
+        "date": "2025-09-23",
+        "close_sina": 3.41,
+        "close_tx": 3.38,
+        "pairs": 233,
+        "pairs_gt_0.5pct": 54,
+        "pairs_gt_5pct": 0,
+        "mean_rel_dev": 0.0027986727668315677,
+        "n_exact_equal": 43
+      },
+      {
+        "sym": "sh603788",
+        "max_rel_dev": 0.008869179600886993,
+        "date": "2026-03-23",
+        "close_sina": 13.65,
+        "close_tx": 13.53,
+        "pairs": 250,
+        "pairs_gt_0.5pct": 13,
+        "pairs_gt_5pct": 0,
+        "mean_rel_dev": 0.0014458881781766273,
+        "n_exact_equal": 99
+      },
+      {
+        "sym": "sz300577",
+        "max_rel_dev": 0.008426966292134866,
+        "date": "2025-09-19",
+        "close_sina": 24.71,
+        "close_tx": 24.92,
+        "pairs": 250,
+        "pairs_gt_0.5pct": 60,
+        "pairs_gt_5pct": 0,
+        "mean_rel_dev": 0.003249295354237861,
+        "n_exact_equal": 22
+      },
+      {
+        "sym": "sz300832",
+        "max_rel_dev": 0.008038585209003173,
+        "date": "2025-09-17",
+        "close_sina": 67.87,
+        "close_tx": 68.42,
+        "pairs": 250,
+        "pairs_gt_0.5pct": 56,
+        "pairs_gt_5pct": 0,
+        "mean_rel_dev": 0.002429427055141831,
+        "n_exact_equal": 89
+      },
+      {
+        "sym": "sh601236",
+        "max_rel_dev": 0.00777777777777781,
+        "date": "2025-10-13",
+        "close_sina": 8.93,
+        "close_tx": 9.0,
+        "pairs": 250,
+        "pairs_gt_0.5pct": 55,
+        "pairs_gt_5pct": 0,
+        "mean_rel_dev": 0.002893616420422878,
+        "n_exact_equal": 92
+      }
+    ],
+    "by_universe": {
+      "bj_stock": {
+        "n_symbols_in_sample": 6,
+        "n_symbols_compared": 0,
+        "n_symbols_fetch_fail": 6,
+        "total_pairs": 0,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_0.5pct_ratio": null,
+        "pairs_gt_5pct": 0,
+        "pairs_gt_5pct_ratio": null
+      },
+      "sh_fund_or_other": {
+        "n_symbols_in_sample": 16,
+        "n_symbols_compared": 0,
+        "n_symbols_fetch_fail": 16,
+        "total_pairs": 0,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_0.5pct_ratio": null,
+        "pairs_gt_5pct": 0,
+        "pairs_gt_5pct_ratio": null
+      },
+      "sh_stock": {
+        "n_symbols_in_sample": 36,
+        "n_symbols_compared": 33,
+        "n_symbols_fetch_fail": 3,
+        "total_pairs": 8225,
+        "pairs_gt_0.5pct": 557,
+        "pairs_gt_0.5pct_ratio": 0.06772036474164134,
+        "pairs_gt_5pct": 0,
+        "pairs_gt_5pct_ratio": 0.0
+      },
+      "sz_fund_or_other": {
+        "n_symbols_in_sample": 12,
+        "n_symbols_compared": 0,
+        "n_symbols_fetch_fail": 12,
+        "total_pairs": 0,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_0.5pct_ratio": null,
+        "pairs_gt_5pct": 0,
+        "pairs_gt_5pct_ratio": null
+      },
+      "sz_stock": {
+        "n_symbols_in_sample": 50,
+        "n_symbols_compared": 47,
+        "n_symbols_fetch_fail": 3,
+        "total_pairs": 11588,
+        "pairs_gt_0.5pct": 471,
+        "pairs_gt_0.5pct_ratio": 0.0406454953400069,
+        "pairs_gt_5pct": 0,
+        "pairs_gt_5pct_ratio": 0.0
+      }
+    },
+    "a_share_only": {
+      "note": "subset of the same 120-symbol sample: sh600/601/603/605/688 + sz000/001/002/003/300/301/302 (excludes ETFs, B-shares, BJ)",
+      "n_symbols_in_sample": 86,
+      "n_symbols_compared": 80,
+      "total_pairs": 19813,
+      "pairs_gt_0.5pct": 1028,
+      "pairs_gt_0.5pct_ratio": 0.05188512592742139,
+      "pairs_gt_5pct": 0,
+      "pairs_gt_5pct_ratio": 0.0,
+      "top10_max_deviation": [
+        {
+          "sym": "sh600782",
+          "max_rel_dev": 0.019512195121951237,
+          "date": "2025-09-15",
+          "pairs": 250
+        },
+        {
+          "sym": "sh600000",
+          "max_rel_dev": 0.014604150653343544,
+          "date": "2025-09-15",
+          "pairs": 250
+        },
+        {
+          "sym": "sh603579",
+          "max_rel_dev": 0.01443037974683545,
+          "date": "2025-09-17",
+          "pairs": 250
+        },
+        {
+          "sym": "sh600848",
+          "max_rel_dev": 0.01152959262106075,
+          "date": "2025-11-18",
+          "pairs": 250
+        },
+        {
+          "sym": "sz002406",
+          "max_rel_dev": 0.010613207547169793,
+          "date": "2026-05-28",
+          "pairs": 250
+        },
+        {
+          "sym": "sz002969",
+          "max_rel_dev": 0.008875739644970487,
+          "date": "2025-09-23",
+          "pairs": 233
+        },
+        {
+          "sym": "sh603788",
+          "max_rel_dev": 0.008869179600886993,
+          "date": "2026-03-23",
+          "pairs": 250
+        },
+        {
+          "sym": "sz300577",
+          "max_rel_dev": 0.008426966292134866,
+          "date": "2025-09-19",
+          "pairs": 250
+        },
+        {
+          "sym": "sz300832",
+          "max_rel_dev": 0.008038585209003173,
+          "date": "2025-09-17",
+          "pairs": 250
+        },
+        {
+          "sym": "sh601236",
+          "max_rel_dev": 0.00777777777777781,
+          "date": "2025-10-13",
+          "pairs": 250
+        }
+      ]
+    },
+    "per_symbol": [
+      {
+        "sym": "bj920171",
+        "sina_rows": 250,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": null,
+        "tx_error": "KeyError: 'day'",
+        "universe_class": "bj_stock"
+      },
+      {
+        "sym": "bj920195",
+        "sina_rows": 250,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": null,
+        "tx_error": "KeyError: 'day'",
+        "universe_class": "bj_stock"
+      },
+      {
+        "sym": "bj920418",
+        "sina_rows": 250,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": null,
+        "tx_error": "KeyError: 'day'",
+        "universe_class": "bj_stock"
+      },
+      {
+        "sym": "bj920809",
+        "sina_rows": 250,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": null,
+        "tx_error": "KeyError: 'day'",
+        "universe_class": "bj_stock"
+      },
+      {
+        "sym": "bj920914",
+        "sina_rows": 250,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": null,
+        "tx_error": "KeyError: 'day'",
+        "universe_class": "bj_stock"
+      },
+      {
+        "sym": "bj920964",
+        "sina_rows": 250,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": null,
+        "tx_error": "KeyError: 'day'",
+        "universe_class": "bj_stock"
+      },
+      {
+        "sym": "sh510590",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh511810",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh512560",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh512680",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh515030",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh515990",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh516830",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh530100",
+        "sina_rows": 0,
+        "tx_rows": 229,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh560180",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh560350",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh560950",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh561220",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh562010",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh562550",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh562860",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh589220",
+        "sina_rows": 0,
+        "tx_rows": 163,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sh_fund_or_other"
+      },
+      {
+        "sym": "sh600000",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 90,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.014604150653343544,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.004516972183342766,
+        "n_exact_equal": 67,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh600018",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0036697247706422866,
+        "max_rel_dev_date": "2025-11-17",
+        "mean_rel_dev": 0.0007824597316559486,
+        "n_exact_equal": 161,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh600081",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh600186",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh600190",
+        "sina_rows": 0,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": "RuntimeError: empty dataframe",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh600221",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh600278",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.003464203233256277,
+        "max_rel_dev_date": "2026-01-28",
+        "mean_rel_dev": 0.001225682036865057,
+        "n_exact_equal": 86,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh600330",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh600357",
+        "sina_rows": 0,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": "RuntimeError: empty dataframe",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh600439",
+        "sina_rows": 249,
+        "tx_rows": 249,
+        "status": "ok",
+        "pairs": 249,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 249,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh600609",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.002551020408163211,
+        "max_rel_dev_date": "2026-04-24",
+        "mean_rel_dev": 0.0014004028083032798,
+        "n_exact_equal": 91,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh600638",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.003120124804992272,
+        "max_rel_dev_date": "2025-10-22",
+        "mean_rel_dev": 0.0014840874681516614,
+        "n_exact_equal": 70,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh600673",
+        "sina_rows": 241,
+        "tx_rows": 241,
+        "status": "ok",
+        "pairs": 241,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 241,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh600701",
+        "sina_rows": 0,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": "RuntimeError: empty dataframe",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh600728",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh600782",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 158,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.019512195121951237,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.00983865727716013,
+        "n_exact_equal": 80,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh600848",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 138,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.01152959262106075,
+        "max_rel_dev_date": "2025-11-18",
+        "mean_rel_dev": 0.005334932450375388,
+        "n_exact_equal": 67,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh600882",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh600885",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.003680981595092019,
+        "max_rel_dev_date": "2026-04-07",
+        "mean_rel_dev": 0.0008298541066888864,
+        "n_exact_equal": 107,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh601236",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 55,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.00777777777777781,
+        "max_rel_dev_date": "2025-10-13",
+        "mean_rel_dev": 0.002893616420422878,
+        "n_exact_equal": 92,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh603098",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.003262642740620026,
+        "max_rel_dev_date": "2026-03-25",
+        "mean_rel_dev": 0.0011145740254753923,
+        "n_exact_equal": 80,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh603200",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.00040012003601072366,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.00017416259554788122,
+        "n_exact_equal": 87,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh603336",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh603579",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 103,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.01443037974683545,
+        "max_rel_dev_date": "2025-09-17",
+        "mean_rel_dev": 0.004277532271519023,
+        "n_exact_equal": 79,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh603698",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0022788481458464165,
+        "max_rel_dev_date": "2026-01-12",
+        "mean_rel_dev": 0.0010978296318096719,
+        "n_exact_equal": 39,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh603788",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 13,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.008869179600886993,
+        "max_rel_dev_date": "2026-03-23",
+        "mean_rel_dev": 0.0014458881781766273,
+        "n_exact_equal": 99,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh603896",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh605055",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.002522068095838646,
+        "max_rel_dev_date": "2026-03-23",
+        "mean_rel_dev": 0.0006698597354328952,
+        "n_exact_equal": 101,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh605178",
+        "sina_rows": 241,
+        "tx_rows": 240,
+        "status": "ok",
+        "pairs": 240,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 240,
+        "sina_only_dates": 1,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh605388",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh688193",
+        "sina_rows": 245,
+        "tx_rows": 245,
+        "status": "ok",
+        "pairs": 245,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0037028465632954546,
+        "max_rel_dev_date": "2025-12-17",
+        "mean_rel_dev": 0.000860419665510598,
+        "n_exact_equal": 89,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh688282",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh688318",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0009847365829640945,
+        "max_rel_dev_date": "2025-09-17",
+        "mean_rel_dev": 0.00023751698694870636,
+        "n_exact_equal": 102,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh688433",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0006455777921239754,
+        "max_rel_dev_date": "2025-11-04",
+        "mean_rel_dev": 0.00014161070358183886,
+        "n_exact_equal": 111,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh688521",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sh688789",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.004658941584040146,
+        "max_rel_dev_date": "2025-09-30",
+        "mean_rel_dev": 0.0023466779778820585,
+        "n_exact_equal": 64,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sh_stock"
+      },
+      {
+        "sym": "sz000003",
+        "sina_rows": 0,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": "RuntimeError: empty dataframe",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz000088",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0044843049327353305,
+        "max_rel_dev_date": "2025-11-07",
+        "mean_rel_dev": 0.0006177740860229698,
+        "n_exact_equal": 187,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz000652",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz000776",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.004637681159420191,
+        "max_rel_dev_date": "2026-04-07",
+        "mean_rel_dev": 0.001298944043048821,
+        "n_exact_equal": 63,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz000892",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz001225",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0030764248704662845,
+        "max_rel_dev_date": "2026-02-25",
+        "mean_rel_dev": 0.0007468034789582656,
+        "n_exact_equal": 94,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz001313",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0013157894736841825,
+        "max_rel_dev_date": "2025-09-17",
+        "mean_rel_dev": 1.5720960150000083e-05,
+        "n_exact_equal": 247,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz002105",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz002140",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 1,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.005021520803443349,
+        "max_rel_dev_date": "2026-03-10",
+        "mean_rel_dev": 0.0018578166901050096,
+        "n_exact_equal": 79,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz002158",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 15,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.005668398677373521,
+        "max_rel_dev_date": "2025-11-21",
+        "mean_rel_dev": 0.0018248151680081404,
+        "n_exact_equal": 82,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz002177",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz002210",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz002250",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.004916420845624455,
+        "max_rel_dev_date": "2025-09-23",
+        "mean_rel_dev": 0.0015600665709999738,
+        "n_exact_equal": 79,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz002398",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 45,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.007385524372230403,
+        "max_rel_dev_date": "2025-11-26",
+        "mean_rel_dev": 0.0023820953060611633,
+        "n_exact_equal": 87,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz002406",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 130,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.010613207547169793,
+        "max_rel_dev_date": "2026-05-28",
+        "mean_rel_dev": 0.004347934134447129,
+        "n_exact_equal": 59,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz002457",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.002904162633107392,
+        "max_rel_dev_date": "2025-12-16",
+        "mean_rel_dev": 0.0009241920894053103,
+        "n_exact_equal": 102,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz002498",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 79,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.005747126436781614,
+        "max_rel_dev_date": "2025-11-27",
+        "mean_rel_dev": 0.0021466468886895654,
+        "n_exact_equal": 95,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz002583",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz002667",
+        "sina_rows": 244,
+        "tx_rows": 244,
+        "status": "ok",
+        "pairs": 244,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 244,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz002801",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.003132341425215467,
+        "max_rel_dev_date": "2025-09-17",
+        "mean_rel_dev": 0.0007317165729104586,
+        "n_exact_equal": 67,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz002969",
+        "sina_rows": 233,
+        "tx_rows": 233,
+        "status": "ok",
+        "pairs": 233,
+        "pairs_gt_0.5pct": 54,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.008875739644970487,
+        "max_rel_dev_date": "2025-09-23",
+        "mean_rel_dev": 0.0027986727668315677,
+        "n_exact_equal": 43,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz159011",
+        "sina_rows": 0,
+        "tx_rows": 72,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159226",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159266",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159297",
+        "sina_rows": 0,
+        "tx_rows": 245,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159312",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159397",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159552",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159680",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159726",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159780",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159916",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz159971",
+        "sina_rows": 0,
+        "tx_rows": 250,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": null,
+        "universe_class": "sz_fund_or_other"
+      },
+      {
+        "sym": "sz300041",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 1,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.005070993914807375,
+        "max_rel_dev_date": "2026-03-23",
+        "mean_rel_dev": 0.0019131352981666802,
+        "n_exact_equal": 72,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz300051",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz300064",
+        "sina_rows": 0,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": "RuntimeError: empty dataframe",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz300184",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz300204",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz300224",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.004149377593361091,
+        "max_rel_dev_date": "2025-10-13",
+        "mean_rel_dev": 0.0009983109089558519,
+        "n_exact_equal": 109,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz300350",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz300402",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0023157082207641345,
+        "max_rel_dev_date": "2025-11-11",
+        "mean_rel_dev": 0.0010595401247283334,
+        "n_exact_equal": 62,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz300410",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz300495",
+        "sina_rows": 0,
+        "tx_rows": 0,
+        "status": "fetch_fail",
+        "sina_error": "JSONDecodeError: No value to decode",
+        "tx_error": "RuntimeError: empty dataframe",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz300529",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 15,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.006538796861377599,
+        "max_rel_dev_date": "2025-09-16",
+        "mean_rel_dev": 0.0017892010527509013,
+        "n_exact_equal": 88,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz300577",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 60,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.008426966292134866,
+        "max_rel_dev_date": "2025-09-19",
+        "mean_rel_dev": 0.003249295354237861,
+        "n_exact_equal": 22,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz300673",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.003172924378635575,
+        "max_rel_dev_date": "2026-01-14",
+        "mean_rel_dev": 0.0010295344859638587,
+        "n_exact_equal": 99,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz300688",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz300763",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0011529038766392606,
+        "max_rel_dev_date": "2025-12-03",
+        "mean_rel_dev": 0.00046177928447889264,
+        "n_exact_equal": 87,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz300788",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.003440120404214074,
+        "max_rel_dev_date": "2026-02-27",
+        "mean_rel_dev": 0.0010385840290712625,
+        "n_exact_equal": 52,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz300832",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 56,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.008038585209003173,
+        "max_rel_dev_date": "2025-09-17",
+        "mean_rel_dev": 0.002429427055141831,
+        "n_exact_equal": 89,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz300850",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0018656716417910712,
+        "max_rel_dev_date": "2025-10-30",
+        "mean_rel_dev": 0.0004732945319726626,
+        "n_exact_equal": 113,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz300890",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0007262164124909497,
+        "max_rel_dev_date": "2026-05-11",
+        "mean_rel_dev": 0.0001626957508270383,
+        "n_exact_equal": 135,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz300918",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0016583747927032628,
+        "max_rel_dev_date": "2025-09-18",
+        "mean_rel_dev": 0.0003334076945680731,
+        "n_exact_equal": 142,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz301029",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 11,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.00679655641141815,
+        "max_rel_dev_date": "2026-03-30",
+        "mean_rel_dev": 0.0014847813715216937,
+        "n_exact_equal": 35,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz301092",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.00410818212940765,
+        "max_rel_dev_date": "2025-09-23",
+        "mean_rel_dev": 0.001803028081207444,
+        "n_exact_equal": 69,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz301121",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz301193",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz301206",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 4,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.00579019073569476,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0016448808262751627,
+        "n_exact_equal": 61,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz301348",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0,
+        "max_rel_dev_date": "2025-09-15",
+        "mean_rel_dev": 0.0,
+        "n_exact_equal": 250,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz301491",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.002361275088547905,
+        "max_rel_dev_date": "2025-09-22",
+        "mean_rel_dev": 0.0010627713981496045,
+        "n_exact_equal": 58,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz301513",
+        "sina_rows": 111,
+        "tx_rows": 111,
+        "status": "ok",
+        "pairs": 111,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.0023384975153463404,
+        "max_rel_dev_date": "2026-04-17",
+        "mean_rel_dev": 0.00032431938096184963,
+        "n_exact_equal": 80,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2026-04-17",
+        "sina_last": "2026-09-24",
+        "tx_first": "2026-04-17",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      },
+      {
+        "sym": "sz301539",
+        "sina_rows": 250,
+        "tx_rows": 250,
+        "status": "ok",
+        "pairs": 250,
+        "pairs_gt_0.5pct": 0,
+        "pairs_gt_5pct": 0,
+        "max_rel_dev": 0.00311665182546751,
+        "max_rel_dev_date": "2026-01-21",
+        "mean_rel_dev": 0.0015939390994697692,
+        "n_exact_equal": 65,
+        "sina_only_dates": 0,
+        "tx_only_dates": 0,
+        "sina_first": "2025-09-15",
+        "sina_last": "2026-09-24",
+        "tx_first": "2025-09-15",
+        "tx_last": "2026-09-24",
+        "universe_class": "sz_stock"
+      }
+    ],
+    "fetch_stats": {
+      "calls": 295,
+      "retries": 79,
+      "hard_fail": 39,
+      "cache_hits": 24,
+      "last": 1790474963.8001688
+    },
+    "elapsed_sec": 340.3,
+    "deviation_profile": {
+      "sh600782": {
+        "pairs": 250,
+        "distinct_owned_ratio_levels": 43,
+        "first10_level_changes": [
+          {
+            "date": "2025-09-15",
+            "rel_dev": -0.019512
+          },
+          {
+            "date": "2025-09-18",
+            "rel_dev": -0.017241
+          },
+          {
+            "date": "2025-10-10",
+            "rel_dev": -0.01937
+          },
+          {
+            "date": "2025-10-14",
+            "rel_dev": -0.0175
+          },
+          {
+            "date": "2025-10-24",
+            "rel_dev": -0.015625
+          },
+          {
+            "date": "2025-10-27",
+            "rel_dev": -0.017766
+          },
+          {
+            "date": "2025-10-28",
+            "rel_dev": -0.015504
+          },
+          {
+            "date": "2025-10-29",
+            "rel_dev": -0.018041
+          },
+          {
+            "date": "2025-11-21",
+            "rel_dev": -0.015666
+          },
+          {
+            "date": "2025-12-09",
+            "rel_dev": -0.013736
+          }
+        ],
+        "n_days_abs_dev_gt_0.5pct": 158,
+        "min_rel_dev": -0.019512195121951237,
+        "max_rel_dev": 0.0,
+        "n_sign_changes": 0,
+        "n_nonzero": 170,
+        "n_exact_zero": 80
+      },
+      "sh600000": {
+        "pairs": 250,
+        "distinct_owned_ratio_levels": 24,
+        "first10_level_changes": [
+          {
+            "date": "2025-09-15",
+            "rel_dev": -0.014604
+          },
+          {
+            "date": "2025-09-17",
+            "rel_dev": -0.012759
+          },
+          {
+            "date": "2025-09-24",
+            "rel_dev": -0.011017
+          },
+          {
+            "date": "2025-10-14",
+            "rel_dev": -0.012955
+          },
+          {
+            "date": "2025-10-29",
+            "rel_dev": -0.009658
+          },
+          {
+            "date": "2025-12-30",
+            "rel_dev": -0.011696
+          },
+          {
+            "date": "2026-01-05",
+            "rel_dev": -0.009649
+          },
+          {
+            "date": "2026-01-15",
+            "rel_dev": -0.007449
+          },
+          {
+            "date": "2026-01-21",
+            "rel_dev": -0.005814
+          },
+          {
+            "date": "2026-01-27",
+            "rel_dev": -0.00409
+          }
+        ],
+        "n_days_abs_dev_gt_0.5pct": 90,
+        "min_rel_dev": -0.014604150653343544,
+        "max_rel_dev": 0.003663003663003802,
+        "n_sign_changes": 0,
+        "n_nonzero": 183,
+        "n_exact_zero": 67
+      },
+      "sh603579": {
+        "pairs": 250,
+        "distinct_owned_ratio_levels": 16,
+        "first10_level_changes": [
+          {
+            "date": "2025-09-15",
+            "rel_dev": -0.012636
+          },
+          {
+            "date": "2025-09-17",
+            "rel_dev": -0.01443
+          },
+          {
+            "date": "2025-09-23",
+            "rel_dev": -0.012765
+          },
+          {
+            "date": "2025-10-13",
+            "rel_dev": -0.011043
+          },
+          {
+            "date": "2025-11-04",
+            "rel_dev": -0.009263
+          },
+          {
+            "date": "2025-11-13",
+            "rel_dev": -0.007471
+          },
+          {
+            "date": "2025-12-03",
+            "rel_dev": -0.005596
+          },
+          {
+            "date": "2026-01-05",
+            "rel_dev": -0.007785
+          },
+          {
+            "date": "2026-01-06",
+            "rel_dev": -0.009537
+          },
+          {
+            "date": "2026-01-19",
+            "rel_dev": -0.007767
+          }
+        ],
+        "n_days_abs_dev_gt_0.5pct": 103,
+        "min_rel_dev": -0.01443037974683545,
+        "max_rel_dev": 0.000556173526140045,
+        "n_sign_changes": 0,
+        "n_nonzero": 171,
+        "n_exact_zero": 79
+      },
+      "sz000892": {
+        "pairs": 250,
+        "distinct_owned_ratio_levels": 1,
+        "first10_level_changes": [
+          {
+            "date": "2025-09-15",
+            "rel_dev": 0.0
+          }
+        ],
+        "n_days_abs_dev_gt_0.5pct": 0,
+        "min_rel_dev": 0.0,
+        "max_rel_dev": 0.0,
+        "n_sign_changes": 0,
+        "n_nonzero": 0,
+        "n_exact_zero": 250
+      },
+      "sh600278": {
+        "pairs": 250,
+        "distinct_owned_ratio_levels": 7,
+        "first10_level_changes": [
+          {
+            "date": "2025-09-15",
+            "rel_dev": -0.001368
+          },
+          {
+            "date": "2026-01-21",
+            "rel_dev": -0.003452
+          },
+          {
+            "date": "2026-03-19",
+            "rel_dev": -0.001323
+          },
+          {
+            "date": "2026-06-29",
+            "rel_dev": 0.001706
+          },
+          {
+            "date": "2026-07-01",
+            "rel_dev": 0.0
+          },
+          {
+            "date": "2026-07-13",
+            "rel_dev": 0.001709
+          },
+          {
+            "date": "2026-07-14",
+            "rel_dev": 0.0
+          }
+        ],
+        "n_days_abs_dev_gt_0.5pct": 0,
+        "min_rel_dev": -0.003464203233256277,
+        "max_rel_dev": 0.0017211703958693073,
+        "n_sign_changes": 0,
+        "n_nonzero": 164,
+        "n_exact_zero": 86
+      }
+    },
+    "dataset_vs_sources": {
+      "window": {
+        "start": "2025-09-15",
+        "end": "2026-09-24"
+      },
+      "sources": {
+        "sina": {
+          "symbols": 86,
+          "pairs": 21290,
+          "exact": 20590,
+          "gt05": 261,
+          "gt5": 0,
+          "ds_missing_dates": 24,
+          "ds_extra_dates": 0,
+          "ds_stale_last": 6,
+          "last_date_same": 80,
+          "exact_ratio": 0.9671207139502114,
+          "gt05_ratio": 0.012259276655706905,
+          "gt5_ratio": 0.0
+        },
+        "tx": {
+          "symbols": 108,
+          "pairs": 26522,
+          "exact": 18762,
+          "gt05": 1447,
+          "gt5": 50,
+          "ds_missing_dates": 0,
+          "ds_extra_dates": 1,
+          "ds_stale_last": 0,
+          "last_date_same": 108,
+          "exact_ratio": 0.7074127139733052,
+          "gt05_ratio": 0.05455847975265817,
+          "gt5_ratio": 0.0018852273584194254
+        }
+      },
+      "per_symbol": [
+        {
+          "sym": "bj920171",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": null
+          },
+          "ds_last": "2026-09-18"
+        },
+        {
+          "sym": "bj920195",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": null
+          },
+          "ds_last": "2026-09-18"
+        },
+        {
+          "sym": "bj920418",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": null
+          },
+          "ds_last": "2026-09-18"
+        },
+        {
+          "sym": "bj920809",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": null
+          },
+          "ds_last": "2026-09-18"
+        },
+        {
+          "sym": "bj920914",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": null
+          },
+          "ds_last": "2026-09-18"
+        },
+        {
+          "sym": "bj920964",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": null
+          },
+          "ds_last": "2026-09-18"
+        },
+        {
+          "sym": "sh510590",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh511810",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh512560",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh512680",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh515030",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh515990",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh516830",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh530100",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh560180",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh560350",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh560950",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh561220",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh562010",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh562550",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh562860",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh589220",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh600000",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh600018",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh600081",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh600186",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh600190",
+          "source_last": {
+            "sina": null,
+            "tx": null
+          },
+          "ds_last": "2026-09-23"
+        },
+        {
+          "sym": "sh600221",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh600278",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh600330",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh600357",
+          "source_last": {
+            "sina": null,
+            "tx": null
+          },
+          "ds_last": "2026-09-23"
+        },
+        {
+          "sym": "sh600439",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh600609",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh600638",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh600673",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh600701",
+          "source_last": {
+            "sina": null,
+            "tx": null
+          },
+          "ds_last": "2026-09-23"
+        },
+        {
+          "sym": "sh600728",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh600782",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh600848",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh600882",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh600885",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh601236",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh603098",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh603200",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh603336",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh603579",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh603698",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh603788",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh603896",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh605055",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh605178",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh605388",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh688193",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh688282",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh688318",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh688433",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh688521",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sh688789",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz000003",
+          "source_last": {
+            "sina": null,
+            "tx": null
+          },
+          "ds_last": "2026-09-23"
+        },
+        {
+          "sym": "sz000088",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz000652",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz000776",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz000892",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz001225",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz001313",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz002105",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz002140",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz002158",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz002177",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz002210",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz002250",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz002398",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz002406",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz002457",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz002498",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz002583",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz002667",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz002801",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz002969",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz159011",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz159226",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz159266",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz159297",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz159312",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz159397",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz159552",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz159680",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz159726",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz159780",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz159916",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz159971",
+          "source_last": {
+            "sina": null,
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz300041",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz300051",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz300064",
+          "source_last": {
+            "sina": null,
+            "tx": null
+          },
+          "ds_last": "2026-09-23"
+        },
+        {
+          "sym": "sz300184",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz300204",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz300224",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz300350",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz300402",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz300410",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz300495",
+          "source_last": {
+            "sina": null,
+            "tx": null
+          },
+          "ds_last": "2026-09-23"
+        },
+        {
+          "sym": "sz300529",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz300577",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz300673",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz300688",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz300763",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz300788",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz300832",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz300850",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz300890",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz300918",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz301029",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz301092",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz301121",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz301193",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz301206",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz301348",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz301491",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz301513",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        },
+        {
+          "sym": "sz301539",
+          "source_last": {
+            "sina": "2026-09-24",
+            "tx": "2026-09-24"
+          },
+          "ds_last": "2026-09-24"
+        }
+      ]
+    }
+  },
+  "qfq_check": {
+    "history_window": {
+      "start": "20160101",
+      "end": "20260924",
+      "note": "data_full coverage start; sina is fetched full-history and sliced"
+    },
+    "n_stocks": 10,
+    "picked_symbols": [
+      "sh600638",
+      "sh600848",
+      "sh600885",
+      "sh688433",
+      "sz002140",
+      "sz002406",
+      "sz002801",
+      "sz300577",
+      "sz300673",
+      "sz301206"
+    ],
+    "latest_price_consistent": {
+      "sina": {
+        "n_checked": 10,
+        "n_latest_equal": 10,
+        "ratio_latest_equal": 1.0,
+        "n_latest_not_equal": 0
+      },
+      "tx": {
+        "n_checked": 10,
+        "n_latest_equal": 10,
+        "ratio_latest_equal": 1.0,
+        "n_latest_not_equal": 0
+      }
+    },
+    "history_raw_vs_qfq": {
+      "sina": {
+        "overlap_days_total": 40345,
+        "days_raw_lt_qfq": 0,
+        "days_qfq_lt_raw": 39772,
+        "days_equal": 573,
+        "n_stocks_with_raw_lt_qfq": 0
+      },
+      "tx": {
+        "overlap_days_total": 21944,
+        "days_raw_lt_qfq": 0,
+        "days_qfq_lt_raw": 21371,
+        "days_equal": 573,
+        "n_stocks_with_raw_lt_qfq": 0
+      }
+    },
+    "per_symbol": [
+      {
+        "sym": "sh600638",
+        "sina": {
+          "status": "ok",
+          "raw_rows": 8082,
+          "qfq_rows": 8082,
+          "raw_last_date": "2026-09-24",
+          "qfq_last_date": "2026-09-24",
+          "same_last_date": true,
+          "raw_last_close": 5.06,
+          "qfq_last_close": 5.06,
+          "latest_close_equal": true,
+          "latest_abs_diff": 0.0,
+          "overlap_days": 8082,
+          "days_raw_lt_qfq": 0,
+          "days_qfq_lt_raw": 8027,
+          "days_equal": 55,
+          "max_abs_rel_diff": 20.34328358208955,
+          "examples_raw_lt_qfq": []
+        },
+        "tx": {
+          "status": "ok",
+          "raw_rows": 2605,
+          "qfq_rows": 2605,
+          "raw_last_date": "2026-09-24",
+          "qfq_last_date": "2026-09-24",
+          "same_last_date": true,
+          "raw_last_close": 5.06,
+          "qfq_last_close": 5.06,
+          "latest_close_equal": true,
+          "latest_abs_diff": 0.0,
+          "overlap_days": 2605,
+          "days_raw_lt_qfq": 0,
+          "days_qfq_lt_raw": 2550,
+          "days_equal": 55,
+          "max_abs_rel_diff": 0.3723849372384937,
+          "examples_raw_lt_qfq": []
+        }
+      },
+      {
+        "sym": "sh600848",
+        "sina": {
+          "status": "ok",
+          "raw_rows": 7444,
+          "qfq_rows": 7444,
+          "raw_last_date": "2026-09-24",
+          "qfq_last_date": "2026-09-24",
+          "same_last_date": true,
+          "raw_last_close": 8.5,
+          "qfq_last_close": 8.5,
+          "latest_close_equal": true,
+          "latest_abs_diff": 0.0,
+          "overlap_days": 7444,
+          "days_raw_lt_qfq": 0,
+          "days_qfq_lt_raw": 7387,
+          "days_equal": 57,
+          "max_abs_rel_diff": 2.103286384976526,
+          "examples_raw_lt_qfq": []
+        },
+        "tx": {
+          "status": "ok",
+          "raw_rows": 2447,
+          "qfq_rows": 2447,
+          "raw_last_date": "2026-09-24",
+          "qfq_last_date": "2026-09-24",
+          "same_last_date": true,
+          "raw_last_close": 8.5,
+          "qfq_last_close": 8.5,
+          "latest_close_equal": true,
+          "latest_abs_diff": 0.0,
+          "overlap_days": 2447,
+          "days_raw_lt_qfq": 0,
+          "days_qfq_lt_raw": 2390,
+          "days_equal": 57,
+          "max_abs_rel_diff": 0.41945606694560666,
+          "examples_raw_lt_qfq": []
+        }
+      },
+      {
+        "sym": "sh600885",
+        "sina": {
+          "status": "ok",
+          "raw_rows": 7163,
+          "qfq_rows": 7163,
+          "raw_last_date": "2026-09-24",
+          "qfq_last_date": "2026-09-24",
+          "same_last_date": true,
+          "raw_last_close": 33.39,
+          "qfq_last_close": 33.39,
+          "latest_close_equal": true,
+          "latest_abs_diff": 0.0,
+          "overlap_days": 7163,
+          "days_raw_lt_qfq": 0,
+          "days_qfq_lt_raw": 7068,
+          "days_equal": 95,
+          "max_abs_rel_diff": 7.376623376623376,
+          "examples_raw_lt_qfq": []
+        },
+        "tx": {
+          "status": "ok",
+          "raw_rows": 2608,
+          "qfq_rows": 2608,
+          "raw_last_date": "2026-09-24",
+          "qfq_last_date": "2026-09-24",
+          "same_last_date": true,
+          "raw_last_close": 33.39,
+          "qfq_last_close": 33.39,
+          "latest_close_equal": true,
+          "latest_abs_diff": 0.0,
+          "overlap_days": 2608,
+          "days_raw_lt_qfq": 0,
+          "days_qfq_lt_raw": 2513,
+          "days_equal": 95,
+          "max_abs_rel_diff": 3.0835117773019274,
+          "examples_raw_lt_qfq": []
+        }
+      },
+      {
+        "sym": "sh688433",
+        "sina": {
+          "status": "ok",
+          "raw_rows": 837,
+          "qfq_rows": 837,
+          "raw_last_date": "2026-09-24",
+          "qfq_last_date": "2026-09-24",
+          "same_last_date": true,
+          "raw_last_close": 86.5,
+          "qfq_last_close": 86.5,
+          "latest_close_equal": true,
+          "latest_abs_diff": 0.0,
+          "overlap_days": 837,
+          "days_raw_lt_qfq": 0,
+          "days_qfq_lt_raw": 749,
+          "days_equal": 88,
+          "max_abs_rel_diff": 0.006996501749125287,
+          "examples_raw_lt_qfq": []
+        },
+        "tx": {
+          "status": "ok",
+          "raw_rows": 837,
+          "qfq_rows": 837,
+          "raw_last_date": "2026-09-24",
+          "qfq_last_date": "2026-09-24",
+          "same_last_date": true,
+          "raw_last_close": 86.5,
+          "qfq_last_close": 86.5,
+          "latest_close_equal": true,
+          "latest_abs_diff": 0.0,
+          "overlap_days": 837,
+          "days_raw_lt_qfq": 0,
+          "days_qfq_lt_raw": 749,
+          "days_equal": 88,
+          "max_abs_rel_diff": 0.01078167115902961,
+          "examples_raw_lt_qfq": []
+        }
+      },
+      {
+        "sym": "sz002140",
+        "sina": {
+          "status": "ok",
+          "raw_rows": 4643,
+          "qfq_rows": 4643,
+          "raw_last_date": "2026-09-24",
+          "qfq_last_date": "2026-09-24",
+          "same_last_date": true,
+          "raw_last_close": 9.22,
+          "qfq_last_close": 9.22,
+          "latest_close_equal": true,
+          "latest_abs_diff": 0.0,
+          "overlap_days": 4643,
+          "days_raw_lt_qfq": 0,
+          "days_qfq_lt_raw": 4577,
+          "days_equal": 66,
+          "max_abs_rel_diff": 8.45631067961165,
+          "examples_raw_lt_qfq": []
+        },
+        "tx": {
+          "status": "ok",
+          "raw_rows": 2608,
+          "qfq_rows": 2608,
+          "raw_last_date": "2026-09-24",
+          "qfq_last_date": "2026-09-24",
+          "same_last_date": true,
+          "raw_last_close": 9.22,
+          "qfq_last_close": 9.22,
+          "latest_close_equal": true,
+          "latest_abs_diff": 0.0,
+          "overlap_days": 2608,
+          "days_raw_lt_qfq": 0,
+          "days_qfq_lt_raw": 2542,
+          "days_equal": 66,
+          "max_abs_rel_diff": 0.5382436260623229,
+          "examples_raw_lt_qfq": []
+        }
+      },
+      {
+        "sym": "sz002406",
+        "sina": {
+          "status": "ok",
+          "raw_rows": 3945,
+          "qfq_rows": 3945,
+          "raw_last_date": "2026-09-24",
+          "qfq_last_date": "2026-09-24",
+          "same_last_date": true,
+          "raw_last_close": 6.45,
+          "qfq_last_close": 6.45,
+          "latest_close_equal": true,
+          "latest_abs_diff": 0.0,
+          "overlap_days": 3945,
+          "days_raw_lt_qfq": 0,
+          "days_qfq_lt_raw": 3890,
+          "days_equal": 55,
+          "max_abs_rel_diff": 3.4474708171206228,
+          "examples_raw_lt_qfq": []
+        },
+        "tx": {
+          "status": "ok",
+          "raw_rows": 2608,
+          "qfq_rows": 2608,
+          "raw_last_date": "2026-09-24",
+          "qfq_last_date": "2026-09-24",
+          "same_last_date": true,
+          "raw_last_close": 6.45,
+          "qfq_last_close": 6.45,
+          "latest_close_equal": true,
+          "latest_abs_diff": 0.0,
+          "overlap_days": 2608,
+          "days_raw_lt_qfq": 0,
+          "days_qfq_lt_raw": 2553,
+          "days_equal": 55,
+          "max_abs_rel_diff": 0.4266666666666666,
+          "examples_raw_lt_qfq": []
+        }
+      },
+      {
+        "sym": "sz002801",
+        "sina": {
+          "status": "ok",
+          "raw_rows": 2495,
+          "qfq_rows": 2495,
+          "raw_last_date": "2026-09-24",
+          "qfq_last_date": "2026-09-24",
+          "same_last_date": true,
+          "raw_last_close": 27.1,
+          "qfq_last_close": 27.1,
+          "latest_close_equal": true,
+          "latest_abs_diff": 0.0,
+          "overlap_days": 2495,
+          "days_raw_lt_qfq": 0,
+          "days_qfq_lt_raw": 2473,
+          "days_equal": 22,
+          "max_abs_rel_diff": 3.517735334242838,
+          "examples_raw_lt_qfq": []
+        },
+        "tx": {
+          "status": "ok",
+          "raw_rows": 2495,
+          "qfq_rows": 2495,
+          "raw_last_date": "2026-09-24",
+          "qfq_last_date": "2026-09-24",
+          "same_last_date": true,
+          "raw_last_close": 27.1,
+          "qfq_last_close": 27.1,
+          "latest_close_equal": true,
+          "latest_abs_diff": 0.0,
+          "overlap_days": 2495,
+          "days_raw_lt_qfq": 0,
+          "days_qfq_lt_raw": 2473,
+          "days_equal": 22,
+          "max_abs_rel_diff": 6.353403141361257,
+          "examples_raw_lt_qfq": []
+        }
+      },
+      {
+        "sym": "sz300577",
+        "sina": {
+          "status": "ok",
+          "raw_rows": 2372,
+          "qfq_rows": 2372,
+          "raw_last_date": "2026-09-24",
+          "qfq_last_date": "2026-09-24",
+          "same_last_date": true,
+          "raw_last_close": 19.34,
+          "qfq_last_close": 19.34,
+          "latest_close_equal": true,
+          "latest_abs_diff": 0.0,
+          "overlap_days": 2372,
+          "days_raw_lt_qfq": 0,
+          "days_qfq_lt_raw": 2370,
+          "days_equal": 2,
+          "max_abs_rel_diff": 2.552495697074011,
+          "examples_raw_lt_qfq": []
+        },
+        "tx": {
+          "status": "ok",
+          "raw_rows": 2372,
+          "qfq_rows": 2372,
+          "raw_last_date": "2026-09-24",
+          "qfq_last_date": "2026-09-24",
+          "same_last_date": true,
+          "raw_last_close": 19.34,
+          "qfq_last_close": 19.34,
+          "latest_close_equal": true,
+          "latest_abs_diff": 0.0,
+          "overlap_days": 2372,
+          "days_raw_lt_qfq": 0,
+          "days_qfq_lt_raw": 2370,
+          "days_equal": 2,
+          "max_abs_rel_diff": 3.240601503759398,
+          "examples_raw_lt_qfq": []
+        }
+      },
+      {
+        "sym": "sz300673",
+        "sina": {
+          "status": "ok",
+          "raw_rows": 2239,
+          "qfq_rows": 2239,
+          "raw_last_date": "2026-09-24",
+          "qfq_last_date": "2026-09-24",
+          "same_last_date": true,
+          "raw_last_close": 14.82,
+          "qfq_last_close": 14.82,
+          "latest_close_equal": true,
+          "latest_abs_diff": 0.0,
+          "overlap_days": 2239,
+          "days_raw_lt_qfq": 0,
+          "days_qfq_lt_raw": 2157,
+          "days_equal": 82,
+          "max_abs_rel_diff": 1.8772357723577235,
+          "examples_raw_lt_qfq": []
+        },
+        "tx": {
+          "status": "ok",
+          "raw_rows": 2239,
+          "qfq_rows": 2239,
+          "raw_last_date": "2026-09-24",
+          "qfq_last_date": "2026-09-24",
+          "same_last_date": true,
+          "raw_last_close": 14.82,
+          "qfq_last_close": 14.82,
+          "latest_close_equal": true,
+          "latest_abs_diff": 0.0,
+          "overlap_days": 2239,
+          "days_raw_lt_qfq": 0,
+          "days_qfq_lt_raw": 2157,
+          "days_equal": 82,
+          "max_abs_rel_diff": 1.9870009285051071,
+          "examples_raw_lt_qfq": []
+        }
+      },
+      {
+        "sym": "sz301206",
+        "sina": {
+          "status": "ok",
+          "raw_rows": 1125,
+          "qfq_rows": 1125,
+          "raw_last_date": "2026-09-24",
+          "qfq_last_date": "2026-09-24",
+          "same_last_date": true,
+          "raw_last_close": 23.65,
+          "qfq_last_close": 23.65,
+          "latest_close_equal": true,
+          "latest_abs_diff": 0.0,
+          "overlap_days": 1125,
+          "days_raw_lt_qfq": 0,
+          "days_qfq_lt_raw": 1074,
+          "days_equal": 51,
+          "max_abs_rel_diff": 0.7144032921810699,
+          "examples_raw_lt_qfq": []
+        },
+        "tx": {
+          "status": "ok",
+          "raw_rows": 1125,
+          "qfq_rows": 1125,
+          "raw_last_date": "2026-09-24",
+          "qfq_last_date": "2026-09-24",
+          "same_last_date": true,
+          "raw_last_close": 23.65,
+          "qfq_last_close": 23.65,
+          "latest_close_equal": true,
+          "latest_abs_diff": 0.0,
+          "overlap_days": 1125,
+          "days_raw_lt_qfq": 0,
+          "days_qfq_lt_raw": 1074,
+          "days_equal": 51,
+          "max_abs_rel_diff": 0.6635743519781719,
+          "examples_raw_lt_qfq": []
+        }
+      }
+    ],
+    "fetch_stats": {
+      "calls": 40,
+      "retries": 0,
+      "hard_fail": 0,
+      "cache_hits": 0,
+      "last": 1790476407.8503163
+    },
+    "elapsed_sec": 101.4
+  },
+  "calendar": {
+    "symbol": "sh600000",
+    "akshare_calendar": {
+      "source": "ak.tool_trade_date_hist_sina()",
+      "first": "1990-12-19",
+      "last": "2026-12-31",
+      "n_dates": 8797
+    },
+    "data_full": {
+      "file": "D:\\Documents\\Workbuddy\\股票基金\\quant-weight-system\\data_full\\sh600000.csv",
+      "rows": 2590,
+      "first_date": "2016-01-04",
+      "last_date": "2026-09-24",
+      "n_distinct_dates": 2590,
+      "n_duplicate_dates": 0
+    },
+    "dates_in_data_not_trading": {
+      "count": 0,
+      "examples": []
+    },
+    "trading_dates_missing_from_data": {
+      "count": 18,
+      "expected_trading_days_in_range": 2608,
+      "coverage_ratio": 0.9930981595092024,
+      "examples": [
+        "2016-02-16",
+        "2016-02-17",
+        "2016-02-18",
+        "2016-02-19",
+        "2016-02-22",
+        "2016-02-23",
+        "2016-02-24",
+        "2016-02-25",
+        "2016-02-26",
+        "2016-02-29"
+      ],
+      "last_10_missing": [
+        "2016-02-26",
+        "2016-02-29",
+        "2016-03-01",
+        "2016-03-02",
+        "2016-03-03",
+        "2016-03-04",
+        "2016-03-07",
+        "2016-03-08",
+        "2016-03-09",
+        "2016-03-10"
+      ]
+    },
+    "last_date_distribution": {
+      "note": "last row date per file, all 7539 data_full CSVs",
+      "counts": {
+        "2026-09-24": 6860,
+        "2026-09-18": 342,
+        "2026-09-23": 337
+      },
+      "mode": [
+        "2026-09-24",
+        6860
+      ],
+      "overall_max": "2026-09-24",
+      "n_distinct_last_dates": 3,
+      "by_universe_class": {
+        "bj_stock": {
+          "2026-09-18": 342
+        },
+        "sh_fund_or_other": {
+          "2026-09-24": 926,
+          "2026-09-23": 2
+        },
+        "sh_stock": {
+          "2026-09-24": 2310,
+          "2026-09-23": 142
+        },
+        "b_share": {
+          "2026-09-23": 5
+        },
+        "sz_stock": {
+          "2026-09-24": 2893,
+          "2026-09-23": 188
+        },
+        "sz_fund_or_other": {
+          "2026-09-24": 731
+        }
+      }
+    },
+    "synthetic_tail_rows": {
+      "file": "C:\\Users\\Admin\\.pi-desktop\\scratch\\d40abb6e-dc12-4d27-8ed2-f290de0a6c5c\\x2net\\out\\scan_tails.json",
+      "n_last_bar_zero_open": 336,
+      "n_last_bar_zero_volume_and_amount": 336,
+      "n_last_bar_identical_to_previous": 5,
+      "zero_bar_by_last_date": {}
+    },
+    "all_files_calendar_tally": {
+      "rows_total_all_files": 12807019,
+      "rows_on_non_trade_date": 7,
+      "n_files_with_non_trade_date": 7,
+      "top_non_trade_dates": [
+        [
+          "2021-06-27",
+          7
+        ]
+      ]
+    },
+    "elapsed_sec": 0.4,
+    "index_file_check": {
+      "file": "D:\\Documents\\Workbuddy\\股票基金\\quant-weight-system\\data_full\\_index.csv",
+      "note": "directory index shipped with the dataset; it is STALE",
+      "index_last_date_counts": {
+        "2026-09-23": 7197,
+        "2026-09-18": 342
+      },
+      "actual_last_date_counts": {
+        "2026-09-24": 6860,
+        "2026-09-18": 342,
+        "2026-09-23": 337
+      },
+      "verdict": "_index.csv claims 7197 files end on 2026-09-23, but only 337 do; 6860 files actually end on 2026-09-24. The index was not regenerated after the last data refresh."
+    },
+    "sh600000_missing_days_confirmation": {
+      "method": "re-fetched ak.stock_zh_a_daily('sh600000', adjust='qfq') for 2016-02-01..2016-03-31",
+      "result": "Sina also has NO row between 2016-02-16 and 2016-03-10; it resumes 2016-03-11",
+      "conclusion": "the 18 days are a genuine trading suspension of sh600000, not a data hole",
+      "row_level_match": "every bar in that span is byte-for-byte identical between data_full and Sina (open/high/low/close/volume/amount)"
+    },
+    "sh600000_missing_days_note": "all 18 missing trading days are 2016-02-16..2016-03-10, i.e. a single trading suspension of sh600000 (the stock resumed on 2016-03-11), not 18 separate data holes"
+  },
+  "outliers": {
+    "scope": {
+      "n_files_scanned": 7539,
+      "files_included": "every <sym>.csv matching ^(sh|sz|bj)[0-9]{6}$",
+      "files_excluded": [
+        "_index"
+      ],
+      "rows_total": 12807019,
+      "n_files_read_error": 0,
+      "read_errors": []
+    },
+    "A_abs_daily_return_gt_21pct": {
+      "definition": "abs(close_t/close_{t-1} - 1) > 0.21",
+      "count": 3514,
+      "examples_first5": [
+        {
+          "sym": "bj920000",
+          "date": "2019-05-23",
+          "pct": -1.0,
+          "close": 0.0,
+          "prev_close": 2.32
+        },
+        {
+          "sym": "bj920000",
+          "date": "2019-05-27",
+          "pct": 0.656652,
+          "close": 3.86,
+          "prev_close": 2.33
+        },
+        {
+          "sym": "bj920000",
+          "date": "2019-07-12",
+          "pct": -1.0,
+          "close": 0.0,
+          "prev_close": 3.86
+        },
+        {
+          "sym": "bj920000",
+          "date": "2020-03-06",
+          "pct": 0.401554,
+          "close": 5.41,
+          "prev_close": 3.86
+        },
+        {
+          "sym": "bj920000",
+          "date": "2023-11-08",
+          "pct": 0.299213,
+          "close": 6.6,
+          "prev_close": 5.08
+        }
+      ],
+      "top_symbols_by_count": [
+        [
+          "bj920682",
+          54
+        ],
+        [
+          "bj920225",
+          52
+        ],
+        [
+          "bj920047",
+          39
+        ],
+        [
+          "bj920021",
+          38
+        ],
+        [
+          "sh512390",
+          38
+        ],
+        [
+          "bj920146",
+          34
+        ],
+        [
+          "bj920832",
+          33
+        ],
+        [
+          "bj920642",
+          31
+        ],
+        [
+          "bj920839",
+          31
+        ],
+        [
+          "bj920368",
+          30
+        ]
+      ],
+      "breakdown": {
+        "zero_price_artifact_rows": 124,
+        "real_moves_abs_gt_21pct": 3390,
+        "real_moves_by_board": {
+          "bj_stock": 2603,
+          "sh_fund_or_other": 156,
+          "sh_stock": 220,
+          "sz_stock": 320,
+          "sz_fund_or_other": 91
+        },
+        "beyond_board_specific_limit": 1280,
+        "beyond_board_specific_limit_by_board": {
+          "bj_stock": 493,
+          "sh_fund_or_other": 156,
+          "sh_stock": 220,
+          "sz_stock": 320,
+          "sz_fund_or_other": 91
+        },
+        "board_limit_note": "SSE/SZSE main+ChiNext+STAR use 20% (21% used as the >21% screen); BSE (bj) uses 30%; first day of a new listing has no limit"
+      },
+      "top20_extreme_abs_moves": [
+        {
+          "abs_pct": 31.565789,
+          "sym": "sz000578",
+          "date": "2011-02-09",
+          "close": 24.75,
+          "prev_close": 0.76
+        },
+        {
+          "abs_pct": 29.147368,
+          "sym": "bj920415",
+          "date": "2016-01-22",
+          "close": 28.64,
+          "prev_close": 0.95
+        },
+        {
+          "abs_pct": 25.86,
+          "sym": "sz000527",
+          "date": "2013-08-05",
+          "close": 13.43,
+          "prev_close": 0.5
+        },
+        {
+          "abs_pct": 20.686567,
+          "sym": "sh600263",
+          "date": "2012-01-16",
+          "close": 14.53,
+          "prev_close": 0.67
+        },
+        {
+          "abs_pct": 14.733166,
+          "sym": "sh511220",
+          "date": "2016-01-04",
+          "close": 100.0,
+          "prev_close": 6.356
+        },
+        {
+          "abs_pct": 12.110568,
+          "sym": "bj920091",
+          "date": "2025-11-21",
+          "close": 117.1,
+          "prev_close": 8.931725887317347
+        },
+        {
+          "abs_pct": 10.396011,
+          "sym": "sh510150",
+          "date": "2016-01-04",
+          "close": 4.0,
+          "prev_close": 0.351
+        },
+        {
+          "abs_pct": 10.030769,
+          "sym": "bj920427",
+          "date": "2020-02-04",
+          "close": 7.17,
+          "prev_close": 0.65
+        },
+        {
+          "abs_pct": 9.833333,
+          "sym": "bj920047",
+          "date": "2016-01-11",
+          "close": 14.95,
+          "prev_close": 1.38
+        },
+        {
+          "abs_pct": 9.0625,
+          "sym": "bj920682",
+          "date": "2016-03-08",
+          "close": 3.22,
+          "prev_close": 0.32
+        },
+        {
+          "abs_pct": 9.004859,
+          "sym": "sh511030",
+          "date": "2025-03-19",
+          "close": 105.001,
+          "prev_close": 10.495
+        },
+        {
+          "abs_pct": 8.781541,
+          "sym": "bj920045",
+          "date": "2025-12-31",
+          "close": 220.49,
+          "prev_close": 22.541438356408754
+        },
+        {
+          "abs_pct": 8.75,
+          "sym": "bj920682",
+          "date": "2016-05-23",
+          "close": 3.12,
+          "prev_close": 0.32
+        },
+        {
+          "abs_pct": 7.940568,
+          "sym": "sz300186",
+          "date": "2015-09-30",
+          "close": 34.6,
+          "prev_close": 3.87
+        },
+        {
+          "abs_pct": 7.856283,
+          "sym": "bj920100",
+          "date": "2025-09-08",
+          "close": 55.22,
+          "prev_close": 6.235121434539111
+        },
+        {
+          "abs_pct": 7.78125,
+          "sym": "bj920682",
+          "date": "2016-01-25",
+          "close": 2.81,
+          "prev_close": 0.32
+        },
+        {
+          "abs_pct": 7.314233,
+          "sym": "bj920019",
+          "date": "2024-10-11",
+          "close": 35.52,
+          "prev_close": 4.272192274212576
+        },
+        {
+          "abs_pct": 6.762123,
+          "sym": "bj920096",
+          "date": "2026-05-18",
+          "close": 110.5,
+          "prev_close": 14.235795280779604
+        },
+        {
+          "abs_pct": 6.737154,
+          "sym": "sh510030",
+          "date": "2016-01-04",
+          "close": 3.915,
+          "prev_close": 0.506
+        },
+        {
+          "abs_pct": 6.534483,
+          "sym": "sz000817",
+          "date": "2005-12-05",
+          "close": 8.74,
+          "prev_close": 1.16
+        }
+      ]
+    },
+    "B_nonpositive_open_or_close": {
+      "definition": "open <= 0 or close <= 0",
+      "count": 606,
+      "examples_first5": [
+        {
+          "sym": "bj920000",
+          "date": "2019-05-23",
+          "open": 0.0,
+          "high": 0.0,
+          "low": 0.0,
+          "close": 0.0,
+          "volume": 449000.0,
+          "amount": 767790.0
+        },
+        {
+          "sym": "bj920000",
+          "date": "2019-07-12",
+          "open": 0.0,
+          "high": 0.0,
+          "low": 0.0,
+          "close": 0.0,
+          "volume": 150000.0,
+          "amount": 450000.0
+        },
+        {
+          "sym": "bj920010",
+          "date": "2018-01-19",
+          "open": 0.0,
+          "high": 0.0,
+          "low": 0.0,
+          "close": 0.0,
+          "volume": 4833000.0,
+          "amount": 17398800.0
+        },
+        {
+          "sym": "bj920010",
+          "date": "2018-01-25",
+          "open": 0.0,
+          "high": 0.0,
+          "low": 0.0,
+          "close": 0.0,
+          "volume": 1907000.0,
+          "amount": 6865200.0
+        },
+        {
+          "sym": "bj920010",
+          "date": "2018-02-08",
+          "open": 0.0,
+          "high": 0.0,
+          "low": 0.0,
+          "close": 0.0,
+          "volume": 5580000.0,
+          "amount": 20088000.0
+        }
+      ]
+    },
+    "C_high_lt_low": {
+      "definition": "high < low",
+      "count": 0,
+      "examples_first5": []
+    },
+    "D_zero_volume_positive_amount": {
+      "definition": "volume == 0 and amount > 0",
+      "count": 1448,
+      "examples_first5": [
+        {
+          "sym": "sh511620",
+          "date": "2018-08-08",
+          "open": 99.89,
+          "high": 99.89,
+          "low": 99.89,
+          "close": 99.89,
+          "volume": 0.0,
+          "amount": 100.0
+        },
+        {
+          "sym": "sh511620",
+          "date": "2018-09-10",
+          "open": 99.818,
+          "high": 99.981,
+          "low": 99.818,
+          "close": 99.981,
+          "volume": 0.0,
+          "amount": 300.0
+        },
+        {
+          "sym": "sh511620",
+          "date": "2018-09-11",
+          "open": 99.984,
+          "high": 99.984,
+          "low": 99.984,
+          "close": 99.984,
+          "volume": 0.0,
+          "amount": 300.0
+        },
+        {
+          "sym": "sh511620",
+          "date": "2018-10-30",
+          "open": 99.961,
+          "high": 99.962,
+          "low": 99.881,
+          "close": 99.881,
+          "volume": 0.0,
+          "amount": 700.0
+        },
+        {
+          "sym": "sh511620",
+          "date": "2018-10-31",
+          "open": 99.881,
+          "high": 99.96,
+          "low": 99.881,
+          "close": 99.96,
+          "volume": 0.0,
+          "amount": 300.0
+        }
+      ]
+    },
+    "E_flat_close_with_volume_jump": {
+      "definition": "close == prev_close and abs(volume - prev_volume)/prev_volume > 0.5 (prev_volume > 0)",
+      "count": 61575,
+      "examples_first5": [
+        {
+          "sym": "bj920000",
+          "date": "2020-03-09",
+          "close": 5.41,
+          "prev_volume": 15000.0,
+          "volume": 3000.0,
+          "rel_vol_diff": 0.8
+        },
+        {
+          "sym": "bj920000",
+          "date": "2020-03-16",
+          "close": 5.41,
+          "prev_volume": 3000.0,
+          "volume": 9000.0,
+          "rel_vol_diff": 2.0
+        },
+        {
+          "sym": "bj920000",
+          "date": "2021-01-14",
+          "close": 5.56,
+          "prev_volume": 481859.0,
+          "volume": 161660.0,
+          "rel_vol_diff": 0.664508
+        },
+        {
+          "sym": "bj920000",
+          "date": "2021-01-27",
+          "close": 5.61,
+          "prev_volume": 596170.0,
+          "volume": 223613.0,
+          "rel_vol_diff": 0.624917
+        },
+        {
+          "sym": "bj920000",
+          "date": "2021-02-09",
+          "close": 5.55,
+          "prev_volume": 66559.0,
+          "volume": 154965.0,
+          "rel_vol_diff": 1.328235
+        }
+      ],
+      "top_symbols_by_count": [
+        [
+          "sz159005",
+          519
+        ],
+        [
+          "sz159001",
+          357
+        ],
+        [
+          "sh511960",
+          336
+        ],
+        [
+          "sz159003",
+          327
+        ],
+        [
+          "sh511970",
+          323
+        ],
+        [
+          "sh511910",
+          313
+        ],
+        [
+          "sh511930",
+          309
+        ],
+        [
+          "sh511770",
+          299
+        ],
+        [
+          "sh511950",
+          298
+        ],
+        [
+          "sh900957",
+          284
+        ]
+      ],
+      "alt_definition_max_over_min_gt_50pct_count": 124080
+    },
+    "counts_summary": {
+      "A_abs_daily_return_gt_21pct": 3514,
+      "B_nonpositive_open_or_close": 606,
+      "C_high_lt_low": 0,
+      "D_zero_volume_positive_amount": 1448,
+      "E_flat_close_vol_jump": 61575
+    },
+    "extra_dirty_data_findings": {
+      "synthetic_trailing_zero_bars": {
+        "n_files": 336,
+        "by_last_date": {
+          "2026-09-23": 336
+        },
+        "definition": "last row has open=0, volume=0 and amount=0 while close carries a stale value"
+      },
+      "n_last_row_identical_to_previous": 5,
+      "examples_last_row_identical_to_previous": [
+        {
+          "sym": "sh512390",
+          "last_date": "2026-09-23",
+          "prev_date": "2026-09-08",
+          "identical_ohlcv_amount": true
+        },
+        {
+          "sym": "sh688496",
+          "last_date": "2026-09-23",
+          "prev_date": "2026-09-11",
+          "identical_ohlcv_amount": true
+        },
+        {
+          "sym": "sz000016",
+          "last_date": "2026-09-23",
+          "prev_date": "2026-09-11",
+          "identical_ohlcv_amount": true
+        },
+        {
+          "sym": "sz002731",
+          "last_date": "2026-09-23",
+          "prev_date": "2026-09-11",
+          "identical_ohlcv_amount": true
+        },
+        {
+          "sym": "sz301139",
+          "last_date": "2026-09-23",
+          "prev_date": "2026-09-11",
+          "identical_ohlcv_amount": true
+        }
+      ],
+      "rows_dated_on_a_non_trading_day": {
+        "count": 7,
+        "rows": [
+          {
+            "sym": "sz300028",
+            "date": "2021-06-27"
+          },
+          {
+            "sym": "sz300090",
+            "date": "2021-06-27"
+          },
+          {
+            "sym": "sz300104",
+            "date": "2021-06-27"
+          },
+          {
+            "sym": "sz300156",
+            "date": "2021-06-27"
+          },
+          {
+            "sym": "sz300216",
+            "date": "2021-06-27"
+          },
+          {
+            "sym": "sz300372",
+            "date": "2021-06-27"
+          },
+          {
+            "sym": "sz300431",
+            "date": "2021-06-27"
+          }
+        ],
+        "note": "all 7 rows are 2021-06-27 (Sunday), one row per file, in 7 delisted sz300xxx files"
+      }
+    }
+  }
+}
