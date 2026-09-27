@@ -139,9 +139,11 @@ def ensure_win_path_shim() -> None:
         log(f"  ⚠ 兼容软链创建失败（不阻断；写死 D:/ 路径的步骤可能仍失败）：{type(e).__name__}: {e}")
 
 
-def run_chain(timeout: int) -> int:
+def run_chain(timeout: int, force: bool = False) -> int:
     ensure_win_path_shim()
-    cmd = [sys.executable, "daily_refresh.py"] + CHAIN_FLAGS
+    # force=True → 给 daily_refresh.py 追加 --force：越过「周末/非交易日」守卫。
+    # 只为**验证与补跑**（例：周日验证云端链能否跑通新策略步骤）；定时任务永不带它。
+    cmd = [sys.executable, "daily_refresh.py"] + CHAIN_FLAGS + (["--force"] if force else [])
     env = os.environ.copy()
     # 云端专属 env（2026-09-24 加；本机链不经此处 → 本机行为一律不变）：
     #  A. REBASE_BUDGET_S：update_daily.py L401 的「复权基准漂移检测」相位预算（默认 2400s）。
@@ -188,6 +190,8 @@ def emit(**kw) -> None:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--mode", choices=["probe", "chain"], default="probe")
+    ap.add_argument("--force-chain", action="store_true",
+                    help="给 daily_refresh.py 追加 --force（越过周末/非交易日守卫；仅验证/补跑）")
     ap.add_argument("--chain-timeout", type=int, default=7200,
                     help="链超时秒数（默认 7200=120min；job 上限 150min，留余量给门禁/组装）")
     ap.add_argument("--no-live-check", action="store_true", help="本地干跑时跳过线上比对")
@@ -211,7 +215,7 @@ def main() -> int:
             log("[chain] ⛔ data_full 为空（缓存与种子均未就位）→ 拒绝跑链（rc 3）")
             emit(publish="false", status="no-data-cache", live_url=LIVE_BASE)
             return 3
-        chain_rc = run_chain(a.chain_timeout)
+        chain_rc = run_chain(a.chain_timeout, a.force_chain)
         log(f"[chain] rc={chain_rc}")
 
     # ---------- 2 G1 结构门禁 ----------

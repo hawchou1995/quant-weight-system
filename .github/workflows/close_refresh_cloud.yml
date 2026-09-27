@@ -28,6 +28,16 @@ on:
           - probe
           - chain
         default: probe
+      force:
+        # 2026-09-27 加（R-cloud-force-0927）：仅手工触发生效，定时任务不受影响。
+        # 不加它则周末/非交易日永远测不到链 —— 09-27 周日实测：chain 模式打印
+        # 「[skip] 周末 —— 收盘刷新无需执行」后 rc=0 空转，新策略步骤根本没被执行。
+        description: 'chain 是否加 --force（越过周末/非交易日守卫；仅验证/补跑用）'
+        type: choice
+        options:
+          - '0'
+          - '1'
+        default: '0'
 
 concurrency:
   group: close-refresh
@@ -104,7 +114,10 @@ jobs:
         id: refresh
         run: |
           set +e
-          python -X utf8 .github/cloud/cloud_refresh.py --mode ${{ steps.mode.outputs.mode }}
+          FORCE_ARG=""
+          if [ "${{ inputs.force }}" = "1" ]; then FORCE_ARG="--force-chain"; fi
+          echo "force 输入=\'${{ inputs.force }}\' → 链参数 \"$FORCE_ARG\""
+          python -X utf8 .github/cloud/cloud_refresh.py --mode ${{ steps.mode.outputs.mode }} $FORCE_ARG
           rc=$?
           echo "rc=$rc" >> "$GITHUB_OUTPUT"
           echo "退出码 rc=$rc（0 成功｜1 链失败｜2 门禁拒发｜3 数据未就位）"
