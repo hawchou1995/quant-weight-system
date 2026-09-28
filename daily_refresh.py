@@ -201,6 +201,13 @@ STEPS = [
     ("缩量超跌-模拟盘/跟踪池 hpdk_paper[软]",
      ["backtest/hengpan_fangliang_dikai_0925/hpdk_paper.py"], "--skip-hpdkpaper" in sys.argv),
 
+    # ETF 动量轮动族（2026-09-28，R-etf-chain-0928 · 用户批准全接入）：此前**整族从未进链**
+    # （脚本 BASE 硬编码 Windows 路径、快照输出落 gitignored 的 dist/、依赖引擎未入库）
+    # → 云端永远显示「待数据」，本机快照也停在 2026-09-07。顺序：模拟盘推进账户 → 快照（信号+账户）
+    # → 由 build_dual_system 读取入库快照。两步 [软]=失败不阻断主链，看板退回统一占位
+    # 「数据截至 — · 待数据」（不静默显示假数据）。--skip-etf 跳过。
+    ("ETF 模拟盘日更 etf_paper[软]", ["etf_paper_0906.py"], "--skip-etf" in sys.argv),
+    ("ETF 看板快照 etf_snapshot[软]", ["etf_dashboard_snapshot.py"], "--skip-etf" in sys.argv),
     ("看板重建 build_dual_system", ["build_dual_system.py"], False),
     ("部署 gh-pages", ["_deploy_fundline_0911.py"], "--skip-deploy" in sys.argv),
 ]
@@ -411,6 +418,13 @@ if not fails and not NO_MAIN_PUSH:   # ⑤ 云端 Phase 1：只写 gh-pages，�
                           "backtest/wechat_hotspot_leader_0925/universe.json",
                           # 2026-09-28 补：面板日历推进器（新脚本不进白名单 → 改动不会被链提交）
                           "backtest/hengpan_fangliang_dikai_0925/universe_cal.py",
+                          # 2026-09-28 补（R-etf-chain-0928）：ETF 全族入库（引擎/依赖/脚本/产物）——
+                          # 此前整族被 .gitignore 排除 → 云端链连 import 都失败 → 看板永远「待数据」
+                          "etf_paper_0906.py", "etf_dashboard_snapshot.py",
+                          "etf_paper_state.json", "etf_dashboard_snapshot.json",
+                          "backtest/etf_momentum_volscale_0906.py",
+                          "backtest/etf_momentum_20d_0906.py",
+                          "backtest/etf_rotation_out/etf_momentum_volscale_0906.csv",
                           "backtest/hengpan_fangliang_dikai_0925/x5_gates.py",
                           "backtest/hengpan_fangliang_dikai_0925/evidence_gates_scan.json",
                           "backtest/hengpan_fangliang_dikai_0925/hpdk_paper.py",

@@ -1,0 +1,119 @@
+{
+  "bt": {
+    "total": 1.7154,
+    "annual": 12.18,
+    "max_dd": -19.06,
+    "sharpe": 1.013,
+    "wr": 62.39,
+    "pos_years": 9,
+    "excess_ann": 9.88,
+    "dd_imp_pp": 9.72,
+    "avg_scale": 0.775,
+    "n_trades": 98,
+    "seg_annual": 11.884725414874689,
+    "seg_max_dd": -9.923967135690114,
+    "seg_sharpe": 1.070475962690118,
+    "seg_wr": 60.29411764705882
+  },
+  "sig": {
+    "as_of": "2026-09-28",
+    "sig_date": "2026-09-28",
+    "rank": [
+      {
+        "code": "sh511260",
+        "name": "十年国债ETF国泰",
+        "mom": -0.6
+      },
+      {
+        "code": "sh510050",
+        "name": "上证50ETF华夏",
+        "mom": -3.79
+      },
+      {
+        "code": "sh510300",
+        "name": "沪深300ETF华泰柏瑞",
+        "mom": -5.6
+      },
+      {
+        "code": "sh510500",
+        "name": "中证500ETF南方",
+        "mom": -6.1
+      },
+      {
+        "code": "sz159915",
+        "name": "创业板ETF易方达",
+        "mom": -8.25
+      },
+      {
+        "code": "sh518880",
+        "name": "黄金ETF华安",
+        "mom": -9.57
+      }
+    ],
+    "top1": "sh511260",
+    "top2": "sh510050",
+    "scale": 0.0,
+    "weights": {},
+    "empty": true,
+    "note": "绝对动量保护：Top1 20日动量 < 0 → 全空仓（货基）（信号日 2026-09-28）",
+    "rank_ref": [
+      {
+        "code": "sh511260",
+        "name": "十年国债ETF国泰",
+        "mom": -0.6
+      },
+      {
+        "code": "sh510050",
+        "name": "上证50ETF华夏",
+        "mom": -3.79
+      },
+      {
+        "code": "sh510300",
+        "name": "沪深300ETF华泰柏瑞",
+        "mom": -5.6
+      },
+      {
+        "code": "sh510500",
+        "name": "中证500ETF南方",
+        "mom": -6.1
+      },
+      {
+        "code": "sz159915",
+        "name": "创业板ETF易方达",
+        "mom": -8.25
+      },
+      {
+        "code": "sh518880",
+        "name": "黄金ETF华安",
+        "mom": -9.57
+      }
+    ]
+  },
+  "paper": {
+    "nav": 97117.13,
+    "px_chg": -1.404,
+    "positions": [
+      {
+        "code": "sh518880",
+        "name": "黄金ETF华安",
+        "shares": 3200,
+        "entry_px": 9.054,
+        "last_close": 8.568,
+        "weight": 29.52
+      },
+      {
+        "code": "sh510500",
+        "name": "中证500ETF南方",
+        "shares": 3700,
+        "entry_px": 7.7988,
+        "last_close": 7.44,
+        "weight": 29.52
+      }
+    ],
+    "pending": null,
+    "last_date": "2026-09-28",
+    "start": "2026-09-03",
+    "cum": -2.88
+  },
+  "generated_at": "2026-09-28 22:35:09.977401"
+}

@@ -1792,7 +1792,9 @@ def watch_card(key, title, source_kind="short", cols=None, note="", empty_msg=No
 # 冻结配置 = 20日动量/前2等权/绝对动量保护/12%目标波动率缩放/月末调仓/T+1开盘
 # ════════════════════════════════════════════════════════════════════
 ETF_SNAP = {}
-_etf_snap_f = (BASE / "dist" / "etf_dashboard_snapshot.json")
+_etf_snap_f = (BASE / "etf_dashboard_snapshot.json")        # 入库路径（R-etf-chain-0928 起写入）
+if not _etf_snap_f.exists():                                # 兼容旧路径（历史 dist/ 产物）
+    _etf_snap_f = (BASE / "dist" / "etf_dashboard_snapshot.json")
 if _etf_snap_f.exists():
     try:
         ETF_SNAP = json.loads(_etf_snap_f.read_text(encoding="utf-8"))
@@ -1804,7 +1806,7 @@ def _etf_paper_card():
     """ETF 动量轮动（冻结模型）卡片：信号状态 + 模拟盘持仓 + 回测证据"""
     if not ETF_SNAP:
         return ('<div class="card" id="card-etf-paper">'
-                '<h2>📈 ETF 动量轮动（冻结模型） <span class="view-badge auto">待数据</span></h2>'
+                '<h2>📈 ETF 动量轮动（冻结模型） ' + asof_badge(None, tag="待数据", ts="") + '</h2>'
                 '<div class="sub">先运行 <code>python etf_dashboard_snapshot.py</code> 生成快照</div></div>')
     _sig = ETF_SNAP.get("sig", {})
     _bt = ETF_SNAP.get("bt", {})
@@ -1918,7 +1920,7 @@ def _kh_paper_card():
     """超卖伏击 优化配置模拟盘卡片：A/C 双轨状态 + 持仓明细 + 回测证据"""
     if not KH_SNAP:
         return ('<div class="card" id="card-kh-paper">'
-                '<h2>🐺 超卖伏击 模拟盘 <span class="badge badge-auto">待数据</span></h2>'
+                '<h2>🐺 超卖伏击 模拟盘 ' + asof_badge(None, tag="待数据", ts="") + '</h2>'
                 '<div class="sub">先运行 <code>python khunter_paper_snapshot.py</code> 生成快照</div></div>')
     _cfg = KH_SNAP.get("config", {})
     _trk = KH_SNAP.get("tracks", {})

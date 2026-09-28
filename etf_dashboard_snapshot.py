@@ -13,13 +13,19 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 
-BASE = Path(r"D:\Documents\Workbuddy\股票基金\quant-weight-system")
+# 2026-09-28（R-etf-chain-0928）：BASE 从文件位置解析 + 旧路径兜底 → 云端（Linux）可移植
+BASE = Path(__file__).resolve().parent
+_LEGACY = Path(r"D:\Documents\Workbuddy\股票基金\quant-weight-system")
+if not (BASE / "data_full").is_dir() and (_LEGACY / "data_full").is_dir():
+    BASE = _LEGACY
 sys.path.insert(0, str(BASE / "backtest"))
 from etf_momentum_20d_0906 import CORE, load_etf, CASH_ANN
 from etf_momentum_volscale_0906 import run_volscale
 
 DATA_DIR = BASE / "data_full"
-OUT = BASE / "dist" / "etf_dashboard_snapshot.json"
+# 2026-09-28（R-etf-chain-0928）：输出改**入库路径**——原 dist/ 被 .gitignore 排除，
+#   云端 checkout 里没有该文件 → build_dual_system 永远读不到 → 看板只显示「待数据」。
+OUT = BASE / "etf_dashboard_snapshot.json"
 NAMES = {}
 _names_f = BASE / "data_full_names.json"
 if _names_f.exists():

@@ -593,3 +593,13 @@ backtest/clip_absorb_0925/
 #   派生大件（12MB 逐笔、258KB 净值曲线）本地留存 —— 摘要 JSON 内含 commands 可完整复现。
 backtest/entry_timing_hpdk_0928/entry_timing_hpdk_0928_trades.csv
 backtest/entry_timing_hpdk_0928/entry_timing_hpdk_0928_equity.csv
+
+# ── 2026-09-28（R-etf-chain-0928 · 用户批准「ETF 全族接入云端链」）────────────────
+# ETF 动量轮动池此前**整族未入库** → 云端链无法 import 引擎/读快照 → 看板永远显示「待数据」，
+# 本机快照也停在 2026-09-07。以下按需例外入库（体积：引擎 12KB×2 / 回测 CSV 2KB / 脚本 14KB）：
+!backtest/etf_momentum_volscale_0906.py
+!backtest/etf_momentum_20d_0906.py
+!etf_paper_0906.py
+!backtest/etf_rotation_out/
+backtest/etf_rotation_out/*
+!backtest/etf_rotation_out/etf_momentum_volscale_0906.csv
