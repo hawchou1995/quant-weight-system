@@ -314,6 +314,8 @@ if not fails:
         ("backtest/hpdk_oos_view.json", None, ("last_scan_date",)),
         # 模拟盘账户的日期字段 = 数据末日（as_of）
         ("backtest/hpdk_paper.json", None, ("as_of",)),
+        # 今日命中（收盘链全池复算 · R-hpdk-hits-0928）：日期字段 = 买日 = 最新交易日
+        ("backtest/hpdk_hits.json", None, ("date",)),
     ]:
         _p = BASE / _rel
         if not _p.exists():
@@ -429,6 +431,8 @@ if not fails and not NO_MAIN_PUSH:   # ⑤ 云端 Phase 1：只写 gh-pages，�
                           "backtest/hengpan_fangliang_dikai_0925/evidence_gates_scan.json",
                           "backtest/hengpan_fangliang_dikai_0925/hpdk_paper.py",
                           "backtest/hpdk_paper.json",
+                          # 2026-09-28 补（R-hpdk-hits-0928）：今日命中（全池复算）产物
+                          "backtest/hpdk_hits.json",
                           "gen_trade_cal.py", "trade_cal_sina.csv",
                           "backtest/hengpan_fangliang_dikai_0925/gen_gates_report.py",
                           # 2026-09-28 补：E-19 口径修正 + forum8 全版块回测线（此前从未进链白名单 → 改动不会被链提交）

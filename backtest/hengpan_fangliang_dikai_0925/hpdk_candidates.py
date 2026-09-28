@@ -268,6 +268,64 @@ def main():
         % (T_last, buy_date, exit_date, len(rows),
            "、".join("%s %s" % (r["code"], r["name"]) for r in rows[:10])))
 
+    # ---------- 今日命中（收盘链全池复算 · R-hpdk-hits-0928）----------
+    # 为什么要有这一步：原设计的「命中」只活在**浏览器端**（09:25 用真实今开判定），且
+    #   ① 只在渲染的 RENDER_N=600 行内做 F 排名 → **系统性少报**（2026-09-28 实测：全池真命中
+    #      147 只，前端只显示 3 只，F 第 2 名落在第 601 行之后被截掉）；
+    #   ② 记录只存 localStorage 且**按 HPDK.as_of 作废** → 信号日一推进，当天命中即消失；
+    #   ③ 零落盘（ADR-0009）→ 服务端无档可查。
+    # 但**收盘后**「上一信号日池 × 当日今开带」是**静态可复算**的（ADR-0009 反对的是盘中实时
+    # 判定需常驻进程，不适用于收盘复算）⇒ 本步复算并落盘，供看板常驻显示与历史回看。
+    # 口径与 A11 对拍、前端 judge 逐条一致：命中 = 上一信号日 wide 池 ∩ gap∈[-3%,-1%]
+    # ∩ B 闸（可交易，剔停牌/一字）∩ F 闸（量比与 20 日涨幅可算），按 F 降序取前 K 只标注。
+    hits = dict(date=T_last, signal_date=None, n_pool=0, n_hits=0, k=FZ["K"],
+                gap_band=[-0.03, -0.01], frozen_sha256=sha0,
+                rule=("命中 = 上一信号日 wide 池 ∩ 当日开盘跳空 gap∈[-3%,-1%] ∩ 可交易"
+                      "（非停牌/一字）∩ 量比与 20 日涨幅可算；F 复合分在命中子集内横截面 z 标准化，"
+                      "降序取前 K 只标注为当日买入候选"),
+                rows=[], top=[])
+    if len(cal) >= 2:
+        S = cal[-2]                       # 上一交易日 = 本买日的信号日
+        iS = cal.index(S)
+        pool_s = sorted(by_day_w.get(S, []))
+        gS = ft["GAP"][iS]
+        cand = []
+        for s in pool_s:
+            j = jof[s]
+            gg = gS[j]
+            oD, cD, cS = F2["O"][iS + 1, j], F2["C"][iS + 1, j], F2["C"][iS, j]
+            a20, vbr, r20 = ft["AMT20"][iS, j], ft["VOLBR"][iS, j], ft["RET20"][iS, j]
+            if not (np.isfinite(gg) and -0.03 <= gg <= -0.01):
+                continue
+            if not (np.isfinite(oD) and oD > 0 and np.isfinite(cS) and cS > 0):
+                continue
+            if abs(oD - cD) < 1e-9 and abs(oD - cS) < 1e-9:       # B 闸：停牌/一字
+                continue
+            if not (np.isfinite(a20) and a20 > 0 and np.isfinite(vbr) and vbr > 0
+                    and np.isfinite(r20)):                         # F 闸
+                continue
+            cand.append((s, float(gg), float(a20), float(vbr), float(r20)))
+        if cand:
+            _amt = np.array([c[2] for c in cand])
+            _vbr = np.array([c[3] for c in cand])
+            _r20 = np.array([c[4] for c in cand])
+            _comp = zs(-np.log(_amt)) + zs(-np.log(_vbr)) + zs(-_r20)
+            order = np.argsort(-_comp)
+            hits["rows"] = [
+                dict(rank=int(r + 1), code=cand[q][0][2:], sym=cand[q][0],
+                     name=names.get(cand[q][0], ""), gap_pct=round(cand[q][1] * 100, 3),
+                     F=round(float(_comp[q]), 4), volbr=round(cand[q][3], 3),
+                     ret20_pct=round(cand[q][4] * 100, 2))
+                for r, q in enumerate(order)]
+            hits["top"] = hits["rows"][:FZ["K"]]
+        hits["signal_date"] = S
+        hits["n_pool"] = len(pool_s)
+        hits["n_hits"] = len(hits["rows"])
+    (outdir / "hpdk_hits.json").write_text(json.dumps(hits, ensure_ascii=False, indent=1),
+                                           encoding="utf-8")
+    log("[out] hpdk_hits.json  买日=%s 信号日=%s 资格池=%d 命中=%d（F 前 3：%s）"
+        % (hits["date"], hits["signal_date"], hits["n_pool"], hits["n_hits"],
+           "、".join("%s %s" % (x["code"], x["name"]) for x in hits["top"][:3])))
     # ---------- OOS 台账只读投影 ----------
     st = json.loads((OUT / "oos_state.json").read_text(encoding="utf-8")) if (OUT / "oos_state.json").exists() else {}
     rp = json.loads((OUT / "oos_report.json").read_text(encoding="utf-8")) if (OUT / "oos_report.json").exists() else {}

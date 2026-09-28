@@ -110,6 +110,7 @@ def hpdk_card(BASE):
     kslot = par.get("KSLOT", 20)
     capital = cap.get("capital", 0) or 0
     k_ops = cap.get("kslot") or 0
+    h = _read(BASE / "backtest" / "hpdk_hits.json")        # 今日命中（收盘链全池复算 · R-hpdk-hits-0928）
     L.append(f'<h2>🎯 缩量超跌 {asof_badge(d.get("as_of"))}</h2>')
     L.append(
         '<div class="sub"><b>策略定义（与冻结预注册逐条一致；本页不复述自定义口径）</b>：T 收盘判定 → '
@@ -132,6 +133,9 @@ def hpdk_card(BASE):
         '09:15–09:25 集合竞价只灰标<b>竞价预判</b>，<b>不剔除任何标的</b>；'
         '<b>09:25 起用真实今开判定</b> —— 命中（今开/昨收−1 ∈ [−3%, −1%] ＋ 可交易 ＋ 准入过滤件达标）者'
         '进入当日候选，其余 <b>自动从清单剔除</b>（不是置灰）。'
+        '<b>该实时判定只是盘中提示；当日命中的权威记录见下方「今日命中（收盘链全池复算）」</b>'
+        '（前端只在渲染的 600 行内做 F 排名 → 会少报；2026-09-28 实测全池 146 只、前端仅 3 只，'
+        'F 第 2 名浙江自然被第 601 行上限截掉）。'
         f'<br><b>操作口径（与回测指标带分列，不混写）</b>：本金 <b>{capital / 1e4:.0f} 万</b> / '
         f'KSLOT <b>{k_ops or "—"}</b> → 单票分配 min(本金/KSLOT, 该股 ADV×1%) = '
         f'<b>{capital / max(1, k_ops) / 1e4:.1f} 万</b>；<b>硬约束：单票 ≤ 该股 20 日均额×1%</b> '
@@ -148,6 +152,35 @@ def hpdk_card(BASE):
         f'{par.get("K", 10)} 名要在「次日开盘低开 −3%~−1% 的子集」内重算复合分，而该子集 09:25 才知道；'
         '代理分是在<b>全体资格池</b>内标准化的，与正式排名不同。搜索 / 排序 / 板块筛选由板内通用脚本接管；'
         '09:25 后本表按真实今开自动剔除并置顶命中者。</span></div>')
+    if h and h.get("signal_date") and h.get("n_hits") is not None:
+        _top_k = h.get("k") or 0
+        L.append(
+            '<div class="sub" style="margin-top:12px;border-left:3px solid var(--down);'
+            'background:rgba(5,150,105,.08);padding:8px 10px;line-height:1.75">'
+            f'<b>✅ 今日命中（收盘链全池复算 · 可回看 · 跨设备一致）</b>：买日 <b>{h.get("date")}</b> · '
+            f'信号日 <b>{h.get("signal_date")}</b> · 资格池 <b>{h.get("n_pool")}</b> → '
+            f'命中 <b>{h.get("n_hits")}</b> 只（开盘跳空带内 ∩ 可交易 ∩ 可算分）'
+            f'｜ F 前 <b>{_top_k}</b> 只 = 当日买入候选'
+            f'<br><span style="color:var(--faint)">{h.get("rule", "")}'
+            '（原设计只有浏览器端 600 行内排名，会少报且跨日即焚 —— 本表为全池复算的权威记录）'
+            '</span></div>')
+        _hr = "".join(
+            '<tr%s><td style="text-align:center">%s</td>'
+            '<td><b>%s</b><br><span style="color:var(--faint);font-size:11px">%s</span></td>'
+            '<td style="text-align:right">%+.2f%%</td><td style="text-align:right">%+.3f</td>'
+            '<td style="text-align:center">%s</td></tr>'
+            % (' class="hpdk-top"' if x["rank"] <= _top_k else "",
+               x["rank"], x["name"], x["code"], x["gap_pct"], x["F"],
+               "✅ 候选" if x["rank"] <= _top_k else "—")
+            for x in (h.get("rows") or []))
+        L.append(
+            f'<div class="sub" style="margin-top:10px"><b>全池命中清单（{len(h.get("rows") or [])} 只 · '
+            f'按 F 降序）</b> · 前 {_top_k} 只即当日买入候选</div>'
+            '<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-hits"><thead><tr>'
+            '<th style="text-align:center">F 名次</th><th>标的</th>'
+            '<th style="text-align:right">今开跳空</th><th style="text-align:right">F 复合分</th>'
+            f'<th style="text-align:center">当日候选（前 {_top_k}）</th></tr></thead>'
+            f'<tbody>{_hr}</tbody></table></div>')
     L.append('<div class="sub" style="margin-top:6px;color:var(--warn)"><b>板块限定（2026-09-27 用户决定：只买主板）</b> —— 同一面板、同一记账规则下的同尺子对比：全窗 年化 <b>+72.59% → +47.77%</b>（−24.82pp）、夏普 <b>2.79 → 2.12</b>、最大回撤 <b>−32.29% → −29.13%</b>（<b>改善 3.16pp</b>）、净胜率 63.14% → 60.63%、单笔净均 +0.5574% → +0.4028%；2018+ 年化 +105.38% → +64.24%。选股集合仅 <b>55.5% 重合</b>（横截面 z 在候选池内标准化 ⇒ 缩池后标准分整体改变）。<b>代价明确：用年化换回撤，风险调整后更差。</b>完整逐项读数见 <code>backtest/报告-只买主板-回测对比-20260927.md</code> 与 <code>backtest/hengpan_fangliang_dikai_0925/evidence_board.json</code>（另有：全池 KSLOT=4 口径 +249.67%、主板 KSLOT=4 +189.75%，操作档见上）。</div>')
     L.append('<div class="sub" style="margin-top:6px;color:var(--warn)">'
              '<b>准入门槛扫描（2026-09-27）</b> —— 用户问「量比要多于多少 / 盈亏比要大于多少会不会改善」：'
