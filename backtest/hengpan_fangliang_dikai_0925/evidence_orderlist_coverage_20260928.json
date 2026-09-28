@@ -1,0 +1,28 @@
+{
+ "generated_at": "2026-09-28 16:44:31",
+ "purpose": "量化「盘前 provisional 挂单清单」与「冻结策略实际买入」的覆盖差",
+ "n_frozen": 24492,
+ "n_not_found": 0,
+ "n_wide": 4324303,
+ "provisional_rank": {
+  "min": 0,
+  "p10": 21,
+  "median": 243,
+  "p90": 1020,
+  "p99": 1727,
+  "max": 2350,
+  "mean": 397.1
+ },
+ "coverage_pct": {
+  "top10": 4.87,
+  "top20": 9.36,
+  "top30": 13.02,
+  "top50": 19.37,
+  "top100": 30.68,
+  "top200": 45.05,
+  "top500": 69.7,
+  "top1000": 89.47
+ },
+ "note": "coverage_pct[topN] = 冻结买入中，盘前 provisional 名次 < N 的占比（= 挂单清单取前 N 名能覆盖到的比例）",
+ "runtime_sec": 32.3
+}

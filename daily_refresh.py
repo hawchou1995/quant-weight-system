@@ -404,6 +404,11 @@ if not fails and not NO_MAIN_PUSH:   # ⑤ 云端 Phase 1：只写 gh-pages，�
                           "backtest/hengpan_fangliang_dikai_0925/audit_launch12_20260928.py",
                           "backtest/hengpan_fangliang_dikai_0925/evidence_launch12_20260928.json",
                           "backtest/hengpan_fangliang_dikai_0925/errata_e19_attrib.py",
+                          # 2026-09-28 补：下单链路核实（挂单 0.99 与开盘价成交的等价性 + 挂单清单覆盖度）
+                          "backtest/hengpan_fangliang_dikai_0925/audit_orderflow_099_20260928.py",
+                          "backtest/hengpan_fangliang_dikai_0925/evidence_orderflow_099_20260928.json",
+                          "backtest/hengpan_fangliang_dikai_0925/audit_orderlist_coverage_20260928.py",
+                          "backtest/hengpan_fangliang_dikai_0925/evidence_orderlist_coverage_20260928.json",
                           "backtest/hengpan_fangliang_dikai_0925/evidence_errata_e19_attrib.json",
                           "backtest/报告-上线前12项检查-缩量超跌-20260928.md",
                           "backtest/audit_lookahead_gushi465_20260928.py",
