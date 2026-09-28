@@ -21,7 +21,7 @@ import numpy as np
 import pandas as pd
 
 R = pathlib.Path(__file__).resolve().parents[2]
-OUT = R / "backtest/hengpan_fangliang_dikai_0925"
+FROZEN_SHA_EXPECT = "0b61a4bbce100ed63be86e72e0692bfc719d6c13e266410d593926b3855518b3"   # v1.6（E-19 修正 STNOW 后）
 FROZEN_SHA_EXPECT = "b3748ca36f83d70589a17cb9324b561a4bc52a26e59e39c60355fb32ea019225"
 ANN = 244.0
 MET_KEYS = ("ann", "mdd", "sharpe", "win_rate", "mean_per_trade", "med_per_trade",

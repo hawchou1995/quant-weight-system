@@ -24,10 +24,13 @@ OUT = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(OUT))
 import x2_sens as X                                     # noqa: E402
 
-# E-15 前（旧序，含同日资金重复使用）：ann=47.77, mdd=-29.13, sharpe=2.12
-V4_BASE_ALL = dict(ann=47.17, mdd=-26.81, sharpe=2.19, n_trades=23759, mean_per_trade=0.4028, win_rate=60.63)
-# E-15 前（旧序）：ann=64.24, mdd=-29.13, sharpe=2.44
-V4_BASE_2018 = dict(ann=63.86, mdd=-26.81, sharpe=2.54, n_trades=21146, mean_per_trade=0.4264, win_rate=60.71)
+# v1.6（E-19 修正 STNOW 后）。E-15 前（旧序，含同日资金重复使用）：ann=47.77, mdd=-29.13, sharpe=2.12
+V4_BASE_ALL = dict(ann=47.3, mdd=-27.41, sharpe=2.15, n_trades=24492, mean_per_trade=0.4029, win_rate=60.98)
+# v1.5 旧值（可逐位复现：x2_sens 的 v15_stnow 臂，P["STNOW_OFF"]=False）：
+#   ann=47.17, mdd=-26.81, sharpe=2.19, n_trades=23759, mean_per_trade=0.4028, win_rate=60.63
+# 2018+ 子窗（E-15 前旧序：ann=64.24, mdd=-29.13, sharpe=2.44）
+V4_BASE_2018 = dict(ann=63.9, mdd=-27.41, sharpe=2.53, n_trades=21146, mean_per_trade=0.4341, win_rate=60.94)
+# v1.5 的 2018+：ann=63.86, mdd=-26.81, sharpe=2.54, n_trades=21146, mean_per_trade=0.4264, win_rate=60.71
 
 ARMS = [("base 基线(无门槛)", {})]
 for v in (0.5, 0.8, 1.0, 1.2, 1.5):

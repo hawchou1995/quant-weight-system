@@ -36,7 +36,8 @@ R = pathlib.Path(__file__).resolve().parents[2]
 OUT = R / "backtest/hengpan_fangliang_dikai_0925"
 OOS = OUT / "oos_run.py"
 BASE_P = dict(P1=0.01, P2=0.03, K=10, KSLOT=20, MINAMT=2e7, MINPX=3.0, LISTED=250,
-              TP=0.02, COST_SIDE=0.000346, SHADOW_START="2016-01-01", WORST_CASE_WIPEOUT=True)
+              TP=0.02, COST_SIDE=0.000346, SHADOW_START="2016-01-01", WORST_CASE_WIPEOUT=True,
+              STNOW_OFF=True)
 ANN = 244.0
 
 
@@ -229,6 +230,7 @@ def main():
         ("KSLOT_30", {"KSLOT": 30}, None),
         ("TP_0.01", {"TP": 0.01}, None), ("TP_0.03", {"TP": 0.03}, None),
         ("TP_off_0.99", {"TP": 0.99}, None),
+        ("v15_stnow", {"STNOW_OFF": False}, None),   # 复现 v1.5 旧行为（按当前名称剔 ST）
         ("lag_VA", None, lambda F: shift_keys(F, ("V", "A"), 1)),
         ("fwd_VA", None, lambda F: shift_keys(F, ("V", "A"), -1)),
         ("shift_all1", None, lambda F: shift_keys(F, ALLP, 1)),

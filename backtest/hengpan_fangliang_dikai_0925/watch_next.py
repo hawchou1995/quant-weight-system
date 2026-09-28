@@ -73,8 +73,11 @@ for _s, _g in _bp.groupby("sym"):
     _pos = np.searchsorted(_idx, np.arange(T), side="right") - 1; _gd = _pos >= 0
     BPSA[_gd, _j] = _v[_pos[_gd]]
 def FILT(t):
-    """返回可交易掩码: 非ST(期内代理+当前名) 且 股价>=3 且 每股净资产>=3(报告期+4个月后方可用)"""
-    return (~STP[t]) & (~STNOW) & (C[t] >= 3.0) & np.isfinite(BPSA[t]) & (BPSA[t] >= 3.0)
+    """返回可交易掩码（**必须与冻结脚本 oos_run.py 的 FILT 逐行同式**）
+    【勘误 E-19，2026-09-28】去掉 STNOW（按当前名称一次性剔除会剔除 228/253 只退市股），
+    只保留点时代理 STP。两侧不一致会被 hpdk_candidates 的 A11 逐位对拍挡下。
+    """
+    return (~STP[t]) & (C[t] >= 3.0) & np.isfinite(BPSA[t]) & (BPSA[t] >= 3.0)
 
 def zs(x):
     x = np.asarray(x,float); mu = np.nanmean(x); sd = np.nanstd(x)

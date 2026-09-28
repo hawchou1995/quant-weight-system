@@ -14,7 +14,11 @@ P = dict(P1=0.01, P2=0.03, K=10, KSLOT=20, MINAMT=2e7, MINPX=3.0, LISTED=250, TP
          COST_SIDE=0.000346, SHADOW_START="2026-09-25", WORST_CASE_WIPEOUT=True,
          MAINBOARD=True,   # 2026-09-27 用户要求：只买主板（见 E-12）
          # ---- 2026-09-27 研究用门槛开关（默认值 = 完全无操作，见 E-13）----
-         VOLBR_MIN=0.0, VOLBR_MAX=1e9, RR_MIN=0.0)
+         VOLBR_MIN=0.0, VOLBR_MAX=1e9, RR_MIN=0.0,
+         # ---- 2026-09-28 用户批准的口径修正（见勘误 E-19）----
+         # STNOW_OFF=True  → FILT 只保留**点时**代理 STP（新默认，已修正）
+         # STNOW_OFF=False → 复原 v1.5 旧行为（额外按「当前名称含 ST/退」一次性剔除），仅供审计复现
+         STNOW_OFF=True)
 FROZEN_SHA = hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest()
 def log(*a): print(*a, flush=True)
 def load_universe():
@@ -104,8 +108,19 @@ def main():
         _pos = np.searchsorted(_idx, np.arange(T), side="right") - 1; _gd = _pos >= 0
         BPSA[_gd, _j] = _v[_pos[_gd]]
     def FILT(t):
-        """返回可交易掩码: 非ST(期内代理+当前名) 且 股价>=3 且 每股净资产>=3(报告期+4个月后方可用)"""
-        return (~STP[t]) & (~STNOW) & (C[t] >= 3.0) & np.isfinite(BPSA[t]) & (BPSA[t] >= 3.0)
+        """返回可交易掩码: 非ST **仅用点时（point-in-time）期内代理 STP** 且 股价>=3 且 每股净资产>=3(报告期+4个月后方可用)
+
+        【勘误 E-19，2026-09-28 用户批准】
+        原实现额外叠加 STNOW（按**当前名称**含 ST/退 一次性剔除全历史），有两个问题：
+          ① 形式上是跨期信息：用「今天的名字」回溯十年历史（未来函数的一种，方向保守）；
+          ② 实测把 253 只退市股整体剔除 228 只（90.1%）→ 使幸存者偏差修正失效。
+        现改为只保留点时 STP；STNOW 仍计算（保留供审计与展示），但**不再参与筛选**。
+        复现 v1.5 旧读数：P["STNOW_OFF"] = False（x2_sens 的 v15_stnow 臂即此）。
+        """
+        m = (~STP[t]) & (C[t] >= 3.0) & np.isfinite(BPSA[t]) & (BPSA[t] >= 3.0)
+        if not P.get("STNOW_OFF", True):
+            m = m & (~STNOW)
+        return m
 
     # ---- 板块掩码（2026-09-27 用户要求「只买主板，其他板块去掉」）----
     # 真主板 = sh600/601/603/605 + sz000/001/002/003

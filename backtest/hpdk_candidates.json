@@ -3,7 +3,7 @@
  "buy_date": "2026-09-28",
  "exit_date": "2026-09-29",
  "calendar_fallback": false,
- "frozen_sha256": "b3748ca36f83d70589a17cb9324b561a4bc52a26e59e39c60355fb32ea019225",
+ "frozen_sha256": "0b61a4bbce100ed63be86e72e0692bfc719d6c13e266410d593926b3855518b3",
  "params": {
   "P1": 0.01,
   "P2": 0.03,
@@ -30,7 +30,7 @@
   "days_compared": 25,
   "days_bitwise_equal": 25
  },
- "n": 2212,
+ "n": 2223,
  "rows": [
   {
    "sym": "sh603053",
@@ -120,6 +120,24 @@
    "tp_hi": 4.423,
    "cap_single": 208682.0,
    "order_size": 49100,
+   "cap_ok": false
+  },
+  {
+   "sym": "sh603189",
+   "code": "603189",
+   "name": "*ST网达",
+   "ind": "计算机",
+   "board": "主板",
+   "close": 9.63,
+   "amt20": 21385190.7,
+   "volbr": 0.5253,
+   "ret20": 0.042208,
+   "buy_lo": 9.341,
+   "buy_hi": 9.534,
+   "tp_lo": 9.528,
+   "tp_hi": 9.725,
+   "cap_single": 213852.0,
+   "order_size": 22800,
    "cap_ok": false
   },
   {
@@ -1038,6 +1056,24 @@
    "tp_hi": 11.683,
    "cap_single": 256057.0,
    "order_size": 22200,
+   "cap_ok": true
+  },
+  {
+   "sym": "sz002872",
+   "code": "002872",
+   "name": "ST天圣",
+   "ind": "医药生物",
+   "board": "主板",
+   "close": 5.94,
+   "amt20": 25645754.8,
+   "volbr": 0.578,
+   "ret20": 0.018868,
+   "buy_lo": 5.762,
+   "buy_hi": 5.881,
+   "tp_lo": 5.877,
+   "tp_hi": 5.999,
+   "cap_single": 256458.0,
+   "order_size": 43300,
    "cap_ok": true
   },
   {
@@ -6153,6 +6189,24 @@
    "cap_ok": true
   },
   {
+   "sym": "sz002538",
+   "code": "002538",
+   "name": "ST司特",
+   "ind": "基础化工",
+   "board": "主板",
+   "close": 6.61,
+   "amt20": 47182520.1,
+   "volbr": 0.6341,
+   "ret20": -0.107962,
+   "buy_lo": 6.412,
+   "buy_hi": 6.544,
+   "tp_lo": 6.54,
+   "tp_hi": 6.675,
+   "cap_single": 471825.0,
+   "order_size": 38900,
+   "cap_ok": true
+  },
+  {
    "sym": "sz002404",
    "code": "002404",
    "name": "嘉欣丝绸",
@@ -6366,6 +6420,24 @@
    "tp_hi": 7.866,
    "cap_single": 479152.0,
    "order_size": 33000,
+   "cap_ok": true
+  },
+  {
+   "sym": "sh603822",
+   "code": "603822",
+   "name": "ST嘉澳",
+   "ind": "基础化工",
+   "board": "主板",
+   "close": 62.42,
+   "amt20": 47931295.8,
+   "volbr": 0.3812,
+   "ret20": 0.083869,
+   "buy_lo": 60.547,
+   "buy_hi": 61.796,
+   "tp_lo": 61.758,
+   "tp_hi": 63.032,
+   "cap_single": 479313.0,
+   "order_size": 4100,
    "cap_ok": true
   },
   {
@@ -9231,6 +9303,24 @@
    "cap_ok": true
   },
   {
+   "sym": "sz000821",
+   "code": "000821",
+   "name": "ST京机",
+   "ind": "电力设备",
+   "board": "主板",
+   "close": 7.45,
+   "amt20": 60158462.6,
+   "volbr": 0.6081,
+   "ret20": 0.019152,
+   "buy_lo": 7.226,
+   "buy_hi": 7.375,
+   "tp_lo": 7.371,
+   "tp_hi": 7.522,
+   "cap_single": 601585.0,
+   "order_size": 34500,
+   "cap_ok": true
+  },
+  {
    "sym": "sh603271",
    "code": "603271",
    "name": "永杰新材",
@@ -11463,6 +11553,24 @@
    "cap_ok": true
   },
   {
+   "sym": "sh603008",
+   "code": "603008",
+   "name": "ST喜临门",
+   "ind": "轻工制造",
+   "board": "主板",
+   "close": 10.47,
+   "amt20": 72434389.4,
+   "volbr": 1.4354,
+   "ret20": 0.247914,
+   "buy_lo": 10.156,
+   "buy_hi": 10.365,
+   "tp_lo": 10.359,
+   "tp_hi": 10.572,
+   "cap_single": 724344.0,
+   "order_size": 24600,
+   "cap_ok": true
+  },
+  {
    "sym": "sz000906",
    "code": "000906",
    "name": "浙商中拓",
@@ -12237,6 +12345,24 @@
    "cap_ok": true
   },
   {
+   "sym": "sh603272",
+   "code": "603272",
+   "name": "*ST联翔",
+   "ind": "轻工制造",
+   "board": "主板",
+   "close": 16.81,
+   "amt20": 77729407.8,
+   "volbr": 0.8461,
+   "ret20": 0.207615,
+   "buy_lo": 16.306,
+   "buy_hi": 16.642,
+   "tp_lo": 16.632,
+   "tp_hi": 16.975,
+   "cap_single": 777294.0,
+   "order_size": 15300,
+   "cap_ok": true
+  },
+  {
    "sym": "sz002752",
    "code": "002752",
    "name": "昇兴股份",
@@ -12504,6 +12630,24 @@
    "tp_hi": 5.696,
    "cap_single": 795541.0,
    "order_size": 45600,
+   "cap_ok": true
+  },
+  {
+   "sym": "sh603595",
+   "code": "603595",
+   "name": "ST东尼",
+   "ind": "电子",
+   "board": "主板",
+   "close": 32.55,
+   "amt20": 79764135.6,
+   "volbr": 0.5517,
+   "ret20": 0.210938,
+   "buy_lo": 31.573,
+   "buy_hi": 32.224,
+   "tp_lo": 32.204,
+   "tp_hi": 32.868,
+   "cap_single": 797641.0,
+   "order_size": 7900,
    "cap_ok": true
   },
   {
@@ -16878,6 +17022,24 @@
    "tp_hi": 4.049,
    "cap_single": 1175668.0,
    "order_size": 64200,
+   "cap_ok": true
+  },
+  {
+   "sym": "sz002082",
+   "code": "002082",
+   "name": "ST万邦",
+   "ind": "医药生物",
+   "board": "主板",
+   "close": 12.0,
+   "amt20": 118172691.6,
+   "volbr": 2.8416,
+   "ret20": 0.22825,
+   "buy_lo": 11.64,
+   "buy_hi": 11.88,
+   "tp_lo": 11.873,
+   "tp_hi": 12.118,
+   "cap_single": 1181727.0,
+   "order_size": 21400,
    "cap_ok": true
   },
   {
@@ -26907,6 +27069,24 @@
    "cap_ok": true
   },
   {
+   "sym": "sz002759",
+   "code": "002759",
+   "name": "ST天际",
+   "ind": "电力设备",
+   "board": "主板",
+   "close": 13.89,
+   "amt20": 257319392.8,
+   "volbr": 0.6995,
+   "ret20": -0.204011,
+   "buy_lo": 13.473,
+   "buy_hi": 13.751,
+   "tp_lo": 13.742,
+   "tp_hi": 14.026,
+   "cap_single": 2573194.0,
+   "order_size": 18500,
+   "cap_ok": true
+  },
+  {
    "sym": "sz000672",
    "code": "000672",
    "name": "上峰材料",
@@ -33690,6 +33870,24 @@
    "tp_hi": 11.108,
    "cap_single": 5892822.0,
    "order_size": 23400,
+   "cap_ok": true
+  },
+  {
+   "sym": "sh600745",
+   "code": "600745",
+   "name": "*ST闻泰",
+   "ind": "电子",
+   "board": "主板",
+   "close": 17.04,
+   "amt20": 590824768.0,
+   "volbr": 0.5778,
+   "ret20": -0.10832,
+   "buy_lo": 16.529,
+   "buy_hi": 16.87,
+   "tp_lo": 16.86,
+   "tp_hi": 17.207,
+   "cap_single": 5908248.0,
+   "order_size": 15100,
    "cap_ok": true
   },
   {

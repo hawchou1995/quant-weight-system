@@ -1,0 +1,35 @@
+{
+ "purpose": "查清未来函数核查报告里 +6.13pp 的真因（STNOW vs BPSA 滤网）",
+ "window": "2018-01-01 起",
+ "sim": "x2_sens.sim_portfolio(order=entry_first)",
+ "arms": {
+  "A_v15": {
+   "n": 23759,
+   "ann": 63.86,
+   "mdd": -26.81,
+   "sharpe": 2.54,
+   "n_trades": 21146,
+   "mean_per_trade": 0.4264,
+   "win_rate": 60.71
+  },
+  "B_v16": {
+   "n": 24492,
+   "ann": 63.9,
+   "mdd": -27.41,
+   "sharpe": 2.53,
+   "n_trades": 21146,
+   "mean_per_trade": 0.4341,
+   "win_rate": 60.94
+  },
+  "C_nostnow_noBPSA": {
+   "n": 25094,
+   "ann": 69.99,
+   "mdd": -28.95,
+   "sharpe": 2.65,
+   "n_trades": 21154,
+   "mean_per_trade": 0.4675,
+   "win_rate": 61.53
+  }
+ },
+ "verdict": "见 report 与 E-19a"
+}
