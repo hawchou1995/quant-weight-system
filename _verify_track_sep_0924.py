@@ -45,7 +45,7 @@ KEPT_FILES = ["backtest/bt520_holdout_0924.json",
 
 ORIG_SUBS = [("st-qlch", "超跌低开低吸"), ("st-kh", "超卖伏击"), ("st-etf", "ETF轮动"),
              ("st-stk", "股票池"), ("st-fund", "基金池")]
-NEW_SUBS = [("st-hpdk", "横盘低开·两日"), ("st-sentinel", "热榜哨兵")]
+NEW_SUBS = [("st-hpdk", "缩量超跌"), ("st-sentinel", "热榜哨兵")]   # st-hpdk 原名「横盘低开·两日」，2026-09-28 更名
 OWNED = {"st-sentinel": {"js": ["sentinel_pool.js", "sentinel_track.js"],
                          "state_json": "backtest/sentinel_state.json",
                          "bt_json": "backtest/sentinel_backtest.json",

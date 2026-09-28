@@ -2405,7 +2405,9 @@ def qlch_card():
                  '当前持仓 <b>%d</b> 只 → 明日可建新仓 <b>%d</b> 只%s<br>'
                  '<b>这不是买入名单</b>：单票上限 K=%d，候选多于空位时<b>随机抽</b>；'
                  '<b># 列是按超跌深度降序的展示排序，不是买入优先级</b>'
-                 '（若要按深度取 TopK，须另立预注册）。</div>'
+                 '（按深度取 TopK 已于 2026-09-28 另立预注册并回测：<b>第三次否证，不过门</b> —— '
+                 '深度排序使夏普下降 0.031~0.058（6/6 组合）、但回撤改善 2.2~2.3pp ⇒ <b>维持随机</b>；'
+                 '证据 <code>backtest/报告-qlch-超跌深度TopK-20260928.md</code>）。</div>'
                  % (ck.get("as_of", "—"), ck.get("pool", ""), ck.get("n", 0),
                     _npos, _room,
                     '　<span style="color:var(--warn)">已持满 → 明日不建新仓，下表仅作观察</span>' if _room <= 0 else '',
@@ -2965,7 +2967,7 @@ def _sentinel_paper_card(track_js="sentinel_track.js", state_json="backtest/sent
     return "".join(out)
 
 
-# ============ 横盘低开·两日 子视图接线（2026-09-27 新增，R-hpdk-dash-0927） ============
+# ============ 缩量超跌（原名「横盘低开·两日」，2026-09-28 更名）子视图接线（2026-09-27 新增，R-hpdk-dash-0927） ============
 # 卡片 HTML 在独立模块 hpdk_card.py（只读本策略自己的产物，不读别的策略文件）。
 import hpdk_card as _HPDK
 
@@ -2990,7 +2992,7 @@ def hpdk_track_card():
     return _HPDK.hpdk_track_card(BASE)
 
 
-HP_HPDK_BT = _bt_ref_card("st-hpdk", "🎯 横盘低开·两日 · 回测参考",
+HP_HPDK_BT = _bt_ref_card("st-hpdk", "🎯 缩量超跌 · 回测参考",
                           "冻结 OOS 规格（K=10 / KSLOT=20 / 止盈+2% / 成本 6.92bp 往返）",
                           "backtest/hpdk_bt_ref.json",
                           "本子标签**自有**回测产物（不与其他子标签共用）。主读数取 2018-01-02 起"
@@ -3049,7 +3051,7 @@ SENTINEL_FOOT = ("""<div class="sub" style="color:var(--faint)">"""
 SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
 {subnav("short", [("st-qlch", "超跌低开低吸"), ("st-kh", "超卖伏击"),
                     ("st-etf", "ETF轮动"), ("st-stk", "股票池"),
-                     ("st-fund", "基金池"), ("st-hpdk", "横盘低开·两日"), ("st-sentinel", "热榜哨兵")],
+                     ("st-fund", "基金池"), ("st-hpdk", "缩量超跌"), ("st-sentinel", "热榜哨兵")],
         default_key="st-qlch")}
 {subview("st-sentinel", "热榜哨兵", "jiandi top30 共振哨兵 · 影子跟踪（shadow_start 2026-09-24）",
   _sentinel_block() + _sentinel_track_card() + _sentinel_paper_card() + SENTINEL_CARD + SENTINEL_FOOT)}
@@ -3068,7 +3070,7 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
   tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=(), inline=True))}
 {subview("st-qlch", "超跌低开低吸", "短期反转 + 跳空低吸 + 熊市择时 · 次日出场",
          qlch_card() + watch_card("st-qlch", "超跌低开低吸", "qlch", note=WATCH_NOTE_QLCH))}
-{subview("st-hpdk", "横盘低开·两日", "缩量超跌 + 次日低开低吸 + 固定持有 2 日 · 前向 OOS 冻结核验",
+{subview("st-hpdk", "缩量超跌", "缩量＋低成交额＋超跌 → 次日低开低吸 → 固定持有 2 日 · 前向 OOS 冻结核验（原名「横盘低开·两日」）",
          hpdk_card() + hpdk_paper_card() + hpdk_track_card() + hpdk_oos_card())}
 {subview("st-kh", "超卖伏击", "RSI 超卖 + 15 策略形态 · 标准/激进双轨",
          KH_HITS_CARD + KH_PAPER_CARD + watch_card("st-kh", "超卖伏击", "kh", note=WATCH_NOTE_KH))}

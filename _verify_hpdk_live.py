@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""_verify_hpdk_live.py — 「横盘低开·两日」子标签的静态校验器（对齐 _verify_qlch_live.py 范式）。
+"""_verify_hpdk_live.py — 「缩量超跌」（原名「横盘低开·两日」）子标签的静态校验器（对齐 _verify_qlch_live.py 范式）。
 
 覆盖契约里的四条机械判据：
   A8  看板渲染：子标签容器 / 子导航项 / 操作必需列齐全 / data-code + data-search / th[data-key]
@@ -57,7 +57,7 @@ def main():
     print("=" * 100)
     print("A8 看板渲染")
     chk('id="sv-st-hpdk"' in html, "5.1 子视图容器 id=sv-st-hpdk")
-    chk(">横盘低开·两日<" in html, "5.2 子导航项文案「横盘低开·两日」")
+    chk(">缩量超跌<" in html, "5.2 子导航项文案「缩量超跌」")
     chk('data-bt-sub="st-hpdk"' in html, "5.3 回测参考子块 data-bt-sub=st-hpdk")
     chk('id="tbl-hpdk-cand"' in html, "5.4 明日买点表 tbl-hpdk-cand")
     heads = re.findall(r'<th[^>]*>([^<]*)</th>', html)

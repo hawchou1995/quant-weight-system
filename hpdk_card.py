@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""hpdk_card.py — 「横盘低开·两日」看板卡片与盘中 payload（2026-09-27 新增，R-hpdk-dash-0927）
+"""hpdk_card.py — 「缩量超跌」看板卡片与盘中 payload（2026-09-27 新增，R-hpdk-dash-0927）
+原名「横盘低开·两日」，2026-09-28 更名（预注册勘误 E-17）；内部标识 st-hpdk / 产物名 hpdk_* 不变。
 
 为什么单独成模块：卡片 HTML 很长，塞进 build_dual_system.py 会放大 diff 噪声。
 本模块只读该策略自己的产物，**不读任何别的策略文件**（隔离约束，见 _verify_hpdk_live.py）：
@@ -86,7 +87,7 @@ def hpdk_card(BASE):
     d = _read(BASE / "backtest" / "hpdk_candidates.json")
     L = ['<div class="card" id="hpdk-card">']
     if not d:
-        L.append('<h2>🎯 横盘低开·两日 <span class="view-badge auto">产物未生成</span></h2>'
+        L.append('<h2>🎯 缩量超跌 <span class="view-badge auto">产物未生成</span></h2>'
                  '<div class="sub" style="color:var(--faint)">跑 <code>'
                  'backtest/hengpan_fangliang_dikai_0925/hpdk_candidates.py</code> 写入 '
                  '<code>backtest/hpdk_candidates.json</code> 后本卡自动出现。</div></div>')
@@ -99,7 +100,7 @@ def hpdk_card(BASE):
     kslot = par.get("KSLOT", 20)
     capital = cap.get("capital", 0) or 0
     k_ops = cap.get("kslot") or 0
-    L.append(f'<h2>🎯 横盘低开·两日 <span class="view-badge auto">数据 as_of {d.get("as_of")}</span></h2>')
+    L.append(f'<h2>🎯 缩量超跌 <span class="view-badge auto">数据 as_of {d.get("as_of")}</span></h2>')
     L.append(
         '<div class="sub"><b>策略定义（与冻结预注册逐条一致；本页不复述自定义口径）</b>：T 收盘判定 → '
         f'资格 = 上市有效交易日 ≥{par.get("LISTED", 250)} ＋ 收盘 ≥{par.get("MINPX", 3.0):.2f} 元 ＋ '
@@ -110,9 +111,10 @@ def hpdk_card(BASE):
         f'｜ 复合分 F = z(−ln 成交额20) + z(−ln 量比) + z(−20 日涨幅)，取前 {par.get("K", 10)} 只'
         f'｜ 仓位 = min(前一日净值/{kslot}, 可用现金)，最多同持 {kslot} 只'
         f'｜ 出场 = 止盈 +{(par.get("TP", 0.02) or 0) * 100:.0f}% ／ 未达标 T+2 尾盘（<b>不止损</b>）'
-        '<br><span style="color:var(--warn)">⚠ 名字里的「横盘放量」是历史遗留：样本内实测「横盘」无用、'
-        '「放量」方向相反（要缩量），<b>冻结规格里既无横盘条件也无放量条件</b>，'
-        '只剩「缩量 ＋ 低成交额 ＋ 超跌」的复合分。</span>'
+        '<br><span style="color:var(--warn)">⚠ <b>原名为「横盘低开·两日」（历史遗留）</b>：样本内实测「横盘」无用、'
+        '「放量」方向相反（要缩量）⇒ <b>冻结规格里既无横盘条件也无放量条件</b>，'
+        '真实因子只有「缩量 ＋ 低成交额 ＋ 超跌」的复合分；'
+        '<b>2026-09-28 起显示名改为「缩量超跌」</b>（只改显示层，内部标识与产物名不变，见预注册勘误 E-17）。</span>'
         f'<br>冻结脚本 <code>oos_run.py</code> SHA256 <code>{ssha}…</code> ｜ 候选生成器与其逐位对拍 '
         f'<b>{a11.get("days_bitwise_equal", 0)}/{a11.get("days_compared", 0)} 个交易日完全相等</b></div>')
     L.append(
@@ -282,7 +284,7 @@ def hpdk_paper_card(BASE):
     d = _hpdk_paper_read(BASE)
     L = ['<div class="card" id="hpdk-paper-card">']
     if not d:
-        L.append('<h2>💼 模拟盘 · 横盘低开·两日 <span class="view-badge auto">产物未生成</span></h2>'
+        L.append('<h2>💼 模拟盘 · 缩量超跌 <span class="view-badge auto">产物未生成</span></h2>'
                  '<div class="sub" style="color:var(--faint)">跑 <code>'
                  'backtest/hengpan_fangliang_dikai_0925/hpdk_paper.py</code> 写入 '
                  '<code>backtest/hpdk_paper.json</code> 后本卡自动出现。</div></div>')
@@ -291,7 +293,7 @@ def hpdk_paper_card(BASE):
     acc = d.get("account") or {}
     rec = d.get("reconcile") or {}
     started = (acc.get("n_settled") or 0) > 0 or (acc.get("n_positions") or 0) > 0
-    L.append('<h2>💼 模拟盘 · 横盘低开·两日 <span class="view-badge auto">%s</span></h2>'
+    L.append('<h2>💼 模拟盘 · 缩量超跌 <span class="view-badge auto">%s</span></h2>'
              % ("运行中 · as_of " + str(d.get("as_of")) if started
                 else "未开始（首个信号日 %s）" % cfg.get("shadow_start")))
     L.append('<div class="sub"><b>口径（操作档，与「建议股数／单票可买」同源）</b>：'
@@ -355,14 +357,14 @@ def hpdk_track_card(BASE):
     d = _hpdk_paper_read(BASE)
     L = ['<div class="card" id="hpdk-track-card">']
     if not d:
-        L.append('<h2>👁 跟踪池 · 横盘低开·两日</h2><div class="sub" style="color:var(--faint)">'
+        L.append('<h2>👁 跟踪池 · 缩量超跌</h2><div class="sub" style="color:var(--faint)">'
                  '产物未生成（见模拟盘卡说明）</div></div>')
         return "".join(L)
     tr = d.get("track") or []
     ho = [x for x in tr if x.get("state") == "持有中"]
     se = [x for x in tr if x.get("state") == "已了结"]
     pe = [x for x in tr if x.get("state") == "待判定"]
-    L.append('<h2>👁 跟踪池 · 横盘低开·两日 <span class="view-badge auto">影子跟踪 · 只记账不成交</span></h2>')
+    L.append('<h2>👁 跟踪池 · 缩量超跌 <span class="view-badge auto">影子跟踪 · 只记账不成交</span></h2>')
     L.append('<div class="sub"><span class="badge badge-auto">持有中 %d</span> '
              '<span class="badge badge-auto">已了结 %d</span> '
              '<span class="badge badge-auto">待判定 %d</span>'

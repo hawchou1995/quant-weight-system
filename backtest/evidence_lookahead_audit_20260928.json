@@ -1,0 +1,98 @@
+{
+ "meta": {
+  "script": "audit_lookahead_gushi465_20260928.py",
+  "run_at": "2026-09-28 10:49:02",
+  "source": "https://gushi.in/topic/465（未来函数排查清单 · 五维）"
+ },
+ "hpdk": {
+  "A1_base_2018plus": {
+   "n_trades": 23759,
+   "ann": 63.86,
+   "mdd": -26.81,
+   "sharpe": 2.54,
+   "n_entries": 20495,
+   "deploy_pct": 48.47
+  },
+  "P_oracle_sort": {
+   "n_trades": 23759,
+   "ann": 65.53,
+   "mdd": -26.73,
+   "sharpe": 2.59,
+   "n_entries": 20495,
+   "deploy_pct": 48.47,
+   "delta_ann": 1.67,
+   "delta_sharpe": 0.05
+  },
+  "P2_oracle_entry_low": {
+   "n_trades": 23759,
+   "n_price_substituted": 23759,
+   "ann": 803.93,
+   "mdd": -7.83,
+   "sharpe": 14.18,
+   "n_entries": 20495,
+   "deploy_pct": 48.74,
+   "delta_ann": 740.07,
+   "delta_sharpe": 11.64
+  },
+  "Q_stnow_off_2018plus": {
+   "n_trades": 25094,
+   "ann": 69.99,
+   "mdd": -28.95,
+   "sharpe": 2.65,
+   "n_entries": 20498,
+   "deploy_pct": 48.47,
+   "delta_ann": 6.13,
+   "delta_sharpe": 0.11
+  },
+  "stnow_scope": {
+   "panel_cols": 5442,
+   "dead_in_panel": 253,
+   "dead_flagged_by_current_name": 228,
+   "dead_still_eligible": 25,
+   "trades_on_dead_syms": 271,
+   "distinct_dead_syms_traded": 14,
+   "traded_syms_flagged_by_current_name": 0,
+   "dead_flagged_trades_lost": 2959
+  },
+  "frozen_sha": {
+   "before": "b3748ca36f83d70589a17cb9324b561a4bc52a26e59e39c60355fb32ea019225",
+   "after": "b3748ca36f83d70589a17cb9324b561a4bc52a26e59e39c60355fb32ea019225",
+   "unchanged": true,
+   "bytes_unchanged": true
+  }
+ },
+ "qlch": {
+  "B1_base_allpool_20bp": {
+   "train_n": 2700,
+   "train_cagr": 25.3868,
+   "train_sharpe": 1.693,
+   "train_mdd": -18.7936,
+   "full_cagr": 20.3874,
+   "full_sharpe": 1.3012
+  },
+  "P_oracle_sort": {
+   "train_cagr": 125.8077,
+   "train_sharpe": 4.3304,
+   "train_mdd": -10.4919,
+   "delta_train_cagr": 100.4209,
+   "delta_train_sharpe": 2.6374
+  },
+  "Q_current_name_st_off": {
+   "cand_with": 4001,
+   "cand_without": 4281,
+   "train_n_with": 2700,
+   "train_n_without": 2795,
+   "train_cagr_with": 25.3868,
+   "train_cagr_without": 25.7481,
+   "train_sharpe_with": 1.693,
+   "train_sharpe_without": 1.6897,
+   "delta_train_cagr": 0.3613,
+   "delta_train_sharpe": -0.0033
+  },
+  "current_name_scope": {
+   "panel_cols": 4087,
+   "flagged_by_current_name": 395
+  }
+ },
+ "elapsed_sec": 94.3
+}

@@ -464,7 +464,7 @@ INTRADAY_JS = r"""
         if (typeof window.A5_ON_QUOTES === 'function') {
           try { window.A5_ON_QUOTES(q, (r && r.ts) || hhmmss(new Date()), S.poolSrc, S.mktTs); } catch(e) {}
         }
-        /* R-hpdk-dash-0927：横盘低开·两日（HPDK）竞价/开盘判定的**第三个**钩子。同理必须显式留在这里
+        /* R-hpdk-dash-0927：缩量超跌（原名「横盘低开·两日」，HPDK）竞价/开盘判定的**第三个**钩子。同理必须显式留在这里
            —— IIFE 内部调的是局部 applyQuotes，外部包装拦不到；无钩子时零开销，行为与原来完全一致。
            本钩子做三件事：09:25 后按真实今开算 gap，把 A/B/C 不满足的标的**从清单移除**，
            并对存活子集按冻结复合分定榜前置顶。零落盘（不写 json / 不碰账本 / 不发请求）。 */
@@ -1148,12 +1148,12 @@ A5_JS = r"""
 """
 
 
-# ============ 横盘低开·两日（hpdk）盘中买点判定 + 不达标自动剔除（R-hpdk-live-0927） ============
+# ============ 缩量超跌（原名「横盘低开·两日」，hpdk）盘中买点判定 + 不达标自动剔除（R-hpdk-live-0927） ============
 # 单列一个注入块（与 INTRADAY_JS 分开）：树图层与 QLCH / A5 两块一行不动 —— 本块只消费「选股池报价」的结果
 # （主盘中层 fetchPool → applyQuotes 的钩子）。注入点：build_dual_system.py 的 `<script>{HPDK_JS}</script>`
 # （紧跟 A5_JS 之后；payload 由 `<script>window.HPDK = …</script>` 内嵌）。
 HPDK_JS = r"""
-/* ============ 横盘低开·两日（hpdk）：买日 09:25 买点判定 + 不达标自动剔除（R-hpdk-live-0927） ============
+/* ============ 缩量超跌（原名「横盘低开·两日」，hpdk）：买日 09:25 买点判定 + 不达标自动剔除（R-hpdk-live-0927） ============
    为什么放浏览器端（ADR-0009）：
      ① 零落盘：只读行情（主盘中层已拉好的选股池报价）与 window.HPDK，只改 DOM —— 不写 json / 不发请求 / 不碰账本；
      ② 复用已验证的盘中层（R-live-0918）：通道、防串码、开市判定、收盘链静默窗一律不重写；
