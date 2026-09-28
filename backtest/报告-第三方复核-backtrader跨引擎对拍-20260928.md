@@ -20,6 +20,9 @@
 | 本次实际使用的技能 | **`backtrader`**（另下载 13 个备用，其中需券商客户端/账号者标注「已安装未运行验证」） |
 
 `npx skills ls -g --json` 中本仓 14 个条目的 `source` 均为 `lzwme/finance-quant-skills` —— **归属核验 14/14 正确**。
+（说明：`npx skills list -g` 的**纯文本模式**会被本机其它 agent 目录的无关告警刷屏，故以 `--json` 模式作证据；两种模式列出的都是同一份全局技能登记表，14 个技能均可被列出。）
+
+**A1 核验输出**：`应装 14 个 / 实到 14 个 / frontmatter 解析失败 0 个`（逐技能校验 `SKILL.md` 的 YAML frontmatter 含 `name` 与 `description`）。
 
 **安装清单（技能 / 文件数）**：akshare 16、baostock 37、jqdatasdk 8、miniqmt 14、pywencai 1、tdxquant 15、tushare 7、akquant 7、backtrader 2、equity-researcher 35、joinquant-strategy 20、qmt-strategy 36、rqalpha 2、template-skill 1。
 
@@ -47,7 +50,7 @@
 
 ## 3. 第三方技能安全审查（A4，只审查不改动）
 
-对 14 个技能的 `SKILL.md` 与其引用的脚本/文档（共 **205 个文本文件**）做模式扫描（远程下载并执行 / 凭据读取 / 外传本地文件 / 写系统配置 / 递归删除 / 动态执行 / 子进程 / 装依赖 / 持久化 / 遥测上报）。
+对 14 个技能的 `SKILL.md` 与其引用的脚本/文档（共 **199 个文本文件**，仅计文本类扩展名）做模式扫描（远程下载并执行 / 凭据读取 / 外传本地文件 / 写系统配置 / 递归删除 / 动态执行 / 子进程 / 装依赖 / 持久化 / 遥测上报）。
 
 | 技能 | 文本件 | 命中 | 级别 | 结论 |
 |---|---|---|---|---|
