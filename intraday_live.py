@@ -1604,6 +1604,49 @@ HPDK_JS = r"""
       var anchor = hr;
       for (i = 0; i < top.length; i++) { body.insertBefore(top[i].tr, anchor.nextSibling); anchor = top[i].tr; }
     }
+    /* ⑦b 全池口径复算（2026-09-28，R-hpdk-fullpool-0928）——**权威口径对照条**：
+       DOM 只渲染 RENDER_N=600 行，②/④ 的判定与 F 排名都只能在这个窗内做 ⇒ 会少报：
+       2026-09-28 实测全池命中 146 只、窗内仅 3 只；窗内重排名还把真 F#7 融捷股份排成 #1，
+       而真 F#2 浙江自然因代理分排第 601 位掉出窗、连判定都没做（今开跳空 −1.07% 其实在带内）。
+       META 覆盖**整个资格池**，这里用全池复算一遍，只把「命中数 + F 前 K 买入名单」写成表上
+       方一条；**不动任何 DOM 行**（置顶/剔除/标灰行为与原来完全一致，零回归风险）。 */
+    var fpEl = document.getElementById('hpdk-fullpool');
+    if (!fpEl && tb && tb.parentNode) {
+      fpEl = document.createElement('div');
+      fpEl.id = 'hpdk-fullpool';
+      fpEl.className = 'hpdk-badge';
+      tb.parentNode.insertBefore(fpEl, tb);
+    }
+    var FP = null;
+    try {
+      if (live && enforce) {
+        var keys = [], kk;
+        for (kk in META) { if (Object.prototype.hasOwnProperty.call(META, kk)) keys.push(kk); }
+        var sur = [], j2;
+        for (j2 = 0; j2 < keys.length; j2++) {
+          var vv = judge(META[keys[j2]], q[keys[j2]]);
+          if (vv.k === 'keep') sur.push({code: keys[j2], m: META[keys[j2]], gap: vv.gap});
+        }
+        score(sur);
+        sur.sort(function(X, Y){ return (Y.F !== X.F) ? (Y.F - X.F) : (X.m.i - Y.m.i); });
+        FP = {pool: keys.length, hits: sur.length, top: sur.slice(0, K)};
+      }
+    } catch (e) { FP = null; S.err = String(e && e.message || e); }
+    if (fpEl) {
+      if (FP) {
+        fpEl.textContent = '\u26a1 全池口径（权威）：资格池 ' + FP.pool + ' 只 → 命中 ' + FP.hits
+          + ' 只｜买入名单 = F 前 ' + K + '：' + FP.top.map(function(x){
+              return (x.m.name || bare(x.code)) + ' ' + bare(x.code); }).join('、')
+          + '｜下表只渲染 ' + S.rows + ' 行（命中 ' + S.hit + ' 只，且顺序为**窗内重排名**）——以本条为准';
+        fpEl.title = CFG.TIP + ' · 本条与服务端「今日命中（收盘链全池复算）」同口径：gap = 今开/昨收−1 '
+          + '∈ [' + fmtPct(numOr(H.gap_lo, -0.03)) + ', ' + fmtPct(numOr(H.gap_hi, -0.01)) + ']'
+          + ' ＋ 可交易 ＋ 准入件；F 在**全池存活子集**内横截面 z 标准化，降序取前 ' + K + ' 只。';
+        fpEl.style.display = '';
+      } else {
+        fpEl.textContent = '';
+        fpEl.style.display = 'none';
+      }
+    }
     /* ⑧ 非判定时段：一行都不剔除。**只有集合竞价 09:15–09:24 挂逐行灰标**（那时 gap 预判有信息量）；
        盘前 / 非买日 / 买日已过 / 无行情 → **不挂任何逐行标签**，相位一律由卡头徽章表达。
        2026-09-27 用户反馈：在「标的」格里每行重复「非买日」很蠢 ⇒ 改为只在有信息量时标记，
