@@ -4,7 +4,12 @@ name: probe-rt
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/15 * * * *'   # 探针期 15 分钟一次（验证 schedule 触发链；生产期改为 30 7 * * 1-5）
+    - cron: '30 7 * * 1-5'   # 生产档：周一~五 07:30 UTC = 北京 15:30（2026-09-28 起）
+# 2026-09-28 用户批准：探针期 15 分钟档（*/15 * * * *）关闭，改回生产档，省 Actions 分钟。
+#   ⚠ 同路径改 cron **可能不被 GitHub 重新注册**（close_refresh 于 09-24 实测过：改文件后仍按旧
+#   cron 触发，最后靠**改名新建实体**才生效，见 close_refresh_cloud.yml 头部注释）。
+#   若本文件改后仍以 15 分钟频率触发（或彻底不触发），处置：把本文件改名为 probe_rt_v2.yml
+#   新建实体强制重注册；改名后需同步验收任务提示词里对 `probe_rt.yml` 的引用（步骤 1b）。
 
 permissions:
   contents: write   # gh-pages push 需要（默认 read，probe 首跑 403 修复）
