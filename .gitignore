@@ -582,3 +582,14 @@ _cloud_dist/
 
 # 2026-09-24：本地云端组装干跑暂存目录（与 _cloud_dist 同类，不应入库）
 _cloud_local/
+
+# 2026-09-28 用户批准：本地留存不入库（同族先例 = 第 252 行 backtest/clip_absorb_20260905/）
+#   该目录是「剪藏指标/经验吸收」线的活跃工作区（含 52MB *.npy 中间件 + 生成 vault 页的脚本），
+#   保持本地留存、不进版本库；如需入库，删掉本节两行即可（可逆）。
+#   注：本行同时用于消掉日链「链末工作区自检」的日常噪音。
+backtest/clip_absorb_0925/
+
+# 2026-09-28 用户批准：entry_timing 只入库「脚本 + 摘要」两个文件，
+#   派生大件（12MB 逐笔、258KB 净值曲线）本地留存 —— 摘要 JSON 内含 commands 可完整复现。
+backtest/entry_timing_hpdk_0928/entry_timing_hpdk_0928_trades.csv
+backtest/entry_timing_hpdk_0928/entry_timing_hpdk_0928_equity.csv

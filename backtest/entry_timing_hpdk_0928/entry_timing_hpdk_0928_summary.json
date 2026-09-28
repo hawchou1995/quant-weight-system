@@ -1,0 +1,1392 @@
+{
+ "_what": "「缩量超跌 / 横盘低开·两日」(st-hpdk) 入场时点变体实测（只读生产；2026-09-28）",
+ "frozen_script": "D:\\Documents\\Workbuddy\\股票基金\\quant-weight-system\\backtest\\hengpan_fangliang_dikai_0925\\oos_run.py",
+ "frozen_script_sha256": "0b61a4bbce100ed63be86e72e0692bfc719d6c13e266410d593926b3855518b3",
+ "frozen_sha_prefix_expect": "0b61a4bbce100ed6",
+ "params": {
+  "P1": 0.01,
+  "P2": 0.03,
+  "K": 10,
+  "KSLOT": 20,
+  "MINAMT": 20000000.0,
+  "MINPX": 3.0,
+  "LISTED": 250,
+  "TP": 0.02,
+  "COST_SIDE": 0.000346,
+  "SHADOW_START": "2016-01-01",
+  "WORST_CASE_WIPEOUT": true,
+  "MAINBOARD": true,
+  "STNOW_OFF": true
+ },
+ "ann_factor": 244.0,
+ "window_start": "2018-01-01",
+ "sim_rule": "复刻 x2_sens.sim_portfolio（预注册 §1.5–10）: 复合分降序取前 K；单票=min(前一日净值/KSLOT,可用现金)；KSLOT 并发上限；持仓期内不重复买；逐日收盘盯市；单边成本 0.000346；资金时序 entry_first（E-15）；弃单不占槽位。",
+ "panel": {
+  "source": "C:\\Users\\Admin\\.pi-desktop\\scratch\\d40abb6e-dc12-4d27-8ed2-f290de0a6c5c\\x3cache\\panel_oos.npz",
+  "T": 2852,
+  "N": 5442,
+  "names_loaded": 5442
+ },
+ "entry_rule": {
+  "A0_开盘价(基线)": "买日(T+1)开盘价成交（09:25 挂单）",
+  "A1_买日收盘价": "买日(T+1)收盘价成交（尾盘再买）",
+  "A2_挂0.5%": "挂 买日开盘价×(1−0.5%)，当日 low≤挂单价→成交于挂单价，否则弃单",
+  "A2_挂1.0%": "挂 买日开盘价×(1−1.0%)，当日 low≤挂单价→成交于挂单价，否则弃单",
+  "A2_挂1.5%": "挂 买日开盘价×(1−1.5%)，当日 low≤挂单价→成交于挂单价，否则弃单",
+  "A2_挂2.0%": "挂 买日开盘价×(1−2.0%)，当日 low≤挂单价→成交于挂单价，否则弃单"
+ },
+ "exit_rule": "不变：止盈 +2%（T+2 日 open≥TP 按 open，否则 high≥TP 按 TP 成交），未达标 T+2 尾盘；不止损；TP 阈值随该臂入场价重算",
+ "cost_side": 0.000346,
+ "cost_roundtrip_bp": 6.92,
+ "arms": {
+  "A0_开盘价(基线)": {
+   "KSLOT_20": {
+    "ann": 63.9,
+    "mdd": -27.41,
+    "sharpe": 2.53,
+    "win_rate": 60.94,
+    "mean_per_trade": 0.4341,
+    "med_per_trade": 1.9294,
+    "n_trades": 21146,
+    "n_entries": 20473,
+    "deploy_pct": 48.42,
+    "exec_n": 20473,
+    "exec_mean": 0.4381,
+    "exec_med": 1.9294,
+    "exec_win": 60.99,
+    "neg_years": 0,
+    "n_years": 9,
+    "yearly": {
+     "2018": 28.54,
+     "2019": 151.0,
+     "2020": 63.38,
+     "2021": 68.21,
+     "2022": 71.19,
+     "2023": 66.77,
+     "2024": 52.38,
+     "2025": 43.53,
+     "2026": 31.9
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "entry_first"
+   },
+   "KSLOT_4": {
+    "ann": 105.55,
+    "mdd": -30.16,
+    "sharpe": 2.86,
+    "win_rate": 60.94,
+    "mean_per_trade": 0.4341,
+    "med_per_trade": 1.9294,
+    "n_trades": 21146,
+    "n_entries": 4236,
+    "deploy_pct": 49.94,
+    "exec_n": 4236,
+    "exec_mean": 0.6221,
+    "exec_med": 1.9294,
+    "exec_win": 63.86,
+    "neg_years": 0,
+    "n_years": 9,
+    "yearly": {
+     "2018": 90.52,
+     "2019": 238.38,
+     "2020": 135.23,
+     "2021": 120.45,
+     "2022": 83.71,
+     "2023": 114.08,
+     "2024": 39.96,
+     "2025": 92.9,
+     "2026": 46.97
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "entry_first"
+   },
+   "KSLOT_20_exitfirst_sens": {
+    "ann": 65.78,
+    "mdd": -29.74,
+    "sharpe": 2.49,
+    "win_rate": 60.94,
+    "mean_per_trade": 0.4341,
+    "med_per_trade": 1.9294,
+    "n_trades": 21146,
+    "n_entries": 21146,
+    "deploy_pct": 50.11,
+    "exec_n": 21146,
+    "exec_mean": 0.4341,
+    "exec_med": 1.9294,
+    "exec_win": 60.94,
+    "neg_years": 0,
+    "n_years": 9,
+    "yearly": {
+     "2018": 30.78,
+     "2019": 162.93,
+     "2020": 65.14,
+     "2021": 71.36,
+     "2022": 72.59,
+     "2023": 69.17,
+     "2024": 53.35,
+     "2025": 42.81,
+     "2026": 29.57
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "exit_first"
+   },
+   "KSLOT_4_exitfirst_sens": {
+    "ann": 267.44,
+    "mdd": -50.65,
+    "sharpe": 3.1,
+    "win_rate": 60.94,
+    "mean_per_trade": 0.4341,
+    "med_per_trade": 1.9294,
+    "n_trades": 21146,
+    "n_entries": 8464,
+    "deploy_pct": 99.42,
+    "exec_n": 8464,
+    "exec_mean": 0.5704,
+    "exec_med": 1.9294,
+    "exec_win": 63.0,
+    "neg_years": 0,
+    "n_years": 9,
+    "yearly": {
+     "2018": 192.24,
+     "2019": 849.35,
+     "2020": 291.75,
+     "2021": 324.58,
+     "2022": 325.82,
+     "2023": 231.75,
+     "2024": 182.73,
+     "2025": 145.3,
+     "2026": 79.11
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "exit_first"
+   }
+  },
+  "A1_买日收盘价": {
+   "KSLOT_20": {
+    "ann": -19.07,
+    "mdd": -85.22,
+    "sharpe": -1.81,
+    "win_rate": 51.98,
+    "mean_per_trade": -0.1721,
+    "med_per_trade": 0.124,
+    "n_trades": 21146,
+    "n_entries": 20473,
+    "deploy_pct": 48.3,
+    "exec_n": 20473,
+    "exec_mean": -0.1739,
+    "exec_med": 0.1181,
+    "exec_win": 51.89,
+    "neg_years": 9,
+    "n_years": 9,
+    "yearly": {
+     "2018": -40.22,
+     "2019": -11.73,
+     "2020": -21.82,
+     "2021": -20.15,
+     "2022": -16.8,
+     "2023": -13.02,
+     "2024": -19.79,
+     "2025": -9.85,
+     "2026": -7.63
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "entry_first"
+   },
+   "KSLOT_4": {
+    "ann": -13.12,
+    "mdd": -74.01,
+    "sharpe": -0.71,
+    "win_rate": 51.98,
+    "mean_per_trade": -0.1721,
+    "med_per_trade": 0.124,
+    "n_trades": 21146,
+    "n_entries": 4236,
+    "deploy_pct": 49.87,
+    "exec_n": 4236,
+    "exec_mean": -0.102,
+    "exec_med": 0.1904,
+    "exec_win": 52.95,
+    "neg_years": 9,
+    "n_years": 9,
+    "yearly": {
+     "2018": -26.09,
+     "2019": -3.24,
+     "2020": -10.22,
+     "2021": -18.76,
+     "2022": -14.48,
+     "2023": -4.49,
+     "2024": -12.25,
+     "2025": -20.48,
+     "2026": -0.83
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "entry_first"
+   },
+   "KSLOT_20_exitfirst_sens": {
+    "ann": -19.49,
+    "mdd": -85.87,
+    "sharpe": -1.79,
+    "win_rate": 51.98,
+    "mean_per_trade": -0.1721,
+    "med_per_trade": 0.124,
+    "n_trades": 21146,
+    "n_entries": 21146,
+    "deploy_pct": 49.96,
+    "exec_n": 21146,
+    "exec_mean": -0.1721,
+    "exec_med": 0.1239,
+    "exec_win": 51.98,
+    "neg_years": 9,
+    "n_years": 9,
+    "yearly": {
+     "2018": -40.59,
+     "2019": -11.36,
+     "2020": -22.29,
+     "2021": -20.96,
+     "2022": -16.39,
+     "2023": -13.2,
+     "2024": -20.68,
+     "2025": -11.17,
+     "2026": -7.98
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "exit_first"
+   },
+   "KSLOT_4_exitfirst_sens": {
+    "ann": -29.18,
+    "mdd": -95.87,
+    "sharpe": -1.22,
+    "win_rate": 51.98,
+    "mean_per_trade": -0.1721,
+    "med_per_trade": 0.124,
+    "n_trades": 21146,
+    "n_entries": 8464,
+    "deploy_pct": 99.31,
+    "exec_n": 8464,
+    "exec_mean": -0.1282,
+    "exec_med": 0.1369,
+    "exec_win": 52.22,
+    "neg_years": 9,
+    "n_years": 9,
+    "yearly": {
+     "2018": -42.89,
+     "2019": -20.92,
+     "2020": -24.6,
+     "2021": -37.67,
+     "2022": -18.91,
+     "2023": -29.08,
+     "2024": -27.9,
+     "2025": -30.65,
+     "2026": -18.1
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "exit_first"
+   }
+  },
+  "A2_挂0.5%": {
+   "KSLOT_20": {
+    "ann": -13.61,
+    "mdd": -74.64,
+    "sharpe": -0.92,
+    "win_rate": 53.22,
+    "mean_per_trade": -0.1899,
+    "med_per_trade": 0.3256,
+    "n_trades": 12982,
+    "n_entries": 12695,
+    "deploy_pct": 30.04,
+    "exec_n": 12695,
+    "exec_mean": -0.1855,
+    "exec_med": 0.3275,
+    "exec_win": 53.23,
+    "neg_years": 8,
+    "n_years": 9,
+    "yearly": {
+     "2018": -37.83,
+     "2019": 5.88,
+     "2020": -7.95,
+     "2021": -9.78,
+     "2022": -5.0,
+     "2023": -12.63,
+     "2024": -23.9,
+     "2025": -6.26,
+     "2026": -13.32
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "entry_first"
+   },
+   "KSLOT_4": {
+    "ann": 2.85,
+    "mdd": -48.71,
+    "sharpe": 0.24,
+    "win_rate": 53.22,
+    "mean_per_trade": -0.1899,
+    "med_per_trade": 0.3256,
+    "n_trades": 12982,
+    "n_entries": 4158,
+    "deploy_pct": 49.05,
+    "exec_n": 4158,
+    "exec_mean": 0.0495,
+    "exec_med": 0.7454,
+    "exec_win": 56.42,
+    "neg_years": 4,
+    "n_years": 9,
+    "yearly": {
+     "2018": -34.77,
+     "2019": 67.64,
+     "2020": 15.98,
+     "2021": 17.03,
+     "2022": 16.22,
+     "2023": -17.11,
+     "2024": -20.99,
+     "2025": 21.9,
+     "2026": -7.33
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "entry_first"
+   },
+   "KSLOT_20_exitfirst_sens": {
+    "ann": -14.25,
+    "mdd": -76.14,
+    "sharpe": -0.93,
+    "win_rate": 53.22,
+    "mean_per_trade": -0.1899,
+    "med_per_trade": 0.3256,
+    "n_trades": 12982,
+    "n_entries": 12982,
+    "deploy_pct": 30.72,
+    "exec_n": 12982,
+    "exec_mean": -0.19,
+    "exec_med": 0.3258,
+    "exec_win": 53.22,
+    "neg_years": 8,
+    "n_years": 9,
+    "yearly": {
+     "2018": -37.8,
+     "2019": 6.55,
+     "2020": -9.0,
+     "2021": -9.77,
+     "2022": -5.56,
+     "2023": -12.74,
+     "2024": -24.94,
+     "2025": -7.74,
+     "2026": -15.29
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "exit_first"
+   },
+   "KSLOT_4_exitfirst_sens": {
+    "ann": -0.24,
+    "mdd": -68.01,
+    "sharpe": 0.21,
+    "win_rate": 53.22,
+    "mean_per_trade": -0.1899,
+    "med_per_trade": 0.3256,
+    "n_trades": 12982,
+    "n_entries": 7851,
+    "deploy_pct": 92.37,
+    "exec_n": 7851,
+    "exec_mean": 0.0293,
+    "exec_med": 0.6197,
+    "exec_win": 55.76,
+    "neg_years": 4,
+    "n_years": 9,
+    "yearly": {
+     "2018": -49.48,
+     "2019": 61.52,
+     "2020": 43.96,
+     "2021": 18.98,
+     "2022": 21.5,
+     "2023": -23.47,
+     "2024": -16.57,
+     "2025": 2.14,
+     "2026": -11.55
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "exit_first"
+   }
+  },
+  "A2_挂1.0%": {
+   "KSLOT_20": {
+    "ann": -11.82,
+    "mdd": -68.63,
+    "sharpe": -0.95,
+    "win_rate": 53.31,
+    "mean_per_trade": -0.2129,
+    "med_per_trade": 0.3418,
+    "n_trades": 9907,
+    "n_entries": 9728,
+    "deploy_pct": 23.01,
+    "exec_n": 9728,
+    "exec_mean": -0.211,
+    "exec_med": 0.3374,
+    "exec_win": 53.29,
+    "neg_years": 7,
+    "n_years": 9,
+    "yearly": {
+     "2018": -34.02,
+     "2019": 0.15,
+     "2020": -7.1,
+     "2021": -6.5,
+     "2022": -4.3,
+     "2023": -11.78,
+     "2024": -23.56,
+     "2025": 0.76,
+     "2026": -10.11
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "entry_first"
+   },
+   "KSLOT_4": {
+    "ann": 0.4,
+    "mdd": -59.89,
+    "sharpe": 0.13,
+    "win_rate": 53.31,
+    "mean_per_trade": -0.2129,
+    "med_per_trade": 0.3418,
+    "n_trades": 9907,
+    "n_entries": 3965,
+    "deploy_pct": 46.76,
+    "exec_n": 3965,
+    "exec_mean": 0.0249,
+    "exec_med": 0.6385,
+    "exec_win": 56.09,
+    "neg_years": 4,
+    "n_years": 9,
+    "yearly": {
+     "2018": -30.54,
+     "2019": 12.15,
+     "2020": 37.46,
+     "2021": 25.43,
+     "2022": 30.21,
+     "2023": -24.38,
+     "2024": -31.02,
+     "2025": 22.23,
+     "2026": -7.12
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "entry_first"
+   },
+   "KSLOT_20_exitfirst_sens": {
+    "ann": -12.16,
+    "mdd": -69.59,
+    "sharpe": -0.95,
+    "win_rate": 53.31,
+    "mean_per_trade": -0.2129,
+    "med_per_trade": 0.3418,
+    "n_trades": 9907,
+    "n_entries": 9907,
+    "deploy_pct": 23.44,
+    "exec_n": 9907,
+    "exec_mean": -0.2129,
+    "exec_med": 0.3418,
+    "exec_win": 53.31,
+    "neg_years": 7,
+    "n_years": 9,
+    "yearly": {
+     "2018": -34.42,
+     "2019": 0.95,
+     "2020": -7.06,
+     "2021": -5.7,
+     "2022": -3.92,
+     "2023": -12.48,
+     "2024": -25.13,
+     "2025": 0.54,
+     "2026": -11.72
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "exit_first"
+   },
+   "KSLOT_4_exitfirst_sens": {
+    "ann": -8.07,
+    "mdd": -75.99,
+    "sharpe": -0.03,
+    "win_rate": 53.31,
+    "mean_per_trade": -0.2129,
+    "med_per_trade": 0.3418,
+    "n_trades": 9907,
+    "n_entries": 6856,
+    "deploy_pct": 80.72,
+    "exec_n": 6856,
+    "exec_mean": -0.0146,
+    "exec_med": 0.5831,
+    "exec_win": 55.7,
+    "neg_years": 4,
+    "n_years": 9,
+    "yearly": {
+     "2018": -40.2,
+     "2019": 28.83,
+     "2020": 10.04,
+     "2021": 30.42,
+     "2022": 9.7,
+     "2023": -30.96,
+     "2024": -39.53,
+     "2025": 16.6,
+     "2026": -18.42
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "exit_first"
+   }
+  },
+  "A2_挂1.5%": {
+   "KSLOT_20": {
+    "ann": -8.07,
+    "mdd": -55.48,
+    "sharpe": -0.74,
+    "win_rate": 53.84,
+    "mean_per_trade": -0.191,
+    "med_per_trade": 0.4017,
+    "n_trades": 7482,
+    "n_entries": 7376,
+    "deploy_pct": 17.46,
+    "exec_n": 7376,
+    "exec_mean": -0.1849,
+    "exec_med": 0.3936,
+    "exec_win": 53.81,
+    "neg_years": 7,
+    "n_years": 9,
+    "yearly": {
+     "2018": -23.94,
+     "2019": 4.07,
+     "2020": -9.67,
+     "2021": -2.29,
+     "2022": -2.2,
+     "2023": -11.5,
+     "2024": -19.9,
+     "2025": 7.8,
+     "2026": -7.76
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "entry_first"
+   },
+   "KSLOT_4": {
+    "ann": 5.57,
+    "mdd": -54.9,
+    "sharpe": 0.36,
+    "win_rate": 53.84,
+    "mean_per_trade": -0.191,
+    "med_per_trade": 0.4017,
+    "n_trades": 7482,
+    "n_entries": 3625,
+    "deploy_pct": 42.79,
+    "exec_n": 3625,
+    "exec_mean": 0.074,
+    "exec_med": 0.7305,
+    "exec_win": 56.72,
+    "neg_years": 3,
+    "n_years": 9,
+    "yearly": {
+     "2018": -27.99,
+     "2019": 42.34,
+     "2020": 17.27,
+     "2021": 27.34,
+     "2022": 13.1,
+     "2023": -24.51,
+     "2024": -20.06,
+     "2025": 42.39,
+     "2026": 7.66
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "entry_first"
+   },
+   "KSLOT_20_exitfirst_sens": {
+    "ann": -8.45,
+    "mdd": -56.92,
+    "sharpe": -0.76,
+    "win_rate": 53.84,
+    "mean_per_trade": -0.191,
+    "med_per_trade": 0.4017,
+    "n_trades": 7482,
+    "n_entries": 7482,
+    "deploy_pct": 17.71,
+    "exec_n": 7482,
+    "exec_mean": -0.1911,
+    "exec_med": 0.4017,
+    "exec_win": 53.85,
+    "neg_years": 7,
+    "n_years": 9,
+    "yearly": {
+     "2018": -24.48,
+     "2019": 4.23,
+     "2020": -9.21,
+     "2021": -2.22,
+     "2022": -2.18,
+     "2023": -11.87,
+     "2024": -21.66,
+     "2025": 7.25,
+     "2026": -8.2
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "exit_first"
+   },
+   "KSLOT_4_exitfirst_sens": {
+    "ann": -7.17,
+    "mdd": -76.05,
+    "sharpe": -0.05,
+    "win_rate": 53.84,
+    "mean_per_trade": -0.191,
+    "med_per_trade": 0.4017,
+    "n_trades": 7482,
+    "n_entries": 5657,
+    "deploy_pct": 66.7,
+    "exec_n": 5657,
+    "exec_mean": -0.0173,
+    "exec_med": 0.6161,
+    "exec_win": 55.52,
+    "neg_years": 5,
+    "n_years": 9,
+    "yearly": {
+     "2018": -29.11,
+     "2019": 49.31,
+     "2020": -17.27,
+     "2021": 20.85,
+     "2022": 1.42,
+     "2023": -40.19,
+     "2024": -29.42,
+     "2025": 44.84,
+     "2026": -20.11
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "exit_first"
+   }
+  },
+  "A2_挂2.0%": {
+   "KSLOT_20": {
+    "ann": -5.06,
+    "mdd": -45.66,
+    "sharpe": -0.52,
+    "win_rate": 54.95,
+    "mean_per_trade": -0.1536,
+    "med_per_trade": 0.5365,
+    "n_trades": 5691,
+    "n_entries": 5617,
+    "deploy_pct": 13.31,
+    "exec_n": 5617,
+    "exec_mean": -0.148,
+    "exec_med": 0.534,
+    "exec_win": 54.96,
+    "neg_years": 6,
+    "n_years": 9,
+    "yearly": {
+     "2018": -17.74,
+     "2019": 7.63,
+     "2020": -7.41,
+     "2021": -3.5,
+     "2022": 0.19,
+     "2023": -8.72,
+     "2024": -19.48,
+     "2025": 10.85,
+     "2026": -1.35
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "entry_first"
+   },
+   "KSLOT_4": {
+    "ann": 5.52,
+    "mdd": -56.85,
+    "sharpe": 0.36,
+    "win_rate": 54.95,
+    "mean_per_trade": -0.1536,
+    "med_per_trade": 0.5365,
+    "n_trades": 5691,
+    "n_entries": 3205,
+    "deploy_pct": 37.85,
+    "exec_n": 3205,
+    "exec_mean": 0.0814,
+    "exec_med": 0.7505,
+    "exec_win": 56.94,
+    "neg_years": 3,
+    "n_years": 9,
+    "yearly": {
+     "2018": -17.18,
+     "2019": 54.58,
+     "2020": 12.74,
+     "2021": 8.53,
+     "2022": 9.6,
+     "2023": -17.6,
+     "2024": -31.06,
+     "2025": 49.01,
+     "2026": 9.74
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "entry_first"
+   },
+   "KSLOT_20_exitfirst_sens": {
+    "ann": -5.32,
+    "mdd": -46.66,
+    "sharpe": -0.53,
+    "win_rate": 54.95,
+    "mean_per_trade": -0.1536,
+    "med_per_trade": 0.5365,
+    "n_trades": 5691,
+    "n_entries": 5691,
+    "deploy_pct": 13.48,
+    "exec_n": 5691,
+    "exec_mean": -0.1536,
+    "exec_med": 0.5366,
+    "exec_win": 54.95,
+    "neg_years": 6,
+    "n_years": 9,
+    "yearly": {
+     "2018": -18.21,
+     "2019": 7.69,
+     "2020": -6.32,
+     "2021": -3.65,
+     "2022": 0.01,
+     "2023": -8.79,
+     "2024": -20.77,
+     "2025": 10.26,
+     "2026": -1.83
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "exit_first"
+   },
+   "KSLOT_4_exitfirst_sens": {
+    "ann": -5.4,
+    "mdd": -70.51,
+    "sharpe": -0.02,
+    "win_rate": 54.95,
+    "mean_per_trade": -0.1536,
+    "med_per_trade": 0.5365,
+    "n_trades": 5691,
+    "n_entries": 4558,
+    "deploy_pct": 53.87,
+    "exec_n": 4558,
+    "exec_mean": -0.013,
+    "exec_med": 0.6744,
+    "exec_win": 56.21,
+    "neg_years": 5,
+    "n_years": 9,
+    "yearly": {
+     "2018": -36.27,
+     "2019": 62.24,
+     "2020": -16.96,
+     "2021": -6.05,
+     "2022": 17.27,
+     "2023": -31.61,
+     "2024": -38.43,
+     "2025": 46.76,
+     "2026": 5.62
+    },
+    "window": [
+     "2018-01-02",
+     "2026-09-24"
+    ],
+    "order": "exit_first"
+   }
+  }
+ },
+ "event_stats": {
+  "A0_开盘价(基线)": {
+   "n_signals": 21146,
+   "n_filled": 21146,
+   "n_nofill": 0,
+   "fill_rate_pct": 100.0,
+   "days_with_signal": 2118,
+   "days_with_fill": 2118,
+   "days_zero_fill": 0,
+   "share_days_zero_fill_pct": 0.0,
+   "filled": {
+    "n": 21146,
+    "mean": 0.4341,
+    "med": 1.9294,
+    "win": 60.94,
+    "p05": -5.4458,
+    "p95": 4.8156,
+    "tp_hit_pct": 51.79
+   },
+   "filled_at_base_price": {
+    "n": 21146,
+    "mean": 0.4341,
+    "med": 1.9294,
+    "win": 60.94,
+    "p05": -5.4458,
+    "p95": 4.8156,
+    "tp_hit_pct": 51.79
+   },
+   "nofill_base": {
+    "n": 0
+   },
+   "nofill_hypo": {
+    "n": 0
+   }
+  },
+  "A1_买日收盘价": {
+   "n_signals": 21146,
+   "n_filled": 21146,
+   "n_nofill": 0,
+   "fill_rate_pct": 100.0,
+   "days_with_signal": 2118,
+   "days_with_fill": 2118,
+   "days_zero_fill": 0,
+   "share_days_zero_fill_pct": 0.0,
+   "filled": {
+    "n": 21146,
+    "mean": -0.1721,
+    "med": 0.124,
+    "win": 51.98,
+    "p05": -4.1688,
+    "p95": 1.9295,
+    "tp_hit_pct": 34.7
+   },
+   "filled_at_base_price": {
+    "n": 21146,
+    "mean": 0.4341,
+    "med": 1.9294,
+    "win": 60.94,
+    "p05": -5.4458,
+    "p95": 4.8156,
+    "tp_hit_pct": 51.79
+   },
+   "nofill_base": {
+    "n": 0
+   },
+   "nofill_hypo": {
+    "n": 0
+   }
+  },
+  "A2_挂0.5%": {
+   "n_signals": 21146,
+   "n_filled": 12982,
+   "n_nofill": 8164,
+   "fill_rate_pct": 61.39,
+   "days_with_signal": 2118,
+   "days_with_fill": 2097,
+   "days_zero_fill": 21,
+   "share_days_zero_fill_pct": 0.99,
+   "filled": {
+    "n": 12982,
+    "mean": -0.1899,
+    "med": 0.3256,
+    "win": 53.22,
+    "p05": -6.035,
+    "p95": 3.8402,
+    "tp_hit_pct": 42.87
+   },
+   "filled_at_base_price": {
+    "n": 12982,
+    "mean": -0.677,
+    "med": -0.3924,
+    "win": 45.62,
+    "p05": -6.5157,
+    "p95": 3.321,
+    "tp_hit_pct": 36.09
+   },
+   "nofill_base": {
+    "n": 8164,
+    "mean": 2.2009,
+    "med": 1.9295,
+    "win": 85.31,
+    "p05": -1.7967,
+    "p95": 6.1613,
+    "tp_hit_pct": 76.75
+   },
+   "nofill_hypo": {
+    "n": 8164,
+    "mean": 2.7168,
+    "med": 2.2532,
+    "win": 91.44,
+    "p05": -0.9304,
+    "p95": 6.6948,
+    "tp_hit_pct": 85.68
+   }
+  },
+  "A2_挂1.0%": {
+   "n_signals": 21146,
+   "n_filled": 9907,
+   "n_nofill": 11239,
+   "fill_rate_pct": 46.85,
+   "days_with_signal": 2118,
+   "days_with_fill": 2032,
+   "days_zero_fill": 86,
+   "share_days_zero_fill_pct": 4.06,
+   "filled": {
+    "n": 9907,
+    "mean": -0.2129,
+    "med": 0.3418,
+    "win": 53.31,
+    "p05": -6.0724,
+    "p95": 3.8549,
+    "tp_hit_pct": 42.8
+   },
+   "filled_at_base_price": {
+    "n": 9907,
+    "mean": -1.1866,
+    "med": -1.0002,
+    "win": 38.68,
+    "p05": -7.0163,
+    "p95": 2.8164,
+    "tp_hit_pct": 30.06
+   },
+   "nofill_base": {
+    "n": 11239,
+    "mean": 1.8627,
+    "med": 1.9295,
+    "win": 80.57,
+    "p05": -2.3276,
+    "p95": 5.7643,
+    "tp_hit_pct": 70.94
+   },
+   "nofill_hypo": {
+    "n": 11239,
+    "mean": 2.8913,
+    "med": 2.4795,
+    "win": 92.6,
+    "p05": -0.7573,
+    "p95": 6.8326,
+    "tp_hit_pct": 87.7
+   }
+  },
+  "A2_挂1.5%": {
+   "n_signals": 21146,
+   "n_filled": 7482,
+   "n_nofill": 13664,
+   "fill_rate_pct": 35.38,
+   "days_with_signal": 2118,
+   "days_with_fill": 1898,
+   "days_zero_fill": 220,
+   "share_days_zero_fill_pct": 10.39,
+   "filled": {
+    "n": 7482,
+    "mean": -0.191,
+    "med": 0.4017,
+    "win": 53.84,
+    "p05": -6.3213,
+    "p95": 4.0565,
+    "tp_hit_pct": 43.41
+   },
+   "filled_at_base_price": {
+    "n": 7482,
+    "mean": -1.651,
+    "med": -1.5115,
+    "win": 33.33,
+    "p05": -7.7667,
+    "p95": 2.4957,
+    "tp_hit_pct": 26.06
+   },
+   "nofill_base": {
+    "n": 13664,
+    "mean": 1.5759,
+    "med": 1.9294,
+    "win": 76.06,
+    "p05": -2.6919,
+    "p95": 5.4222,
+    "tp_hit_pct": 65.87
+   },
+   "nofill_hypo": {
+    "n": 13664,
+    "mean": 3.1394,
+    "med": 2.762,
+    "win": 94.26,
+    "p05": -0.3193,
+    "p95": 7.0276,
+    "tp_hit_pct": 90.49
+   }
+  },
+  "A2_挂2.0%": {
+   "n_signals": 21146,
+   "n_filled": 5691,
+   "n_nofill": 15455,
+   "fill_rate_pct": 26.91,
+   "days_with_signal": 2118,
+   "days_with_fill": 1730,
+   "days_zero_fill": 388,
+   "share_days_zero_fill_pct": 18.32,
+   "filled": {
+    "n": 5691,
+    "mean": -0.1536,
+    "med": 0.5365,
+    "win": 54.95,
+    "p05": -6.4994,
+    "p95": 4.2995,
+    "tp_hit_pct": 44.61
+   },
+   "filled_at_base_price": {
+    "n": 5691,
+    "mean": -2.0975,
+    "med": -1.9614,
+    "win": 28.87,
+    "p05": -8.4015,
+    "p95": 2.2134,
+    "tp_hit_pct": 22.83
+   },
+   "nofill_base": {
+    "n": 15455,
+    "mean": 1.3663,
+    "med": 1.9294,
+    "win": 72.75,
+    "p05": -3.0859,
+    "p95": 5.2673,
+    "tp_hit_pct": 62.45
+   },
+   "nofill_hypo": {
+    "n": 15455,
+    "mean": 3.4509,
+    "med": 3.1071,
+    "win": 95.45,
+    "p05": 0.1889,
+    "p95": 7.4156,
+    "tp_hit_pct": 92.97
+   }
+  }
+ },
+ "deltas_vs_A0": {
+  "A1_买日收盘价": {
+   "KSLOT_20": {
+    "d_ann_pp": -82.97,
+    "d_mdd_pp": -57.81,
+    "d_sharpe": -4.34,
+    "d_n_entries": 0,
+    "d_deploy_pp": -0.12,
+    "d_mean_bp": -60.62
+   },
+   "KSLOT_4": {
+    "d_ann_pp": -118.67,
+    "d_mdd_pp": -43.85,
+    "d_sharpe": -3.57,
+    "d_n_entries": 0,
+    "d_deploy_pp": -0.07,
+    "d_mean_bp": -60.62
+   }
+  },
+  "A2_挂0.5%": {
+   "KSLOT_20": {
+    "d_ann_pp": -77.51,
+    "d_mdd_pp": -47.23,
+    "d_sharpe": -3.45,
+    "d_n_entries": -7778,
+    "d_deploy_pp": -18.38,
+    "d_mean_bp": -62.4
+   },
+   "KSLOT_4": {
+    "d_ann_pp": -102.7,
+    "d_mdd_pp": -18.55,
+    "d_sharpe": -2.62,
+    "d_n_entries": -78,
+    "d_deploy_pp": -0.89,
+    "d_mean_bp": -62.4
+   }
+  },
+  "A2_挂1.0%": {
+   "KSLOT_20": {
+    "d_ann_pp": -75.72,
+    "d_mdd_pp": -41.22,
+    "d_sharpe": -3.48,
+    "d_n_entries": -10745,
+    "d_deploy_pp": -25.41,
+    "d_mean_bp": -64.7
+   },
+   "KSLOT_4": {
+    "d_ann_pp": -105.15,
+    "d_mdd_pp": -29.73,
+    "d_sharpe": -2.73,
+    "d_n_entries": -271,
+    "d_deploy_pp": -3.18,
+    "d_mean_bp": -64.7
+   }
+  },
+  "A2_挂1.5%": {
+   "KSLOT_20": {
+    "d_ann_pp": -71.97,
+    "d_mdd_pp": -28.07,
+    "d_sharpe": -3.27,
+    "d_n_entries": -13097,
+    "d_deploy_pp": -30.96,
+    "d_mean_bp": -62.51
+   },
+   "KSLOT_4": {
+    "d_ann_pp": -99.98,
+    "d_mdd_pp": -24.74,
+    "d_sharpe": -2.5,
+    "d_n_entries": -611,
+    "d_deploy_pp": -7.15,
+    "d_mean_bp": -62.51
+   }
+  },
+  "A2_挂2.0%": {
+   "KSLOT_20": {
+    "d_ann_pp": -68.96,
+    "d_mdd_pp": -18.25,
+    "d_sharpe": -3.05,
+    "d_n_entries": -14856,
+    "d_deploy_pp": -35.11,
+    "d_mean_bp": -58.77
+   },
+   "KSLOT_4": {
+    "d_ann_pp": -100.03,
+    "d_mdd_pp": -26.69,
+    "d_sharpe": -2.5,
+    "d_n_entries": -1031,
+    "d_deploy_pp": -12.09,
+    "d_mean_bp": -58.77
+   }
+  }
+ },
+ "path_stats_A3_2018": {
+  "n": 21146,
+  "close_vs_open": {
+   "n": 21146,
+   "mean": 0.6264,
+   "med": 0.6434,
+   "p05": -3.6311,
+   "p25": -0.8841,
+   "p75": 2.0186,
+   "p95": 4.8573,
+   "share_neg_pct": 36.88
+  },
+  "low_vs_open": {
+   "n": 21146,
+   "mean": -1.438,
+   "med": -0.8757,
+   "p05": -4.9564,
+   "p25": -2.122,
+   "p75": -0.1285,
+   "p95": 0.0,
+   "share_neg_pct": 77.69
+  },
+  "high_vs_open": {
+   "n": 21146,
+   "mean": 2.568,
+   "med": 2.0725,
+   "p05": 0.2611,
+   "p25": 1.232,
+   "p75": 3.2745,
+   "p95": 6.5314,
+   "share_neg_pct": 0.0
+  },
+  "touch_pct": {
+   "low_le_-0.5%": 61.37,
+   "low_le_-1.0%": 46.81,
+   "low_le_-1.5%": 35.35,
+   "low_le_-2.0%": 26.89
+  }
+ },
+ "path_stats_A3_fullwindow": {
+  "n": 24492,
+  "close_vs_open": {
+   "n": 24492,
+   "mean": 0.6098,
+   "med": 0.6331,
+   "p05": -3.6112,
+   "p25": -0.8637,
+   "p75": 1.9883,
+   "p95": 4.7749,
+   "share_neg_pct": 36.84
+  },
+  "low_vs_open": {
+   "n": 24492,
+   "mean": -1.4328,
+   "med": -0.8696,
+   "p05": -4.9543,
+   "p25": -2.1042,
+   "p75": -0.128,
+   "p95": 0.0,
+   "share_neg_pct": 77.71
+  },
+  "high_vs_open": {
+   "n": 24492,
+   "mean": 2.5278,
+   "med": 2.0408,
+   "p05": 0.2532,
+   "p25": 1.2069,
+   "p75": 3.2258,
+   "p95": 6.4172,
+   "share_neg_pct": 0.0
+  },
+  "touch_pct": {
+   "low_le_-0.5%": 61.27,
+   "low_le_-1.0%": 46.58,
+   "low_le_-1.5%": 35.04,
+   "low_le_-2.0%": 26.58
+  }
+ },
+ "anchors": {
+  "anchor_source": "backtest/hengpan_fangliang_dikai_0925/evidence_sensitivity.json (subwindow_2018 / base)",
+  "checked": {
+   "KSLOT_20.ann": {
+    "got": 63.9,
+    "expect": 63.9,
+    "pass_": true
+   },
+   "KSLOT_20.mdd": {
+    "got": -27.41,
+    "expect": -27.41,
+    "pass_": true
+   },
+   "KSLOT_20.sharpe": {
+    "got": 2.53,
+    "expect": 2.53,
+    "pass_": true
+   },
+   "KSLOT_20.win_rate": {
+    "got": 60.94,
+    "expect": 60.94,
+    "pass_": true
+   },
+   "KSLOT_20.mean_per_trade": {
+    "got": 0.4341,
+    "expect": 0.4341,
+    "pass_": true
+   },
+   "KSLOT_20.n_trades": {
+    "got": 21146,
+    "expect": 21146,
+    "pass_": true
+   },
+   "KSLOT_20.n_entries": {
+    "got": 20473,
+    "expect": 20473,
+    "pass_": true
+   },
+   "KSLOT_20.deploy_pct": {
+    "got": 48.42,
+    "expect": 48.42,
+    "pass_": true
+   },
+   "KSLOT_4.ann": {
+    "got": 105.55,
+    "expect": 105.55,
+    "pass_": true
+   },
+   "KSLOT_4.mdd": {
+    "got": -30.16,
+    "expect": -30.16,
+    "pass_": true
+   },
+   "KSLOT_4.sharpe": {
+    "got": 2.86,
+    "expect": 2.86,
+    "pass_": true
+   },
+   "KSLOT_4.n_trades": {
+    "got": 21146,
+    "expect": 21146,
+    "pass_": true
+   },
+   "KSLOT_4.n_entries": {
+    "got": 4236,
+    "expect": 4236,
+    "pass_": true
+   },
+   "KSLOT_4.deploy_pct": {
+    "got": 49.94,
+    "expect": 49.94,
+    "pass_": true
+   },
+   "FULLWINDOW.ann": {
+    "got": 47.3,
+    "expect": 47.3,
+    "pass_": true
+   },
+   "FULLWINDOW.mdd": {
+    "got": -27.41,
+    "expect": -27.41,
+    "pass_": true
+   },
+   "FULLWINDOW.sharpe": {
+    "got": 2.15,
+    "expect": 2.15,
+    "pass_": true
+   },
+   "FULLWINDOW.n_trades": {
+    "got": 24492,
+    "expect": 24492,
+    "pass_": true
+   },
+   "FULLWINDOW.n_entries": {
+    "got": 23656,
+    "expect": 23656,
+    "pass_": true
+   },
+   "FULLWINDOW.deploy_pct": {
+    "got": 41.59,
+    "expect": 41.59,
+    "pass_": true
+   }
+  },
+  "exit_replication_max_abs_diff_pct": 0.0,
+  "exit_replication_ok": true,
+  "all_pass": true
+ },
+ "known_limits": [
+  "日线口径：只有买日 open/high/low/close 四个锚点，不知道「日内最低/最高发生的时刻」→ 无法建模「10:30 之后再市价买」这类具体延后时点；A1 是端点（尾盘），A2 是用 low 判定的挂单型（日线下唯一可近似的中途低吸方式）。",
+  "A1 的成交价按买日收盘价 = 模型假设（真实尾盘市价单成交价≈收盘但不等于收盘，有跟踪误差）。",
+  "A2 只判「价格是否触及」，未建模成交量/排队/封板堵单/部分成交（按全额成交假设）→ 成交率是乐观上界。",
+  "A2 未建模「挂单在开盘价下方，若当日 low 恰等于挂单价但尾盘封死」的排队风险。",
+  "出场规则沿用冻结 v1.3（止盈用到 T+2 当日 high），属既有口径、非本次新增假设。",
+  "A1/A2 的 TP 阈值随新入场价下移（+2% 目标不变，绝对价位更低）→ 止盈命中率上升是规则内生的，不是新增优势。",
+  "窗口 2018-01-02~2026-09-24 为样本内（前向 OOS 自 2026-09-28 起，样本 = 0）。",
+  "资金时序：主表统一 entry_first（与冻结基线同规则，便于归因）；A1 的尾盘买入在现实中可与同日尾盘卖出共用资金，已附 exit_first 敏感性列（KSLOT=4 档差异最大）。"
+ ],
+ "commands": {
+  "run": "python backtest/entry_timing_hpdk_0928/entry_timing_hpdk_0928.py --cache \"<panel cache dir>\" --scratch \"$env:PI_SCRATCH_DIR\""
+ }
+}
