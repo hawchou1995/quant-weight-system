@@ -398,14 +398,72 @@ if not fails and not NO_MAIN_PUSH:   # ⑤ 云端 Phase 1：只写 gh-pages，�
                           "backtest/hpdk_paper.json",
                           "gen_trade_cal.py", "trade_cal_sina.csv",
                           "backtest/hengpan_fangliang_dikai_0925/gen_gates_report.py",
+                          # 2026-09-28 补：E-19 口径修正 + forum8 全版块回测线（此前从未进链白名单 → 改动不会被链提交）
+                          "backtest/PRE-REGISTRATION_20260926_hengpan_dikai_oos.md",
+                          "backtest/hengpan_fangliang_dikai_0925/evidence_sensitivity.json",
+                          "backtest/hengpan_fangliang_dikai_0925/audit_launch12_20260928.py",
+                          "backtest/hengpan_fangliang_dikai_0925/evidence_launch12_20260928.json",
+                          "backtest/hengpan_fangliang_dikai_0925/errata_e19_attrib.py",
+                          "backtest/hengpan_fangliang_dikai_0925/evidence_errata_e19_attrib.json",
+                          "backtest/报告-上线前12项检查-缩量超跌-20260928.md",
+                          "backtest/audit_lookahead_gushi465_20260928.py",
+                          "backtest/evidence_lookahead_audit_20260928.json",
+                          "backtest/报告-未来函数核查-gushi465清单-20260928.md",
+                          "backtest/PRE-REGISTRATION_20260928_forum8_formula_sweep.md",
+                          "backtest/报告-forum8全部策略回测-20260928.md",
+                          "backtest/报告-forum8-top5-20260928.html",
+                          "backtest/forum8_formulas_0928/m1_census_20260928.py",
+                          "backtest/forum8_formulas_0928/m2_sweep_20260928.py",
+                          "backtest/forum8_formulas_0928/m2_sweep_v2_20260928.py",
+                          "backtest/forum8_formulas_0928/m2_sweep_v3_20260928.py",
+                          "backtest/forum8_formulas_0928/m2_sweep_v4_20260928.py",
+                          "backtest/forum8_formulas_0928/m3_horizon_20260928.py",
+                          "backtest/forum8_formulas_0928/m4_portfolio_20260928.py",
+                          "backtest/forum8_formulas_0928/gen_html_top5_20260928.py",
+                          "backtest/forum8_formulas_0928/audit_lookahead_forum8_20260928.py",
+                          "backtest/forum8_formulas_0928/_report_tables_20260928.md",
+                          "backtest/forum8_formulas_0928/census_forum8_20260928.json",
+                          "backtest/forum8_formulas_0928/evidence_forum8_sweep_20260928.json",
+                          "backtest/forum8_formulas_0928/evidence_forum8_sweep_v2_20260928.json",
+                          "backtest/forum8_formulas_0928/evidence_forum8_sweep_v3_20260928.json",
+                          "backtest/forum8_formulas_0928/evidence_forum8_sweep_v4_20260928.json",
+                          "backtest/forum8_formulas_0928/evidence_forum8_horizon_m3_20260928.json",
+                          "backtest/forum8_formulas_0928/evidence_forum8_portfolio_m4_20260928.json",
+                          "backtest/forum8_formulas_0928/evidence_lookahead_forum8_20260928.json",
+                          "backtest/r2_rebuild_0911/tdx_interp.py",
                           "docs/adr/0010-short-board-new-strategies-onboarding.md"],
                          cwd=str(BASE), capture_output=True)
-    if git.returncode == 0:
+    if git.returncode != 0:
+        # 2026-09-28 修：原先 add 失败（或白名单漏项）是**静默**的 —— 链 rc=0 但什么都没提交。
+        print(f"[git] ⚠ git add 失败 rc={git.returncode}："
+              f"{git.stderr.decode(errors='replace')[:200]}", flush=True)
+    else:
         c = subprocess.run(["git", "commit", "-m", f"chore(daily): {date.today()} 收盘刷新（池/信号/看板/复盘日志）"],
                            cwd=str(BASE), capture_output=True)
+        cout = (c.stdout or b"").decode(errors="replace").strip()
+        cerr = (c.stderr or b"").decode(errors="replace").strip()
         if c.returncode == 0:
             p = subprocess.run(["git", "push", "origin", "main"], cwd=str(BASE), capture_output=True)
-            print(f"[git] main 同步 {'✓' if p.returncode == 0 else '✗ ' + p.stderr.decode(errors='replace')[:100]}", flush=True)
+            print(f"[git] commit ✓ {cout.splitlines()[0][:90] if cout else ''} | "
+                  f"push {'✓' if p.returncode == 0 else '✗ ' + p.stderr.decode(errors='replace')[:120]}",
+                  flush=True)
+        else:
+            # rc=1 且无输出 = 「nothing to commit」（白名单里没有变化），属正常；其余是错误。
+            print(f"[git] commit rc={c.returncode}"
+                  f"{'（无变化）' if 'nothing to commit' in cout + cerr else ''}：{cout[:160]} | {cerr[:160]}",
+                  flush=True)
+    # ---- 链末工作区自检（2026-09-28 新增，非阻断）----
+    # 目的：链 rc=0 也不代表「该提交的都提交了」。把未提交/未跟踪项报出来，
+    # 白名单漏项（本项目已犯过 09-17/09-23/09-24 三次）从此在链日志里可见。
+    _st = subprocess.run(["git", "status", "--porcelain"], cwd=str(BASE), capture_output=True, text=True)
+    _lines = [l for l in (_st.stdout or "").splitlines() if l.strip()]
+    if _lines:
+        print(f"[git] 工作区自检：{len(_lines)} 项未提交/未跟踪（前 20）——"
+              f"若含本链产物，说明白名单漏项", flush=True)
+        for l in _lines[:20]:
+            print("      " + l, flush=True)
+    else:
+        print("[git] 工作区自检：干净 ✓", flush=True)
 
 # ---- 双卫星模拟盘记账（非致命：按「信号日次一交易日开盘价+20bp」口径自动建仓/日更净值，无需用户回填成交）----
 if not fails:

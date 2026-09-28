@@ -1,8 +1,8 @@
 {
- "generated_at": "2026-09-28 12:18:51",
+ "generated_at": "2026-09-28 14:36:06",
  "topic": "https://gushi.in/topic/468 《从模拟盘到实盘：上线前必须完成的 12 项检查》",
  "object": "缩量超跌 (st-hpdk)",
- "frozen_script_sha256": "b3748ca36f83d70589a17cb9324b561a4bc52a26e59e39c60355fb32ea019225",
+ "frozen_script_sha256": "0b61a4bbce100ed63be86e72e0692bfc719d6c13e266410d593926b3855518b3",
  "params": {
   "P1": 0.01,
   "P2": 0.03,
@@ -14,7 +14,8 @@
   "TP": 0.02,
   "COST_SIDE": 0.000346,
   "SHADOW_START": "2016-01-01",
-  "WORST_CASE_WIPEOUT": true
+  "WORST_CASE_WIPEOUT": true,
+  "STNOW_OFF": true
  },
  "panel": {
   "T": 2852,
@@ -24,79 +25,79 @@
  "anchors": {
   "self_ext_vs_x2": {
    "ann": [
-    47.17,
-    47.17
+    47.3,
+    47.3
    ],
    "mdd": [
-    -26.81,
-    -26.81
+    -27.41,
+    -27.41
    ],
    "sharpe": [
-    2.19,
-    2.19
+    2.15,
+    2.15
    ],
    "win_rate": [
-    60.63,
-    60.63
+    60.98,
+    60.98
    ],
    "mean_per_trade": [
-    0.4028,
-    0.4028
+    0.4029,
+    0.4029
    ],
    "med_per_trade": [
     1.9294,
     1.9294
    ],
    "n_trades": [
-    23759,
-    23759
+    24492,
+    24492
    ],
    "n_entries": [
-    23002,
-    23002
+    23656,
+    23656
    ],
    "deploy_pct": [
-    40.43,
-    40.43
+    41.59,
+    41.59
    ]
   },
   "ext_vs_x2_diff": [],
   "vs_sensitivity_base": {
    "ann": [
-    47.17,
-    47.17
+    47.3,
+    47.3
    ],
    "mdd": [
-    -26.81,
-    -26.81
+    -27.41,
+    -27.41
    ],
    "sharpe": [
-    2.19,
-    2.19
+    2.15,
+    2.15
    ],
    "win_rate": [
-    60.63,
-    60.63
+    60.98,
+    60.98
    ],
    "mean_per_trade": [
-    0.4028,
-    0.4028
+    0.4029,
+    0.4029
    ],
    "med_per_trade": [
     1.9294,
     1.9294
    ],
    "n_trades": [
-    23759,
-    23759
+    24492,
+    24492
    ],
    "n_entries": [
-    23002,
-    23002
+    23656,
+    23656
    ],
    "deploy_pct": [
-    40.43,
-    40.43
+    41.59,
+    41.59
    ]
   },
   "sensitivity_diff": [],
@@ -104,30 +105,30 @@
  },
  "headline": {
   "kslot4": {
-   "ann": 76.61,
-   "mdd": -33.63,
-   "sharpe": 2.29,
-   "win_rate": 60.63,
-   "mean_per_trade": 0.4028,
+   "ann": 73.54,
+   "mdd": -34.64,
+   "sharpe": 2.16,
+   "win_rate": 60.98,
+   "mean_per_trade": 0.4029,
    "med_per_trade": 1.9294,
-   "n_trades": 23759,
-   "n_entries": 4886,
-   "deploy_pct": 42.82,
+   "n_trades": 24492,
+   "n_entries": 5133,
+   "deploy_pct": 45.0,
    "neg_years": 1,
    "n_years": 12,
    "yearly": {
     "2015": 0.0,
-    "2016": 9.28,
-    "2017": -5.5,
-    "2018": 88.16,
-    "2019": 210.17,
-    "2020": 158.02,
-    "2021": 157.84,
-    "2022": 101.81,
-    "2023": 115.8,
-    "2024": 47.58,
-    "2025": 87.29,
-    "2026": 59.44
+    "2016": -27.7,
+    "2017": 55.01,
+    "2018": 84.47,
+    "2019": 226.54,
+    "2020": 150.99,
+    "2021": 110.27,
+    "2022": 118.61,
+    "2023": 108.33,
+    "2024": 36.31,
+    "2025": 92.9,
+    "2026": 46.97
    },
    "window": [
     "2015-01-05",
@@ -135,30 +136,30 @@
    ]
   },
   "kslot20": {
-   "ann": 47.17,
-   "mdd": -26.81,
-   "sharpe": 2.19,
-   "win_rate": 60.63,
-   "mean_per_trade": 0.4028,
+   "ann": 47.3,
+   "mdd": -27.41,
+   "sharpe": 2.15,
+   "win_rate": 60.98,
+   "mean_per_trade": 0.4029,
    "med_per_trade": 1.9294,
-   "n_trades": 23759,
-   "n_entries": 23002,
-   "deploy_pct": 40.43,
+   "n_trades": 24492,
+   "n_entries": 23656,
+   "deploy_pct": 41.59,
    "neg_years": 0,
    "n_years": 12,
    "yearly": {
     "2015": 0.0,
-    "2016": 1.18,
-    "2017": 23.67,
-    "2018": 26.9,
-    "2019": 142.97,
-    "2020": 59.64,
-    "2021": 67.35,
-    "2022": 64.99,
-    "2023": 70.9,
-    "2024": 52.08,
-    "2025": 51.99,
-    "2026": 36.06
+    "2016": 3.23,
+    "2017": 22.17,
+    "2018": 28.82,
+    "2019": 151.0,
+    "2020": 63.38,
+    "2021": 68.21,
+    "2022": 71.19,
+    "2023": 66.77,
+    "2024": 52.38,
+    "2025": 43.53,
+    "2026": 31.9
    },
    "window": [
     "2015-01-05",
@@ -167,109 +168,109 @@
   }
  },
  "cost": {
-  "n": 4886,
-  "gross_mean": 0.6514,
-  "net_mean": 0.5817,
+  "n": 5133,
+  "gross_mean": 0.6086,
+  "net_mean": 0.539,
   "drag_per_trade_pp": 0.0696,
   "roundtrip_cost_pct": 0.0692,
-  "gross_win_rate": 63.57,
-  "net_win_rate": 63.47,
-  "coverage_ratio": 8.41
+  "gross_win_rate": 63.88,
+  "net_win_rate": 63.76,
+  "coverage_ratio": 7.79
  },
  "cost_table_k4": [
   {
    "mult": 0.0,
-   "ann": 89.83,
-   "mdd": -33.24,
-   "sharpe": 2.56,
-   "mean_per_trade": 0.4028,
-   "win_rate": 60.63
+   "ann": 87.21,
+   "mdd": -31.98,
+   "sharpe": 2.44,
+   "mean_per_trade": 0.4029,
+   "win_rate": 60.98
   },
   {
    "mult": 1.0,
-   "ann": 76.61,
-   "mdd": -33.63,
-   "sharpe": 2.29,
-   "mean_per_trade": 0.4028,
-   "win_rate": 60.63
+   "ann": 73.54,
+   "mdd": -34.64,
+   "sharpe": 2.16,
+   "mean_per_trade": 0.4029,
+   "win_rate": 60.98
   },
   {
    "mult": 2.0,
-   "ann": 64.31,
-   "mdd": -34.2,
-   "sharpe": 2.02,
-   "mean_per_trade": 0.4028,
-   "win_rate": 60.63
+   "ann": 60.87,
+   "mdd": -38.22,
+   "sharpe": 1.88,
+   "mean_per_trade": 0.4029,
+   "win_rate": 60.98
   },
   {
    "mult": 3.0,
-   "ann": 52.86,
-   "mdd": -37.29,
-   "sharpe": 1.75,
-   "mean_per_trade": 0.4028,
-   "win_rate": 60.63
+   "ann": 49.13,
+   "mdd": -42.36,
+   "sharpe": 1.61,
+   "mean_per_trade": 0.4029,
+   "win_rate": 60.98
   }
  ],
  "cost_table_k20": [
   {
    "mult": 0.0,
-   "ann": 57.55,
-   "mdd": -26.15,
-   "sharpe": 2.56,
-   "mean_per_trade": 0.4028,
-   "win_rate": 60.63
+   "ann": 57.98,
+   "mdd": -26.76,
+   "sharpe": 2.52,
+   "mean_per_trade": 0.4029,
+   "win_rate": 60.98
   },
   {
    "mult": 1.0,
-   "ann": 47.17,
-   "mdd": -26.81,
-   "sharpe": 2.19,
-   "mean_per_trade": 0.4028,
-   "win_rate": 60.63
+   "ann": 47.3,
+   "mdd": -27.41,
+   "sharpe": 2.15,
+   "mean_per_trade": 0.4029,
+   "win_rate": 60.98
   },
   {
    "mult": 2.0,
-   "ann": 37.48,
-   "mdd": -27.46,
-   "sharpe": 1.82,
-   "mean_per_trade": 0.4028,
-   "win_rate": 60.63
+   "ann": 37.33,
+   "mdd": -28.06,
+   "sharpe": 1.78,
+   "mean_per_trade": 0.4029,
+   "win_rate": 60.98
   },
   {
    "mult": 3.0,
-   "ann": 28.43,
-   "mdd": -28.1,
-   "sharpe": 1.46,
-   "mean_per_trade": 0.4028,
-   "win_rate": 60.63
+   "ann": 28.04,
+   "mdd": -28.69,
+   "sharpe": 1.41,
+   "mean_per_trade": 0.4029,
+   "win_rate": 60.98
   }
  ],
  "position": [
   {
    "config": "KSLOT=4",
-   "n": 4886,
+   "n": 5133,
    "weight_target": 0.25,
    "weight_max": 0.25,
    "weight_median": 0.25,
-   "alloc_median": 7.151,
+   "alloc_median": 5.9174,
    "account_cap_yuan": {
-    "p10": 936117.0,
-    "median": 2006939.0,
-    "p90": 7808327.0
+    "p10": 933923.0,
+    "median": 1997365.0,
+    "p90": 7726567.0
    },
    "max_concurrent_est": 4
   },
   {
    "config": "KSLOT=20",
-   "n": 23002,
+   "n": 23656,
    "weight_target": 0.05,
    "weight_max": 0.05,
    "weight_median": 0.05,
-   "alloc_median": 0.4395,
+   "alloc_median": 0.4632,
    "account_cap_yuan": {
-    "p10": 5035193.0,
-    "median": 12535346.0,
-    "p90": 49561867.0
+    "p10": 5024757.0,
+    "median": 12470628.0,
+    "p90": 49067208.0
    },
    "max_concurrent_est": 20
   }
@@ -279,22 +280,22 @@
    "config": "KSLOT=4",
    "trades": {
     "bull": {
-     "n": 264,
-     "mean": 0.7872,
-     "win_rate": 63.26,
+     "n": 265,
+     "mean": 0.9327,
+     "win_rate": 66.42,
      "worst": -11.9273
     },
     "bear": {
-     "n": 4416,
-     "mean": 0.5528,
-     "win_rate": 63.34,
+     "n": 4643,
+     "mean": 0.4994,
+     "win_rate": 63.49,
      "worst": -100.0
     },
     "range": {
-     "n": 206,
-     "mean": 0.9395,
-     "win_rate": 66.5,
-     "worst": -8.7343
+     "n": 225,
+     "mean": 0.892,
+     "win_rate": 66.22,
+     "worst": -9.21
     }
    },
    "days": {
@@ -303,42 +304,42 @@
     "range": 180
    },
    "deploy_pct_by_regime": {
-    "bull": 31.14,
-    "bear": 44.88,
-    "range": 28.57
+    "bull": 31.27,
+    "bear": 47.19,
+    "range": 31.22
    },
-   "idle_days": 516,
-   "idle_pct": 18.09,
+   "idle_days": 325,
+   "idle_pct": 11.4,
    "idle_days_by_regime": {
     "bull": 101,
-    "bear": 344,
-    "range": 71
+    "bear": 156,
+    "range": 68
    },
    "crush_days": 247,
-   "crush_idle_days": 78,
-   "crush_trades_n": 355,
-   "crush_mean": -0.9085,
-   "crush_worst": -100.0
+   "crush_idle_days": 68,
+   "crush_trades_n": 374,
+   "crush_mean": -0.6268,
+   "crush_worst": -16.6628
   },
   {
    "config": "KSLOT=20",
    "trades": {
     "bull": {
-     "n": 1278,
-     "mean": 0.9843,
-     "win_rate": 66.35,
+     "n": 1274,
+     "mean": 1.0266,
+     "win_rate": 67.03,
      "worst": -11.9273
     },
     "bear": {
-     "n": 20680,
-     "mean": 0.3652,
-     "win_rate": 60.15,
+     "n": 21320,
+     "mean": 0.3542,
+     "win_rate": 60.46,
      "worst": -100.0
     },
     "range": {
-     "n": 1044,
-     "mean": 0.6158,
-     "win_rate": 63.41,
+     "n": 1062,
+     "mean": 0.5926,
+     "win_rate": 63.47,
      "worst": -13.8957
     }
    },
@@ -348,82 +349,82 @@
     "range": 180
    },
    "deploy_pct_by_regime": {
-    "bull": 30.38,
-    "bear": 42.14,
-    "range": 29.04
+    "bull": 30.29,
+    "bear": 43.44,
+    "range": 29.54
    },
-   "idle_days": 401,
-   "idle_pct": 14.06,
+   "idle_days": 282,
+   "idle_pct": 9.89,
    "idle_days_by_regime": {
     "bull": 79,
-    "bear": 251,
-    "range": 71
+    "bear": 135,
+    "range": 68
    },
    "crush_days": 247,
-   "crush_idle_days": 70,
-   "crush_trades_n": 1561,
-   "crush_mean": -0.7082,
+   "crush_idle_days": 62,
+   "crush_trades_n": 1660,
+   "crush_mean": -0.5704,
    "crush_worst": -100.0
   }
  ],
  "fillability": {
-  "n": 4886,
+  "n": 5133,
   "entry_limit_up_n": 0,
   "entry_limit_up_pct": 0.0,
-  "entry_gap_median_pct": -1.254,
-  "exit_locked_down_n": 7,
-  "exit_locked_down_pct": 0.14
+  "entry_gap_median_pct": -1.263,
+  "exit_locked_down_n": 6,
+  "exit_locked_down_pct": 0.12
  },
  "exit_structure": {
   "hold_days_median": 1.0,
   "hold_days_max": 2,
-  "tp_hit_pct": 53.17,
+  "tp_hit_pct": 53.54,
   "exit_flag_dist": {
-   "0": 4882,
-   "2": 3,
-   "1": 1
+   "0": 5127,
+   "2": 4,
+   "1": 2
   },
   "mae_median_pct": -1.25,
-  "mae_p10_pct": -5.18,
-  "mae_worst_pct": -17.99,
-  "trades_below_m5_pct": 10.6,
-  "trades_below_m8_pct": 3.11
+  "mae_p10_pct": -5.31,
+  "mae_worst_pct": -18.17,
+  "trades_below_m5_pct": 11.22,
+  "trades_below_m8_pct": 3.64
  },
  "stops": [
   {
    "stop_pct": -3.0,
-   "n_trigger": 1015,
-   "trigger_pct": 20.77,
-   "mean": 0.5557,
+   "n_trigger": 1084,
+   "trigger_pct": 21.12,
+   "mean": 0.5395,
    "median": 1.9294,
-   "win_rate": 61.17,
+   "win_rate": 61.45,
    "worst": -18.0453
   },
   {
    "stop_pct": -5.0,
-   "n_trigger": 465,
-   "trigger_pct": 9.52,
-   "mean": 0.5842,
+   "n_trigger": 515,
+   "trigger_pct": 10.03,
+   "mean": 0.5525,
    "median": 1.9294,
-   "win_rate": 62.85,
+   "win_rate": 63.04,
    "worst": -18.0453
   },
   {
    "stop_pct": -8.0,
-   "n_trigger": 140,
-   "trigger_pct": 2.87,
-   "mean": 0.6109,
+   "n_trigger": 172,
+   "trigger_pct": 3.35,
+   "mean": 0.5785,
    "median": 1.9294,
-   "win_rate": 63.32,
+   "win_rate": 63.59,
    "worst": -18.0453
   },
   {
    "stop_pct": -10.0,
-   "n_trigger": 68,
-   "trigger_pct": 1.39,
-   "mean": 0.6185,
+   "n_trigger": 80,
+   "trigger_pct": 1.56,
+   "mean": 0.5906,
    "median": 1.9294,
-   "win_rate": 63.43,
+   "win_rate": 63.72,
    "worst": -18.0453
   }
  ],
@@ -431,43 +432,43 @@
   {
    "config": "KSLOT=4",
    "n_days": 2851,
-   "daily_drop3_n": 58,
-   "daily_drop3_per_year": 4.96,
-   "daily_drop3_median_fwd5_pct": 3.17,
-   "daily_drop3_mean_fwd5_pct": 2.51,
-   "weekly_drop8_n": 8,
-   "weekly_drop8_per_year": 0.65,
-   "max_consec_loss": 9,
-   "n_streak_ge5": 52
+   "daily_drop3_n": 68,
+   "daily_drop3_per_year": 5.82,
+   "daily_drop3_median_fwd5_pct": 2.62,
+   "daily_drop3_mean_fwd5_pct": 1.99,
+   "weekly_drop8_n": 9,
+   "weekly_drop8_per_year": 0.73,
+   "max_consec_loss": 10,
+   "n_streak_ge5": 54
   },
   {
    "config": "KSLOT=20",
    "n_days": 2851,
-   "daily_drop3_n": 55,
-   "daily_drop3_per_year": 4.71,
-   "daily_drop3_median_fwd5_pct": 2.52,
-   "daily_drop3_mean_fwd5_pct": 2.13,
-   "weekly_drop8_n": 4,
-   "weekly_drop8_per_year": 0.32,
+   "daily_drop3_n": 60,
+   "daily_drop3_per_year": 5.14,
+   "daily_drop3_median_fwd5_pct": 2.07,
+   "daily_drop3_mean_fwd5_pct": 1.86,
+   "weekly_drop8_n": 3,
+   "weekly_drop8_per_year": 0.24,
    "max_consec_loss": 32,
-   "n_streak_ge5": 375
+   "n_streak_ge5": 378
   }
  ],
  "static": {
   "冻结规格 oos_run.py": {
    "path": "backtest\\hengpan_fangliang_dikai_0925\\oos_run.py",
    "exists": true,
-   "size": 13814
+   "size": 14887
   },
   "预注册": {
    "path": "backtest\\PRE-REGISTRATION_20260926_hengpan_dikai_oos.md",
    "exists": true,
-   "size": 46641
+   "size": 50466
   },
   "挂单清单工具": {
    "path": "backtest\\hengpan_fangliang_dikai_0925\\watch_next.py",
    "exists": true,
-   "size": 12797
+   "size": 12975
   },
   "模拟盘引擎": {
    "path": "backtest\\hengpan_fangliang_dikai_0925\\hpdk_paper.py",
@@ -492,7 +493,7 @@
   "词汇表": {
    "path": "CONTEXT.md",
    "exists": true,
-   "size": 15173
+   "size": 17250
   },
   "ADR-0010": {
    "path": "docs\\adr\\0010-short-board-new-strategies-onboarding.md",
@@ -509,6 +510,7 @@
   "E-15",
   "E-16",
   "E-17",
+  "E-19",
   "E-2",
   "E-3",
   "E-4",
@@ -534,15 +536,15 @@
  },
  "skip": {
   "k4": {
-   "dup": 79,
-   "slot": 2374,
+   "dup": 108,
+   "slot": 2489,
    "nofund": 0
   },
   "k20": {
-   "dup": 750,
-   "slot": 7,
+   "dup": 828,
+   "slot": 8,
    "nofund": 0
   }
  },
- "runtime_sec": 12.2
+ "runtime_sec": 28.3
 }
