@@ -1,9 +1,9 @@
 {
-  "run_id": "36404696796",
-  "sha": "2af7e927d1ed83ec7f1fe997789bcf08d5041a94",
+  "run_id": "36422126855",
+  "sha": "11b05822b6d3108c1e85ec92ca2e2406fd8f8062",
   "mode": "chain",
   "status": "published-candidate",
-  "ts_cn": "2026-09-28 19:35:11",
+  "ts_cn": "2026-09-28 22:20:25",
   "today_cn": "2026-09-28",
   "chain_rc": 0,
   "g2_fresh": true,
@@ -20,8 +20,8 @@
   "files": [
     {
       "name": "dual_system.html",
-      "md5": "ba4740f8de02",
-      "bytes": 2429257,
+      "md5": "678ce8c97f48",
+      "bytes": 2433397,
       "as_of": "2026-09-28"
     },
     {
@@ -50,7 +50,7 @@
     },
     {
       "name": "review_log.html",
-      "md5": "283e9bf4e6a6",
+      "md5": "f79f798ccb55",
       "bytes": 47169,
       "as_of": null
     },
@@ -68,19 +68,19 @@
     },
     {
       "name": "short_signals.js",
-      "md5": "b111139b0e18",
-      "bytes": 1809252,
+      "md5": "d7400b577db0",
+      "bytes": 1808774,
       "as_of": "2026-09-28"
     },
     {
       "name": "enhanced_data.js",
-      "md5": "60888fe07550",
-      "bytes": 416260,
+      "md5": "fd229485c669",
+      "bytes": 426298,
       "as_of": "2026-09-28"
     },
     {
       "name": "a5_pool.js",
-      "md5": "c6c031f24e2b",
+      "md5": "f58537af8b50",
       "bytes": 20457,
       "as_of": "2026-09-28"
     },
@@ -98,27 +98,27 @@
     },
     {
       "name": "sentinel_pool.js",
-      "md5": "028c42d6449a",
+      "md5": "5c3f84957f62",
       "bytes": 31791,
       "as_of": "2026-09-28"
     },
     {
       "name": "sentinel_track.js",
-      "md5": "b944bd9da175",
+      "md5": "20d954237a6d",
       "bytes": 2542,
       "as_of": "2026-09-28"
     },
     {
       "name": "index.html",
-      "md5": "ba4740f8de02",
-      "bytes": 2429257,
+      "md5": "678ce8c97f48",
+      "bytes": 2433397,
       "as_of": null
     }
   ],
   "hpdk_fresh": {
-    "backtest/hpdk_candidates.json": "stale(2026-09-24!=2026-09-28)",
-    "backtest/hpdk_paper.json": "stale(2026-09-24!=2026-09-28)",
-    "backtest/hpdk_oos_view.json": "stale(2026-09-24!=2026-09-28)"
+    "backtest/hpdk_candidates.json": "ok",
+    "backtest/hpdk_paper.json": "ok",
+    "backtest/hpdk_oos_view.json": "ok"
   },
   "hpdk_expect": "2026-09-28"
 }
