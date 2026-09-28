@@ -1,0 +1,453 @@
+{
+ "generated_at": "2026-09-28 13:58:03",
+ "purpose": "M3 受限版：3 条毛口径过门者的持有期扫描（成本能否被摊薄）",
+ "cost": 0.002,
+ "horizons": [
+  1,
+  2,
+  3,
+  5,
+  10,
+  20
+ ],
+ "min_n": 100,
+ "alpha": 0.05,
+ "rows": [
+  {
+   "id": "543",
+   "title": "探底放量突破选股公式源码",
+   "signal": "探底放量突破",
+   "horizons": [
+    {
+     "K": 1,
+     "n": 51240,
+     "gross": {
+      "mean_pct": 0.1194,
+      "med_pct": -0.3593,
+      "day_mean_pct": 0.1153,
+      "days": 2539,
+      "t": 2.643,
+      "ci_lo_pct": 0.0297,
+      "gate": true
+     },
+     "net": {
+      "mean_pct": -0.0806,
+      "med_pct": -0.5593,
+      "day_mean_pct": -0.0847,
+      "days": 2539,
+      "t": -1.943,
+      "ci_lo_pct": -0.1703,
+      "gate": false
+     },
+     "avg_hold_days": 2.001053864168618
+    },
+    {
+     "K": 2,
+     "n": 51216,
+     "gross": {
+      "mean_pct": 0.1691,
+      "med_pct": -0.4626,
+      "day_mean_pct": 0.1007,
+      "days": 2538,
+      "t": 1.824,
+      "ci_lo_pct": -0.0076,
+      "gate": false
+     },
+     "net": {
+      "mean_pct": -0.0309,
+      "med_pct": -0.6626,
+      "day_mean_pct": -0.0993,
+      "days": 2538,
+      "t": -1.8,
+      "ci_lo_pct": -0.2076,
+      "gate": false
+     },
+     "avg_hold_days": 3.001932989690722
+    },
+    {
+     "K": 3,
+     "n": 51130,
+     "gross": {
+      "mean_pct": 0.2052,
+      "med_pct": -0.5956,
+      "day_mean_pct": 0.1268,
+      "days": 2537,
+      "t": 1.897,
+      "ci_lo_pct": -0.0043,
+      "gate": false
+     },
+     "net": {
+      "mean_pct": 0.0052,
+      "med_pct": -0.7956,
+      "day_mean_pct": -0.0732,
+      "days": 2537,
+      "t": -1.096,
+      "ci_lo_pct": -0.2043,
+      "gate": false
+     },
+     "avg_hold_days": 4.002112262859378
+    },
+    {
+     "K": 5,
+     "n": 51014,
+     "gross": {
+      "mean_pct": 0.07,
+      "med_pct": -0.9061,
+      "day_mean_pct": -0.1247,
+      "days": 2534,
+      "t": -1.567,
+      "ci_lo_pct": -0.2808,
+      "gate": false
+     },
+     "net": {
+      "mean_pct": -0.13,
+      "med_pct": -1.1061,
+      "day_mean_pct": -0.3247,
+      "days": 2534,
+      "t": -4.081,
+      "ci_lo_pct": -0.4808,
+      "gate": false
+     },
+     "avg_hold_days": 6.003136393931078
+    },
+    {
+     "K": 10,
+     "n": 50830,
+     "gross": {
+      "mean_pct": -0.0763,
+      "med_pct": -1.5258,
+      "day_mean_pct": -0.4586,
+      "days": 2529,
+      "t": -4.778,
+      "ci_lo_pct": -0.6468,
+      "gate": false
+     },
+     "net": {
+      "mean_pct": -0.2763,
+      "med_pct": -1.7258,
+      "day_mean_pct": -0.6586,
+      "days": 2529,
+      "t": -6.861,
+      "ci_lo_pct": -0.8468,
+      "gate": false
+     },
+     "avg_hold_days": 11.005331497147354
+    },
+    {
+     "K": 20,
+     "n": 50441,
+     "gross": {
+      "mean_pct": -0.3958,
+      "med_pct": -2.6068,
+      "day_mean_pct": -0.9264,
+      "days": 2515,
+      "t": -6.97,
+      "ci_lo_pct": -1.187,
+      "gate": false
+     },
+     "net": {
+      "mean_pct": -0.5958,
+      "med_pct": -2.8068,
+      "day_mean_pct": -1.1264,
+      "days": 2515,
+      "t": -8.475,
+      "ci_lo_pct": -1.387,
+      "gate": false
+     },
+     "avg_hold_days": 21.005610515255448
+    }
+   ]
+  },
+  {
+   "id": "774",
+   "title": "最强黄金坑选股公式源码",
+   "signal": "最强黄金坑",
+   "horizons": [
+    {
+     "K": 1,
+     "n": 71956,
+     "gross": {
+      "mean_pct": 0.0718,
+      "med_pct": -0.3587,
+      "day_mean_pct": 0.0786,
+      "days": 2502,
+      "t": 2.461,
+      "ci_lo_pct": 0.016,
+      "gate": true
+     },
+     "net": {
+      "mean_pct": -0.1282,
+      "med_pct": -0.5587,
+      "day_mean_pct": -0.1214,
+      "days": 2502,
+      "t": -3.799,
+      "ci_lo_pct": -0.184,
+      "gate": false
+     },
+     "avg_hold_days": 2.001153482683862
+    },
+    {
+     "K": 2,
+     "n": 71887,
+     "gross": {
+      "mean_pct": 0.1037,
+      "med_pct": -0.4265,
+      "day_mean_pct": 0.0528,
+      "days": 2501,
+      "t": 1.363,
+      "ci_lo_pct": -0.0232,
+      "gate": false
+     },
+     "net": {
+      "mean_pct": -0.0963,
+      "med_pct": -0.6265,
+      "day_mean_pct": -0.1472,
+      "days": 2501,
+      "t": -3.804,
+      "ci_lo_pct": -0.2232,
+      "gate": false
+     },
+     "avg_hold_days": 3.0019057687759956
+    },
+    {
+     "K": 3,
+     "n": 71661,
+     "gross": {
+      "mean_pct": 0.0897,
+      "med_pct": -0.5452,
+      "day_mean_pct": -0.0014,
+      "days": 2500,
+      "t": -0.029,
+      "ci_lo_pct": -0.0933,
+      "gate": false
+     },
+     "net": {
+      "mean_pct": -0.1103,
+      "med_pct": -0.7452,
+      "day_mean_pct": -0.2014,
+      "days": 2500,
+      "t": -4.295,
+      "ci_lo_pct": -0.2933,
+      "gate": false
+     },
+     "avg_hold_days": 4.002428098965964
+    },
+    {
+     "K": 5,
+     "n": 71513,
+     "gross": {
+      "mean_pct": 0.0462,
+      "med_pct": -0.7549,
+      "day_mean_pct": -0.1775,
+      "days": 2498,
+      "t": -3.124,
+      "ci_lo_pct": -0.289,
+      "gate": false
+     },
+     "net": {
+      "mean_pct": -0.1538,
+      "med_pct": -0.9549,
+      "day_mean_pct": -0.3775,
+      "days": 2498,
+      "t": -6.643,
+      "ci_lo_pct": -0.489,
+      "gate": false
+     },
+     "avg_hold_days": 6.002656859591962
+    },
+    {
+     "K": 10,
+     "n": 71345,
+     "gross": {
+      "mean_pct": 0.0807,
+      "med_pct": -1.1099,
+      "day_mean_pct": -0.3191,
+      "days": 2492,
+      "t": -4.443,
+      "ci_lo_pct": -0.46,
+      "gate": false
+     },
+     "net": {
+      "mean_pct": -0.1193,
+      "med_pct": -1.3099,
+      "day_mean_pct": -0.5191,
+      "days": 2492,
+      "t": -7.227,
+      "ci_lo_pct": -0.66,
+      "gate": false
+     },
+     "avg_hold_days": 11.005158034900834
+    },
+    {
+     "K": 20,
+     "n": 70861,
+     "gross": {
+      "mean_pct": 0.1162,
+      "med_pct": -1.6669,
+      "day_mean_pct": -0.4416,
+      "days": 2482,
+      "t": -4.451,
+      "ci_lo_pct": -0.6361,
+      "gate": false
+     },
+     "net": {
+      "mean_pct": -0.0838,
+      "med_pct": -1.8669,
+      "day_mean_pct": -0.6416,
+      "days": 2482,
+      "t": -6.467,
+      "ci_lo_pct": -0.8361,
+      "gate": false
+     },
+     "avg_hold_days": 21.00468522882827
+    }
+   ]
+  },
+  {
+   "id": "807",
+   "title": "五均线粘合起爆选股公式源码",
+   "signal": "均线粘合起爆",
+   "horizons": [
+    {
+     "K": 1,
+     "n": 28825,
+     "gross": {
+      "mean_pct": 0.1054,
+      "med_pct": -0.2508,
+      "day_mean_pct": 0.0945,
+      "days": 2357,
+      "t": 2.207,
+      "ci_lo_pct": 0.0105,
+      "gate": true
+     },
+     "net": {
+      "mean_pct": -0.0946,
+      "med_pct": -0.4508,
+      "day_mean_pct": -0.1055,
+      "days": 2357,
+      "t": -2.465,
+      "ci_lo_pct": -0.1895,
+      "gate": false
+     },
+     "avg_hold_days": 2.0016999132697313
+    },
+    {
+     "K": 2,
+     "n": 28799,
+     "gross": {
+      "mean_pct": 0.1406,
+      "med_pct": -0.3021,
+      "day_mean_pct": 0.0699,
+      "days": 2355,
+      "t": 1.392,
+      "ci_lo_pct": -0.0286,
+      "gate": false
+     },
+     "net": {
+      "mean_pct": -0.0594,
+      "med_pct": -0.5021,
+      "day_mean_pct": -0.1301,
+      "days": 2355,
+      "t": -2.589,
+      "ci_lo_pct": -0.2286,
+      "gate": false
+     },
+     "avg_hold_days": 3.0025348102364666
+    },
+    {
+     "K": 3,
+     "n": 28763,
+     "gross": {
+      "mean_pct": 0.1326,
+      "med_pct": -0.3934,
+      "day_mean_pct": 0.0758,
+      "days": 2354,
+      "t": 1.287,
+      "ci_lo_pct": -0.0397,
+      "gate": false
+     },
+     "net": {
+      "mean_pct": -0.0674,
+      "med_pct": -0.5934,
+      "day_mean_pct": -0.1242,
+      "days": 2354,
+      "t": -2.11,
+      "ci_lo_pct": -0.2397,
+      "gate": false
+     },
+     "avg_hold_days": 4.003302854361506
+    },
+    {
+     "K": 5,
+     "n": 28738,
+     "gross": {
+      "mean_pct": 0.1476,
+      "med_pct": -0.4954,
+      "day_mean_pct": 0.1158,
+      "days": 2352,
+      "t": 1.535,
+      "ci_lo_pct": -0.0322,
+      "gate": false
+     },
+     "net": {
+      "mean_pct": -0.0524,
+      "med_pct": -0.6954,
+      "day_mean_pct": -0.0842,
+      "days": 2352,
+      "t": -1.117,
+      "ci_lo_pct": -0.2322,
+      "gate": false
+     },
+     "avg_hold_days": 6.0034449161389105
+    },
+    {
+     "K": 10,
+     "n": 28720,
+     "gross": {
+      "mean_pct": 0.1664,
+      "med_pct": -0.76,
+      "day_mean_pct": 0.0438,
+      "days": 2348,
+      "t": 0.426,
+      "ci_lo_pct": -0.1576,
+      "gate": false
+     },
+     "net": {
+      "mean_pct": -0.0336,
+      "med_pct": -0.96,
+      "day_mean_pct": -0.1562,
+      "days": 2348,
+      "t": -1.521,
+      "ci_lo_pct": -0.3576,
+      "gate": false
+     },
+     "avg_hold_days": 11.004805013927577
+    },
+    {
+     "K": 20,
+     "n": 28580,
+     "gross": {
+      "mean_pct": 0.033,
+      "med_pct": -1.2543,
+      "day_mean_pct": -0.1908,
+      "days": 2337,
+      "t": -1.452,
+      "ci_lo_pct": -0.4484,
+      "gate": false
+     },
+     "net": {
+      "mean_pct": -0.167,
+      "med_pct": -1.4543,
+      "day_mean_pct": -0.3908,
+      "days": 2337,
+      "t": -2.974,
+      "ci_lo_pct": -0.6484,
+      "gate": false
+     },
+     "avg_hold_days": 21.00482855143457
+    }
+   ]
+  }
+ ],
+ "runtime_sec": 48.3
+}
