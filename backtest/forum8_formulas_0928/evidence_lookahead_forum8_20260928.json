@@ -1,0 +1,4714 @@
+{
+ "meta": {
+  "script": "audit_lookahead_forum8_20260928.py",
+  "run_at": "2026-09-28 14:46:53",
+  "purpose": "gushi.in/forum/8 三条「毛口径过门」公式（543/774/807）的未来函数（前视）五维复核",
+  "method": "gushi.in/topic/465 五维清单（可执行取证）",
+  "frozen_reuse": [
+   "m2_sweep_20260928.py",
+   "m2_sweep_v3_20260928.py",
+   "r2_rebuild_0911/tdx_interp.py"
+  ],
+  "untouched_frozen": true,
+  "forbidden": [
+   "git commit/push",
+   "修改既有文件",
+   "改判据"
+  ]
+ },
+ "panel": {
+  "path": "C:\\Users\\Admin\\.pi-desktop\\scratch\\d40abb6e-dc12-4d27-8ed2-f290de0a6c5c\\x1cache\\panel_oos.npz",
+  "T": 2852,
+  "N": 5442,
+  "cal_start": "2015-01-05",
+  "cal_end": "2026-09-24",
+  "fields": "O/H/L/C/V/A",
+  "missing_stored_as": 0,
+  "c_positive_share": 0.698918,
+  "eligible_cols": 5428,
+  "audit_sample_cols": 48,
+  "truncation_cols": 60,
+  "truncation_points": [
+   20,
+   186,
+   353,
+   519,
+   686,
+   852,
+   1019,
+   1185,
+   1352,
+   1518,
+   1685,
+   1851,
+   2018,
+   2184,
+   2351,
+   2517,
+   2684,
+   2847,
+   2849,
+   2850,
+   2851
+  ]
+ },
+ "frozen_readings": {
+  "543": {
+   "title": "探底放量突破选股公式源码",
+   "signal_name": "探底放量突破",
+   "url": "https://gushi.in/topic/543",
+   "code_sha1_frozen": "5e8cc4e14fcc",
+   "m2": {
+    "n": 51240,
+    "gross_exc_pct": 0.1194,
+    "gross_t": 2.642947840322287,
+    "gross_ci95_lo_pct": 0.0297,
+    "gross_gate": true,
+    "net_exc_pct": -0.0806,
+    "net_ci95_lo_pct": -0.1703,
+    "net_gate": false
+   },
+   "m3_K1": {
+    "gross_exc_pct": 0.1194,
+    "gross_t": 2.643,
+    "gross_gate": true,
+    "net_exc_pct": -0.0806,
+    "net_gate": false
+   }
+  },
+  "774": {
+   "title": "最强黄金坑选股公式源码",
+   "signal_name": "最强黄金坑",
+   "url": "https://gushi.in/topic/774",
+   "code_sha1_frozen": "707c134779a2",
+   "m2": {
+    "n": 71956,
+    "gross_exc_pct": 0.0718,
+    "gross_t": 2.4613822483677854,
+    "gross_ci95_lo_pct": 0.016,
+    "gross_gate": true,
+    "net_exc_pct": -0.1282,
+    "net_ci95_lo_pct": -0.184,
+    "net_gate": false
+   },
+   "m3_K1": {
+    "gross_exc_pct": 0.0718,
+    "gross_t": 2.461,
+    "gross_gate": true,
+    "net_exc_pct": -0.1282,
+    "net_gate": false
+   }
+  },
+  "807": {
+   "title": "五均线粘合起爆选股公式源码",
+   "signal_name": "均线粘合起爆",
+   "url": "https://gushi.in/topic/807",
+   "code_sha1_frozen": "0c5c1e7de439",
+   "m2": {
+    "n": 28825,
+    "gross_exc_pct": 0.1054,
+    "gross_t": 2.206758022220922,
+    "gross_ci95_lo_pct": 0.0105,
+    "gross_gate": true,
+    "net_exc_pct": -0.0946,
+    "net_ci95_lo_pct": -0.1895,
+    "net_gate": false
+   },
+   "m3_K1": {
+    "gross_exc_pct": 0.1054,
+    "gross_t": 2.207,
+    "gross_gate": true,
+    "net_exc_pct": -0.0946,
+    "net_gate": false
+   }
+  }
+ },
+ "dim1_data_availability": {
+  "543": {
+   "raw_code_chars": 519,
+   "normalized_code_chars": 519,
+   "statement_vars": [
+    "跌幅超5",
+    "跌幅触发",
+    "跌幅间隔",
+    "前高三日",
+    "前高二日",
+    "前高一日",
+    "前高两日",
+    "阶段高点",
+    "涨幅超3",
+    "间隔合理",
+    "距高不远",
+    "反弹适度",
+    "五日温和",
+    "放量",
+    "一穿三",
+    "探底放量突破"
+   ],
+   "data_vars_used": [
+    "C",
+    "H",
+    "L",
+    "O",
+    "V"
+   ],
+   "all_vars_used": [
+    "C",
+    "H",
+    "L",
+    "O",
+    "V",
+    "一穿三",
+    "五日温和",
+    "前高一日",
+    "前高三日",
+    "前高两日",
+    "前高二日",
+    "反弹适度",
+    "放量",
+    "涨幅超3",
+    "跌幅触发",
+    "跌幅超5",
+    "跌幅间隔",
+    "距高不远",
+    "间隔合理",
+    "阶段高点"
+   ],
+   "functions_used": [
+    "BARSLAST",
+    "CROSS",
+    "FILTER",
+    "LLV",
+    "MA",
+    "MAX",
+    "REF"
+   ],
+   "inputs": [
+    {
+     "name": "C",
+     "cn": "收盘",
+     "kind": "原始输入",
+     "available_at": "T 收盘（panel_oos.npz 的当日 bar）"
+    },
+    {
+     "name": "H",
+     "cn": "最高",
+     "kind": "原始输入",
+     "available_at": "T 收盘（panel_oos.npz 的当日 bar）"
+    },
+    {
+     "name": "L",
+     "cn": "最低",
+     "kind": "原始输入",
+     "available_at": "T 收盘（panel_oos.npz 的当日 bar）"
+    },
+    {
+     "name": "O",
+     "cn": "开盘",
+     "kind": "原始输入",
+     "available_at": "T 收盘（panel_oos.npz 的当日 bar）"
+    },
+    {
+     "name": "V",
+     "cn": "成交量",
+     "kind": "原始输入",
+     "available_at": "T 收盘（panel_oos.npz 的当日 bar）"
+    }
+   ],
+   "derived": [
+    {
+     "name": "跌幅超5",
+     "kind": "派生量",
+     "expr": "(((REF(C,5)-C)/REF(C,5))*100) > 5",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "跌幅触发",
+     "kind": "派生量",
+     "expr": "FILTER(跌幅超5,10)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "跌幅间隔",
+     "kind": "派生量",
+     "expr": "BARSLAST(跌幅触发)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "前高三日",
+     "kind": "派生量",
+     "expr": "REF(H,(跌幅间隔+2))",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "前高二日",
+     "kind": "派生量",
+     "expr": "REF(H,(跌幅间隔+1))",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "前高一日",
+     "kind": "派生量",
+     "expr": "REF(H,跌幅间隔)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "前高两日",
+     "kind": "派生量",
+     "expr": "MAX(前高三日,前高二日)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "阶段高点",
+     "kind": "派生量",
+     "expr": "MAX(前高两日,前高一日)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "涨幅超3",
+     "kind": "派生量",
+     "expr": "(((C-REF(C,1))/REF(C,1))*100) > 3",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "间隔合理",
+     "kind": "派生量",
+     "expr": "跌幅间隔 < 150",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "距高不远",
+     "kind": "派生量",
+     "expr": "(((O-阶段高点)/阶段高点)*100) < 10",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "反弹适度",
+     "kind": "派生量",
+     "expr": "(((C-LLV(L,跌幅间隔))/LLV(L,跌幅间隔))*100) < 50",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "五日温和",
+     "kind": "派生量",
+     "expr": "(((C-REF(O,5))/REF(O,5))*100) < 8",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "放量",
+     "kind": "派生量",
+     "expr": "V > (REF(V,1)*1.5)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "一穿三",
+     "kind": "派生量",
+     "expr": "CROSS(C,MA(C,5)) AND CROSS(C,MA(C,10)) AND CROSS(C,MA(C,20)) AND MA(C,20) > REF(MA(C,20),1)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "探底放量突破",
+     "kind": "派生量",
+     "expr": "涨幅超3 AND 间隔合理 AND 距高不远 AND 反弹适度 AND 五日温和 AND 放量 AND 一穿三",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    }
+   ],
+   "forbidden_token_hits_in_text": [],
+   "forbidden_token_hits_in_ast": [],
+   "lenient_engine_tokens_used": [],
+   "dynainfo_flag": false,
+   "negative_ref_literal_hits": [],
+   "verdict": "PASS",
+   "note": "所有输入均为当日及之前 bar 的 O/H/L/C/V；未使用 AMOUNT(A) 时 A 通道不参与；无任何常量/最后棒/筹码/财务类记号。",
+   "truncation_invariance": {
+    "fwd_chan_injected": null,
+    "n_cols": 60,
+    "trunc_points": 21,
+    "n_locals_compared": 16,
+    "n_cells": 1260,
+    "n_compared": 21420,
+    "n_mismatch_output": 0,
+    "n_mismatch_intermediate": 0,
+    "n_mismatch": 0,
+    "n_cells_with_any_diff": 0,
+    "max_rel_diff": 0.0,
+    "examples": [],
+    "verdict": "PASS",
+    "note": "把输入只喂第 0..tr 行重算，再与全历史输出逐点比对；无前视 ⇒ 必须逐位相同"
+   }
+  },
+  "774": {
+   "raw_code_chars": 843,
+   "normalized_code_chars": 845,
+   "statement_vars": [
+    "三日跌幅超五",
+    "大跌起点",
+    "距大跌天数",
+    "距大跌两日高",
+    "距大跌一日高",
+    "距大跌当日高",
+    "近期最高价",
+    "当日涨幅超五",
+    "距大跌未超百五",
+    "开盘未超高三成",
+    "反弹未超低五成",
+    "五日开盘未超三",
+    "量能未超均量三",
+    "八十九日未超八",
+    "五日线",
+    "十日线",
+    "二十日线",
+    "六十日线",
+    "均线最高",
+    "均线最低",
+    "均线已粘合",
+    "大跌反弹条件",
+    "大跌反弹信号",
+    "最强黄金坑"
+   ],
+   "data_vars_used": [
+    "C",
+    "H",
+    "L",
+    "O",
+    "V"
+   ],
+   "all_vars_used": [
+    "C",
+    "H",
+    "LOW",
+    "O",
+    "VOL",
+    "三日跌幅超五",
+    "二十日线",
+    "五日开盘未超三",
+    "五日线",
+    "八十九日未超八",
+    "六十日线",
+    "十日线",
+    "反弹未超低五成",
+    "均线已粘合",
+    "均线最低",
+    "均线最高",
+    "大跌反弹信号",
+    "大跌反弹条件",
+    "大跌起点",
+    "开盘未超高三成",
+    "当日涨幅超五",
+    "距大跌一日高",
+    "距大跌两日高",
+    "距大跌天数",
+    "距大跌当日高",
+    "距大跌未超百五",
+    "近期最高价",
+    "量能未超均量三"
+   ],
+   "functions_used": [
+    "BARSLAST",
+    "FILTER",
+    "LLV",
+    "MA",
+    "MAX",
+    "MIN",
+    "REF"
+   ],
+   "inputs": [
+    {
+     "name": "C",
+     "cn": "收盘",
+     "kind": "原始输入",
+     "available_at": "T 收盘（panel_oos.npz 的当日 bar）"
+    },
+    {
+     "name": "H",
+     "cn": "最高",
+     "kind": "原始输入",
+     "available_at": "T 收盘（panel_oos.npz 的当日 bar）"
+    },
+    {
+     "name": "L",
+     "cn": "最低",
+     "kind": "原始输入",
+     "available_at": "T 收盘（panel_oos.npz 的当日 bar）"
+    },
+    {
+     "name": "O",
+     "cn": "开盘",
+     "kind": "原始输入",
+     "available_at": "T 收盘（panel_oos.npz 的当日 bar）"
+    },
+    {
+     "name": "V",
+     "cn": "成交量",
+     "kind": "原始输入",
+     "available_at": "T 收盘（panel_oos.npz 的当日 bar）"
+    }
+   ],
+   "derived": [
+    {
+     "name": "三日跌幅超五",
+     "kind": "派生量",
+     "expr": "(((REF(C,3)-C)/REF(C,3))*100) > 5",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "大跌起点",
+     "kind": "派生量",
+     "expr": "FILTER(三日跌幅超五,10)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "距大跌天数",
+     "kind": "派生量",
+     "expr": "BARSLAST(大跌起点)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "距大跌两日高",
+     "kind": "派生量",
+     "expr": "REF(H,(距大跌天数+2))",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "距大跌一日高",
+     "kind": "派生量",
+     "expr": "REF(H,(距大跌天数+1))",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "距大跌当日高",
+     "kind": "派生量",
+     "expr": "REF(H,距大跌天数)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "近期最高价",
+     "kind": "派生量",
+     "expr": "MAX(MAX(距大跌两日高,距大跌一日高),距大跌当日高)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "当日涨幅超五",
+     "kind": "派生量",
+     "expr": "(((C-REF(C,1))/REF(C,1))*100) > 2 AND (((C-REF(C,1))/REF(C,1))*100) < 8",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "距大跌未超百五",
+     "kind": "派生量",
+     "expr": "距大跌天数 < 150",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "开盘未超高三成",
+     "kind": "派生量",
+     "expr": "(((O-近期最高价)/近期最高价)*100) < 30",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "反弹未超低五成",
+     "kind": "派生量",
+     "expr": "(((C-LLV(LOW,距大跌天数))/LLV(LOW,距大跌天数))*100) < 50",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "五日开盘未超三",
+     "kind": "派生量",
+     "expr": "(((C-REF(O,5))/REF(O,5))*100) < 30",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "量能未超均量三",
+     "kind": "派生量",
+     "expr": "(VOL/MA(VOL,5)) < 3.5",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "八十九日未超八",
+     "kind": "派生量",
+     "expr": "(((C-REF(C,89))/REF(C,89))*100) < 80",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "五日线",
+     "kind": "派生量",
+     "expr": "MA(C,5)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "十日线",
+     "kind": "派生量",
+     "expr": "MA(C,10)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "二十日线",
+     "kind": "派生量",
+     "expr": "MA(C,20)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "六十日线",
+     "kind": "派生量",
+     "expr": "MA(C,60)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "均线最高",
+     "kind": "派生量",
+     "expr": "MAX(MAX(五日线,十日线),MAX(二十日线,六十日线))",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "均线最低",
+     "kind": "派生量",
+     "expr": "MIN(MIN(五日线,十日线),MIN(二十日线,六十日线))",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "均线已粘合",
+     "kind": "派生量",
+     "expr": "(均线最高/均线最低) < 1.05",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "大跌反弹条件",
+     "kind": "派生量",
+     "expr": "当日涨幅超五 AND 距大跌未超百五 AND 开盘未超高三成 AND 反弹未超低五成 AND 五日开盘未超三 AND 量能未超均量三 AND 八十九日未超八",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "大跌反弹信号",
+     "kind": "派生量",
+     "expr": "FILTER(大跌反弹条件,15)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "最强黄金坑",
+     "kind": "派生量",
+     "expr": "大跌反弹信号 AND 均线已粘合 AND C > 二十日线 AND C > 六十日线",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    }
+   ],
+   "forbidden_token_hits_in_text": [],
+   "forbidden_token_hits_in_ast": [],
+   "lenient_engine_tokens_used": [],
+   "dynainfo_flag": false,
+   "negative_ref_literal_hits": [],
+   "verdict": "PASS",
+   "note": "所有输入均为当日及之前 bar 的 O/H/L/C/V；未使用 AMOUNT(A) 时 A 通道不参与；无任何常量/最后棒/筹码/财务类记号。",
+   "truncation_invariance": {
+    "fwd_chan_injected": null,
+    "n_cols": 60,
+    "trunc_points": 21,
+    "n_locals_compared": 24,
+    "n_cells": 1260,
+    "n_compared": 31500,
+    "n_mismatch_output": 0,
+    "n_mismatch_intermediate": 0,
+    "n_mismatch": 0,
+    "n_cells_with_any_diff": 0,
+    "max_rel_diff": 0.0,
+    "examples": [],
+    "verdict": "PASS",
+    "note": "把输入只喂第 0..tr 行重算，再与全历史输出逐点比对；无前视 ⇒ 必须逐位相同"
+   }
+  },
+  "807": {
+   "raw_code_chars": 410,
+   "normalized_code_chars": 411,
+   "statement_vars": [
+    "MA5",
+    "MA10",
+    "MA20",
+    "MA30",
+    "MA60",
+    "HH",
+    "LL",
+    "粘合度",
+    "均线粘合",
+    "VOL5",
+    "VOL135",
+    "量能放大",
+    "趋势20",
+    "趋势30",
+    "趋势60",
+    "均线粘合起爆"
+   ],
+   "data_vars_used": [
+    "C",
+    "V"
+   ],
+   "all_vars_used": [
+    "C",
+    "HH",
+    "LL",
+    "MA10",
+    "MA20",
+    "MA30",
+    "MA5",
+    "MA60",
+    "V",
+    "VOL135",
+    "均线粘合",
+    "粘合度",
+    "趋势20",
+    "趋势30",
+    "趋势60",
+    "量能放大"
+   ],
+   "functions_used": [
+    "MA",
+    "MAX",
+    "MIN",
+    "REF"
+   ],
+   "inputs": [
+    {
+     "name": "C",
+     "cn": "收盘",
+     "kind": "原始输入",
+     "available_at": "T 收盘（panel_oos.npz 的当日 bar）"
+    },
+    {
+     "name": "V",
+     "cn": "成交量",
+     "kind": "原始输入",
+     "available_at": "T 收盘（panel_oos.npz 的当日 bar）"
+    }
+   ],
+   "derived": [
+    {
+     "name": "MA5",
+     "kind": "派生量",
+     "expr": "MA(C,5)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "MA10",
+     "kind": "派生量",
+     "expr": "MA(C,10)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "MA20",
+     "kind": "派生量",
+     "expr": "MA(C,20)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "MA30",
+     "kind": "派生量",
+     "expr": "MA(C,30)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "MA60",
+     "kind": "派生量",
+     "expr": "MA(C,60)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "HH",
+     "kind": "派生量",
+     "expr": "MAX(MA5,MAX(MA10,MAX(MA20,MAX(MA30,MA60))))",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "LL",
+     "kind": "派生量",
+     "expr": "MIN(MA5,MIN(MA10,MIN(MA20,MIN(MA30,MA60))))",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "粘合度",
+     "kind": "派生量",
+     "expr": "(((HH-LL)/LL)*100)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "均线粘合",
+     "kind": "派生量",
+     "expr": "粘合度 < 2",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "VOL5",
+     "kind": "派生量",
+     "expr": "MA(V,5)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "VOL135",
+     "kind": "派生量",
+     "expr": "MA(V,135)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "量能放大",
+     "kind": "派生量",
+     "expr": "V > VOL135",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "趋势20",
+     "kind": "派生量",
+     "expr": "MA20 > REF(MA20,1)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "趋势30",
+     "kind": "派生量",
+     "expr": "MA30 > REF(MA30,1)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "趋势60",
+     "kind": "派生量",
+     "expr": "MA60 > REF(MA60,1)",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    },
+    {
+     "name": "均线粘合起爆",
+     "kind": "派生量",
+     "expr": "均线粘合 AND 量能放大 AND 趋势20 AND 趋势30 AND 趋势60",
+     "available_at": "仅由 ≤T 的输入与同块前列派生量构成"
+    }
+   ],
+   "forbidden_token_hits_in_text": [],
+   "forbidden_token_hits_in_ast": [],
+   "lenient_engine_tokens_used": [],
+   "dynainfo_flag": false,
+   "negative_ref_literal_hits": [],
+   "verdict": "PASS",
+   "note": "所有输入均为当日及之前 bar 的 O/H/L/C/V；未使用 AMOUNT(A) 时 A 通道不参与；无任何常量/最后棒/筹码/财务类记号。",
+   "truncation_invariance": {
+    "fwd_chan_injected": null,
+    "n_cols": 60,
+    "trunc_points": 21,
+    "n_locals_compared": 16,
+    "n_cells": 1260,
+    "n_compared": 21420,
+    "n_mismatch_output": 0,
+    "n_mismatch_intermediate": 0,
+    "n_mismatch": 0,
+    "n_cells_with_any_diff": 0,
+    "max_rel_diff": 0.0,
+    "examples": [],
+    "verdict": "PASS",
+    "note": "把输入只喂第 0..tr 行重算，再与全历史输出逐点比对；无前视 ⇒ 必须逐位相同"
+   }
+  }
+ },
+ "dim2_function_semantics": {
+  "543": {
+   "function_counts": {
+    "BARSLAST": 1,
+    "CROSS": 3,
+    "FILTER": 1,
+    "LLV": 2,
+    "MA": 5,
+    "MAX": 2,
+    "REF": 11
+   },
+   "window_functions": [
+    {
+     "fn": "FILTER",
+     "window_arg": "10",
+     "min_effective": 10.0,
+     "max_effective": 10.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "自左向右单遍：命中则 out[i]=1 且 i<=cool 的后续命中被压掉，cool=i+n —— 冷却窗口只朝未来压后续*命中*，不读未来数据",
+     "cite": "tdx_interp.py:530-541"
+    },
+    {
+     "fn": "LLV",
+     "window_arg": "跌幅间隔",
+     "min_effective": 0.0,
+     "max_effective": 550.0,
+     "sentinel_count": 31312,
+     "samples": 136896,
+     "direction": "仅回溯",
+     "engine": "同 HHV，rolling(k).min() / roll_min_var",
+     "cite": "tdx_interp.py:404-413, 614-653"
+    },
+    {
+     "fn": "MA",
+     "window_arg": "10",
+     "min_effective": 10.0,
+     "max_effective": 10.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "rolling(n, min_periods=n).mean()，窗口右端=当前根",
+     "cite": "tdx_interp.py:389-393"
+    },
+    {
+     "fn": "MA",
+     "window_arg": "20",
+     "min_effective": 20.0,
+     "max_effective": 20.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "rolling(n, min_periods=n).mean()，窗口右端=当前根",
+     "cite": "tdx_interp.py:389-393"
+    },
+    {
+     "fn": "MA",
+     "window_arg": "5",
+     "min_effective": 5.0,
+     "max_effective": 5.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "rolling(n, min_periods=n).mean()，窗口右端=当前根",
+     "cite": "tdx_interp.py:389-393"
+    },
+    {
+     "fn": "REF",
+     "window_arg": "(跌幅间隔+1)",
+     "min_effective": 1.0,
+     "max_effective": 551.0,
+     "sentinel_count": 31312,
+     "samples": 136896,
+     "direction": "仅回溯",
+     "engine": "Series.shift(k)；常量 k<0 → raise NotImplementedError('negative window')；变窗序列 k → ref_var(): idx=i-k，idx<0 置 NaN、idx>=n 抛 IndexError（不会静默取到未来）",
+     "cite": "tdx_interp.py:374-376, 383-388, 590-599"
+    },
+    {
+     "fn": "REF",
+     "window_arg": "(跌幅间隔+2)",
+     "min_effective": 2.0,
+     "max_effective": 552.0,
+     "sentinel_count": 31312,
+     "samples": 136896,
+     "direction": "仅回溯",
+     "engine": "Series.shift(k)；常量 k<0 → raise NotImplementedError('negative window')；变窗序列 k → ref_var(): idx=i-k，idx<0 置 NaN、idx>=n 抛 IndexError（不会静默取到未来）",
+     "cite": "tdx_interp.py:374-376, 383-388, 590-599"
+    },
+    {
+     "fn": "REF",
+     "window_arg": "1",
+     "min_effective": 1.0,
+     "max_effective": 1.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "Series.shift(k)；常量 k<0 → raise NotImplementedError('negative window')；变窗序列 k → ref_var(): idx=i-k，idx<0 置 NaN、idx>=n 抛 IndexError（不会静默取到未来）",
+     "cite": "tdx_interp.py:374-376, 383-388, 590-599"
+    },
+    {
+     "fn": "REF",
+     "window_arg": "5",
+     "min_effective": 5.0,
+     "max_effective": 5.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "Series.shift(k)；常量 k<0 → raise NotImplementedError('negative window')；变窗序列 k → ref_var(): idx=i-k，idx<0 置 NaN、idx>=n 抛 IndexError（不会静默取到未来）",
+     "cite": "tdx_interp.py:374-376, 383-388, 590-599"
+    },
+    {
+     "fn": "REF",
+     "window_arg": "跌幅间隔",
+     "min_effective": 0.0,
+     "max_effective": 550.0,
+     "sentinel_count": 31312,
+     "samples": 136896,
+     "direction": "仅回溯",
+     "engine": "Series.shift(k)；常量 k<0 → raise NotImplementedError('negative window')；变窗序列 k → ref_var(): idx=i-k，idx<0 置 NaN、idx>=n 抛 IndexError（不会静默取到未来）",
+     "cite": "tdx_interp.py:374-376, 383-388, 590-599"
+    }
+   ],
+   "negative_or_future_window": [],
+   "pointwise_functions": [
+    "MAX"
+   ],
+   "verdict": "PASS",
+   "note": "REF 窗口取到的 min 值 >= 0 ⇒ 最远只到 T 本身；HHV/LLV/SUM/COUNT/MA/EMA/SMA/FILTER 等 min 窗口 >= 1 ⇒ 最远只到 T。引擎对负窗口（常量或变窗）一律抛错，不会静默取到未来（见 dim4 源码级探针回执）。"
+  },
+  "774": {
+   "function_counts": {
+    "BARSLAST": 1,
+    "FILTER": 2,
+    "LLV": 2,
+    "MA": 5,
+    "MAX": 5,
+    "MIN": 3,
+    "REF": 13
+   },
+   "window_functions": [
+    {
+     "fn": "FILTER",
+     "window_arg": "10",
+     "min_effective": 10.0,
+     "max_effective": 10.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "自左向右单遍：命中则 out[i]=1 且 i<=cool 的后续命中被压掉，cool=i+n —— 冷却窗口只朝未来压后续*命中*，不读未来数据",
+     "cite": "tdx_interp.py:530-541"
+    },
+    {
+     "fn": "FILTER",
+     "window_arg": "15",
+     "min_effective": 15.0,
+     "max_effective": 15.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "自左向右单遍：命中则 out[i]=1 且 i<=cool 的后续命中被压掉，cool=i+n —— 冷却窗口只朝未来压后续*命中*，不读未来数据",
+     "cite": "tdx_interp.py:530-541"
+    },
+    {
+     "fn": "LLV",
+     "window_arg": "距大跌天数",
+     "min_effective": 0.0,
+     "max_effective": 572.0,
+     "sentinel_count": 31181,
+     "samples": 136896,
+     "direction": "仅回溯",
+     "engine": "同 HHV，rolling(k).min() / roll_min_var",
+     "cite": "tdx_interp.py:404-413, 614-653"
+    },
+    {
+     "fn": "MA",
+     "window_arg": "10",
+     "min_effective": 10.0,
+     "max_effective": 10.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "rolling(n, min_periods=n).mean()，窗口右端=当前根",
+     "cite": "tdx_interp.py:389-393"
+    },
+    {
+     "fn": "MA",
+     "window_arg": "20",
+     "min_effective": 20.0,
+     "max_effective": 20.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "rolling(n, min_periods=n).mean()，窗口右端=当前根",
+     "cite": "tdx_interp.py:389-393"
+    },
+    {
+     "fn": "MA",
+     "window_arg": "5",
+     "min_effective": 5.0,
+     "max_effective": 5.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "rolling(n, min_periods=n).mean()，窗口右端=当前根",
+     "cite": "tdx_interp.py:389-393"
+    },
+    {
+     "fn": "MA",
+     "window_arg": "60",
+     "min_effective": 60.0,
+     "max_effective": 60.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "rolling(n, min_periods=n).mean()，窗口右端=当前根",
+     "cite": "tdx_interp.py:389-393"
+    },
+    {
+     "fn": "REF",
+     "window_arg": "(距大跌天数+1)",
+     "min_effective": 1.0,
+     "max_effective": 573.0,
+     "sentinel_count": 31181,
+     "samples": 136896,
+     "direction": "仅回溯",
+     "engine": "Series.shift(k)；常量 k<0 → raise NotImplementedError('negative window')；变窗序列 k → ref_var(): idx=i-k，idx<0 置 NaN、idx>=n 抛 IndexError（不会静默取到未来）",
+     "cite": "tdx_interp.py:374-376, 383-388, 590-599"
+    },
+    {
+     "fn": "REF",
+     "window_arg": "(距大跌天数+2)",
+     "min_effective": 2.0,
+     "max_effective": 574.0,
+     "sentinel_count": 31181,
+     "samples": 136896,
+     "direction": "仅回溯",
+     "engine": "Series.shift(k)；常量 k<0 → raise NotImplementedError('negative window')；变窗序列 k → ref_var(): idx=i-k，idx<0 置 NaN、idx>=n 抛 IndexError（不会静默取到未来）",
+     "cite": "tdx_interp.py:374-376, 383-388, 590-599"
+    },
+    {
+     "fn": "REF",
+     "window_arg": "1",
+     "min_effective": 1.0,
+     "max_effective": 1.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "Series.shift(k)；常量 k<0 → raise NotImplementedError('negative window')；变窗序列 k → ref_var(): idx=i-k，idx<0 置 NaN、idx>=n 抛 IndexError（不会静默取到未来）",
+     "cite": "tdx_interp.py:374-376, 383-388, 590-599"
+    },
+    {
+     "fn": "REF",
+     "window_arg": "3",
+     "min_effective": 3.0,
+     "max_effective": 3.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "Series.shift(k)；常量 k<0 → raise NotImplementedError('negative window')；变窗序列 k → ref_var(): idx=i-k，idx<0 置 NaN、idx>=n 抛 IndexError（不会静默取到未来）",
+     "cite": "tdx_interp.py:374-376, 383-388, 590-599"
+    },
+    {
+     "fn": "REF",
+     "window_arg": "5",
+     "min_effective": 5.0,
+     "max_effective": 5.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "Series.shift(k)；常量 k<0 → raise NotImplementedError('negative window')；变窗序列 k → ref_var(): idx=i-k，idx<0 置 NaN、idx>=n 抛 IndexError（不会静默取到未来）",
+     "cite": "tdx_interp.py:374-376, 383-388, 590-599"
+    },
+    {
+     "fn": "REF",
+     "window_arg": "89",
+     "min_effective": 89.0,
+     "max_effective": 89.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "Series.shift(k)；常量 k<0 → raise NotImplementedError('negative window')；变窗序列 k → ref_var(): idx=i-k，idx<0 置 NaN、idx>=n 抛 IndexError（不会静默取到未来）",
+     "cite": "tdx_interp.py:374-376, 383-388, 590-599"
+    },
+    {
+     "fn": "REF",
+     "window_arg": "距大跌天数",
+     "min_effective": 0.0,
+     "max_effective": 572.0,
+     "sentinel_count": 31181,
+     "samples": 136896,
+     "direction": "仅回溯",
+     "engine": "Series.shift(k)；常量 k<0 → raise NotImplementedError('negative window')；变窗序列 k → ref_var(): idx=i-k，idx<0 置 NaN、idx>=n 抛 IndexError（不会静默取到未来）",
+     "cite": "tdx_interp.py:374-376, 383-388, 590-599"
+    }
+   ],
+   "negative_or_future_window": [],
+   "pointwise_functions": [
+    "MAX",
+    "MIN"
+   ],
+   "verdict": "PASS",
+   "note": "REF 窗口取到的 min 值 >= 0 ⇒ 最远只到 T 本身；HHV/LLV/SUM/COUNT/MA/EMA/SMA/FILTER 等 min 窗口 >= 1 ⇒ 最远只到 T。引擎对负窗口（常量或变窗）一律抛错，不会静默取到未来（见 dim4 源码级探针回执）。"
+  },
+  "807": {
+   "function_counts": {
+    "MA": 7,
+    "MAX": 4,
+    "MIN": 4,
+    "REF": 3
+   },
+   "window_functions": [
+    {
+     "fn": "MA",
+     "window_arg": "10",
+     "min_effective": 10.0,
+     "max_effective": 10.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "rolling(n, min_periods=n).mean()，窗口右端=当前根",
+     "cite": "tdx_interp.py:389-393"
+    },
+    {
+     "fn": "MA",
+     "window_arg": "135",
+     "min_effective": 135.0,
+     "max_effective": 135.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "rolling(n, min_periods=n).mean()，窗口右端=当前根",
+     "cite": "tdx_interp.py:389-393"
+    },
+    {
+     "fn": "MA",
+     "window_arg": "20",
+     "min_effective": 20.0,
+     "max_effective": 20.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "rolling(n, min_periods=n).mean()，窗口右端=当前根",
+     "cite": "tdx_interp.py:389-393"
+    },
+    {
+     "fn": "MA",
+     "window_arg": "30",
+     "min_effective": 30.0,
+     "max_effective": 30.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "rolling(n, min_periods=n).mean()，窗口右端=当前根",
+     "cite": "tdx_interp.py:389-393"
+    },
+    {
+     "fn": "MA",
+     "window_arg": "5",
+     "min_effective": 5.0,
+     "max_effective": 5.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "rolling(n, min_periods=n).mean()，窗口右端=当前根",
+     "cite": "tdx_interp.py:389-393"
+    },
+    {
+     "fn": "MA",
+     "window_arg": "60",
+     "min_effective": 60.0,
+     "max_effective": 60.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "rolling(n, min_periods=n).mean()，窗口右端=当前根",
+     "cite": "tdx_interp.py:389-393"
+    },
+    {
+     "fn": "REF",
+     "window_arg": "1",
+     "min_effective": 1.0,
+     "max_effective": 1.0,
+     "sentinel_count": 0,
+     "samples": 48,
+     "direction": "仅回溯",
+     "engine": "Series.shift(k)；常量 k<0 → raise NotImplementedError('negative window')；变窗序列 k → ref_var(): idx=i-k，idx<0 置 NaN、idx>=n 抛 IndexError（不会静默取到未来）",
+     "cite": "tdx_interp.py:374-376, 383-388, 590-599"
+    }
+   ],
+   "negative_or_future_window": [],
+   "pointwise_functions": [
+    "MAX",
+    "MIN"
+   ],
+   "verdict": "PASS",
+   "note": "REF 窗口取到的 min 值 >= 0 ⇒ 最远只到 T 本身；HHV/LLV/SUM/COUNT/MA/EMA/SMA/FILTER 等 min 窗口 >= 1 ⇒ 最远只到 T。引擎对负窗口（常量或变窗）一律抛错，不会静默取到未来（见 dim4 源码级探针回执）。"
+  }
+ },
+ "dim3_shift_experiment": {
+  "543": {
+   "baseline": {
+    "n": 51240,
+    "n_true_signals": 51544,
+    "days_active": 2539,
+    "uniq_symbols": 5353,
+    "wr": 0.4837,
+    "gross_mean_pct": 0.3074,
+    "bm_ref_mean_buy_pct": 0.1879,
+    "gross_buy": {
+     "exc_mean_pct": 0.1194,
+     "t": 2.642947840322287,
+     "ci95_lo_pct": 0.0297,
+     "ci95_hi_pct": 0.2008,
+     "gate": true
+    },
+    "buy": {
+     "exc_mean_pct": -0.0806,
+     "t": -1.942662974162502,
+     "ci95_lo_pct": -0.1703,
+     "ci95_hi_pct": 0.0008,
+     "gate": false
+    },
+    "all": {
+     "exc_mean_pct": -0.0881,
+     "t": -2.2199607374959798,
+     "ci95_lo_pct": -0.1823,
+     "gate": false
+    }
+   },
+   "channels": {
+    "C": {
+     "lag1": {
+      "n": 9203,
+      "n_true_signals": 9271,
+      "days_active": 1916,
+      "uniq_symbols": 4002,
+      "wr": 0.491,
+      "gross_mean_pct": 0.4633,
+      "bm_ref_mean_buy_pct": 0.3402,
+      "gross_buy": {
+       "exc_mean_pct": 0.1231,
+       "t": 0.5424203622029996,
+       "ci95_lo_pct": -0.1139,
+       "ci95_hi_pct": 0.2009,
+       "gate": false
+      },
+      "buy": {
+       "exc_mean_pct": -0.0769,
+       "t": -1.9496602005658341,
+       "ci95_lo_pct": -0.3139,
+       "ci95_hi_pct": 0.0009,
+       "gate": false
+      },
+      "all": {
+       "exc_mean_pct": -0.0842,
+       "t": -2.0747408109608103,
+       "ci95_lo_pct": -0.3238,
+       "gate": false
+      },
+      "kind": "①"
+     },
+     "fwd1": {
+      "n": 5404,
+      "n_true_signals": 5434,
+      "days_active": 1569,
+      "uniq_symbols": 3217,
+      "wr": 0.9458,
+      "gross_mean_pct": 6.0178,
+      "bm_ref_mean_buy_pct": 1.0542,
+      "gross_buy": {
+       "exc_mean_pct": 4.9637,
+       "t": 54.245849629270005,
+       "ci95_lo_pct": 5.3889,
+       "ci95_hi_pct": 5.7932,
+       "gate": true
+      },
+      "buy": {
+       "exc_mean_pct": 4.7637,
+       "t": 52.3054070368509,
+       "ci95_lo_pct": 5.1889,
+       "ci95_hi_pct": 5.5932,
+       "gate": true
+      },
+      "all": {
+       "exc_mean_pct": 4.7569,
+       "t": 52.21723549430084,
+       "ci95_lo_pct": 5.1802,
+       "gate": true
+      },
+      "kind": "①"
+     }
+    },
+    "H": {
+     "lag1": {
+      "n": 51422,
+      "n_true_signals": 51726,
+      "days_active": 2539,
+      "uniq_symbols": 5353,
+      "wr": 0.4836,
+      "gross_mean_pct": 0.3072,
+      "bm_ref_mean_buy_pct": 0.1873,
+      "gross_buy": {
+       "exc_mean_pct": 0.1199,
+       "t": 2.7012758718704606,
+       "ci95_lo_pct": 0.0322,
+       "ci95_hi_pct": 0.2029,
+       "gate": true
+      },
+      "buy": {
+       "exc_mean_pct": -0.0801,
+       "t": -1.8934065998007494,
+       "ci95_lo_pct": -0.1678,
+       "ci95_hi_pct": 0.0029,
+       "gate": false
+      },
+      "all": {
+       "exc_mean_pct": -0.0876,
+       "t": -2.1712818869093593,
+       "ci95_lo_pct": -0.1798,
+       "gate": false
+      },
+      "kind": "①"
+     },
+     "fwd1": {
+      "n": 51051,
+      "n_true_signals": 51355,
+      "days_active": 2538,
+      "uniq_symbols": 5352,
+      "wr": 0.4838,
+      "gross_mean_pct": 0.3083,
+      "bm_ref_mean_buy_pct": 0.1878,
+      "gross_buy": {
+       "exc_mean_pct": 0.1205,
+       "t": 2.647418832958805,
+       "ci95_lo_pct": 0.0299,
+       "ci95_hi_pct": 0.201,
+       "gate": true
+      },
+      "buy": {
+       "exc_mean_pct": -0.0795,
+       "t": -1.9374782226189222,
+       "ci95_lo_pct": -0.1701,
+       "ci95_hi_pct": 0.001,
+       "gate": false
+      },
+      "all": {
+       "exc_mean_pct": -0.087,
+       "t": -2.213840207439608,
+       "ci95_lo_pct": -0.1821,
+       "gate": false
+      },
+      "kind": "①"
+     }
+    },
+    "L": {
+     "lag1": {
+      "n": 51208,
+      "n_true_signals": 51511,
+      "days_active": 2539,
+      "uniq_symbols": 5353,
+      "wr": 0.4837,
+      "gross_mean_pct": 0.3077,
+      "bm_ref_mean_buy_pct": 0.1882,
+      "gross_buy": {
+       "exc_mean_pct": 0.1195,
+       "t": 2.644717637650649,
+       "ci95_lo_pct": 0.0298,
+       "ci95_hi_pct": 0.2008,
+       "gate": true
+      },
+      "buy": {
+       "exc_mean_pct": -0.0805,
+       "t": -1.9417809808772684,
+       "ci95_lo_pct": -0.1702,
+       "ci95_hi_pct": 0.0008,
+       "gate": false
+      },
+      "all": {
+       "exc_mean_pct": -0.088,
+       "t": -2.2191294614985417,
+       "ci95_lo_pct": -0.1822,
+       "gate": false
+      },
+      "kind": "①"
+     },
+     "fwd1": {
+      "n": 51251,
+      "n_true_signals": 51470,
+      "days_active": 2539,
+      "uniq_symbols": 5353,
+      "wr": 0.4836,
+      "gross_mean_pct": 0.3075,
+      "bm_ref_mean_buy_pct": 0.1878,
+      "gross_buy": {
+       "exc_mean_pct": 0.1197,
+       "t": 2.6438896213523684,
+       "ci95_lo_pct": 0.0298,
+       "ci95_hi_pct": 0.2008,
+       "gate": true
+      },
+      "buy": {
+       "exc_mean_pct": -0.0803,
+       "t": -1.941733215421837,
+       "ci95_lo_pct": -0.1702,
+       "ci95_hi_pct": 0.0008,
+       "gate": false
+      },
+      "all": {
+       "exc_mean_pct": -0.0878,
+       "t": -2.219030720698075,
+       "ci95_lo_pct": -0.1823,
+       "gate": false
+      },
+      "kind": "①"
+     }
+    },
+    "O": {
+     "lag1": {
+      "n": 51048,
+      "n_true_signals": 51359,
+      "days_active": 2536,
+      "uniq_symbols": 5353,
+      "wr": 0.4819,
+      "gross_mean_pct": 0.2953,
+      "bm_ref_mean_buy_pct": 0.1841,
+      "gross_buy": {
+       "exc_mean_pct": 0.1113,
+       "t": 1.9527699312796791,
+       "ci95_lo_pct": -0.0004,
+       "ci95_hi_pct": 0.169,
+       "gate": false
+      },
+      "buy": {
+       "exc_mean_pct": -0.0887,
+       "t": -2.6777500513955155,
+       "ci95_lo_pct": -0.2004,
+       "ci95_hi_pct": -0.031,
+       "gate": false
+      },
+      "all": {
+       "exc_mean_pct": -0.0962,
+       "t": -2.9599654996795546,
+       "ci95_lo_pct": -0.2124,
+       "gate": false
+      },
+      "kind": "①"
+     },
+     "fwd1": {
+      "n": 49821,
+      "n_true_signals": 50012,
+      "days_active": 2539,
+      "uniq_symbols": 5345,
+      "wr": 0.4848,
+      "gross_mean_pct": 0.3177,
+      "bm_ref_mean_buy_pct": 0.1846,
+      "gross_buy": {
+       "exc_mean_pct": 0.1331,
+       "t": 3.4182933170849177,
+       "ci95_lo_pct": 0.0636,
+       "ci95_hi_pct": 0.2348,
+       "gate": true
+      },
+      "buy": {
+       "exc_mean_pct": -0.0669,
+       "t": -1.1628440170861867,
+       "ci95_lo_pct": -0.1364,
+       "ci95_hi_pct": 0.0348,
+       "gate": false
+      },
+      "all": {
+       "exc_mean_pct": -0.0744,
+       "t": -1.4391834471258722,
+       "ci95_lo_pct": -0.1484,
+       "gate": false
+      },
+      "kind": "①"
+     }
+    },
+    "V": {
+     "lag1": {
+      "n": 5401,
+      "n_true_signals": 5441,
+      "days_active": 1579,
+      "uniq_symbols": 3217,
+      "wr": 0.4827,
+      "gross_mean_pct": 0.2346,
+      "bm_ref_mean_buy_pct": 0.2839,
+      "gross_buy": {
+       "exc_mean_pct": -0.0493,
+       "t": 1.0537623182132176,
+       "ci95_lo_pct": -0.0839,
+       "ci95_hi_pct": 0.2789,
+       "gate": false
+      },
+      "buy": {
+       "exc_mean_pct": -0.2493,
+       "t": -1.1088296637919668,
+       "ci95_lo_pct": -0.2839,
+       "ci95_hi_pct": 0.0789,
+       "gate": false
+      },
+      "all": {
+       "exc_mean_pct": -0.2572,
+       "t": -1.220926391009257,
+       "ci95_lo_pct": -0.2942,
+       "gate": false
+      },
+      "kind": "①"
+     },
+     "fwd1": {
+      "n": 10050,
+      "n_true_signals": 10198,
+      "days_active": 1974,
+      "uniq_symbols": 4118,
+      "wr": 0.6391,
+      "gross_mean_pct": 2.2251,
+      "bm_ref_mean_buy_pct": 0.3609,
+      "gross_buy": {
+       "exc_mean_pct": 1.8642,
+       "t": 16.294303057796633,
+       "ci95_lo_pct": 1.4562,
+       "ci95_hi_pct": 1.8547,
+       "gate": true
+      },
+      "buy": {
+       "exc_mean_pct": 1.6642,
+       "t": 14.325701153136238,
+       "ci95_lo_pct": 1.2562,
+       "ci95_hi_pct": 1.6547,
+       "gate": true
+      },
+      "all": {
+       "exc_mean_pct": 1.6569,
+       "t": 14.22813849956971,
+       "ci95_lo_pct": 1.246,
+       "gate": true
+      },
+      "kind": "①"
+     }
+    }
+   },
+   "identity_control": {
+    "re_eval_signal_identical": true,
+    "note": "同面板复制后重算，信号矩阵应逐位相同（分辨力/确定性前提）"
+   },
+   "all_channels_fwd1": {
+    "n": 51319,
+    "n_true_signals": 51544,
+    "days_active": 2539,
+    "uniq_symbols": 5353,
+    "wr": 0.9394,
+    "gross_mean_pct": 5.8796,
+    "bm_ref_mean_buy_pct": 0.8023,
+    "gross_buy": {
+     "exc_mean_pct": 5.0773,
+     "t": 106.31323777066487,
+     "ci95_lo_pct": 5.602,
+     "ci95_hi_pct": 5.8125,
+     "gate": true
+    },
+    "buy": {
+     "exc_mean_pct": 4.8773,
+     "t": 102.58768798393352,
+     "ci95_lo_pct": 5.402,
+     "ci95_hi_pct": 5.6125,
+     "gate": true
+    },
+    "all": {
+     "exc_mean_pct": 4.8711,
+     "t": 102.34988402828834,
+     "ci95_lo_pct": 5.3908,
+     "gate": true
+    },
+    "kind": "①"
+   },
+   "verdict": {
+    "verdict": "PASS",
+    "baseline_gross_pct": 0.1194,
+    "fwd1_max_channel": "C",
+    "fwd1_max_gross_pct": 4.9637,
+    "fwd1_max_t": 54.245849629270005,
+    "lag1_max_channel": "C",
+    "lag1_max_gross_pct": 0.1231,
+    "note": "取未来 1 日（前视注入）应把毛超额抬升一个数量级；滞后 1 日不应出现同向抬升。若某通道取未来值后读数无明显改善，则该通道不是时间敏感通道（方法仍成立）。"
+   }
+  },
+  "774": {
+   "baseline": {
+    "n": 71956,
+    "n_true_signals": 72146,
+    "days_active": 2502,
+    "uniq_symbols": 5331,
+    "wr": 0.4695,
+    "gross_mean_pct": 0.3087,
+    "bm_ref_mean_buy_pct": 0.2369,
+    "gross_buy": {
+     "exc_mean_pct": 0.0718,
+     "t": 2.4613822483677854,
+     "ci95_lo_pct": 0.016,
+     "ci95_hi_pct": 0.1413,
+     "gate": true
+    },
+    "buy": {
+     "exc_mean_pct": -0.1282,
+     "t": -3.798801910927872,
+     "ci95_lo_pct": -0.184,
+     "ci95_hi_pct": -0.0587,
+     "gate": false
+    },
+    "all": {
+     "exc_mean_pct": -0.1376,
+     "t": -4.161279948542598,
+     "ci95_lo_pct": -0.1955,
+     "gate": false
+    }
+   },
+   "channels": {
+    "C": {
+     "lag1": {
+      "n": 71967,
+      "n_true_signals": 72225,
+      "days_active": 2504,
+      "uniq_symbols": 5330,
+      "wr": 0.4667,
+      "gross_mean_pct": 0.3153,
+      "bm_ref_mean_buy_pct": 0.2612,
+      "gross_buy": {
+       "exc_mean_pct": 0.0542,
+       "t": -0.06386086185529531,
+       "ci95_lo_pct": -0.0617,
+       "ci95_hi_pct": 0.0578,
+       "gate": false
+      },
+      "buy": {
+       "exc_mean_pct": -0.1458,
+       "t": -6.630718561372178,
+       "ci95_lo_pct": -0.2617,
+       "ci95_hi_pct": -0.1422,
+       "gate": false
+      },
+      "all": {
+       "exc_mean_pct": -0.1559,
+       "t": -7.014876814898874,
+       "ci95_lo_pct": -0.2732,
+       "gate": false
+      },
+      "kind": "①"
+     },
+     "fwd1": {
+      "n": 71941,
+      "n_true_signals": 72068,
+      "days_active": 2503,
+      "uniq_symbols": 5330,
+      "wr": 0.8967,
+      "gross_mean_pct": 3.2783,
+      "bm_ref_mean_buy_pct": 0.795,
+      "gross_buy": {
+       "exc_mean_pct": 2.4834,
+       "t": 78.430356675175,
+       "ci95_lo_pct": 3.0621,
+       "ci95_hi_pct": 3.2192,
+       "gate": true
+      },
+      "buy": {
+       "exc_mean_pct": 2.2834,
+       "t": 73.4358534453451,
+       "ci95_lo_pct": 2.8621,
+       "ci95_hi_pct": 3.0192,
+       "gate": true
+      },
+      "all": {
+       "exc_mean_pct": 2.2747,
+       "t": 73.17041385887607,
+       "ci95_lo_pct": 2.8515,
+       "gate": true
+      },
+      "kind": "①"
+     }
+    },
+    "H": {
+     "lag1": {
+      "n": 71965,
+      "n_true_signals": 72155,
+      "days_active": 2502,
+      "uniq_symbols": 5331,
+      "wr": 0.4695,
+      "gross_mean_pct": 0.3089,
+      "bm_ref_mean_buy_pct": 0.2369,
+      "gross_buy": {
+       "exc_mean_pct": 0.072,
+       "t": 2.4458383519035554,
+       "ci95_lo_pct": 0.0155,
+       "ci95_hi_pct": 0.1409,
+       "gate": true
+      },
+      "buy": {
+       "exc_mean_pct": -0.128,
+       "t": -3.8114733780982855,
+       "ci95_lo_pct": -0.1845,
+       "ci95_hi_pct": -0.0591,
+       "gate": false
+      },
+      "all": {
+       "exc_mean_pct": -0.1374,
+       "t": -4.173763682515242,
+       "ci95_lo_pct": -0.196,
+       "gate": false
+      },
+      "kind": "①"
+     },
+     "fwd1": {
+      "n": 71951,
+      "n_true_signals": 72141,
+      "days_active": 2503,
+      "uniq_symbols": 5331,
+      "wr": 0.4696,
+      "gross_mean_pct": 0.31,
+      "bm_ref_mean_buy_pct": 0.2372,
+      "gross_buy": {
+       "exc_mean_pct": 0.0728,
+       "t": 2.473377081592141,
+       "ci95_lo_pct": 0.0164,
+       "ci95_hi_pct": 0.1418,
+       "gate": true
+      },
+      "buy": {
+       "exc_mean_pct": -0.1272,
+       "t": -3.781113531586313,
+       "ci95_lo_pct": -0.1836,
+       "ci95_hi_pct": -0.0582,
+       "gate": false
+      },
+      "all": {
+       "exc_mean_pct": -0.1366,
+       "t": -4.143068941557971,
+       "ci95_lo_pct": -0.1951,
+       "gate": false
+      },
+      "kind": "①"
+     }
+    },
+    "L": {
+     "lag1": {
+      "n": 71748,
+      "n_true_signals": 71937,
+      "days_active": 2501,
+      "uniq_symbols": 5329,
+      "wr": 0.4696,
+      "gross_mean_pct": 0.3088,
+      "bm_ref_mean_buy_pct": 0.237,
+      "gross_buy": {
+       "exc_mean_pct": 0.0717,
+       "t": 2.4709900779748257,
+       "ci95_lo_pct": 0.0163,
+       "ci95_hi_pct": 0.1419,
+       "gate": true
+      },
+      "buy": {
+       "exc_mean_pct": -0.1283,
+       "t": -3.777115106638902,
+       "ci95_lo_pct": -0.1837,
+       "ci95_hi_pct": -0.0581,
+       "gate": false
+      },
+      "all": {
+       "exc_mean_pct": -0.1377,
+       "t": -4.138979437710445,
+       "ci95_lo_pct": -0.1951,
+       "gate": false
+      },
+      "kind": "①"
+     },
+     "fwd1": {
+      "n": 71998,
+      "n_true_signals": 72105,
+      "days_active": 2502,
+      "uniq_symbols": 5330,
+      "wr": 0.4693,
+      "gross_mean_pct": 0.3079,
+      "bm_ref_mean_buy_pct": 0.2363,
+      "gross_buy": {
+       "exc_mean_pct": 0.0716,
+       "t": 2.3710065802798606,
+       "ci95_lo_pct": 0.0131,
+       "ci95_hi_pct": 0.1381,
+       "gate": true
+      },
+      "buy": {
+       "exc_mean_pct": -0.1284,
+       "t": -3.9039336135691136,
+       "ci95_lo_pct": -0.1869,
+       "ci95_hi_pct": -0.0619,
+       "gate": false
+      },
+      "all": {
+       "exc_mean_pct": -0.1378,
+       "t": -4.267388662821352,
+       "ci95_lo_pct": -0.1984,
+       "gate": false
+      },
+      "kind": "①"
+     }
+    },
+    "O": {
+     "lag1": {
+      "n": 71969,
+      "n_true_signals": 72159,
+      "days_active": 2503,
+      "uniq_symbols": 5331,
+      "wr": 0.4695,
+      "gross_mean_pct": 0.3083,
+      "bm_ref_mean_buy_pct": 0.2369,
+      "gross_buy": {
+       "exc_mean_pct": 0.0714,
+       "t": 2.460309144641611,
+       "ci95_lo_pct": 0.016,
+       "ci95_hi_pct": 0.142,
+       "gate": true
+      },
+      "buy": {
+       "exc_mean_pct": -0.1286,
+       "t": -3.7655516094592243,
+       "ci95_lo_pct": -0.184,
+       "ci95_hi_pct": -0.058,
+       "gate": false
+      },
+      "all": {
+       "exc_mean_pct": -0.138,
+       "t": -4.128070664788144,
+       "ci95_lo_pct": -0.1955,
+       "gate": false
+      },
+      "kind": "①"
+     },
+     "fwd1": {
+      "n": 71959,
+      "n_true_signals": 72149,
+      "days_active": 2502,
+      "uniq_symbols": 5331,
+      "wr": 0.4695,
+      "gross_mean_pct": 0.3083,
+      "bm_ref_mean_buy_pct": 0.2373,
+      "gross_buy": {
+       "exc_mean_pct": 0.071,
+       "t": 2.451265223696769,
+       "ci95_lo_pct": 0.0157,
+       "ci95_hi_pct": 0.1412,
+       "gate": true
+      },
+      "buy": {
+       "exc_mean_pct": -0.129,
+       "t": -3.799079219136657,
+       "ci95_lo_pct": -0.1843,
+       "ci95_hi_pct": -0.0588,
+       "gate": false
+      },
+      "all": {
+       "exc_mean_pct": -0.1384,
+       "t": -4.161048744534312,
+       "ci95_lo_pct": -0.1958,
+       "gate": false
+      },
+      "kind": "①"
+     }
+    },
+    "V": {
+     "lag1": {
+      "n": 72064,
+      "n_true_signals": 72257,
+      "days_active": 2504,
+      "uniq_symbols": 5331,
+      "wr": 0.4693,
+      "gross_mean_pct": 0.3081,
+      "bm_ref_mean_buy_pct": 0.2372,
+      "gross_buy": {
+       "exc_mean_pct": 0.0709,
+       "t": 2.5768127896788595,
+       "ci95_lo_pct": 0.0198,
+       "ci95_hi_pct": 0.146,
+       "gate": true
+      },
+      "buy": {
+       "exc_mean_pct": -0.1291,
+       "t": -3.6396076254968204,
+       "ci95_lo_pct": -0.1802,
+       "ci95_hi_pct": -0.054,
+       "gate": false
+      },
+      "all": {
+       "exc_mean_pct": -0.1385,
+       "t": -4.001439690742491,
+       "ci95_lo_pct": -0.1917,
+       "gate": false
+      },
+      "kind": "①"
+     },
+     "fwd1": {
+      "n": 72098,
+      "n_true_signals": 72279,
+      "days_active": 2503,
+      "uniq_symbols": 5331,
+      "wr": 0.4691,
+      "gross_mean_pct": 0.3038,
+      "bm_ref_mean_buy_pct": 0.2364,
+      "gross_buy": {
+       "exc_mean_pct": 0.0674,
+       "t": 2.388382824111347,
+       "ci95_lo_pct": 0.0137,
+       "ci95_hi_pct": 0.1389,
+       "gate": true
+      },
+      "buy": {
+       "exc_mean_pct": -0.1326,
+       "t": -3.8735305311590693,
+       "ci95_lo_pct": -0.1863,
+       "ci95_hi_pct": -0.0611,
+       "gate": false
+      },
+      "all": {
+       "exc_mean_pct": -0.1421,
+       "t": -4.236152065401305,
+       "ci95_lo_pct": -0.1978,
+       "gate": false
+      },
+      "kind": "①"
+     }
+    }
+   },
+   "identity_control": {
+    "re_eval_signal_identical": true,
+    "note": "同面板复制后重算，信号矩阵应逐位相同（分辨力/确定性前提）"
+   },
+   "all_channels_fwd1": {
+    "n": 72041,
+    "n_true_signals": 72147,
+    "days_active": 2502,
+    "uniq_symbols": 5332,
+    "wr": 0.8973,
+    "gross_mean_pct": 3.2817,
+    "bm_ref_mean_buy_pct": 0.7973,
+    "gross_buy": {
+     "exc_mean_pct": 2.4843,
+     "t": 79.73509938161719,
+     "ci95_lo_pct": 3.0631,
+     "ci95_hi_pct": 3.2175,
+     "gate": true
+    },
+    "buy": {
+     "exc_mean_pct": 2.2843,
+     "t": 74.6569076340943,
+     "ci95_lo_pct": 2.8631,
+     "ci95_hi_pct": 3.0175,
+     "gate": true
+    },
+    "all": {
+     "exc_mean_pct": 2.2756,
+     "t": 74.38621898746261,
+     "ci95_lo_pct": 2.8525,
+     "gate": true
+    },
+    "kind": "①"
+   },
+   "verdict": {
+    "verdict": "PASS",
+    "baseline_gross_pct": 0.0718,
+    "fwd1_max_channel": "C",
+    "fwd1_max_gross_pct": 2.4834,
+    "fwd1_max_t": 78.430356675175,
+    "lag1_max_channel": "H",
+    "lag1_max_gross_pct": 0.072,
+    "note": "取未来 1 日（前视注入）应把毛超额抬升一个数量级；滞后 1 日不应出现同向抬升。若某通道取未来值后读数无明显改善，则该通道不是时间敏感通道（方法仍成立）。"
+   }
+  },
+  "807": {
+   "baseline": {
+    "n": 28825,
+    "n_true_signals": 28952,
+    "days_active": 2357,
+    "uniq_symbols": 4347,
+    "wr": 0.4837,
+    "gross_mean_pct": 0.4016,
+    "bm_ref_mean_buy_pct": 0.2961,
+    "gross_buy": {
+     "exc_mean_pct": 0.1054,
+     "t": 2.206758022220922,
+     "ci95_lo_pct": 0.0105,
+     "ci95_hi_pct": 0.1784,
+     "gate": true
+    },
+    "buy": {
+     "exc_mean_pct": -0.0946,
+     "t": -2.4645800186887312,
+     "ci95_lo_pct": -0.1895,
+     "ci95_hi_pct": -0.0216,
+     "gate": false
+    },
+    "all": {
+     "exc_mean_pct": -0.106,
+     "t": -2.74365264678744,
+     "ci95_lo_pct": -0.2011,
+     "gate": false
+    }
+   },
+   "channels": {
+    "C": {
+     "lag1": {
+      "n": 27973,
+      "n_true_signals": 28091,
+      "days_active": 2347,
+      "uniq_symbols": 4313,
+      "wr": 0.4747,
+      "gross_mean_pct": 0.4042,
+      "bm_ref_mean_buy_pct": 0.3336,
+      "gross_buy": {
+       "exc_mean_pct": 0.0707,
+       "t": 0.6064961584860342,
+       "ci95_lo_pct": -0.0564,
+       "ci95_hi_pct": 0.1069,
+       "gate": false
+      },
+      "buy": {
+       "exc_mean_pct": -0.1293,
+       "t": -4.195382900816513,
+       "ci95_lo_pct": -0.2564,
+       "ci95_hi_pct": -0.0931,
+       "gate": false
+      },
+      "all": {
+       "exc_mean_pct": -0.1418,
+       "t": -4.461934321359525,
+       "ci95_lo_pct": -0.2673,
+       "gate": false
+      },
+      "kind": "①"
+     },
+     "fwd1": {
+      "n": 22039,
+      "n_true_signals": 22084,
+      "days_active": 2288,
+      "uniq_symbols": 4017,
+      "wr": 0.6074,
+      "gross_mean_pct": 1.1699,
+      "bm_ref_mean_buy_pct": 0.4704,
+      "gross_buy": {
+       "exc_mean_pct": 0.6995,
+       "t": 17.61839667781668,
+       "ci95_lo_pct": 0.8347,
+       "ci95_hi_pct": 1.0438,
+       "gate": true
+      },
+      "buy": {
+       "exc_mean_pct": 0.4995,
+       "t": 13.866886066046915,
+       "ci95_lo_pct": 0.6347,
+       "ci95_hi_pct": 0.8438,
+       "gate": true
+      },
+      "all": {
+       "exc_mean_pct": 0.4888,
+       "t": 13.671340845714878,
+       "ci95_lo_pct": 0.6242,
+       "gate": true
+      },
+      "kind": "①"
+     }
+    },
+    "V": {
+     "lag1": {
+      "n": 22012,
+      "n_true_signals": 22084,
+      "days_active": 2287,
+      "uniq_symbols": 4019,
+      "wr": 0.4812,
+      "gross_mean_pct": 0.3882,
+      "bm_ref_mean_buy_pct": 0.2757,
+      "gross_buy": {
+       "exc_mean_pct": 0.1124,
+       "t": 2.2380561437732776,
+       "ci95_lo_pct": 0.0126,
+       "ci95_hi_pct": 0.1908,
+       "gate": true
+      },
+      "buy": {
+       "exc_mean_pct": -0.0876,
+       "t": -2.1637676895271722,
+       "ci95_lo_pct": -0.1874,
+       "ci95_hi_pct": -0.0092,
+       "gate": false
+      },
+      "all": {
+       "exc_mean_pct": -0.0985,
+       "t": -2.426757269618954,
+       "ci95_lo_pct": -0.1989,
+       "gate": false
+      },
+      "kind": "①"
+     },
+     "fwd1": {
+      "n": 28007,
+      "n_true_signals": 28091,
+      "days_active": 2347,
+      "uniq_symbols": 4312,
+      "wr": 0.5551,
+      "gross_mean_pct": 0.7759,
+      "bm_ref_mean_buy_pct": 0.3334,
+      "gross_buy": {
+       "exc_mean_pct": 0.4425,
+       "t": 8.951600975202869,
+       "ci95_lo_pct": 0.3144,
+       "ci95_hi_pct": 0.4909,
+       "gate": true
+      },
+      "buy": {
+       "exc_mean_pct": 0.2425,
+       "t": 4.505294687134181,
+       "ci95_lo_pct": 0.1144,
+       "ci95_hi_pct": 0.2909,
+       "gate": true
+      },
+      "all": {
+       "exc_mean_pct": 0.2308,
+       "t": 4.2552093591102835,
+       "ci95_lo_pct": 0.103,
+       "gate": true
+      },
+      "kind": "①"
+     }
+    }
+   },
+   "identity_control": {
+    "re_eval_signal_identical": true,
+    "note": "同面板复制后重算，信号矩阵应逐位相同（分辨力/确定性前提）"
+   },
+   "all_channels_fwd1": {
+    "n": 28864,
+    "n_true_signals": 28952,
+    "days_active": 2357,
+    "uniq_symbols": 4350,
+    "wr": 0.7279,
+    "gross_mean_pct": 2.0325,
+    "bm_ref_mean_buy_pct": 0.5062,
+    "gross_buy": {
+     "exc_mean_pct": 1.5263,
+     "t": 35.29042180555147,
+     "ci95_lo_pct": 1.8023,
+     "ci95_hi_pct": 2.0144,
+     "gate": true
+    },
+    "buy": {
+     "exc_mean_pct": 1.3263,
+     "t": 31.591939712252092,
+     "ci95_lo_pct": 1.6023,
+     "ci95_hi_pct": 1.8144,
+     "gate": true
+    },
+    "all": {
+     "exc_mean_pct": 1.3153,
+     "t": 31.396429041588696,
+     "ci95_lo_pct": 1.5918,
+     "gate": true
+    },
+    "kind": "①"
+   },
+   "verdict": {
+    "verdict": "PASS",
+    "baseline_gross_pct": 0.1054,
+    "fwd1_max_channel": "C",
+    "fwd1_max_gross_pct": 0.6995,
+    "fwd1_max_t": 17.61839667781668,
+    "lag1_max_channel": "V",
+    "lag1_max_gross_pct": 0.1124,
+    "note": "取未来 1 日（前视注入）应把毛超额抬升一个数量级；滞后 1 日不应出现同向抬升。若某通道取未来值后读数无明显改善，则该通道不是时间敏感通道（方法仍成立）。"
+   }
+  }
+ },
+ "dim4_positive_control": {
+  "PC0_identity": {
+   "543": {
+    "re_eval_signal_identical": true,
+    "note": "同面板复制后重算，信号矩阵应逐位相同（分辨力/确定性前提）"
+   },
+   "774": {
+    "re_eval_signal_identical": true,
+    "note": "同面板复制后重算，信号矩阵应逐位相同（分辨力/确定性前提）"
+   },
+   "807": {
+    "re_eval_signal_identical": true,
+    "note": "同面板复制后重算，信号矩阵应逐位相同（分辨力/确定性前提）"
+   }
+  },
+  "PC1_inject_all_channels_fwd1": {
+   "543": {
+    "injection": "全通道（C,H,L,O,V）整体前移 1 日：用 T+1 的行情当作 T 的行情",
+    "before": {
+     "n": 51240,
+     "gross_exc_pct": 0.1194,
+     "t": 2.642947840322287,
+     "ci95_lo_pct": 0.0297,
+     "gate": true,
+     "net_exc_pct": -0.0806
+    },
+    "after": {
+     "n": 51319,
+     "gross_exc_pct": 5.0773,
+     "t": 106.31323777066487,
+     "ci95_lo_pct": 5.602,
+     "gate": true,
+     "net_exc_pct": 4.8773,
+     "n_true_signals": 51544
+    },
+    "delta_gross_exc_pp": 4.9579,
+    "delta_t": 103.67,
+    "improved": true
+   },
+   "774": {
+    "injection": "全通道（C,H,L,O,V）整体前移 1 日：用 T+1 的行情当作 T 的行情",
+    "before": {
+     "n": 71956,
+     "gross_exc_pct": 0.0718,
+     "t": 2.4613822483677854,
+     "ci95_lo_pct": 0.016,
+     "gate": true,
+     "net_exc_pct": -0.1282
+    },
+    "after": {
+     "n": 72041,
+     "gross_exc_pct": 2.4843,
+     "t": 79.73509938161719,
+     "ci95_lo_pct": 3.0631,
+     "gate": true,
+     "net_exc_pct": 2.2843,
+     "n_true_signals": 72147
+    },
+    "delta_gross_exc_pp": 2.4125,
+    "delta_t": 77.274,
+    "improved": true
+   },
+   "807": {
+    "injection": "全通道（C,V）整体前移 1 日：用 T+1 的行情当作 T 的行情",
+    "before": {
+     "n": 28825,
+     "gross_exc_pct": 0.1054,
+     "t": 2.206758022220922,
+     "ci95_lo_pct": 0.0105,
+     "gate": true,
+     "net_exc_pct": -0.0946
+    },
+    "after": {
+     "n": 28864,
+     "gross_exc_pct": 1.5263,
+     "t": 35.29042180555147,
+     "ci95_lo_pct": 1.8023,
+     "gate": true,
+     "net_exc_pct": 1.3263,
+     "n_true_signals": 28952
+    },
+    "delta_gross_exc_pp": 1.4209,
+    "delta_t": 33.084,
+    "improved": true
+   }
+  },
+  "PC2_inject_single_channel_fwd1": {
+   "543": {
+    "C": {
+     "gross_exc_pct": 4.9637,
+     "t": 54.245849629270005,
+     "ci95_lo_pct": 5.3889,
+     "gate": true,
+     "n": 5404
+    },
+    "H": {
+     "gross_exc_pct": 0.1205,
+     "t": 2.647418832958805,
+     "ci95_lo_pct": 0.0299,
+     "gate": true,
+     "n": 51051
+    },
+    "L": {
+     "gross_exc_pct": 0.1197,
+     "t": 2.6438896213523684,
+     "ci95_lo_pct": 0.0298,
+     "gate": true,
+     "n": 51251
+    },
+    "O": {
+     "gross_exc_pct": 0.1331,
+     "t": 3.4182933170849177,
+     "ci95_lo_pct": 0.0636,
+     "gate": true,
+     "n": 49821
+    },
+    "V": {
+     "gross_exc_pct": 1.8642,
+     "t": 16.294303057796633,
+     "ci95_lo_pct": 1.4562,
+     "gate": true,
+     "n": 10050
+    }
+   },
+   "774": {
+    "C": {
+     "gross_exc_pct": 2.4834,
+     "t": 78.430356675175,
+     "ci95_lo_pct": 3.0621,
+     "gate": true,
+     "n": 71941
+    },
+    "H": {
+     "gross_exc_pct": 0.0728,
+     "t": 2.473377081592141,
+     "ci95_lo_pct": 0.0164,
+     "gate": true,
+     "n": 71951
+    },
+    "L": {
+     "gross_exc_pct": 0.0716,
+     "t": 2.3710065802798606,
+     "ci95_lo_pct": 0.0131,
+     "gate": true,
+     "n": 71998
+    },
+    "O": {
+     "gross_exc_pct": 0.071,
+     "t": 2.451265223696769,
+     "ci95_lo_pct": 0.0157,
+     "gate": true,
+     "n": 71959
+    },
+    "V": {
+     "gross_exc_pct": 0.0674,
+     "t": 2.388382824111347,
+     "ci95_lo_pct": 0.0137,
+     "gate": true,
+     "n": 72098
+    }
+   },
+   "807": {
+    "C": {
+     "gross_exc_pct": 0.6995,
+     "t": 17.61839667781668,
+     "ci95_lo_pct": 0.8347,
+     "gate": true,
+     "n": 22039
+    },
+    "V": {
+     "gross_exc_pct": 0.4425,
+     "t": 8.951600975202869,
+     "ci95_lo_pct": 0.3144,
+     "gate": true,
+     "n": 28007
+    }
+   }
+  },
+  "PC3_source_level_injection_attempts": {
+   "REF_负常量": {
+    "probe": "A:=REF(C,-1);A>0;",
+    "result": "求值拒绝",
+    "receipt": "NotImplementedError: negative window"
+   },
+   "REF_负表达式": {
+    "probe": "A:=REF(C,1-2);A>0;",
+    "result": "求值拒绝",
+    "receipt": "NotImplementedError: negative window"
+   },
+   "REF_HHV_负参": {
+    "probe": "A:=REF(HHV(H,10),-1);A>0;",
+    "result": "求值拒绝",
+    "receipt": "NotImplementedError: negative window"
+   },
+   "REF_变窗负参": {
+    "probe": "N:=BARSLAST(C>0);A:=REF(C,N-1);A>0;",
+    "result": "求值拒绝",
+    "receipt": "IndexError: index 20 is out of bounds for axis 0 with size 20"
+   },
+   "HHV_负参": {
+    "probe": "A:=HHV(H,0-3);A>0;",
+    "result": "求值拒绝",
+    "receipt": "NotImplementedError: negative window"
+   },
+   "CONST": {
+    "probe": "A:=CONST(C);A>0;",
+    "result": "编译拒绝",
+    "receipt": "unsupported: CONST"
+   },
+   "ISLASTBAR": {
+    "probe": "A:=ISLASTBAR;A>0;",
+    "result": "编译拒绝",
+    "receipt": "unavailable data var ISLASTBAR"
+   },
+   "CURRBARSCOUNT": {
+    "probe": "A:=CURRBARSCOUNT;A>0;",
+    "result": "编译拒绝",
+    "receipt": "unavailable data var CURRBARSCOUNT"
+   },
+   "TOTALBARSCOUNT": {
+    "probe": "A:=TOTALBARSCOUNT;A>0;",
+    "result": "编译拒绝",
+    "receipt": "unavailable data var TOTALBARSCOUNT"
+   },
+   "DYNAINFO": {
+    "probe": "A:=DYNAINFO(4);A>0;",
+    "result": "可编译且可求值",
+    "receipt": "flags={'dyuse': True}"
+   },
+   "ZIG": {
+    "probe": "A:=ZIG(3,5);A>0;",
+    "result": "编译拒绝",
+    "receipt": "unsupported: ZIG"
+   },
+   "PEAK": {
+    "probe": "A:=PEAK(1,3,1);A>0;",
+    "result": "编译拒绝",
+    "receipt": "unsupported: PEAK"
+   },
+   "TROUGH": {
+    "probe": "A:=TROUGH(2,3,1);A>0;",
+    "result": "编译拒绝",
+    "receipt": "unsupported: TROUGH"
+   },
+   "WINNER": {
+    "probe": "A:=WINNER(C);A>0;",
+    "result": "编译拒绝",
+    "receipt": "unsupported: WINNER"
+   },
+   "COST": {
+    "probe": "A:=COST(50);A>0;",
+    "result": "编译拒绝",
+    "receipt": "unsupported: COST"
+   },
+   "FINANCE": {
+    "probe": "A:=FINANCE(7);A>0;",
+    "result": "编译拒绝",
+    "receipt": "unsupported: FINANCE"
+   },
+   "NAMELIKE": {
+    "probe": "A:=NAMELIKE(1);A>0;",
+    "result": "编译拒绝",
+    "receipt": "unsupported: NAMELIKE"
+   }
+  },
+  "PC4_truncation_test_resolving_power": {
+   "543_基线": {
+    "fwd_chan_injected": null,
+    "n_cols": 20,
+    "trunc_points": 6,
+    "n_locals_compared": 16,
+    "n_cells": 120,
+    "n_compared": 2040,
+    "n_mismatch_output": 0,
+    "n_mismatch_intermediate": 0,
+    "n_mismatch": 0,
+    "n_cells_with_any_diff": 0,
+    "max_rel_diff": 0.0,
+    "examples": [],
+    "verdict": "PASS"
+   },
+   "543_C通道入口前视注入": {
+    "fwd_chan_injected": "C",
+    "n_cols": 20,
+    "trunc_points": 6,
+    "n_locals_compared": 16,
+    "n_cells": 120,
+    "n_compared": 2040,
+    "n_mismatch_output": 0,
+    "n_mismatch_intermediate": 395,
+    "n_mismatch": 395,
+    "n_cells_with_any_diff": 60,
+    "max_rel_diff": 1.0,
+    "examples": [
+     {
+      "t": 353,
+      "col": 58,
+      "var": "跌幅超5",
+      "full": 0.0,
+      "truncated": 1.0
+     },
+     {
+      "t": 353,
+      "col": 141,
+      "var": "跌幅超5",
+      "full": 0.0,
+      "truncated": 1.0
+     },
+     {
+      "t": 353,
+      "col": 230,
+      "var": "跌幅超5",
+      "full": 0.0,
+      "truncated": 1.0
+     },
+     {
+      "t": 353,
+      "col": 230,
+      "var": "跌幅触发",
+      "full": 0.0,
+      "truncated": 1.0
+     },
+     {
+      "t": 353,
+      "col": 230,
+      "var": "跌幅间隔",
+      "full": 26.0,
+      "truncated": 0.0
+     },
+     {
+      "t": 353,
+      "col": 230,
+      "var": "前高三日",
+      "full": 5.17,
+      "truncated": 5.22
+     }
+    ],
+    "verdict": "前视"
+   },
+   "807_基线": {
+    "fwd_chan_injected": null,
+    "n_cols": 20,
+    "trunc_points": 6,
+    "n_locals_compared": 16,
+    "n_cells": 120,
+    "n_compared": 2040,
+    "n_mismatch_output": 0,
+    "n_mismatch_intermediate": 0,
+    "n_mismatch": 0,
+    "n_cells_with_any_diff": 0,
+    "max_rel_diff": 0.0,
+    "examples": [],
+    "verdict": "PASS"
+   },
+   "807_V通道入口前视注入": {
+    "fwd_chan_injected": "V",
+    "n_cols": 20,
+    "trunc_points": 6,
+    "n_locals_compared": 16,
+    "n_cells": 120,
+    "n_compared": 2040,
+    "n_mismatch_output": 0,
+    "n_mismatch_intermediate": 154,
+    "n_mismatch": 154,
+    "n_cells_with_any_diff": 66,
+    "max_rel_diff": 1.0,
+    "examples": [
+     {
+      "t": 353,
+      "col": 58,
+      "var": "VOL5",
+      "full": 4498480.0,
+      "truncated": 3452722.6
+     },
+     {
+      "t": 353,
+      "col": 58,
+      "var": "VOL135",
+      "full": 16381721.22963,
+      "truncated": 16342989.474074
+     },
+     {
+      "t": 353,
+      "col": 141,
+      "var": "VOL5",
+      "full": 4121907.6,
+      "truncated": 3066689.4
+     },
+     {
+      "t": 353,
+      "col": 141,
+      "var": "VOL135",
+      "full": 6188641.637037,
+      "truncated": 6149559.481481
+     },
+     {
+      "t": 353,
+      "col": 230,
+      "var": "VOL5",
+      "full": 16729596.4,
+      "truncated": 10033425.2
+     },
+     {
+      "t": 353,
+      "col": 230,
+      "var": "VOL135",
+      "full": 7071326.414815,
+      "truncated": 6823320.074074
+     }
+    ],
+    "verdict": "前视"
+   }
+  },
+  "note": "阳性对照 = 在**数据入口**注入前视（把 T+1 的值当作 T 的值喂进公式）。源码层前视（负 REF / CONST / ISLASTBAR / 筹码 / 财务）在本解释器里一律被拒（见 PC3），故入口注入是唯一可实施的注入方式，等价于清单里的「把 REF(C,1) 改成 C」的加强版。",
+  "resolving_power": {
+   "PC1_所有公式毛超额均改善": true,
+   "PC3_源码层前视通道全部被拒": true,
+   "PC4_截断检验能识别入口前视": true,
+   "结论": "方法有分辨力（三条阳性对照均成立）"
+  }
+ },
+ "dim5_handcheck": {
+  "543": [
+   {
+    "t": 881,
+    "j": 1000,
+    "symbol": "sh603041",
+    "dates": [
+     "2018-08-09(T-2)",
+     "2018-08-10(T-1)",
+     "2018-08-13(T)"
+    ],
+    "rows_by_bar": {
+     "T-2": {
+      "date": "2018-08-09",
+      "O": 11.07,
+      "H": 11.6,
+      "L": 11.01,
+      "C": 11.24,
+      "V": 741837.0,
+      "A": 12920308.0
+     },
+     "T-1": {
+      "date": "2018-08-10",
+      "O": 11.31,
+      "H": 11.35,
+      "L": 11.18,
+      "C": 11.22,
+      "V": 287300.0,
+      "A": 4993268.0
+     },
+     "T": {
+      "date": "2018-08-13",
+      "O": 11.24,
+      "H": 11.6,
+      "L": 11.18,
+      "C": 11.6,
+      "V": 1137873.0,
+      "A": 20116624.0
+     }
+    },
+    "intermediates_T2_T1_T": {
+     "跌幅超5": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "跌幅触发": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "跌幅间隔": [
+      38.0,
+      39.0,
+      40.0
+     ],
+     "前高三日": [
+      12.52,
+      12.52,
+      12.52
+     ],
+     "前高二日": [
+      12.35,
+      12.35,
+      12.35
+     ],
+     "前高一日": [
+      12.27,
+      12.27,
+      12.27
+     ],
+     "前高两日": [
+      12.52,
+      12.52,
+      12.52
+     ],
+     "阶段高点": [
+      12.52,
+      12.52,
+      12.52
+     ],
+     "涨幅超3": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "间隔合理": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "距高不远": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "反弹适度": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "五日温和": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "放量": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "一穿三": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "探底放量突破": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "__输出信号": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "__引擎中间量_RAW": {
+      "MA5_T": 11.288,
+      "MA10_T": 11.362,
+      "MA20_T": 11.5105,
+      "MA20_T1": 11.51,
+      "V_T1": 287300.0,
+      "C_T1": 11.22,
+      "H_T2": 11.6,
+      "L_T2": 11.01
+     }
+    },
+    "manual_recompute": {
+     "涨幅超3_手算_pct": 3.38681,
+     "跌幅超5_手算_pct": -2.112683,
+     "五日温和_手算_pct": 1.933218,
+     "放量比_手算": 3.960574,
+     "MA5_T": 11.288,
+     "MA5_T-1": 11.24,
+     "MA10_T": 11.362,
+     "MA10_T-1": 11.331,
+     "MA20_T": 11.5105,
+     "MA20_T-1": 11.51,
+     "一穿三_手算": 1.0
+    },
+    "uses_only_le_T": "核对点：上表每个中间量在 T 列的值只由 rows_by_bar 中 ≤T 的原始 bar 决定；T+1 及以后的任何数值均不出现在本表。",
+    "manual_vs_engine": {
+     "items": [
+      {
+       "item": "MA5_T",
+       "manual": 11.288,
+       "engine": 11.288,
+       "match": true
+      },
+      {
+       "item": "MA10_T",
+       "manual": 11.362,
+       "engine": 11.362,
+       "match": true
+      },
+      {
+       "item": "MA20_T",
+       "manual": 11.5105,
+       "engine": 11.5105,
+       "match": true
+      },
+      {
+       "item": "一穿三",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "涨幅超3(>3%)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "五日温和(<8%)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "放量(V>1.5xV_T-1)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "间隔合理(<150)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      }
+     ],
+     "n_checked": 8,
+     "n_match": 8,
+     "mismatch": [],
+     "all_match": true,
+     "verdict": "PASS"
+    }
+   },
+   {
+    "t": 1553,
+    "j": 256,
+    "symbol": "sh600348",
+    "dates": [
+     "2021-05-20(T-2)",
+     "2021-05-21(T-1)",
+     "2021-05-24(T)"
+    ],
+    "rows_by_bar": {
+     "T-2": {
+      "date": "2021-05-20",
+      "O": 2.73,
+      "H": 2.74,
+      "L": 2.64,
+      "C": 2.68,
+      "V": 39282600.0,
+      "A": 215171792.0
+     },
+     "T-1": {
+      "date": "2021-05-21",
+      "O": 2.68,
+      "H": 2.74,
+      "L": 2.67,
+      "C": 2.7,
+      "V": 23993612.0,
+      "A": 132310024.0
+     },
+     "T": {
+      "date": "2021-05-24",
+      "O": 2.97,
+      "H": 2.97,
+      "L": 2.93,
+      "C": 2.97,
+      "V": 78565368.0,
+      "A": 474190144.0
+     }
+    },
+    "intermediates_T2_T1_T": {
+     "跌幅超5": [
+      1.0,
+      1.0,
+      0.0
+     ],
+     "跌幅触发": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "跌幅间隔": [
+      3.0,
+      4.0,
+      5.0
+     ],
+     "前高三日": [
+      3.05,
+      3.05,
+      3.05
+     ],
+     "前高二日": [
+      3.0,
+      3.0,
+      3.0
+     ],
+     "前高一日": [
+      2.92,
+      2.92,
+      2.92
+     ],
+     "前高两日": [
+      3.05,
+      3.05,
+      3.05
+     ],
+     "阶段高点": [
+      3.05,
+      3.05,
+      3.05
+     ],
+     "涨幅超3": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "间隔合理": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "距高不远": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "反弹适度": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "五日温和": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "放量": [
+      1.0,
+      0.0,
+      1.0
+     ],
+     "一穿三": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "探底放量突破": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "__输出信号": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "__引擎中间量_RAW": {
+      "MA5_T": 2.806,
+      "MA10_T": 2.884,
+      "MA20_T": 2.873,
+      "MA20_T1": 2.8625,
+      "V_T1": 23993612.0,
+      "C_T1": 2.7,
+      "H_T2": 2.74,
+      "L_T2": 2.64
+     }
+    },
+    "manual_recompute": {
+     "涨幅超3_手算_pct": 9.999999,
+     "跌幅超5_手算_pct": -3.846159,
+     "五日温和_手算_pct": 3.124997,
+     "放量比_手算": 3.274429,
+     "MA5_T": 2.806,
+     "MA5_T-1": 2.784,
+     "MA10_T": 2.884,
+     "MA10_T-1": 2.908,
+     "MA20_T": 2.873,
+     "MA20_T-1": 2.8625,
+     "一穿三_手算": 1.0
+    },
+    "uses_only_le_T": "核对点：上表每个中间量在 T 列的值只由 rows_by_bar 中 ≤T 的原始 bar 决定；T+1 及以后的任何数值均不出现在本表。",
+    "manual_vs_engine": {
+     "items": [
+      {
+       "item": "MA5_T",
+       "manual": 2.806,
+       "engine": 2.806,
+       "match": true
+      },
+      {
+       "item": "MA10_T",
+       "manual": 2.884,
+       "engine": 2.884,
+       "match": true
+      },
+      {
+       "item": "MA20_T",
+       "manual": 2.873,
+       "engine": 2.873,
+       "match": true
+      },
+      {
+       "item": "一穿三",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "涨幅超3(>3%)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "五日温和(<8%)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "放量(V>1.5xV_T-1)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "间隔合理(<150)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      }
+     ],
+     "n_checked": 8,
+     "n_match": 8,
+     "mismatch": [],
+     "all_match": true,
+     "verdict": "PASS"
+    }
+   },
+   {
+    "t": 2195,
+    "j": 409,
+    "symbol": "sh600563",
+    "dates": [
+     "2024-01-08(T-2)",
+     "2024-01-09(T-1)",
+     "2024-01-10(T)"
+    ],
+    "rows_by_bar": {
+     "T-2": {
+      "date": "2024-01-08",
+      "O": 79.089996,
+      "H": 79.839996,
+      "L": 76.529999,
+      "C": 76.529999,
+      "V": 1431660.0,
+      "A": 117819216.0
+     },
+     "T-1": {
+      "date": "2024-01-09",
+      "O": 77.0,
+      "H": 79.589996,
+      "L": 75.690002,
+      "C": 78.440002,
+      "V": 1989999.0,
+      "A": 164932896.0
+     },
+     "T": {
+      "date": "2024-01-10",
+      "O": 77.910004,
+      "H": 85.879997,
+      "L": 77.739998,
+      "C": 84.650002,
+      "V": 3982238.0,
+      "A": 351772128.0
+     }
+    },
+    "intermediates_T2_T1_T": {
+     "跌幅超5": [
+      1.0,
+      1.0,
+      0.0
+     ],
+     "跌幅触发": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "跌幅间隔": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "前高三日": [
+      83.050003,
+      83.050003,
+      83.050003
+     ],
+     "前高二日": [
+      82.029999,
+      82.029999,
+      82.029999
+     ],
+     "前高一日": [
+      83.330002,
+      83.330002,
+      83.330002
+     ],
+     "前高两日": [
+      83.050003,
+      83.050003,
+      83.050003
+     ],
+     "阶段高点": [
+      83.330002,
+      83.330002,
+      83.330002
+     ],
+     "涨幅超3": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "间隔合理": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "距高不远": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "反弹适度": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "五日温和": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "放量": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "一穿三": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "探底放量突破": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "__输出信号": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "__引擎中间量_RAW": {
+      "MA5_T": 80.104001,
+      "MA10_T": 81.882001,
+      "MA20_T": 81.220001,
+      "MA20_T1": 81.211001,
+      "V_T1": 1989999.0,
+      "C_T1": 78.440002,
+      "H_T2": 79.839996,
+      "L_T2": 76.529999
+     }
+    },
+    "manual_recompute": {
+     "涨幅超3_手算_pct": 7.916878,
+     "跌幅超5_手算_pct": -4.05655,
+     "五日温和_手算_pct": 2.098659,
+     "放量比_手算": 2.001126,
+     "MA5_T": 80.104001,
+     "MA5_T-1": 79.444,
+     "MA10_T": 81.882001,
+     "MA10_T-1": 81.439001,
+     "MA20_T": 81.220001,
+     "MA20_T-1": 81.211001,
+     "一穿三_手算": 1.0
+    },
+    "uses_only_le_T": "核对点：上表每个中间量在 T 列的值只由 rows_by_bar 中 ≤T 的原始 bar 决定；T+1 及以后的任何数值均不出现在本表。",
+    "manual_vs_engine": {
+     "items": [
+      {
+       "item": "MA5_T",
+       "manual": 80.104001,
+       "engine": 80.104001,
+       "match": true
+      },
+      {
+       "item": "MA10_T",
+       "manual": 81.882001,
+       "engine": 81.882001,
+       "match": true
+      },
+      {
+       "item": "MA20_T",
+       "manual": 81.220001,
+       "engine": 81.220001,
+       "match": true
+      },
+      {
+       "item": "一穿三",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "涨幅超3(>3%)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "五日温和(<8%)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "放量(V>1.5xV_T-1)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "间隔合理(<150)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      }
+     ],
+     "n_checked": 8,
+     "n_match": 8,
+     "mismatch": [],
+     "all_match": true,
+     "verdict": "PASS"
+    }
+   }
+  ],
+  "774": [
+   {
+    "t": 941,
+    "j": 74,
+    "symbol": "sh600106",
+    "dates": [
+     "2018-11-09(T-2)",
+     "2018-11-12(T-1)",
+     "2018-11-13(T)"
+    ],
+    "rows_by_bar": {
+     "T-2": {
+      "date": "2018-11-09",
+      "O": 2.26,
+      "H": 2.29,
+      "L": 2.26,
+      "C": 2.26,
+      "V": 5257004.0,
+      "A": 16077364.0
+     },
+     "T-1": {
+      "date": "2018-11-12",
+      "O": 2.25,
+      "H": 2.32,
+      "L": 2.25,
+      "C": 2.32,
+      "V": 10294921.0,
+      "A": 31917426.0
+     },
+     "T": {
+      "date": "2018-11-13",
+      "O": 2.29,
+      "H": 2.4,
+      "L": 2.28,
+      "C": 2.37,
+      "V": 20121840.0,
+      "A": 63754080.0
+     }
+    },
+    "intermediates_T2_T1_T": {
+     "三日跌幅超五": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "大跌起点": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "距大跌天数": [
+      19.0,
+      20.0,
+      21.0
+     ],
+     "距大跌两日高": [
+      2.4,
+      2.4,
+      2.4
+     ],
+     "距大跌一日高": [
+      2.26,
+      2.26,
+      2.26
+     ],
+     "距大跌当日高": [
+      2.23,
+      2.23,
+      2.23
+     ],
+     "近期最高价": [
+      2.4,
+      2.4,
+      2.4
+     ],
+     "当日涨幅超五": [
+      0.0,
+      1.0,
+      1.0
+     ],
+     "距大跌未超百五": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "开盘未超高三成": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "反弹未超低五成": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "五日开盘未超三": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "量能未超均量三": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "八十九日未超八": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "五日线": [
+      2.29,
+      2.296,
+      2.304
+     ],
+     "十日线": [
+      2.271,
+      2.282,
+      2.295
+     ],
+     "二十日线": [
+      2.2355,
+      2.2425,
+      2.2525
+     ],
+     "六十日线": [
+      2.319333,
+      2.316,
+      2.314167
+     ],
+     "均线最高": [
+      2.319333,
+      2.316,
+      2.314167
+     ],
+     "均线最低": [
+      2.2355,
+      2.2425,
+      2.2525
+     ],
+     "均线已粘合": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "大跌反弹条件": [
+      0.0,
+      1.0,
+      1.0
+     ],
+     "大跌反弹信号": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "最强黄金坑": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "__输出信号": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "__引擎中间量_RAW": {
+      "MA5_T": 2.304,
+      "MA10_T": 2.295,
+      "MA20_T": 2.2525,
+      "MA20_T1": 2.2425,
+      "V_T1": 10294921.0,
+      "C_T1": 2.32,
+      "H_T2": 2.29,
+      "L_T2": 2.26
+     }
+    },
+    "manual_recompute": {
+     "当日涨幅_手算_pct": 2.15517,
+     "三日跌幅_手算_pct": -3.947365,
+     "五日开盘_手算_pct": 3.493447,
+     "八十九日_手算_pct": 6.278021,
+     "量能比_手算": 1.887422,
+     "均线粘合比_手算": 1.027377,
+     "MA20_T": 2.2525,
+     "MA60_T": 2.314167
+    },
+    "uses_only_le_T": "核对点：上表每个中间量在 T 列的值只由 rows_by_bar 中 ≤T 的原始 bar 决定；T+1 及以后的任何数值均不出现在本表。",
+    "manual_vs_engine": {
+     "items": [
+      {
+       "item": "MA20_T",
+       "manual": 2.2525,
+       "engine": 2.2525,
+       "match": true
+      },
+      {
+       "item": "MA60_T",
+       "manual": 2.314167,
+       "engine": 2.314167,
+       "match": true
+      },
+      {
+       "item": "均线粘合比",
+       "manual": 1.027377,
+       "engine": 1.0273771365149833,
+       "match": true
+      },
+      {
+       "item": "当日涨幅超五(2%~8%)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "量能未超均量三(<3.5)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "五日开盘未超三(<30)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "八十九日未超八(<80)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      }
+     ],
+     "n_checked": 7,
+     "n_match": 7,
+     "mismatch": [],
+     "all_match": true,
+     "verdict": "PASS"
+    }
+   },
+   {
+    "t": 1584,
+    "j": 296,
+    "symbol": "sh600398",
+    "dates": [
+     "2021-07-05(T-2)",
+     "2021-07-06(T-1)",
+     "2021-07-07(T)"
+    ],
+    "rows_by_bar": {
+     "T-2": {
+      "date": "2021-07-05",
+      "O": 4.85,
+      "H": 4.92,
+      "L": 4.76,
+      "C": 4.89,
+      "V": 15793396.0,
+      "A": 109025760.0
+     },
+     "T-1": {
+      "date": "2021-07-06",
+      "O": 4.89,
+      "H": 4.94,
+      "L": 4.82,
+      "C": 4.89,
+      "V": 9806861.0,
+      "A": 67953200.0
+     },
+     "T": {
+      "date": "2021-07-07",
+      "O": 4.88,
+      "H": 5.1,
+      "L": 4.83,
+      "C": 5.05,
+      "V": 25394254.0,
+      "A": 179504128.0
+     }
+    },
+    "intermediates_T2_T1_T": {
+     "三日跌幅超五": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "大跌起点": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "距大跌天数": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "距大跌两日高": [
+      5.29,
+      5.29,
+      5.29
+     ],
+     "距大跌一日高": [
+      5.21,
+      5.21,
+      5.21
+     ],
+     "距大跌当日高": [
+      5.08,
+      5.08,
+      5.08
+     ],
+     "近期最高价": [
+      5.29,
+      5.29,
+      5.29
+     ],
+     "当日涨幅超五": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "距大跌未超百五": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "开盘未超高三成": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "反弹未超低五成": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "五日开盘未超三": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "量能未超均量三": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "八十九日未超八": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "五日线": [
+      5.066,
+      4.962,
+      4.956
+     ],
+     "十日线": [
+      4.993,
+      4.985,
+      5.001
+     ],
+     "二十日线": [
+      5.005,
+      5.0075,
+      5.0175
+     ],
+     "六十日线": [
+      4.8475,
+      4.849167,
+      4.8535
+     ],
+     "均线最高": [
+      5.066,
+      5.0075,
+      5.0175
+     ],
+     "均线最低": [
+      4.8475,
+      4.849167,
+      4.8535
+     ],
+     "均线已粘合": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "大跌反弹条件": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "大跌反弹信号": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "最强黄金坑": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "__输出信号": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "__引擎中间量_RAW": {
+      "MA5_T": 4.956,
+      "MA10_T": 5.001,
+      "MA20_T": 5.0175,
+      "MA20_T1": 5.0075,
+      "V_T1": 9806861.0,
+      "C_T1": 4.89,
+      "H_T2": 4.92,
+      "L_T2": 4.76
+     }
+    },
+    "manual_recompute": {
+     "当日涨幅_手算_pct": 3.27199,
+     "三日跌幅_手算_pct": -3.696105,
+     "五日开盘_手算_pct": -4.536858,
+     "八十九日_手算_pct": 9.307366,
+     "量能比_手算": 1.246346,
+     "均线粘合比_手算": 1.03379,
+     "MA20_T": 5.0175,
+     "MA60_T": 4.8535
+    },
+    "uses_only_le_T": "核对点：上表每个中间量在 T 列的值只由 rows_by_bar 中 ≤T 的原始 bar 决定；T+1 及以后的任何数值均不出现在本表。",
+    "manual_vs_engine": {
+     "items": [
+      {
+       "item": "MA20_T",
+       "manual": 5.0175,
+       "engine": 5.0175,
+       "match": true
+      },
+      {
+       "item": "MA60_T",
+       "manual": 4.8535,
+       "engine": 4.8535,
+       "match": true
+      },
+      {
+       "item": "均线粘合比",
+       "manual": 1.03379,
+       "engine": 1.0337900484186668,
+       "match": true
+      },
+      {
+       "item": "当日涨幅超五(2%~8%)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "量能未超均量三(<3.5)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "五日开盘未超三(<30)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "八十九日未超八(<80)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      }
+     ],
+     "n_checked": 7,
+     "n_match": 7,
+     "mismatch": [],
+     "all_match": true,
+     "verdict": "PASS"
+    }
+   },
+   {
+    "t": 2212,
+    "j": 1923,
+    "symbol": "sh688271",
+    "dates": [
+     "2024-01-31(T-2)",
+     "2024-02-01(T-1)",
+     "2024-02-02(T)"
+    ],
+    "rows_by_bar": {
+     "T-2": {
+      "date": "2024-01-31",
+      "O": 133.479996,
+      "H": 134.770004,
+      "L": 129.990005,
+      "C": 133.860001,
+      "V": 2448346.0,
+      "A": 328463520.0
+     },
+     "T-1": {
+      "date": "2024-02-01",
+      "O": 132.0,
+      "H": 134.960007,
+      "L": 131.0,
+      "C": 133.710007,
+      "V": 1816815.0,
+      "A": 244165248.0
+     },
+     "T": {
+      "date": "2024-02-02",
+      "O": 133.820007,
+      "H": 136.960007,
+      "L": 132.990005,
+      "C": 136.389999,
+      "V": 2920711.0,
+      "A": 396403392.0
+     }
+    },
+    "intermediates_T2_T1_T": {
+     "三日跌幅超五": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "大跌起点": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "距大跌天数": [
+      13.0,
+      14.0,
+      15.0
+     ],
+     "距大跌两日高": [
+      139.889999,
+      139.889999,
+      139.889999
+     ],
+     "距大跌一日高": [
+      138.169998,
+      138.169998,
+      138.169998
+     ],
+     "距大跌当日高": [
+      136.710007,
+      136.710007,
+      136.710007
+     ],
+     "近期最高价": [
+      139.889999,
+      139.889999,
+      139.889999
+     ],
+     "当日涨幅超五": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "距大跌未超百五": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "开盘未超高三成": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "反弹未超低五成": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "五日开盘未超三": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "量能未超均量三": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "八十九日未超八": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "五日线": [
+      135.665997,
+      134.9,
+      134.966
+     ],
+     "十日线": [
+      134.385999,
+      134.717,
+      135.03
+     ],
+     "二十日线": [
+      134.952499,
+      134.402499,
+      134.288499
+     ],
+     "六十日线": [
+      134.061167,
+      134.255167,
+      134.513667
+     ],
+     "均线最高": [
+      135.665997,
+      134.9,
+      135.03
+     ],
+     "均线最低": [
+      134.061167,
+      134.255167,
+      134.288499
+     ],
+     "均线已粘合": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "大跌反弹条件": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "大跌反弹信号": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "最强黄金坑": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "__输出信号": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "__引擎中间量_RAW": {
+      "MA5_T": 134.966,
+      "MA10_T": 135.03,
+      "MA20_T": 134.288499,
+      "MA20_T1": 134.402499,
+      "V_T1": 1816815.0,
+      "C_T1": 133.710007,
+      "H_T2": 134.770004,
+      "L_T2": 129.990005
+     }
+    },
+    "manual_recompute": {
+     "当日涨幅_手算_pct": 2.004332,
+     "三日跌幅_手算_pct": -1.232097,
+     "五日开盘_手算_pct": 0.168916,
+     "八十九日_手算_pct": 32.907811,
+     "量能比_手算": 1.331026,
+     "均线粘合比_手算": 1.005522,
+     "MA20_T": 134.288499,
+     "MA60_T": 134.513667
+    },
+    "uses_only_le_T": "核对点：上表每个中间量在 T 列的值只由 rows_by_bar 中 ≤T 的原始 bar 决定；T+1 及以后的任何数值均不出现在本表。",
+    "manual_vs_engine": {
+     "items": [
+      {
+       "item": "MA20_T",
+       "manual": 134.288499,
+       "engine": 134.288499,
+       "match": true
+      },
+      {
+       "item": "MA60_T",
+       "manual": 134.513667,
+       "engine": 134.513667,
+       "match": true
+      },
+      {
+       "item": "均线粘合比",
+       "manual": 1.005522,
+       "engine": 1.0055217014526314,
+       "match": true
+      },
+      {
+       "item": "当日涨幅超五(2%~8%)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "量能未超均量三(<3.5)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "五日开盘未超三(<30)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "八十九日未超八(<80)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      }
+     ],
+     "n_checked": 7,
+     "n_match": 7,
+     "mismatch": [],
+     "all_match": true,
+     "verdict": "PASS"
+    }
+   }
+  ],
+  "807": [
+   {
+    "t": 948,
+    "j": 1217,
+    "symbol": "sh603315",
+    "dates": [
+     "2018-11-20(T-2)",
+     "2018-11-21(T-1)",
+     "2018-11-22(T)"
+    ],
+    "rows_by_bar": {
+     "T-2": {
+      "date": "2018-11-20",
+      "O": 11.22,
+      "H": 11.37,
+      "L": 11.05,
+      "C": 11.07,
+      "V": 1993100.0,
+      "A": 23307584.0
+     },
+     "T-1": {
+      "date": "2018-11-21",
+      "O": 11.01,
+      "H": 11.01,
+      "L": 10.71,
+      "C": 10.86,
+      "V": 1266200.0,
+      "A": 14304410.0
+     },
+     "T": {
+      "date": "2018-11-22",
+      "O": 10.8,
+      "H": 11.06,
+      "L": 10.8,
+      "C": 11.05,
+      "V": 1134881.0,
+      "A": 12944577.0
+     }
+    },
+    "intermediates_T2_T1_T": {
+     "MA5": [
+      11.174,
+      11.112,
+      11.07
+     ],
+     "MA10": [
+      11.074,
+      11.07,
+      11.091
+     ],
+     "MA20": [
+      11.0985,
+      11.077,
+      11.091
+     ],
+     "MA30": [
+      11.028333,
+      11.012333,
+      11.024
+     ],
+     "MA60": [
+      10.979,
+      10.975833,
+      10.981667
+     ],
+     "HH": [
+      11.174,
+      11.112,
+      11.091
+     ],
+     "LL": [
+      10.979,
+      10.975833,
+      10.981667
+     ],
+     "粘合度": [
+      1.776118,
+      1.240604,
+      0.995599
+     ],
+     "均线粘合": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "VOL5": [
+      1776254.8,
+      1622174.8,
+      1492591.0
+     ],
+     "VOL135": [
+      847195.703704,
+      856574.962963,
+      864981.488889
+     ],
+     "量能放大": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "趋势20": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "趋势30": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "趋势60": [
+      1.0,
+      0.0,
+      1.0
+     ],
+     "均线粘合起爆": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "__输出信号": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "__引擎中间量_RAW": {
+      "MA5_T": 11.07,
+      "MA10_T": 11.091,
+      "MA20_T": 11.091,
+      "MA20_T1": 11.077,
+      "V_T1": 1266200.0,
+      "C_T1": 10.86,
+      "H_T2": 11.37,
+      "L_T2": 11.05
+     }
+    },
+    "manual_recompute": {
+     "MA5_T": 11.07,
+     "MA10_T": 11.091,
+     "MA20_T": 11.091,
+     "MA30_T": 11.024,
+     "MA60_T": 10.981667,
+     "粘合度_手算_pct": 0.995599,
+     "VOL135_T": 864981.488889,
+     "量能放大_手算": 1.312029,
+     "趋势20_手算": 1.0,
+     "趋势30_手算": 1.0,
+     "趋势60_手算": 1.0
+    },
+    "uses_only_le_T": "核对点：上表每个中间量在 T 列的值只由 rows_by_bar 中 ≤T 的原始 bar 决定；T+1 及以后的任何数值均不出现在本表。",
+    "manual_vs_engine": {
+     "items": [
+      {
+       "item": "MA5_T",
+       "manual": 11.07,
+       "engine": 11.07,
+       "match": true
+      },
+      {
+       "item": "MA10_T",
+       "manual": 11.091,
+       "engine": 11.091,
+       "match": true
+      },
+      {
+       "item": "MA20_T",
+       "manual": 11.091,
+       "engine": 11.091,
+       "match": true
+      },
+      {
+       "item": "MA30_T",
+       "manual": 11.024,
+       "engine": 11.024,
+       "match": true
+      },
+      {
+       "item": "MA60_T",
+       "manual": 10.981667,
+       "engine": 10.981667,
+       "match": true
+      },
+      {
+       "item": "粘合度_pct",
+       "manual": 0.995599,
+       "engine": 0.995599,
+       "match": true
+      },
+      {
+       "item": "VOL135_T",
+       "manual": 864981.488889,
+       "engine": 864981.488889,
+       "match": true
+      },
+      {
+       "item": "趋势20",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "趋势30",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "趋势60",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "量能放大(V>VOL135)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      }
+     ],
+     "n_checked": 11,
+     "n_match": 11,
+     "mismatch": [],
+     "all_match": true,
+     "verdict": "PASS"
+    }
+   },
+   {
+    "t": 1601,
+    "j": 122,
+    "symbol": "sh600167",
+    "dates": [
+     "2021-07-28(T-2)",
+     "2021-07-29(T-1)",
+     "2021-07-30(T)"
+    ],
+    "rows_by_bar": {
+     "T-2": {
+      "date": "2021-07-28",
+      "O": 7.36,
+      "H": 7.53,
+      "L": 7.3,
+      "C": 7.5,
+      "V": 13555670.0,
+      "A": 119421632.0
+     },
+     "T-1": {
+      "date": "2021-07-29",
+      "O": 7.45,
+      "H": 7.52,
+      "L": 7.38,
+      "C": 7.46,
+      "V": 10917552.0,
+      "A": 95592696.0
+     },
+     "T": {
+      "date": "2021-07-30",
+      "O": 7.45,
+      "H": 7.46,
+      "L": 7.17,
+      "C": 7.22,
+      "V": 12356829.0,
+      "A": 105773664.0
+     }
+    },
+    "intermediates_T2_T1_T": {
+     "MA5": [
+      7.38,
+      7.376,
+      7.368
+     ],
+     "MA10": [
+      7.473,
+      7.481,
+      7.434
+     ],
+     "MA20": [
+      7.3395,
+      7.3535,
+      7.354
+     ],
+     "MA30": [
+      7.323,
+      7.336667,
+      7.34
+     ],
+     "MA60": [
+      7.398833,
+      7.400167,
+      7.402167
+     ],
+     "HH": [
+      7.473,
+      7.481,
+      7.434
+     ],
+     "LL": [
+      7.323,
+      7.336667,
+      7.34
+     ],
+     "粘合度": [
+      2.048342,
+      1.967289,
+      1.280655
+     ],
+     "均线粘合": [
+      0.0,
+      1.0,
+      1.0
+     ],
+     "VOL5": [
+      8145681.8,
+      9222143.8,
+      9984161.4
+     ],
+     "VOL135": [
+      9788586.422222,
+      9799831.059259,
+      9738002.281481
+     ],
+     "量能放大": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "趋势20": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "趋势30": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "趋势60": [
+      0.0,
+      1.0,
+      1.0
+     ],
+     "均线粘合起爆": [
+      0.0,
+      1.0,
+      1.0
+     ],
+     "__输出信号": [
+      0.0,
+      1.0,
+      1.0
+     ],
+     "__引擎中间量_RAW": {
+      "MA5_T": 7.368,
+      "MA10_T": 7.434,
+      "MA20_T": 7.354,
+      "MA20_T1": 7.3535,
+      "V_T1": 10917552.0,
+      "C_T1": 7.46,
+      "H_T2": 7.53,
+      "L_T2": 7.3
+     }
+    },
+    "manual_recompute": {
+     "MA5_T": 7.368,
+     "MA10_T": 7.434,
+     "MA20_T": 7.354,
+     "MA30_T": 7.34,
+     "MA60_T": 7.402167,
+     "粘合度_手算_pct": 1.280655,
+     "VOL135_T": 9738002.281481,
+     "量能放大_手算": 1.268929,
+     "趋势20_手算": 1.0,
+     "趋势30_手算": 1.0,
+     "趋势60_手算": 1.0
+    },
+    "uses_only_le_T": "核对点：上表每个中间量在 T 列的值只由 rows_by_bar 中 ≤T 的原始 bar 决定；T+1 及以后的任何数值均不出现在本表。",
+    "manual_vs_engine": {
+     "items": [
+      {
+       "item": "MA5_T",
+       "manual": 7.368,
+       "engine": 7.368,
+       "match": true
+      },
+      {
+       "item": "MA10_T",
+       "manual": 7.434,
+       "engine": 7.434,
+       "match": true
+      },
+      {
+       "item": "MA20_T",
+       "manual": 7.354,
+       "engine": 7.354,
+       "match": true
+      },
+      {
+       "item": "MA30_T",
+       "manual": 7.34,
+       "engine": 7.34,
+       "match": true
+      },
+      {
+       "item": "MA60_T",
+       "manual": 7.402167,
+       "engine": 7.402167,
+       "match": true
+      },
+      {
+       "item": "粘合度_pct",
+       "manual": 1.280655,
+       "engine": 1.280655,
+       "match": true
+      },
+      {
+       "item": "VOL135_T",
+       "manual": 9738002.281481,
+       "engine": 9738002.281481,
+       "match": true
+      },
+      {
+       "item": "趋势20",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "趋势30",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "趋势60",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "量能放大(V>VOL135)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      }
+     ],
+     "n_checked": 11,
+     "n_match": 11,
+     "mismatch": [],
+     "all_match": true,
+     "verdict": "PASS"
+    }
+   },
+   {
+    "t": 2216,
+    "j": 46,
+    "symbol": "sh600064",
+    "dates": [
+     "2024-02-06(T-2)",
+     "2024-02-07(T-1)",
+     "2024-02-08(T)"
+    ],
+    "rows_by_bar": {
+     "T-2": {
+      "date": "2024-02-06",
+      "O": 5.06,
+      "H": 5.39,
+      "L": 5.06,
+      "C": 5.34,
+      "V": 23375972.0,
+      "A": 139551952.0
+     },
+     "T-1": {
+      "date": "2024-02-07",
+      "O": 5.33,
+      "H": 5.5,
+      "L": 5.3,
+      "C": 5.5,
+      "V": 28651172.0,
+      "A": 177272256.0
+     },
+     "T": {
+      "date": "2024-02-08",
+      "O": 5.49,
+      "H": 5.67,
+      "L": 5.49,
+      "C": 5.58,
+      "V": 31210836.0,
+      "A": 198608272.0
+     }
+    },
+    "intermediates_T2_T1_T": {
+     "MA5": [
+      5.26,
+      5.292,
+      5.356
+     ],
+     "MA10": [
+      5.341,
+      5.362,
+      5.378
+     ],
+     "MA20": [
+      5.2945,
+      5.3065,
+      5.321
+     ],
+     "MA30": [
+      5.298667,
+      5.307667,
+      5.318333
+     ],
+     "MA60": [
+      5.3475,
+      5.349,
+      5.351833
+     ],
+     "HH": [
+      5.3475,
+      5.362,
+      5.378
+     ],
+     "LL": [
+      5.26,
+      5.292,
+      5.318333
+     ],
+     "粘合度": [
+      1.663498,
+      1.322751,
+      1.121904
+     ],
+     "均线粘合": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "VOL5": [
+      21094083.6,
+      23179834.0,
+      26151596.8
+     ],
+     "VOL135": [
+      13469726.481481,
+      13560953.014815,
+      13609187.711111
+     ],
+     "量能放大": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "趋势20": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "趋势30": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "趋势60": [
+      0.0,
+      1.0,
+      1.0
+     ],
+     "均线粘合起爆": [
+      0.0,
+      1.0,
+      1.0
+     ],
+     "__输出信号": [
+      0.0,
+      1.0,
+      1.0
+     ],
+     "__引擎中间量_RAW": {
+      "MA5_T": 5.356,
+      "MA10_T": 5.378,
+      "MA20_T": 5.321,
+      "MA20_T1": 5.3065,
+      "V_T1": 28651172.0,
+      "C_T1": 5.5,
+      "H_T2": 5.39,
+      "L_T2": 5.06
+     }
+    },
+    "manual_recompute": {
+     "MA5_T": 5.356,
+     "MA10_T": 5.378,
+     "MA20_T": 5.321,
+     "MA30_T": 5.318333,
+     "MA60_T": 5.351833,
+     "粘合度_手算_pct": 1.121904,
+     "VOL135_T": 13609187.711111,
+     "量能放大_手算": 2.293365,
+     "趋势20_手算": 1.0,
+     "趋势30_手算": 1.0,
+     "趋势60_手算": 1.0
+    },
+    "uses_only_le_T": "核对点：上表每个中间量在 T 列的值只由 rows_by_bar 中 ≤T 的原始 bar 决定；T+1 及以后的任何数值均不出现在本表。",
+    "manual_vs_engine": {
+     "items": [
+      {
+       "item": "MA5_T",
+       "manual": 5.356,
+       "engine": 5.356,
+       "match": true
+      },
+      {
+       "item": "MA10_T",
+       "manual": 5.378,
+       "engine": 5.378,
+       "match": true
+      },
+      {
+       "item": "MA20_T",
+       "manual": 5.321,
+       "engine": 5.321,
+       "match": true
+      },
+      {
+       "item": "MA30_T",
+       "manual": 5.318333,
+       "engine": 5.318333,
+       "match": true
+      },
+      {
+       "item": "MA60_T",
+       "manual": 5.351833,
+       "engine": 5.351833,
+       "match": true
+      },
+      {
+       "item": "粘合度_pct",
+       "manual": 1.121904,
+       "engine": 1.121904,
+       "match": true
+      },
+      {
+       "item": "VOL135_T",
+       "manual": 13609187.711111,
+       "engine": 13609187.711111,
+       "match": true
+      },
+      {
+       "item": "趋势20",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "趋势30",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "趋势60",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      },
+      {
+       "item": "量能放大(V>VOL135)",
+       "manual": 1.0,
+       "engine": 1.0,
+       "match": true
+      }
+     ],
+     "n_checked": 11,
+     "n_match": 11,
+     "mismatch": [],
+     "all_match": true,
+     "verdict": "PASS"
+    }
+   }
+  ]
+ },
+ "summary": {
+  "543": {
+   "title": "探底放量突破选股公式源码",
+   "signal_name": "探底放量突破",
+   "code_sha1_audited": "5e8cc4e14fcc",
+   "code_sha1_frozen": "5e8cc4e14fcc",
+   "verdicts": {
+    "dim1_data_availability": "PASS",
+    "dim1_truncation_invariance": "PASS",
+    "dim2_function_semantics": "PASS",
+    "dim3_shift_experiment": "PASS",
+    "dim4_positive_control": "PASS",
+    "dim5_handcheck": "PASS"
+   },
+   "dim5_detail": {
+    "picks": 3,
+    "values_checked": 24,
+    "mismatches": 0,
+    "all_match": true
+   },
+   "dim4_detail": {
+    "injection": "全通道（C,H,L,O,V）整体前移 1 日：用 T+1 的行情当作 T 的行情",
+    "delta_gross_exc_pp": 4.9579,
+    "delta_t": 103.67,
+    "improved": true
+   },
+   "verdict": "PASS",
+   "anomalies": []
+  },
+  "774": {
+   "title": "最强黄金坑选股公式源码",
+   "signal_name": "最强黄金坑",
+   "code_sha1_audited": "707c134779a2",
+   "code_sha1_frozen": "707c134779a2",
+   "verdicts": {
+    "dim1_data_availability": "PASS",
+    "dim1_truncation_invariance": "PASS",
+    "dim2_function_semantics": "PASS",
+    "dim3_shift_experiment": "PASS",
+    "dim4_positive_control": "PASS",
+    "dim5_handcheck": "PASS"
+   },
+   "dim5_detail": {
+    "picks": 3,
+    "values_checked": 21,
+    "mismatches": 0,
+    "all_match": true
+   },
+   "dim4_detail": {
+    "injection": "全通道（C,H,L,O,V）整体前移 1 日：用 T+1 的行情当作 T 的行情",
+    "delta_gross_exc_pp": 2.4125,
+    "delta_t": 77.274,
+    "improved": true
+   },
+   "verdict": "PASS",
+   "anomalies": []
+  },
+  "807": {
+   "title": "五均线粘合起爆选股公式源码",
+   "signal_name": "均线粘合起爆",
+   "code_sha1_audited": "0c5c1e7de439",
+   "code_sha1_frozen": "0c5c1e7de439",
+   "verdicts": {
+    "dim1_data_availability": "PASS",
+    "dim1_truncation_invariance": "PASS",
+    "dim2_function_semantics": "PASS",
+    "dim3_shift_experiment": "PASS",
+    "dim4_positive_control": "PASS",
+    "dim5_handcheck": "PASS"
+   },
+   "dim5_detail": {
+    "picks": 3,
+    "values_checked": 33,
+    "mismatches": 0,
+    "all_match": true
+   },
+   "dim4_detail": {
+    "injection": "全通道（C,V）整体前移 1 日：用 T+1 的行情当作 T 的行情",
+    "delta_gross_exc_pp": 1.4209,
+    "delta_t": 33.084,
+    "improved": true
+   },
+   "verdict": "PASS",
+   "anomalies": []
+  },
+  "_overall": {
+   "前视条数": 0,
+   "前视id": [],
+   "结论": "3 条均无未来函数，M2/M3 的毛口径读数可保留",
+   "阳性对照成立": "方法有分辨力（三条阳性对照均成立）",
+   "备注": "本任务只做复核与取证，不涉及「能不能赚钱」的结论。"
+  }
+ },
+ "anomalies": [],
+ "anomalies_original_200char": [],
+ "runtime_sec": 966.7
+}

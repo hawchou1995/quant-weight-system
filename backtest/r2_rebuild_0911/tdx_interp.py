@@ -14,6 +14,7 @@
 数据变量：C/CLOSE O/OPEN H/HIGH L/LOW V/VOL/VOLUME AMO/AMOUNT
 """
 import re
+import math
 
 import numpy as np
 import pandas as pd
@@ -175,11 +176,15 @@ SUPPORTED = {"REF", "MA", "EMA", "SMA", "HHV", "LLV", "HHVBARS", "LLVBARS",
              "CROSS", "BARSLAST", "BARSSINCE", "COUNT", "EVERY", "EXIST",
              "SUM", "MAX", "MIN", "ABS", "POW", "SQRT", "SGN", "MOD", "IF",
              "BETWEEN", "UPNDAY", "DOWNNDAY", "NDAY", "STD", "EXPMA", "SLOPE",
-             "FORCAST", "AVEDEV", "FILTER", "CONST", "ATAN", "RANGE", "DMA"}
+             "FORCAST", "AVEDEV", "FILTER", "CONST", "ATAN", "RANGE", "DMA",
+             # v4 追加（2026-09-28）：纯数学函数；不改动既有分支
+             "MEMA", "BARSLASTCOUNT", "ZTPRICE", "ROUND", "INTPART", "WMA",
+             "BARSCOUNT", "BACKSET", "RSI", "VARP", "COVAR", "LAST",
+             "TOPRANGE", "LOWRANGE"}
 # DYNAINFO：盘中实时量，日频回测近似为常数 1（当日有成交；另计 flag）
 LENIENT = {"DYNAINFO", "STICKLINE", "DRAWTEXT", "DRAWTEXT_FIX", "DRAWICON",
            "DRAWNUMBER", "DRAWNUMBER_FIX", "DRAWABOVE", "DRAWLINE", "POLYLINE",
-           "VERTLINE", "DRAWKLINE", "DRAWNULL_FN"}
+           "VERTLINE", "DRAWKLINE", "DRAWNULL_FN", "DRAWSL"}
 UNSUPPORTED = {"FINANCE", "NAMELIKE", "CODELIKE", "INBLOCK",
                "WINNER", "COST", "ZIG", "PEAK", "TROUGH", "PEAKBARS",
                "TROUGHBARS", "STKINDI", "EXPMEMA", "TFILTER",
@@ -548,6 +553,10 @@ def _call(fn, args, env):
         x = arr(0); lo = arr(1); hi = arr(2)
         with np.errstate(invalid="ignore"):
             return ((x >= lo) & (x <= hi)).astype(float)
+    # v4 追加（2026-09-28）：alpha 为序列（var-alpha 变窗）时走序列递归；标量 alpha 仍走原分支
+    if fn == "DMA" and not (isinstance(a[1], float)
+                            or (isinstance(a[1], np.ndarray) and a[1].size == 1)):
+        return dma_series(arr(0), _np(a[1]))
     if fn == "DMA":
         x = arr(0)
         alpha = _const(a[1] if isinstance(a[1], float) else 0.0, None)
@@ -559,6 +568,72 @@ def _call(fn, args, env):
     if fn in ("STICKLINE", "DRAWTEXT", "DRAWTEXT_FIX", "DRAWICON", "DRAWNUMBER",
               "DRAWNUMBER_FIX", "DRAWABOVE", "DRAWLINE", "POLYLINE", "VERTLINE",
               "DRAWKLINE"):
+        return np.zeros(len(arr(0)))
+    # ---------------- v4 追加实现（2026-09-28，纯追加，不改动既有分支） ----------------
+    if fn == "MEMA":                   # MEMA_t = (X_t + (N-1)*MEMA_{t-1}) / N  == EMA(alpha=1/N)
+        x, n = arr(0), n_arg(1)
+        if not isinstance(n, int) or n < 1:
+            raise NotImplementedError("MEMA var-N")
+        return _series(x).ewm(alpha=1.0 / n, adjust=False).mean().to_numpy()
+    if fn == "BARSLASTCOUNT":          # 连续满足 X 的根数（含当前根）
+        return barslastcount(arr(0) != 0)
+    if fn == "ZTPRICE":                # 涨停价 = round(前收*(1+R), 2)；只依赖前收，非未来函数
+        with np.errstate(invalid="ignore"):
+            return round_half_up(arr(0) * (1.0 + arr(1)), 2)
+    if fn == "ROUND":                  # 四舍五入（半离零），与 ZTPRICE 同一口径
+        nd = n_arg(1)
+        if not isinstance(nd, int):
+            raise NotImplementedError("ROUND var-N")
+        return round_half_up(arr(0), nd)
+    if fn == "INTPART":                # 向零取整
+        return np.trunc(arr(0))
+    if fn == "WMA":                    # 线性加权移动平均，权重 N,N-1,...,1
+        x, n = arr(0), n_arg(1)
+        if not isinstance(n, int) or n < 1:
+            raise NotImplementedError("WMA var-N")
+        w = np.arange(1, n + 1, dtype=float)
+        w = w / w.sum()
+        return _series(x).rolling(n, min_periods=n).apply(
+            lambda y: float(np.dot(y, w)), raw=True).to_numpy()
+    if fn == "BARSCOUNT":              # 自第一个有效值以来的周期数
+        return barscount(arr(0))
+    if fn == "BACKSET":                # X 为真的位置及其前 N-1 根置 1
+        nn = n_arg(1)
+        if not isinstance(nn, int):
+            raise NotImplementedError("BACKSET var-N")
+        return backset(arr(0) != 0, nn)
+    if fn == "RSI":                    # RSI(N)（用 CLOSE）或 RSI(X,N)
+        if len(a) == 1:
+            x = _np(env["CLOSE"] if "CLOSE" in env else env["C"])
+            n = n_arg(0)
+        else:
+            x, n = arr(0), n_arg(1)
+        if not isinstance(n, int) or n < 1:
+            raise NotImplementedError("RSI var-N")
+        return rsi_series(x, n)
+    if fn == "VARP":                   # 总体方差（ddof=0）
+        n = n_arg(1)
+        if not isinstance(n, int) or n < 1:
+            raise NotImplementedError("VARP var-N")
+        return _series(arr(0)).rolling(n, min_periods=n).var(ddof=0).to_numpy()
+    if fn == "COVAR":                  # 样本协方差（ddof=1）
+        n = n_arg(2)
+        if not isinstance(n, int) or n < 2:
+            raise NotImplementedError("COVAR var-N")
+        return covar_series(arr(0), arr(1), n)
+    if fn == "LAST":                   # LAST(X,A,B)：前 A 根到前 B 根是否一直满足
+        if len(a) != 3:
+            raise NotImplementedError("LAST arity")
+        ia, ib = n_arg(1), n_arg(2)
+        if not isinstance(ia, int) or not isinstance(ib, int):
+            raise NotImplementedError("LAST var-N")
+        return last_true(arr(0) != 0, ia, ib)
+    if fn in ("TOPRANGE", "LOWRANGE"):  # N>0 → N 周期极值；N<=0/缺省 → 自首个有效值起
+        n = n_arg(1) if len(a) > 1 else 0
+        if not isinstance(n, int):
+            raise NotImplementedError(fn + " var-N")
+        return range_ext(arr(0), n, fn == "TOPRANGE")
+    if fn == "DRAWSL":                 # 纯画线（显示层），与 DRAWLINE 等同样返回 0
         return np.zeros(len(arr(0)))
     raise NotImplementedError(fn)
 
@@ -651,3 +726,127 @@ def roll_max_var(x, k):
 
 def roll_min_var(x, k):
     return _roll_var(x, k, "min")
+
+
+# ---------------- v4 追加：纯数学函数原语（2026-09-28） ----------------
+
+def round_half_up(x, nd):
+    """四舍五入（半离零），TDX ROUND / ZTPRICE 口径；NaN 原样传播。"""
+    x = np.asarray(x, float)
+    f = 10.0 ** nd
+    with np.errstate(invalid="ignore"):
+        return np.sign(x) * np.floor(np.abs(x) * f + 0.5) / f
+
+
+def barslastcount(cond):
+    """BARSLASTCOUNT(X)：连续满足 X 的周期数（含当前根）；当前根不满足 → 0。"""
+    c = np.asarray(cond, bool)
+    n = len(c)
+    if n == 0:
+        return np.zeros(0)
+    idx = np.arange(n)
+    last_false = np.maximum.accumulate(np.where(~c, idx, -1))
+    return np.where(c, idx - last_false, 0.0).astype(float)
+
+
+def backset(cond, n):
+    """BACKSET(X,N)：X 为真的位置及其前 N-1 根置 1（历史不足则从首根起）。"""
+    c = np.asarray(cond, bool)
+    out = np.zeros(len(c))
+    k = max(int(n), 1)
+    for i in np.where(c)[0]:
+        out[max(0, i - k + 1): i + 1] = 1.0
+    return out
+
+
+def barscount(x):
+    """BARSCOUNT(X)：自第一个有效值（有限且非 0）以来的周期数；之前为 0。"""
+    x = np.asarray(x, float)
+    ok = np.isfinite(x) & (x != 0)
+    if not ok.any():
+        return np.zeros(len(x))
+    i0 = int(np.argmax(ok))
+    idx = np.arange(len(x), dtype=float)
+    return np.where(ok, idx - i0 + 1.0, 0.0)
+
+
+def rsi_series(x, n):
+    """RSI(N) = SMA(MAX(X-REF(X,1),0),N,1) / SMA(ABS(X-REF(X,1)),N,1) * 100
+    （TDX 的 SMA(.,N,1) 即 alpha=1/N 的 ewm(adjust=False)）。"""
+    x = np.asarray(x, float)
+    if x.size == 0:
+        return x.copy()
+    d = x - np.concatenate(([np.nan], x[:-1]))
+    up = np.where(np.isnan(d), np.nan, np.fmax(d, 0.0))
+    ab = np.abs(d)
+    al = 1.0 / n
+    num = _series(up).ewm(alpha=al, adjust=False).mean().to_numpy()
+    den = _series(ab).ewm(alpha=al, adjust=False).mean().to_numpy()
+    out = np.full(x.size, np.nan)
+    m = np.isfinite(den) & (den > 0)
+    out[m] = num[m] / den[m] * 100.0
+    return out
+
+
+def covar_series(x, y, n):
+    """COVAR(X,Y,N)：N 周期样本协方差（ddof=1）。"""
+    xs, ys = _series(x), _series(y)
+    mxy = (xs * ys).rolling(n, min_periods=n).mean()
+    mx = xs.rolling(n, min_periods=n).mean()
+    my = ys.rolling(n, min_periods=n).mean()
+    cov_pop = mxy - mx * my                      # E[xy]-E[x]E[y]，避免 NaN 链式污染
+    return (cov_pop * (n / (n - 1.0))).to_numpy()
+
+
+def last_true(cond, a, b):
+    """LAST(X,A,B)：前 A 根到前 B 根是否一直满足 X（自动排序 A/B；历史不足 → 0）。"""
+    c = np.asarray(cond, bool).astype(float)
+    lo, hi = (a, b) if a < b else (b, a)        # lo=近端偏移（小），hi=远端偏移（大）
+    lo, hi = max(0, lo), max(0, hi)
+    win = hi - lo + 1
+    s = _series(c).shift(lo)
+    r = s.rolling(win, min_periods=win).min().to_numpy()
+    return np.where(r == 1.0, 1.0, 0.0)
+
+
+def range_ext(x, n, is_max):
+    """TOPRANGE/LOWRANGE：n>0 → n 周期极值；n<=0 → 自第一个有效值起（cummax/cummin）。"""
+    x = np.asarray(x, float)
+    if x.size == 0:
+        return x.copy()
+    if n > 0:
+        s = _series(x)
+        return (s.rolling(n, min_periods=n).max() if is_max
+                else s.rolling(n, min_periods=n).min()).to_numpy()
+    return np.fmax.accumulate(x) if is_max else np.fmin.accumulate(x)
+
+
+def dma_series(x, alpha):
+    """DMA(X,A) 的序列 alpha 版：y_t = A_t*x_t + (1-A_t)*y_{t-1}。
+    y 以首个有效 x 播种（与既有标量分支 ewm(adjust=False) 同约定）；
+    x 为 NaN 处 y 保持上一根；alpha 为 NaN（窗口未满）取前一个有效值，前导用首个有效值回填。"""
+    x = np.asarray(x, float)
+    a = np.asarray(alpha, float)
+    n = len(x)
+    if n == 0:
+        return np.zeros(0)
+    fin = np.isfinite(a)
+    if not fin.any():
+        raise NotImplementedError("DMA alpha all-NaN")
+    idx = np.where(fin, np.arange(n), -1)
+    np.maximum.accumulate(idx, out=idx)
+    src = np.where(idx >= 0, idx, int(np.argmax(fin)))
+    xl, al = x.tolist(), a[src].tolist()
+    out = [0.0] * n
+    prev = float("nan")
+    for i in range(n):
+        xi = xl[i]
+        if not math.isfinite(xi):
+            out[i] = prev
+            continue
+        if math.isfinite(prev):
+            prev = al[i] * xi + (1.0 - al[i]) * prev
+        else:
+            prev = xi
+        out[i] = prev
+    return np.asarray(out, float)
