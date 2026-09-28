@@ -1413,9 +1413,14 @@ HPDK_JS = r"""
       return {k: 'drop', gate: 'B', why: 'B: 停牌/一字（现价=今开=昨收）'};
     var gap = opn / pcl - 1;
     var lo = numOr(H.gap_lo, -0.03), hi = numOr(H.gap_hi, -0.01);
-    if (!(gap >= lo - CFG.EPS && gap <= hi + CFG.EPS))
+    /* 上沿按「开区间」——对齐冻结生产者的 float32 算术（2026-09-28，R-hpdk-gapedge-0928）：
+       生产者面板 O/C 为 float32，20.79/21.0−1 = −0.009999931（落在带外）；
+       本函数用 float64 报价：−0.010000000000000009（落在带内）⇒ 边界名会**多算 1 只**
+       实测 2026-09-28：601020 华钰矿业 gap 恰为 −1.0000%，前端计入、生产者/卡片不计入。
+       为与冻结口径一致，距上沿 < 1e-7 视为带外（下沿仍按闭区间——生产者 float32 同样含下沿）。 */
+    if (!(gap >= lo - CFG.EPS && gap <= hi + CFG.EPS && (hi - gap) >= 1e-7))
       return {k: 'drop', gate: 'A', gap: gap,
-              why: 'A: 今开/昨收−1 = ' + fmtPct(gap) + ' 不在 [' + fmtPct(lo) + ', ' + fmtPct(hi) + ']'};
+              why: 'A: 今开/昨收−1 = ' + fmtPct(gap) + ' 不在 [' + fmtPct(lo) + ', ' + fmtPct(hi) + ')（上沿按开区间=冻结 float32 口径）'};
     if (!(num(m.volbr) > 0)) return {k: 'drop', gate: 'F', gap: gap, why: 'F: 缺量比数据（算不出复合分）'};
     if (isNaN(num(m.ret20))) return {k: 'drop', gate: 'F', gap: gap, why: 'F: 缺 20 日涨幅数据（算不出复合分）'};
     return {k: 'keep', gap: gap};
@@ -1634,7 +1639,8 @@ HPDK_JS = r"""
     } catch (e) { FP = null; S.err = String(e && e.message || e); }
     if (fpEl) {
       if (FP) {
-        fpEl.textContent = '\u26a1 全池口径（权威）：资格池 ' + FP.pool + ' 只 → 命中 ' + FP.hits
+        fpEl.textContent = '\u26a1 全池口径（权威）· 买日 ' + (H.buy_date || '—') + '（信号日 ' + (H.as_of || '—')
+          + '）：资格池 ' + FP.pool + ' 只 → 命中 ' + FP.hits
           + ' 只｜买入名单 = F 前 ' + K + '：' + FP.top.map(function(x){
               return (x.m.name || bare(x.code)) + ' ' + bare(x.code); }).join('、')
           + '｜下表只渲染 ' + S.rows + ' 行（命中 ' + S.hit + ' 只，且顺序为**窗内重排名**）——以本条为准';

@@ -346,6 +346,24 @@ def main():
     log("[out] hpdk_hits.json  买日=%s 信号日=%s 资格池=%d 命中=%d（F 前 3：%s）"
         % (hits["date"], hits["signal_date"], hits["n_pool"], hits["n_hits"],
            "、".join("%s %s" % (x["code"], x["name"]) for x in hits["top"][:3])))
+    # ---------- 命中历史留档（R-hpdk-hits-0928）----------
+    # 2026-09-28 的教训：命中记录当时只在浏览器 localStorage、且按 as_of 作废 ⇒ **事后无从回看**
+    # （用户傍晚再看只剩 3 只候选，无法证明早上是 4 只）。此档一行一日、幂等追加、体积可忽略。
+    _hist = outdir / "hpdk_hits_history.jsonl"
+    _rec = dict(date=hits["date"], signal_date=hits["signal_date"], n_pool=hits["n_pool"],
+                n_hits=hits["n_hits"], k=hits["k"],
+                top=[x["code"] for x in hits["top"]],
+                rows=[dict(code=x["code"], name=x["name"], ind=x.get("ind", ""),
+                           gap_pct=x["gap_pct"], F=x["F"]) for x in hits["rows"]])
+    _old = []
+    if _hist.exists():
+        _old = [json.loads(l) for l in _hist.read_text(encoding="utf-8").splitlines() if l.strip()]
+    if not any(r.get("date") == hits["date"] for r in _old):
+        with _hist.open("a", encoding="utf-8") as _fh:
+            _fh.write(json.dumps(_rec, ensure_ascii=False) + "\n")
+        log("[out] hpdk_hits_history.jsonl 追加 %s（累计 %d 天）" % (hits["date"], len(_old) + 1))
+    else:
+        log("[out] hpdk_hits_history.jsonl 已含 %s（幂等跳过）" % hits["date"])
     # ---------- OOS 台账只读投影 ----------
     st = json.loads((OUT / "oos_state.json").read_text(encoding="utf-8")) if (OUT / "oos_state.json").exists() else {}
     rp = json.loads((OUT / "oos_report.json").read_text(encoding="utf-8")) if (OUT / "oos_report.json").exists() else {}
