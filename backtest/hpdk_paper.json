@@ -1,6 +1,6 @@
 {
- "as_of": "2026-09-24",
- "updated_at": "2026-09-28 14:30:32",
+ "as_of": "2026-09-28",
+ "updated_at": "2026-09-28 20:20:24",
  "frozen_script_sha256": "0b61a4bbce100ed63be86e72e0692bfc719d6c13e266410d593926b3855518b3",
  "config": {
   "capital": 1000000.0,
@@ -30,24 +30,42 @@
   "mean_per_trade": null,
   "med_per_trade": null,
   "total_pnl": 0.0,
-  "nav_series_len": 0
+  "nav_series_len": 1
  },
- "nav_daily": [],
+ "nav_daily": [
+  [
+   "2026-09-28",
+   1.0
+  ]
+ ],
  "positions": [],
  "settled": [],
- "track": [],
+ "track": [
+  {
+   "state": "待判定",
+   "signal_date": "2026-09-28",
+   "code": "—",
+   "name": "资格池 2227 只（等次一交易日 09:25 用真实今开筛选）",
+   "board": "",
+   "ind": "",
+   "gap": null,
+   "entry_date": null,
+   "entry_open": null,
+   "exit_date": null
+  }
+ ],
  "reconcile": {
   "ledger_n": 0,
   "replay_settleable": 0,
   "mismatches": []
  },
  "pool_now": {
-  "as_of": "2026-09-24",
-  "buy_date": "2026-09-28",
-  "exit_date": "2026-09-29",
-  "n": 2223,
+  "as_of": "2026-09-28",
+  "buy_date": "2026-09-29",
+  "exit_date": "2026-09-30",
+  "n": 2227,
   "boards": {
-   "主板": 2223
+   "主板": 2227
   }
  }
 }

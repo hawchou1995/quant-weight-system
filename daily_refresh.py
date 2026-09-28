@@ -39,6 +39,14 @@ STEPS = [
     # 而 fullpool_guard / em_bulk 都靠该文件末行判定「今日」。原先排在它们之后
     # → 三步拿到上一交易日做基准：freshness 误报新鲜、guard 漏补、em_bulk 口径校验拒写(rc=2)。
     ("HS300 索引行 ensure_index_row", ["backtest/ensure_index_row.py"], False),
+    # 缩量超跌族「面板日历」推进（2026-09-28，R-hpdk-cal-0928）——必须早于 hpdk 两步：
+    # `backtest/wechat_hotspot_leader_0925/universe.json` 的 calendar 既是 oos_run.py 的面板日历，
+    # 也是 hpdk_candidates 产物 `as_of` 的来源；此前链路**无任何日更步骤**（只跑候选/模拟盘）
+    # → 日历冻结在生成日（实测 2026-09-24）→ 缩量超跌卡片 as_of/buy_date 永不前进，
+    #   且云端新鲜度期望（= index_000300.csv 末行）日日报 stale(2026-09-24!=今日)。
+    # 只**追加**交易日：单调、幂等、前缀逐位不变、不动 universe 成员
+    # （保留 universe_maint.py 的 18 只僵尸清除结果）。已最新时秒退 no-op。
+    ("缩量超跌-面板日历 universe_cal", ["backtest/hengpan_fangliang_dikai_0925/universe_cal.py"], False),
     # 全量池守卫（R-fullpool-0917，2026-09-17 建）：降级源只补池内子集（如 440/7539）→ 全市场口径
     # 数据（涨停全景/A5 扫描）失真。本步查 data_full 新鲜度，陈旧 >100 只自动触发全量补数（约 1-2h）。
     # [软]=失败不阻断主链；--skip-fullguard 跳过。
@@ -178,6 +186,15 @@ STEPS = [
     # [软]=失败不阻断主链（看板退回上一份候选，卡片显示「产物未生成」，不会静默显示假数据）。
     # 幂等：只读行情/面板、只写自己的两个产物；与冻结脚本 oos_run.py 的 A11 逐位对拍失败会 exit 2。
     # 缓存落在系统临时目录（不污染仓库：A14 要求工作区无新增未跟踪文件）。--skip-hpdk 跳过。
+    # 缩量超跌-前向 OOS 台账 runner（2026-09-28，R-hpdk-cal-0928）——必须在 hpdk 投影之前：
+    # `hpdk_candidates.py` 的 hpdk_oos_view.json 是 `oos_state.json` 的**只读投影**
+    # （last_scan_date 直接取 st["last_scan_date"]），而该 state 由本 runner 写。
+    # 此前 runner 从未进链 → state 冻结在手工跑的那天（实测 2026-09-24，且仍是 v1.5 口径）→
+    # 云端新鲜度（期望 = index_000300.csv 末行）对该件日日报 stale。本机实测 39.9s/轮。
+    # 幂等：只追加 shadow_start 之后、台账里没有的 (signal_date, sym)。
+    # --skip-oosrun 跳过。
+    ("缩量超跌-前向OOS台账 oos_run", ["backtest/hengpan_fangliang_dikai_0925/oos_run.py"],
+     "--skip-oosrun" in sys.argv),
     ("缩量超跌-当日候选 hpdk_candidates[软]",
      ["backtest/hengpan_fangliang_dikai_0925/hpdk_candidates.py"], "--skip-hpdk" in sys.argv),
     # 模拟盘账户 + 跟踪池（从冻结 OOS 台账派生；与台账对拍不一致会 exit 3）——同样必须在 build 之前。
@@ -392,6 +409,8 @@ if not fails and not NO_MAIN_PUSH:   # ⑤ 云端 Phase 1：只写 gh-pages，�
                           "backtest/hengpan_fangliang_dikai_0925/oos_report.json",
                           "backtest/hengpan_fangliang_dikai_0925/oos_trades.jsonl",
                           "backtest/wechat_hotspot_leader_0925/universe.json",
+                          # 2026-09-28 补：面板日历推进器（新脚本不进白名单 → 改动不会被链提交）
+                          "backtest/hengpan_fangliang_dikai_0925/universe_cal.py",
                           "backtest/hengpan_fangliang_dikai_0925/x5_gates.py",
                           "backtest/hengpan_fangliang_dikai_0925/evidence_gates_scan.json",
                           "backtest/hengpan_fangliang_dikai_0925/hpdk_paper.py",

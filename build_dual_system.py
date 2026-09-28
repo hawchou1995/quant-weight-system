@@ -20,6 +20,19 @@ from ui_subtab import SUBNAV_CSS, SUBNAV_JS, subnav, subview, ASSET_HINT
 from intraday_live import INTRADAY_JS, QLCH_JS, HPDK_JS, A5_JUDGE_JS, A5_JS
 
 
+# ── 全站「数据截止」徽章唯一入口（2026-09-28，R-asof-ui-0928）───────────────────
+# 用户要求：**所有选股池**的数据截止时间「位置、样式必须统一」。三条硬约束：
+#   位置 = 池标题 <h2> 内、紧跟标题文字之后的**第一个** span（不再放 h2 之外）；
+#   样式 = class="view-badge auto"（橙色 auto 徽章；不再用 badge / badge-auto）；
+#   文本 = `数据截至 YYYY-MM-DD[ HH:MM] · 口径`（口径 ∈ 收盘 / 盘中实时 / 净值…）。
+# 新增选股池一律调用本函数，禁止自拼徽章字符串（否则位置/样式会再次漂移）。
+def asof_badge(date, tag="收盘", ts="15:00", note="收盘数据"):
+    """统一「数据截止」徽章。date 缺失显示「—」；ts 传 None/"" 则不显示时刻。"""
+    d = str(date) if date not in (None, "") else "—"
+    t = (" " + str(ts)) if ts else ""
+    return ('<span class="view-badge auto" title="%s">数据截至 %s%s · %s</span>'
+            % (note, d, t, tag))
+
 def _crowding():
     """大盘拥挤度（代理口径 · 2026-09-18 用户需求 #11）。
 
@@ -284,7 +297,7 @@ def _sat_paper_card(path, tk, title):
         ev = ((d.get("events") or [{}])[-1].get("event", ""))
         role = m.get("role", "")
         return (f'<div class="card" id="sat-paper-{tag}-card">'
-                f'<h2>{title} <span class="badge badge-auto">{m.get("rebased","2026-09-15")[:10]} 重设 · 基数 {basis:,.0f} · {role}</span></h2>'
+                f'<h2>{title} {asof_badge(dt)} <span class="view-badge auto">{m.get("rebased","2026-09-15")[:10]} 重设 · 基数 {basis:,.0f} · {role}</span></h2>'
                 f'<div class="kpis">'
                 f'<div class="kpi"><div class="l">模拟净值</div><div class="v">{nav:,.0f}</div><div class="s">期初 {basis:,.0f}</div></div>'
                 f'<div class="kpi"><div class="l">累计收益</div><div class="v" style="color:{ "var(--down)" if ret >= 0 else "var(--up)" }">{ret:+.2f}%</div><div class="s">含成本口径</div></div>'
@@ -320,7 +333,7 @@ try:
     except Exception:
         _ftarget = "—"
     FUND_PAPER_CARD = (f'<div class="card" id="fund-paper-card">'
-                       f'<h2>🧪 基金主仓（基金动量 · 持 20 日） <span class="badge badge-auto">10.2 万（17万×60%）· 持仓 20 交易日</span></h2>'
+                f'<h2>🧪 基金主仓（基金动量 · 持 20 日） {asof_badge(_flast.get("date") if _fnh else _fp.get("events", [{}])[-1].get("date"))} <span class="view-badge auto">10.2 万（17万×60%）· 持仓 20 交易日</span></h2>'
                        f'<div class="kpis">'
                        f'<div class="kpi"><div class="l">模拟净值</div><div class="v">{_fnav:.4f}</div><div class="s">期初 1.0</div></div>'
                        f'<div class="kpi"><div class="l">累计收益</div><div class="v" style="color:{'#10b981' if _fret >= 0 else '#ef4444'}">{_fret:+.2f}%</div><div class="s">C类份额 5bp/边</div></div>'
@@ -364,7 +377,7 @@ def _shadow_ret20_card():
         f_nb = f"{nb:.4f}" if nb else "—"
         f_n3 = f"{n3:.4f}" if n3 else "—"
         return (f'<div class="card" id="shadow-ret20-card">'
-                f'<h2>🧪 对照臂 · 动量增强（#2 λ0.2 主 / #4 λ0.3 陪跑） <span class="badge badge-auto">纸面跟踪 · 生产 composite 未动</span></h2>'
+                f'<h2>🧪 对照臂 · 动量增强（#2 λ0.2 主 / #4 λ0.3 陪跑） {asof_badge(last["date"])} <span class="view-badge auto">纸面跟踪 · 生产 composite 未动</span></h2>'
                 f'<div class="kpis">'
                 f'<div class="kpi"><div class="l">λ0.2 归一净值</div><div class="v">{f_n2}</div><div class="s">vs BASE <b style="color:{_col(d2)}">{d2:+.2f}%</b></div></div>'
                 f'<div class="kpi"><div class="l">BASE 归一净值</div><div class="v">{f_nb}</div><div class="s">生产口径基准臂</div></div>'
@@ -398,7 +411,7 @@ def _gold_sat_card():
         _cold = "var(--down)" if _ret >= 0 else "var(--up)"
         _flags = "；".join(_m.get("hard_flags") or [])
         return (f'<div class="card" id="gold-sat-card">'
-                f'<h2>🥇 黄金对冲（卫星层 10% · sh518880 买入持有） <span class="badge badge-auto">2026-09-17 投产 · 只做卫星层</span></h2>'
+                f'<h2>🥇 黄金对冲（卫星层 10% · sh518880 买入持有） {asof_badge(_last.get("date"))} <span class="view-badge auto">2026-09-17 投产 · 只做卫星层</span></h2>'
                 f'<div class="kpis">'
                 f'<div class="kpi"><div class="l">黄金袖净值</div><div class="v">{_nav / _notional:.4f}</div><div class="s">名义 {_notional:.0f} · {_lots} 手</div></div>'
                 f'<div class="kpi"><div class="l">累计收益</div><div class="v" style="color:{_cold}">{_ret:+.2f}%</div><div class="s">B&H · 无卖出</div></div>'
@@ -423,7 +436,7 @@ def _ret20_paper_card():
     import json as _js
     _arms = [("l02", "λ0.2", "#2 · 对照臂主候选"), ("l03", "λ0.3", "#4 · 对照臂陪跑")]
     try:
-        _rows, _nav, _ovl = [], {}, {}
+        _rows, _nav, _ovl, _last = [], {}, {}, {}
         for _a, _lab, _tagd in _arms:
             _p = BASE / "backtest" / f"ret20_paper_{_a}.json"
             _d = _js.loads(_p.read_text(encoding="utf-8"))
@@ -450,7 +463,7 @@ def _ret20_paper_card():
                  f"λ0.2/λ0.3 互重合 <b>{float(_ovl.get('l02_vs_l03', 0)):.3f}</b>"
                  f"｜BASE 臂 NAV {_nav.get('base', 1.0):.4f}（同窗影子）") if _ovl else "影子 metrics 未就绪"
         return (f'<div class="card" id="ret20-paper-card">'
-                f'<h2>📐 动量增强模拟盘（λ0.2 / λ0.3） <span class="badge badge-auto">2026-09-17 投产 · 生产 composite 未改</span></h2>'
+                f'<h2>📐 动量增强模拟盘（λ0.2 / λ0.3） {asof_badge(_last.get("date"))} <span class="view-badge auto">2026-09-17 投产 · 生产 composite 未改</span></h2>'
                 f'<div class="sub">形态：<code>l02=(z(comp)+0.2·z(ret20))/1.2</code>、<code>l03=(z(comp)+0.3·z(ret20))/1.3</code>'
                 f'，冻结引擎 BASE 原样 = 生产口径 · 两臂各 <b>68,000 同额纯对照</b>（零实盘资金申领，不与多因子主仓抢配额）</div>'
                 f'<table class="tbl"><thead><tr><th>臂</th><th>定位</th><th>NAV</th><th>在仓</th><th>现金</th><th>信号日</th><th>状态</th></tr></thead>'
@@ -1303,11 +1316,11 @@ def a5_view_html():
     if intraday:
         idate = A5.get("intraday_date") or A5_ASOF
         its = A5.get("intraday_ts") or ""
-        asof_badge = (f'<span class="view-badge auto" '
-                      f'title="行情截至 {idate} {its} · 清单（观察/回避/持仓）为 {A5_ASOF} 收盘口径">'
-                      f'数据截至 {idate} {its} · 盘中实时（清单为 {A5_ASOF} 收盘口径）</span>')
+        a5_asof_badge = asof_badge(
+            idate, tag="盘中实时（清单为 %s 收盘口径）" % A5_ASOF, ts=its,
+            note=("行情截至 %s %s · 清单（观察/回避/持仓）为 %s 收盘口径" % (idate, its, A5_ASOF)))
     else:
-        asof_badge = f'<span class="view-badge auto" title="收盘数据">数据截至 {A5_ASOF} 15:00 · 收盘</span>'
+        a5_asof_badge = asof_badge(A5_ASOF)
 
     # 今日涨停全景（2026-09-05 用户需求：≥9.5%/封板一览 + A5 命中标记，纯观察）
     zp = A5.get("zt_panorama", {})
@@ -1371,8 +1384,7 @@ def a5_view_html():
 <div class="card" id="sys-a5">
 <div class="sys-head">
 <div class="sys-head-top">
-<h2>🎯 首板低吸（双池滤网 v1.3） <span class="view-badge auto">池A 超跌 / 池B 趋势 · 模拟盘观察</span></h2>
-{asof_badge}
+<h2>🎯 首板低吸（双池滤网 v1.3） {a5_asof_badge} <span class="view-badge auto">池A 超跌 / 池B 趋势 · 模拟盘观察</span></h2>
 </div>
 <div class="sys-head-tags">
 <span class="badge badge-auto" style="background:#059669;color:#fff">✅ v1.3 双池独立滤网（2026-09-15 上线）· 模拟盘观察中</span>
@@ -1453,8 +1465,7 @@ def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extr
     if as_of:
         _tag = "盘中实时" if intraday_note else "现价"
         _ts = as_of_min or ("15:00" if not intraday_note else "")
-        _ts_html = f" {_ts}" if _ts else ""
-        asof_html = f'<span class="view-badge auto" title="{intraday_note or "收盘数据"}">数据截至 {as_of}{_ts_html} · {_tag}</span>'
+        asof_html = asof_badge(as_of, tag=_tag, ts=_ts, note=(intraday_note or "收盘数据"))
     stat_bar = (extra_stat if extra_stat else "") + f'''<div class="op-stats">
 <span class="op op-add">🟢 加仓区 <b>{sum(t8.get(t,0) for t in tier_add)}</b> 只</span>
 <span class="op op-watch">🟡 观望 <b>{sum(t8.get(t,0) for t in tier_watch)}</b> 只</span>
@@ -1474,8 +1485,7 @@ def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extr
     _body = f'''<div class="card" id="{sid}">
 <div class="sys-head">
 <div class="sys-head-top">
-<h2>{title} <span class="view-badge {badge}">{sub}</span></h2>
-{asof_html}
+<h2>{title} {asof_html} <span class="view-badge {badge}">{sub}</span></h2>
 </div>
 {_head_extra}
 </div>
@@ -1794,7 +1804,7 @@ def _etf_paper_card():
     """ETF 动量轮动（冻结模型）卡片：信号状态 + 模拟盘持仓 + 回测证据"""
     if not ETF_SNAP:
         return ('<div class="card" id="card-etf-paper">'
-                '<h2>📈 ETF 动量轮动（冻结模型） <span class="badge badge-auto">待数据</span></h2>'
+                '<h2>📈 ETF 动量轮动（冻结模型） <span class="view-badge auto">待数据</span></h2>'
                 '<div class="sub">先运行 <code>python etf_dashboard_snapshot.py</code> 生成快照</div></div>')
     _sig = ETF_SNAP.get("sig", {})
     _bt = ETF_SNAP.get("bt", {})
@@ -1861,7 +1871,7 @@ def _etf_paper_card():
     )
 
     return f'''<div class="card" id="card-etf-paper">
-<div class="card-h"><h2>📈 ETF 动量轮动（冻结模型） <span class="badge badge-auto">自动 · 2026-09-06 定稿</span></h2><span class="fold-arrow">▾</span></div>
+<div class="card-h"><h2>📈 ETF 动量轮动（冻结模型） {asof_badge(_as_of)} <span class="view-badge auto">自动 · 2026-09-06 定稿</span></h2><span class="fold-arrow">▾</span></div>
 <div class="body" style="padding:0 16px 16px">
 <div class="sub"><b>冻结配置</b>：core 6 只（沪深300/中证500/上证50/创业板/黄金/国债）· 20 日动量 · 绝对动量保护（Top1&lt;0 空仓）· 前 2 等权 · 目标波动率 <b>12%</b>（20 日窗口·clamp 25%~100%）· 月末最后交易日信号 → 次日开盘执行 · 成本 0.1% · <b>6/6 过验收门</b>（回撤 -19.1% vs 基线 -28.8% · 年化 12.2% · 夏普 1.01 · 9/10 正年 · 2021+ 段独立验证同样改善）· <b>仅供研究，不构成投资建议</b></div>
 <div class="kpis" style="margin:10px 0">{_bt_kpi}</div>
@@ -1872,7 +1882,7 @@ def _etf_paper_card():
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px">
 <div>
-<div class="etf-sec">🎯 当前信号（20 日动量排名，数据截至 {_as_of}）</div>
+<div class="etf-sec">🎯 当前信号（20 日动量排名）</div>
 <table class="tbl"><thead><tr><th>#</th><th>标的</th><th style="text-align:center">板块</th><th style="text-align:right">20日动量</th><th style="text-align:right">目标权重</th></tr></thead>
 <tbody>{"".join(_rows)}</tbody></table>
 </div>
@@ -1979,7 +1989,7 @@ def _kh_paper_card():
             f'<td style="text-align:right">{r.get("win_rate", 0):.1f}%</td></tr>' for r in _arr[:10])
 
     return f'''<div class="card" id="card-kh-paper">
-<div class="card-h"><h2>🐺 超卖伏击模拟盘（标准 / 激进） <span class="badge badge-auto">自动 · 前向验证</span></h2><span class="fold-arrow">▾</span></div>
+<div class="card-h"><h2>🐺 超卖伏击模拟盘（标准 / 激进） {asof_badge(SHORT_POOL_ASOF)} <span class="view-badge auto">自动 · 前向验证</span></h2><span class="fold-arrow">▾</span></div>
 <div class="body" style="padding:0 16px 16px">
 <div class="sub" style="margin-top:8px"><b>模拟什么</b>：超卖伏击 优化配置（2026-09-07 MA250 定稿）在<b>真实时间线前向验证</b>——入场=15 策略信号命中 + 分域 RSI（熊&lt;35/牛&lt;32/弱牛&lt;32）+ 熊市判定(沪深300&lt;MA250) + 主板 + 收盘≥3元 + 20日均额≥3000万；出场=分域 RSI（熊&gt;59/牛&gt;75/弱牛&gt;80）T+1 开盘执行 + 25 交易日持有上限；仓位=5仓×¥20,000 · 成本 0.575% × 2 边。</div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px">
@@ -2068,7 +2078,7 @@ try:
                 f'<div class="tbl-wrap"><table class="tbl sat-tbl" data-t="{track}"><thead><tr>{head}</tr></thead><tbody>{tds}</tbody></table></div>')
 
     SAT_CARD = (f'<div class="card" id="sat-card">\n'
-                f'<h2>🛰️ 卫星目标持仓 <span class="badge badge-auto">双轨 60/0/40 · 数据截至 {_sat["asof"]}（收盘）</span></h2>\n'
+                f'<h2>🛰️ 卫星目标持仓 {asof_badge(_sat["asof"])} <span class="view-badge auto">双轨 60/0/40</span></h2>\n'
                 f'<div class="sub">信号生成：<code>backtest/signal_satellite_0913.py</code>（每日收盘跑 → T+1 开盘清单）· 资金占比：<b>卫星 100% 多因子主仓</b>｜双轨口径 FB3-H20 主仓 60%· 目标持仓为<b>下次调仓的完整清单</b>（非增量）· 评分列悬浮可见拆解 · 操作列=相对模拟盘当前持仓</div>\n'
                 f'{_sat_rows("track_b")}\n</div>')
 except Exception as _e:
@@ -2116,7 +2126,7 @@ for _c in _fund_tier:
                    f'<td class="num">{100/_n_f:.1f}%</td><td>{_act}</td></tr>')
 _gate_txt = ("🟢 开（股票可买）" if _mg.get("open") else "🟠 关（仅拦股票池；基金轨不受影响——熊市 FB3 照常买入，转 Top3 低波防守仓）") + f' · 沪深300 {_mg.get("idx_close", "—")} vs MA20 {_mg.get("idx_ma20", "—")}'
 FB3_POOL_CARD = (f'<div class="card" id="fb3-pool-card">'
-                 f'<h2>🥇 主仓 FB3-H20 基金池 <span class="badge badge-auto">当前 regime 持仓 · 数据截至 {_sp_j.get("as_of", "—")}</span></h2>'
+                 f'<h2>🥇 主仓 FB3-H20 基金池 {asof_badge(_sp_j.get("as_of"))} <span class="view-badge auto">当前 regime 持仓</span></h2>'
                  f'<div class="sub">排序=基金动量分降序 · 市况门控 {_gate_txt} · 60% 资金 · 牛市 Top10 动量 / 熊市 Top3 低波（C 类份额，T+1 净值申赎）· 操作=相对模拟盘当前持仓</div>'
                  f'<div class="sub" style="color:var(--warn)">⚠ 实盘清单已按份额去重（同一基金 A/C/E 类只留一只，优先 C 类）——回测口径未去重，故实盘预期与回测数字存在系统性差异</div>'
                  f'<div class="sub" style="color:var(--faint)">行业集中度约束（同行业≤N，N∈{{1,2,3}}）已于 2026-09-14 预注册实测：三轨均未过「相位中位夏普≥对照 + 50bp 档不劣化 + 配对显著」闸 → 不采纳（报告 backtest/报告-行业集中度约束三轨实测_20260914.md）</div>'
@@ -2278,7 +2288,7 @@ if _cf.exists():
 # 跟踪池统一放底部（股票+基金同一 watch 卡，类型筛选），不做 标准/激进 双跟踪池（买入同一、卖出判定归模拟盘双轨）
 # 2026-09-05 用户需求：新增「超卖伏击命中策略一览」卡（命中 15 策略全展示，按 RSI 升序，档位/建议区分）
 KH_HITS_CARD = f'''<div class="card" id="card-kh-hits">
-<h2>🎯 超卖伏击 命中策略一览 <span class="badge badge-auto">自动 · 按 RSI 升序</span></h2>
+<h2>🎯 超卖伏击 命中策略一览 {asof_badge(SHORT_POOL_ASOF)} <span class="view-badge auto">自动 · 按 RSI 升序</span></h2>
 <div class="sub">全量池短线股票中<b>命中 15 个超卖形态策略</b>的标的（含未达买入阈值者，事件驱动）· 按当前 RSI 升序（超卖优先）· 档位/建议 = 牛熊分域裁决，<b>标准版（A59 主卖出）</b>与<b>激进版（C50 参考线）</b>分四列独立展示：<b>买入</b> = RSI 低于分域阈值（熊&lt;35 / 牛&lt;32 / 弱牛&lt;32）· <b>卖出</b> = 标准版 RSI&gt;59/75/80、激进版 RSI&gt;50 · 命中但未达阈值 = 观望（仅观察，不构成操作）· 数据截至 {SHORT_POOL_ASOF}</div>
 <div class="toolbar" id="kh-hits-bar">
 <input type="text" id="kh-hits-q" placeholder="🔍 搜索代码 / 名称 / 策略…" autocomplete="off" spellcheck="false">
@@ -2343,6 +2353,8 @@ def qlch_card():
         except Exception:
             cand = {}
     bt = {}
+    # 2026-09-28 R-asof-ui-0928：ck 上移到卡头之前——h2 里的「数据截止」徽章要用它的 as_of
+    ck = cand.get("by_track", {}).get("B4_K3", {})
     # 2026-09-22 R-qlch-t1exit-0922：原 qlch_bt_summary.json 是 T+0 违法口径（★198 复发），
     # 改读 T+1 合规复测产物；旧文件保留作历史对照但不再上卡。
     fp2 = B / "qlch_bt_t1exit_0922.json"
@@ -2355,8 +2367,9 @@ def qlch_card():
             bt = {}
     L = []
     L.append('<div class="card" id="qlch-card">')
-    L.append('<h2>🏷 超跌低开低吸 <span class="view-badge auto">'
-             '短期反转 + 跳空低吸 + 熊市择时 + 分位滤网 · 影子盘 · T+1 合规</span></h2>')
+    L.append('<h2>🏷 超跌低开低吸 %s <span class="view-badge auto">'
+             '短期反转 + 跳空低吸 + 熊市择时 + 分位滤网 · 影子盘 · T+1 合规</span></h2>'
+             % asof_badge(ck.get("as_of")))
     if bt.get("void"):
         L.append('<div class="subhint" style="border-left:3px solid var(--warn);'
                  'background:rgba(255,180,60,.08);padding:8px 10px;margin-top:8px;line-height:1.75">%s</div>'
@@ -2372,7 +2385,6 @@ def qlch_card():
 
     L.append('<div class="etf-sec" style="margin-top:14px">🎯 选股结果 · 今日收盘候选'
              '（等次日开盘 gap 判定后入场）</div>')
-    ck = cand.get("by_track", {}).get("B4_K3", {})
     if ck:
         rows = ck.get("codes", [])
         # ---- 明日买点（R-qlch-buyhint-0922）：今收 × [0.95, 0.98]；名额来自在产影子盘 ----
@@ -2400,7 +2412,7 @@ def qlch_card():
                     '<div style="margin-top:3px;font-variant-numeric:tabular-nums">%.3f ~ %.3f</div></td>'
                     % (_op, lo, hi))
 
-        L.append('<div class="sub">截至 <b>%s</b> 收盘 · %s · n = <b>%d</b> 只 · '
+        L.append('<div class="sub">信号日 <b>%s</b> 收盘 · %s · n = <b>%d</b> 只 · '
                  '明日买点 = <b>今收 × [0.95, 0.98]</b>（跳空 −5%%~−2%% 才买，成交价 = 明日开盘）· '
                  '当前持仓 <b>%d</b> 只 → 明日可建新仓 <b>%d</b> 只%s<br>'
                  '<b>这不是买入名单</b>：单票上限 K=%d，候选多于空位时<b>随机抽</b>；'
@@ -2789,7 +2801,7 @@ def _sentinel_block(pool_js="sentinel_pool.js", track_js="sentinel_track.js",
     out = []
 
     out.append('<div class="card" id="card-sentinel-pool">')
-    out.append('<h2>📡 热榜哨兵 · 选股池 <span class="badge badge-auto">as_of %s</span></h2>' % _e(as_of))
+    out.append('<h2>📡 热榜哨兵 · 选股池 %s</h2>' % asof_badge(as_of))
     out.append('<div class="sub"><span class="badge badge-auto">入场 = K≥2 见底信号共振 且当日共振家数 θ≥%s</span> '
                '<span class="badge badge-auto">主板 sh60/sz00 · T 收盘确认 → T+1 开盘买</span> '
                '<span class="badge badge-auto">影子只读 · 只可否决 · 不构成通过性证据</span></div>' % _e(thr))
@@ -3361,7 +3373,7 @@ html = f"""<!doctype html>
 <div class="card" id="sys-auto">
 <div class="sys-head">
 <div class="sys-head-top">
-<h2>🛰️ 三轨中长线 <span class="view-badge auto">FB3-H20 主仓 + SUPER 卫星 · 资金 60/0/40</span></h2>
+<h2>🛰️ 三轨中长线 {asof_badge(DATA["meta"].get("as_of"))} <span class="view-badge auto">FB3-H20 主仓 + SUPER 卫星 · 资金 60/0/40</span></h2>
 </div>
 <div class="sys-head-tags">
 <span class="badge badge-auto">v9 股票分层战法已退役（十重证伪 · ADR-0006/0007）</span>

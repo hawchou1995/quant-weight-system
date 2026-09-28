@@ -1,7 +1,7 @@
 {
- "frozen_script_sha256": "b3748ca36f83d70589a17cb9324b561a4bc52a26e59e39c60355fb32ea019225",
+ "frozen_script_sha256": "0b61a4bbce100ed63be86e72e0692bfc719d6c13e266410d593926b3855518b3",
  "shadow_start": "2026-09-25",
- "last_data_date": "2026-09-24",
+ "last_data_date": "2026-09-28",
  "exit_rule": "v1.3 主口径: 止盈 +2.00% / 不止损 / 未达标 T+2 尾盘; 对照口径: 纯 T+2 尾盘",
  "n_pending": 0,
  "acceptance": {

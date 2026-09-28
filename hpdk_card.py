@@ -16,6 +16,16 @@ import math
 RENDER_N = 600        # 服务端渲染行数上限（盘中重算用内嵌全量池，不受此限制）
 LEVEL3 = 3.0          # 每股净资产门槛（与冻结规格一致，仅用于文案）
 
+# ── 「数据截止」徽章（R-asof-ui-0928）───────────────────────────────────────────
+# 必须与 build_dual_system.asof_badge 输出**逐字节一致**（用户要求全站选股池统一）：
+#   位置 = h2 内紧跟标题；样式 = class="view-badge auto"；文本 = `数据截至 DATE [HH:MM] · 口径`。
+# 两处各留一份定义：本模块是被 build_dual_system 在文件后段 import 的，反向导入会成环。
+def asof_badge(date, tag="收盘", ts="15:00", note="收盘数据"):
+    d = str(date) if date not in (None, "") else "—"
+    t = (" " + str(ts)) if ts else ""
+    return ('<span class="view-badge auto" title="%s">数据截至 %s%s · %s</span>'
+            % (note, d, t, tag))
+
 
 def _read(p):
     try:
@@ -100,7 +110,7 @@ def hpdk_card(BASE):
     kslot = par.get("KSLOT", 20)
     capital = cap.get("capital", 0) or 0
     k_ops = cap.get("kslot") or 0
-    L.append(f'<h2>🎯 缩量超跌 <span class="view-badge auto">数据 as_of {d.get("as_of")}</span></h2>')
+    L.append(f'<h2>🎯 缩量超跌 {asof_badge(d.get("as_of"))}</h2>')
     L.append(
         '<div class="sub"><b>策略定义（与冻结预注册逐条一致；本页不复述自定义口径）</b>：T 收盘判定 → '
         f'资格 = 上市有效交易日 ≥{par.get("LISTED", 250)} ＋ 收盘 ≥{par.get("MINPX", 3.0):.2f} 元 ＋ '
@@ -293,9 +303,9 @@ def hpdk_paper_card(BASE):
     acc = d.get("account") or {}
     rec = d.get("reconcile") or {}
     started = (acc.get("n_settled") or 0) > 0 or (acc.get("n_positions") or 0) > 0
-    L.append('<h2>💼 模拟盘 · 缩量超跌 <span class="view-badge auto">%s</span></h2>'
-             % ("运行中 · as_of " + str(d.get("as_of")) if started
-                else "未开始（首个信号日 %s）" % cfg.get("shadow_start")))
+    L.append('<h2>💼 模拟盘 · 缩量超跌 %s <span class="view-badge auto">%s</span></h2>'
+             % (asof_badge(d.get("as_of")),
+                "运行中" if started else "未开始（首个信号日 %s）" % cfg.get("shadow_start")))
     L.append('<div class="sub"><b>口径（操作档，与「建议股数／单票可买」同源）</b>：'
              '本金 <b>%.0f 万</b> · KSLOT <b>%s</b> · 单票 = min(前一日净值/KSLOT, 可用现金, 该股 20日均额×1%%) · '
              '止盈 <b>+%.0f%%</b>（未达标 T+2 尾盘）· 成本 <b>%.2f bp</b> 往返 · 池 = <b>%s</b>'
