@@ -164,20 +164,42 @@ def hpdk_card(BASE):
             f'<br><span style="color:var(--faint)">{h.get("rule", "")}'
             '（原设计只有浏览器端 600 行内排名，会少报且跨日即焚 —— 本表为全池复算的权威记录）'
             '</span></div>')
+        _ic = h.get("ind_counts") or {}
+        _dedn = len(h.get("top_dedup_ind") or [])
         _hr = "".join(
             '<tr%s><td style="text-align:center">%s</td>'
             '<td><b>%s</b><br><span style="color:var(--faint);font-size:11px">%s</span></td>'
+            '<td>%s%s</td>'
             '<td style="text-align:right">%+.2f%%</td><td style="text-align:right">%+.3f</td>'
             '<td style="text-align:center">%s</td></tr>'
             % (' class="hpdk-top"' if x["rank"] <= _top_k else "",
-               x["rank"], x["name"], x["code"], x["gap_pct"], x["F"],
+               x["rank"], x["name"], x["code"], x.get("ind", "—"),
+               ('<span style="color:var(--warn)"> · 同行业第 %d 只</span>' % x["ind_seq"])
+               if (x.get("ind_seq") or 1) > 1 else "",
+               x["gap_pct"], x["F"],
                "✅ 候选" if x["rank"] <= _top_k else "—")
             for x in (h.get("rows") or []))
+        _topk_r = (h.get("top") or [])[:_top_k]
+        _ind_top = {}
+        for _x in _topk_r:
+            _ind_top[_x.get("ind", "—")] = _ind_top.get(_x.get("ind", "—"), 0) + 1
+        _n_dup = _top_k - len(_ind_top)
+        _ded_codes = h.get("top_dedup_ind") or []
+        _added = [c for c in _ded_codes if c not in {x["code"] for x in _topk_r}]
         L.append(
             f'<div class="sub" style="margin-top:10px"><b>全池命中清单（{len(h.get("rows") or [])} 只 · '
-            f'按 F 降序）</b> · 前 {_top_k} 只即当日买入候选</div>'
+            f'按 F 降序）</b> · 前 {_top_k} 只即当日买入候选'
+            f'<br><b>行业集中度</b>（命中全池）：'
+            + " ｜ ".join(f'{k} <b>{v}</b> 只' for k, v in list(_ic.items())[:6])
+            + f'<br><span style="color:var(--warn)">⚠ 冻结判据里<b>没有行业约束</b>：F 前 {_top_k} 只中有 '
+            f'<b>{_n_dup}</b> 只与更靠前者同行业（' + "、".join(f'{k} {v} 席' for k, v in _ind_top.items() if v > 1)
+            + f'）；按「同行业只取 1 只」（2026-09-28 你的实际操作口径）去重后，'
+            f'前 {_top_k} 名顺延为 {_dedn} 只互不同行业 —— 新增纳入 '
+            + ("、".join(_added[:6]) or "无")
+            + f'（第 {_top_k + 1} 名之后顺延）。本表只做显示（不改选股、不改排名）；'
+            f'要把它变成策略约束须走预注册勘误。</span></div>'
             '<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-hits"><thead><tr>'
-            '<th style="text-align:center">F 名次</th><th>标的</th>'
+            '<th style="text-align:center">F 名次</th><th>标的</th><th>行业</th>'
             '<th style="text-align:right">今开跳空</th><th style="text-align:right">F 复合分</th>'
             f'<th style="text-align:center">当日候选（前 {_top_k}）</th></tr></thead>'
             f'<tbody>{_hr}</tbody></table></div>')

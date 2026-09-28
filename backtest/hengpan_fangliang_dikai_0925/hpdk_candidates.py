@@ -311,13 +311,33 @@ def main():
             _r20 = np.array([c[4] for c in cand])
             _comp = zs(-np.log(_amt)) + zs(-np.log(_vbr)) + zs(-_r20)
             order = np.argsort(-_comp)
-            hits["rows"] = [
-                dict(rank=int(r + 1), code=cand[q][0][2:], sym=cand[q][0],
-                     name=names.get(cand[q][0], ""), gap_pct=round(cand[q][1] * 100, 3),
-                     F=round(float(_comp[q]), 4), volbr=round(cand[q][3], 3),
-                     ret20_pct=round(cand[q][4] * 100, 2))
-                for r, q in enumerate(order)]
-            hits["top"] = hits["rows"][:FZ["K"]]
+            # 2026-09-28（R-hpdk-ind-0928）：命中清单加**行业 + 同行业序** ——
+            # 用户 09-28 实际操作口径是「同行业只买 1 只」（人工去重），但冻结判据里没有行业约束
+            # （改判据属预注册变更，须走勘误）。行业集中度实测：146 只命中里有色金属 34 只（23%），
+            # F 前 10 里占 5 席 ⇒ 去重信息必须可见，故只做**显示层**（不改选股、不改排名）。
+            _rows, _indseq = [], {}
+            for r, q in enumerate(order):
+                sym = cand[q][0]
+                gi = ind.get(sym, "") or "—"
+                _indseq[gi] = _indseq.get(gi, 0) + 1
+                _rows.append(dict(rank=int(r + 1), code=sym[2:], sym=sym,
+                                  name=names.get(sym, ""), ind=gi, ind_seq=_indseq[gi],
+                                  gap_pct=round(cand[q][1] * 100, 3),
+                                  F=round(float(_comp[q]), 4), volbr=round(cand[q][3], 3),
+                                  ret20_pct=round(cand[q][4] * 100, 2)))
+            hits["rows"] = _rows
+            hits["top"] = _rows[:FZ["K"]]
+            hits["ind_counts"] = dict(sorted(_indseq.items(), key=lambda kv: -kv[1]))
+            # 「同行业只取 1 只」口径下的前 K（显示层参考，不改策略）
+            _ded, _seen = [], set()
+            for x in _rows:
+                if x["ind"] in _seen:
+                    continue
+                _seen.add(x["ind"])
+                _ded.append(x)
+                if len(_ded) >= FZ["K"]:
+                    break
+            hits["top_dedup_ind"] = [x["code"] for x in _ded]
         hits["signal_date"] = S
         hits["n_pool"] = len(pool_s)
         hits["n_hits"] = len(hits["rows"])
