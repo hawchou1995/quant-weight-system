@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>gushi.in forum/8 全量回测 · Top5（2026-09-28）</title>
+<style>
+:root{--bg:#0f1115;--panel:#171a21;--panel2:#1d2129;--line:#2a2f3a;--tx:#e8eaf0;--mut:#9aa3b2;
+--pos:#ff6b6b;--neg:#4bd6a0;--acc:#5b9dff;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.7 "Segoe UI","Microsoft YaHei",system-ui,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 22px 80px}
+h1{font-size:26px;margin:0 0 6px}
+h2{font-size:19px;margin:34px 0 12px;padding-left:10px;border-left:4px solid var(--acc)}
+.sub2{color:var(--mut);font-size:13px}
+.verdict{background:linear-gradient(135deg,#1b2030,#171a21);border:1px solid var(--line);
+border-radius:14px;padding:20px 22px;margin:18px 0 8px}
+.verdict .big{font-size:19px;font-weight:600;margin-bottom:6px}
+.kpi{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px}
+.kpi div{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 16px;min-width:150px}
+.kpi label{display:block;color:var(--mut);font-size:12px}
+.kpi b{font-size:19px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:12px 0;position:relative}
+.rank{position:absolute;right:16px;top:12px;font-size:26px;font-weight:800;color:#2f3542}
+.ttl{font-size:17px;font-weight:600;padding-right:56px}
+.ttl a{color:var(--tx);text-decoration:none;border-bottom:1px dashed #3a4152}
+.ttl a:hover{color:var(--acc)}
+.meta{margin:8px 0 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tag{font-size:12px;color:var(--mut);background:#12151b;border:1px solid var(--line);border-radius:999px;padding:2px 10px}
+.badge{font-size:12px;border-radius:999px;padding:2px 10px;font-weight:600}
+.badge.ok{background:#2b1c1f;color:var(--pos);border:1px solid #4a2a2f}
+.badge.no{background:#161b22;color:var(--mut);border:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.grid>div{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.grid label{display:block;color:var(--mut);font-size:12px}
+.grid b{font-size:17px}
+.pos{color:var(--pos)} .neg{color:var(--neg)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--panel);
+border:1px solid var(--line);border-radius:10px;overflow:hidden}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child,th:nth-child(2),td.lt{text-align:left}
+th{background:#12151b;color:var(--mut);font-weight:600;font-size:12.5px}
+tr:hover td{background:#1a1e26}
+td.lt{white-space:normal;min-width:230px} td.id{color:var(--acc);font-weight:600} td.n{color:var(--mut)}
+.sub{color:var(--mut);font-size:11.5px}
+.legend{color:var(--mut);font-size:12.5px;margin:8px 0}
+.box{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--acc);
+border-radius:10px;padding:14px 18px;margin:14px 0}
+ul{margin:8px 0 0 18px;padding:0} li{margin:5px 0}
+code{background:#12151b;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:13px}
+.foot{color:var(--mut);font-size:12.5px;margin-top:34px;border-top:1px solid var(--line);padding-top:14px}
+.scroll{overflow-x:auto}
+</style></head><body><div class="wrap">
+
+<h1>gushi.in <code>forum/8</code>《指标公式》全量策略回测 · Top5</h1>
+<div class="sub2">生成 2026-09-28 14:02 · 抓取覆盖 <b>253/253</b> 帖 · 数据面板 2015-01-05 ~ 2026-09-24（T=2,852 × N=5,442，含 253 只退市）· 判据先冻结（预注册 + 勘误 E-18）</div>
+
+<div class="verdict">
+  <div class="big">结论：<span class="pos">净口径 0 / 53 条过门</span>；对称毛口径 3 / 53 条有微弱统计边际，但 <span class="pos">成本 ≈ 边际的 11 倍</span> —— 不投产。</div>
+  <div class="sub2">事件口径：信号日 T 收盘成立 → <b>T+1 开盘买</b>（开盘涨停买不进则剔除）→ <b>T+2 收盘卖</b> → 往返成本 20bp，与同窗口「可成交」全市场等权比较，按信号日聚类做 t 检验。</div>
+  <div class="kpi">
+    <div><label>可回测选股公式（①）</label><b>53</b></div>
+    <div><label>纯画线只登记（②）</label><b>73</b></div>
+    <div><label>跳过（③）</label><b>49</b></div>
+    <div><label>无法编译（④）</label><b>78</b></div>
+    <div><label>①毛边际中位</label><b class="pos">+0.0177%</b></div>
+    <div><label>回合成本</label><b>0.2000%</b></div>
+    <div><label>M3 持有期扫描</label><b class="neg">0 条可投产</b></div>
+  </div>
+</div>
+
+<h2>Top 5（按对称毛口径 95% CI 下界排序）</h2>
+<div class="sub2" style="margin-bottom:10px">排序依据 = 毛超额/笔的「按信号日聚类 95% CI 下界」（判据轴，先冻结）。<b>毛口径</b>＝买卖双方都不计成本（安慰剂基线 ≈ 0）；<b>净口径</b>＝信号腿扣 0.20% 回合成本（保守读数）。</div>
+
+  <div class="card">
+    <div class="rank">#1</div>
+    <div class="ttl"><a href="https://gushi.in/topic/543" target="_blank" rel="noreferrer">探底放量突破选股公式源码</a></div>
+    <div class="meta"><span class="tag">topic/543</span>
+      <span class="tag">信号：探底放量突破</span>
+      <span class="tag">群组：选股室</span>
+      <span class="badge ok">过门 · 毛口径</span></div>
+    <div class="grid">
+      <div><label>事件数 n</label><b>51,240</b></div>
+      <div><label>毛超额/笔</label><b class="pos">+0.1194%</b></div>
+      <div><label>95% CI 下界</label><b class="pos">+0.0297%</b></div>
+      <div><label>聚类 t</label><b>2.64</b></div>
+      <div><label>净超额/笔（−0.20%）</label><b class="neg">-0.0806%</b></div>
+      <div><label>净 CI 下界</label><b class="neg">-0.1703%</b></div>
+      <div><label>胜率</label><b>48.4%</b></div>
+      <div><label>有效信号日</label><b>2,539</b></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="rank">#2</div>
+    <div class="ttl"><a href="https://gushi.in/topic/774" target="_blank" rel="noreferrer">最强黄金坑选股公式源码</a></div>
+    <div class="meta"><span class="tag">topic/774</span>
+      <span class="tag">信号：最强黄金坑</span>
+      <span class="tag">群组：选股室</span>
+      <span class="badge ok">过门 · 毛口径</span></div>
+    <div class="grid">
+      <div><label>事件数 n</label><b>71,956</b></div>
+      <div><label>毛超额/笔</label><b class="pos">+0.0718%</b></div>
+      <div><label>95% CI 下界</label><b class="pos">+0.0160%</b></div>
+      <div><label>聚类 t</label><b>2.46</b></div>
+      <div><label>净超额/笔（−0.20%）</label><b class="neg">-0.1282%</b></div>
+      <div><label>净 CI 下界</label><b class="neg">-0.1840%</b></div>
+      <div><label>胜率</label><b>46.9%</b></div>
+      <div><label>有效信号日</label><b>2,502</b></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="rank">#3</div>
+    <div class="ttl"><a href="https://gushi.in/topic/807" target="_blank" rel="noreferrer">五均线粘合起爆选股公式源码</a></div>
+    <div class="meta"><span class="tag">topic/807</span>
+      <span class="tag">信号：均线粘合起爆</span>
+      <span class="tag">群组：选股室</span>
+      <span class="badge ok">过门 · 毛口径</span></div>
+    <div class="grid">
+      <div><label>事件数 n</label><b>28,825</b></div>
+      <div><label>毛超额/笔</label><b class="pos">+0.1054%</b></div>
+      <div><label>95% CI 下界</label><b class="pos">+0.0105%</b></div>
+      <div><label>聚类 t</label><b>2.21</b></div>
+      <div><label>净超额/笔（−0.20%）</label><b class="neg">-0.0946%</b></div>
+      <div><label>净 CI 下界</label><b class="neg">-0.1895%</b></div>
+      <div><label>胜率</label><b>48.4%</b></div>
+      <div><label>有效信号日</label><b>2,357</b></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="rank">#4</div>
+    <div class="ttl"><a href="https://gushi.in/topic/500" target="_blank" rel="noreferrer">均线粘合放量突破选股模型，捕捉横盘蓄势后的主升浪启动！</a></div>
+    <div class="meta"><span class="tag">topic/500</span>
+      <span class="tag">信号：粘合放量突破</span>
+      <span class="tag">群组：量化指标</span>
+      <span class="badge no">否证</span></div>
+    <div class="grid">
+      <div><label>事件数 n</label><b>112,837</b></div>
+      <div><label>毛超额/笔</label><b class="pos">+0.0594%</b></div>
+      <div><label>95% CI 下界</label><b class="neg">-0.0096%</b></div>
+      <div><label>聚类 t</label><b>1.64</b></div>
+      <div><label>净超额/笔（−0.20%）</label><b class="neg">-0.1406%</b></div>
+      <div><label>净 CI 下界</label><b class="neg">-0.2096%</b></div>
+      <div><label>胜率</label><b>46.4%</b></div>
+      <div><label>有效信号日</label><b>2,613</b></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="rank">#5</div>
+    <div class="ttl"><a href="https://gushi.in/topic/815" target="_blank" rel="noreferrer">短线爆发力选股模型-均线多头排列+放量长阳突破</a></div>
+    <div class="meta"><span class="tag">topic/815</span>
+      <span class="tag">信号：主力找票器</span>
+      <span class="tag">群组：选股室</span>
+      <span class="badge no">否证</span></div>
+    <div class="grid">
+      <div><label>事件数 n</label><b>92,008</b></div>
+      <div><label>毛超额/笔</label><b class="pos">+0.0633%</b></div>
+      <div><label>95% CI 下界</label><b class="neg">-0.0164%</b></div>
+      <div><label>聚类 t</label><b>1.46</b></div>
+      <div><label>净超额/笔（−0.20%）</label><b class="neg">-0.1367%</b></div>
+      <div><label>净 CI 下界</label><b class="neg">-0.2164%</b></div>
+      <div><label>胜率</label><b>46.8%</b></div>
+      <div><label>有效信号日</label><b>2,566</b></div>
+    </div>
+  </div>
+
+<h2>M3 · 持有期扫描（持有期拉长能否摊薄成本？）</h2>
+<div class="sub2" style="margin-bottom:10px">入场仍为 T+1 开盘；持有 K 个交易日后收盘卖出。高亮单元格＝该持有期下毛口径 CI 下界 &gt; 0（过门）。<b>同尺子锚定：K=1 与 M2 定稿读数逐位一致</b>（543 +0.1194% / 774 +0.0718% / 807 +0.1054%）。</div>
+<div class="scroll"><table>
+<thead><tr><th>公式</th><th>K=1 日</th><th>K=2 日</th><th>K=3 日</th><th>K=5 日</th><th>K=10 日</th><th>K=20 日</th></tr></thead><tbody><tr><td class='lt'>543<br><span class='sub'>探底放量突破</span></td><td style='background:#fff3f3'><b class='pos'>+0.1194</b><br><span class='sub'>t=2.643 · 净 -0.0806</span></td><td><b class='pos'>+0.1691</b><br><span class='sub'>t=1.824 · 净 -0.0309</span></td><td><b class='pos'>+0.2052</b><br><span class='sub'>t=1.897 · 净 +0.0052</span></td><td><b class='pos'>+0.0700</b><br><span class='sub'>t=-1.567 · 净 -0.1300</span></td><td><b class='neg'>-0.0763</b><br><span class='sub'>t=-4.778 · 净 -0.2763</span></td><td><b class='neg'>-0.3958</b><br><span class='sub'>t=-6.97 · 净 -0.5958</span></td></tr><tr><td class='lt'>774<br><span class='sub'>最强黄金坑</span></td><td style='background:#fff3f3'><b class='pos'>+0.0718</b><br><span class='sub'>t=2.461 · 净 -0.1282</span></td><td><b class='pos'>+0.1037</b><br><span class='sub'>t=1.363 · 净 -0.0963</span></td><td><b class='pos'>+0.0897</b><br><span class='sub'>t=-0.029 · 净 -0.1103</span></td><td><b class='pos'>+0.0462</b><br><span class='sub'>t=-3.124 · 净 -0.1538</span></td><td><b class='pos'>+0.0807</b><br><span class='sub'>t=-4.443 · 净 -0.1193</span></td><td><b class='pos'>+0.1162</b><br><span class='sub'>t=-4.451 · 净 -0.0838</span></td></tr><tr><td class='lt'>807<br><span class='sub'>均线粘合起爆</span></td><td style='background:#fff3f3'><b class='pos'>+0.1054</b><br><span class='sub'>t=2.207 · 净 -0.0946</span></td><td><b class='pos'>+0.1406</b><br><span class='sub'>t=1.392 · 净 -0.0594</span></td><td><b class='pos'>+0.1326</b><br><span class='sub'>t=1.287 · 净 -0.0674</span></td><td><b class='pos'>+0.1476</b><br><span class='sub'>t=1.535 · 净 -0.0524</span></td><td><b class='pos'>+0.1664</b><br><span class='sub'>t=0.426 · 净 -0.0336</span></td><td><b class='pos'>+0.0330</b><br><span class='sub'>t=-1.452 · 净 -0.1670</span></td></tr></tbody></table></div>
+<div class="box">
+  <b>读法</b>：毛边际确实随持有期上升（543 在 K=3 到 <span class="pos">+0.2052%</span>、807 在 K=10 到 +0.1664%），点估计上已能盖过 0.20% 成本（543@K=3 净超额首次转正 <span class="pos">+0.0052%</span>）；
+  但<b>按信号日聚类的 t 随 K 单调衰减</b>（2.6 → 1.8 → 0.4 → 负），CI 下界始终 &lt; 0；<b>543 在 K≥10 转为显著负</b>（t = −4.78 / −6.97）⇒ 信号「短命且会反转」，不是"没信号"。
+</div>
+
+<h2>器械检验（同轮廓安慰剂，12 种子 × 2 轮廓）</h2>
+<div class="sub2" style="margin-bottom:10px">用随机信号（每日信号数与真实公式一致）验证尺子：<b>对称口径基线必须 ≈ 0</b>，否则判据不可信。</div>
+<div class="scroll"><table>
+<thead><tr><th>轮廓</th><th>v1 预注册口径</th><th>修正基准（含成本）</th><th>对称口径（无成本）</th><th>种子</th></tr></thead>
+<tbody><tr><td>dense30</td><td class='neg'>-0.2243%</td><td class='neg'>-0.2068%</td><td class='neg'>-0.0068%</td><td>12</td></tr><tr><td>sparse5x500</td><td class='neg'>-0.2218%</td><td class='neg'>-0.2005%</td><td class='neg'>-0.0005%</td><td>12</td></tr></tbody></table></div>
+<div class="box">
+  <b>勘误 E-18</b>（跑完后自查发现）：① 面板缺失值存的是 <code>0</code>（非 NaN），"入场日有价、次日无数据"的票被算成 −100%，<b>抬高所有读数 +0.077pp/笔</b>；② 基准混入"开盘涨停买不进"的票（+0.0175pp）；③ 成本只算信号腿（−0.20pp）。v1 的预注册读数原样保留，三个口径并报；判据阈值不动。
+</div>
+
+<h2>① 档全表（53 条）</h2>
+<div class="legend">图例：<span class="pos">红 = 正</span>，<span class="neg">绿 = 负</span>（A股惯例）。点标题可跳原帖。</div>
+<div class="scroll"><table>
+<thead><tr><th>id</th><th>标题</th><th>信号名</th><th>n</th><th>毛超额/笔</th><th>毛CI下界</th><th>t</th><th>净超额/笔</th><th>净CI下界</th><th>判定</th></tr></thead>
+<tbody><tr><td class='id'>543</td><td class='lt'><a href='https://gushi.in/topic/543' target='_blank' rel='noreferrer'>探底放量突破选股公式源码</a></td><td>探底放量突破</td><td class='n'>51,240</td><td class='pos'>+0.1194</td><td class='pos'>+0.0297</td><td>2.64</td><td class='neg'>-0.0806</td><td class='neg'>-0.1703</td><td>毛口径过门</td></tr>
+<tr><td class='id'>774</td><td class='lt'><a href='https://gushi.in/topic/774' target='_blank' rel='noreferrer'>最强黄金坑选股公式源码</a></td><td>最强黄金坑</td><td class='n'>71,956</td><td class='pos'>+0.0718</td><td class='pos'>+0.0160</td><td>2.46</td><td class='neg'>-0.1282</td><td class='neg'>-0.1840</td><td>毛口径过门</td></tr>
+<tr><td class='id'>807</td><td class='lt'><a href='https://gushi.in/topic/807' target='_blank' rel='noreferrer'>五均线粘合起爆选股公式源码</a></td><td>均线粘合起爆</td><td class='n'>28,825</td><td class='pos'>+0.1054</td><td class='pos'>+0.0105</td><td>2.21</td><td class='neg'>-0.0946</td><td class='neg'>-0.1895</td><td>毛口径过门</td></tr>
+<tr><td class='id'>500</td><td class='lt'><a href='https://gushi.in/topic/500' target='_blank' rel='noreferrer'>均线粘合放量突破选股模型，捕捉横盘蓄势后的主升浪启动！</a></td><td>粘合放量突破</td><td class='n'>112,837</td><td class='pos'>+0.0594</td><td class='neg'>-0.0096</td><td>1.64</td><td class='neg'>-0.1406</td><td class='neg'>-0.2096</td><td>否证</td></tr>
+<tr><td class='id'>815</td><td class='lt'><a href='https://gushi.in/topic/815' target='_blank' rel='noreferrer'>短线爆发力选股模型-均线多头排列+放量长阳突破</a></td><td>主力找票器</td><td class='n'>92,008</td><td class='pos'>+0.0633</td><td class='neg'>-0.0164</td><td>1.46</td><td class='neg'>-0.1367</td><td class='neg'>-0.2164</td><td>否证</td></tr>
+<tr><td class='id'>483</td><td class='lt'><a href='https://gushi.in/topic/483' target='_blank' rel='noreferrer'>真完美，一阳定势选股公式</a></td><td>一阳定势</td><td class='n'>34,262</td><td class='pos'>+0.1032</td><td class='neg'>-0.0206</td><td>1.47</td><td class='neg'>-0.0968</td><td class='neg'>-0.2206</td><td>否证</td></tr>
+<tr><td class='id'>834</td><td class='lt'><a href='https://gushi.in/topic/834' target='_blank' rel='noreferrer'>通达信波段王副图指标公式</a></td><td>冲击量</td><td class='n'>2,016,692</td><td class='pos'>+0.0166</td><td class='neg'>-0.0242</td><td>0.67</td><td class='neg'>-0.1834</td><td class='neg'>-0.2242</td><td>否证</td></tr>
+<tr><td class='id'>796</td><td class='lt'><a href='https://gushi.in/topic/796' target='_blank' rel='noreferrer'>通达信挖坑极致洗盘指标公式源码</a></td><td>挖坑极致洗盘</td><td class='n'>30,646</td><td class='pos'>+0.1131</td><td class='neg'>-0.0261</td><td>1.45</td><td class='neg'>-0.0869</td><td class='neg'>-0.2261</td><td>否证</td></tr>
+<tr><td class='id'>645</td><td class='lt'><a href='https://gushi.in/topic/645' target='_blank' rel='noreferrer'>超级主升浪指标源码</a></td><td>超级主升浪</td><td class='n'>79,951</td><td class='pos'>+0.0555</td><td class='neg'>-0.0313</td><td>0.98</td><td class='neg'>-0.1445</td><td class='neg'>-0.2313</td><td>否证</td></tr>
+<tr><td class='id'>574</td><td class='lt'><a href='https://gushi.in/topic/574' target='_blank' rel='noreferrer'>短线封神选股指标公式源码</a></td><td>短线封神</td><td class='n'>54,827</td><td class='pos'>+0.0563</td><td class='neg'>-0.0340</td><td>1.06</td><td class='neg'>-0.1437</td><td class='neg'>-0.2340</td><td>否证</td></tr>
+<tr><td class='id'>790</td><td class='lt'><a href='https://gushi.in/topic/790' target='_blank' rel='noreferrer'>仙人指路、底部异动试盘选股公式</a></td><td>仙人指路</td><td class='n'>20,549</td><td class='pos'>+0.1124</td><td class='neg'>-0.0536</td><td>0.91</td><td class='neg'>-0.0876</td><td class='neg'>-0.2536</td><td>否证</td></tr>
+<tr><td class='id'>872</td><td class='lt'><a href='https://gushi.in/topic/872' target='_blank' rel='noreferrer'>三周期MACD共振选股副图指标</a></td><td>SHXG</td><td class='n'>1,845,731</td><td class='pos'>+0.0165</td><td class='neg'>-0.0614</td><td>-0.77</td><td class='neg'>-0.1835</td><td class='neg'>-0.2614</td><td>否证</td></tr>
+<tr><td class='id'>628</td><td class='lt'><a href='https://gushi.in/topic/628' target='_blank' rel='noreferrer'>异动起起飞选股指标源码（2026机构量化专用版）</a></td><td>异动起飞</td><td class='n'>26,855</td><td class='pos'>+0.0352</td><td class='neg'>-0.0639</td><td>0.46</td><td class='neg'>-0.1648</td><td class='neg'>-0.2639</td><td>否证</td></tr>
+<tr><td class='id'>674</td><td class='lt'><a href='https://gushi.in/topic/674' target='_blank' rel='noreferrer'>尾盘买入战法选股公式</a></td><td>尾盘买入战法</td><td class='n'>64,525</td><td class='pos'>+0.0647</td><td class='neg'>-0.0652</td><td>0.50</td><td class='neg'>-0.1353</td><td class='neg'>-0.2652</td><td>否证</td></tr>
+<tr><td class='id'>565</td><td class='lt'><a href='https://gushi.in/topic/565' target='_blank' rel='noreferrer'>均线粘合蓄势突破选股公式源码</a></td><td>蓄势突破</td><td class='n'>23,061</td><td class='pos'>+0.0387</td><td class='neg'>-0.0678</td><td>0.33</td><td class='neg'>-0.1613</td><td class='neg'>-0.2678</td><td>否证</td></tr>
+<tr><td class='id'>731</td><td class='lt'><a href='https://gushi.in/topic/731' target='_blank' rel='noreferrer'>放量突破箱体选股公式</a></td><td>突破箱体</td><td class='n'>8,547</td><td class='pos'>+0.0331</td><td class='neg'>-0.0748</td><td>0.51</td><td class='neg'>-0.1669</td><td class='neg'>-0.2748</td><td>否证</td></tr>
+<tr><td class='id'>688</td><td class='lt'><a href='https://gushi.in/topic/688' target='_blank' rel='noreferrer'>低位蓄势选股指标公式源码</a></td><td>低位蓄势</td><td class='n'>25,659</td><td class='pos'>+0.0652</td><td class='neg'>-0.0799</td><td>0.58</td><td class='neg'>-0.1348</td><td class='neg'>-0.2799</td><td>否证</td></tr>
+<tr><td class='id'>878</td><td class='lt'><a href='https://gushi.in/topic/878' target='_blank' rel='noreferrer'>通达信强势起爆指标公式源码</a></td><td>强势起爆</td><td class='n'>19,571</td><td class='pos'>+0.0613</td><td class='neg'>-0.0853</td><td>0.14</td><td class='neg'>-0.1387</td><td class='neg'>-0.2853</td><td>否证</td></tr>
+<tr><td class='id'>592</td><td class='lt'><a href='https://gushi.in/topic/592' target='_blank' rel='noreferrer'>加强版一阳三线选股公式源码</a></td><td>一阳三线</td><td class='n'>36,401</td><td class='pos'>+0.0467</td><td class='neg'>-0.0862</td><td>-0.06</td><td class='neg'>-0.1533</td><td class='neg'>-0.2862</td><td>否证</td></tr>
+<tr><td class='id'>794</td><td class='lt'><a href='https://gushi.in/topic/794' target='_blank' rel='noreferrer'>主升浪最佳买点指标</a></td><td>最佳买点</td><td class='n'>69,750</td><td class='pos'>+0.0561</td><td class='neg'>-0.0869</td><td>-0.31</td><td class='neg'>-0.1439</td><td class='neg'>-0.2869</td><td>否证</td></tr>
+<tr><td class='id'>644</td><td class='lt'><a href='https://gushi.in/topic/644' target='_blank' rel='noreferrer'>主力资金介入选股公式源码</a></td><td>主力资金介入</td><td class='n'>25,014</td><td class='pos'>+0.1174</td><td class='neg'>-0.0887</td><td>0.41</td><td class='neg'>-0.0826</td><td class='neg'>-0.2887</td><td>否证</td></tr>
+<tr><td class='id'>713</td><td class='lt'><a href='https://gushi.in/topic/713' target='_blank' rel='noreferrer'>加速形态·主力控盘选股器指标源码</a></td><td>主力控盘突破</td><td class='n'>113,441</td><td class='pos'>+0.0476</td><td class='neg'>-0.0903</td><td>-0.76</td><td class='neg'>-0.1524</td><td class='neg'>-0.2903</td><td>否证</td></tr>
+<tr><td class='id'>577</td><td class='lt'><a href='https://gushi.in/topic/577' target='_blank' rel='noreferrer'>三把锁选股指标公式源码</a></td><td>三把锁选股</td><td class='n'>12,199</td><td class='pos'>+0.0526</td><td class='neg'>-0.0970</td><td>0.39</td><td class='neg'>-0.1474</td><td class='neg'>-0.2970</td><td>否证</td></tr>
+<tr><td class='id'>526</td><td class='lt'><a href='https://gushi.in/topic/526' target='_blank' rel='noreferrer'>主升浪起爆点选股公式</a></td><td>主升浪起爆点</td><td class='n'>129,199</td><td class='pos'>+0.0559</td><td class='neg'>-0.1017</td><td>-1.27</td><td class='neg'>-0.1441</td><td class='neg'>-0.3017</td><td>否证</td></tr>
+<tr><td class='id'>828</td><td class='lt'><a href='https://gushi.in/topic/828' target='_blank' rel='noreferrer'>三步点金量化指标源码</a></td><td>三步点金</td><td class='n'>62,136</td><td class='neg'>-0.0091</td><td class='neg'>-0.1070</td><td>-0.50</td><td class='neg'>-0.2091</td><td class='neg'>-0.3070</td><td>否证</td></tr>
+<tr><td class='id'>862</td><td class='lt'><a href='https://gushi.in/topic/862' target='_blank' rel='noreferrer'>精准抄底选股公式源码</a></td><td>精准抄底</td><td class='n'>19,457</td><td class='pos'>+0.8293</td><td class='neg'>-0.1157</td><td>0.77</td><td class='pos'>+0.6293</td><td class='neg'>-0.3157</td><td>否证</td></tr>
+<tr><td class='id'>590</td><td class='lt'><a href='https://gushi.in/topic/590' target='_blank' rel='noreferrer'>精准筛选主升浪的起爆点选股公式</a></td><td>主升浪起爆点</td><td class='n'>52,399</td><td class='pos'>+0.0054</td><td class='neg'>-0.1179</td><td>-0.47</td><td class='neg'>-0.1946</td><td class='neg'>-0.3179</td><td>否证</td></tr>
+<tr><td class='id'>537</td><td class='lt'><a href='https://gushi.in/topic/537' target='_blank' rel='noreferrer'>量化擒龙选股指标公式</a></td><td>量化擒龙选股</td><td class='n'>125,357</td><td class='neg'>-0.0076</td><td class='neg'>-0.1188</td><td>-1.65</td><td class='neg'>-0.2076</td><td class='neg'>-0.3188</td><td>否证</td></tr>
+<tr><td class='id'>826</td><td class='lt'><a href='https://gushi.in/topic/826' target='_blank' rel='noreferrer'>主升浪起爆点选股公式源码</a></td><td>主升浪起爆点</td><td class='n'>38,358</td><td class='neg'>-0.0235</td><td class='neg'>-0.1190</td><td>-0.62</td><td class='neg'>-0.2235</td><td class='neg'>-0.3190</td><td>否证</td></tr>
+<tr><td class='id'>487</td><td class='lt'><a href='https://gushi.in/topic/487' target='_blank' rel='noreferrer'>用量化战法，提前潜伏主升浪第一波起爆点</a></td><td>主升浪启爆点</td><td class='n'>46,018</td><td class='neg'>-0.0082</td><td class='neg'>-0.1265</td><td>-1.29</td><td class='neg'>-0.2082</td><td class='neg'>-0.3265</td><td>否证</td></tr>
+<tr><td class='id'>496</td><td class='lt'><a href='https://gushi.in/topic/496' target='_blank' rel='noreferrer'>王者倍量柱选股指标【天量 \+ 倍量 \+ 站上均线】</a></td><td>倍量突破</td><td class='n'>57,981</td><td class='neg'>-0.0224</td><td class='neg'>-0.1352</td><td>-1.77</td><td class='neg'>-0.2224</td><td class='neg'>-0.3352</td><td>否证</td></tr>
+<tr><td class='id'>635</td><td class='lt'><a href='https://gushi.in/topic/635' target='_blank' rel='noreferrer'>通达信三合一选股公式源码</a></td><td>三合一选股</td><td class='n'>126,050</td><td class='neg'>-0.0111</td><td class='neg'>-0.1473</td><td>-1.67</td><td class='neg'>-0.2111</td><td class='neg'>-0.3473</td><td>否证</td></tr>
+<tr><td class='id'>763</td><td class='lt'><a href='https://gushi.in/topic/763' target='_blank' rel='noreferrer'>精准捕捉主升浪启动初期的量化选股系统</a></td><td>升浪启动初期</td><td class='n'>87,407</td><td class='pos'>+0.0091</td><td class='neg'>-0.1579</td><td>-2.51</td><td class='neg'>-0.1909</td><td class='neg'>-0.3579</td><td>否证</td></tr>
+<tr><td class='id'>536</td><td class='lt'><a href='https://gushi.in/topic/536' target='_blank' rel='noreferrer'>前高突破 \+ 锯齿震荡整理后启动选股公式</a></td><td>异动突破</td><td class='n'>120,376</td><td class='pos'>+0.0016</td><td class='neg'>-0.1591</td><td>-3.24</td><td class='neg'>-0.1984</td><td class='neg'>-0.3591</td><td>否证</td></tr>
+<tr><td class='id'>838</td><td class='lt'><a href='https://gushi.in/topic/838' target='_blank' rel='noreferrer'>超级主力建仓选股公式源码</a></td><td>超级主力建仓</td><td class='n'>32,825</td><td class='neg'>-0.0102</td><td class='neg'>-0.1835</td><td>-2.82</td><td class='neg'>-0.2102</td><td class='neg'>-0.3835</td><td>否证</td></tr>
+<tr><td class='id'>883</td><td class='lt'><a href='https://gushi.in/topic/883' target='_blank' rel='noreferrer'>多周期K线形态筑底+反转突破+均线确认的底部反转选股公式</a></td><td>指标迷</td><td class='n'>15,223</td><td class='neg'>-0.0061</td><td class='neg'>-0.1839</td><td>-0.73</td><td class='neg'>-0.2061</td><td class='neg'>-0.3839</td><td>否证</td></tr>
+<tr><td class='id'>600</td><td class='lt'><a href='https://gushi.in/topic/600' target='_blank' rel='noreferrer'>反包吞并反转选股公式源码</a></td><td>反包选股</td><td class='n'>41,080</td><td class='pos'>+0.0159</td><td class='neg'>-0.1899</td><td>-0.91</td><td class='neg'>-0.1841</td><td class='neg'>-0.3899</td><td>否证</td></tr>
+<tr><td class='id'>599</td><td class='lt'><a href='https://gushi.in/topic/599' target='_blank' rel='noreferrer'>六线多头回踩5日线后的二次确认买点</a></td><td>多头突破选股</td><td class='n'>66,595</td><td class='pos'>+0.0039</td><td class='neg'>-0.1948</td><td>-2.29</td><td class='neg'>-0.1961</td><td class='neg'>-0.3948</td><td>否证</td></tr>
+<tr><td class='id'>658</td><td class='lt'><a href='https://gushi.in/topic/658' target='_blank' rel='noreferrer'>跟庄吃肉选股模型，精准捕捉主力吸筹启动信号！</a></td><td>跟庄吃肉</td><td class='n'>18,005</td><td class='pos'>+0.0177</td><td class='neg'>-0.1998</td><td>-1.37</td><td class='neg'>-0.1823</td><td class='neg'>-0.3998</td><td>否证</td></tr>
+<tr><td class='id'>475</td><td class='lt'><a href='https://gushi.in/topic/475' target='_blank' rel='noreferrer'>三步点金选股指标公式源码</a></td><td>三步点金</td><td class='n'>20,212</td><td class='pos'>+0.0205</td><td class='neg'>-0.2245</td><td>-1.89</td><td class='neg'>-0.1795</td><td class='neg'>-0.4245</td><td>否证</td></tr>
+<tr><td class='id'>855</td><td class='lt'><a href='https://gushi.in/topic/855' target='_blank' rel='noreferrer'>一剑封喉选股公式源码</a></td><td>一剑封喉</td><td class='n'>35,476</td><td class='neg'>-0.0352</td><td class='neg'>-0.2304</td><td>-3.33</td><td class='neg'>-0.2352</td><td class='neg'>-0.4304</td><td>否证</td></tr>
+<tr><td class='id'>488</td><td class='lt'><a href='https://gushi.in/topic/488' target='_blank' rel='noreferrer'>主力暗中建仓选股公式</a></td><td>主力暗中建仓</td><td class='n'>29,323</td><td class='neg'>-0.0807</td><td class='neg'>-0.2344</td><td>-2.66</td><td class='neg'>-0.2807</td><td class='neg'>-0.4344</td><td>否证</td></tr>
+<tr><td class='id'>610</td><td class='lt'><a href='https://gushi.in/topic/610' target='_blank' rel='noreferrer'>起爆火焰副图指标公式源码</a></td><td>起爆信号</td><td class='n'>61,567</td><td class='neg'>-0.1470</td><td class='neg'>-0.2475</td><td>-3.36</td><td class='neg'>-0.3470</td><td class='neg'>-0.4475</td><td>否证</td></tr>
+<tr><td class='id'>748</td><td class='lt'><a href='https://gushi.in/topic/748' target='_blank' rel='noreferrer'>量化选股模型轻松助抓牛股！</a></td><td>主力暗中介入</td><td class='n'>25,428</td><td class='neg'>-0.0144</td><td class='neg'>-0.2619</td><td>-2.71</td><td class='neg'>-0.2144</td><td class='neg'>-0.4619</td><td>否证</td></tr>
+<tr><td class='id'>561</td><td class='lt'><a href='https://gushi.in/topic/561' target='_blank' rel='noreferrer'>不追暴涨股，专找回踩五日线后重新起涨的选股公式</a></td><td>XG</td><td class='n'>13,544</td><td class='neg'>-0.1023</td><td class='neg'>-0.2712</td><td>-0.73</td><td class='neg'>-0.3023</td><td class='neg'>-0.4712</td><td>否证</td></tr>
+<tr><td class='id'>824</td><td class='lt'><a href='https://gushi.in/topic/824' target='_blank' rel='noreferrer'>通达信机构建仓选股公式</a></td><td>机构建仓</td><td class='n'>33,566</td><td class='neg'>-0.0673</td><td class='neg'>-0.2880</td><td>-2.70</td><td class='neg'>-0.2673</td><td class='neg'>-0.4880</td><td>否证</td></tr>
+<tr><td class='id'>827</td><td class='lt'><a href='https://gushi.in/topic/827' target='_blank' rel='noreferrer'>底部起爆点擒龙战法源码</a></td><td>底部起爆擒龙</td><td class='n'>998</td><td class='neg'>-0.0274</td><td class='neg'>-0.2915</td><td>-0.33</td><td class='neg'>-0.2274</td><td class='neg'>-0.4915</td><td>否证</td></tr>
+<tr><td class='id'>527</td><td class='lt'><a href='https://gushi.in/topic/527' target='_blank' rel='noreferrer'>强势股启动选股公式源码</a></td><td>强势股启动</td><td class='n'>83,951</td><td class='neg'>-0.1498</td><td class='neg'>-0.3195</td><td>-6.18</td><td class='neg'>-0.3498</td><td class='neg'>-0.5195</td><td>否证</td></tr>
+<tr><td class='id'>735</td><td class='lt'><a href='https://gushi.in/topic/735' target='_blank' rel='noreferrer'>底部主力吸筹与洗盘结束”的抄底模型</a></td><td>底部潜伏</td><td class='n'>164,208</td><td class='pos'>+0.0219</td><td class='neg'>-0.3384</td><td>-4.93</td><td class='neg'>-0.1781</td><td class='neg'>-0.5384</td><td>否证</td></tr>
+<tr><td class='id'>833</td><td class='lt'><a href='https://gushi.in/topic/833' target='_blank' rel='noreferrer'>五维共振的短线启动选股指标</a></td><td>五维共振</td><td class='n'>33,014</td><td class='neg'>-0.0462</td><td class='neg'>-0.3520</td><td>-2.87</td><td class='neg'>-0.2462</td><td class='neg'>-0.5520</td><td>否证</td></tr>
+<tr><td class='id'>760</td><td class='lt'><a href='https://gushi.in/topic/760' target='_blank' rel='noreferrer'>龙头股突破起爆选股公式源码</a></td><td>龙头突破起爆</td><td class='n'>22,749</td><td class='neg'>-0.1141</td><td class='neg'>-0.3659</td><td>-3.72</td><td class='neg'>-0.3141</td><td class='neg'>-0.5659</td><td>否证</td></tr>
+<tr><td class='id'>666</td><td class='lt'><a href='https://gushi.in/topic/666' target='_blank' rel='noreferrer'>旭日东升选股指标公式源码</a></td><td>旭日东升</td><td class='n'>14,118</td><td class='pos'>+0.4253</td><td class='neg'>-0.4212</td><td>-1.46</td><td class='pos'>+0.2253</td><td class='neg'>-0.6212</td><td>否证</td></tr>
+<tr><td class='id'>724</td><td class='lt'><a href='https://gushi.in/topic/724' target='_blank' rel='noreferrer'>波段起点选股公式源码</a></td><td>波段起点</td><td class='n'>1,489</td><td class='neg'>-0.1437</td><td class='neg'>-0.5585</td><td>-1.29</td><td class='neg'>-0.3437</td><td class='neg'>-0.7585</td><td>否证</td></tr></tbody></table></div>
+
+<h2>不能证明什么</h2>
+<ul>
+<li><b>只覆盖可编译的部分</b>：253 帖里只有 <b>53 条</b>进了回测；<b>78 条</b>因不支持函数被登记（<code>MEMA/SAR/BARSLASTCOUNT/ZTPRICE/CAPITAL/WINNER</code> 等），本结论<b>不能否证它们</b>。</li>
+<li><b>事件级 ≠ 组合级</b>：不含资金占用、并发槽位（当前 max_concurrent 达 334~569，须先按槽位截断）、排序选择；"过门"只说明该信号有可交易的方向性边际。</li>
+<li><b>公式照抄原文</b>：保留作者固有缺陷（潜在未来函数、参数过拟合）；<b>3 条过门者的未来函数复核尚未完成</b>。</li>
+<li><b>日线近似</b>：无分时、无盘口、无排队；开盘涨停一律按"买不进"剔除（保守）。</li>
+<li><b>基准自建</b>：等权全市场（含退市）；成本 0.20% 为建模值，<b>未采集真实滑点</b>。</li>
+</ul>
+
+<div class="foot">
+数据与证据：<code>evidence_forum8_sweep_v3_20260928.json</code>（定稿）· <code>evidence_forum8_horizon_m3_20260928.json</code> · <code>census_forum8_20260928.json</code>（253 帖清册）<br>
+报告：<code>报告-forum8全部策略回测-20260928.md</code> · 判据：<code>PRE-REGISTRATION_20260928_forum8_formula_sweep.md</code>（含 E-18）<br>
+取数通道：Firecrawl stealth（本地直连与本地浏览器均被 Cloudflare 拦截）。原始正文不入库。
+</div>
+</div></body></html>
