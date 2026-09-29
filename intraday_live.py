@@ -1512,6 +1512,29 @@ HPDK_JS = r"""
   }
 
   /* ---------- 主流程（幂等：每轮先还原再判定 → 重复刷新不叠加、不重复计数） ---------- */
+  /* R-hpdk-pooltop-0929：把「盘前选股池」（明日买点准备清单整段）搬到卡片**最上方**并**默认折叠**。
+     用户 2026-09-29：① 存档不要放在最上面，选股池放在最上面；② 批准默认折叠；③ 清单表头照旧。
+     幂等：只在首次创建 #hpdk-pool-box；找不到池子段落时零动作（卡片改版也不会炸）。 */
+  function poolTop(){
+    var sec = document.getElementById('hpdk-pool-sec');
+    var top = document.getElementById('hpdk-live-top');
+    if (!sec || !top || !top.parentNode) return;
+    if (document.getElementById('hpdk-pool-box')) return;
+    var box = document.createElement('details');
+    box.id = 'hpdk-pool-box';
+    box.className = 'sub';
+    box.style.margin = '8px 0 2px';
+    var sm = document.createElement('summary');
+    sm.style.cursor = 'pointer';
+    var nrow = sec.querySelectorAll('tbody tr').length;
+    sm.innerHTML = '<b>\u{1F4CB} 盘前选股池</b>（资格池 <b>' + ((H.rows || []).length) + '</b> 只 · 本表渲染 ' + nrow
+      + ' 行 · 盘前代理分序 · <b>不是买入名单</b>）— 点开查看 / 搜索 / 排序';
+    box.appendChild(sm);
+    var note = document.getElementById('hpdk-pool-note');
+    top.parentNode.insertBefore(box, top);      /* 池子放最上面：唯一买入清单紧随其后 */
+    if (note) box.appendChild(note);
+    box.appendChild(sec);
+  }
   function render(q, ts, src, mktTs){
     var tb = document.getElementById(CFG.TBL);
     if (!tb) return null;                     /* 表不在本页（未渲染）→ 什么都不做（首屏也会走到这里） */
@@ -1775,6 +1798,7 @@ HPDK_JS = r"""
   }
   function run(q, ts, src, mktTs){
     if (!document.getElementById(CFG.TBL)) return null;   /* 表不存在 → 零开销 */
+    try { poolTop(); } catch (e) {}      /* R-hpdk-pooltop-0929：把选股池搬到最上方并折叠（幂等） */
     try { return render(q, ts, src, mktTs); }
     catch(e) { S.err = String(e && e.message || e); return null; }
   }

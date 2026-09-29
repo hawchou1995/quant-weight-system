@@ -238,6 +238,7 @@ def hpdk_card(BASE):
         f'止盈价 = <b>买入价 × {tp:.2f}</b>；未达止盈则 <b>{d.get("exit_date")} 尾盘</b>卖出。</div>')
     rows = rows_with_proxy(d)
     shown = rows[:RENDER_N]
+    L.append('<div id="hpdk-pool-note">')    # 开 2026-09-29：池子说明段
     L.append(
         f'<div class="sub" style="margin-top:10px"><b>明日买点准备清单</b>（信号日 <b>{d.get("as_of")}</b> 收盘 · '
         f'买日 <b>{d.get("buy_date")}</b> · 了结日 <b>{d.get("exit_date")}</b>）· '
@@ -248,6 +249,7 @@ def hpdk_card(BASE):
         '09:25 后本表按真实今开自动剔除并置顶命中者。'
         '<b>全卡只有一个买入口径</b>：卡片最上方的「今日买入清单」（全池判定 · 09:25 首算即冻结）——'
         '本表是它的<b>盘前准备视图</b>。</span></div>')
+    L.append('</div>')                       # 关：#hpdk-pool-note（池子说明段，随池子一起被搬进折叠区）
     if h and h.get("signal_date") and h.get("n_hits") is not None:
         _top_k = h.get("k") or 0
         L.append(
@@ -355,6 +357,7 @@ def hpdk_card(BASE):
              '<b>已经软性偏好缩量</b>，加硬门槛只截断有用样本；且任何门槛都会改变当日候选池 ⇒ '
              '横截面 z 重算 ⇒ 选股整体重排。完整 18 臂读数见 '
              '<code>backtest/报告-准入门槛扫描-量比与盈亏比-20260927.md</code>。</div>')
+    L.append('<div id="hpdk-pool-sec">')     # 开 2026-09-29：盘前选股池（明日买点准备清单）整段
     L.append('<div class="toolbar">'
              '<input type="text" id="tbl-hpdk-cand-q" '
              'placeholder="🔍 搜索名称 / 代码 / 板块 / 行业…" autocomplete="off" spellcheck="false">'
@@ -435,6 +438,7 @@ def hpdk_card(BASE):
              '<code>今收×0.99</code> 限价买单 → ② 09:15–09:20【可撤单窗口】看虚拟开盘价，撤掉跌幅 &gt;3% '
              '的标的 → ③ 09:25 集合竞价撮合，开盘落在 −1%~−3% 的自动以开盘价成交 → '
              '④ T+2 09:15 前挂 <code>买入价×1.02</code> 限价卖单 → ⑤ T+2 14:55 未成交市价卖。</div>')
+    L.append('</div>')                       # 关：#hpdk-pool-sec（盘前选股池整段；由 HPDK_JS 搬到卡片最上方并折叠）
     L.append('</div>')
     return "".join(L)
 
