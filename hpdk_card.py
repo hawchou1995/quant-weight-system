@@ -33,6 +33,31 @@ def _read(p):
             return json.load(fh)
     except Exception:
         return {}
+ST_BADGE = ('<span class="badge" style="background:rgba(220,38,38,.18);color:var(--down);'
+            'margin-left:4px" title="现行名称含 ST/退：预注册勘误 E-19 后，冻结判据只做**点时 ST 代理**、'
+            '关掉了现行名称过滤 ⇒ 近期才被 ST 的票会漏进来。此徽章只做标记，不改选股与排名">ST</span>')
+
+
+def is_st_name(name):
+    n = (name or "").upper()
+    return ("ST" in n) or ("退" in (name or ""))
+
+
+def mark_st_rows(html, names):
+    """把行内 `<b>名称</b>` 后补一个 ST 徽章（显示层标记；不改选股、不改排名）。
+
+    背景（2026-09-29 用户质疑「选股池混进了 *ST」）：E-19 关掉了「按现行名称含 ST/退」的剔除，
+    改为只用点时代理 STP = 250 日最大绝对日收益 ≤5.6%；该代理对「近期才戴帽」的票不敏感
+    （窗口内仍留有戴帽前的大涨跌幅）⇒ 现行 ST 会漏进名单。策略层改判据须走勘误，先做到「看得见」。
+    """
+    for nm in names:
+        if not nm or not is_st_name(nm):
+            continue
+        old = "<b>%s</b>" % nm
+        if old in html:
+            html = html.replace(old, "<b>%s</b>%s" % (nm, ST_BADGE), 1)
+    return html
+
 
 # ── 📌 买日批次跟踪表（R-hpdk-cohort-0929，2026-09-29 从主卡移入跟踪池卡）─────────────
 # 用户反馈「跟踪池还是没有昨日 top4」根因是**放错卡**：本表原先挂在「缩量超跌主卡」，
@@ -96,7 +121,9 @@ def cohort_block(BASE):
         '<th data-key="state" style="text-align:center">状态</th>'
         '<th data-key="exit" style="text-align:right">卖出价</th>'
         '<th data-key="ret" style="text-align:right">净收益</th></tr></thead>'
-        '<tbody>' + "".join(rows) + '</tbody></table></div>')
+        '<tbody>' + mark_st_rows("".join(rows),
+                                [x.get("name") for b in co["batches"] for x in (b.get("rows") or [])])
+        + '</tbody></table></div>')
 
 
 def _zs(v):
@@ -179,13 +206,13 @@ def hpdk_card(BASE):
     L.append(
         '<div class="sub"><b>策略定义（与冻结预注册逐条一致；本页不复述自定义口径）</b>：T 收盘判定 → '
         f'资格 = 上市有效交易日 ≥{par.get("LISTED", 250)} ＋ 收盘 ≥{par.get("MINPX", 3.0):.2f} 元 ＋ '
-        f'20 日均额 ≥{(par.get("MINAMT", 2e7) or 0) / 1e4:.0f} 万 ＋ 非 ST/*ST（期内代理 ＋ 现名）＋ '
+        f'20 日均额 ≥{(par.get("MINAMT", 2e7) or 0) / 1e4:.0f} 万 ＋ 非 ST/*ST（<b>仅期内代理 STP</b>；现名过滤 = 关闭 · 勘误 E-19）＋ '
         '每股净资产 ≥3 元（报告期 +4 个月后方可用）'
         '＋ **只买主板**（sh600/601/603/605 ＋ sz000/001/002/003；剔创业板 300/301/302、科创板 688）'
         '｜ <b>次日开盘跳空 gap = 今开/昨收 − 1 ∈ [−3%, −1%]</b>（低开至少 1%、不超过 3%）'
         f'｜ 复合分 F = z(−ln 成交额20) + z(−ln 量比) + z(−20 日涨幅)，取前 {par.get("K", 10)} 只'
         f'｜ 仓位 = min(前一日净值/{kslot}, 可用现金)，最多同持 {kslot} 只'
-        f'｜ 出场 = 止盈 +{(par.get("TP", 0.02) or 0) * 100:.0f}% ／ 未达标 T+2 尾盘（<b>不止损</b>）'
+        f'｜ 出场 = 止盈 +{(par.get("TP", 0.02) or 0) * 100:.0f}%（<b>基准 = 实际成交价</b>，即买入日开盘价 ×1.02）／ 未达标 T+2 尾盘（<b>不止损</b>）'
         '<br><span style="color:var(--warn)">⚠ <b>原名为「横盘低开·两日」（历史遗留）</b>：样本内实测「横盘」无用、'
         '「放量」方向相反（要缩量）⇒ <b>冻结规格里既无横盘条件也无放量条件</b>，'
         '真实因子只有「缩量 ＋ 低成交额 ＋ 超跌」的复合分；'
@@ -283,7 +310,8 @@ def hpdk_card(BASE):
             '<th data-key="gap" style="text-align:right">今开跳空</th>'
             '<th data-key="F" style="text-align:right">F 复合分</th>'
             f'<th data-key="cand" style="text-align:center">当日候选（前 {_top_k}）</th></tr></thead>'
-            f'<tbody>{_hr}</tbody></table></div>')
+            f'<tbody>{mark_st_rows(_hr, [x.get("name") for x in (h.get("rows") or [])])}</tbody>'
+            '</table></div>')
     # 近 N 日命中回看（R-hpdk-hist-0929）：卡片主区块只显示"最近一个已完成买日"，
     # 而用户关心的往往是"昨天/前几天的买日命中"（含自己实际下单那批）⇒ 把历史档
     # backtest/hpdk_hits_history.jsonl 的最近若干日紧凑渲染出来（一行一日）。

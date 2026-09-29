@@ -1554,7 +1554,10 @@ HPDK_JS = r"""
     /* ④ 存活者排名（存活子集内 z 标准化）→ 取前 k 只置顶 + 写入单元格 */
     score(keepRank);
     keepRank.sort(function(X, Y){ return (Y.F !== X.F) ? (Y.F - X.F) : (X.m.i - Y.m.i); });  /* 同分按资格池原序 */
-    var K = numOr(H.k, 10); if (!(K >= 1)) K = 10;
+    /* K 真值源（2026-09-29 严审修正）：payload 顶层有 k（= 冻结 params.K 的镜像，实测 =10），
+       但 params 本身被构建期裁剪掉了 ⇒ 本条改为「优先 params.K、回退顶层 k、最后 10」，
+       避免任一来源被裁剪时静默用错名单长度（原写法只读 H.k，一旦裁剪即无保护）。 */
+    var K = numOr((H.params && H.params.K), numOr(H.k, 10)); if (!(K >= 1)) K = 10;
     var slot = numOr(H.capital, 0) / Math.max(1, numOr(H.kslot, 1));    /* 单票分配上限 = 本金 / KSLOT */
     var top = keepRank.slice(0, K);
     for (i = 0; i < top.length; i++) {
@@ -1603,10 +1606,12 @@ HPDK_JS = r"""
     if (top.length) {
       var hr = document.createElement('tr');
       hr.className = 'hpdk-buy-hdr';
-      hr.innerHTML = '<td colspan="' + (NCOL || 14) + '">\u26a1 今日买入候选（' + top.length
-        + '）· 已剔除 ' + S.removed + ' 只 · 置顶=视图态：不改信号池、不改 depth rank、不写盘'
-        + (S.pool > S.rows ? ' · 注：资格池 ' + S.pool + ' 只，本表只渲染 ' + S.rows + ' 行，F 排名在本表存活行内算' : '')
-        + '</td>';
+      hr.innerHTML = '<td colspan="' + (NCOL || 14) + '">\u26a1 窗内买入候选（' + top.length
+        + ' 只 · 本表 ' + S.rows + ' 行内的重排名结果）· 已剔除 ' + S.removed
+        + ' 只 · 置顶=视图态：不改信号池、不改 depth rank、不写盘'
+        + (S.pool > S.rows ? ' · 注：资格池 ' + S.pool + ' 只，本表只渲染 ' + S.rows + ' 行' : '')
+        + '<br><b>买入名单请以表格上方的「全池口径（权威）」条为准</b>——本条只反映窗口内的存活行，'
+        + '两者分母不同（窗内少报）。</td>';
       body.insertBefore(hr, body.firstChild);
       var anchor = hr;
       for (i = 0; i < top.length; i++) { body.insertBefore(top[i].tr, anchor.nextSibling); anchor = top[i].tr; }
@@ -1622,33 +1627,72 @@ HPDK_JS = r"""
       fpEl = document.createElement('div');
       fpEl.id = 'hpdk-fullpool';
       fpEl.className = 'hpdk-badge';
-      tb.parentNode.insertBefore(fpEl, tb);
+      tb.parentNode.insertBefore(fpEl, tb);      /* 2026-09-29 修：本行与下一行曾被我的编辑误删 */
     }
-    var FP = null;
+    /* 2026-09-29 严审修正（用户报「9:25 后买入名单一直在变，3 只 / 10 只两套口径」）：
+       ① 分母不同：本条的存活子集 = **整个资格池 META**，而下方表格 = 只渲染的 RENDER_N=600 行
+          ⇒ 两个「命中数」天然不同（实测：本条 10 只 vs 表头 3 只）。现在把两者的口径写成同一句。
+       ② 报价覆盖每轮变：盘中层只对「有报价的行」取到 px/pcl/opn，拿不到报价的行判为 na
+          （保守留存、不计命中）⇒ 命中数与名单随刷新漂移。现在显式统计并展示「缺报价 X 只」。
+       ③ 09:25 后开盘价已冻结 ⇒ 命中集合本应确定。本条在 enforce（= 买日且 ≥09:25）时**首算即冻结**
+          （localStorage 按 buy_date 存），此后刷新只读冻结值 ⇒ 名单不再变；换日自动作废。
+       （现价 px 仍参与 B 闸「停牌/一字」，这是冻结判据本身的口径，保留不动——但它只影响极少数票。）
+    */
+    /* 冻结键：09:25 后开盘价已定 ⇒ 命中集合确定，首算即冻结（按 buy_date 存），刷新只读冻结值。 */
+    var FPKEY = 'quant_hpdk_fp_v1';
+    function loadFP(){
+      try { var a = JSON.parse(localStorage.getItem(FPKEY));
+            return (a && String(a.buy_date) === String(H.buy_date || '')) ? a : null; }
+      catch (e) { return null; }
+    }
+    function saveFP(o){ try { localStorage.setItem(FPKEY, JSON.stringify(o)); } catch (e) {} }
+    var FP = null, FPfrozen = false;
     try {
       if (live && enforce) {
-        var keys = [], kk;
-        for (kk in META) { if (Object.prototype.hasOwnProperty.call(META, kk)) keys.push(kk); }
-        var sur = [], j2;
-        for (j2 = 0; j2 < keys.length; j2++) {
-          var vv = judge(META[keys[j2]], q[keys[j2]]);
-          if (vv.k === 'keep') sur.push({code: keys[j2], m: META[keys[j2]], gap: vv.gap});
+        FP = loadFP();
+        if (FP) { FPfrozen = true; }
+        else {
+          var keys = [], kk;
+          for (kk in META) { if (Object.prototype.hasOwnProperty.call(META, kk)) keys.push(kk); }
+          var sur = [], miss = 0, j2;
+          for (j2 = 0; j2 < keys.length; j2++) {
+            var qq = q[keys[j2]];
+            if (!qq) miss++;
+            var vv = judge(META[keys[j2]], qq);
+            if (vv.k === 'keep') sur.push({code: keys[j2], m: META[keys[j2]], gap: vv.gap});
+          }
+          score(sur);
+          sur.sort(function(X, Y){ return (Y.F !== X.F) ? (Y.F - X.F) : (X.m.i - Y.m.i); });
+          FP = {buy_date: String(H.buy_date || ''), pool: keys.length, hits: sur.length,
+                missing: miss, k: K,
+                top: sur.slice(0, K).map(function(x){
+                       return {code: x.code, name: x.m.name || ''}; }),
+                ts: ymd(new Date()) + ' ' + hms(new Date())};
+          saveFP(FP);
+          FPfrozen = true;   /* 首算即冻结生效：本次渲染就标注「已冻结」，不必等下一次刷新 */
         }
-        score(sur);
-        sur.sort(function(X, Y){ return (Y.F !== X.F) ? (Y.F - X.F) : (X.m.i - Y.m.i); });
-        FP = {pool: keys.length, hits: sur.length, top: sur.slice(0, K)};
       }
     } catch (e) { FP = null; S.err = String(e && e.message || e); }
     if (fpEl) {
       if (FP) {
-        fpEl.textContent = '\u26a1 全池口径（权威）· 买日 ' + (H.buy_date || '—') + '（信号日 ' + (H.as_of || '—')
-          + '）：资格池 ' + FP.pool + ' 只 → 命中 ' + FP.hits
-          + ' 只｜买入名单 = F 前 ' + K + '：' + FP.top.map(function(x){
-              return (x.m.name || bare(x.code)) + ' ' + bare(x.code); }).join('、')
-          + '｜下表只渲染 ' + S.rows + ' 行（命中 ' + S.hit + ' 只，且顺序为**窗内重排名**）——以本条为准';
-        fpEl.title = CFG.TIP + ' · 本条与服务端「今日命中（收盘链全池复算）」同口径：gap = 今开/昨收−1 '
-          + '∈ [' + fmtPct(numOr(H.gap_lo, -0.03)) + ', ' + fmtPct(numOr(H.gap_hi, -0.01)) + ']'
-          + ' ＋ 可交易 ＋ 准入件；F 在**全池存活子集**内横截面 z 标准化，降序取前 ' + K + ' 只。';
+        var _topN = FP.top.length, _stn = 0;
+        fpEl.textContent = '\u26a1 全池口径（权威' + (FPfrozen ? ' · 09:25 后已冻结' : '') + '）· 买日 '
+          + (H.buy_date || '—') + '（信号日 ' + (H.as_of || '—') + '）：资格池 ' + FP.pool
+          + ' 只 → 命中 ' + FP.hits + ' 只' + (FP.missing ? ('（另 ' + FP.missing + ' 只缺报价未判定）') : '')
+          + '｜买入名单 = F 前 ' + FP.k + '（本次 ' + _topN + ' 只）：'
+          + FP.top.map(function(x){
+              var nm = (x.name || ''), isst = /ST/i.test(nm) || (nm.indexOf('退') >= 0);
+              if (isst) { _stn++; }
+              return (nm || bare(x.code)) + ' ' + bare(x.code) + (isst ? '\u26a0\ufe0fST' : '');
+            }).join('、')
+          + (_stn ? ('  ｜<b style="color:var(--down)">⚠ 其中 ' + _stn + ' 只为现行 ST/*ST</b>'
+                     + '（冻结判据 E-19 后只做点时 ST 代理、不过滤现行名称 → 请自行剔除）') : '')
+          + '｜下方表格只渲染 ' + S.rows + ' 行 → 其「窗内命中 ' + S.hit + ' 只」是另一分母（顺序为窗内重排名）'
+          + '，**以本条为准**';
+        fpEl.title = CFG.TIP + ' · 口径：gap = 今开/昨收−1 ∈ [' + fmtPct(numOr(H.gap_lo, -0.03))
+          + ', ' + fmtPct(numOr(H.gap_hi, -0.01)) + ']（float32 复刻冻结生产者）＋ 可交易 ＋ 准入件；'
+          + 'F 在**全池存活子集**内横截面 z 标准化，降序取前 ' + FP.k + ' 只。'
+          + (FPfrozen ? ('名单已于 ' + FP.ts + ' 首算并冻结，刷新不再变更（换日自动作废）。') : '');
         fpEl.style.display = '';
       } else {
         fpEl.textContent = '';
