@@ -1,0 +1,354 @@
+{
+ "_what": "分钟级滑价实测 → 年化映射；滑价敏感度曲线来自 evidence_slip_c_vs_0925_20260929.json（官方逐笔重算）",
+ "curve": [
+  {
+   "s": 0.0,
+   "ann": 46.4,
+   "sharpe": 2.13,
+   "mdd": -26.8,
+   "win_rate": 60.74
+  },
+  {
+   "s": 0.0002,
+   "ann": 43.45,
+   "sharpe": 2.02,
+   "mdd": -26.98,
+   "win_rate": 60.53
+  },
+  {
+   "s": 0.0005,
+   "ann": 39.29,
+   "sharpe": 1.86,
+   "mdd": -27.19,
+   "win_rate": 60.17
+  },
+  {
+   "s": 0.001,
+   "ann": 32.48,
+   "sharpe": 1.59,
+   "mdd": -27.83,
+   "win_rate": 59.5
+  },
+  {
+   "s": 0.002,
+   "ann": 19.75,
+   "sharpe": 1.05,
+   "mdd": -28.98,
+   "win_rate": 58.09
+  },
+  {
+   "s": 0.003,
+   "ann": 8.24,
+   "sharpe": 0.51,
+   "mdd": -41.51,
+   "win_rate": 56.75
+  },
+  {
+   "s": 0.005,
+   "ann": -11.29,
+   "sharpe": -0.53,
+   "mdd": -79.23,
+   "win_rate": 53.84
+  },
+  {
+   "s": 0.01,
+   "ann": -45.64,
+   "sharpe": -3.03,
+   "mdd": -99.92,
+   "win_rate": 46.56
+  }
+ ],
+ "map": {
+  "全部": {
+   "09:31": {
+    "mean": -0.257,
+    "median": -0.355,
+    "ann_at_mean": 46.4,
+    "ann_at_median": 46.4,
+    "sharpe_at_mean": 2.13,
+    "share_gt05": 22.3,
+    "share_gt1": 13.3,
+    "p10": -1.603,
+    "p90": 1.23
+   },
+   "09:32": {
+    "mean": -0.218,
+    "median": -0.167,
+    "ann_at_mean": 46.4,
+    "ann_at_median": 46.4,
+    "sharpe_at_mean": 2.13,
+    "share_gt05": 24.7,
+    "share_gt1": 15.1,
+    "p10": -1.857,
+    "p90": 1.364
+   },
+   "09:33": {
+    "mean": -0.495,
+    "median": -0.463,
+    "ann_at_mean": 46.4,
+    "ann_at_median": 46.4,
+    "sharpe_at_mean": 2.13,
+    "share_gt05": 22.9,
+    "share_gt1": 13.9,
+    "p10": -2.211,
+    "p90": 1.332
+   },
+   "09:34": {
+    "mean": -0.45,
+    "median": -0.317,
+    "ann_at_mean": 46.4,
+    "ann_at_median": 46.4,
+    "sharpe_at_mean": 2.13,
+    "share_gt05": 25.3,
+    "share_gt1": 13.9,
+    "p10": -2.045,
+    "p90": 1.201
+   },
+   "09:35": {
+    "mean": -0.67,
+    "median": -0.526,
+    "ann_at_mean": 46.4,
+    "ann_at_median": 46.4,
+    "sharpe_at_mean": 2.13,
+    "share_gt05": 24.1,
+    "share_gt1": 16.9,
+    "p10": -2.857,
+    "p90": 1.481
+   },
+   "09:40": {
+    "mean": -1.108,
+    "median": -1.07,
+    "ann_at_mean": 46.4,
+    "ann_at_median": 46.4,
+    "sharpe_at_mean": 2.13,
+    "share_gt05": 21.1,
+    "share_gt1": 16.9,
+    "p10": -3.964,
+    "p90": 2.082
+   },
+   "09:45": {
+    "mean": -1.121,
+    "median": -1.357,
+    "ann_at_mean": 46.4,
+    "ann_at_median": 46.4,
+    "sharpe_at_mean": 2.13,
+    "share_gt05": 21.1,
+    "share_gt1": 16.3,
+    "p10": -3.905,
+    "p90": 2.102
+   },
+   "09:50": {
+    "mean": -1.286,
+    "median": -1.416,
+    "ann_at_mean": 46.4,
+    "ann_at_median": 46.4,
+    "sharpe_at_mean": 2.13,
+    "share_gt05": 18.1,
+    "share_gt1": 13.9,
+    "p10": -4.509,
+    "p90": 1.984
+   }
+  },
+  "top10（3 个买日）": {
+   "09:31": {
+    "mean": 0.476,
+    "median": 0.217,
+    "ann_at_mean": -8.95,
+    "ann_at_median": 17.79,
+    "sharpe_at_mean": -0.41,
+    "share_gt05": 43.3,
+    "share_gt1": 30.0,
+    "p10": -0.815,
+    "p90": 1.818
+   },
+   "09:32": {
+    "mean": 0.841,
+    "median": 0.584,
+    "ann_at_mean": -34.72,
+    "ann_at_median": -17.06,
+    "sharpe_at_mean": -2.23,
+    "share_gt05": 56.7,
+    "share_gt1": 40.0,
+    "p10": -0.439,
+    "p90": 2.574
+   },
+   "09:33": {
+    "mean": 0.697,
+    "median": 0.873,
+    "ann_at_mean": -24.82,
+    "ann_at_median": -36.92,
+    "sharpe_at_mean": -1.51,
+    "share_gt05": 60.0,
+    "share_gt1": 40.0,
+    "p10": -0.772,
+    "p90": 2.482
+   },
+   "09:34": {
+    "mean": 0.584,
+    "median": 0.662,
+    "ann_at_mean": -17.06,
+    "ann_at_median": -22.42,
+    "sharpe_at_mean": -0.95,
+    "share_gt05": 56.7,
+    "share_gt1": 40.0,
+    "p10": -1.213,
+    "p90": 2.071
+   },
+   "09:35": {
+    "mean": 0.677,
+    "median": 0.769,
+    "ann_at_mean": -23.45,
+    "ann_at_median": -29.77,
+    "sharpe_at_mean": -1.42,
+    "share_gt05": 56.7,
+    "share_gt1": 46.7,
+    "p10": -1.225,
+    "p90": 2.241
+   },
+   "09:40": {
+    "mean": 0.711,
+    "median": 0.969,
+    "ann_at_mean": -25.79,
+    "ann_at_median": -43.51,
+    "sharpe_at_mean": -1.58,
+    "share_gt05": 56.7,
+    "share_gt1": 50.0,
+    "p10": -1.692,
+    "p90": 2.938
+   },
+   "09:45": {
+    "mean": 0.668,
+    "median": 1.033,
+    "ann_at_mean": -22.83,
+    "ann_at_median": -45.64,
+    "sharpe_at_mean": -1.37,
+    "share_gt05": 56.7,
+    "share_gt1": 50.0,
+    "p10": -2.437,
+    "p90": 2.968
+   },
+   "09:50": {
+    "mean": 0.518,
+    "median": 0.391,
+    "ann_at_mean": -12.53,
+    "ann_at_median": -0.65,
+    "sharpe_at_mean": -0.62,
+    "share_gt05": 43.3,
+    "share_gt1": 33.3,
+    "p10": -2.238,
+    "p90": 2.98
+   }
+  },
+  "09-28 全部 146 只带内命中": {
+   "09:31": {
+    "mean": -0.419,
+    "median": -0.432,
+    "ann_at_mean": 46.4,
+    "ann_at_median": 46.4,
+    "sharpe_at_mean": 2.13,
+    "share_gt05": 17.6,
+    "share_gt1": 9.6,
+    "p10": -1.701,
+    "p90": 0.888
+   },
+   "09:32": {
+    "mean": -0.452,
+    "median": -0.299,
+    "ann_at_mean": 46.4,
+    "ann_at_median": 46.4,
+    "sharpe_at_mean": 2.13,
+    "share_gt05": 17.6,
+    "share_gt1": 9.6,
+    "p10": -2.073,
+    "p90": 0.929
+   },
+   "09:33": {
+    "mean": -0.757,
+    "median": -0.573,
+    "ann_at_mean": 46.4,
+    "ann_at_median": 46.4,
+    "sharpe_at_mean": 2.13,
+    "share_gt05": 14.7,
+    "share_gt1": 8.1,
+    "p10": -2.38,
+    "p90": 0.868
+   },
+   "09:34": {
+    "mean": -0.679,
+    "median": -0.429,
+    "ann_at_mean": 46.4,
+    "ann_at_median": 46.4,
+    "sharpe_at_mean": 2.13,
+    "share_gt05": 18.4,
+    "share_gt1": 8.1,
+    "p10": -2.355,
+    "p90": 0.745
+   },
+   "09:35": {
+    "mean": -0.968,
+    "median": -0.68,
+    "ann_at_mean": 46.4,
+    "ann_at_median": 46.4,
+    "sharpe_at_mean": 2.13,
+    "share_gt05": 16.9,
+    "share_gt1": 10.3,
+    "p10": -3.194,
+    "p90": 0.984
+   },
+   "09:40": {
+    "mean": -1.509,
+    "median": -1.391,
+    "ann_at_mean": 46.4,
+    "ann_at_median": 46.4,
+    "sharpe_at_mean": 2.13,
+    "share_gt05": 13.2,
+    "share_gt1": 9.6,
+    "p10": -4.463,
+    "p90": 0.865
+   },
+   "09:45": {
+    "mean": -1.516,
+    "median": -1.458,
+    "ann_at_mean": 46.4,
+    "ann_at_median": 46.4,
+    "sharpe_at_mean": 2.13,
+    "share_gt05": 13.2,
+    "share_gt1": 8.8,
+    "p10": -4.524,
+    "p90": 0.747
+   },
+   "09:50": {
+    "mean": -1.684,
+    "median": -1.699,
+    "ann_at_mean": 46.4,
+    "ann_at_median": 46.4,
+    "sharpe_at_mean": 2.13,
+    "share_gt05": 12.5,
+    "share_gt1": 9.6,
+    "p10": -4.87,
+    "p90": 0.913
+   }
+  }
+ },
+ "by_day": {
+  "2026-09-24": {
+   "n": 10,
+   "mean_0931": -0.2017,
+   "median_0931": -0.3419,
+   "mean_0935": 0.4916
+  },
+  "2026-09-28": {
+   "n": 10,
+   "mean_0931": 0.4002,
+   "median_0931": 0.0951,
+   "mean_0935": -0.2445
+  },
+  "2026-09-29": {
+   "n": 10,
+   "mean_0931": 1.2282,
+   "median_0931": 1.2302,
+   "mean_0935": 1.7853
+  }
+ },
+ "note": "静默期 09:26–09:30 内提交的单与集合竞价同价（开盘价）→ 滑价 0；上表滑价从首个连续竞价分钟 09:31 起算"
+}
