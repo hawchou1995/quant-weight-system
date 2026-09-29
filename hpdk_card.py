@@ -203,6 +203,33 @@ def hpdk_card(BASE):
             '<th style="text-align:right">今开跳空</th><th style="text-align:right">F 复合分</th>'
             f'<th style="text-align:center">当日候选（前 {_top_k}）</th></tr></thead>'
             f'<tbody>{_hr}</tbody></table></div>')
+    # 近 N 日命中回看（R-hpdk-hist-0929）：卡片主区块只显示"最近一个已完成买日"，
+    # 而用户关心的往往是"昨天/前几天的买日命中"（含自己实际下单那批）⇒ 把历史档
+    # backtest/hpdk_hits_history.jsonl 的最近若干日紧凑渲染出来（一行一日）。
+    _hp = BASE / "backtest" / "hpdk_hits_history.jsonl"
+    if _hp.exists():
+        try:
+            _hs = [json.loads(l) for l in _hp.read_text(encoding="utf-8").splitlines() if l.strip()]
+        except Exception:
+            _hs = []
+        _hs = [x for x in _hs if x.get("date")][-5:][::-1]
+        if len(_hs) > 1:
+            _rs = "".join(
+                '<tr><td style="text-align:center">%s</td><td style="text-align:center">%s</td>'
+                '<td style="text-align:right">%s</td><td style="text-align:right">%s</td>'
+                '<td>%s</td></tr>'
+                % (x.get("date"), x.get("signal_date"), x.get("n_pool"), x.get("n_hits"),
+                   "、".join(str(c) for c in (x.get("top") or [])[:6]) or "—")
+                for x in _hs)
+            L.append(
+                f'<div class="sub" style="margin-top:10px"><b>近 {len(_hs)} 个买日命中回看</b>'
+                '<span style="color:var(--faint)">（来自 backtest/hpdk_hits_history.jsonl；'
+                '上方主区块只显示最近一个买日）</span></div>'
+                '<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-hist" '
+                'style="width:100%;font-size:12px"><thead><tr>'
+                '<th style="text-align:center">买日</th><th style="text-align:center">信号日</th>'
+                '<th style="text-align:right">资格池</th><th style="text-align:right">命中</th>'
+                f'<th>F 前 6</th></tr></thead><tbody>{_rs}</tbody></table></div>')
     L.append('<div class="sub" style="margin-top:6px;color:var(--warn)"><b>板块限定（2026-09-27 用户决定：只买主板）</b> —— 同一面板、同一记账规则下的同尺子对比：全窗 年化 <b>+72.59% → +47.77%</b>（−24.82pp）、夏普 <b>2.79 → 2.12</b>、最大回撤 <b>−32.29% → −29.13%</b>（<b>改善 3.16pp</b>）、净胜率 63.14% → 60.63%、单笔净均 +0.5574% → +0.4028%；2018+ 年化 +105.38% → +64.24%。选股集合仅 <b>55.5% 重合</b>（横截面 z 在候选池内标准化 ⇒ 缩池后标准分整体改变）。<b>代价明确：用年化换回撤，风险调整后更差。</b>完整逐项读数见 <code>backtest/报告-只买主板-回测对比-20260927.md</code> 与 <code>backtest/hengpan_fangliang_dikai_0925/evidence_board.json</code>（另有：全池 KSLOT=4 口径 +249.67%、主板 KSLOT=4 +189.75%，操作档见上）。</div>')
     L.append('<div class="sub" style="margin-top:6px;color:var(--warn)">'
              '<b>准入门槛扫描（2026-09-27）</b> —— 用户问「量比要多于多少 / 盈亏比要大于多少会不会改善」：'
