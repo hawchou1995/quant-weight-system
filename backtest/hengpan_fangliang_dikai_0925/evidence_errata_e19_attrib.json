@@ -4,31 +4,31 @@
  "sim": "x2_sens.sim_portfolio(order=entry_first)",
  "arms": {
   "A_v15": {
-   "n": 23759,
-   "ann": 63.86,
+   "n": 23769,
+   "ann": 63.81,
    "mdd": -26.81,
    "sharpe": 2.54,
-   "n_trades": 21146,
-   "mean_per_trade": 0.4264,
-   "win_rate": 60.71
+   "n_trades": 21156,
+   "mean_per_trade": 0.4261,
+   "win_rate": 60.7
   },
   "B_v16": {
-   "n": 24492,
-   "ann": 63.9,
-   "mdd": -27.41,
-   "sharpe": 2.53,
-   "n_trades": 21146,
-   "mean_per_trade": 0.4341,
-   "win_rate": 60.94
+   "n": 24502,
+   "ann": 62.7,
+   "mdd": -26.8,
+   "sharpe": 2.51,
+   "n_trades": 21157,
+   "mean_per_trade": 0.4234,
+   "win_rate": 60.64
   },
   "C_nostnow_noBPSA": {
-   "n": 25094,
-   "ann": 69.99,
-   "mdd": -28.95,
-   "sharpe": 2.65,
-   "n_trades": 21154,
-   "mean_per_trade": 0.4675,
-   "win_rate": 61.53
+   "n": 25105,
+   "ann": 69.41,
+   "mdd": -28.57,
+   "sharpe": 2.64,
+   "n_trades": 21165,
+   "mean_per_trade": 0.4643,
+   "win_rate": 61.45
   }
  },
  "verdict": "见 report 与 E-19a"

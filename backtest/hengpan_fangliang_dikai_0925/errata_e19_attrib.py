@@ -17,14 +17,14 @@ D = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(D))
 import x2_sens as X  # noqa: E402
 
-cache = pathlib.Path(os.environ["PI_SCRATCH_DIR"]) / "x1cache"
+cache = D / ".x3cache"     # 【2026-09-29 修】改用与 x2_sens 同一个面板缓存（scratch 目录已清空）
 OUT = D / "oos_run.py"
 
+# 【勘误 E-22 · 2026-09-29 修】原锚点是旧 FILT 文本（已随 E-19/E-22 改写）⇒ 改为
+# 「从 m = (~STP… 到 return m」整段匹配，对 FILT 内部改写免疫。
 OLD = re.compile(
-    r"        m = \(~STP\[t\]\) & \(C\[t\] >= 3\.0\) & np\.isfinite\(BPSA\[t\]\) & \(BPSA\[t\] >= 3\.0\)\n"
-    r"        if not P\.get\(\"STNOW_OFF\", True\):\n"
-    r"            m = m & \(~STNOW\)\n"
-    r"        return m")
+    r"        m = \(~STP\[t\]\) & \(C\[t\] >= 3\.0\).*?\n        return m\n",
+    re.S)
 NEW_C = ("        m = (~STP[t]) & (C[t] >= 3.0)          # 探针 C：去 STNOW + 去 BPSA\n"
          "        return m")
 probe = D / "_tmp_probeC_oos_run.py"   # 必须与 oos_run.py 同目录：脚本用 parents[2] 定位仓库根
@@ -51,7 +51,8 @@ def snap(recs, P, tag):
 
 
 # A) v1.5 原样
-recs, P = X.run_variant(mod, cache, cal, F, done, "attr_A_v15", {"STNOW_OFF": False})
+recs, P = X.run_variant(mod, cache, cal, F, done, "attr_A_v15",
+                        {"STNOW_LIVE_ONLY": False, "STP_CNT": 0})   # v1.5 = 全量剔现名 + 无 A
 snap(recs, P, "A_v15")
 # B) v1.6（只去 STNOW）
 recs, P = X.run_variant(mod, cache, cal, F, done, "attr_B_v16", None)

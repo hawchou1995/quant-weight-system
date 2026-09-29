@@ -1,7 +1,7 @@
 {
  "as_of": "2026-09-28",
- "updated_at": "2026-09-29 11:56:19",
- "frozen_script_sha256": "7d14d27e9e28df9e50ecfb6aeaa00c021dc60a3aeedac4f5b33724670e444e92",
+ "updated_at": "2026-09-29 13:45:32",
+ "frozen_script_sha256": "2351eb9d42acc62e35049d47785e755ff9ce5a0a60d178e90c7baa83f47800a2",
  "config": {
   "capital": 1000000.0,
   "kslot": 4,

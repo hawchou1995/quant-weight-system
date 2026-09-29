@@ -96,21 +96,11 @@ def hpdk_parts(cache):
     log("  P2 价格型前瞻对照（入场价换成入场日**最低价**）→ 2018+ 年化 %+.2f%%（Δ %+.2fpp）/ 夏普 %s（Δ %+.3f）"
         % (ml["ann"], ml["ann"] - m0["ann"], ml["sharpe"], ml["sharpe"] - m0["sharpe"]))
 
-    # Q：临时探针副本，去掉 ~STNOW
-    txt = oos_src.decode("utf-8")
-    old = "return (~STP[t]) & (~STNOW) & (C[t] >= 3.0)"
-    new = "return (~STP[t]) & np.ones(N, dtype=bool) & (C[t] >= 3.0)   # 审计探针：去掉「当前名称」筛子"
-    assert txt.count(old) == 1, "探针锚点不唯一：%d" % txt.count(old)
-    probe = pathlib.Path(os.environ["PI_SCRATCH_DIR"]) / "oos_run_nostnow_probe.py"
-    t2 = txt.replace(old, new)
-    # 探针位于 scratch，需把 R 重写为绝对路径（否则相对 __file__ 解析错位）
-    oldR = "R = pathlib.Path(__file__).resolve().parents[2]"
-    assert t2.count(oldR) == 1, "R 锚点不唯一"
-    t2 = t2.replace(oldR, 'R = pathlib.Path(r"%s")   # 审计探针：绝对路径' % str(R).replace("\\", "/"))
-    probe.write_text(t2, encoding="utf-8")
-    X.OOS = probe                                  # 仅本进程内改 X.OOS（原文件未动）
-    mod_p = X.load_mod()
-    recs_n, _ = X.run_variant(mod_p, cache, cal, F, done, "audit_nostnow", None, None)
+    # 【勘误 E-22 · 2026-09-29 修】原实现改文件做探针（patch 旧 FILT 文本 `return (~STP[t]) & (~STNOW)…`），
+    # 该文本在 E-19/E-22 后已不存在 ⇒ 改用 overrides（新 3 值语义直接支持「不用现名过滤」）。
+    # 该段意图是「去掉 ~STNOW」，同时关掉 A（STP_CNT=0）以隔离变量。
+    recs_n, _ = X.run_variant(mod, cache, cal, F, done, "audit_nostnow",
+                              {"STNOW_OFF": True, "STP_CNT": 0})
     mn = X.sim_portfolio(recs_n, cal, syms, F, K, KSLOT, COST, start="2018-01-01")
     out["Q_stnow_off_2018plus"] = dict(n_trades=len(recs_n), **{k: mn[k] for k in
         ("ann", "mdd", "sharpe", "n_entries", "deploy_pct")},
@@ -198,7 +188,7 @@ def qlch_parts():
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--out", default=None)
     a = ap.parse_args(); t0 = time.time()
-    cache = pathlib.Path(os.environ.get("PI_SCRATCH_DIR", ".")) / "x1cache"
+    cache = R / "backtest/hengpan_fangliang_dikai_0925/.x3cache"   # 【2026-09-29 修】复用同一面板缓存
     res = dict(meta=dict(script=pathlib.Path(__file__).name,
                          run_at=time.strftime("%Y-%m-%d %H:%M:%S"),
                          source="https://gushi.in/topic/465（未来函数排查清单 · 五维）"), hpdk={}, qlch={})

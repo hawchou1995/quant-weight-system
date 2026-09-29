@@ -22,7 +22,7 @@ import pandas as pd
 
 R = pathlib.Path(__file__).resolve().parents[2]
 OUT = R / "backtest/hengpan_fangliang_dikai_0925"
-FROZEN_SHA_EXPECT = "7d14d27e9e28df9e50ecfb6aeaa00c021dc60a3aeedac4f5b33724670e444e92"   # v1.7（E-22 A+C）；v1.6 = 0b61a4bb…；v1.5 = b3748ca3…
+FROZEN_SHA_EXPECT = "2351eb9d42acc62e35049d47785e755ff9ce5a0a60d178e90c7baa83f47800a2"   # v1.7a（E-22 + 开关语义修复）；v1.7=7d14d27e…；v1.6=0b61a4bb…   # v1.7（E-22 A+C）；v1.6 = 0b61a4bb…；v1.5 = b3748ca3…
 ANN = 244.0
 MET_KEYS = ("ann", "mdd", "sharpe", "win_rate", "mean_per_trade", "med_per_trade",
             "n_trades", "n_entries", "deploy_pct")

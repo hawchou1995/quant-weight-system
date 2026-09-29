@@ -16,8 +16,7 @@ P = dict(P1=0.01, P2=0.03, K=10, KSLOT=20, MINAMT=2e7, MINPX=3.0, LISTED=250, TP
           # STP_CNT=3        → A：代理需「250 日内 |日收益|≥4.8% 的天数 ≥3」；设 0 = 关掉 A
           # STNOW_LIVE_ONLY  → C：现名过滤只作用于在售票（退市票豁免）；设 False = 复原 v1.5 全量剔
           # STNOW_OFF=True   → 完全不使用现名过滤（E-19 行为）；保留供审计复现
-          STP_CNT=3, STNOW_LIVE_ONLY=True,
-          STNOW_OFF=False)
+          STP_CNT=3, STNOW_LIVE_ONLY=True, STNOW_OFF=False)
 FROZEN_SHA = hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest()
 def log(*a): print(*a, flush=True)
 def load_universe():
@@ -125,14 +124,21 @@ def main():
         复现 v1.5 旧读数：P["STNOW_OFF"] = False（x2_sens 的 v15_stnow 臂即此）。
         """
         m = (~STP[t]) & (C[t] >= 3.0) & np.isfinite(BPSA[t]) & (BPSA[t] >= 3.0)
-        if not P.get("STNOW_OFF", True):
-            m = m & (~STNOW)                       # v1.5 旧行为（全量剔现名）：仅审计复现用
+        # 开关语义（2026-09-29 修：原分支顺序写反 ⇒ 默认 STNOW_OFF=False 会走「全量剔现名」，
+        # 使 C 的在售票豁免**不生效**，且与 evidence_sensitivity 的 base 臂口径不一致）：
+        #   STNOW_OFF=True              → 完全不用现名过滤（E-19 行为）
+        #   STNOW_OFF=False + LIVE_ONLY → C：只剔在售票（**新默认**）
+        #   STNOW_OFF=False + LIVE_ONLY=False → v1.5 全量剔现名
+        if P.get("STNOW_OFF", False):
+            pass                                   # 不用现名过滤（仅审计复现 E-19）
         elif P.get("STNOW_LIVE_ONLY", True):
             # 【勘误 E-22 · C（2026-09-29 用户批准）】现名过滤只作用于**在售票**；退市票豁免。
             # 依据：E-19 实测「全量剔现名」把 253 只退市股剔掉 228 只（90.1%）⇒ 幸存者修正失效；
             # 而近期才戴帽的在售票（002743 / *ST网达）必须剔 —— 代理对它们召回仅 ~3%（E-21 实测）。
             # 代价：重新引入「用今天的名字回溯历史」的跨期信息（方向保守）。
             m = m & ((~STNOW) | _DEAD)
+        else:
+            m = m & (~STNOW)                       # v1.5 旧行为（全量剔现名）：仅审计复现
         return m
 
     # ---- 板块掩码（2026-09-27 用户要求「只买主板，其他板块去掉」）----
@@ -203,6 +209,9 @@ def main():
             # --- 主口径(v1.3): 止盈 +TP%, 不止损; 未达标 -> T+2 尾盘 ---
             tp_lv = entry * (1.0 + P["TP"]); o2 = O[ex_t][j]; h2 = H[ex_t][j]
             exT, usedT, flagT, tp_hit = exC, usedC, flagC, 0
+            # 【止损研究结论（2026-09-29 实测，未采用）】−3/−5/−8/−10% 四档全部使年化下降
+            # 2.75~9.37pp、夏普全降，且**不消除 −100% 全损**（T+1 买入日不可卖，连续跌停照样全损）。
+            # 依据：backtest/hengpan_fangliang_dikai_0925/evidence_ls_stop_study_20260929.json
             if np.isfinite(h2) and h2 > 0 and np.isfinite(o2):
                 if o2 >= tp_lv: exT, usedT, flagT, tp_hit = o2, ex_t, 0, 1
                 elif h2 >= tp_lv: exT, usedT, flagT, tp_hit = tp_lv, ex_t, 0, 1

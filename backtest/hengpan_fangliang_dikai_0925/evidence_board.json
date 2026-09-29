@@ -1,5 +1,5 @@
 {
- "frozen_script_sha256": "7d14d27e9e28df9e50ecfb6aeaa00c021dc60a3aeedac4f5b33724670e444e92",
+ "frozen_script_sha256": "2351eb9d42acc62e35049d47785e755ff9ce5a0a60d178e90c7baa83f47800a2",
  "panel": {
   "T": 2853,
   "N": 5442,
@@ -20,8 +20,8 @@
    "n_signal_days": 2584,
    "n_unique_syms": 3789,
    "syms_board": {
-    "主板": 2223,
     "创业板": 1104,
+    "主板": 2223,
     "科创板": 462
    },
    "by_kslot": {

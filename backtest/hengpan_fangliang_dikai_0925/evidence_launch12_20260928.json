@@ -1,8 +1,8 @@
 {
- "generated_at": "2026-09-29 13:04:36",
+ "generated_at": "2026-09-29 13:46:19",
  "topic": "https://gushi.in/topic/468 《从模拟盘到实盘：上线前必须完成的 12 项检查》",
  "object": "缩量超跌 (st-hpdk)",
- "frozen_script_sha256": "7d14d27e9e28df9e50ecfb6aeaa00c021dc60a3aeedac4f5b33724670e444e92",
+ "frozen_script_sha256": "2351eb9d42acc62e35049d47785e755ff9ce5a0a60d178e90c7baa83f47800a2",
  "params": {
   "P1": 0.01,
   "P2": 0.03,
@@ -15,7 +15,11 @@
   "COST_SIDE": 0.000346,
   "SHADOW_START": "2016-01-01",
   "WORST_CASE_WIPEOUT": true,
-  "STNOW_OFF": true
+  "STP_CNT": 3,
+  "STNOW_LIVE_ONLY": true,
+  "STNOW_OFF": false,
+  "LD_N": 0,
+  "STOP": 0.0
  },
  "panel": {
   "T": 2853,
@@ -458,12 +462,12 @@
   "冻结规格 oos_run.py": {
    "path": "backtest\\hengpan_fangliang_dikai_0925\\oos_run.py",
    "exists": true,
-   "size": 16151
+   "size": 17075
   },
   "预注册": {
    "path": "backtest\\PRE-REGISTRATION_20260926_hengpan_dikai_oos.md",
    "exists": true,
-   "size": 68546
+   "size": 69156
   },
   "挂单清单工具": {
    "path": "backtest\\hengpan_fangliang_dikai_0925\\watch_next.py",
@@ -549,5 +553,5 @@
    "nofund": 0
   }
  },
- "runtime_sec": 13.3
+ "runtime_sec": 15.5
 }

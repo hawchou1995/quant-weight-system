@@ -37,7 +37,9 @@ OUT = R / "backtest/hengpan_fangliang_dikai_0925"
 OOS = OUT / "oos_run.py"
 BASE_P = dict(P1=0.01, P2=0.03, K=10, KSLOT=20, MINAMT=2e7, MINPX=3.0, LISTED=250,
               TP=0.02, COST_SIDE=0.000346, SHADOW_START="2016-01-01", WORST_CASE_WIPEOUT=True,
-              STNOW_OFF=True)
+              # 【校准 2026-09-29】生产默认（E-22 A+C）：现名过滤只剔在售票 + 代理加钉板计数
+              STP_CNT=3, STNOW_LIVE_ONLY=True, STNOW_OFF=False,
+              LD_N=0, STOP=0.0)
 ANN = 244.0
 
 
@@ -234,9 +236,11 @@ def main():
         #   stp_A_off    = 关掉 A（退回只看「最大绝对日收益≤5.6%」的旧代理）
         #   stnow_all_C  = 关掉 C（现名过滤作用于全量 = v1.5 行为，会误剔 228/253 只退市股）
         #   v15_both_off = A/C 全关 + 现名全量剔 = v1.5 等价（历史对照基线）
-        ("v15_stnow", {"STNOW_OFF": False, "STP_CNT": 0}, None),   # v1.5 等价（A/C 全关）
-        ("stp_A_off", {"STP_CNT": 0}, None),                       # 只关 A
-        ("stnow_all_C", {"STNOW_LIVE_ONLY": False}, None),         # 只关 C
+        # 三值语义（2026-09-29 修）：STNOW_OFF=True→不用现名过滤；LIVE_ONLY=False→v1.5 全量剔
+        ("v15_stnow", {"STNOW_LIVE_ONLY": False, "STP_CNT": 0}, None),   # v1.5 等价：全量剔现名 + 无 A
+        ("stnow_off", {"STNOW_OFF": True, "STP_CNT": 0}, None),          # E-19 等价：不用现名过滤 + 无 A
+        ("stp_A_off", {"STP_CNT": 0}, None),                            # 只关 A
+        ("stnow_full_A", {"STNOW_LIVE_ONLY": False}, None),              # 全量剔现名 + A（C 关）
         ("lag_VA", None, lambda F: shift_keys(F, ("V", "A"), 1)),
         ("fwd_VA", None, lambda F: shift_keys(F, ("V", "A"), -1)),
         ("shift_all1", None, lambda F: shift_keys(F, ALLP, 1)),

@@ -34,12 +34,15 @@ OOS = R / "backtest" / "hengpan_fangliang_dikai_0925" / "oos_run.py"
 ANN = 244.0
 START = "2018-01-01"
 # 【勘误 E-22 · 2026-09-29】跟随新冻结 SHA（v1.7）；旧值 0b61a4bbce100ed6（v1.6 · E-19）留档
-SHA_PREFIX = "7d14d27e9e28df9e"
+SHA_PREFIX = "2351eb9d42acc62e"   # v1.7a；旧值 7d14d27e(v1.7) / 0b61a4bb(v1.6) 留档
 X_LADDER = (0.005, 0.010, 0.015, 0.020)
 
 P_FROZEN = dict(P1=0.01, P2=0.03, K=10, KSLOT=20, MINAMT=2e7, MINPX=3.0, LISTED=250, TP=0.02,
                 COST_SIDE=0.000346, SHADOW_START="2016-01-01", WORST_CASE_WIPEOUT=True,
-                MAINBOARD=True, STNOW_OFF=True)
+                MAINBOARD=True,
+              # 【校准 2026-09-29】改跟随生产默认（E-22 A+C）；旧写 STNOW_OFF=True 在新 3 值语义下
+              # = 完全不用现名过滤（与生产不一致）。
+              STP_CNT=3, STNOW_LIVE_ONLY=True, STNOW_OFF=False)
 
 ARMSPEC = [("A0_开盘价(基线)", "A0", None), ("A1_买日收盘价", "A1", None)] + \
           [("A2_挂%.1f%%" % (x * 100), "A2", x) for x in X_LADDER]
