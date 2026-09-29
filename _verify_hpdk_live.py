@@ -141,6 +141,17 @@ def main():
             "被改动=%s" % dirty if dirty else "共 %d 个受保护文件" % len(OTHER))
     except Exception as e:
         chk(False, "7.2 其它策略数据产物相对 git HEAD 零改动", "git 执行失败 %r" % (e,))
+    # 7.2b 隔离的**静态直证**（2026-09-29 code review 补）：上面 7.2 用 git diff 做动态代理，
+    # 会把「链本地重跑产生的正常产物变更」误判为越界（实测：本地跑 build_short_pool 后即 FAIL）。
+    # 直接证明方式：本模块源码里**不得出现对他策略产物的写操作**（写=污染的唯一途径）。
+    _wops = re.findall(r"open\([^)]*[\"']w[\"']|write_text\(|\.to_csv\(|json\.dump\(|shutil\.copy2\(", src_card)
+    _writes_other = [w for w in _wops]
+    chk(not _writes_other, "7.2b 本模块无任何写/拷操作（只读模块 · 静态直证）",
+        "写操作=%s" % _writes_other if _writes_other else "0 处")
+    _hits_other = [n for n in [x.split("/")[-1] for x in OTHER]
+                   if re.search(r"[\"'][^\"']{0,40}%s" % re.escape(n), src_card)]
+    chk(not _hits_other, "7.2c 本模块未引用他策略产物文件名（连读都不读）",
+        "命中=%s" % _hits_other if _hits_other else "0 处")
     # 7.3 实盘登记区块（R-hpdk-real-0929）：存在性 + 隔离（零落盘/不出本机）+ 口径
     chk(('id="tbl-hpdk-real"' in html) and ("window.HPDK_REAL" in html) and ("hpdk-real-add" in html),
         "7.3 实盘登记区块已渲染（表单 + 表 + HPDK_REAL）")

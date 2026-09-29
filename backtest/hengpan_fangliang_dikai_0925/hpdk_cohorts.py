@@ -46,8 +46,11 @@ def calendar():
             IDX.read_text(encoding="utf-8-sig").splitlines()[1:] if ln[:4].isdigit()]
 
 
+_BARS_CACHE = {}      # code-review 修正（0929）：原实现每 (批次 × 标的) 都重读整个 CSV
+
 def bars(sym):
-    """{(date): (open, high, close)}；缺文件/坏行 → 跳过。"""
+    if sym in _BARS_CACHE:
+        return _BARS_CACHE[sym]
     p = DFULL / (sym + ".csv")
     if not p.exists():
         return {}
@@ -71,6 +74,7 @@ def bars(sym):
                     continue
     except Exception:
         return {}
+    _BARS_CACHE[sym] = out
     return out
 
 

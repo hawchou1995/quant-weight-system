@@ -1411,16 +1411,18 @@ HPDK_JS = r"""
     if (!(opn > 0)) return {k: 'drop', gate: 'B', why: 'B: 无今开（09:25 前 / 行情缺失）'};
     if (Math.abs(px - pcl) <= CFG.EPS && Math.abs(opn - pcl) <= CFG.EPS)
       return {k: 'drop', gate: 'B', why: 'B: 停牌/一字（现价=今开=昨收）'};
-    var gap = opn / pcl - 1;
+    /* gap 用 **float32 复刻**冻结生产者的算术（2026-09-29 code review 修正，R-hpdk-gapf32-0929）：
+       生产者面板 O/C 是 np.float32 ⇒ 其 gap 也是 float32 结果；前端拿到的是 float64 报价。
+       直接相除会有 ~1e-7 级偏差，恰在带沿的标的会两侧判反（实测 2026-09-28：601020 华钰矿业
+       gap 名义 −1.0000%：float32 得 −0.009999931（带外）、float64 得 −0.0099999…（带内））。
+       上一版用「距上沿 < 1e-7 视为带外」是**猜测**且只补了上沿 ⇒ 改为逐字复刻：
+         Math.fround(a)/Math.fround(b) 再 fround = float32 除法，随后 −1 在 float64 里做
+         （与 numpy「float32 数组相除→float64 标量比较」一致）⇒ 两侧带沿都自动对齐。 */
+    var gap = Math.fround(Math.fround(opn) / Math.fround(pcl)) - 1;
     var lo = numOr(H.gap_lo, -0.03), hi = numOr(H.gap_hi, -0.01);
-    /* 上沿按「开区间」——对齐冻结生产者的 float32 算术（2026-09-28，R-hpdk-gapedge-0928）：
-       生产者面板 O/C 为 float32，20.79/21.0−1 = −0.009999931（落在带外）；
-       本函数用 float64 报价：−0.010000000000000009（落在带内）⇒ 边界名会**多算 1 只**
-       实测 2026-09-28：601020 华钰矿业 gap 恰为 −1.0000%，前端计入、生产者/卡片不计入。
-       为与冻结口径一致，距上沿 < 1e-7 视为带外（下沿仍按闭区间——生产者 float32 同样含下沿）。 */
-    if (!(gap >= lo - CFG.EPS && gap <= hi + CFG.EPS && (hi - gap) >= 1e-7))
+    if (!(gap >= lo - CFG.EPS && gap <= hi + CFG.EPS))
       return {k: 'drop', gate: 'A', gap: gap,
-              why: 'A: 今开/昨收−1 = ' + fmtPct(gap) + ' 不在 [' + fmtPct(lo) + ', ' + fmtPct(hi) + ')（上沿按开区间=冻结 float32 口径）'};
+              why: 'A: 今开/昨收−1 = ' + fmtPct(gap) + ' 不在 [' + fmtPct(lo) + ', ' + fmtPct(hi) + ']'};
     if (!(num(m.volbr) > 0)) return {k: 'drop', gate: 'F', gap: gap, why: 'F: 缺量比数据（算不出复合分）'};
     if (isNaN(num(m.ret20))) return {k: 'drop', gate: 'F', gap: gap, why: 'F: 缺 20 日涨幅数据（算不出复合分）'};
     return {k: 'keep', gap: gap};

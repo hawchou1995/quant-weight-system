@@ -34,6 +34,70 @@ def _read(p):
     except Exception:
         return {}
 
+# ── 📌 买日批次跟踪表（R-hpdk-cohort-0929，2026-09-29 从主卡移入跟踪池卡）─────────────
+# 用户反馈「跟踪池还是没有昨日 top4」根因是**放错卡**：本表原先挂在「缩量超跌主卡」，
+# 而用户的查看位在「👁 跟踪池 · 缩量超跌」⇒ 抽成模块级函数并在跟踪池卡内调用。
+# 口径：以**买日**为主键、覆盖全部命中历史买日（含影子账本窗口外那批）；买入价=买日开盘，
+# 止盈线=×1.02，了结日=买日之后第一个交易日；了结判定与冻结规则逐条一致。
+def cohort_block(BASE):
+    co = _read(BASE / "backtest" / "hpdk_cohorts.json")
+    if not (co and (co.get("batches") or [])):
+        return ""
+    rows = []
+    for b in co["batches"]:
+        ex = b.get("exit_date") or "未到"
+        for x in (b.get("rows") or []):
+            ret = x.get("ret_pct")
+            col = "" if ret is None else ("var(--up)" if ret > 0 else "var(--down)")
+            _badge = ("<span class=\"badge badge-auto\">已了结</span>" if x.get("status") == "已了结"
+                      else ("<span class=\"badge badge-auto\">持有中</span>"
+                            if str(x.get("status") or "").startswith("持有中")
+                            else "<span style=\"color:var(--faint)\">%s</span>" % (x.get("status") or "—")))
+            rows.append(
+                '<tr data-code="%s" data-search="%s">'
+                '<td data-key="bd" style="font-variant-numeric:tabular-nums">%s</td>'
+                '<td data-key="xd" style="font-variant-numeric:tabular-nums">%s</td>'
+                '<td data-key="name"><b>%s</b><br><span style="color:var(--sub);font-size:var(--fs-xs);'
+                'font-variant-numeric:tabular-nums">%s</span></td>'
+                '<td data-key="ind" style="color:var(--sub)">%s</td>'
+                '<td data-key="entry" data-v="%s" style="text-align:right;'
+                'font-variant-numeric:tabular-nums">%s</td>'
+                '<td data-key="tp" data-v="%s" style="text-align:right;color:var(--up);'
+                'font-variant-numeric:tabular-nums">%s</td>'
+                '<td data-key="state" style="text-align:center">%s</td>'
+                '<td data-key="exit" data-v="%s" style="text-align:right;'
+                'font-variant-numeric:tabular-nums">%s</td>'
+                '<td data-key="ret" data-v="%s" style="text-align:right;color:%s;'
+                'font-variant-numeric:tabular-nums">%s</td></tr>'
+                % (x.get("sym") or x.get("code"),
+                   " ".join([str(x.get("name") or ""), str(x.get("code") or ""), str(x.get("ind") or "")]),
+                   b.get("buy_date"), ex, x.get("name") or "", x.get("code") or "",
+                   x.get("ind") or "—",
+                   x.get("entry") or "", ("%.3f" % x["entry"]) if x.get("entry") else "—",
+                   x.get("tp") or "", ("%.4f" % x["tp"]) if x.get("tp") else "—",
+                   _badge,
+                   x.get("exit") or "", ("%.3f" % x["exit"]) if x.get("exit") else "—",
+                   ret if ret is not None else "", col, ("%+.2f%%" % ret) if ret is not None else "—"))
+    return (
+        '<div class="sub" style="margin-top:12px"><b>📌 买日批次跟踪'
+        f'（模型买入名单 · 逐笔到了结 · 覆盖全部命中历史买日）</b>'
+        '<span style="color:var(--sub)"> —— 以<b>买日</b>为主键；'
+        f'止盈 = 买入价×{(1 + (co.get("tp") or 0.02)):.2f}；了结日 = 买日之后第一个交易日；'
+        '了结判定：了结日 open≥止盈按 open / 盘中 high≥止盈按止盈价 / 否则尾盘；'
+        f'净收益含往返成本 {co.get("cost_roundtrip_bp", 6.92)}bp。'
+        f'批次 {co.get("n_batches")} · 已了结 {co.get("n_settled")} / 持有中 {co.get("n_holding")}'
+        '<br><span style="color:var(--warn)">⚠ 这是<b>模型买入名单</b>（F 前 10）；'
+        '你自己的实际成交请在下方「💼 实盘登记」里逐笔登记。</span></span></div>'
+        '<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-cohort" style="width:100%;font-size:12px">'
+        '<thead><tr><th data-key="bd">买日</th><th data-key="xd">了结日</th>'
+        '<th data-key="name">标的</th><th data-key="ind">行业</th>'
+        '<th data-key="entry" style="text-align:right">买入价</th>'
+        '<th data-key="tp" style="text-align:right">止盈价 +2%</th>'
+        '<th data-key="state" style="text-align:center">状态</th>'
+        '<th data-key="exit" style="text-align:right">卖出价</th>'
+        '<th data-key="ret" style="text-align:right">净收益</th></tr></thead>'
+        '<tbody>' + "".join(rows) + '</tbody></table></div>')
+
 
 def _zs(v):
     n = len(v)
@@ -166,18 +230,30 @@ def hpdk_card(BASE):
             '</span></div>')
         _ic = h.get("ind_counts") or {}
         _dedn = len(h.get("top_dedup_ind") or [])
+        # 样式对齐站点既有表（2026-09-29 用户反馈「面目全非」）：每个 td 带 data-key/data-v
+        # （板内通用排序/搜索接管）、标的用 <b>名</b><br><span>码</span>、数值 tabular-nums、
+        # 状态用 badge、候选行加 hpdk-top 高亮 —— 与「明日买点准备清单」表同一视觉语言。
         _hr = "".join(
-            '<tr%s><td style="text-align:center">%s</td>'
-            '<td><b>%s</b><br><span style="color:var(--faint);font-size:11px">%s</span></td>'
-            '<td>%s%s</td>'
-            '<td style="text-align:right">%+.2f%%</td><td style="text-align:right">%+.3f</td>'
-            '<td style="text-align:center">%s</td></tr>'
-            % (' class="hpdk-top"' if x["rank"] <= _top_k else "",
-               x["rank"], x["name"], x["code"], x.get("ind", "—"),
-               ('<span style="color:var(--warn)"> · 同行业第 %d 只</span>' % x["ind_seq"])
+            '<tr data-code="%s" data-search="%s"%s>'
+            '<td data-key="rank" data-v="%s" style="text-align:center;'
+            'font-variant-numeric:tabular-nums">%s</td>'
+            '<td data-key="name"><b>%s</b><br><span style="color:var(--sub);font-size:var(--fs-xs);'
+            'font-variant-numeric:tabular-nums">%s</span></td>'
+            '<td data-key="ind" style="color:var(--sub)">%s%s</td>'
+            '<td data-key="gap" data-v="%s" style="text-align:right;color:var(--down);'
+            'font-variant-numeric:tabular-nums">%+.2f%%</td>'
+            '<td data-key="F" data-v="%s" style="text-align:right;'
+            'font-variant-numeric:tabular-nums">%+.3f</td>'
+            '<td data-key="cand" style="text-align:center">%s</td></tr>'
+            % (x.get("sym") or x.get("code"), " ".join(
+                   [str(x.get("name") or ""), str(x.get("code") or ""), str(x.get("ind") or "")]),
+               ' class="hpdk-top"' if x["rank"] <= _top_k else "",
+               x["rank"], x["rank"], x["name"], x["code"], x.get("ind") or "—",
+               (' <span class="badge badge-auto">同行业第 %d 只</span>' % x["ind_seq"])
                if (x.get("ind_seq") or 1) > 1 else "",
-               x["gap_pct"], x["F"],
-               "✅ 候选" if x["rank"] <= _top_k else "—")
+               x["gap_pct"], x["gap_pct"], x["F"], x["F"],
+               '<span class="badge badge-auto">✅ 买入候选</span>' if x["rank"] <= _top_k
+               else '<span style="color:var(--faint)">—</span>')
             for x in (h.get("rows") or []))
         _topk_r = (h.get("top") or [])[:_top_k]
         _ind_top = {}
@@ -198,10 +274,15 @@ def hpdk_card(BASE):
             + ("、".join(_added[:6]) or "无")
             + f'（第 {_top_k + 1} 名之后顺延）。本表只做显示（不改选股、不改排名）；'
             f'要把它变成策略约束须走预注册勘误。</span></div>'
-            '<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-hits"><thead><tr>'
-            '<th style="text-align:center">F 名次</th><th>标的</th><th>行业</th>'
-            '<th style="text-align:right">今开跳空</th><th style="text-align:right">F 复合分</th>'
-            f'<th style="text-align:center">当日候选（前 {_top_k}）</th></tr></thead>'
+            '<div class="toolbar"><input type="text" id="tbl-hpdk-hits-q" '
+            'placeholder="🔍 搜索名称 / 代码 / 行业…" autocomplete="off" spellcheck="false">'
+            '<span class="count" id="tbl-hpdk-hits-count"></span></div>'
+            '<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-hits" style="width:100%;font-size:12px">'
+            '<thead><tr><th data-key="rank" style="text-align:center">F 名次</th>'
+            '<th data-key="name">标的</th><th data-key="ind">行业</th>'
+            '<th data-key="gap" style="text-align:right">今开跳空</th>'
+            '<th data-key="F" style="text-align:right">F 复合分</th>'
+            f'<th data-key="cand" style="text-align:center">当日候选（前 {_top_k}）</th></tr></thead>'
             f'<tbody>{_hr}</tbody></table></div>')
     # 近 N 日命中回看（R-hpdk-hist-0929）：卡片主区块只显示"最近一个已完成买日"，
     # 而用户关心的往往是"昨天/前几天的买日命中"（含自己实际下单那批）⇒ 把历史档
@@ -230,48 +311,6 @@ def hpdk_card(BASE):
                 '<th style="text-align:center">买日</th><th style="text-align:center">信号日</th>'
                 '<th style="text-align:right">资格池</th><th style="text-align:right">命中</th>'
                 f'<th>F 前 6</th></tr></thead><tbody>{_rs}</tbody></table></div>')
-    # ── 买日批次跟踪（R-hpdk-cohort-0929）：以**买日**为主键的逐笔跟踪（含了结结果）──────
-    # 为什么不放影子跟踪池：影子池只装预注册窗口内批次；而用户实际买入那批（信号日 09-24
-    # → 买日 09-28）在窗口外 ⇒ 09-29 到了 T+2 了结日却无处可看。本表覆盖**全部命中历史买日**，
-    # 与冻结出场规则逐条一致（open≥止盈按open / high≥止盈按止盈 / 否则尾盘），给出买入价·止盈线·
-    # 了结日·卖出价·净收益 ⇒ 「在哪里跟踪」与「卖价怎么定」都有答案。
-    _co = _read(BASE / "backtest" / "hpdk_cohorts.json")
-    if _co and (_co.get("batches") or []):
-        _cr = []
-        for _b in _co["batches"]:
-            _ex = _b.get("exit_date") or "未到"
-            for _x in (_b.get("rows") or []):
-                _stt = _x.get("status") or "—"
-                _ret = _x.get("ret_pct")
-                _col = "" if _ret is None else ("var(--up)" if _ret > 0 else "var(--down)")
-                _cr.append(
-                    '<tr><td>%s</td><td>%s</td><td><b>%s</b><br>'
-                    '<span style="color:var(--faint);font-size:11px">%s</span></td>'
-                    '<td style="color:var(--sub)">%s</td>'
-                    '<td style="text-align:right">%s</td>'
-                    '<td style="text-align:right;color:var(--warn)">%s</td>'
-                    '<td>%s</td><td style="text-align:right">%s</td>'
-                    '<td style="text-align:right;color:%s">%s</td></tr>'
-                    % (_b.get("buy_date"), _ex, _x.get("name") or "", _x.get("code") or "",
-                       _x.get("ind") or "—",
-                       ("%.3f" % _x["entry"]) if _x.get("entry") else "—",
-                       ("%.4f" % _x["tp"]) if _x.get("tp") else "—",
-                       _stt,
-                       ("%.3f" % _x["exit"]) if _x.get("exit") else "—",
-                       _col, ("%+.2f%%" % _ret) if _ret is not None else "—"))
-        L.append(
-            f'<div class="sub" style="margin-top:12px"><b>📌 买日批次跟踪（模型买入名单 · 逐笔到了结）</b>'
-            f'<span style="color:var(--faint)"> —— 以**买日**为主键，覆盖全部命中历史买日'
-            f'（含影子账本窗口外那批）；卖出规则 = 止盈 买入价×{(1 + (_co.get("tp") or 0.02)):.2f}，'
-            f'了结日 = 买日之后第一个交易日；open≥止盈按 open / high≥止盈按止盈价 / 否则尾盘；'
-            f'净收益含往返成本 {_co.get("cost_roundtrip_bp", 6.92)}bp。'
-            f'批次 {_co.get("n_batches")} · 已了结 {_co.get("n_settled")} / 持有中 {_co.get("n_holding")}</span></div>'
-            '<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-cohort" style="width:100%;font-size:12px">'
-            '<thead><tr><th>买日</th><th>了结日</th><th>标的</th><th>行业</th>'
-            '<th style="text-align:right">买入价</th><th style="text-align:right">止盈价(+2%)</th>'
-            '<th>状态</th><th style="text-align:right">卖出价</th>'
-            '<th style="text-align:right">净收益</th></tr></thead>'
-            f'<tbody>{"".join(_cr)}</tbody></table></div>')
     L.append('<div class="sub" style="margin-top:6px;color:var(--warn)"><b>板块限定（2026-09-27 用户决定：只买主板）</b> —— 同一面板、同一记账规则下的同尺子对比：全窗 年化 <b>+72.59% → +47.77%</b>（−24.82pp）、夏普 <b>2.79 → 2.12</b>、最大回撤 <b>−32.29% → −29.13%</b>（<b>改善 3.16pp</b>）、净胜率 63.14% → 60.63%、单笔净均 +0.5574% → +0.4028%；2018+ 年化 +105.38% → +64.24%。选股集合仅 <b>55.5% 重合</b>（横截面 z 在候选池内标准化 ⇒ 缩池后标准分整体改变）。<b>代价明确：用年化换回撤，风险调整后更差。</b>完整逐项读数见 <code>backtest/报告-只买主板-回测对比-20260927.md</code> 与 <code>backtest/hengpan_fangliang_dikai_0925/evidence_board.json</code>（另有：全池 KSLOT=4 口径 +249.67%、主板 KSLOT=4 +189.75%，操作档见上）。</div>')
     L.append('<div class="sub" style="margin-top:6px;color:var(--warn)">'
              '<b>准入门槛扫描（2026-09-27）</b> —— 用户问「量比要多于多少 / 盈亏比要大于多少会不会改善」：'
@@ -533,6 +572,10 @@ def hpdk_track_card(BASE):
             f'命中 <b>{_h.get("n_hits")}</b> 只，F 前 {_h.get("k")}（{_topn}…）。'
             f'<span style="color:var(--faint)">（本表 = 影子账本；命中区块 = 买日口径，独立于 OOS 窗口）</span>'
             '</div>')
+    # 2026-09-29（R-hpdk-cohort-0929b）：把「买日批次跟踪」表放进**跟踪池卡**（用户查看位）。
+    # 原先挂在主卡 ⇒ 用户连问三次「跟踪池还是没有昨日 top4」。口径不变（模型买入名单，
+    # 覆盖全部命中历史买日，含影子账本窗口外那批）。
+    L.append(cohort_block(BASE))
     L.append('<div class="toolbar">'
              '<input type="text" id="tbl-hpdk-track-q" placeholder="🔍 搜索名称 / 代码 / 板块…" '
              'autocomplete="off" spellcheck="false">'
@@ -611,17 +654,26 @@ def hpdk_track_card(BASE):
         '<button type="button" id="hpdk-real-exp">导出 JSON</button>'
         '<span class="count" id="hpdk-real-count"></span></div>'
         '<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-real" style="width:100%;font-size:12px">'
-        '<thead><tr><th>买日</th><th>标的</th><th style="text-align:right">买入价</th>'
-         '<th style="text-align:right">股数</th><th style="text-align:right">成本</th>'
-         '<th style="text-align:right">止盈价(+2%)</th>'
-        '<th>了结日（买日+1 交易日）</th><th>状态</th><th style="text-align:center">操作</th></tr></thead>'
-         '<tbody><tr><td colspan="9" style="text-align:center;color:var(--faint)">'
+        '<thead><tr><th data-key="bd">买日</th><th data-key="name">标的</th>'
+        '<th data-key="px" style="text-align:right">买入价</th>'
+        '<th data-key="qty" style="text-align:right">股数</th>'
+        '<th data-key="cost" style="text-align:right">成本</th>'
+        '<th data-key="tp" style="text-align:right">止盈价 +2%</th>'
+        '<th data-key="xd">了结日（买日+1 交易日）</th>'
+        '<th data-key="state" style="text-align:center">状态</th>'
+        '<th style="text-align:center">操作</th></tr></thead>'
+        '<tbody><tr><td colspan="9" style="text-align:center;color:var(--faint)">'
         '尚无登记 —— 用上方表单逐笔添加（默认买入日 = 最近交易日）</td></tr></tbody></table></div>')
     L.append(
         '<script>(function(){'
         'var LS="quant_hpdk_real_v1", CAL=' + json.dumps(_cal90, ensure_ascii=False) + ';'
         'function norm(c){c=String(c||"").replace(/^(sh|sz|bj)/i,"").trim();'
-        'if(!/^\\d{6}$/.test(c))return "";return (c[0]==="6"?"sh":"sz")+c;}'
+        'if(!/^\\d{6}$/.test(c))return "";'
+        '/* code review 修正（0929）：原来「非 6 开头一律 sz」⇒ 8xx/4xx（北交所）、9xx（B股）'
+        '会被静默映射成不存在的深市代码；本策略只覆盖 沪6 / 深00＋中小02 / 创业板30 / 科创68 */'
+        'if(c[0]==="6")return "sh"+c;'
+        'if(c[0]==="0"||c[0]==="3")return "sz"+c;'
+        'return "";}'
         'function bare(c){return String(c||"").replace(/^(sh|sz|bj)/i,"");}'
         'function load(){try{var a=JSON.parse(localStorage.getItem(LS));return (a&&a.length)?a:[]}catch(e){return []}}'
         'function save(a){try{localStorage.setItem(LS,JSON.stringify(a))}catch(e){}}'
@@ -629,15 +681,31 @@ def hpdk_track_card(BASE):
         'function stateOf(d){var i=CAL.indexOf(d);if(i<0)return "买日不在日历";'
         'var x=CAL[i+1];if(!x)return "持有中（下一交易日未到）";'
         'return (CAL[CAL.length-1]>=x)?"已到期（了结日尾盘卖出）":("持有中 · 了结 "+x);}'
+        '/* 名称查表：从 window.HPDK 资格池取 代码→名称（与站点其它表同款「名+码」两行显示） */'
+        'function nameOf(sym){var rs=(window.HPDK&&window.HPDK.rows)||[],k;'
+        'for(k=0;k<rs.length;k++)if(rs[k]&&rs[k].code===bare(sym))return rs[k].name||"";return "";}'
         'function render(){var tb=document.querySelector("#tbl-hpdk-real tbody");if(!tb)return;'
         'var a=load(),i,rows="",tot=0;'
         'for(i=0;i<a.length;i++){var r=a[i],cost=(Number(r.px)||0)*(Number(r.qty)||0);tot+=cost;'
-        'rows+="<tr><td>"+r.date+"</td><td><b>"+bare(r.sym)+"</b></td>"'
-        '+"<td style=text-align:right>"+(Number(r.px)||0).toFixed(3)+"</td>"'
-        '+"<td style=text-align:right>"+(Number(r.qty)||0)+"</td>"'
-        '+"<td style=text-align:right>"+cost.toFixed(0)+"</td>"'
-        '+"<td style=text-align:right;color:var(--warn)>"+((Number(r.px)||0)*1.02).toFixed(3)+"</td>"'
-        '+"<td>"+(exitOf(r.date)||"—")+"</td><td>"+stateOf(r.date)+"</td>"'
+        'var nm=nameOf(r.sym),st=stateOf(r.date);'
+        'var stB=/^已到期/.test(st)?"<span class=badge badge-auto>"+st+"</span>"'
+        ':(/^持有中/.test(st)?"<span class=badge badge-auto>"+st+"</span>"'
+        ':"<span style=color:var(--faint)>"+st+"</span>");'
+        'rows+="<tr>"'
+        '+"<td data-key=bd style=font-variant-numeric:tabular-nums>"+r.date+"</td>"'
+        '+"<td data-key=name><b>"+(nm||bare(r.sym))+"</b><br>"'
+        '+"<span style=color:var(--sub);font-size:var(--fs-xs);font-variant-numeric:tabular-nums>"'
+        '+bare(r.sym)+"</span></td>"'
+        '+"<td data-key=px style=text-align:right;font-variant-numeric:tabular-nums>"'
+        '+(Number(r.px)||0).toFixed(3)+"</td>"'
+        '+"<td data-key=qty style=text-align:right;font-variant-numeric:tabular-nums>"'
+        '+(Number(r.qty)||0).toLocaleString()+" 股</td>"'
+        '+"<td data-key=cost style=text-align:right;font-variant-numeric:tabular-nums>"'
+        '+cost.toFixed(0)+" 元</td>"'
+        '+"<td data-key=tp style=text-align:right;color:var(--up);font-variant-numeric:tabular-nums>"'
+        '+((Number(r.px)||0)*1.02).toFixed(3)+"</td>"'
+        '+"<td data-key=xd>"+(exitOf(r.date)||"—")+"</td>"'
+        '+"<td data-key=state style=text-align:center>"+stB+"</td>"'
         "+\"<td style=text-align:center><button type=button data-del='\"+i+\"'>删</button></td></tr>\";}"
         'if(!a.length)rows="<tr><td colspan=9 style=text-align:center;color:var(--faint)>尚无登记</td></tr>";'
         'tb.innerHTML=rows;'
@@ -647,7 +715,7 @@ def hpdk_track_card(BASE):
         'var d=document.getElementById("hpdk-real-date").value.trim();'
         'var px=parseFloat(document.getElementById("hpdk-real-px").value);'
         'var qy=parseInt(document.getElementById("hpdk-real-qty").value,10);'
-        'if(!sym||!/^\\d{4}-\\d{2}-\\d{2}$/.test(d)||!(px>0)){alert("请填：6 位代码 / 买日 YYYY-MM-DD / 正数买入价");return;}'
+        'if(!sym||!/^\\d{4}-\\d{2}-\\d{2}$/.test(d)||!(px>0)){alert("请填：6 位代码（仅支持 6/0/3 开头：沪市主板 · 深市主板/中小 · 创业板）/ 买日 YYYY-MM-DD / 正数买入价");return;}'
         'var a=load();a.push({sym:sym,date:d,px:px,qty:(qy>0?qy:0),ts:new Date().toISOString()});'
         'save(a);document.getElementById("hpdk-real-code").value="";'
         'document.getElementById("hpdk-real-px").value="";document.getElementById("hpdk-real-qty").value="";render();}'

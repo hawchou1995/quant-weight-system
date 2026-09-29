@@ -348,7 +348,9 @@ def main():
            "、".join("%s %s" % (x["code"], x["name"]) for x in hits["top"][:3])))
     # ---------- 命中历史留档（R-hpdk-hits-0928）----------
     # 2026-09-28 的教训：命中记录当时只在浏览器 localStorage、且按 as_of 作废 ⇒ **事后无从回看**
-    # （用户傍晚再看只剩 3 只候选，无法证明早上是 4 只）。此档一行一日、幂等追加、体积可忽略。
+    # （用户傍晚再看只剩 3 只候选，无法证明早上是 4 只）。此档一行一日、体积可忽略。
+    # 2026-09-29 code review 修正：原为「该日已存在则跳过」⇒ 同一买日被重算（数据修订/补跑）时
+    #   档案会停在**首算**版本（陈旧）。改为**就地覆盖该日**（其余日期原样保留、顺序不变）。
     _hist = outdir / "hpdk_hits_history.jsonl"
     _rec = dict(date=hits["date"], signal_date=hits["signal_date"], n_pool=hits["n_pool"],
                 n_hits=hits["n_hits"], k=hits["k"],
@@ -358,12 +360,18 @@ def main():
     _old = []
     if _hist.exists():
         _old = [json.loads(l) for l in _hist.read_text(encoding="utf-8").splitlines() if l.strip()]
-    if not any(r.get("date") == hits["date"] for r in _old):
-        with _hist.open("a", encoding="utf-8") as _fh:
-            _fh.write(json.dumps(_rec, ensure_ascii=False) + "\n")
-        log("[out] hpdk_hits_history.jsonl 追加 %s（累计 %d 天）" % (hits["date"], len(_old) + 1))
+    _idx = next((i for i, r in enumerate(_old) if r.get("date") == hits["date"]), None)
+    if _idx is None:
+        _old.append(_rec)
+        _verb = "追加"
     else:
-        log("[out] hpdk_hits_history.jsonl 已含 %s（幂等跳过）" % hits["date"])
+        _same = json.dumps(_old[_idx], ensure_ascii=False, sort_keys=True) == \
+                json.dumps(_rec, ensure_ascii=False, sort_keys=True)
+        _old[_idx] = _rec
+        _verb = "无变化" if _same else "就地覆盖（该买日被重算）"
+    _hist.write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in _old) + "\n",
+                     encoding="utf-8")
+    log("[out] hpdk_hits_history.jsonl %s %s（累计 %d 天）" % (_verb, hits["date"], len(_old)))
     # ---------- OOS 台账只读投影 ----------
     st = json.loads((OUT / "oos_state.json").read_text(encoding="utf-8")) if (OUT / "oos_state.json").exists() else {}
     rp = json.loads((OUT / "oos_report.json").read_text(encoding="utf-8")) if (OUT / "oos_report.json").exists() else {}
