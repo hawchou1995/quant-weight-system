@@ -46,7 +46,12 @@ STEPS = [
     #   且云端新鲜度期望（= index_000300.csv 末行）日日报 stale(2026-09-24!=今日)。
     # 只**追加**交易日：单调、幂等、前缀逐位不变、不动 universe 成员
     # （保留 universe_maint.py 的 18 只僵尸清除结果）。已最新时秒退 no-op。
-    ("缩量超跌-面板日历 universe_cal", ["backtest/hengpan_fangliang_dikai_0925/universe_cal.py"], False),
+    # 2026-09-29 修复（R-hpdk-cal-0929）：本步此前**漏了 `--apply`** ⇒ universe_cal.py 默认 dry-run
+    # ⇒ 每天只打报告不落盘 ⇒ 日历二次冻结（09-28 卡住，线上卡片 as_of 停在前一日）。
+    # 实测：09-29 21:48 data_full 已有 09-29、index_000300.csv 末行 09-29，而 universe.json
+    # mtime 仍是 09-28 20:07（人工 --apply 的那次）。加 --apply 后本步自愈（幂等：已最新即 no-op，
+    # 落盘前备份 universe.json.bak-cal-<ts>，并回读校验「前缀不变 / 长度单调 / 末日==index 末日」）。
+    ("缩量超跌-面板日历 universe_cal", ["backtest/hengpan_fangliang_dikai_0925/universe_cal.py", "--apply"], False),
     # 全量池守卫（R-fullpool-0917，2026-09-17 建）：降级源只补池内子集（如 440/7539）→ 全市场口径
     # 数据（涨停全景/A5 扫描）失真。本步查 data_full 新鲜度，陈旧 >100 只自动触发全量补数（约 1-2h）。
     # [软]=失败不阻断主链；--skip-fullguard 跳过。

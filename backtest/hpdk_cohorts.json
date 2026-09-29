@@ -1,12 +1,12 @@
 {
- "generated_at": "2026-09-29 13:45:32",
+ "generated_at": "2026-09-29 22:54:25",
  "tp": 0.02,
  "cost_side": 0.000346,
  "cost_roundtrip_bp": 6.92,
- "calendar_last": "2026-09-28",
+ "calendar_last": "2026-09-29",
  "rule": "买日批次跟踪：买入价=买日开盘；止盈线=买入价×1.02；了结日=买日之后第一个交易日；了结=open≥止盈按open / high≥止盈按止盈 / 否则尾盘close；净收益含往返成本 6.92bp。独立于影子账本窗口（覆盖全部命中历史买日）。",
- "n_batches": 1,
- "n_settled": 0,
+ "n_batches": 2,
+ "n_settled": 10,
  "n_holding": 10,
  "batches": [
   {
@@ -14,7 +14,7 @@
    "signal_date": "2026-09-24",
    "n_pool": 2312,
    "n_hits": 146,
-   "exit_date": null,
+   "exit_date": "2026-09-29",
    "rows": [
     {
      "code": "600327",
@@ -25,10 +25,11 @@
      "F": 2.8563,
      "entry": 3.75,
      "tp": 3.825,
-     "status": "持有中（了结日未到）",
-     "exit_date": null,
-     "exit": null,
-     "ret_pct": null
+     "status": "已了结",
+     "exit_date": "2026-09-29",
+     "exit": 3.825,
+     "exit_how": "盘中触止盈 → 按止盈价成交",
+     "ret_pct": 1.9294
     },
     {
      "code": "605080",
@@ -39,10 +40,11 @@
      "F": 2.5164,
      "entry": 22.7,
      "tp": 23.154,
-     "status": "持有中（了结日未到）",
-     "exit_date": null,
-     "exit": null,
-     "ret_pct": null
+     "status": "已了结",
+     "exit_date": "2026-09-29",
+     "exit": 23.66,
+     "exit_how": "了结日开盘≥止盈 → 按开盘成交",
+     "ret_pct": 4.157
     },
     {
      "code": "603399",
@@ -53,10 +55,11 @@
      "F": 2.4249,
      "entry": 13.0,
      "tp": 13.26,
-     "status": "持有中（了结日未到）",
-     "exit_date": null,
-     "exit": null,
-     "ret_pct": null
+     "status": "已了结",
+     "exit_date": "2026-09-29",
+     "exit": 13.26,
+     "exit_how": "盘中触止盈 → 按止盈价成交",
+     "ret_pct": 1.9294
     },
     {
      "code": "603137",
@@ -67,10 +70,11 @@
      "F": 2.2568,
      "entry": 19.36,
      "tp": 19.7472,
-     "status": "持有中（了结日未到）",
-     "exit_date": null,
-     "exit": null,
-     "ret_pct": null
+     "status": "已了结",
+     "exit_date": "2026-09-29",
+     "exit": 17.98,
+     "exit_how": "未达标 → 了结日尾盘",
+     "ret_pct": -7.1923
     },
     {
      "code": "603933",
@@ -81,10 +85,11 @@
      "F": 2.2292,
      "entry": 19.13,
      "tp": 19.5126,
-     "status": "持有中（了结日未到）",
-     "exit_date": null,
-     "exit": null,
-     "ret_pct": null
+     "status": "已了结",
+     "exit_date": "2026-09-29",
+     "exit": 18.82,
+     "exit_how": "未达标 → 了结日尾盘",
+     "ret_pct": -1.6885
     },
     {
      "code": "002192",
@@ -95,10 +100,11 @@
      "F": 2.1562,
      "entry": 58.12,
      "tp": 59.2824,
-     "status": "持有中（了结日未到）",
-     "exit_date": null,
-     "exit": null,
-     "ret_pct": null
+     "status": "已了结",
+     "exit_date": "2026-09-29",
+     "exit": 56.97,
+     "exit_how": "未达标 → 了结日尾盘",
+     "ret_pct": -2.0465
     },
     {
      "code": "001337",
@@ -109,10 +115,11 @@
      "F": 2.1135,
      "entry": 45.57,
      "tp": 46.4814,
-     "status": "持有中（了结日未到）",
-     "exit_date": null,
-     "exit": null,
-     "ret_pct": null
+     "status": "已了结",
+     "exit_date": "2026-09-29",
+     "exit": 44.55,
+     "exit_how": "未达标 → 了结日尾盘",
+     "ret_pct": -2.3059
     },
     {
      "code": "002237",
@@ -123,10 +130,11 @@
      "F": 2.104,
      "entry": 12.6,
      "tp": 12.852,
-     "status": "持有中（了结日未到）",
-     "exit_date": null,
-     "exit": null,
-     "ret_pct": null
+     "status": "已了结",
+     "exit_date": "2026-09-29",
+     "exit": 12.35,
+     "exit_how": "未达标 → 了结日尾盘",
+     "ret_pct": -2.0519
     },
     {
      "code": "002983",
@@ -137,10 +145,11 @@
      "F": 2.0305,
      "entry": 21.9,
      "tp": 22.338,
-     "status": "持有中（了结日未到）",
-     "exit_date": null,
-     "exit": null,
-     "ret_pct": null
+     "status": "已了结",
+     "exit_date": "2026-09-29",
+     "exit": 21.92,
+     "exit_how": "未达标 → 了结日尾盘",
+     "ret_pct": 0.0221
     },
     {
      "code": "000688",
@@ -151,6 +160,156 @@
      "F": 2.0297,
      "entry": 24.65,
      "tp": 25.143,
+     "status": "已了结",
+     "exit_date": "2026-09-29",
+     "exit": 24.15,
+     "exit_how": "未达标 → 了结日尾盘",
+     "ret_pct": -2.0962
+    }
+   ]
+  },
+  {
+   "buy_date": "2026-09-29",
+   "signal_date": "2026-09-28",
+   "n_pool": 2314,
+   "n_hits": 176,
+   "exit_date": null,
+   "rows": [
+    {
+     "code": "002277",
+     "sym": "sz002277",
+     "name": "友阿股份",
+     "ind": "商贸零售",
+     "gap_pct": -1.578,
+     "F": 3.1296,
+     "entry": 4.99,
+     "tp": 5.0898,
+     "status": "持有中（了结日未到）",
+     "exit_date": null,
+     "exit": null,
+     "ret_pct": null
+    },
+    {
+     "code": "000716",
+     "sym": "sz000716",
+     "name": "黑芝麻",
+     "ind": "食品饮料",
+     "gap_pct": -1.008,
+     "F": 3.1282,
+     "entry": 4.91,
+     "tp": 5.0082,
+     "status": "持有中（了结日未到）",
+     "exit_date": null,
+     "exit": null,
+     "ret_pct": null
+    },
+    {
+     "code": "600969",
+     "sym": "sh600969",
+     "name": "郴电国际",
+     "ind": "公用事业",
+     "gap_pct": -1.244,
+     "F": 3.0373,
+     "entry": 9.53,
+     "tp": 9.7206,
+     "status": "持有中（了结日未到）",
+     "exit_date": null,
+     "exit": null,
+     "ret_pct": null
+    },
+    {
+     "code": "002889",
+     "sym": "sz002889",
+     "name": "东方嘉盛",
+     "ind": "交通运输",
+     "gap_pct": -2.007,
+     "F": 3.0097,
+     "entry": 11.72,
+     "tp": 11.9544,
+     "status": "持有中（了结日未到）",
+     "exit_date": null,
+     "exit": null,
+     "ret_pct": null
+    },
+    {
+     "code": "603029",
+     "sym": "sh603029",
+     "name": "天鹅股份",
+     "ind": "机械设备",
+     "gap_pct": -1.686,
+     "F": 2.9113,
+     "entry": 16.33,
+     "tp": 16.6566,
+     "status": "持有中（了结日未到）",
+     "exit_date": null,
+     "exit": null,
+     "ret_pct": null
+    },
+    {
+     "code": "001299",
+     "sym": "sz001299",
+     "name": "美能能源",
+     "ind": "公用事业",
+     "gap_pct": -1.296,
+     "F": 2.7433,
+     "entry": 9.9,
+     "tp": 10.098,
+     "status": "持有中（了结日未到）",
+     "exit_date": null,
+     "exit": null,
+     "ret_pct": null
+    },
+    {
+     "code": "603737",
+     "sym": "sh603737",
+     "name": "三棵树",
+     "ind": "建筑材料",
+     "gap_pct": -1.833,
+     "F": 2.7082,
+     "entry": 20.35,
+     "tp": 20.757,
+     "status": "持有中（了结日未到）",
+     "exit_date": null,
+     "exit": null,
+     "ret_pct": null
+    },
+    {
+     "code": "603101",
+     "sym": "sh603101",
+     "name": "汇嘉时代",
+     "ind": "商贸零售",
+     "gap_pct": -1.233,
+     "F": 2.6613,
+     "entry": 7.21,
+     "tp": 7.3542,
+     "status": "持有中（了结日未到）",
+     "exit_date": null,
+     "exit": null,
+     "ret_pct": null
+    },
+    {
+     "code": "002350",
+     "sym": "sz002350",
+     "name": "北京科锐",
+     "ind": "电力设备",
+     "gap_pct": -1.043,
+     "F": 2.5718,
+     "entry": 13.28,
+     "tp": 13.5456,
+     "status": "持有中（了结日未到）",
+     "exit_date": null,
+     "exit": null,
+     "ret_pct": null
+    },
+    {
+     "code": "000713",
+     "sym": "sz000713",
+     "name": "国投丰乐",
+     "ind": "农林牧渔",
+     "gap_pct": -1.146,
+     "F": 2.506,
+     "entry": 6.04,
+     "tp": 6.1608,
      "status": "持有中（了结日未到）",
      "exit_date": null,
      "exit": null,
