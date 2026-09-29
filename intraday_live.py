@@ -1697,11 +1697,22 @@ HPDK_JS = r"""
     var FP = null, FPfrozen = false;
     try {
       if (live && enforce) {
+        /* R-hpdk-upgrade-0929：**覆盖率升级闸**。冻结值带 cov；若当前报价覆盖比冻结时
+           **显著更好（> +10pp）**，说明冻结那份是「数据不全时算的」（线上实测：70% 覆盖就冻死 ⇒
+           可能有票因缺报价而没进名单）⇒ 重算并覆盖；否则维持冻结（名单不再漂移）。
+           收敛性：覆盖涨到饱和后差值 <10pp ⇒ 不再重算 ⇒ 稳定。 */
+        var keys = [], kk;
+        for (kk in META) { if (Object.prototype.hasOwnProperty.call(META, kk)) keys.push(kk); }
+        var _hit0 = 0, _j0;
+        for (_j0 = 0; _j0 < keys.length; _j0++) { var _q0 = q[keys[_j0]]; if (_q0 && num(_q0.px) > 0) _hit0++; }
+        var _covNow = Math.round(100 * _hit0 / Math.max(1, keys.length));
         FP = loadFP();
-        if (FP) { FPfrozen = true; }
-        else {
-          var keys = [], kk;
-          for (kk in META) { if (Object.prototype.hasOwnProperty.call(META, kk)) keys.push(kk); }
+        if (FP && (FP.cov === null || FP.cov === undefined || _covNow <= (FP.cov + 10))) {
+          FPfrozen = true;                    /* 数据没有明显变好 → 用冻结值 */
+        } else {
+          FP = null;                          /* 没有冻结值 / 覆盖显著改善 → 重算 */
+        }
+        if (!FP) {
           var sur = [], miss = 0, j2;
           for (j2 = 0; j2 < keys.length; j2++) {
             var qq = q[keys[j2]];
@@ -1719,14 +1730,11 @@ HPDK_JS = r"""
                        var _d = q[x.code] || {};
                        return {code: x.code, name: x.m.name || '', px: num(_d.px), pct: num(_d.pct),
                                opn: num(_d.opn), pcl: num(_d.pcl), gap: x.gap}; }),
-                ts: ymd(new Date()) + ' ' + hms(new Date())};
-          /* R-hpdk-freeze-0929：**只有报价覆盖够（≥50%）才允许冻结** —— 线上实测事故：
-             首算发生在 10:00:42、当时只拿到 17 条报价 ⇒ 把「命中 3 只」冻成了名单，
-             报价到齐后也不再变（用户看到的就是 3 行全是「—」的清单，图1）。
-             覆盖不足 ⇒ 不落冻结、继续随刷新重算（判据没错，错的是拿残缺报价定名单）。 */
-          var _cov = (keys.length - miss) / Math.max(1, keys.length);
-          FP.cov = Math.round(_cov * 100);
-          if (_cov >= 0.5) { saveFP(FP); FPfrozen = true; }
+                cov: _covNow, ts: ymd(new Date()) + ' ' + hms(new Date())};
+          /* R-hpdk-freeze-0929：**报价覆盖 ≥50% 才允许落冻结** —— 线上实测事故：首算发生在
+             10:00:42、当时只拿到 17 条报价 ⇒ 把「命中 3 只」冻成了名单，报价到齐后也不再变
+             （用户看到的就是 3 行全是「—」的清单）。覆盖不足 ⇒ 只用于本次渲染，不落盘。 */
+          if (_covNow >= 50) { saveFP(FP); FPfrozen = true; }
         }
       }
     } catch (e) { FP = null; S.err = String(e && e.message || e); }
