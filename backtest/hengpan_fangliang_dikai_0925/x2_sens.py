@@ -230,7 +230,13 @@ def main():
         ("KSLOT_30", {"KSLOT": 30}, None),
         ("TP_0.01", {"TP": 0.01}, None), ("TP_0.03", {"TP": 0.03}, None),
         ("TP_off_0.99", {"TP": 0.99}, None),
-        ("v15_stnow", {"STNOW_OFF": False}, None),   # 复现 v1.5 旧行为（按当前名称剔 ST）
+        # 【勘误 E-22 · 2026-09-29 用户批准 A+C】三条对照臂（判据变更的读数留档）：
+        #   stp_A_off    = 关掉 A（退回只看「最大绝对日收益≤5.6%」的旧代理）
+        #   stnow_all_C  = 关掉 C（现名过滤作用于全量 = v1.5 行为，会误剔 228/253 只退市股）
+        #   v15_both_off = A/C 全关 + 现名全量剔 = v1.5 等价（历史对照基线）
+        ("v15_stnow", {"STNOW_OFF": False, "STP_CNT": 0}, None),   # v1.5 等价（A/C 全关）
+        ("stp_A_off", {"STP_CNT": 0}, None),                       # 只关 A
+        ("stnow_all_C", {"STNOW_LIVE_ONLY": False}, None),         # 只关 C
         ("lag_VA", None, lambda F: shift_keys(F, ("V", "A"), 1)),
         ("fwd_VA", None, lambda F: shift_keys(F, ("V", "A"), -1)),
         ("shift_all1", None, lambda F: shift_keys(F, ALLP, 1)),

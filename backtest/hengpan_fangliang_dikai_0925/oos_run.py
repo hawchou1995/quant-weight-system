@@ -11,14 +11,13 @@ DEAD = R/"backtest/_delisted_universe/delisted_bars.csv.gz"
 STATE_F = OUT/"oos_state.json"; TRADES_F = OUT/"oos_trades.jsonl"; REPORT_F = OUT/"oos_report.json"
 # ---- 冻结参数（不得修改）----
 P = dict(P1=0.01, P2=0.03, K=10, KSLOT=20, MINAMT=2e7, MINPX=3.0, LISTED=250, TP=0.02,
-         COST_SIDE=0.000346, SHADOW_START="2026-09-25", WORST_CASE_WIPEOUT=True,
-         MAINBOARD=True,   # 2026-09-27 用户要求：只买主板（见 E-12）
-         # ---- 2026-09-27 研究用门槛开关（默认值 = 完全无操作，见 E-13）----
-         VOLBR_MIN=0.0, VOLBR_MAX=1e9, RR_MIN=0.0,
-         # ---- 2026-09-28 用户批准的口径修正（见勘误 E-19）----
-         # STNOW_OFF=True  → FILT 只保留**点时**代理 STP（新默认，已修正）
-         # STNOW_OFF=False → 复原 v1.5 旧行为（额外按「当前名称含 ST/退」一次性剔除），仅供审计复现
-         STNOW_OFF=True)
+          COST_SIDE=0.000346, SHADOW_START="2026-09-25", WORST_CASE_WIPEOUT=True,
+          # ---- ST 筛子（2026-09-29 · 勘误 E-22 · 用户批准 A+C）----
+          # STP_CNT=3        → A：代理需「250 日内 |日收益|≥4.8% 的天数 ≥3」；设 0 = 关掉 A
+          # STNOW_LIVE_ONLY  → C：现名过滤只作用于在售票（退市票豁免）；设 False = 复原 v1.5 全量剔
+          # STNOW_OFF=True   → 完全不使用现名过滤（E-19 行为）；保留供审计复现
+          STP_CNT=3, STNOW_LIVE_ONLY=True,
+          STNOW_OFF=False)
 FROZEN_SHA = hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest()
 def log(*a): print(*a, flush=True)
 def load_universe():
@@ -88,10 +87,18 @@ def main():
     _NAMES = json.loads((R/"data_full_names.json").read_text(encoding="utf-8"))
     STNOW = np.array([(("ST" in (_NAMES.get(_s,"") or "").upper()) or ("退" in (_NAMES.get(_s,"") or "")))
                       for _s in syms], dtype=bool)
-    _Cv = np.where(VALID, C, np.nan)
+    # 【勘误 E-22 · C】退市票掩码：现名过滤 C 只作用于在售票，退市票豁免（保 E-19 的幸存者修正）
+    _Cv = np.where(VALID, C, np.nan)          # 有效收盘（供 _r1 / 过滤件使用）
+    _DEAD = np.array([s_ in set(dead) for s_ in syms], dtype=bool)
     _r1 = np.full((T, N), np.nan, dtype=np.float32); _r1[1:] = _Cv[1:]/_Cv[:-1] - 1.0
     _MX = pd.DataFrame(np.abs(_r1)).rolling(250, min_periods=60).max().to_numpy(dtype=np.float32)
-    STP = np.isfinite(_MX) & (_MX <= 0.056)          # 期内 ST 代理: 250日最大绝对日收益<=5.6% (即 ±5% 限价制度)
+    # 【勘误 E-22 · A（2026-09-29 用户批准）】代理加第二条件：窗口内 |日收益| ≥4.8% 的天数 ≥ STP_CNT。
+    # 依据（E-21 实测）：只看「最大绝对日收益 ≤5.6%」会把**安静的正常股**误判成 ST ——
+    # 基准日 2026-09-28 判 ST 128 只、真 ST 仅 6 只（误杀率 2.46%）；加本条件后降到 0.26% 且召回不变
+    # （点时代理、无前视）。真 ST 票在 250 日内几乎必然出现 ≥4.8% 的日波动。
+    _CNT = pd.DataFrame((np.abs(_r1) >= 0.048).astype(np.float32)).rolling(250, min_periods=60).sum().to_numpy(dtype=np.float32)
+    _NEED = int(P.get("STP_CNT", 3))
+    STP = (np.isfinite(_MX) & (_MX <= 0.056) & (_CNT >= _NEED)) if _NEED > 0 else (np.isfinite(_MX) & (_MX <= 0.056))
     BPSA = np.full((T, N), np.nan, dtype=np.float32)
     _bp = pd.read_csv(R/"backtest/_fundamentals/bps_quarterly.csv.gz")
     _bp["report_date"] = pd.to_datetime(_bp["report_date"], errors="coerce")
@@ -119,7 +126,13 @@ def main():
         """
         m = (~STP[t]) & (C[t] >= 3.0) & np.isfinite(BPSA[t]) & (BPSA[t] >= 3.0)
         if not P.get("STNOW_OFF", True):
-            m = m & (~STNOW)
+            m = m & (~STNOW)                       # v1.5 旧行为（全量剔现名）：仅审计复现用
+        elif P.get("STNOW_LIVE_ONLY", True):
+            # 【勘误 E-22 · C（2026-09-29 用户批准）】现名过滤只作用于**在售票**；退市票豁免。
+            # 依据：E-19 实测「全量剔现名」把 253 只退市股剔掉 228 只（90.1%）⇒ 幸存者修正失效；
+            # 而近期才戴帽的在售票（002743 / *ST网达）必须剔 —— 代理对它们召回仅 ~3%（E-21 实测）。
+            # 代价：重新引入「用今天的名字回溯历史」的跨期信息（方向保守）。
+            m = m & ((~STNOW) | _DEAD)
         return m
 
     # ---- 板块掩码（2026-09-27 用户要求「只买主板，其他板块去掉」）----

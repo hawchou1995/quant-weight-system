@@ -56,7 +56,11 @@ STNOW = np.array([(("ST" in (_NAMES.get(_s,"") or "").upper()) or ("退" in (_NA
 _Cv = np.where(VALID, C, np.nan)
 _r1 = np.full((T, N), np.nan, dtype=np.float32); _r1[1:] = _Cv[1:]/_Cv[:-1] - 1.0
 _MX = pd.DataFrame(np.abs(_r1)).rolling(250, min_periods=60).max().to_numpy(dtype=np.float32)
-STP = np.isfinite(_MX) & (_MX <= 0.056)          # 期内 ST 代理: 250日最大绝对日收益<=5.6% (即 ±5% 限价制度)
+# 【勘误 E-22 · A（2026-09-29 用户批准）】代理加第二条件（与 oos_run.py 逐行同式）
+_CNT = pd.DataFrame((np.abs(_r1) >= 0.048).astype(np.float32)).rolling(250, min_periods=60).sum().to_numpy(dtype=np.float32)
+STP = np.isfinite(_MX) & (_MX <= 0.056) & (_CNT >= 3)
+# 【勘误 E-22 · C】退市票掩码：现名过滤只作用于在售票，退市票豁免（保 E-19 的幸存者修正）
+_DEAD = np.array([s_ in set(dead) for s_ in syms], dtype=bool)
 BPSA = np.full((T, N), np.nan, dtype=np.float32)
 _bp = pd.read_csv(R/"backtest/_fundamentals/bps_quarterly.csv.gz")
 _bp["report_date"] = pd.to_datetime(_bp["report_date"], errors="coerce")
@@ -74,10 +78,13 @@ for _s, _g in _bp.groupby("sym"):
     BPSA[_gd, _j] = _v[_pos[_gd]]
 def FILT(t):
     """返回可交易掩码（**必须与冻结脚本 oos_run.py 的 FILT 逐行同式**）
-    【勘误 E-19，2026-09-28】去掉 STNOW（按当前名称一次性剔除会剔除 228/253 只退市股），
-    只保留点时代理 STP。两侧不一致会被 hpdk_candidates 的 A11 逐位对拍挡下。
+    【勘误 E-19】只保留点时代理 STP（去掉会误剔 228/253 只退市股的 STNOW）。
+    【勘误 E-22 · A+C】STP 加「|日收益|≥4.8% 天数 ≥3」；现名过滤只在**在售票**生效
+    （退市票豁免，保 E-19 的幸存者修正）。两侧不一致会被 A11 逐位对拍挡下。
     """
-    return (~STP[t]) & (C[t] >= 3.0) & np.isfinite(BPSA[t]) & (BPSA[t] >= 3.0)
+    m = (~STP[t]) & (C[t] >= 3.0) & np.isfinite(BPSA[t]) & (BPSA[t] >= 3.0)
+    m = m & ((~STNOW) | _DEAD)
+    return m
 
 def zs(x):
     x = np.asarray(x,float); mu = np.nanmean(x); sd = np.nanstd(x)
