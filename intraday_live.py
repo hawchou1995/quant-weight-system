@@ -1209,6 +1209,7 @@ HPDK_JS = r"""
   var S = {ts: '', src: '', mktTs: '', mktDate: '', mmin: -1, phase: 'none', gate: false, live: false,
            rows: 0, pool: 0, removed: 0, hit: 0, kept: 0, noquote: 0, calls: 0, err: '', diag: []};
   var META = {}, ORDER = null, TV = null, COLS = null, NCOL = 0;
+  var TOPCACHE = {buy: '', html: ''};   /* R-hpdk-keep-0929：上一帧清单（源抖动时不清空） */
 
   function num(v){ var x = (v === null || v === undefined || v === '') ? NaN : parseFloat(v); return isNaN(x) ? NaN : x; }
   function numOr(v, d){ var x = num(v); return isNaN(x) ? d : x; }
@@ -1409,14 +1410,16 @@ HPDK_JS = r"""
      返回 {k:'keep'|'drop'|'na', gate:'A'|'B'|'C'|'F'|'na', why, gap?}
      · k='na'（该码本次报价缺失 / 三个价格字段全无）→ **保守留存**：不剔除任何判不了的行（宁可漏剔，不可误剔）。 */
   function judge(m, d){
-    /* R-hpdk-stlive-0929（勘误 E-20 · 用户批准 A 案）：**live frontier 按真名单剔 ST**。
-       历史日没有点时名称数据 ⇒ 冻结判据只能用代理 STP（E-19 的结论，本轮实测再次确认：
-       603189 最后一次 >5.6% 波动在 09-15，任何 ≥9 日窗口都抓不住它；能抓的 ≤8 日窗口要剔掉
-       全池 74%）。但「今天」的名称本身就是点上的信息 ⇒ frontier 额外按现行名称剔 ST/退。
-       与收盘链 hpdk_candidates.py 的 frontier 口径两侧一致；不改历史读数、不改冻结脚本。 */
-    var _nm0 = String((m && m.name) || '');
-    if (/ST/i.test(_nm0) || _nm0.indexOf('退') >= 0)
-      return {k: 'drop', gate: 'ST', why: 'ST: 现行名称含 ST/退（' + _nm0 + '）'};
+    /* R-hpdk-stlive-0929（勘误 E-20 · 用户批准 A 案）+ R-hpdk-name-0929（用户实测「002743 是 ST 也进了清单」）：
+       **live frontier 按真名单剔 ST/退，且同时用「实时行情名」与「内嵌名」双源判定**。
+       为什么双源：内嵌名来自 data_full_names.json，该文件长期不更新（实测停在 2026-08-17）
+       ⇒ 002743 早已改名 **ST富煌**（东财 f14 / 腾讯 [1] 一致）却仍按「富煌钢构」放行。
+       实时行情名 = 当下真名 ⇒ 任一源含 ST/退 即剔除（`_nmB`）。
+       历史日没有点时名称数据 ⇒ 冻结判据仍只用代理 STP（E-19），本筛子只作用于 frontier，
+       不改历史读数、不改冻结脚本 oos_run.py；与收盘链 hpdk_candidates.py 两侧同口径。 */
+    var _nmB = String((m && m.name) || '') + '|' + String((d && d.name) || '');
+    if (/ST/i.test(_nmB) || _nmB.indexOf('退') >= 0)
+      return {k: 'drop', gate: 'ST', why: 'ST: 现行名称含 ST/退（' + _nmB.replace('|', ' / ') + '）'};
     var A20 = num(m && m.amt20), C = num(m && m.close);
     var minamt = numOr(H.minamt, 0), minpx = numOr(H.minpx, 0);
     if (!(A20 > 0 && A20 >= minamt - CFG.EPS))
@@ -1553,6 +1556,15 @@ HPDK_JS = r"""
     var buy = String(H.buy_date || '');
     /* 闸门 = 唯一开关（用**交易所时间戳**，不用本地日期）：只有「行情日 === 买日 且 时刻 ≥ 09:25」才剔除 */
     var enforce = !!(live && mkt && buy && mkt.date === buy && mkt.min >= CFG.OPEN_MIN);
+    S.fallback = false;
+    /* R-hpdk-fallback-0929：**交易所时间戳缺失时用本地时钟兜底**（日期=买日 且 本地 ≥09:26）。
+       根因：探测接口（qt.gtimg 指数）偶发失败 ⇒ mktTs 空 ⇒ enforce 永假 ⇒ 清单**整个消失**（用户实测）。
+       判据不变（gap 带 / 可交易 / 准入件），只是不再让「一个辅助请求失败」决定清单是否存在。
+       09:26 这个下限保证开盘前（09:15–09:25 竞价）仍不剔除、不误判。 */
+    if (!enforce && live && buy && !mkt) {
+      var _now = new Date(), _lmin = _now.getHours() * 60 + _now.getMinutes();
+      if (ymd(_now) === buy && _lmin >= (9 * 60 + 26)) { enforce = true; S.fallback = true; }
+    }
     S.gate = enforce;
     S.phase = phaseOf(mkt, buy);
     S.rows = 0; S.removed = 0; S.hit = 0; S.kept = 0; S.noquote = 0; S.diag = []; S.err = '';
@@ -1643,8 +1655,8 @@ HPDK_JS = r"""
     }
     /* ⑥ 判定不明的行（本次报价缺失该码）：保守留存 + 灰标签（绝不因「没数据」剔除） */
     for (i = 0; i < keepNa.length; i++)
-      tagInto(keepNa[i].tr, '待行情（保守留存）', 'pre',
-            '本次报价缺该码 → 不剔除（宁可漏剔，不可误剔）。' + CFG.TIP, true);
+       tagInto(keepNa[i].tr, '待行情（保守留存）', 'pre',
+             '本次报价缺该码 → 不剔除（宁可漏剔，不可误剔）。' + CFG.TIP, true);
     S.kept = keepRank.length + keepNa.length;
     S.hit = top.length;
     /* ⑦ 说明行（**不再置顶任何行**）：本表 = 盘前准备视图；唯一买入清单 = 卡片最上方 */
@@ -1675,7 +1687,7 @@ HPDK_JS = r"""
     /* 冻结键：09:25 后开盘价已定 ⇒ 命中集合确定，首算即冻结（按 buy_date 存），刷新只读冻结值。 */
     /* 冻结键**升版 v2**（2026-09-29）：v1 里可能存着「残缺报价冻结」的名单（且无价格快照 ⇒ 全「—」），
        升版即作废旧值，浏览器下次加载自动重算 —— 不再需要用户手动清缓存。 */
-    var FPKEY = 'quant_hpdk_fp_v2';
+    var FPKEY = 'quant_hpdk_fp_v3';
     function loadFP(){
       try { var a = JSON.parse(localStorage.getItem(FPKEY));
             return (a && String(a.buy_date) === String(H.buy_date || '')) ? a : null; }
@@ -1729,53 +1741,95 @@ HPDK_JS = r"""
     };
     if (topEl) {
       if (FP) {
-        var _k3 = FP.top.length, _i3, _h3 = '';
+        var _k3 = FP.top.length, _i3, _h3 = '', _ADV = numOr(CFG.ADV_FRAC, 0.01);
+        var _slot = numOr(H.capital, 0) / Math.max(1, numOr(H.kslot, 1));
         _h3 += '<div class="sub" style="border-left:3px solid var(--warn);padding-left:8px;margin:0 0 8px">'
             +  '<b>今日买入清单（全池判定 · 本卡唯一买入口径）</b> · 买日 <b>' + (H.buy_date || '—') + '</b>'
             +  '（信号日 ' + (H.as_of || '—') + '）· 资格池 <b>' + FP.pool + '</b> 只 → 命中 <b>' + FP.hits + '</b> 只'
             +  ' · <b>报价覆盖 ' + (FP.cov === null || FP.cov === undefined ? '—' : FP.cov + '%')
             +  '</b>（缺报价 ' + (FP.missing || 0) + ' 只未判定）'
             +  ' · 名单 = F 前 ' + FP.k + '（本次 ' + _k3 + ' 只）'
-            +  (FPfrozen ? (' · <b>09:25 后已冻结</b>（' + escH(FP.ts) + ' 首算，刷新不再变）') : '')
+            +  (FPfrozen ? (' · <b>09:25 后已冻结</b>（' + escH(FP.ts) + ' 首算，名单不再变）') : '')
+            +  (S.fallback ? ' · <span style="color:var(--warn)">时间戳源不可用：已按本地时钟兜底</span>' : '')
             +  '｜现行 ST/退 按名称剔除</div>';
         if (!_k3) {
           _h3 += '<div class="sub" style="color:var(--faint)">本次判定范围内无命中'
               +  (FP.missing ? ('（' + FP.missing + ' 只缺报价，未判定）') : '') + '。</div>';
         } else {
           _h3 += '<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-buylist" style="width:100%;font-size:12px">'
-              +  '<thead><tr><th style="text-align:center">#</th><th>标的</th><th>行业</th>'
-              +  '<th style="text-align:right">现价</th><th style="text-align:right">涨跌幅</th>'
-              +  '<th style="text-align:right">今开跳空</th><th style="text-align:right">买入价（今开）</th>'
-              +  '<th style="text-align:right">止盈价 +2%</th></tr></thead><tbody>';
+              +  '<thead><tr>'
+              +  '<th style="text-align:center">#</th><th>标的</th>'
+              +  '<th style="text-align:center">状态</th><th>板块</th><th>行业</th>'
+              +  '<th data-key="px" style="text-align:right">现价 <span class="live-tag">实时</span></th>'
+              +  '<th data-key="chg" style="text-align:right">涨跌幅 <span class="live-tag">实时</span></th>'
+              +  '<th data-key="amt" style="text-align:right">成交额20</th>'
+              +  '<th data-key="vr" style="text-align:right">量比</th>'
+              +  '<th data-key="r20" style="text-align:right">20日涨幅</th>'
+              +  '<th data-key="buy" style="text-align:right">买入价</th>'
+              +  '<th data-key="tp" style="text-align:right">止盈价 +2%</th>'
+              +  '<th style="text-align:center">卖出时点</th>'
+              +  '<th data-key="qty" style="text-align:right">建议股数</th>'
+              +  '<th data-key="cap" style="text-align:center">单票可买（上限）</th>'
+              +  '</tr></thead><tbody>';
           for (_i3 = 0; _i3 < _k3; _i3++) {
             var _x3 = FP.top[_i3], _c3 = bare(_x3.code), _d3 = q[_c3] || {}, _m3 = META[_c3] || {};
-            var _px = num(_x3.px);  if (!(_px > 0)) _px = num(_d3.px);
-            var _op = num(_x3.opn); if (!(_op > 0)) _op = num(_d3.opn);
+            var _px = num(_d3.px);  if (!(_px > 0)) _px = num(_x3.px);
             var _pc = num(_d3.pct);
-            var _gp = (_x3.gap === null || _x3.gap === undefined) ? NaN : num(_x3.gap);
-            if (isNaN(_gp)) {
-              var _pl = num(_d3.pcl);
-              _gp = (num(_d3.px) > 0 && _pl > 0) ? (Math.fround(Math.fround(num(_d3.px)) / Math.fround(_pl)) - 1) : NaN;
-            }
+            var _op = num(_d3.opn); if (!(_op > 0)) _op = num(_x3.opn);
+            var _amt = num(_m3.amt20), _vr = num(_m3.volbr), _r20 = num(_m3.ret20);
             var _tp = _op > 0 ? _op * (1 + numOr(H.tp, 0.02)) : NaN;
-            _h3 += '<tr>'
+            var _capv = _amt > 0 ? _amt * _ADV : NaN;
+            var _alloc = Math.min(_slot, _capv);
+            var _qty = (_op > 0 && _alloc > 0) ? Math.floor(_alloc / _op / 100) * 100 : 0;
+            var _lim = isFinite(_capv) && _capv < _slot - CFG.EPS;
+            var _pcTxt = isNaN(_pc) ? '—' : ((_pc > 0 ? '+' : '') + Number(_pc).toFixed(2) + '%');
+            var _pcCol = isNaN(_pc) ? 'var(--sub)' : (_pc > 0 ? 'var(--up)' : (_pc < 0 ? 'var(--down)' : 'var(--sub)'));
+            var _r20Txt = isNaN(_r20) ? '—' : ((_r20 > 0 ? '+' : '') + (_r20 * 100).toFixed(2) + '%');
+            _h3 += '<tr data-code="' + _c3 + '" data-search="' + escH((_x3.name || '') + ' ' + _c3 + ' '
+                    + (_m3.board || '') + ' ' + (_m3.ind || '')) + '">'
                 +  '<td style="text-align:center">' + (_i3 + 1) + '</td>'
                 +  '<td><b>' + escH(_x3.name || _c3) + '</b><br><span style="color:var(--sub);font-size:var(--fs-xs)">'
                 +  escH(_c3) + '</span></td>'
+                +  '<td style="text-align:center"><span class="badge badge-auto">\u2705 买入候选</span></td>'
+                +  '<td style="color:var(--sub)">' + escH(_m3.board || '—') + '</td>'
                 +  '<td style="color:var(--sub)">' + escH(_m3.ind || '—') + '</td>'
-                +  '<td style="text-align:right;font-variant-numeric:tabular-nums">' + (_px > 0 ? _px.toFixed(2) : '—') + '</td>'
-                +  '<td style="text-align:right;color:' + (isNaN(_pc) ? 'var(--sub)' : (_pc > 0 ? 'var(--up)' : (_pc < 0 ? 'var(--down)' : 'var(--sub)'))) + '">'
-                +  (isNaN(_pc) ? '—' : fmtPct(_pc / 100)) + '</td>'
-                +  '<td style="text-align:right;color:var(--down)">' + (isNaN(_gp) ? '—' : fmtPct(_gp)) + '</td>'
-                +  '<td style="text-align:right;font-variant-numeric:tabular-nums"><b>' + (_op > 0 ? _op.toFixed(3) : '—') + '</b></td>'
-                +  '<td style="text-align:right;color:var(--up);font-variant-numeric:tabular-nums">' + (isNaN(_tp) ? '—' : _tp.toFixed(4)) + '</td>'
+                +  '<td data-key="px" class="live-cell" style="text-align:right;font-variant-numeric:tabular-nums">'
+                +  (_px > 0 ? Number(_px).toFixed(2) : '—') + '</td>'
+                +  '<td data-key="chg" class="live-cell" data-v="' + (isNaN(_pc) ? '' : _pc.toFixed(2))
+                +  '" style="text-align:right;color:' + _pcCol + ';font-variant-numeric:tabular-nums">' + _pcTxt + '</td>'
+                +  '<td data-key="amt" data-v="' + (isNaN(_amt) ? '' : _amt) + '" style="text-align:right">'
+                +  fmtWan(_amt) + '</td>'
+                +  '<td data-key="vr" data-v="' + (isNaN(_vr) ? '' : _vr) + '" style="text-align:right">'
+                +  (isNaN(_vr) ? '—' : Number(_vr).toFixed(2)) + '</td>'
+                +  '<td data-key="r20" data-v="' + (isNaN(_r20) ? '' : _r20) + '" style="text-align:right;color:'
+                +  (isNaN(_r20) ? 'var(--faint)' : (_r20 > 0 ? 'var(--up)' : 'var(--down)')) + '">' + _r20Txt + '</td>'
+                +  '<td data-key="buy" style="text-align:right;font-variant-numeric:tabular-nums">'
+                +  '<span class="badge badge-auto">● 今开成交</span>'
+                +  '<div style="margin-top:3px"><b>' + (_op > 0 ? Number(_op).toFixed(3) : '—') + '</b></div></td>'
+                +  '<td data-key="tp" style="text-align:right;color:var(--up);font-variant-numeric:tabular-nums">'
+                +  (isNaN(_tp) ? '—' : Number(_tp).toFixed(4)) + '</td>'
+                +  '<td style="text-align:center;color:var(--sub)">T+2<br>' + escH(H.exit_date || '—') + ' 尾盘</td>'
+                +  '<td data-key="qty" data-v="' + _qty + '" style="text-align:right;font-variant-numeric:tabular-nums">'
+                +  fmtQty(_qty) + '</td>'
+                +  '<td data-key="cap" style="text-align:center">'
+                +  (_lim ? ('<span style="color:var(--warn)">限至 ' + fmtWan(_capv) + '</span>') : '足额') + '</td>'
                 +  '</tr>';
           }
-          _h3 += '</tbody></table></div>';
+          _h3 += '</tbody></table>'
+              +  '<div class="sub" style="color:var(--faint);margin-top:4px">'
+              +  '买入价 = <b>买日实际今开</b>（低开 −1%~−3% 于昨收）· 止盈 = 买入价 ×1.02 · '
+              +  '单票可买 = min(本金/KSLOT=' + fmtWan(_slot) + ', 20日均额×1%) </div></div>';
         }
         topEl.innerHTML = _h3;
+        TOPCACHE.buy = String(H.buy_date || ''); TOPCACHE.html = _h3;
+      } else if (TOPCACHE.buy && TOPCACHE.buy === String(H.buy_date || '')) {
+        /* R-hpdk-keep-0929：FP 本轮为 null（探测失败 / 报价源抖动 / 相位未到）→
+           **保留上一帧清单，绝不清空**（用户 2026-09-29 报「买入清单动不动就消失」）。 */
+        if (topEl.innerHTML.indexOf('tbl-hpdk-buylist') < 0 && TOPCACHE.html) topEl.innerHTML = TOPCACHE.html;
       } else {
-        topEl.innerHTML = '';
+        topEl.innerHTML = '<div class="sub" style="color:var(--faint)">今日买入清单：等待盘中行情'
+            +  (S.mktTs ? ('（行情时间戳 ' + escH(S.mktTs) + '）') : '（尚未取到行情时间戳）')
+            +  '。打开页面后自动拉取；09:25 后按真实今开判定并冻结。</div>';
       }
     }
     /* ⑧ 非判定时段：一行都不剔除。**只有集合竞价 09:15–09:24 挂逐行灰标**（那时 gap 预判有信息量）；

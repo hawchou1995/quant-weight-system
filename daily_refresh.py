@@ -195,6 +195,11 @@ STEPS = [
     # --skip-oosrun 跳过。
     ("缩量超跌-前向OOS台账 oos_run", ["backtest/hengpan_fangliang_dikai_0925/oos_run.py"],
      "--skip-oosrun" in sys.argv),
+    # 当日名称快照（2026-09-29，R-hpdk-name-0929）：从 data_fundamental/name_hist.csv（每日简称史）
+    # 取每只票最新可用名 → data_fundamental/name_latest.json。**必须在 hpdk_candidates 之前**：
+    # frontier 的「现行名称剔 ST/退」以前用 data_full_names.json（实测停在 2026-08-17）⇒
+    # 002743 早已是 ST富煌 却进了买入清单（用户实测）。本步 ~40s（纯本地扫描，不发请求）；[软]。
+    ("当日名称快照 name_latest[软]", ["refresh_name_latest.py"], "--skip-names" in sys.argv),
     ("缩量超跌-当日候选 hpdk_candidates[软]",
      ["backtest/hengpan_fangliang_dikai_0925/hpdk_candidates.py"], "--skip-hpdk" in sys.argv),
     # 模拟盘账户 + 跟踪池（从冻结 OOS 台账派生；与台账对拍不一致会 exit 3）——同样必须在 build 之前。

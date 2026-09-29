@@ -164,6 +164,28 @@ def main():
     T, N = F["C"].shape
     jof = {s: j for j, s in enumerate(syms)}
     names = json.loads((R / "data_full_names.json").read_text(encoding="utf-8"))
+    # R-hpdk-name-0929（用户 2026-09-29 实测）：**当日名称源** —— data_full_names.json 长期不更新
+    # （实测停在 2026-08-17），会让已 ST 的票漏剔：002743 实为 **ST富煌**（东财/腾讯实时名一致）
+    # 却进了买入清单。改用 data_fundamental/name_latest.json（由 refresh_name_latest.py 从
+    # **每日简称史** name_hist.csv 取每只票最新可用名生成）。名称仅用于 frontier 过滤，不改判据。
+    _NL = R / "data_fundamental" / "name_latest.json"
+    name_now = json.loads(_NL.read_text(encoding="utf-8")) if _NL.exists() else {}
+    log("[name] 当日名称源：%s（%d 只）" % ("name_latest.json" if name_now else "退回 data_full_names.json",
+                                        len(name_now)))
+
+    def name_of(sym):
+        """优先当日名称源 → 退回静态名称文件。sym 形如 sz002743。"""
+        c = sym[2:] if sym[:2] in ("sh", "sz", "bj") else sym
+        return name_now.get(c) or names.get(sym, "")
+
+    def is_st_name(nm):
+        n = nm or ""
+        return ("ST" in n.upper()) or ("退" in n)
+
+    def st_name_or_none(sym):
+        nm = name_of(sym)
+        return nm if is_st_name(nm) else None
+
     ind = {u["sym"]: u.get("ind", "") for u in
            json.loads((R / "backtest/wechat_hotspot_leader_0925/universe.json")
                       .read_text(encoding="utf-8"))["universe"]}
@@ -221,20 +243,17 @@ def main():
         print(json.dumps(dict(n_ok=n_ok, n_cmp=n_cmp, mism=mism[:3]), ensure_ascii=False, indent=1))
         log("!! A11 对拍失败 → 口径漂移，拒绝产出候选。")
         sys.exit(2)
-
-    # ---------- 当日候选（供看板） ----------
     T_last = cal[-1]
+    # ---------- 当日候选（供看板） ----------
     i = T - 1
     pool = sorted(by_day_w.get(T_last, []))
     rows = []
     for s in pool:
         j = jof[s]
-        # R-hpdk-stlive-0929（勘误 E-20 · A 案）：frontier 的准备清单同样按**现行名称**剔 ST/退
-        # （与「今日命中」、前端 judge 三处同口径；历史读数与冻结脚本不受影响）。
-        _nm_c = names.get(s, "") or ""
-        if ("ST" in _nm_c.upper()) or ("退" in _nm_c):
+        # R-hpdk-name-0929：frontier 准备清单按**当日名称源**剔 ST/退（当日源优先，退回静态名）
+        if st_name_or_none(s):
             continue
-        row = dict(sym=s, code=s[2:], name=names.get(s, ""), ind=ind.get(s, ""),
+        row = dict(sym=s, code=s[2:], name=name_of(s), ind=ind.get(s, ""),
                    board=board_of(s), close=round(float(F["C"][i, j]), 3),
                    amt20=round(float(ft["AMT20"][i, j]), 1) if np.isfinite(ft["AMT20"][i, j]) else None,
                    volbr=round(float(ft["VOLBR"][i, j]), 4) if np.isfinite(ft["VOLBR"][i, j]) else None,
@@ -301,8 +320,7 @@ def main():
             # 历史日没有点时名称数据（E-19 只能用代理 STP），但「今天」的名称本身就是点上的信息。
             # 只作用于 frontier 产物（今日命中 / 明日准备清单），不改历史读数、不改冻结脚本 oos_run.py，
             # 也不参与 A11 对拍（对拍走 by_day_w + 冻结重放，与本筛子无关）。前端 judge 已同口径（两侧一致）。
-            _nm_h = names.get(s, "") or ""
-            if ("ST" in _nm_h.upper()) or ("退" in _nm_h):
+            if st_name_or_none(s):
                 continue
             gg = gS[j]
             oD, cD, cS = F2["O"][iS + 1, j], F2["C"][iS + 1, j], F2["C"][iS, j]
@@ -333,7 +351,7 @@ def main():
                 gi = ind.get(sym, "") or "—"
                 _indseq[gi] = _indseq.get(gi, 0) + 1
                 _rows.append(dict(rank=int(r + 1), code=sym[2:], sym=sym,
-                                  name=names.get(sym, ""), ind=gi, ind_seq=_indseq[gi],
+                                  name=name_of(sym), ind=gi, ind_seq=_indseq[gi],
                                   gap_pct=round(cand[q][1] * 100, 3),
                                   F=round(float(_comp[q]), 4), volbr=round(cand[q][3], 3),
                                   ret20_pct=round(cand[q][4] * 100, 2)))
