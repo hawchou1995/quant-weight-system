@@ -1820,7 +1820,10 @@ HPDK_JS = r"""
               +  '<th data-key="amt" style="text-align:right">成交额20</th>'
               +  '<th data-key="vr" style="text-align:right">量比</th>'
               +  '<th data-key="r20" style="text-align:right">20日涨幅</th>'
-               +  '<th data-key="buy" style="text-align:right">挂单价 <span class="live-tag">昨收×0.99</span></th>'
+              /* R-hpdk-pcl-0929（用户 2026-09-29 要求）：加「昨收价」列 —— 便于**当场核对**
+                 挂单价是否 = 昨收×0.99（挂单价是你要下单的数，昨收是它的来源）。 */
+              +  '<th data-key="pcl" style="text-align:right">昨收价</th>'
+              +  '<th data-key="buy" style="text-align:right">挂单价 <span class="live-tag">昨收×0.99</span></th>'
                +  '<th style="text-align:right">成交价 <span class="live-tag">今开</span></th>'
                +  '<th data-key="tp" style="text-align:right">止盈价 +2%</th>'
               +  '<th style="text-align:center">卖出时点</th>'
@@ -1868,7 +1871,9 @@ HPDK_JS = r"""
                     那才是你前一晚能挂进券商的下单价（也是上沿自动把关的那条限价）。
                     「成交价」另列 = 今开（09:25 撮合价），它才是止盈的基准（冻结规则：止盈 = 实际成交价×1.02）。
                     两列并列的原因：挂单价 = 你控制的；成交价 = 市场给的（≤ 挂单价）。 */
-                 +  '<td data-key="buy" data-v="' + (isNaN(_ordpx) ? '' : _ordpx) + '" style="text-align:right;font-variant-numeric:tabular-nums">'
+                  +  '<td data-key="pcl" data-v="' + (isNaN(_pcl0) ? '' : _pcl0) + '" style="text-align:right;font-variant-numeric:tabular-nums">'
+                  +  (isNaN(_pcl0) ? '—' : Number(_pcl0).toFixed(3)) + '</td>'
+                  +  '<td data-key="buy" data-v="' + (isNaN(_ordpx) ? '' : _ordpx) + '" style="text-align:right;font-variant-numeric:tabular-nums">'
                  +  (isNaN(_ordpx) ? '—' : Number(_ordpx).toFixed(3))
                  +  '<div style="margin-top:3px;font-size:var(--fs-xs);color:var(--faint)">限价（上沿）</div></td>'
                  +  '<td style="text-align:right;font-variant-numeric:tabular-nums">'
