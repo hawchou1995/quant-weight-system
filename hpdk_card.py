@@ -442,6 +442,28 @@ def hpdk_track_card(BASE):
                  % ((d.get("pool_now") or {}).get("as_of"), (d.get("pool_now") or {}).get("buy_date"),
                     (d.get("pool_now") or {}).get("exit_date"), (d.get("pool_now") or {}).get("n")))
                 if d.get("pool_now") else ""))
+    # 2026-09-29（R-hpdk-tracknote-0929，用户反馈「昨天早盘买入的没出现在跟踪池」）：
+    # 根因是**预注册窗口边界**，不是漏记——影子账本 SHADOW_START=2026-09-25 ⇒ 首个信号日
+    # = 09-28（09-25 休市；hpdk_paper 日志实证：首个信号日索引 2852/日历 2853 日）；
+    # 而用户 09-28 早盘买入那批来自**信号日 09-24 = 样本内最后一日** ⇒ 按预注册不在影子盘内。
+    # 面板在 09-28 盘前却给了「今日买入候选」⇒ 指导与记账不一致。此处把边界与去向写清楚。
+    _h = _read(BASE / "backtest" / "hpdk_hits.json")
+    _ss = ((d.get("config") or {}).get("shadow_start"))
+    _sigs = [x.get("signal_date") for x in tr if x.get("signal_date")]
+    if _h and _h.get("signal_date") and _ss and str(_h["signal_date"]) < str(_ss):
+        _topn = "、".join("%s %s" % (x.get("name", ""), x.get("code", ""))
+                          for x in (_h.get("top") or [])[:6])
+        L.append(
+            '<div class="sub" style="margin-top:8px;border-left:3px solid var(--warn);'
+            'background:rgba(255,180,60,.08);padding:8px 10px;line-height:1.75">'
+            f'<b>⚠ 为什么「上次买日那批」不在本表里</b>：影子账本窗口自 <b>{_ss}</b> 起（预注册）'
+            f'⇒ 其<b>首个信号日 = {min(_sigs) if _sigs else "—"}</b>（{_ss} 为休市日，顺延）；'
+            f'而最近一次买日 <b>{_h.get("date")}</b> 的信号日是 <b>{_h.get("signal_date")}</b>'
+            f'（<b>样本内最后一日</b>）⇒ 按预注册<b>不计入影子账本</b>，故本表看不到它。'
+            f'<br>该批的权威记录见上方「<b>✅ 今日命中（收盘链全池复算）</b>」区块：'
+            f'命中 <b>{_h.get("n_hits")}</b> 只，F 前 {_h.get("k")}（{_topn}…）。'
+            f'<span style="color:var(--faint)">（本表 = 影子账本；命中区块 = 买日口径，独立于 OOS 窗口）</span>'
+            '</div>')
     L.append('<div class="toolbar">'
              '<input type="text" id="tbl-hpdk-track-q" placeholder="🔍 搜索名称 / 代码 / 板块…" '
              'autocomplete="off" spellcheck="false">'
