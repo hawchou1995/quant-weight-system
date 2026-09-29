@@ -67,7 +67,12 @@ def main():
     BASE_P = dict(P1=0.01, P2=0.03, K=10, KSLOT=20, MINAMT=2e7, MINPX=3.0, LISTED=250,
                   TP=TP, COST_SIDE=COST_SIDE, SHADOW_START="2016-01-01",
                   WORST_CASE_WIPEOUT=True, MAINBOARD=True,
-                  VOLBR_MIN=0.0, VOLBR_MAX=1e9, RR_MIN=0.0, STNOW_OFF=True)
+                  VOLBR_MIN=0.0, VOLBR_MAX=1e9, RR_MIN=0.0,
+                 # 【勘误 E-22 · 2026-09-29】原写 STNOW_OFF=True（= 当时的默认「不用现名过滤」）。
+                 # E-22 后默认 = 「现名过滤只作用于在售票 + 代理加 5% 钉板计数」⇒ 若继续写
+                 # STNOW_OFF=True 会**反转语义**（完全关掉现名过滤），使本审计与生产口径不一致。
+                 # 故改为显式跟随新默认：STNOW_OFF=False + STNOW_LIVE_ONLY=True + STP_CNT=3。
+                 STNOW_OFF=False, STNOW_LIVE_ONLY=True, STP_CNT=3)
 
     def run(tag, ov):
         mod.P.clear(); mod.P.update(BASE_P)

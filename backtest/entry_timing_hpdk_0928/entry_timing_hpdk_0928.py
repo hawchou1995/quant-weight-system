@@ -33,7 +33,8 @@ R = HERE.parents[1]                      # project root
 OOS = R / "backtest" / "hengpan_fangliang_dikai_0925" / "oos_run.py"
 ANN = 244.0
 START = "2018-01-01"
-SHA_PREFIX = "0b61a4bbce100ed6"
+# 【勘误 E-22 · 2026-09-29】跟随新冻结 SHA（v1.7）；旧值 0b61a4bbce100ed6（v1.6 · E-19）留档
+SHA_PREFIX = "7d14d27e9e28df9e"
 X_LADDER = (0.005, 0.010, 0.015, 0.020)
 
 P_FROZEN = dict(P1=0.01, P2=0.03, K=10, KSLOT=20, MINAMT=2e7, MINPX=3.0, LISTED=250, TP=0.02,
@@ -45,12 +46,15 @@ ARMSPEC = [("A0_开盘价(基线)", "A0", None), ("A1_买日收盘价", "A1", No
 ARM_ORDER = [a[0] for a in ARMSPEC]
 
 # 同尺子锚点：evidence_sensitivity.json 的 subwindow_2018（2018-01-02~2026-09-24，主板，v1.6）
+# 【勘误 E-22 · 2026-09-29】锚点随新冻结口径（v1.7 · A+C）更新；旧值留档：
+#   v1.6：2018+ KSLOT20 ann=63.90 mdd=-27.41 sharpe=2.53 win=60.94 mean=0.4341 n=21146 ne=20473 dep=48.42
+#         KSLOT4 ann=105.55 mdd=-30.16 sharpe=2.86 ne=4236 dep=49.94 ；全窗 47.30/-27.41/2.15/24492/23656/41.59
 ANCHOR_2018 = {
-    20: dict(ann=63.90, mdd=-27.41, sharpe=2.53, win_rate=60.94, mean_per_trade=0.4341,
-             n_trades=21146, n_entries=20473, deploy_pct=48.42),
-    4: dict(ann=105.55, mdd=-30.16, sharpe=2.86, n_trades=21146, n_entries=4236, deploy_pct=49.94),
+    20: dict(ann=62.70, mdd=-26.80, sharpe=2.51, win_rate=60.64, mean_per_trade=0.4234,
+            n_trades=21157, n_entries=20495, deploy_pct=48.45),
+    4: dict(ann=106.16, mdd=-30.13, sharpe=2.86, n_trades=21157, n_entries=4238, deploy_pct=49.95),
 }
-ANCHOR_FULL = dict(ann=47.30, mdd=-27.41, sharpe=2.15, n_trades=24492, n_entries=23656, deploy_pct=41.59)
+ANCHOR_FULL = dict(ann=46.40, mdd=-26.80, sharpe=2.13, n_trades=24502, n_entries=23675, deploy_pct=41.61)
 
 
 def log(*a):
