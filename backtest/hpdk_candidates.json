@@ -30,7 +30,7 @@
   "days_compared": 25,
   "days_bitwise_equal": 25
  },
- "n": 2227,
+ "n": 2216,
  "rows": [
   {
    "sym": "sh600834",
@@ -156,24 +156,6 @@
    "tp_hi": 17.207,
    "cap_single": 208601.0,
    "order_size": 12600,
-   "cap_ok": false
-  },
-  {
-   "sym": "sh603189",
-   "code": "603189",
-   "name": "*ST网达",
-   "ind": "计算机",
-   "board": "主板",
-   "close": 9.46,
-   "amt20": 20945137.5,
-   "volbr": 0.6778,
-   "ret20": 0.009605,
-   "buy_lo": 9.176,
-   "buy_hi": 9.365,
-   "tp_lo": 9.36,
-   "tp_hi": 9.552,
-   "cap_single": 209451.0,
-   "order_size": 22800,
    "cap_ok": false
   },
   {
@@ -984,24 +966,6 @@
    "tp_hi": 19.802,
    "cap_single": 251993.0,
    "order_size": 13100,
-   "cap_ok": true
-  },
-  {
-   "sym": "sz002872",
-   "code": "002872",
-   "name": "ST天圣",
-   "ind": "医药生物",
-   "board": "主板",
-   "close": 6.04,
-   "amt20": 25213821.4,
-   "volbr": 0.7885,
-   "ret20": 0.054101,
-   "buy_lo": 5.859,
-   "buy_hi": 5.98,
-   "tp_lo": 5.976,
-   "tp_hi": 6.1,
-   "cap_single": 252138.0,
-   "order_size": 42600,
    "cap_ok": true
   },
   {
@@ -5505,24 +5469,6 @@
    "cap_ok": true
   },
   {
-   "sym": "sh603822",
-   "code": "603822",
-   "name": "ST嘉澳",
-   "ind": "基础化工",
-   "board": "主板",
-   "close": 62.93,
-   "amt20": 43884040.3,
-   "volbr": 0.5286,
-   "ret20": 0.022919,
-   "buy_lo": 61.042,
-   "buy_hi": 62.301,
-   "tp_lo": 62.263,
-   "tp_hi": 63.547,
-   "cap_single": 438840.0,
-   "order_size": 4000,
-   "cap_ok": true
-  },
-  {
    "sym": "sh603172",
    "code": "603172",
    "name": "万丰股份",
@@ -7230,24 +7176,6 @@
    "tp_hi": 3.837,
    "cap_single": 501977.0,
    "order_size": 67800,
-   "cap_ok": true
-  },
-  {
-   "sym": "sz002538",
-   "code": "002538",
-   "name": "ST司特",
-   "ind": "基础化工",
-   "board": "主板",
-   "close": 6.83,
-   "amt20": 50208988.1,
-   "volbr": 2.9156,
-   "ret20": -0.06694,
-   "buy_lo": 6.625,
-   "buy_hi": 6.762,
-   "tp_lo": 6.758,
-   "tp_hi": 6.897,
-   "cap_single": 502090.0,
-   "order_size": 37700,
    "cap_ok": true
   },
   {
@@ -9228,24 +9156,6 @@
    "tp_hi": 23.841,
    "cap_single": 599964.0,
    "order_size": 10900,
-   "cap_ok": true
-  },
-  {
-   "sym": "sz000821",
-   "code": "000821",
-   "name": "ST京机",
-   "ind": "电力设备",
-   "board": "主板",
-   "close": 7.25,
-   "amt20": 60142880.0,
-   "volbr": 0.6536,
-   "ret20": -0.010914,
-   "buy_lo": 7.032,
-   "buy_hi": 7.178,
-   "tp_lo": 7.173,
-   "tp_hi": 7.322,
-   "cap_single": 601429.0,
-   "order_size": 35500,
    "cap_ok": true
   },
   {
@@ -11877,24 +11787,6 @@
    "cap_ok": true
   },
   {
-   "sym": "sh603272",
-   "code": "603272",
-   "name": "*ST联翔",
-   "ind": "轻工制造",
-   "board": "主板",
-   "close": 16.15,
-   "amt20": 74334966.0,
-   "volbr": 0.6461,
-   "ret20": 0.075233,
-   "buy_lo": 15.665,
-   "buy_hi": 15.988,
-   "tp_lo": 15.978,
-   "tp_hi": 16.308,
-   "cap_single": 743350.0,
-   "order_size": 15900,
-   "cap_ok": true
-  },
-  {
    "sym": "sz002267",
    "code": "002267",
    "name": "陕天然气",
@@ -12288,24 +12180,6 @@
    "tp_hi": 6.634,
    "cap_single": 764270.0,
    "order_size": 39200,
-   "cap_ok": true
-  },
-  {
-   "sym": "sh603008",
-   "code": "603008",
-   "name": "ST喜临门",
-   "ind": "轻工制造",
-   "board": "主板",
-   "close": 10.53,
-   "amt20": 76564746.6,
-   "volbr": 1.6265,
-   "ret20": 0.253572,
-   "buy_lo": 10.214,
-   "buy_hi": 10.425,
-   "tp_lo": 10.418,
-   "tp_hi": 10.634,
-   "cap_single": 765647.0,
-   "order_size": 24400,
    "cap_ok": true
   },
   {
@@ -12828,24 +12702,6 @@
    "tp_hi": 9.472,
    "cap_single": 809894.0,
    "order_size": 27400,
-   "cap_ok": true
-  },
-  {
-   "sym": "sh603595",
-   "code": "603595",
-   "name": "ST东尼",
-   "ind": "电子",
-   "board": "主板",
-   "close": 30.6,
-   "amt20": 81033233.6,
-   "volbr": 0.7876,
-   "ret20": 0.162172,
-   "buy_lo": 29.682,
-   "buy_hi": 30.294,
-   "tp_lo": 30.276,
-   "tp_hi": 30.9,
-   "cap_single": 810332.0,
-   "order_size": 8400,
    "cap_ok": true
   },
   {
@@ -19074,24 +18930,6 @@
    "tp_hi": 24.72,
    "cap_single": 1345386.0,
    "order_size": 10500,
-   "cap_ok": true
-  },
-  {
-   "sym": "sz002082",
-   "code": "002082",
-   "name": "ST万邦",
-   "ind": "医药生物",
-   "board": "主板",
-   "close": 13.2,
-   "amt20": 135106005.6,
-   "volbr": 2.9143,
-   "ret20": 0.370716,
-   "buy_lo": 12.804,
-   "buy_hi": 13.068,
-   "tp_lo": 13.06,
-   "tp_hi": 13.329,
-   "cap_single": 1351060.0,
-   "order_size": 19500,
    "cap_ok": true
   },
   {
@@ -26817,24 +26655,6 @@
    "cap_ok": true
   },
   {
-   "sym": "sz002759",
-   "code": "002759",
-   "name": "ST天际",
-   "ind": "电力设备",
-   "board": "主板",
-   "close": 13.44,
-   "amt20": 246346156.0,
-   "volbr": 0.7491,
-   "ret20": -0.244944,
-   "buy_lo": 13.037,
-   "buy_hi": 13.306,
-   "tp_lo": 13.298,
-   "tp_hi": 13.572,
-   "cap_single": 2463462.0,
-   "order_size": 19100,
-   "cap_ok": true
-  },
-  {
    "sym": "sh600436",
    "code": "600436",
    "name": "片仔癀",
@@ -33528,24 +33348,6 @@
    "tp_hi": 48.662,
    "cap_single": 5423256.0,
    "order_size": 5300,
-   "cap_ok": true
-  },
-  {
-   "sym": "sh600745",
-   "code": "600745",
-   "name": "*ST闻泰",
-   "ind": "电子",
-   "board": "主板",
-   "close": 16.3,
-   "amt20": 542839963.2,
-   "volbr": 0.767,
-   "ret20": -0.176352,
-   "buy_lo": 15.811,
-   "buy_hi": 16.137,
-   "tp_lo": 16.127,
-   "tp_hi": 16.46,
-   "cap_single": 5428400.0,
-   "order_size": 15800,
    "cap_ok": true
   },
   {

@@ -451,6 +451,17 @@ INTRADAY_JS = r"""
       var tgs = targets();
       var codes = [], seen = {};
       for (var i = 0; i < tgs.length; i++) { if (!seen[tgs[i].code]) { seen[tgs[i].code] = 1; codes.push(tgs[i].code); } }
+      /* R-hpdk-fullpool-0929：并入「**整个资格池**」的代码（由 HPDK 块经 window.POOL_EXTRA_CODES 暴露），
+         让判定覆盖全池（2227 只）而不只是 DOM 渲染的 600 行。线上实测旧行为：DOM 可判定仅 336 行 ⇒
+         「今日命中」只有 3~30 只、且随刷新漂移，用户看到「两个买入口径」。无此钩子时零变化。 */
+      if (typeof window.POOL_EXTRA_CODES === 'function') {
+        try {
+          var _ex = window.POOL_EXTRA_CODES() || [];
+          for (var _ie = 0; _ie < _ex.length; _ie++) {
+            if (_ex[_ie] && !seen[_ex[_ie]]) { seen[_ex[_ie]] = 1; codes.push(_ex[_ie]); }
+          }
+        } catch (e) {}
+      }
       var p = codes.length ? fetchPool(codes).then(function(q){
         var r = applyQuotes(q, hhmmss(new Date()));
         /* R-qlch-live-0923：报价落地的外部钩子。**必须显式留**：本 IIFE 内部调的是局部函数 applyQuotes，
@@ -1398,6 +1409,14 @@ HPDK_JS = r"""
      返回 {k:'keep'|'drop'|'na', gate:'A'|'B'|'C'|'F'|'na', why, gap?}
      · k='na'（该码本次报价缺失 / 三个价格字段全无）→ **保守留存**：不剔除任何判不了的行（宁可漏剔，不可误剔）。 */
   function judge(m, d){
+    /* R-hpdk-stlive-0929（勘误 E-20 · 用户批准 A 案）：**live frontier 按真名单剔 ST**。
+       历史日没有点时名称数据 ⇒ 冻结判据只能用代理 STP（E-19 的结论，本轮实测再次确认：
+       603189 最后一次 >5.6% 波动在 09-15，任何 ≥9 日窗口都抓不住它；能抓的 ≤8 日窗口要剔掉
+       全池 74%）。但「今天」的名称本身就是点上的信息 ⇒ frontier 额外按现行名称剔 ST/退。
+       与收盘链 hpdk_candidates.py 的 frontier 口径两侧一致；不改历史读数、不改冻结脚本。 */
+    var _nm0 = String((m && m.name) || '');
+    if (/ST/i.test(_nm0) || _nm0.indexOf('退') >= 0)
+      return {k: 'drop', gate: 'ST', why: 'ST: 现行名称含 ST/退（' + _nm0 + '）'};
     var A20 = num(m && m.amt20), C = num(m && m.close);
     var minamt = numOr(H.minamt, 0), minpx = numOr(H.minpx, 0);
     if (!(A20 > 0 && A20 >= minamt - CFG.EPS))
@@ -1622,13 +1641,6 @@ HPDK_JS = r"""
        而真 F#2 浙江自然因代理分排第 601 位掉出窗、连判定都没做（今开跳空 −1.07% 其实在带内）。
        META 覆盖**整个资格池**，这里用全池复算一遍，只把「命中数 + F 前 K 买入名单」写成表上
        方一条；**不动任何 DOM 行**（置顶/剔除/标灰行为与原来完全一致，零回归风险）。 */
-    var fpEl = document.getElementById('hpdk-fullpool');
-    if (!fpEl && tb && tb.parentNode) {
-      fpEl = document.createElement('div');
-      fpEl.id = 'hpdk-fullpool';
-      fpEl.className = 'hpdk-badge';
-      tb.parentNode.insertBefore(fpEl, tb);      /* 2026-09-29 修：本行与下一行曾被我的编辑误删 */
-    }
     /* 2026-09-29 严审修正（用户报「9:25 后买入名单一直在变，3 只 / 10 只两套口径」）：
        ① 分母不同：本条的存活子集 = **整个资格池 META**，而下方表格 = 只渲染的 RENDER_N=600 行
           ⇒ 两个「命中数」天然不同（实测：本条 10 只 vs 表头 3 只）。现在把两者的口径写成同一句。
@@ -1665,38 +1677,75 @@ HPDK_JS = r"""
           sur.sort(function(X, Y){ return (Y.F !== X.F) ? (Y.F - X.F) : (X.m.i - Y.m.i); });
           FP = {buy_date: String(H.buy_date || ''), pool: keys.length, hits: sur.length,
                 missing: miss, k: K,
+                /* R-hpdk-top-0929：把**判定当时的报价快照**一并冻结进名单 —— 冻结帧读回时价格列
+                   才是「首算那一刻」的值（否则会拿刷新后的实时价去配一份已冻结的名单，自相矛盾）。 */
                 top: sur.slice(0, K).map(function(x){
-                       return {code: x.code, name: x.m.name || ''}; }),
+                       var _d = q[x.code] || {};
+                       return {code: x.code, name: x.m.name || '', px: num(_d.px), pct: num(_d.pct),
+                               opn: num(_d.opn), pcl: num(_d.pcl), gap: x.gap}; }),
                 ts: ymd(new Date()) + ' ' + hms(new Date())};
           saveFP(FP);
           FPfrozen = true;   /* 首算即冻结生效：本次渲染就标注「已冻结」，不必等下一次刷新 */
         }
       }
     } catch (e) { FP = null; S.err = String(e && e.message || e); }
-    if (fpEl) {
+    /* R-hpdk-top-0929：把「今日买入清单」渲染到卡片**最上方**的专属容器 #hpdk-live-top。
+       用户 2026-09-29 反馈：① 同屏两个买入口径（权威条 vs 表格）到底看哪个；② 要图3那种
+       「只列买入清单」的看法且要置顶。⇒ 原内联「权威条」取消，全卡**只保留这一个买入口径**，
+       并把清单以表格形式放到卡片顶部。冻结语义（09:25 首算即冻结）原样保留。 */
+    var topEl = document.getElementById('hpdk-live-top');
+    var escH = function(s){
+      return String(s === null || s === undefined ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    };
+    if (topEl) {
       if (FP) {
-        var _topN = FP.top.length, _stn = 0;
-        fpEl.textContent = '\u26a1 全池口径（权威' + (FPfrozen ? ' · 09:25 后已冻结' : '') + '）· 买日 '
-          + (H.buy_date || '—') + '（信号日 ' + (H.as_of || '—') + '）：资格池 ' + FP.pool
-          + ' 只 → 命中 ' + FP.hits + ' 只' + (FP.missing ? ('（另 ' + FP.missing + ' 只缺报价未判定）') : '')
-          + '｜买入名单 = F 前 ' + FP.k + '（本次 ' + _topN + ' 只）：'
-          + FP.top.map(function(x){
-              var nm = (x.name || ''), isst = /ST/i.test(nm) || (nm.indexOf('退') >= 0);
-              if (isst) { _stn++; }
-              return (nm || bare(x.code)) + ' ' + bare(x.code) + (isst ? '\u26a0\ufe0fST' : '');
-            }).join('、')
-          + (_stn ? ('  ｜<b style="color:var(--down)">⚠ 其中 ' + _stn + ' 只为现行 ST/*ST</b>'
-                     + '（冻结判据 E-19 后只做点时 ST 代理、不过滤现行名称 → 请自行剔除）') : '')
-          + '｜下方表格只渲染 ' + S.rows + ' 行 → 其「窗内命中 ' + S.hit + ' 只」是另一分母（顺序为窗内重排名）'
-          + '，**以本条为准**';
-        fpEl.title = CFG.TIP + ' · 口径：gap = 今开/昨收−1 ∈ [' + fmtPct(numOr(H.gap_lo, -0.03))
-          + ', ' + fmtPct(numOr(H.gap_hi, -0.01)) + ']（float32 复刻冻结生产者）＋ 可交易 ＋ 准入件；'
-          + 'F 在**全池存活子集**内横截面 z 标准化，降序取前 ' + FP.k + ' 只。'
-          + (FPfrozen ? ('名单已于 ' + FP.ts + ' 首算并冻结，刷新不再变更（换日自动作废）。') : '');
-        fpEl.style.display = '';
+        var _k3 = FP.top.length, _i3, _h3 = '';
+        _h3 += '<div class="sub" style="border-left:3px solid var(--warn);padding-left:8px;margin:0 0 8px">'
+            +  '<b>今日买入清单（全池判定 · 本卡唯一买入口径）</b> · 买日 <b>' + (H.buy_date || '—') + '</b>'
+            +  '（信号日 ' + (H.as_of || '—') + '）· 资格池 <b>' + FP.pool + '</b> 只 → 命中 <b>' + FP.hits + '</b> 只'
+            +  (FP.missing ? ('（另 ' + FP.missing + ' 只缺报价未判定）') : '')
+            +  ' · 名单 = F 前 ' + FP.k + '（本次 ' + _k3 + ' 只）'
+            +  (FPfrozen ? (' · <b>09:25 后已冻结</b>（' + escH(FP.ts) + ' 首算，刷新不再变）') : '')
+            +  '｜现行 ST/退 按名称剔除</div>';
+        if (!_k3) {
+          _h3 += '<div class="sub" style="color:var(--faint)">本次判定范围内无命中'
+              +  (FP.missing ? ('（' + FP.missing + ' 只缺报价，未判定）') : '') + '。</div>';
+        } else {
+          _h3 += '<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-buylist" style="width:100%;font-size:12px">'
+              +  '<thead><tr><th style="text-align:center">#</th><th>标的</th><th>行业</th>'
+              +  '<th style="text-align:right">现价</th><th style="text-align:right">涨跌幅</th>'
+              +  '<th style="text-align:right">今开跳空</th><th style="text-align:right">买入价（今开）</th>'
+              +  '<th style="text-align:right">止盈价 +2%</th></tr></thead><tbody>';
+          for (_i3 = 0; _i3 < _k3; _i3++) {
+            var _x3 = FP.top[_i3], _c3 = bare(_x3.code), _d3 = q[_c3] || {}, _m3 = META[_c3] || {};
+            var _px = num(_x3.px);  if (!(_px > 0)) _px = num(_d3.px);
+            var _op = num(_x3.opn); if (!(_op > 0)) _op = num(_d3.opn);
+            var _pc = num(_d3.pct);
+            var _gp = (_x3.gap === null || _x3.gap === undefined) ? NaN : num(_x3.gap);
+            if (isNaN(_gp)) {
+              var _pl = num(_d3.pcl);
+              _gp = (num(_d3.px) > 0 && _pl > 0) ? (Math.fround(Math.fround(num(_d3.px)) / Math.fround(_pl)) - 1) : NaN;
+            }
+            var _tp = _op > 0 ? _op * (1 + numOr(H.tp, 0.02)) : NaN;
+            _h3 += '<tr>'
+                +  '<td style="text-align:center">' + (_i3 + 1) + '</td>'
+                +  '<td><b>' + escH(_x3.name || _c3) + '</b><br><span style="color:var(--sub);font-size:var(--fs-xs)">'
+                +  escH(_c3) + '</span></td>'
+                +  '<td style="color:var(--sub)">' + escH(_m3.ind || '—') + '</td>'
+                +  '<td style="text-align:right;font-variant-numeric:tabular-nums">' + (_px > 0 ? _px.toFixed(2) : '—') + '</td>'
+                +  '<td style="text-align:right;color:' + (isNaN(_pc) ? 'var(--sub)' : (_pc > 0 ? 'var(--up)' : (_pc < 0 ? 'var(--down)' : 'var(--sub)'))) + '">'
+                +  (isNaN(_pc) ? '—' : fmtPct(_pc / 100)) + '</td>'
+                +  '<td style="text-align:right;color:var(--down)">' + (isNaN(_gp) ? '—' : fmtPct(_gp)) + '</td>'
+                +  '<td style="text-align:right;font-variant-numeric:tabular-nums"><b>' + (_op > 0 ? _op.toFixed(3) : '—') + '</b></td>'
+                +  '<td style="text-align:right;color:var(--up);font-variant-numeric:tabular-nums">' + (isNaN(_tp) ? '—' : _tp.toFixed(4)) + '</td>'
+                +  '</tr>';
+          }
+          _h3 += '</tbody></table></div>';
+        }
+        topEl.innerHTML = _h3;
       } else {
-        fpEl.textContent = '';
-        fpEl.style.display = 'none';
+        topEl.innerHTML = '';
       }
     }
     /* ⑧ 非判定时段：一行都不剔除。**只有集合竞价 09:15–09:24 挂逐行灰标**（那时 gap 预判有信息量）；
@@ -1727,6 +1776,10 @@ HPDK_JS = r"""
      只包 window.INTRADAY.applyQuotes 在**真实刷新路径**上一次都拦不到；真实路径靠 intraday_live.py
      applyQuotes 调用点显式留的 window.HPDK_ON_QUOTES 钩子）： */
   window.HPDK_ON_QUOTES = function(q, ts, src, mktTs){ return run(q, ts, src, mktTs); };
+  /* R-hpdk-fullpool-0929：把**整个资格池**的代码暴露给盘中层 —— 让判定与「今日买入清单」
+     覆盖全池（2227 只），而不是只有 DOM 渲染的 600 行（线上实测：DOM 可判定仅 336 行 ⇒
+     买入名单一度只剩 3 只、且随刷新漂移）。盘中层无此钩子时行为与原来完全一致（只判 DOM 行）。 */
+  window.POOL_EXTRA_CODES = function(){ try { return Object.keys(META); } catch (e) { return []; } };
   var IN = window.INTRADAY;
   if (IN && typeof IN.applyQuotes === 'function') {
     var orig = IN.applyQuotes;

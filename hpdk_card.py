@@ -203,10 +203,13 @@ def hpdk_card(BASE):
     k_ops = cap.get("kslot") or 0
     h = _read(BASE / "backtest" / "hpdk_hits.json")        # 今日命中（收盘链全池复算 · R-hpdk-hits-0928）
     L.append(f'<h2>🎯 缩量超跌 {asof_badge(d.get("as_of"))}</h2>')
+    # R-hpdk-top-0929：卡片**最上方**的「今日买入清单」容器 —— 盘中由 HPDK_JS 用全池报价填充
+    # （用户 2026-09-29 要求：要图3那种看清单的方式，且要置顶；同屏只留一个买入口径）。
+    L.append('<div id="hpdk-live-top" class="sub" style="margin:8px 0 2px"></div>')
     L.append(
         '<div class="sub"><b>策略定义（与冻结预注册逐条一致；本页不复述自定义口径）</b>：T 收盘判定 → '
         f'资格 = 上市有效交易日 ≥{par.get("LISTED", 250)} ＋ 收盘 ≥{par.get("MINPX", 3.0):.2f} 元 ＋ '
-        f'20 日均额 ≥{(par.get("MINAMT", 2e7) or 0) / 1e4:.0f} 万 ＋ 非 ST/*ST（<b>仅期内代理 STP</b>；现名过滤 = 关闭 · 勘误 E-19）＋ '
+        f'20 日均额 ≥{(par.get("MINAMT", 2e7) or 0) / 1e4:.0f} 万 ＋ 非 ST/*ST（<b>双轨</b>：历史日 = 点时代理 STP〔E-19〕；<b>live frontier = 现行名称</b>〔E-20 · 你批准的 A 案〕）＋ '
         '每股净资产 ≥3 元（报告期 +4 个月后方可用）'
         '＋ **只买主板**（sh600/601/603/605 ＋ sz000/001/002/003；剔创业板 300/301/302、科创板 688）'
         '｜ <b>次日开盘跳空 gap = 今开/昨收 − 1 ∈ [−3%, −1%]</b>（低开至少 1%、不超过 3%）'
@@ -242,7 +245,9 @@ def hpdk_card(BASE):
         '<br><span style="color:var(--warn)">⚠ <b>这不是买入名单</b>：真正的前 '
         f'{par.get("K", 10)} 名要在「次日开盘低开 −3%~−1% 的子集」内重算复合分，而该子集 09:25 才知道；'
         '代理分是在<b>全体资格池</b>内标准化的，与正式排名不同。搜索 / 排序 / 板块筛选由板内通用脚本接管；'
-        '09:25 后本表按真实今开自动剔除并置顶命中者。</span></div>')
+        '09:25 后本表按真实今开自动剔除并置顶命中者。'
+        '<b>全卡只有一个买入口径</b>：卡片最上方的「今日买入清单」（全池判定 · 09:25 首算即冻结）——'
+        '本表是它的<b>盘前准备视图</b>。</span></div>')
     if h and h.get("signal_date") and h.get("n_hits") is not None:
         _top_k = h.get("k") or 0
         L.append(
@@ -290,8 +295,10 @@ def hpdk_card(BASE):
         _ded_codes = h.get("top_dedup_ind") or []
         _added = [c for c in _ded_codes if c not in {x["code"] for x in _topk_r}]
         L.append(
-            f'<div class="sub" style="margin-top:10px"><b>全池命中清单（{len(h.get("rows") or [])} 只 · '
-            f'按 F 降序）</b> · 前 {_top_k} 只即当日买入候选'
+            f'<div class="sub" style="margin-top:10px"><b>买日 {h.get("date")} 的全池命中清单（{len(h.get("rows") or [])} 只 · '
+            f'按 F 降序）</b> · 该买日前 {_top_k} 只即<b>当时</b>的买入候选'
+            f'<br><span style="color:var(--warn)">⚠ 这是<b>买日 {h.get("date")}（信号日 {h.get("signal_date")}）的存档</b>，'
+            f'<b>不是今天的买入名单</b> —— 今天的清单只看卡片最上方「今日买入清单」。</span>'
             f'<br><b>行业集中度</b>（命中全池）：'
             + " ｜ ".join(f'{k} <b>{v}</b> 只' for k, v in list(_ic.items())[:6])
             + f'<br><span style="color:var(--warn)">⚠ 冻结判据里<b>没有行业约束</b>：F 前 {_top_k} 只中有 '

@@ -229,6 +229,11 @@ def main():
     rows = []
     for s in pool:
         j = jof[s]
+        # R-hpdk-stlive-0929（勘误 E-20 · A 案）：frontier 的准备清单同样按**现行名称**剔 ST/退
+        # （与「今日命中」、前端 judge 三处同口径；历史读数与冻结脚本不受影响）。
+        _nm_c = names.get(s, "") or ""
+        if ("ST" in _nm_c.upper()) or ("退" in _nm_c):
+            continue
         row = dict(sym=s, code=s[2:], name=names.get(s, ""), ind=ind.get(s, ""),
                    board=board_of(s), close=round(float(F["C"][i, j]), 3),
                    amt20=round(float(ft["AMT20"][i, j]), 1) if np.isfinite(ft["AMT20"][i, j]) else None,
@@ -292,6 +297,13 @@ def main():
         cand = []
         for s in pool_s:
             j = jof[s]
+            # R-hpdk-stlive-0929（勘误 E-20 · 用户批准 A 案）：**买日 = frontier ⇒ 用真名单剔 ST/退**。
+            # 历史日没有点时名称数据（E-19 只能用代理 STP），但「今天」的名称本身就是点上的信息。
+            # 只作用于 frontier 产物（今日命中 / 明日准备清单），不改历史读数、不改冻结脚本 oos_run.py，
+            # 也不参与 A11 对拍（对拍走 by_day_w + 冻结重放，与本筛子无关）。前端 judge 已同口径（两侧一致）。
+            _nm_h = names.get(s, "") or ""
+            if ("ST" in _nm_h.upper()) or ("退" in _nm_h):
+                continue
             gg = gS[j]
             oD, cD, cS = F2["O"][iS + 1, j], F2["C"][iS + 1, j], F2["C"][iS, j]
             a20, vbr, r20 = ft["AMT20"][iS, j], ft["VOLBR"][iS, j], ft["RET20"][iS, j]
