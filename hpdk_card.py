@@ -230,6 +230,48 @@ def hpdk_card(BASE):
                 '<th style="text-align:center">买日</th><th style="text-align:center">信号日</th>'
                 '<th style="text-align:right">资格池</th><th style="text-align:right">命中</th>'
                 f'<th>F 前 6</th></tr></thead><tbody>{_rs}</tbody></table></div>')
+    # ── 买日批次跟踪（R-hpdk-cohort-0929）：以**买日**为主键的逐笔跟踪（含了结结果）──────
+    # 为什么不放影子跟踪池：影子池只装预注册窗口内批次；而用户实际买入那批（信号日 09-24
+    # → 买日 09-28）在窗口外 ⇒ 09-29 到了 T+2 了结日却无处可看。本表覆盖**全部命中历史买日**，
+    # 与冻结出场规则逐条一致（open≥止盈按open / high≥止盈按止盈 / 否则尾盘），给出买入价·止盈线·
+    # 了结日·卖出价·净收益 ⇒ 「在哪里跟踪」与「卖价怎么定」都有答案。
+    _co = _read(BASE / "backtest" / "hpdk_cohorts.json")
+    if _co and (_co.get("batches") or []):
+        _cr = []
+        for _b in _co["batches"]:
+            _ex = _b.get("exit_date") or "未到"
+            for _x in (_b.get("rows") or []):
+                _stt = _x.get("status") or "—"
+                _ret = _x.get("ret_pct")
+                _col = "" if _ret is None else ("var(--up)" if _ret > 0 else "var(--down)")
+                _cr.append(
+                    '<tr><td>%s</td><td>%s</td><td><b>%s</b><br>'
+                    '<span style="color:var(--faint);font-size:11px">%s</span></td>'
+                    '<td style="color:var(--sub)">%s</td>'
+                    '<td style="text-align:right">%s</td>'
+                    '<td style="text-align:right;color:var(--warn)">%s</td>'
+                    '<td>%s</td><td style="text-align:right">%s</td>'
+                    '<td style="text-align:right;color:%s">%s</td></tr>'
+                    % (_b.get("buy_date"), _ex, _x.get("name") or "", _x.get("code") or "",
+                       _x.get("ind") or "—",
+                       ("%.3f" % _x["entry"]) if _x.get("entry") else "—",
+                       ("%.4f" % _x["tp"]) if _x.get("tp") else "—",
+                       _stt,
+                       ("%.3f" % _x["exit"]) if _x.get("exit") else "—",
+                       _col, ("%+.2f%%" % _ret) if _ret is not None else "—"))
+        L.append(
+            f'<div class="sub" style="margin-top:12px"><b>📌 买日批次跟踪（模型买入名单 · 逐笔到了结）</b>'
+            f'<span style="color:var(--faint)"> —— 以**买日**为主键，覆盖全部命中历史买日'
+            f'（含影子账本窗口外那批）；卖出规则 = 止盈 买入价×{(1 + (_co.get("tp") or 0.02)):.2f}，'
+            f'了结日 = 买日之后第一个交易日；open≥止盈按 open / high≥止盈按止盈价 / 否则尾盘；'
+            f'净收益含往返成本 {_co.get("cost_roundtrip_bp", 6.92)}bp。'
+            f'批次 {_co.get("n_batches")} · 已了结 {_co.get("n_settled")} / 持有中 {_co.get("n_holding")}</span></div>'
+            '<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-cohort" style="width:100%;font-size:12px">'
+            '<thead><tr><th>买日</th><th>了结日</th><th>标的</th><th>行业</th>'
+            '<th style="text-align:right">买入价</th><th style="text-align:right">止盈价(+2%)</th>'
+            '<th>状态</th><th style="text-align:right">卖出价</th>'
+            '<th style="text-align:right">净收益</th></tr></thead>'
+            f'<tbody>{"".join(_cr)}</tbody></table></div>')
     L.append('<div class="sub" style="margin-top:6px;color:var(--warn)"><b>板块限定（2026-09-27 用户决定：只买主板）</b> —— 同一面板、同一记账规则下的同尺子对比：全窗 年化 <b>+72.59% → +47.77%</b>（−24.82pp）、夏普 <b>2.79 → 2.12</b>、最大回撤 <b>−32.29% → −29.13%</b>（<b>改善 3.16pp</b>）、净胜率 63.14% → 60.63%、单笔净均 +0.5574% → +0.4028%；2018+ 年化 +105.38% → +64.24%。选股集合仅 <b>55.5% 重合</b>（横截面 z 在候选池内标准化 ⇒ 缩池后标准分整体改变）。<b>代价明确：用年化换回撤，风险调整后更差。</b>完整逐项读数见 <code>backtest/报告-只买主板-回测对比-20260927.md</code> 与 <code>backtest/hengpan_fangliang_dikai_0925/evidence_board.json</code>（另有：全池 KSLOT=4 口径 +249.67%、主板 KSLOT=4 +189.75%，操作档见上）。</div>')
     L.append('<div class="sub" style="margin-top:6px;color:var(--warn)">'
              '<b>准入门槛扫描（2026-09-27）</b> —— 用户问「量比要多于多少 / 盈亏比要大于多少会不会改善」：'
@@ -570,9 +612,10 @@ def hpdk_track_card(BASE):
         '<span class="count" id="hpdk-real-count"></span></div>'
         '<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-real" style="width:100%;font-size:12px">'
         '<thead><tr><th>买日</th><th>标的</th><th style="text-align:right">买入价</th>'
-        '<th style="text-align:right">股数</th><th style="text-align:right">成本</th>'
+         '<th style="text-align:right">股数</th><th style="text-align:right">成本</th>'
+         '<th style="text-align:right">止盈价(+2%)</th>'
         '<th>了结日（买日+1 交易日）</th><th>状态</th><th style="text-align:center">操作</th></tr></thead>'
-        '<tbody><tr><td colspan="8" style="text-align:center;color:var(--faint)">'
+         '<tbody><tr><td colspan="9" style="text-align:center;color:var(--faint)">'
         '尚无登记 —— 用上方表单逐笔添加（默认买入日 = 最近交易日）</td></tr></tbody></table></div>')
     L.append(
         '<script>(function(){'
@@ -593,9 +636,10 @@ def hpdk_track_card(BASE):
         '+"<td style=text-align:right>"+(Number(r.px)||0).toFixed(3)+"</td>"'
         '+"<td style=text-align:right>"+(Number(r.qty)||0)+"</td>"'
         '+"<td style=text-align:right>"+cost.toFixed(0)+"</td>"'
+        '+"<td style=text-align:right;color:var(--warn)>"+((Number(r.px)||0)*1.02).toFixed(3)+"</td>"'
         '+"<td>"+(exitOf(r.date)||"—")+"</td><td>"+stateOf(r.date)+"</td>"'
-        '+"<td style=text-align:center><button type=button data-del=\\""+i+"\\">删</button></td></tr>";}'
-        'if(!a.length)rows="<tr><td colspan=8 style=text-align:center;color:var(--faint)>尚无登记</td></tr>";'
+        "+\"<td style=text-align:center><button type=button data-del='\"+i+\"'>删</button></td></tr>\";}"
+        'if(!a.length)rows="<tr><td colspan=9 style=text-align:center;color:var(--faint)>尚无登记</td></tr>";'
         'tb.innerHTML=rows;'
         'var c=document.getElementById("hpdk-real-count");'
         'if(c)c.textContent="共 "+a.length+" 笔 · 合计成本 "+tot.toFixed(0)+" 元";}'

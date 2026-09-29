@@ -199,6 +199,13 @@ STEPS = [
      ["backtest/hengpan_fangliang_dikai_0925/hpdk_candidates.py"], "--skip-hpdk" in sys.argv),
     # 模拟盘账户 + 跟踪池（从冻结 OOS 台账派生；与台账对拍不一致会 exit 3）——同样必须在 build 之前。
     ("缩量超跌-模拟盘/跟踪池 hpdk_paper[软]",
+    # 买日批次跟踪（2026-09-29，R-hpdk-cohort-0929）：以**买日**为主键的逐笔跟踪
+    # （买入价=买日开盘 / 止盈=×1.02 / 了结日=买日之后第一个交易日 / 按冻结出场规则给了结结果）。
+    # 必须在 hpdk_candidates 之后（读它写的命中历史档），并在 build_dual_system 之前（卡片要读）。
+    # 覆盖**全部命中历史买日** ⇒ 影子账本窗口外那批（信号日 09-24 → 买日 09-28）也能跟踪。
+    # [软]=失败不阻断主链；--skip-cohort 跳过。
+    ("缩量超跌-买日批次跟踪 hpdk_cohorts[软]",
+     ["backtest/hengpan_fangliang_dikai_0925/hpdk_cohorts.py"], "--skip-cohort" in sys.argv),
      ["backtest/hengpan_fangliang_dikai_0925/hpdk_paper.py"], "--skip-hpdkpaper" in sys.argv),
 
     # ETF 动量轮动族（2026-09-28，R-etf-chain-0928 · 用户批准全接入）：此前**整族从未进链**
@@ -433,6 +440,10 @@ if not fails and not NO_MAIN_PUSH:   # ⑤ 云端 Phase 1：只写 gh-pages，�
                           "backtest/hpdk_paper.json",
                           # 2026-09-28 补（R-hpdk-hits-0928）：今日命中（全池复算）产物
                           "backtest/hpdk_hits.json",
+                          # 2026-09-29 补（R-hpdk-cohort-0929）：买日批次跟踪器 + 命中历史 + 产物
+                          "backtest/hengpan_fangliang_dikai_0925/hpdk_cohorts.py",
+                          "backtest/hpdk_hits_history.jsonl",
+                          "backtest/hpdk_cohorts.json",
                           "gen_trade_cal.py", "trade_cal_sina.csv",
                           "backtest/hengpan_fangliang_dikai_0925/gen_gates_report.py",
                           # 2026-09-28 补：E-19 口径修正 + forum8 全版块回测线（此前从未进链白名单 → 改动不会被链提交）
