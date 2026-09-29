@@ -154,17 +154,29 @@ INTRADAY_JS = r"""
         });
         return step();
       }, function(){ /* 本片失败：腾讯兜底 */
-        srcTx++;
-        var u2 = 'https://qt.gtimg.cn/q=' + chunk.map(txCode).join(',');
-        return getGBK(u2, 12000).then(function(txt){
-          txt.trim().split('\n').forEach(function(l){
-            var f = l.split('~'); if (f.length < 33) return;
-            var px = num(f[3]), pct = num(f[32]);
-            if (f[2] && !isNaN(px)) out[f[2]] = {px: px, pct: isNaN(pct) ? 0 : pct, name: f[1] || '',
-                                                 pcl: num(f[4]), opn: num(f[5])};
-          });
-          return step();
-        }, function(){ return step(); });
+        /* R-hpdk-txchunk-0929：**腾讯兜底必须自己再分片**。原实现直接复用东财的 800 码 chunk
+           拼 qt.gtimg 的 URL —— 浏览器对该长度会 **快速失败**（CFG.TX_CHUNK 注释有实测记录：
+           400 码 OK / 800 码 TypeError: Failed to fetch）⇒ 兜底形同虚设：EM 失败 + TX 空返回
+           = 整批 0 报价（实测 2215 只全池取报价 79.6s、只覆盖 64%）。 */
+        var txParts = [];
+        for (var ti = 0; ti < chunk.length; ti += CFG.TX_CHUNK) txParts.push(chunk.slice(ti, ti + CFG.TX_CHUNK));
+        var tpi = 0;
+        function txStep(){
+          if (tpi >= txParts.length) return step();
+          var part = txParts[tpi++];
+          S.txBatches++;
+          var u2 = 'https://qt.gtimg.cn/q=' + part.map(txCode).join(',');
+          return getGBK(u2, 12000).then(function(txt){
+            txt.trim().split('\n').forEach(function(l){
+              var f = l.split('~'); if (f.length < 33) return;
+              var px = num(f[3]), pct = num(f[32]);
+              if (f[2] && !isNaN(px)) out[f[2]] = {px: px, pct: isNaN(pct) ? 0 : pct, name: f[1] || '',
+                                                   pcl: num(f[4]), opn: num(f[5])};
+            });
+            return txStep();
+          }, function(){ S.txFail++; return txStep(); });
+        }
+        return txStep();
       });
     }
     return step();
@@ -347,7 +359,7 @@ INTRADAY_JS = r"""
     if (f.length < 46) return;
     var c = f[2], p = num(f[32]), a = num(f[37]), fl = num(f[44]), m = num(f[45]);
     if (!c || c.length !== 6) return;
-    rows.push({c: c, n: f[1] || '', p: isNaN(p) ? 0 : p,
+    rows.push({c: c, n: f[1] || '', px: num(f[3]), p: isNaN(p) ? 0 : p,
                a: isNaN(a) ? 0 : a / 1e4, m: isNaN(m) ? 0 : m, f: isNaN(fl) ? 0 : fl,
                pcl: num(f[4]), opn: num(f[5])});
   }
@@ -410,6 +422,22 @@ INTRADAY_JS = r"""
   function marketDone(rows){
     if (!rows.length) return 0;
     var ts = hhmmss(new Date());
+    /* R-hpdk-marketq-0929：把**全市场快照**发布成报价表，供缩量超跌卡做「全池判定」。
+       为什么这么做：池子报价接口按 chunk 拉 2215 只实测要 **79.6s 且只覆盖 64%**
+       （东财失败 → 腾讯兜底，而浏览器对 800 码 URL 会快速失败，见 CFG.TX_CHUNK 注释）；
+       而全市场快照本来就在拉（腾讯 400 码/片 · 覆盖 5200 只 · 每 3 分钟一次，字段含 [3]现价
+       [4]昨收 [5]今开 [32]涨跌幅）⇒ 复用它是**零额外请求 + 全覆盖**。
+       仅发布给卡内判定使用，不改任何 DOM、不落盘。 */
+    var mq = {}, mc = 0, mi;
+    for (mi = 0; mi < rows.length; mi++) {
+      var r0 = rows[mi];
+      if (!r0 || !r0.c) continue;
+      if (!(num(r0.px) > 0)) continue;
+      mq[r0.c] = {px: num(r0.px), pct: num(r0.p), pcl: num(r0.pcl), opn: num(r0.opn),
+                  name: r0.n || ''};
+      mc++;
+    }
+    S.marketQ = mq; S.marketN = mc; S.marketTs = hhmmss(new Date());
     var hit = 0;
     if (typeof window.HM_APPLY === 'function') hit = window.HM_APPLY(rows, ts) || 0;
     var note = document.getElementById('hm-live');
@@ -440,6 +468,18 @@ INTRADAY_JS = r"""
 
   /* ---------- 刷新与调度 ---------- */
   function refresh(force){
+      /* R-hpdk-poolfallback-0929：全市场快照（S.marketQ）拿不到时（页面无 HEATMAP / 快照失败），
+         把整个资格池并进池子报价请求 —— 有兜底路径（腾讯 400 码分片）。快照可用时**不再并池**，
+         避免每轮多打 6 个请求。 */
+      var _needExtra = !(S.marketQ && S.marketN >= 1000);
+      if (_needExtra && typeof window.POOL_EXTRA_CODES === 'function') {
+        try {
+          var _ex = window.POOL_EXTRA_CODES() || [];
+          for (var _ie = 0; _ie < _ex.length; _ie++) {
+            if (_ex[_ie] && !seen[_ex[_ie]]) { seen[_ex[_ie]] = 1; codes.push(_ex[_ie]); }
+          }
+        } catch (e) {}
+      }
     if (chainQuiet()) { S.quiet = true; pill(); return Promise.resolve(false); }  /* R-treelive-0922 */
     S.quiet = false;
     if (S.busy) return Promise.resolve(false);
@@ -451,24 +491,25 @@ INTRADAY_JS = r"""
       var tgs = targets();
       var codes = [], seen = {};
       for (var i = 0; i < tgs.length; i++) { if (!seen[tgs[i].code]) { seen[tgs[i].code] = 1; codes.push(tgs[i].code); } }
-      /* R-hpdk-fullpool-0929：并入「**整个资格池**」的代码（由 HPDK 块经 window.POOL_EXTRA_CODES 暴露），
-         让判定覆盖全池（2227 只）而不只是 DOM 渲染的 600 行。线上实测旧行为：DOM 可判定仅 336 行 ⇒
-         「今日命中」只有 3~30 只、且随刷新漂移，用户看到「两个买入口径」。无此钩子时零变化。 */
-      if (typeof window.POOL_EXTRA_CODES === 'function') {
-        try {
-          var _ex = window.POOL_EXTRA_CODES() || [];
-          for (var _ie = 0; _ie < _ex.length; _ie++) {
-            if (_ex[_ie] && !seen[_ex[_ie]]) { seen[_ex[_ie]] = 1; codes.push(_ex[_ie]); }
-          }
-        } catch (e) {}
-      }
+      /* R-hpdk-marketq-0929：**不再把整个资格池塞进池子报价接口** —— 实测 2215 只要 79.6s 且只覆盖 64%
+         （东财失败 → 腾讯兜底，浏览器对 800 码 URL 快速失败）。全池判定改用 R-hpdk-marketq-0929
+         发布的全市场快照（S.marketQ，零额外请求、全覆盖）。池子接口只服务 DOM 行的实时刷新。 */
       var p = codes.length ? fetchPool(codes).then(function(q){
         var r = applyQuotes(q, hhmmss(new Date()));
+        /* R-hpdk-marketq-0929：全池判定用「全市场快照 ∪ 池内报价」（池内更鲜 → 后者覆盖前者）。 */
+        var qAll = q;
+        if (S.marketQ) {
+          qAll = {}; var _k;
+          for (_k in S.marketQ) { if (Object.prototype.hasOwnProperty.call(S.marketQ, _k)) qAll[_k] = S.marketQ[_k]; }
+          for (_k in q) { if (Object.prototype.hasOwnProperty.call(q, _k)) qAll[_k] = q[_k]; }
+        }
+        var _hookTs = (r && r.ts) || hhmmss(new Date());
+        var _hookSrc = (S.marketQ ? ('全市场快照 ' + (S.marketN || 0) + ' 只' + (S.poolSrc ? (' · ' + S.poolSrc) : '')) : S.poolSrc);
         /* R-qlch-live-0923：报价落地的外部钩子。**必须显式留**：本 IIFE 内部调的是局部函数 applyQuotes，
            外部改写 window.INTRADAY.applyQuotes 拦不到这里（线上实测：包装版在真实刷新路径上一次都没跑）。
            无钩子时零开销，行为与原来完全一致；树图腿不经过这里。 */
         if (typeof window.QLCH_ON_QUOTES === 'function') {
-          try { window.QLCH_ON_QUOTES(q, (r && r.ts) || hhmmss(new Date()), S.poolSrc, S.mktTs); } catch(e) {}
+          try { window.QLCH_ON_QUOTES(qAll, _hookTs, _hookSrc, S.mktTs); } catch(e) {}
         }
         /* R-a5-auction-0924：打板族（A5）竞价/开盘判定的**第二个**钩子。同理必须显式留在这里 ——
            IIFE 内部调的是局部 applyQuotes，外部包装拦不到；无钩子时零开销，行为与原来完全一致。 */
@@ -480,15 +521,17 @@ INTRADAY_JS = r"""
            本钩子做三件事：09:25 后按真实今开算 gap，把 A/B/C 不满足的标的**从清单移除**，
            并对存活子集按冻结复合分定榜前置顶。零落盘（不写 json / 不碰账本 / 不发请求）。 */
         if (typeof window.HPDK_ON_QUOTES === 'function') {
-          try { window.HPDK_ON_QUOTES(q, (r && r.ts) || hhmmss(new Date()), S.poolSrc, S.mktTs); } catch(e) {}
+          try { window.HPDK_ON_QUOTES(qAll, _hookTs, _hookSrc, S.mktTs); } catch(e) {}
         }
         S.lastPool = Date.now();
         return r;
       }) : Promise.resolve(null);
       /* R-treelive-0922：周期性树图刷新**仅开市时段**（S.live）—— 非交易时段只在页内补刷(force)拉一次快照，
          否则收盘后每 15 分钟仍会打 56 次 clist，与日链抢配额 */
-      var needTree = !!document.getElementById('hm-chart') &&
-                     (force || (S.live && kxmmActive() && (Date.now() - S.lastTree > CFG.TREE_MS)));
+      /* R-hpdk-marketq-0929：全池判定要「全市场快照」⇒ 只要缩量超跌卡在页面上，就按 TREE_MS
+         周期拉一次（原条件只认热力图 #hm-chart，若用户没开热力图则该快照永不刷新）。 */
+      var needTree = (!!document.getElementById('hm-chart') || !!document.getElementById('hpdk-live-top')) &&
+                     (force || (S.live && (Date.now() - S.lastTree > CFG.TREE_MS)));
       var t = needTree ? fetchMarket() : Promise.resolve(null);
       return Promise.all([p, t]);
     }).then(function(rs){
