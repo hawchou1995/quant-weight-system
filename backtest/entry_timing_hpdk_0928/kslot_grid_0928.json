@@ -1,5 +1,5 @@
 {
- "frozen_sha256": "0b61a4bbce100ed63be86e72e0692bfc719d6c13e266410d593926b3855518b3",
+ "frozen_sha256": "7d14d27e9e28df9e50ecfb6aeaa00c021dc60a3aeedac4f5b33724670e444e92",
  "arm": "A0_开盘价(基线)",
  "K": 10,
  "cost_side": 0.000346,
@@ -849,5 +849,9 @@
    ],
    "order": "entry_first"
   }
- }
+ },
+ "_generated_by": "scratch/kslot_grid.py（补充件）",
+ "_authoritative_source": "backtest/entry_timing_hpdk_0928/entry_timing_hpdk_0928_summary.json（同尺子锚点 all_pass=True）",
+ "_deviation_note": "本件为补充网格：其入场/了结记账与权威研究存在微小偏差（实测 KSLOT=4 ann 106.64 vs 106.16、KSLOT=20 ann 62.75 vs 62.70、n_entries 相差 2~10 笔）—— 引用**结论**时以权威研究为准，本件仅用于观察 KSLOT 扫描的形状（甜点区间）。",
+ "_errata": "E-22（2026-09-29）：ST 筛子 A+C 变更后重生成，SHA 由 0b61a4bbce100ed6(v1.6) → 7d14d27e(v1.7)。"
 }
