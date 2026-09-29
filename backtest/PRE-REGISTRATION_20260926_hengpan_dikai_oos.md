@@ -915,6 +915,12 @@ m = m & ((~STNOW) | _DEAD)        # STNOW_LIVE_ONLY=True（新默认）
 · `hpdk_bt_ref.json` · `hpdk_candidates.json` · `hpdk_hits.json` · `hpdk_hits_history.jsonl` ·
 `hpdk_oos_view.json` · `hpdk_paper.json` · `hpdk_cohorts.json` · 看板重建 + gh-pages 部署 + 线上真机复验。
 
-**诚实披露**：仍**未重跑**的审计件 = `evidence_gates_scan.json`（四闸扫描）· `evidence_t0_audit.json`（T+0 审计）
-· `evidence_launch12_20260928.json`（上线 12 项检查）。它们引用的是旧 SHA 下的读数 ⇒ **引用前须先重跑**
-（`x5_gates.py` / `x6_t0_audit.py` / `audit_launch12_20260928.py`）。本卡不引用它们，故线上不受影响。
+ **审计件重跑（2026-09-29 补做，用户批准）**：`evidence_gates_scan.json`（`x5_gates.py`）·
+ `evidence_t0_audit.json`（`x6_t0_audit.py`）· `evidence_launch12_20260928.json`
+ （`audit_launch12_20260928.py`）**均已按新 SHA `7d14d27e…` 重跑**，关键自检全部通过：
+ - 四闸扫描：基线等价性断言 ✅一致（新基线 46.40/−26.80/2.13/24502 逐位吻合；旧值留档）。
+ - T+0 审计：A 段双序对拍 24 502 笔；C 段两套独立记账等价性 max|Δ| = **0.0046pp**（限 0.01）通过；
+   D 段「幽灵拒单」偏差量化仍成立（128 笔 / Δann −0.23pp）。
+ - 上线 12 项：同尺子锚点「扩展记账 vs `sim_portfolio` = **一致**」「vs `evidence_sensitivity.base` = **一致**」。
+ - `x5_gates.py` 与 `audit_launch12_20260928.py` 里硬编码的期望值/SHA 已同步 v1.7，**旧值以注释留档**。
+ ⇒ E-22 的产物影响面**已 100% 补齐**，仓库内不再有引用旧 SHA 的活跃证据件。
