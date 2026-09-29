@@ -603,3 +603,5 @@ backtest/entry_timing_hpdk_0928/entry_timing_hpdk_0928_equity.csv
 !backtest/etf_rotation_out/
 backtest/etf_rotation_out/*
 !backtest/etf_rotation_out/etf_momentum_volscale_0906.csv
+# 回测变体缓存目录（x2_sens/x5_gates 运行产生；444MB，不入库）
+.x3cache/
