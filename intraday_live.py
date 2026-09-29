@@ -1327,7 +1327,11 @@ HPDK_JS = r"""
       '.hpdk-badge{background:var(--card2);color:var(--down);border:1px solid var(--down);border-radius:var(--r-sm);',
       'padding:1px 6px;font-size:var(--fs-xs);font-weight:500;white-space:nowrap}',
       '.hpdk-live-src{margin-left:6px;font-size:var(--fs-xs);color:var(--faint);font-weight:400}',
-      'td.hpdk-live-cell{color:var(--down);font-variant-numeric:tabular-nums}'
+      'td.hpdk-live-cell{color:var(--down);font-variant-numeric:tabular-nums}',
+      /* R-hpdk-cancel-0929（用户批准 D）：竞价阶段「建议撤单」= 唯一需要动手的事 */
+      'tr.hpdk-cancel{box-shadow:inset 3px 0 0 var(--warn);background:rgba(180,83,9,.07)}',
+      '.hpdk-tag.cancel{background:var(--warn);color:#fff;margin-left:0;margin-right:6px;font-weight:600}',
+      '.hpdk-tag.watch{background:transparent;border:1px dashed var(--warn);color:var(--warn)}'
     ].join('');
     document.head.appendChild(st);
   }
@@ -1433,7 +1437,7 @@ HPDK_JS = r"""
     for (i = 0; i < ts.length; i++) if (ts[i].parentNode) ts[i].parentNode.removeChild(ts[i]);
   }
   function resetRow(tr){
-    tr.classList.remove('hpdk-buy'); tr.classList.remove('hpdk-keep');
+    tr.classList.remove('hpdk-buy'); tr.classList.remove('hpdk-keep'); tr.classList.remove('hpdk-cancel');
     if (tr.removeAttribute) tr.removeAttribute('data-hpdk');
     stripTags(tr);
     if (!COLS) return;
@@ -1816,8 +1820,9 @@ HPDK_JS = r"""
               +  '<th data-key="amt" style="text-align:right">成交额20</th>'
               +  '<th data-key="vr" style="text-align:right">量比</th>'
               +  '<th data-key="r20" style="text-align:right">20日涨幅</th>'
-              +  '<th data-key="buy" style="text-align:right">买入价</th>'
-              +  '<th data-key="tp" style="text-align:right">止盈价 +2%</th>'
+               +  '<th data-key="buy" style="text-align:right">挂单价 <span class="live-tag">昨收×0.99</span></th>'
+               +  '<th style="text-align:right">成交价 <span class="live-tag">今开</span></th>'
+               +  '<th data-key="tp" style="text-align:right">止盈价 +2%</th>'
               +  '<th style="text-align:center">卖出时点</th>'
               +  '<th data-key="qty" style="text-align:right">建议股数</th>'
               +  '<th data-key="cap" style="text-align:center">单票可买（上限）</th>'
@@ -1826,7 +1831,12 @@ HPDK_JS = r"""
             var _x3 = FP.top[_i3], _c3 = bare(_x3.code), _d3 = q[_c3] || {}, _m3 = META[_c3] || {};
             var _px = num(_d3.px);  if (!(_px > 0)) _px = num(_x3.px);
             var _pc = num(_d3.pct);
-            var _op = num(_d3.opn); if (!(_op > 0)) _op = num(_x3.opn);
+             var _op = num(_d3.opn); if (!(_op > 0)) _op = num(_x3.opn);
+             /* 挂单价 = 昨收 × 0.99（冻结参数 P1=0.01 ⇒ 上沿）。优先用冻结快照里的昨收，
+                否则退回实时报价的昨收。这就是「推荐买入价」—— 前一晚可挂、且自动把关上沿。
+                变量名必须用 _ordpx：_lim 已被后面「限仓布尔」占用（曾撞名 ⇒ 显示 0.000）。 */
+             var _pcl0 = num(_x3.pcl); if (!(_pcl0 > 0)) _pcl0 = num(_d3.pcl);
+             var _ordpx = _pcl0 > 0 ? (_pcl0 * (1 + numOr(H.gap_hi, -0.01))) : NaN;
             var _amt = num(_m3.amt20), _vr = num(_m3.volbr), _r20 = num(_m3.ret20);
             var _tp = _op > 0 ? _op * (1 + numOr(H.tp, 0.02)) : NaN;
             var _capv = _amt > 0 ? _amt * _ADV : NaN;
@@ -1854,9 +1864,16 @@ HPDK_JS = r"""
                 +  (isNaN(_vr) ? '—' : Number(_vr).toFixed(2)) + '</td>'
                 +  '<td data-key="r20" data-v="' + (isNaN(_r20) ? '' : _r20) + '" style="text-align:right;color:'
                 +  (isNaN(_r20) ? 'var(--faint)' : (_r20 > 0 ? 'var(--up)' : 'var(--down)')) + '">' + _r20Txt + '</td>'
-                +  '<td data-key="buy" style="text-align:right;font-variant-numeric:tabular-nums">'
-                +  '<span class="badge badge-auto">● 今开成交</span>'
-                +  '<div style="margin-top:3px"><b>' + (_op > 0 ? Number(_op).toFixed(3) : '—') + '</b></div></td>'
+                 /* R-hpdk-ordpx-0929（用户 2026-09-29 明确要求）：**推荐买入价 = 昨收×0.99** ——
+                    那才是你前一晚能挂进券商的下单价（也是上沿自动把关的那条限价）。
+                    「成交价」另列 = 今开（09:25 撮合价），它才是止盈的基准（冻结规则：止盈 = 实际成交价×1.02）。
+                    两列并列的原因：挂单价 = 你控制的；成交价 = 市场给的（≤ 挂单价）。 */
+                 +  '<td data-key="buy" data-v="' + (isNaN(_ordpx) ? '' : _ordpx) + '" style="text-align:right;font-variant-numeric:tabular-nums">'
+                 +  (isNaN(_ordpx) ? '—' : Number(_ordpx).toFixed(3))
+                 +  '<div style="margin-top:3px;font-size:var(--fs-xs);color:var(--faint)">限价（上沿）</div></td>'
+                 +  '<td style="text-align:right;font-variant-numeric:tabular-nums">'
+                 +  '<span class="badge badge-auto">● 今开成交</span>'
+                 +  '<div style="margin-top:3px"><b>' + (_op > 0 ? Number(_op).toFixed(3) : '—') + '</b></div></td>'
                 +  '<td data-key="tp" style="text-align:right;color:var(--up);font-variant-numeric:tabular-nums">'
                 +  (isNaN(_tp) ? '—' : Number(_tp).toFixed(4)) + '</td>'
                 +  '<td style="text-align:center;color:var(--sub)">T+2<br>' + escH(H.exit_date || '—') + ' 尾盘</td>'
@@ -1868,8 +1885,13 @@ HPDK_JS = r"""
           }
           _h3 += '</tbody></table>'
               +  '<div class="sub" style="color:var(--faint);margin-top:4px">'
-              +  '买入价 = <b>买日实际今开</b>（低开 −1%~−3% 于昨收）· 止盈 = 买入价 ×1.02 · '
-              +  '单票可买 = min(本金/KSLOT=' + fmtWan(_slot) + ', 20日均额×1%) </div></div>';
+               +  '<b>挂单价 = 昨收 × 0.99</b>（前一晚可挂；<b>上沿由限价自动把关</b> —— '
+               +  '开盘高于它的本就不成交）· <b>成交价 = 今开</b>（09:25 撮合价，必定 ≤ 挂单价）· '
+               +  '<b>止盈 = 成交价 ×1.02</b>（冻结规则：基准 = <b>实际成交价</b>，不是挂单价）· '
+               +  '单票可买 = min(本金/KSLOT=' + fmtWan(_slot) + ', 20日均额×1%)'
+               +  '<br><span style="color:var(--warn)">⚠ 下单：挂单价按分位<b>向上取整</b>（宁可高一分，'
+               +  '否则会漏掉刚好在带内的票；实测上沿略放宽反而略优）· '
+               +  '<b>09:25 撮合后立刻撤掉未成交挂单</b>（否则盘中跌到挂单价会意外成交）</span></div></div>';
         }
         topEl.innerHTML = _h3;
         TOPCACHE.buy = String(H.buy_date || ''); TOPCACHE.html = _h3;
@@ -1888,12 +1910,57 @@ HPDK_JS = r"""
        2026-09-27 用户反馈：在「标的」格里每行重复「非买日」很蠢 ⇒ 改为只在有信息量时标记，
        并把标记写进「状态」列（标的格保持干净）。 */
     if (live && !enforce && S.phase === 'auction') {
-      var tip0 = CFG.TIP + ' · 集合竞价预判：以竞价参考价 px/昨收−1 估算，**不剔除任何标的**；'
-               + '09:25 起用真实今开判定。' + (buy ? ('买日 ' + buy + '。') : '');
+      /* R-hpdk-cancel-0929（用户批准 D · 2026-09-29）：竞价阶段（09:15–09:24）**唯一需要动手的事 = 撤下沿的单**。
+         机制：挂单价 = 0.99×昨收 是**固定上限** —— 开盘价高于它（gap > −1%）的**本就不会成交**
+         ⇒ 上沿由限价自动把关（实测：带内 83% 的票挤在上沿附近，但它们全都不需要判断）。
+         真正要撤的是 gap < −3%（跌幅过大）：这些票开盘价在限价**之下** ⇒ 挂单**必成交** ⇒ 必须手动撤。
+         容错：实测下沿放宽到 −4% 几乎无成本（年化 46.85 vs 46.40）、−5% 才痛（42.73）⇒ 阈值附近不必纠结。
+         输出：逐行四档可操作标记 + 汇总行附「撤单短名单」。**仅提示，不剔除任何行**（竞价不判命中）。 */
+      var _up = numOr(H.gap_hi, -0.01), _lo = numOr(H.gap_lo, -0.03), _soft = _lo + 0.002;
+      var _can = [], _wat = [], _inb = 0, _abv = 0, _nq = 0;
       for (i = 0; i < pend.length; i++) {
-        var d2 = q[pend[i].code] || {}, px2 = num(d2.px), pcl2 = num(d2.pcl);
-        var t2 = '竞价预判 ' + fmtPct((px2 > 0 && pcl2 > 0) ? (px2 / pcl2 - 1) : NaN);
-        tagInto(pend[i].tr, t2, 'pre', tip0);
+        var d2 = q[pend[i].code] || {}, px2 = num(d2.px), pcl2 = num(d2.pcl), op2 = num(d2.opn);
+        var base2 = (op2 > 0) ? op2 : px2;                  /* 优先虚拟开盘价；竞价早期可能只有参考价 */
+        var g2 = (base2 > 0 && pcl2 > 0) ? (base2 / pcl2 - 1) : NaN;
+        var m2 = META[pend[i].code] || {}, nm2 = m2.name || pend[i].code;
+        var lim2 = pcl2 > 0 ? (pcl2 * 0.99) : NaN;          /* 你要挂的限价 = 昨收×0.99 */
+        var t2, c2, why2;
+        if (isNaN(g2)) {
+          t2 = '竞价预判 —'; c2 = 'pre'; _nq++; why2 = '本次无竞价参考价（保守留存）';
+        } else if (g2 < _lo) {
+          t2 = '⚠ 建议撤单 ' + fmtPct(g2); c2 = 'cancel'; _can.push({code: pend[i].code, name: nm2, g: g2});
+          why2 = '跌幅已破下沿：开盘价会在你的限价 ' + (isNaN(lim2) ? '—' : lim2.toFixed(3))
+               + ' 之下 ⇒ 挂单**必成交**，必须手动撤';
+          pend[i].tr.classList.add('hpdk-cancel');
+        } else if (g2 < _soft) {
+          t2 = '留意下沿 ' + fmtPct(g2); c2 = 'watch'; _wat.push({code: pend[i].code, name: nm2, g: g2});
+          why2 = '贴近下沿：若继续走弱将进入撤单区（实测容错约 1 个点，不必纠结）';
+        } else if (g2 <= _up + CFG.EPS) {
+          t2 = '带内 · 待成交 ' + fmtPct(g2); c2 = 'pre'; _inb++;
+          why2 = '在 [' + fmtPct(_lo) + ', ' + fmtPct(_up) + '] 内 ⇒ 09:25 以开盘价成交';
+        } else {
+          t2 = '高于上沿 · 不会成交 ' + fmtPct(g2); c2 = 'pre'; _abv++;
+          why2 = '开盘价高于你的限价 ' + (isNaN(lim2) ? '—' : lim2.toFixed(3)) + ' ⇒ 买单不成交，无需处理';
+        }
+        tagInto(pend[i].tr, t2, c2,
+          CFG.TIP + ' · 集合竞价（09:15–09:24）：虚拟开盘价 '
+          + (base2 > 0 ? base2.toFixed(3) : '—') + ' / 昨收 ' + (pcl2 > 0 ? pcl2.toFixed(3) : '—') + '　'
+          + why2 + '。你的挂单价固定 = 0.99×昨收 = ' + (isNaN(lim2) ? '—' : lim2.toFixed(3))
+          + '（**上沿由限价自动把关**，不需要你判断）。');
+      }
+      if (hr) {
+        var _lst = _can.length
+          ? ('：' + _can.map(function(x){ return escH(x.name) + ' ' + bare(x.code) + '（' + fmtPct(x.g) + '）'; }).join('、'))
+          : '（无）';
+        hr.innerHTML += '<br><b style="color:var(--warn)">⚡ 竞价（09:15–09:24）：建议撤单 '
+          + _can.length + ' 只</b>' + _lst
+          + (_wat.length ? ('　｜ <span style="color:var(--warn)">留意下沿 ' + _wat.length + ' 只</span>') : '')
+          + '　｜ 带内待成交 <b>' + _inb + '</b> 只'
+          + '　｜ 高于上沿（不成交·无需处理）' + _abv + ' 只'
+          + (_nq ? ('　｜ 无报价 ' + _nq + ' 只') : '')
+          + '<br><span style="color:var(--faint)">挂单价固定 = <b>0.99×昨收</b>：上沿由限价自动把关，'
+          + '所以你**只需撤下沿**。09:25 撮合后：<b>立刻撤掉未成交挂单</b>'
+          + '（否则盘中跌到 0.99×昨收 会意外成交，而规则只允许「开盘价买入」）。</span>';
       }
     }
     if (changed) saveRec(rec);
