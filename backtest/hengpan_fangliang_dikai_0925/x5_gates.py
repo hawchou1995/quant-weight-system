@@ -25,7 +25,11 @@ sys.path.insert(0, str(OUT))
 import x2_sens as X                                     # noqa: E402
 
 # v1.6（E-19 修正 STNOW 后）。E-15 前（旧序，含同日资金重复使用）：ann=47.77, mdd=-29.13, sharpe=2.12
-V4_BASE_ALL = dict(ann=47.3, mdd=-27.41, sharpe=2.15, n_trades=24492, mean_per_trade=0.4029, win_rate=60.98)
+# 【勘误 E-22 · 2026-09-29】新基线（A+C 生效后实测，x2_sens base 臂）：
+#   ann=46.40, mdd=-26.80, sharpe=2.13, n_trades=24502, mean_per_trade=0.3926, win_rate=60.74
+# 旧值（E-19/v1.6 默认，保留可追溯）：ann=47.3, mdd=-27.41, sharpe=2.15, n_trades=24492,
+#   mean_per_trade=0.4029, win_rate=60.98
+V4_BASE_ALL = dict(ann=46.4, mdd=-26.8, sharpe=2.13, n_trades=24502, mean_per_trade=0.3926, win_rate=60.74)
 # v1.5 旧值（可逐位复现：x2_sens 的 v15_stnow 臂，P["STNOW_OFF"]=False）：
 #   ann=47.17, mdd=-26.81, sharpe=2.19, n_trades=23759, mean_per_trade=0.4028, win_rate=60.63
 # 2018+ 子窗（E-15 前旧序：ann=64.24, mdd=-29.13, sharpe=2.44）
