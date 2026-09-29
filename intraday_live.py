@@ -1585,13 +1585,15 @@ HPDK_JS = r"""
       var qty = (opn > 0 && alloc > 0) ? Math.floor(alloc / opn / 100) * 100 : 0;
       var tpPx = opn * (1 + numOr(H.tp, 0.02));
       var limited = capv < slot - CFG.EPS;                 /* 该股 ADV×1% 放不满单票分配 → 容量受限 */
-      var rank = i + 1;
       var tip = 'F = ' + it.F.toFixed(3) + '（z: ' + it.z1.toFixed(2) + ' / ' + it.z2.toFixed(2) + ' / ' + it.z3.toFixed(2)
               + '）· 今开/昨收−1 = ' + fmtPct(it.gap) + ' · 20 日均额 ' + fmtWan(amt)
               + ' · 单票分配 ' + alloc.toFixed(0) + ' 元（min(本金/KSLOT=' + slot.toFixed(0) + ', ADV×1%=' + capv.toFixed(0) + ')）'
               + ' · 买日 ' + (buy || '—') + '；' + CFG.TIP;
-      var lab = '\u2705 今日买入候选 #' + rank;
-      tagInto(it.tr, lab, 'buy', tip);
+      /* R-hpdk-onelist-0929：**表内不再给序号、不再置顶**。
+         用户 2026-09-29 实测：表内「✅今日买入候选 #1..#10」来自「窗内 600 行重排名」，
+         与全池清单只重合 9/10、序号也不同 ⇒ 被读成**第三个买入口径**。序号只属于卡片最上方
+         的「今日买入清单」（全池判定 · 唯一）。本表降级为**盘前准备视图**：只做过滤与字段回填。 */
+      tagInto(it.tr, '\u2705 在清单内', 'buy', tip);
       if (colOf('buy') >= 0) writeCell(it.tr, 'buy', opn.toFixed(3), tip, opn);
       if (colOf('tp') >= 0) writeCell(it.tr, 'tp', tpPx.toFixed(3), tip, Math.round(tpPx * 1000) / 1000);
       if (colOf('qty') >= 0) writeCell(it.tr, 'qty', fmtQty(qty), tip, qty);
@@ -1602,7 +1604,7 @@ HPDK_JS = r"""
           : '该股 20日均额×1% = ' + fmtWan(capv) + ' ≥ 计划额 ' + fmtWan(slot) + '，可按计划额足额买入。')
         + '；' + CFG.TIP, limited ? 0 : 1);
       it.tr.classList.add('hpdk-buy');
-      it.tr.setAttribute('data-hpdk', 'buy#' + rank);
+      it.tr.setAttribute('data-hpdk', 'buy');
       if (!rec[it.code]) {
         rec[it.code] = {first: ymd(new Date()) + ' ' + hms(new Date()), kind: 'keep', as_of: H.as_of, buy_date: buy};
         changed = true;
@@ -1612,8 +1614,9 @@ HPDK_JS = r"""
     for (i = K; i < keepRank.length; i++) {
       var it2 = keepRank[i];
       it2.tr.classList.add('hpdk-keep');
-      tagInto(it2.tr, '留存 · F 第 ' + (i + 1) + ' 位', 'keep',
-            'F = ' + it2.F.toFixed(3) + '，排名在 k=' + K + ' 之后：本日不买，仍留在清单里。' + CFG.TIP, true);
+      tagInto(it2.tr, '留存（未入清单）', 'keep',
+            'F = ' + it2.F.toFixed(3) + '，本日不在清单内：窗内代理分排位在 k=' + K + ' 之后。'
+            + '仍留在表里，但**它不是买入候选**。' + CFG.TIP, true);
     }
     /* ⑥ 判定不明的行（本次报价缺失该码）：保守留存 + 灰标签（绝不因「没数据」剔除） */
     for (i = 0; i < keepNa.length; i++)
@@ -1621,20 +1624,16 @@ HPDK_JS = r"""
             '本次报价缺该码 → 不剔除（宁可漏剔，不可误剔）。' + CFG.TIP, true);
     S.kept = keepRank.length + keepNa.length;
     S.hit = top.length;
-    /* ⑦ 置顶：分组行 colspan = 运行时列数（勿写死），按 F 降序（#1 在最上） */
-    if (top.length) {
-      var hr = document.createElement('tr');
-      hr.className = 'hpdk-buy-hdr';
-      hr.innerHTML = '<td colspan="' + (NCOL || 14) + '">\u26a1 窗内买入候选（' + top.length
-        + ' 只 · 本表 ' + S.rows + ' 行内的重排名结果）· 已剔除 ' + S.removed
-        + ' 只 · 置顶=视图态：不改信号池、不改 depth rank、不写盘'
-        + (S.pool > S.rows ? ' · 注：资格池 ' + S.pool + ' 只，本表只渲染 ' + S.rows + ' 行' : '')
-        + '<br><b>买入名单请以表格上方的「全池口径（权威）」条为准</b>——本条只反映窗口内的存活行，'
-        + '两者分母不同（窗内少报）。</td>';
-      body.insertBefore(hr, body.firstChild);
-      var anchor = hr;
-      for (i = 0; i < top.length; i++) { body.insertBefore(top[i].tr, anchor.nextSibling); anchor = top[i].tr; }
-    }
+    /* ⑦ 说明行（**不再置顶任何行**）：本表 = 盘前准备视图；唯一买入清单 = 卡片最上方 */
+    var hr = document.createElement('tr');
+    hr.className = 'hpdk-buy-hdr';
+    hr.innerHTML = '<td colspan="' + (NCOL || 14) + '">\u26a1 盘前准备视图（本表只渲染 ' + S.rows + ' 行）'
+      + ' · 盘中已按真实今开过滤：剔除 ' + S.removed + ' 只 · 留存 ' + (S.kept || 0) + ' 只'
+      + ' · 其中在清单内 ' + top.length + ' 只'
+      + '<br><b>买入口径只有一个：卡片最上方的「今日买入清单」</b>（全池 '
+      + (S.pool ? S.pool + ' 只' : '—') + ' 判定 · 09:25 首算即冻结）。'
+      + '本表行序是**盘前代理分**、只渲染 600 行、**不是买入口径**。</td>';
+    body.insertBefore(hr, body.firstChild);
     /* ⑦b 全池口径复算（2026-09-28，R-hpdk-fullpool-0928）——**权威口径对照条**：
        DOM 只渲染 RENDER_N=600 行，②/④ 的判定与 F 排名都只能在这个窗内做 ⇒ 会少报：
        2026-09-28 实测全池命中 146 只、窗内仅 3 只；窗内重排名还把真 F#7 融捷股份排成 #1，
@@ -1651,7 +1650,9 @@ HPDK_JS = r"""
        （现价 px 仍参与 B 闸「停牌/一字」，这是冻结判据本身的口径，保留不动——但它只影响极少数票。）
     */
     /* 冻结键：09:25 后开盘价已定 ⇒ 命中集合确定，首算即冻结（按 buy_date 存），刷新只读冻结值。 */
-    var FPKEY = 'quant_hpdk_fp_v1';
+    /* 冻结键**升版 v2**（2026-09-29）：v1 里可能存着「残缺报价冻结」的名单（且无价格快照 ⇒ 全「—」），
+       升版即作废旧值，浏览器下次加载自动重算 —— 不再需要用户手动清缓存。 */
+    var FPKEY = 'quant_hpdk_fp_v2';
     function loadFP(){
       try { var a = JSON.parse(localStorage.getItem(FPKEY));
             return (a && String(a.buy_date) === String(H.buy_date || '')) ? a : null; }
@@ -1684,8 +1685,13 @@ HPDK_JS = r"""
                        return {code: x.code, name: x.m.name || '', px: num(_d.px), pct: num(_d.pct),
                                opn: num(_d.opn), pcl: num(_d.pcl), gap: x.gap}; }),
                 ts: ymd(new Date()) + ' ' + hms(new Date())};
-          saveFP(FP);
-          FPfrozen = true;   /* 首算即冻结生效：本次渲染就标注「已冻结」，不必等下一次刷新 */
+          /* R-hpdk-freeze-0929：**只有报价覆盖够（≥50%）才允许冻结** —— 线上实测事故：
+             首算发生在 10:00:42、当时只拿到 17 条报价 ⇒ 把「命中 3 只」冻成了名单，
+             报价到齐后也不再变（用户看到的就是 3 行全是「—」的清单，图1）。
+             覆盖不足 ⇒ 不落冻结、继续随刷新重算（判据没错，错的是拿残缺报价定名单）。 */
+          var _cov = (keys.length - miss) / Math.max(1, keys.length);
+          FP.cov = Math.round(_cov * 100);
+          if (_cov >= 0.5) { saveFP(FP); FPfrozen = true; }
         }
       }
     } catch (e) { FP = null; S.err = String(e && e.message || e); }
@@ -1704,7 +1710,8 @@ HPDK_JS = r"""
         _h3 += '<div class="sub" style="border-left:3px solid var(--warn);padding-left:8px;margin:0 0 8px">'
             +  '<b>今日买入清单（全池判定 · 本卡唯一买入口径）</b> · 买日 <b>' + (H.buy_date || '—') + '</b>'
             +  '（信号日 ' + (H.as_of || '—') + '）· 资格池 <b>' + FP.pool + '</b> 只 → 命中 <b>' + FP.hits + '</b> 只'
-            +  (FP.missing ? ('（另 ' + FP.missing + ' 只缺报价未判定）') : '')
+            +  ' · <b>报价覆盖 ' + (FP.cov === null || FP.cov === undefined ? '—' : FP.cov + '%')
+            +  '</b>（缺报价 ' + (FP.missing || 0) + ' 只未判定）'
             +  ' · 名单 = F 前 ' + FP.k + '（本次 ' + _k3 + ' 只）'
             +  (FPfrozen ? (' · <b>09:25 后已冻结</b>（' + escH(FP.ts) + ' 首算，刷新不再变）') : '')
             +  '｜现行 ST/退 按名称剔除</div>';
