@@ -538,6 +538,87 @@ def hpdk_track_card(BASE):
                     ("%+.4f%%" % x["ret_pct"]) if x.get("ret_pct") is not None else "—",
                     "{:,}".format(x.get("shares") or 0)))
     L.append('</tbody></table></div>')
+    # ── 💼 实盘登记（2026-09-29，R-hpdk-real-0929 · 用户「按你的来」）─────────────────────
+    # 与影子账本**彻底分离**：影子账本 = 冻结 OOS 台账派生（预注册窗口、SHA 锁定）；
+    # 实盘登记 = 你自己的真实成交，**只存本机浏览器 localStorage**，不上传、不入库、不碰台账。
+    # 公开仓里绝不落你的真实持仓（本块 HTML 不含任何成交数据，只有表单与逻辑）。
+    # 了结日按冻结口径 = 买入日 + 1 个交易日（entry=cal[t+1] / exit=cal[t+2]）。
+    try:
+        _cal = [ln.split(",")[0].strip() for ln in
+                (BASE / "index_000300.csv").read_text(encoding="utf-8-sig").splitlines()[1:]
+                if ln[:4].isdigit()]
+    except Exception:
+        _cal = []
+    _cal90 = _cal[-90:]
+    _last_td = (_cal90[-1] if _cal90 else "")
+    L.append(
+        '<div class="sub" style="margin-top:16px;border-top:1px dashed var(--border);padding-top:10px">'
+        '<b>💼 实盘登记（你的真实成交 · 仅存本机浏览器）</b>'
+        '<span style="color:var(--faint)"> —— 与上表（影子账本/模拟）分开记账：'
+        '本块数据只写在你这台浏览器的 localStorage，<b>不上传服务器、不入仓库、不改冻结台账</b>；'
+        '换浏览器/清缓存即消失（可用下方「导出」自行备份）。</span>'
+        f'<br><span style="color:var(--faint)">了结日按冻结口径 = 买入日 + 1 个交易日'
+        f'（当前日历末日 {_last_td}）</span></div>'
+        '<div class="toolbar" id="hpdk-real-bar">'
+        '<input type="text" id="hpdk-real-code" placeholder="代码（6 位，如 600327）" style="width:170px">'
+        f'<input type="text" id="hpdk-real-date" placeholder="买入日 YYYY-MM-DD" value="{_last_td}" style="width:150px">'
+        '<input type="text" id="hpdk-real-px" placeholder="买入价" style="width:90px">'
+        '<input type="text" id="hpdk-real-qty" placeholder="股数" style="width:90px">'
+        '<button type="button" id="hpdk-real-add">＋ 登记</button>'
+        '<button type="button" id="hpdk-real-clear">清空</button>'
+        '<button type="button" id="hpdk-real-exp">导出 JSON</button>'
+        '<span class="count" id="hpdk-real-count"></span></div>'
+        '<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-real" style="width:100%;font-size:12px">'
+        '<thead><tr><th>买日</th><th>标的</th><th style="text-align:right">买入价</th>'
+        '<th style="text-align:right">股数</th><th style="text-align:right">成本</th>'
+        '<th>了结日（买日+1 交易日）</th><th>状态</th><th style="text-align:center">操作</th></tr></thead>'
+        '<tbody><tr><td colspan="8" style="text-align:center;color:var(--faint)">'
+        '尚无登记 —— 用上方表单逐笔添加（默认买入日 = 最近交易日）</td></tr></tbody></table></div>')
+    L.append(
+        '<script>(function(){'
+        'var LS="quant_hpdk_real_v1", CAL=' + json.dumps(_cal90, ensure_ascii=False) + ';'
+        'function norm(c){c=String(c||"").replace(/^(sh|sz|bj)/i,"").trim();'
+        'if(!/^\\d{6}$/.test(c))return "";return (c[0]==="6"?"sh":"sz")+c;}'
+        'function bare(c){return String(c||"").replace(/^(sh|sz|bj)/i,"");}'
+        'function load(){try{var a=JSON.parse(localStorage.getItem(LS));return (a&&a.length)?a:[]}catch(e){return []}}'
+        'function save(a){try{localStorage.setItem(LS,JSON.stringify(a))}catch(e){}}'
+        'function exitOf(d){var i=CAL.indexOf(d);if(i<0)return "";return CAL[i+1]||"";}'
+        'function stateOf(d){var i=CAL.indexOf(d);if(i<0)return "买日不在日历";'
+        'var x=CAL[i+1];if(!x)return "持有中（下一交易日未到）";'
+        'return (CAL[CAL.length-1]>=x)?"已到期（了结日尾盘卖出）":("持有中 · 了结 "+x);}'
+        'function render(){var tb=document.querySelector("#tbl-hpdk-real tbody");if(!tb)return;'
+        'var a=load(),i,rows="",tot=0;'
+        'for(i=0;i<a.length;i++){var r=a[i],cost=(Number(r.px)||0)*(Number(r.qty)||0);tot+=cost;'
+        'rows+="<tr><td>"+r.date+"</td><td><b>"+bare(r.sym)+"</b></td>"'
+        '+"<td style=text-align:right>"+(Number(r.px)||0).toFixed(3)+"</td>"'
+        '+"<td style=text-align:right>"+(Number(r.qty)||0)+"</td>"'
+        '+"<td style=text-align:right>"+cost.toFixed(0)+"</td>"'
+        '+"<td>"+(exitOf(r.date)||"—")+"</td><td>"+stateOf(r.date)+"</td>"'
+        '+"<td style=text-align:center><button type=button data-del=\\""+i+"\\">删</button></td></tr>";}'
+        'if(!a.length)rows="<tr><td colspan=8 style=text-align:center;color:var(--faint)>尚无登记</td></tr>";'
+        'tb.innerHTML=rows;'
+        'var c=document.getElementById("hpdk-real-count");'
+        'if(c)c.textContent="共 "+a.length+" 笔 · 合计成本 "+tot.toFixed(0)+" 元";}'
+        'function add(){var sym=norm(document.getElementById("hpdk-real-code").value);'
+        'var d=document.getElementById("hpdk-real-date").value.trim();'
+        'var px=parseFloat(document.getElementById("hpdk-real-px").value);'
+        'var qy=parseInt(document.getElementById("hpdk-real-qty").value,10);'
+        'if(!sym||!/^\\d{4}-\\d{2}-\\d{2}$/.test(d)||!(px>0)){alert("请填：6 位代码 / 买日 YYYY-MM-DD / 正数买入价");return;}'
+        'var a=load();a.push({sym:sym,date:d,px:px,qty:(qy>0?qy:0),ts:new Date().toISOString()});'
+        'save(a);document.getElementById("hpdk-real-code").value="";'
+        'document.getElementById("hpdk-real-px").value="";document.getElementById("hpdk-real-qty").value="";render();}'
+        'function del(i){var a=load();a.splice(i,1);save(a);render();}'
+        'function clr(){if(confirm("清空全部实盘登记？（仅影响本机浏览器）")){save([]);render();}}'
+        'function exp(){var t=JSON.stringify(load(),null,1);'
+        'try{navigator.clipboard.writeText(t);alert("已复制到剪贴板（"+load().length+" 笔）")}'
+        'catch(e){window.prompt("手动复制：",t)}}'
+        'document.addEventListener("click",function(e){var t=e.target;if(!t||!t.getAttribute)return;'
+        'var dl=t.getAttribute("data-del");if(dl!==null&&dl!==undefined&&dl!==""){del(parseInt(dl,10));return;}'
+        'if(t.id==="hpdk-real-add")add();else if(t.id==="hpdk-real-clear")clr();'
+        'else if(t.id==="hpdk-real-exp")exp();});'
+        'window.HPDK_REAL={list:load,add:add,del:del,clear:clr,exitOf:exitOf,stateOf:stateOf,cal:CAL};'
+        'render();'
+        '})();</script>')
     L.append('</div>')
     return "".join(L)
 

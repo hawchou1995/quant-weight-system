@@ -143,6 +143,17 @@ def main():
             "被改动=%s" % dirty if dirty else "共 %d 个受保护文件" % len(OTHER))
     except Exception as e:
         chk(False, "7.2 其它策略数据产物相对 git HEAD 零改动", "git 执行失败 %r" % (e,))
+    # 7.3 实盘登记区块（R-hpdk-real-0929）：存在性 + 隔离（零落盘/不出本机）+ 口径
+    chk(('id="tbl-hpdk-real"' in html) and ("window.HPDK_REAL" in html) and ("hpdk-real-add" in html),
+        "7.3 实盘登记区块已渲染（表单 + 表 + HPDK_REAL）")
+    chk(("quant_hpdk_real_v1" in html) and ("localStorage" in html),
+        "7.3b 实盘数据仅 localStorage（零落盘 / 不上传）")
+    _realjs = html[html.find('var LS="quant_hpdk_real_v1"'):][:6000] if ('var LS="quant_hpdk_real_v1"' in html) else ""
+    chk(("fetch(" not in _realjs) and ("XMLHttpRequest" not in _realjs),
+        "7.3c 实盘区块 JS 无 fetch/XHR（数据不出本机）")
+    chk("CAL[i+1]" in html, "7.3d 了结日 = 买日 + 1 交易日（冻结口径）")
+    chk("index_000300.csv" in src_card,
+        "7.3e 唯一跨件读取 = index_000300.csv（共享交易日历，全站同源）")
 
     print("-" * 100)
     print("A11 口径漂移防护（对拍记录）")
