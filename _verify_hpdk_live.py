@@ -117,13 +117,18 @@ def main():
     print("-" * 100)
     print("A12 隔离证明")
     own = {"backtest/hpdk_candidates.json", "backtest/hpdk_oos_view.json",
-           "backtest/hpdk_bt_ref.json", "backtest/hpdk_hits.json"}
-    reads = set(re.findall(r'"backtest"\s*/\s*"([^"]+)"', src_card)) | \
-            set(re.findall(r'backtest/([A-Za-z0-9_\-]+\.(?:json|js|csv))', src_card))
-    # 2026-09-28（R-hpdk-hits-0928）：本策略新增自有产物 hpdk_hits.json（今日命中·全池复算）→ 同步白名单
+           "backtest/hpdk_bt_ref.json", "backtest/hpdk_hits.json",
+           "backtest/hpdk_hits_history.jsonl"}
+    reads = set(re.findall(r'"[^"]*backtest"\s*/\s*"([^"]+)"', src_card)) | \
+            set(re.findall(r'[^/]*"backtest"\s*/\s*"([A-Za-z0-9_\-]+\.(?:jsonl|json|js|csv))"', src_card)) | \
+            set(re.findall(r'backtest/([A-Za-z0-9_\-]+\.(?:jsonl|json|js|csv))', src_card))
+    # 2026-09-28 R-hpdk-hits-0928 / 2026-09-29 R-hpdk-hist-0929：本策略新增自有产物
+    # hpdk_hits.json（今日命中·全池复算）与 hpdk_hits_history.jsonl（命中历史留档）→ 同步白名单
     cross = sorted(reads - {"hpdk_candidates.json", "hpdk_oos_view.json",
-                                "hpdk_paper.json", "hpdk_hits.json"})
-    chk(not cross, "7.1 hpdk_card.py 只读本策略自有产物", "越界=%s" % cross if cross else "")
+                                "hpdk_paper.json", "hpdk_hits.json",
+                                "hpdk_hits_history.jsonl"})
+    chk(not cross, "7.1 hpdk_card.py 只读本策略自有产物",
+        "越界=%s" % cross if cross else "own=%s" % sorted(own))
     OTHER = ["backtest/qlch_candidates.json", "backtest/qlch_paper_state.json",
              "backtest/qlch_paper_state_b4_k3.json", "backtest/qlch_paper_state_b4_k3_mb.json",
              "backtest/qlch_bt_t1exit_0922.json", "backtest/qlch_bt_ref.json",
