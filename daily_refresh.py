@@ -202,16 +202,20 @@ STEPS = [
     ("当日名称快照 name_latest[软]", ["refresh_name_latest.py"], "--skip-names" in sys.argv),
     ("缩量超跌-当日候选 hpdk_candidates[软]",
      ["backtest/hengpan_fangliang_dikai_0925/hpdk_candidates.py"], "--skip-hpdk" in sys.argv),
-    # 模拟盘账户 + 跟踪池（从冻结 OOS 台账派生；与台账对拍不一致会 exit 3）——同样必须在 build 之前。
-    ("缩量超跌-模拟盘/跟踪池 hpdk_paper[软]",
-    # 买日批次跟踪（2026-09-29，R-hpdk-cohort-0929）：以**买日**为主键的逐笔跟踪
-    # （买入价=买日开盘 / 止盈=×1.02 / 了结日=买日之后第一个交易日 / 按冻结出场规则给了结结果）。
-    # 必须在 hpdk_candidates 之后（读它写的命中历史档），并在 build_dual_system 之前（卡片要读）。
-    # 覆盖**全部命中历史买日** ⇒ 影子账本窗口外那批（信号日 09-24 → 买日 09-28）也能跟踪。
-    # [软]=失败不阻断主链；--skip-cohort 跳过。
-    ("缩量超跌-买日批次跟踪 hpdk_cohorts[软]",
-     ["backtest/hengpan_fangliang_dikai_0925/hpdk_cohorts.py"], "--skip-cohort" in sys.argv),
-     ["backtest/hengpan_fangliang_dikai_0925/hpdk_paper.py"], "--skip-hpdkpaper" in sys.argv),
+     # 模拟盘账户 + 跟踪池（从冻结 OOS 台账派生；与台账对拍不一致会 exit 3）——同样必须在 build 之前。
+     ("缩量超跌-模拟盘/跟踪池 hpdk_paper[软]",
+      ["backtest/hengpan_fangliang_dikai_0925/hpdk_paper.py"], "--skip-hpdkpaper" in sys.argv),
+     # 买日批次跟踪（2026-09-29，R-hpdk-cohort-0929）：以**买日**为主键的逐笔跟踪
+     # （买入价=买日开盘 / 止盈=×1.02 / 了结日=买日之后第一个交易日 / 按冻结出场规则给了结结果）。
+     # 必须在 hpdk_candidates 之后（读它写的命中历史档），并在 build_dual_system 之前（卡片要读）。
+     # 覆盖**全部命中历史买日** ⇒ 影子账本窗口外那批（信号日 09-24 → 买日 09-28）也能跟踪。
+     # [软]=失败不阻断主链；--skip-cohort 跳过。
+     # ⚠ 2026-09-29 修：此前本段注释被插进 hpdk_paper 元组**中间**，使 hpdk_paper 只剩 name、
+     #   与 hpdk_cohorts 粘连成 **4 元素元组** → `for name, args, skip in STEPS` 抛
+     #   ValueError: too many values to unpack（本机实测 39 步跑完后崩在 build_dual_system 之前）。
+     #   云端因 7200s 墙更早超时于 L83 fetch_val_daily，从未跑到此行 ⇒ 该 bug 一直潜伏未暴露。
+     ("缩量超跌-买日批次跟踪 hpdk_cohorts[软]",
+      ["backtest/hengpan_fangliang_dikai_0925/hpdk_cohorts.py"], "--skip-cohort" in sys.argv),
 
     # ETF 动量轮动族（2026-09-28，R-etf-chain-0928 · 用户批准全接入）：此前**整族从未进链**
     # （脚本 BASE 硬编码 Windows 路径、快照输出落 gitignored 的 dist/、依赖引擎未入库）

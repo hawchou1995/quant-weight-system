@@ -192,8 +192,13 @@ def main() -> int:
     ap.add_argument("--mode", choices=["probe", "chain"], default="probe")
     ap.add_argument("--force-chain", action="store_true",
                     help="给 daily_refresh.py 追加 --force（越过周末/非交易日守卫；仅验证/补跑）")
-    ap.add_argument("--chain-timeout", type=int, default=7200,
-                    help="链超时秒数（默认 7200=120min；job 上限 150min，留余量给门禁/组装）")
+    # 2026-09-29：7200(120min) 实测不足 —— run 36558370018 在 fetch_val_daily 前被砍（[chain] rc=1），
+    #   后段 rebuild_panels / revscreen_regen / qlch 六臂 / A5 / factor_gate 全未执行，
+    #   发布产物 a5_pool.js 停在 09-24。正常轮 ~117min，最坏抓数组合（update_daily 67min +
+    #   fetch_val_em_daily 28.5min + fund_nav 15min）≈111min 已无余量 ⇒ 抬到 9000(150min)，
+    #   workflow job timeout 同步 150→180min。
+    ap.add_argument("--chain-timeout", type=int, default=9000,
+                    help="链超时秒数（默认 9000=150min；job 上限 180min，留余量给门禁/组装）")
     ap.add_argument("--no-live-check", action="store_true", help="本地干跑时跳过线上比对")
     a = ap.parse_args()
 

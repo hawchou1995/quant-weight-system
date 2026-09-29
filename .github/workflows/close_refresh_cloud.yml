@@ -49,7 +49,9 @@ permissions:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 150
+    # 2026-09-29：150 → 180min。链预算同步抬到 9000s(150min)；后段门禁/组装/发布实测仅 ~37s，
+    #   留 30min 余量足够。（run 36558370018 实测：7200s 墙在 fetch_val_daily 前砍断全链）
+    timeout-minutes: 180
     env:
       TZ: Asia/Shanghai
     steps:
