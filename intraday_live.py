@@ -132,51 +132,67 @@ INTRADAY_JS = r"""
   /* ---------- 选股池报价 ---------- */
   function fetchPool(codes){
     var out = {}, i = 0, srcEm = 0, srcTx = 0;
-    function step(){
-      if (i >= codes.length) {
-        /* R-qlch-live-0923：登记本批报价的来源（东财主源 / 腾讯兜底）—— qlch 徽标要显示「源 东财/腾讯」，
-           不靠猜。任一片走兜底即如实标注（东财|腾讯）。 */
-        S.poolSrc = srcTx ? (srcEm ? '东财|腾讯' : '腾讯') : (srcEm ? '东财' : '');
-        return Promise.resolve(out);
+    /* R-hpdk-txfirst-0930（2026-09-30 实测驱动）：**腾讯优先**。
+       实测（本机，与前端同 URL 形态）：东财 `ulist.np` 三片**全 502/断连（0 覆盖）**；
+       腾讯 13+6+6=25 个请求（400 码/片）**全成功、100% 覆盖、无任何限流**（4.4s/2.1s/1.9s）。
+       而原实现是「东财优先、失败才兜底腾讯」，且 **`srcTx` 从未自增** ⇒ 表头「源 东财」
+       是失真显示（真实来源无法从该字段判断）。用户 2026-09-30 看到的「覆盖 30%」即由此而来。
+       ⇒ 改为腾讯优先；东财仅在腾讯本片不足 60% 时兜底（并如实合并计数）。 */
+    function covOf(chunk){
+      var n = 0, k;
+      for (k = 0; k < chunk.length; k++) { var q = out[chunk[k]]; if (q && q.px > 0) n++; }
+      return n;
+    }
+    function txFetch(chunk, done){
+      var parts = [], ti;
+      for (ti = 0; ti < chunk.length; ti += CFG.TX_CHUNK) parts.push(chunk.slice(ti, ti + CFG.TX_CHUNK));
+      var pi = 0;
+      function st(){
+        if (pi >= parts.length) return done();
+        var part = parts[pi++];
+        S.txBatches++;
+        var u2 = 'https://qt.gtimg.cn/q=' + part.map(txCode).join(',');
+        return getGBK(u2, 12000).then(function(txt){
+          txt.trim().split('\n').forEach(function(l){
+            var f = l.split('~'); if (f.length < 33) return;
+            var px = num(f[3]), pct = num(f[32]);
+            if (f[2] && !isNaN(px)) out[f[2]] = {px: px, pct: isNaN(pct) ? 0 : pct, name: f[1] || '',
+                                                 pcl: num(f[4]), opn: num(f[5])};
+          });
+          srcTx++;
+          return st();
+        }, function(){ S.txFail++; return st(); });
       }
-      var chunk = codes.slice(i, i + CFG.EM_CHUNK); i += CFG.EM_CHUNK;
+      return st();
+    }
+    function emFetch(chunk, done){
       var host = CFG.HOSTS[0];
-      /* R-qlch-live-0923：fields 增 f17（今开）/f18（昨收）—— qlch 买点判定要 gap = 今开/昨收−1，
-         原 fields 只有 f2 现价 / f3 涨跌幅，跳空判不了。pcl=昨收、opn=今开（下游 QLCH_LIVE 消费）。 */
+      /* R-qlch-live-0923：fields 增 f17（今开）/f18（昨收）—— qlch 买点判定要 gap = 今开/昨收−1 */
       var u = 'https://' + host + '/api/qt/ulist.np/get?fltt=2&invt=2&fields=f2,f3,f12,f14,f17,f18&secids='
             + chunk.map(mktCode).join(',') + '&_=' + Date.now();
       return getJSON(u, 12000).then(function(j){
-        srcEm++;
+        var got = 0;
         ((j.data && j.data.diff) || []).forEach(function(x){
           var px = num(x.f2), pct = num(x.f3);
-          if (!isNaN(px)) out[x.f12] = {px: px, pct: isNaN(pct) ? 0 : pct, name: x.f14 || '',
-                                        pcl: num(x.f18), opn: num(x.f17)};
+          if (!isNaN(px)) { out[x.f12] = {px: px, pct: isNaN(pct) ? 0 : pct, name: x.f14 || '',
+                                          pcl: num(x.f18), opn: num(x.f17)}; got++; }
         });
-        return step();
-      }, function(){ /* 本片失败：腾讯兜底 */
-        /* R-hpdk-txchunk-0929：**腾讯兜底必须自己再分片**。原实现直接复用东财的 800 码 chunk
-           拼 qt.gtimg 的 URL —— 浏览器对该长度会 **快速失败**（CFG.TX_CHUNK 注释有实测记录：
-           400 码 OK / 800 码 TypeError: Failed to fetch）⇒ 兜底形同虚设：EM 失败 + TX 空返回
-           = 整批 0 报价（实测 2215 只全池取报价 79.6s、只覆盖 64%）。 */
-        var txParts = [];
-        for (var ti = 0; ti < chunk.length; ti += CFG.TX_CHUNK) txParts.push(chunk.slice(ti, ti + CFG.TX_CHUNK));
-        var tpi = 0;
-        function txStep(){
-          if (tpi >= txParts.length) return step();
-          var part = txParts[tpi++];
-          S.txBatches++;
-          var u2 = 'https://qt.gtimg.cn/q=' + part.map(txCode).join(',');
-          return getGBK(u2, 12000).then(function(txt){
-            txt.trim().split('\n').forEach(function(l){
-              var f = l.split('~'); if (f.length < 33) return;
-              var px = num(f[3]), pct = num(f[32]);
-              if (f[2] && !isNaN(px)) out[f[2]] = {px: px, pct: isNaN(pct) ? 0 : pct, name: f[1] || '',
-                                                   pcl: num(f[4]), opn: num(f[5])};
-            });
-            return txStep();
-          }, function(){ S.txFail++; return txStep(); });
-        }
-        return txStep();
+        /* R-hpdk-empartial-0930：东财若返回 200 但只给部分/空 diff，原实现会 `srcEm++` 并静默跳过，
+           兜底永不触发 ⇒ 覆盖静默掉到 30% 而无任何提示。判据改为「本片不足 60% 才算没拿到」。 */
+        if (got * 10 >= chunk.length * 6) srcEm++;
+        return done();
+      }, function(){ return done(); });
+    }
+    function step(){
+      if (i >= codes.length) {
+        /* R-qlch-live-0923：如实登记本批来源（腾讯优先后语义调整为「腾讯|东财」） */
+        S.poolSrc = (srcTx && srcEm) ? '腾讯|东财' : (srcTx ? '腾讯' : (srcEm ? '东财' : ''));
+        return Promise.resolve(out);
+      }
+      var chunk = codes.slice(i, i + CFG.EM_CHUNK); i += CFG.EM_CHUNK;
+      return txFetch(chunk, function(){
+        if (covOf(chunk) * 10 >= chunk.length * 6) return step();   /* 腾讯本片 ≥60% → 够用 */
+        return emFetch(chunk, step);                                 /* 否则补东财 */
       });
     }
     return step();
