@@ -1830,6 +1830,24 @@ HPDK_JS = r"""
       return String(s === null || s === undefined ? '' : s)
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     };
+    /* R-hpdk-persist-top-0930（用户 2026-09-30 要求清单常驻）：表头**单一真值源** ——
+       常驻骨架（无清单时）与真实清单共用同一份，避免两处 thead 漂移。共 17 列。 */
+    var TOPTHEAD = '<thead><tr>'
+        + '<th style="text-align:center">#</th><th>标的</th>'
+        + '<th style="text-align:center">状态</th><th>板块</th><th>行业</th>'
+        + '<th data-key="px" style="text-align:right">现价 <span class="live-tag">实时</span></th>'
+        + '<th data-key="chg" style="text-align:right">涨跌幅 <span class="live-tag">实时</span></th>'
+        + '<th data-key="amt" style="text-align:right">成交额20</th>'
+        + '<th data-key="vr" style="text-align:right">量比</th>'
+        + '<th data-key="r20" style="text-align:right">20日涨幅</th>'
+        + '<th data-key="pcl" style="text-align:right">昨收价</th>'
+        + '<th data-key="buy" style="text-align:right">挂单价 <span class="live-tag">昨收×0.99</span></th>'
+        + '<th style="text-align:right">成交价 <span class="live-tag">今开</span></th>'
+        + '<th data-key="tp" style="text-align:right">止盈价 +2%</th>'
+        + '<th style="text-align:center">卖出时点</th>'
+        + '<th data-key="qty" style="text-align:right">建议股数</th>'
+        + '<th data-key="cap" style="text-align:center">单票可买（上限）</th>'
+        + '</tr></thead>';
     if (topEl) {
       if (FP) {
         var _k3 = FP.top.length, _i3, _h3 = '', _ADV = numOr(CFG.ADV_FRAC, 0.01);
@@ -1876,26 +1894,14 @@ HPDK_JS = r"""
         if (!_k3) {
           _h3 += '<div class="sub" style="color:var(--faint)">本次判定范围内无命中'
               +  (FP.missing ? ('（' + FP.missing + ' 只缺报价，未判定）') : '') + '。</div>';
+          /* R-hpdk-persist-top-0930：无命中时也给出**完整表头**（0 行是正常结果，不是故障）。 */
+          _h3 += '<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-buylist" style="width:100%;font-size:12px">'
+              +  TOPTHEAD
+              +  '<tbody><tr><td colspan="17" style="color:var(--faint);padding:8px 0">'
+              +  '（本次判定范围内无命中 \u2014 名单为空是正常结果）</td></tr></tbody></table></div>';
         } else {
           _h3 += '<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-buylist" style="width:100%;font-size:12px">'
-              +  '<thead><tr>'
-              +  '<th style="text-align:center">#</th><th>标的</th>'
-              +  '<th style="text-align:center">状态</th><th>板块</th><th>行业</th>'
-              +  '<th data-key="px" style="text-align:right">现价 <span class="live-tag">实时</span></th>'
-              +  '<th data-key="chg" style="text-align:right">涨跌幅 <span class="live-tag">实时</span></th>'
-              +  '<th data-key="amt" style="text-align:right">成交额20</th>'
-              +  '<th data-key="vr" style="text-align:right">量比</th>'
-              +  '<th data-key="r20" style="text-align:right">20日涨幅</th>'
-              /* R-hpdk-pcl-0929（用户 2026-09-29 要求）：加「昨收价」列 —— 便于**当场核对**
-                 挂单价是否 = 昨收×0.99（挂单价是你要下单的数，昨收是它的来源）。 */
-              +  '<th data-key="pcl" style="text-align:right">昨收价</th>'
-              +  '<th data-key="buy" style="text-align:right">挂单价 <span class="live-tag">昨收×0.99</span></th>'
-               +  '<th style="text-align:right">成交价 <span class="live-tag">今开</span></th>'
-               +  '<th data-key="tp" style="text-align:right">止盈价 +2%</th>'
-              +  '<th style="text-align:center">卖出时点</th>'
-              +  '<th data-key="qty" style="text-align:right">建议股数</th>'
-              +  '<th data-key="cap" style="text-align:center">单票可买（上限）</th>'
-              +  '</tr></thead><tbody>';
+              +  TOPTHEAD + '<tbody>';
           for (_i3 = 0; _i3 < _k3; _i3++) {
             var _x3 = FP.top[_i3], _c3 = bare(_x3.code), _d3 = q[_c3] || {}, _m3 = META[_c3] || {};
             var _px = num(_d3.px);  if (!(_px > 0)) _px = num(_x3.px);
@@ -1971,9 +1977,29 @@ HPDK_JS = r"""
            **保留上一帧清单，绝不清空**（用户 2026-09-29 报「买入清单动不动就消失」）。 */
         if (topEl.innerHTML.indexOf('tbl-hpdk-buylist') < 0 && TOPCACHE.html) topEl.innerHTML = TOPCACHE.html;
       } else {
-        topEl.innerHTML = '<div class="sub" style="color:var(--faint)">今日买入清单：等待盘中行情'
-            +  (S.mktTs ? ('（行情时间戳 ' + escH(S.mktTs) + '）') : '（尚未取到行情时间戳）')
-            +  '。打开页面后自动拉取；09:25 后按真实今开判定并冻结。</div>';
+        /* R-hpdk-persist-top-0930（用户 2026-09-30 要求：「竞价预备清单/买入清单要常驻显示，至少有个表头」）：
+           原先这里只有一行灰字、**无表头** ⇒ 用户无法区分「还没到时段 / 非买日 / 行情坏了」。
+           现在常驻渲染：状态行 + 买日/信号日 + **完整表头**（0 行 + 一行说明）。 */
+        var _st, _nw = new Date(), _nm2 = _nw.getHours() * 60 + _nw.getMinutes(), _td0 = ymd(_nw);
+        var _isBuy = !!(buy && _td0 === buy);
+        if (!buy) _st = '本卡未带买日（产物为占位 / 未生成）';
+        else if (!live) _st = '等待行情 —— 页面打开后自动拉取；行情源无响应时保持本状态（不是故障）';
+        else if (_isBuy && _nm2 < (9 * 60 + 15))
+          _st = '买日 ' + buy + ' · 尚未到集合竞价（09:15 开启预备清单；09:25 出权威清单）';
+        else if (_isBuy && _nm2 >= (9 * 60 + 15) && _nm2 < CFG.OPEN_MIN)
+          _st = '买日 ' + buy + ' · 竞价时段 09:15\u201309:25 —— 预备清单按参考价实时判定';
+        else if (_isBuy)
+          _st = '买日 ' + buy + ' · 等待 09:25 撮合出真实今开（该时段不剔除、不判定）';
+        else _st = '非买日（买日 ' + buy + '）—— 本清单只在买日 09:25 后出结果';
+        topEl.innerHTML = '<div class="sub" style="border-left:3px solid var(--faint);padding-left:8px;margin:0 0 8px">'
+            + '<b>今日买入清单（全池判定 · 本卡唯一买入口径）</b> · 买日 <b>' + (buy || '\u2014') + '</b>'
+            + '（信号日 ' + (H.as_of || '\u2014') + '）· 状态：<b>' + _st + '</b>'
+            + (S.mktTs ? (' · 行情时间戳 ' + escH(S.mktTs)) : ' · 尚未取到行情时间戳')
+            + '</div>'
+            + '<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-buylist" style="width:100%;font-size:12px">'
+            + TOPTHEAD
+            + '<tbody><tr><td colspan="17" style="color:var(--faint);padding:8px 0">'
+            + '（暂无清单 \u2014 ' + _st + '）</td></tr></tbody></table></div>';
       }
     }
     /* ⑧ 非判定时段：一行都不剔除。**只有集合竞价 09:15–09:24 挂逐行灰标**（那时 gap 预判有信息量）；
