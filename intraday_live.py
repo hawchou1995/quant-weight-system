@@ -1456,7 +1456,7 @@ HPDK_JS = r"""
   /* ---------- 判定：C（静态准入）→ B（可交易）→ A（低开带）→ F（排名字段） ----------
      返回 {k:'keep'|'drop'|'na', gate:'A'|'B'|'C'|'F'|'na', why, gap?}
      · k='na'（该码本次报价缺失 / 三个价格字段全无）→ **保守留存**：不剔除任何判不了的行（宁可漏剔，不可误剔）。 */
-  function judge(m, d){
+  function judge(m, d, refPx){
     /* R-hpdk-stlive-0929（勘误 E-20 · 用户批准 A 案）+ R-hpdk-name-0929（用户实测「002743 是 ST 也进了清单」）：
        **live frontier 按真名单剔 ST/退，且同时用「实时行情名」与「内嵌名」双源判定**。
        为什么双源：内嵌名来自 data_full_names.json，该文件长期不更新（实测停在 2026-08-17）
@@ -1477,9 +1477,16 @@ HPDK_JS = r"""
     if (!(px > 0) && !(pcl > 0) && !(opn > 0)) return {k: 'na', gate: 'na', why: '无行情（保守留存）'};
     if (!(px > 0)) return {k: 'drop', gate: 'B', why: 'B: 无现价'};
     if (!(pcl > 0)) return {k: 'drop', gate: 'B', why: 'B: 无昨收'};
-    if (!(opn > 0)) return {k: 'drop', gate: 'B', why: 'B: 无今开（09:25 前 / 行情缺失）'};
-    if (Math.abs(px - pcl) <= CFG.EPS && Math.abs(opn - pcl) <= CFG.EPS)
+    /* R-hpdk-preauction-0930：竞价预备口径 —— 09:25 前没有真实今开，用「现价」= 集合竞价
+       虚拟开盘参考价代 gap。只在 refPx=true（= preMode，09:15–09:25）时启用；**权威口径永远用
+       真实今开**（refPx 为假时 _oeff === opn，逻辑与改动前逐字相同 ⇒ 零回归）。 */
+    var _oeff = opn;
+    if (refPx && !(opn > 0) && px > 0) _oeff = px;
+    if (!(_oeff > 0)) return {k: 'drop', gate: 'B', why: 'B: 无今开（09:25 前 / 行情缺失）'};
+    if ((opn > 0) && Math.abs(px - pcl) <= CFG.EPS && Math.abs(opn - pcl) <= CFG.EPS)
       return {k: 'drop', gate: 'B', why: 'B: 停牌/一字（现价=今开=昨收）'};
+    if (refPx && !(opn > 0) && Math.abs(px - pcl) <= CFG.EPS)
+      return {k: 'drop', gate: 'B', why: 'B: 参考价=昨收（无成交意愿/停牌）'};
     /* gap 用 **float32 复刻**冻结生产者的算术（2026-09-29 code review 修正，R-hpdk-gapf32-0929）：
        生产者面板 O/C 是 np.float32 ⇒ 其 gap 也是 float32 结果；前端拿到的是 float64 报价。
        直接相除会有 ~1e-7 级偏差，恰在带沿的标的会两侧判反（实测 2026-09-28：601020 华钰矿业
@@ -1487,7 +1494,7 @@ HPDK_JS = r"""
        上一版用「距上沿 < 1e-7 视为带外」是**猜测**且只补了上沿 ⇒ 改为逐字复刻：
          Math.fround(a)/Math.fround(b) 再 fround = float32 除法，随后 −1 在 float64 里做
          （与 numpy「float32 数组相除→float64 标量比较」一致）⇒ 两侧带沿都自动对齐。 */
-    var gap = Math.fround(Math.fround(opn) / Math.fround(pcl)) - 1;
+    var gap = Math.fround(Math.fround(_oeff) / Math.fround(pcl)) - 1;
     var lo = numOr(H.gap_lo, -0.03), hi = numOr(H.gap_hi, -0.01);
     if (!(gap >= lo - CFG.EPS && gap <= hi + CFG.EPS))
       return {k: 'drop', gate: 'A', gap: gap,
@@ -1741,9 +1748,33 @@ HPDK_JS = r"""
       catch (e) { return null; }
     }
     function saveFP(o){ try { localStorage.setItem(FPKEY, JSON.stringify(o)); } catch (e) {} }
+    /* R-hpdk-preauction-0930：竞价预备清单独立键 —— **不参与权威冻结**，只用于 09:25 后的对拍
+       （算现场参考价误差 σ）。与权威键分开，避免预判污染 09:25 那份必须稳定的名单。 */
+    var PREKEY = 'quant_hpdk_pre_v1';
+    function loadPRE(){
+      try { var a = JSON.parse(localStorage.getItem(PREKEY));
+            return (a && String(a.buy_date) === String(H.buy_date || '')) ? a : null; }
+      catch (e) { return null; }
+    }
+    function savePRE(o){ try { localStorage.setItem(PREKEY, JSON.stringify(o)); } catch (e) {} }
     var FP = null, FPfrozen = false;
+    /* R-hpdk-preauction-0930（用户 2026-09-29 批准 · C 案）：**09:15–09:25 竞价预备清单**。
+       用户要求「09:15 起实时更新买入清单、不锁定，09:25 前从里面挑 TOP4 挂单」。
+       口径：用行情「现价」= 集合竞价虚拟开盘参考价 代替今开算 gap ⇒ 带内预判集合 → F 前 K。
+       它不是权威口径：不落 FPKEY 冻结、09:25 一到立即切回真实今开清单（并按 PREKEY 做对拍）。
+       交易所时间戳缺失时用本地时钟兜底（与 enforce 的 fallback 同思路，见 R-hpdk-fallback-0929）。 */
+    var _preMin = -1, _preDate = '';
+    if (mkt) { _preMin = mkt.min; _preDate = mkt.date; }
+    if (!(live && buy && _preDate === buy && _preMin >= (9 * 60 + 15) && _preMin < CFG.OPEN_MIN)) {
+      var _n2 = new Date(), _l2 = _n2.getHours() * 60 + _n2.getMinutes();
+      if (live && buy && ymd(_n2) === buy && _l2 >= (9 * 60 + 15) && _l2 < CFG.OPEN_MIN) {
+        _preMin = _l2; _preDate = buy;
+      }
+    }
+    var preMode = !!(live && buy && _preDate === buy && _preMin >= (9 * 60 + 15) && _preMin < CFG.OPEN_MIN);
+    S.preMode = preMode;
     try {
-      if (live && enforce) {
+      if (live && (enforce || preMode)) {
         /* R-hpdk-upgrade-0929：**覆盖率升级闸**。冻结值带 cov；若当前报价覆盖比冻结时
            **显著更好（> +10pp）**，说明冻结那份是「数据不全时算的」（线上实测：70% 覆盖就冻死 ⇒
            可能有票因缺报价而没进名单）⇒ 重算并覆盖；否则维持冻结（名单不再漂移）。
@@ -1753,7 +1784,9 @@ HPDK_JS = r"""
         var _hit0 = 0, _j0;
         for (_j0 = 0; _j0 < keys.length; _j0++) { var _q0 = q[keys[_j0]]; if (_q0 && num(_q0.px) > 0) _hit0++; }
         var _covNow = Math.round(100 * _hit0 / Math.max(1, keys.length));
-        FP = loadFP();
+        /* R-hpdk-preauction-0930：竞价预备口径**必须实时重算**（09:15–09:24 参考价逐秒在动），
+           绝不复用 09:25 之后那份权威冻结值。 */
+        FP = preMode ? null : loadFP();
         if (FP && (FP.cov === null || FP.cov === undefined || _covNow <= (FP.cov + 10))) {
           FPfrozen = true;                    /* 数据没有明显变好 → 用冻结值 */
         } else {
@@ -1764,13 +1797,13 @@ HPDK_JS = r"""
           for (j2 = 0; j2 < keys.length; j2++) {
             var qq = q[keys[j2]];
             if (!qq) miss++;
-            var vv = judge(META[keys[j2]], qq);
+            var vv = judge(META[keys[j2]], qq, preMode);
             if (vv.k === 'keep') sur.push({code: keys[j2], m: META[keys[j2]], gap: vv.gap});
           }
           score(sur);
           sur.sort(function(X, Y){ return (Y.F !== X.F) ? (Y.F - X.F) : (X.m.i - Y.m.i); });
           FP = {buy_date: String(H.buy_date || ''), pool: keys.length, hits: sur.length,
-                missing: miss, k: K,
+                k: K, prov: preMode, ref_ts: preMode ? S.mktTs : null,
                 /* R-hpdk-top-0929：把**判定当时的报价快照**一并冻结进名单 —— 冻结帧读回时价格列
                    才是「首算那一刻」的值（否则会拿刷新后的实时价去配一份已冻结的名单，自相矛盾）。 */
                 top: sur.slice(0, K).map(function(x){
@@ -1781,7 +1814,10 @@ HPDK_JS = r"""
           /* R-hpdk-freeze-0929：**报价覆盖 ≥50% 才允许落冻结** —— 线上实测事故：首算发生在
              10:00:42、当时只拿到 17 条报价 ⇒ 把「命中 3 只」冻成了名单，报价到齐后也不再变
              （用户看到的就是 3 行全是「—」的清单）。覆盖不足 ⇒ 只用于本次渲染，不落盘。 */
-          if (_covNow >= 50) { saveFP(FP); FPfrozen = true; }
+          /* R-hpdk-preauction-0930：竞价预备口径**不落权威冻结**（它只是预判，09:25 会变）；
+             改存 PREKEY，供 09:25 后做「预判 vs 实测」对拍。 */
+          if (preMode) { if (_covNow >= 50) savePRE(FP); }
+          else if (_covNow >= 50) { saveFP(FP); FPfrozen = true; }
         }
       }
     } catch (e) { FP = null; S.err = String(e && e.message || e); }
@@ -1807,6 +1843,36 @@ HPDK_JS = r"""
             +  (FPfrozen ? (' · <b>09:25 后已冻结</b>（' + escH(FP.ts) + ' 首算，名单不再变）') : '')
             +  (S.fallback ? ' · <span style="color:var(--warn)">时间戳源不可用：已按本地时钟兜底</span>' : '')
             +  '｜现行 ST/退 按名称剔除</div>';
+        /* R-hpdk-preauction-0930（用户 2026-09-29 批准）：竞价预备口径的说明 + 09:25 后的「预判 vs 实测」对拍。
+           对拍口径：PRE.top 的 px = 09:15–09:25 参考价，FP.top 的 opn = 09:25 真实开盘价；
+           对**同时在两份名单里**的票算 |参考价/昨收 − 今开/昨收| —— 这就是现场测得的参考价误差 σ。 */
+        if (FP.prov) {
+          _h3 += '<div class="sub" style="color:var(--warn);margin-top:6px">'
+              +  '\u26a1 <b>竞价预备口径</b>：09:15\u201309:25 还没有真实今开，本清单用行情「现价」'
+              +  '（= 集合竞价虚拟开盘参考价）代替今开算 gap \u21d2 带内预判集合 \u2192 F 前 ' + FP.k + '。'
+              +  '<b>它不是权威口径、不落冻结</b>；09:25 撮合出真实开盘价后立即切回权威清单，'
+              +  '届时此处会显示「预判 vs 实测」的重合度与参考价平均偏差。</div>';
+        } else {
+          var _PL = loadPRE();
+          if (_PL && String(_PL.buy_date) === String(H.buy_date || '') && _PL.top && _PL.top.length) {
+            var _cf = {}, _ci, _ov = 0, _devs = [];
+            for (_ci = 0; _ci < FP.top.length; _ci++) _cf[FP.top[_ci].code] = FP.top[_ci];
+            for (_ci = 0; _ci < _PL.top.length; _ci++) {
+              var _pk = _PL.top[_ci], _tf = _cf[_pk.code];
+              if (_tf) _ov++;
+              if (_tf && num(_pk.px) > 0 && num(_pk.pcl) > 0 && num(_tf.pcl) > 0 && num(_tf.opn) > 0)
+                _devs.push(Math.abs(num(_pk.px) / num(_pk.pcl) - num(_tf.opn) / num(_tf.pcl)) * 100);
+            }
+            var _dev = _devs.length ? (_devs.reduce(function(a, b){ return a + b; }, 0) / _devs.length) : NaN;
+            _h3 += '<div class="sub" style="color:var(--faint);margin-top:6px">'
+                +  '\u2696 <b>竞价预判对拍</b>（09:15\u201309:25 参考价口径 vs 09:25 真实今开）：'
+                +  '名单重合 <b>' + _ov + ' / ' + FP.k + '</b>'
+                +  ' · 参考价平均偏差 <b>' + (isNaN(_dev) ? '\u2014' : _dev.toFixed(3) + '%') + '</b>'
+                +  '（n=' + _devs.length + '）'
+                +  ' · 预判命中 <b>' + (_PL.hits === null || _PL.hits === undefined ? '\u2014' : _PL.hits) + '</b> 只'
+                +  '｜按实测 σ 查滑价曲线：\u22640.1% \u2248 损失 11%，\u22640.2% \u2248 损失 28%</div>';
+          }
+        }
         if (!_k3) {
           _h3 += '<div class="sub" style="color:var(--faint)">本次判定范围内无命中'
               +  (FP.missing ? ('（' + FP.missing + ' 只缺报价，未判定）') : '') + '。</div>';
