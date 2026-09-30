@@ -1,0 +1,53 @@
+{
+ "_what": "端到端验收证据：卡片「今日买入清单」全池口径修复后的实测（浏览器真机 + 命令行双路径对拍）",
+ "date": "2026-09-30",
+ "verifying_commit": "main 76686fd / gh-pages b37f330",
+ "method": [
+  "① 浏览器真机：PI-Desktop 工作面板载入线上 index.html（cache-bust），等实时层跑一轮，读 window.INTRADAY.state 与 #hpdk-live-top 文本",
+  "② 命令行独立复算：backtest/hengpan_fangliang_dikai_0925/hpdk_live_fullpool.py --top 10（腾讯 400 码/片，2311/2311）",
+  "③ 两路径逐位对拍"
+ ],
+ "root_cause": {
+  "bug": "资格池并入池内报价的那段代码写在 refresh() 直接作用域，且在 var codes/seen 声明之前；而声明在下方 .then(function(){...}) 回调内，属不同函数作用域 ⇒ 访问 codes/seen 抛 ReferenceError，被 try{}catch(e){} 静默吞掉 ⇒ 整个资格池从未并入",
+  "symptom": "池内报价只覆盖 DOM 已渲染的 600 行 ⇒ 全池判定覆盖率长期卡 ~30%、命中 13 只（真值 50）",
+  "why_previous_fix_looked_like_no_op": "上一轮把报价源从东财改为腾讯（该修复本身正确：东财本机实测 0 覆盖），但码数未变 ⇒ 覆盖率瓶颈与数据源无关 ⇒ 用户看到「看板一点没动」"
+ },
+ "fix": {
+  "change": "整段移到 codes/seen 声明之后的同一作用域；去掉空 catch（改 S.poolExtraErr 留痕）；新增 S.poolExtraN",
+  "static_checks": {
+   "py_compile": "rc=0",
+   "node_check_intraday_js": "rc=0",
+   "var_needExtra_occurrences": 1,
+   "position_needExtra_after_var_codes": true,
+   "silent_catch_remaining": false
+  }
+ },
+ "live_measurement_before_fix": {
+  "source": "e10dc1a（上一版）",
+  "cover_pct": 30,
+  "n_hits": 13,
+  "intraday_state": {"marketN": 0, "poolSrc": "腾讯", "txBatches": 1, "txFail": 0},
+  "note": "hasNewMarker=false，确认页面跑的是上一版"
+ },
+ "live_measurement_after_fix": {
+  "source": "b37f330（本轮）",
+  "has_new_marker": true,
+  "intraday_state": {"poolExtraN": 2424, "poolSrc": "腾讯", "txBatches": 6, "txFail": 0, "marketN": 0},
+  "card_header": "资格池 2311 只 → 命中 50 只 · 报价覆盖 100%（缺报价 0 只未判定）· 名单 = F 前 10（本次 10 只）· 09:25 后已冻结（2026-09-30 10:13:58 首算，名单不再变）",
+  "cover_pct": 100,
+  "n_hits": 50,
+  "red_warning_visible": false
+ },
+ "cross_check": {
+  "front_end_top10": ["002234", "603506", "601038", "600639", "002043", "600791", "000514", "000965", "001872", "600604"],
+  "cli_top10": ["002234", "603506", "601038", "600639", "002043", "600791", "000514", "000965", "001872", "600604"],
+  "identical": true,
+  "n_identical": 10,
+  "note": "前端与命令行两条完全独立的实现，给出逐位一致的 F 前 10 与相同的命中总数 50"
+ },
+ "verdict": "PASS — 覆盖率 30%→100%、命中 13→50、名单与独立复算逐位一致",
+ "remaining": [
+  "marketN 仍为 0（全市场快照/热图腿未取到）⇒ 池内报价兜底生效并已覆盖 100%，但每轮多打 6 个腾讯请求；快照腿根因另查",
+  "09:30 竞价预备清单（preMode）本轮未在竞价时段实测（页面 10:11 后才载入）"
+ ]
+}
