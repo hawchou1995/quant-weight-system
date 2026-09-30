@@ -484,18 +484,6 @@ INTRADAY_JS = r"""
 
   /* ---------- 刷新与调度 ---------- */
   function refresh(force){
-      /* R-hpdk-poolfallback-0929：全市场快照（S.marketQ）拿不到时（页面无 HEATMAP / 快照失败），
-         把整个资格池并进池子报价请求 —— 有兜底路径（腾讯 400 码分片）。快照可用时**不再并池**，
-         避免每轮多打 6 个请求。 */
-      var _needExtra = !(S.marketQ && S.marketN >= 1000);
-      if (_needExtra && typeof window.POOL_EXTRA_CODES === 'function') {
-        try {
-          var _ex = window.POOL_EXTRA_CODES() || [];
-          for (var _ie = 0; _ie < _ex.length; _ie++) {
-            if (_ex[_ie] && !seen[_ex[_ie]]) { seen[_ex[_ie]] = 1; codes.push(_ex[_ie]); }
-          }
-        } catch (e) {}
-      }
     if (chainQuiet()) { S.quiet = true; pill(); return Promise.resolve(false); }  /* R-treelive-0922 */
     S.quiet = false;
     if (S.busy) return Promise.resolve(false);
@@ -507,6 +495,23 @@ INTRADAY_JS = r"""
       var tgs = targets();
       var codes = [], seen = {};
       for (var i = 0; i < tgs.length; i++) { if (!seen[tgs[i].code]) { seen[tgs[i].code] = 1; codes.push(tgs[i].code); } }
+      /* R-hpdk-poolfallback-0930（**位置修复 · 本日第二次自伤**）：原实现把这段放在 `refresh()` 作用域、
+         **在 `var codes = [], seen = {}` 之前** —— 而那两个变量声明在下方的 `.then(function(){...})` 回调里，
+         属**不同函数作用域** ⇒ 这里访问 `codes/seen` 直接 ReferenceError，又被 `try{}catch(e){}` 静默吞掉
+         ⇒ **整个资格池从未并入 `codes`**：池内报价只覆盖 DOM 已渲染的行（约 600–700 只）
+         ⇒ 全池判定覆盖率长期卡在 ~30%（2026-09-30 实测 693/2311），命中 13 只 vs 真值 50 只，
+         且「源 东财→腾讯」的改动**对覆盖率毫无影响**（码数没变）——用户看到的「看板一点没动」即此。
+         教训：`try{}catch(e){}` 空吞是事故的放大器，任何 catch 必须留痕。 */
+      var _needExtra = !(S.marketQ && S.marketN >= 1000);
+      if (_needExtra && typeof window.POOL_EXTRA_CODES === 'function') {
+        try {
+          var _ex = window.POOL_EXTRA_CODES() || [];
+          for (var _ie = 0; _ie < _ex.length; _ie++) {
+            if (_ex[_ie] && !seen[_ex[_ie]]) { seen[_ex[_ie]] = 1; codes.push(_ex[_ie]); }
+          }
+          S.poolExtraN = codes.length;
+        } catch (e) { S.poolExtraErr = String((e && e.message) || e); }
+      }
       /* R-hpdk-marketq-0929：**不再把整个资格池塞进池子报价接口** —— 实测 2215 只要 79.6s 且只覆盖 64%
          （东财失败 → 腾讯兜底，浏览器对 800 码 URL 快速失败）。全池判定改用 R-hpdk-marketq-0929
          发布的全市场快照（S.marketQ，零额外请求、全覆盖）。池子接口只服务 DOM 行的实时刷新。 */
