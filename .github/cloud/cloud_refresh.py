@@ -19,7 +19,8 @@
   G3 防回归：线上同名文件 as_of 若**新于**本地 → 该文件不进发布集（保留线上更新版）
 
 退出码：0 成功（含 no-new-data）/ 1 链失败 / 2 口径结构不合格（拒发）/ 3 外部端点不可用
-输出：$GITHUB_OUTPUT 的 publish / status / live_url（供 workflow 的 if 与回读用）
+输出：$GITHUB_OUTPUT 的 publish / status / live_url / chain_rc（供 workflow 的 if、回读
+      与「链失败门禁」用）。chain_rc 空 = 非 chain 模式；"0" = 链全绿；非 "0" = 链内硬失败。
 """
 from __future__ import annotations
 
@@ -41,6 +42,10 @@ STAGING = REPO / "_cloud_dist"
 LIVE_BASE = "https://hawchou1995.github.io/quant-weight-system/"
 RUN_ID = os.environ.get("GITHUB_RUN_ID", "local")
 SHA = os.environ.get("GITHUB_SHA", "")
+
+# 链返回码（main() 中赋值）。emit() 统一带出到 $GITHUB_OUTPUT，供 workflow 的
+# 「链失败门禁」判定（2026-09-30 加：链 rc≠0 必须让 job 变红）。
+CHAIN_RC = None
 
 # ---- 发布清单（真值源 = _deploy_fundline_0911.py 的 SYNC；两处改动必须同步）----
 SYNC = [
@@ -178,6 +183,8 @@ def runtime_deps() -> tuple[list, list]:
 
 
 def emit(**kw) -> None:
+    # chain_rc 统一带出（调用方无需各自传）：非 chain 模式为 ""，否则为链返回码字符串
+    kw.setdefault("chain_rc", "" if CHAIN_RC is None else CHAIN_RC)
     out = os.environ.get("GITHUB_OUTPUT")
     if not out:
         log("[outputs] " + json.dumps(kw, ensure_ascii=False))
@@ -221,6 +228,8 @@ def main() -> int:
             emit(publish="false", status="no-data-cache", live_url=LIVE_BASE)
             return 3
         chain_rc = run_chain(a.chain_timeout, a.force_chain)
+        global CHAIN_RC
+        CHAIN_RC = chain_rc
         log(f"[chain] rc={chain_rc}")
 
     # ---------- 2 G1 结构门禁 ----------

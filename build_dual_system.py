@@ -1624,6 +1624,20 @@ def _w_rows_qlch():
     return [r for _d, r in out], []
 
 
+def _w_code(x):
+    """账本元素 → 代码字符串（兼容两种 schema；2026-09-30 修复）
+
+    pending_buys 历史上是「代码字符串」列表；2026-09-03 起 khunter_paper 改写为
+    「字典」列表 [{"code","rsi","close","regime"}, ...]（见 khunter_paper_20260903.py
+    的 st["pending_buys"] = [{"code": b["code"], ...} for b in buys]）。
+    旧代码直接 WATCH_NAMES.get(元素) → TypeError: unhashable type: 'dict'，
+    使云端 run 36722593102 的 build_dual_system exit 1、看板整篇未重建。
+    """
+    if isinstance(x, dict):
+        return str(x.get("code", "") or "")
+    return str(x or "")
+
+
 def _w_rows_kh():
     """超卖伏击：A 轨（标准 · khunter_paper_state.json）+ C 轨（激进 · khunter_paper_state_c.json）
     的 positions / pending / trades（**只读**账本，不写）。
@@ -1636,7 +1650,7 @@ def _w_rows_kh():
             continue
         _nh = d.get("nav_history") or []
         _last_d = _nh[-1].get("date", "") if _nh else ""
-        pend_sell = set(d.get("pending_sells") or [])
+        pend_sell = {_w_code(_x) for _x in (d.get("pending_sells") or [])}
         for p in (d.get("positions") or []):
             c = p.get("code", "")
             st = ('<span class="warn">待卖出 · T+1 开盘</span>' if c in pend_sell
@@ -1647,7 +1661,8 @@ def _w_rows_kh():
                 "d": p.get("entry_date") or "—", "px": _w_num(p.get("entry_px")),
                 "last": _w_num(p.get("last_close")),
                 "hold": "%s d" % p.get("hold_days", "—")}))
-        for c in (d.get("pending_buys") or []):
+        for _b in (d.get("pending_buys") or []):
+            c = _w_code(_b)
             out.append((_last_d, {
                 "code": c, "name": WATCH_NAMES.get(c, ""), "tgt": _w_tgt(c),
                 "board": _w_board(c), "arm": arm,

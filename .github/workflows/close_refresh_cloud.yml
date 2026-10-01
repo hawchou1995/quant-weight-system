@@ -13,6 +13,9 @@ name: 收盘刷新（云端）
 # 发布：cloud_refresh.py 组装 _cloud_dist/ 并过三道门禁，publish=true 才 peaceiris 写 gh-pages
 #       keep_files:true → 盘中 rt_snapshot.yml 产出的文件不会被本 workflow 删除
 # 退出码：0 成功（含 no-new-data）/ 1 链失败 / 2 门禁拒发 / 3 数据未就位（本 workflow 视为告警不红）
+# 2026-09-30 加「链失败门禁」末步：链 rc≠0（daily_refresh 的 fails 非空）时，在发布/回读/delta
+#   全部照常完成之后把 job 置红。修此前「链 rc=1 但 cloud_refresh 因 publish=true 仍 return 0
+#   ⇒ job 绿、摘要 rc=0」的静默吞错（run 36722593102 的 build_dual_system exit 1 即此例）。
 # 2026-09-25 改名为 close_refresh_cloud.yml（R-cloudsync-0925）：cron 曾于 09-24 改为 07:05 UTC，
 #   但 GitHub 旧注册未刷新——09-24 12:40 / 09-25 12:42 UTC 两轮仍按旧 12:30 UTC 触发（延迟 10–12 分钟特征一致）。
 #   同路径改文件不生效 → 改名 = 新建 workflow 实体，强制重新注册 schedule。（旧名 close_refresh.yml 已废弃）
@@ -202,5 +205,25 @@ jobs:
       - name: 摘要
         if: always()
         run: |
-          echo "mode=${{ steps.mode.outputs.mode }} status=${{ steps.refresh.outputs.status }} publish=${{ steps.refresh.outputs.publish }} rc=${{ steps.refresh.outputs.rc }}"
+          echo "mode=${{ steps.mode.outputs.mode }} status=${{ steps.refresh.outputs.status }} publish=${{ steps.refresh.outputs.publish }} rc=${{ steps.refresh.outputs.rc }} chain_rc=${{ steps.refresh.outputs.chain_rc }}"
           [ -f _cloud_dist/_cloud_manifest.json ] && cat _cloud_dist/_cloud_manifest.json || true
+
+      # ---- 8 链失败门禁（2026-09-30 加）----
+      # 判据：链 rc≠0 ⇒ daily_refresh.py 的 fails 列表非空（硬失败；软失败 soft_fails 不改 rc）。
+      # 此前 cloud_refresh.py 只要 publish=true 就 return 0，掩盖了链内硬失败。
+      # 必须放最后且 always()：发布 / 回读 / 数据缓存 / data-delta 得先照常产出当日产物，
+      #   本步只负责把 job 标红，让硬失败可见（回读仍成功，不丢产物）。
+      - name: 链失败门禁
+        if: always()
+        run: |
+          RC="${{ steps.refresh.outputs.chain_rc }}"
+          echo "链返回码 chain_rc='${RC}'"
+          # 空 = 非 chain 模式（无链）；"0" = 链全绿；
+          # "3" = 外部端点不可用/数据未就位 —— 沿用 workflow 既有约定：告警不红；
+          # 其余（典型 "1"）= daily_refresh.py 的 fails 非空 = 链内硬失败 → 置 job 红。
+          if [ -z "$RC" ] || [ "$RC" = "0" ] || [ "$RC" = "3" ]; then
+            echo "✅ 无链硬失败（chain_rc 为空/0/3）"
+            exit 0
+          fi
+          echo "::error::链返回码 chain_rc=${RC} —— 链内存在硬失败（日志搜 '[chain] rc=' 与行首 '❌ 失败:'）。发布与 data-delta 已完成，本步仅置 job 失败以暴露问题。"
+          exit 1
