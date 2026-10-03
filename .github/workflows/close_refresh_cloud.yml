@@ -16,6 +16,12 @@ name: 收盘刷新（云端）
 # 2026-09-30 加「链失败门禁」末步：链 rc≠0（daily_refresh 的 fails 非空）时，在发布/回读/delta
 #   全部照常完成之后把 job 置红。修此前「链 rc=1 但 cloud_refresh 因 publish=true 仍 return 0
 #   ⇒ job 绿、摘要 rc=0」的静默吞错（run 36722593102 的 build_dual_system exit 1 即此例）。
+# 2026-10-03 加 as_of 输入 + G2b 门禁（R-cloud-makeup-1003）：修「看板停在 09-29 且无法自愈」。
+#   两处独立缺陷：①09-30 链内 build_dual_system 崩溃 → dual_system.html 未重建，而两个 JS
+#   已刷到 09-30；旧 G2 只看 JS 故放行，上线「标题 09-29 / 数据 09-30」的错配看板。
+#   ②G2 按「北京今日」判新鲜 → 长假期间恒 no-new-data，10-01 已重建出 09-30 全套却被丢掉，
+#   只能干等下一个真实交易日直接从 09-29 跳到 10-08/10-09。修法：G2a 三锚点（含 HTML）+
+#   可显式断言数据日的 as_of 输入；G2b 用 mtime 判定「这版看板到底重建没重建」。
 # 2026-09-25 改名为 close_refresh_cloud.yml（R-cloudsync-0925）：cron 曾于 09-24 改为 07:05 UTC，
 #   但 GitHub 旧注册未刷新——09-24 12:40 / 09-25 12:42 UTC 两轮仍按旧 12:30 UTC 触发（延迟 10–12 分钟特征一致）。
 #   同路径改文件不生效 → 改名 = 新建 workflow 实体，强制重新注册 schedule。（旧名 close_refresh.yml 已废弃）
@@ -41,6 +47,14 @@ on:
           - '0'
           - '1'
         default: '0'
+      as_of:
+        # 2026-10-03 加（R-cloud-makeup-1003）：补发/补跑必须显式断言数据日。
+        # 背景：cloud_refresh.py 的 G2 原先按「北京今日」判新鲜 → 非交易日/长假恒判
+        #   no-new-data（绿、不发布），于是 09-30 那次 build_dual_system 崩溃造成的
+        #   旧看板再也无法被纠正。留空 = 沿用今日（定时任务原语义，行为不变）。
+        description: '期望数据日 YYYY-MM-DD（补发/补跑用；留空=今日）。与实物不符即 rc2 拒发'
+        type: string
+        default: ''
 
 concurrency:
   group: close-refresh
@@ -121,8 +135,10 @@ jobs:
           set +e
           FORCE_ARG=""
           if [ "${{ inputs.force }}" = "1" ]; then FORCE_ARG="--force-chain"; fi
-          echo "force 输入=\'${{ inputs.force }}\' → 链参数 \"$FORCE_ARG\""
-          python -X utf8 .github/cloud/cloud_refresh.py --mode ${{ steps.mode.outputs.mode }} $FORCE_ARG
+          EXPECT_ARG=""
+          if [ -n "${{ inputs.as_of }}" ]; then EXPECT_ARG="--expect-as-of ${{ inputs.as_of }}"; fi
+          echo "force 输入='${{ inputs.force }}' → 链参数 \"$FORCE_ARG\" · 期望数据日='${{ inputs.as_of }}' → \"$EXPECT_ARG\""
+          python -X utf8 .github/cloud/cloud_refresh.py --mode ${{ steps.mode.outputs.mode }} $FORCE_ARG $EXPECT_ARG
           rc=$?
           echo "rc=$rc" >> "$GITHUB_OUTPUT"
           echo "退出码 rc=$rc（0 成功｜1 链失败｜2 门禁拒发｜3 数据未就位）"

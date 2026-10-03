@@ -14,8 +14,15 @@
 
 门禁（任一不过即拒发，不写线上；对应 rc 2/3）：
   G1 结构：清单文件齐 + dual_system.html 的运行期 <script src> 全在清单内（防静默发旧文件）
-  G2 新鲜度：enhanced_data.js / short_signals.js 的 as_of == 今日（北京时区）；
-            chain 模式不满足 → status=no-new-data（绿，等价「非交易日/无新数据」）
+  G2a 数据日：enhanced_data.js / short_signals.js / dual_system.html 三者的 as_of 必须都 == 期望日
+             （期望日 = --expect-as-of 显式断言，留空则北京今日）；
+             chain 模式不满足且未显式断言 → status=no-new-data（绿，等价「非交易日/无新数据」）；
+             显式断言不满足 → status=stale-data（拒发，rc 2）
+  G2b 重建：dual_system.html 的 mtime 不得早于两个数据文件（容差 G2_MTIME_TOL_S=300s）——
+             早于即认定「看板未重建」→ status=html-stale（拒发，rc 2）。
+             2026-10-03 加：修 2026-09-30 事故（run 36722593102：build_dual_system 崩溃 →
+             dual_system.html 停在 09-29 未重建，而两个 JS 已刷到 09-30；旧 G2 只看两个 JS
+             故判「新鲜」放行，上线一个「页面标题 09-29 / 数据 09-30」的错配看板）。
   G3 防回归：线上同名文件 as_of 若**新于**本地 → 该文件不进发布集（保留线上更新版）
 
 退出码：0 成功（含 no-new-data）/ 1 链失败 / 2 口径结构不合格（拒发）/ 3 外部端点不可用
@@ -74,6 +81,11 @@ HTML = "dual_system.html"
 AS_OF_RE = re.compile(r'"as_of"\s*:\s*"(\d{4}-\d{2}-\d{2})"')
 # G2 硬门只看这两个（看板标题「数据截至 X」与命中一览都读它们）
 G2_FILES = ("enhanced_data.js", "short_signals.js")
+# 看板 HTML 内嵌的数据日（标题与卡片徽章文本 = 「数据截至 YYYY-MM-DD …」）——G2a 第三锚点。
+# 2026-10-03 加：此前 HTML 从不进任何门禁，是「JS 新 / HTML 旧」错配能上线的原因。
+HTML_ASOF_RE = re.compile(r'数据截至\s*(\d{4}-\d{2}-\d{2})')
+# G2b 容差：checkout/写盘抖动是毫秒级；真实「未重建」是小时级（09-30 实测差 12.8h）。
+G2_MTIME_TOL_S = 300
 
 CHAIN_FLAGS = ["--skip-deploy", "--skip-fullguard",
                "--no-main-push", "--skip-gushi"]
@@ -106,6 +118,15 @@ def today_cn() -> str:
 
 def as_of_of(text: str):
     m = AS_OF_RE.search(text)
+    return m.group(1) if m else None
+
+
+def html_as_of(text: str):
+    """看板 HTML 内嵌的数据日（「数据截至 YYYY-MM-DD」）。取首个命中（= <title>，全页一致）。
+
+    2026-10-03 加。缺失 → None（调用方按**不过**处理：宁可拒发，不发一个读不出数据日的看板）。
+    """
+    m = HTML_ASOF_RE.search(text)
     return m.group(1) if m else None
 
 
@@ -199,6 +220,9 @@ def main() -> int:
     ap.add_argument("--mode", choices=["probe", "chain"], default="probe")
     ap.add_argument("--force-chain", action="store_true",
                     help="给 daily_refresh.py 追加 --force（越过周末/非交易日守卫；仅验证/补跑）")
+    ap.add_argument("--expect-as-of", dest="expect_as_of", default="",
+                    help="显式断言期望数据日 YYYY-MM-DD（补发/补跑专用）。"
+                         "留空 = 按北京今日（定时任务的正常语义，行为不变）。")
     # 2026-09-29：7200(120min) 实测不足 —— run 36558370018 在 fetch_val_daily 前被砍（[chain] rc=1），
     #   后段 rebuild_panels / revscreen_regen / qlch 六臂 / A5 / factor_gate 全未执行，
     #   发布产物 a5_pool.js 停在 09-24。正常轮 ~117min，最坏抓数组合（update_daily 67min +
@@ -260,20 +284,50 @@ def main() -> int:
             log(f"  ⏭ 防回归：线上 {n} as_of={live_o} 新于本地 {lo} —— 本次不发该文件")
     if skipped_newer:
         log(f"✅ G3 防回归：跳过 {len(skipped_newer)} 个文件（{'、'.join(skipped_newer)}）")
-
-    # ---------- 4 G2 新鲜度门禁 ----------
+    # ---------- 4 G2a 数据日门禁（三锚点，含看板 HTML）----------
+    # 期望日 = --expect-as-of 显式断言（补发/补跑），留空 = 北京今日（定时任务原语义）。
+    #   2026-10-03 加 expect：修「长假期间永远无法自愈」——10-01 run 36805573342 已用 --force
+    #   重建出 09-30 全套（链 rc=0），却被「vs 今日 2026-10-01」判 no-new-data 丢掉，
+    #   于是 09-29 的旧看板再也无法被纠正，只能等下一个真实交易日直接跳到 10-08/10-09。
     today = today_cn()
+    expect = a.expect_as_of or today
     as_ofs = {}
     for n in G2_FILES:
         as_ofs[n] = as_of_of((REPO / n).read_text(encoding="utf-8", errors="replace"))
-    fresh = all(v == today for v in as_ofs.values())
-    log(f"{'✅' if fresh else '⏳'} G2 新鲜度：{as_ofs} vs 今日 {today}")
-    if a.mode == "chain" and not fresh:
-        log("→ status=no-new-data（非交易日/数据未就绪）：不发布，退出 0")
-        emit(publish="false", status="no-new-data", live_url=LIVE_BASE)
-        return 0
+    # 看板 HTML 的数据日（标题/徽章「数据截至 YYYY-MM-DD」）——第三个锚点，缺一即不算新鲜。
+    #   缺字段 → None → 与 expect 不等 → 不过（宁可拒发）。
+    as_ofs[HTML] = html_as_of((REPO / HTML).read_text(encoding="utf-8", errors="replace"))
+    fresh = all(v == expect for v in as_ofs.values()) and None not in as_ofs.values()
+    _src = "（--expect-as-of 显式断言）" if a.expect_as_of else "（北京今日）"
+    log(f"{'✅' if fresh else '⏳'} G2a 数据日：{as_ofs} vs 期望 {expect}{_src}")
+    if not fresh:
+        if a.expect_as_of:
+            log(f"❌ G2a 数据日门禁不过 —— 显式断言 {a.expect_as_of}，实物 {as_ofs}：拒发（rc 2）")
+            emit(publish="false", status="stale-data", live_url=LIVE_BASE)
+            return 2
+        if a.mode == "chain":
+            log("→ status=no-new-data（非交易日/数据未就绪）：不发布，退出 0")
+            emit(publish="false", status="no-new-data", live_url=LIVE_BASE)
+            return 0
+        log("→ probe 模式：仅告警，不阻断（补 --expect-as-of 可强制断言）")
 
-    # ---------- 4b 新策略产物新鲜度（**软检查**：只告警 + 记进清单，不阻断发布）----------
+    # ---------- 4b G2b 看板重建门禁（mtime 一致性）----------
+    # 2026-10-03 加。事故现场（run 36722593102）：build_dual_system 抛 TypeError 崩掉 →
+    #   dual_system.html 自 09-30 10:10 起没被重建；而 enhanced_data.js / short_signals.js
+    #   已在同一轮刷到 09-30 → 旧 G2 只看两个 JS，判「新鲜」放行，上线「标题 09-29 / 数据 09-30」。
+    # 判据：链内 dual_system.html 是**最后一个**写盘的生产步骤（build_dual_system 在 STEPS 末位），
+    #   故其 mtime 必须不早于两个数据文件（容差 300s，吸收 checkout/写盘抖动）。
+    # 注：与 G2a 互补 —— G2a 管「数据日对不对」，本门管「这版看板到底重建没重建」。
+    data_mt = max((REPO / n).stat().st_mtime for n in G2_FILES)
+    html_mt = (REPO / HTML).stat().st_mtime
+    if html_mt < data_mt - G2_MTIME_TOL_S:
+        log(f"❌ G2b 看板重建门禁不过 —— {HTML} 的 mtime 比数据文件早 "
+            f"{data_mt - html_mt:.0f}s（容差 {G2_MTIME_TOL_S}s）：认定本轮未重建看板，拒发（rc 2）")
+        emit(publish="false", status="html-stale", live_url=LIVE_BASE)
+        return 2
+    log(f"✅ G2b 看板重建：{HTML} mtime 不早于数据文件（差 {html_mt - data_mt:+.0f}s）")
+
+    # ---------- 4c 新策略产物新鲜度（**软检查**：只告警 + 记进清单，不阻断发布）----------
     # 语义同 SYNC_SOFT：新策略一次偶发失败不得阻断整条云端发布；但必须**可见** ——
     # 否则会静默发布一个「横盘低开」卡片显示「产物未生成」的页面，而无人察觉。
     hpdk = {}
@@ -316,8 +370,13 @@ def main() -> int:
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(REPO / n, dst)
         assert md5(dst) == md5(REPO / n), f"复制校验失败 {n}"
+        # 2026-10-03：看板 HTML 的 as_of 用「数据截至」徽章（html_as_of），不用通用
+        #   '"as_of": "…"' 正则 —— 后者会命中 HTML 内嵌的**任意**子系统 payload
+        #   （ETF/哨兵/A5…），未必等于页面标题所示的数据日（09-30 事故清单里
+        #   dual_system.html 记 09-29 正是这么来的）。清单要报的是「页面显示的数据日」。
+        _txt = dst.read_text(encoding="utf-8", errors="replace")
         files.append({"name": n, "md5": md5(dst)[:12], "bytes": dst.stat().st_size,
-                      "as_of": as_of_of(dst.read_text(encoding="utf-8", errors="replace"))})
+                      "as_of": (html_as_of(_txt) if n == HTML else as_of_of(_txt))})
     shutil.copy2(REPO / HTML, STAGING / "index.html")
     assert md5(STAGING / HTML) == md5(STAGING / "index.html"), "index.html 双向同步失败"
     files.append({"name": "index.html", "md5": md5(STAGING / "index.html")[:12],
