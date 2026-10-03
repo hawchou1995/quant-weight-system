@@ -6,9 +6,17 @@
       → 自动链恒打印 [skip] 非交易日，实际全靠傍晚人工 --force 追跑。
 
 本脚本（链内步骤，位于数据步之后）：
+  - 【补线】先按数据源最近 N 根日线把文件补齐到**最近可用交易日**（只补 < 今日 的历史缺失行）
   - 从数据源取**今日** HS300 日线（主：东财 kline；备：新浪 hq 快照，二者对 09-16 行逐位对拍过）
   - 取到 → 写入 / 就地刷新 index_000300.csv 末行（幂等：盘中写的非终值，收盘后重跑自动刷新），exit 0
-  - 取不到（节假日 / 数据源未就绪）→ exit 3（约定码：调用方据此判"非交易日"，跳过后续步骤）
+  - 取不到（节假日 / 数据源未就绪）→ 补线仍已落盘，再 exit 3（约定码：调用方据此判"非交易日"，跳过后续步骤）
+
+2026-10-03 加【补线】（R-index-catchup-1003）：原来只写「今天」那一行。长假/补跑时取不到今日
+  行情就 exit 3，文件便停在**仓库里那份旧末行**（实测 main 停在 2026-09-28），而 index_000300.csv
+  是**全站共享交易日历**——一半策略拿它的末行当「今日」（sentinel_daily/qlch_paper*/gold_sat_paper/
+  satellite_paper/ret20_paper/shadow_ret20）。后果：云端 run 37104738938 把这些步骤全部算成
+  09-28（日志 `--date=2026-09-28 | index 末行=2026-09-28`），看板 6 张子策略卡从 09-29 退到 09-28。
+  补线后「末行 == 最新交易日」在任何时候都成立，本机与云端同修。
 
 口径（与库内 09-15/09-16 行一致）：列序 date,open,high,low,close,volume；
   volume 单位 = 股（东财/新浪原始值 = 手，×100）；价格 2 位小数去尾零。
@@ -29,9 +37,11 @@ DEFAULT_CSV = BASE / "index_000300.csv"
 UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
 EXIT_NOT_TRADING = 3            # 约定码：今日行情不可得（非交易日/未就绪）
 
-EM_URL = ("https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.000300"
-          "&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57"
-          "&klt=101&fqt=0&end=20500101&lmt=8")
+EM_BASE = ("https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.000300"
+           "&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57"
+           "&klt=101&fqt=0&end=20500101&lmt=")
+EM_URL = EM_BASE + "8"              # 今日行（原路径）
+EM_RECENT_URL = EM_BASE + "30"     # 补线：最近 30 根交易日（覆盖长假缺口）
 
 
 def _get(url, headers=None, enc="utf-8", timeout=15):
@@ -65,6 +75,41 @@ def fetch_sina_bar(day):
             "close": float(f[3]), "vol_hand": float(f[8])}
 
 
+
+def fetch_em_recent():
+    """东财最近 N 根日线：{日期: bar}（补线用；口径同 fetch_em_bar）"""
+    d = json.loads(_get(EM_RECENT_URL))
+    out = {}
+    for k in (d.get("data") or {}).get("klines", []):
+        f = k.split(",")
+        # f51=date f52=open f53=close f54=high f55=low f56=volume(手)
+        out[f[0]] = {"date": f[0], "open": float(f[1]), "close": float(f[2]),
+                     "high": float(f[3]), "low": float(f[4]), "vol_hand": float(f[5])}
+    return out
+
+
+def catch_up(csv, lines, nl, last_date, target, check):
+    """把 index_000300.csv 补齐到**数据源最近可用交易日**（补 < 今日 的历史缺失行）。
+
+    返回 (已补日期列表, 新末行日期)。--check 时只打印不写（闸门验证不受影响）。
+    取数失败/没有缺口 → 原样返回，绝不因补线失败而中断主链（补线是修数据，不是闸门）。
+    """
+    try:
+        bars = fetch_em_recent()
+    except Exception as e:                               # noqa: BLE001
+        print(f"[ensure] 补线取数异常（跳过补线，不阻断）：{type(e).__name__}: {str(e)[:90]}", flush=True)
+        return [], last_date
+    todo = sorted(d for d in bars if last_date < d < target)
+    if not todo:
+        return [], last_date
+    if check:
+        print(f"[ensure][check] 可补 {len(todo)} 行：{todo[0]} → {todo[-1]}（末行 {last_date}）", flush=True)
+        return todo, todo[-1]
+    lines.extend(make_row(bars[d]) for d in todo)
+    csv.write_bytes(nl.join(ln.encode("utf-8") for ln in lines) + nl)
+    print(f"[ensure] 补线 {len(todo)} 行：{todo[0]} → {todo[-1]}（源=em；末行 {last_date} → {todo[-1]}）",
+          flush=True)
+    return todo, todo[-1]
 def _fmt(v):
     s = f"{float(v):.2f}".rstrip("0").rstrip(".")
     return s or "0"
@@ -108,6 +153,9 @@ def main():
     lines = raw.decode("utf-8").splitlines()
     last_date = lines[-1].split(",")[0]
 
+
+    # ---- 补线：先补齐到数据源最近可用交易日（只补 < 今日 的历史缺失行）----
+    _added, last_date = catch_up(csv, lines, nl, last_date, target, args.check)
     bar, src = None, ""
     for name, fn in (("em", fetch_em_bar), ("sina", fetch_sina_bar)):
         try:
