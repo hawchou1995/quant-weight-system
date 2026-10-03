@@ -43,6 +43,13 @@ EM_BASE = ("https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.000300
 EM_URL = EM_BASE + "8"              # 今日行（原路径）
 EM_RECENT_URL = EM_BASE + "30"     # 补线：最近 30 根交易日（覆盖长假缺口）
 
+# 补线回落源（2026-10-03）：东财在 GitHub runner 上会被拒 → 备腾讯/新浪——
+#   两者正是 update_daily 在云端**能**取到数据的源。单位：tx=手；sina=股。
+TX_RECENT_URL = ("https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
+                 "?param=sh000300,day,,,2000,qfq")
+SINA_RECENT_URL = ("https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/"
+                   "CN_MarketData.getKLineData?symbol=sh000300&scale=240&ma=no&datalen=60")
+
 
 def _get(url, headers=None, enc="utf-8", timeout=15):
     req = urllib.request.Request(url, headers={**UA, **(headers or {})})
@@ -87,6 +94,57 @@ def fetch_em_recent():
                      "high": float(f[3]), "low": float(f[4]), "vol_hand": float(f[5])}
     return out
 
+def fetch_tx_recent():
+    """腾讯 fqkline 日线：{日期: bar}（volume=手，口径同 update_daily.fetch_tx_qfq）
+
+    行序 = [date, open, close, high, low, volume(手)]。**不带起止日期**：带日期会命中滞后
+    缓存节点（止于前日），无日期变体才返回最新——见 update_daily.py:182 的实测结论。
+    """
+    d = json.loads(_get(TX_RECENT_URL))
+    node = (d.get("data") or {}).get("sh000300") or {}
+    kl = node.get("qfqday") or node.get("day") or []
+    out = {}
+    for r in kl:
+        if len(r) >= 6 and not isinstance(r[5], dict):
+            out[r[0]] = {"date": r[0], "open": float(r[1]), "close": float(r[2]),
+                         "high": float(r[3]), "low": float(r[4]), "vol_hand": float(r[5])}
+    return out
+
+
+def fetch_sina_recent():
+    """新浪 json_v2 历史日线：{日期: bar}（volume **已是股** → /100 得手）
+
+    端点与口径同 fetch_full_universe.py:126（scale=240=日线）；必须带 Referer，否则返回
+    JS 字面量而非 JSON（json.loads 会炸）——本脚本直解 JSON。
+    """
+    t = _get(SINA_RECENT_URL, {"Referer": "https://finance.sina.com.cn"})
+    out = {}
+    for r in json.loads(t):
+        out[r["day"]] = {"date": r["day"], "open": float(r["open"]), "high": float(r["high"]),
+                         "low": float(r["low"]), "close": float(r["close"]),
+                         "vol_hand": float(r["volume"]) / 100.0}
+    return out
+
+
+def fetch_recent():
+    """补线取数：多源回落 东财 → 腾讯 → 新浪。返回 ({日期: bar}, 源名)；全失败 ({}, "")。
+
+    2026-10-03（R-index-catchup-1003b）：东财 push2his 在 GitHub runner 上会被拒——run
+    37108593872 实测 `RemoteDisconnected`（同轮 EM 其它端点 502/被拦），而链内 update_daily
+    用新浪/腾讯能取到当日。所以补线必须多源：**本地能补、云端补不上 = 等于没修**。
+    单位：em/tx 的 volume=手（make_row 内 ×100 转股），sina 的 volume 已是股。
+    """
+    for name, fn in (("em", fetch_em_recent), ("tx", fetch_tx_recent), ("sina", fetch_sina_recent)):
+        try:
+            bars = fn()
+        except Exception as e:                           # noqa: BLE001
+            print(f"[ensure] 补线源 {name} 失败：{type(e).__name__}: {str(e)[:80]}", flush=True)
+            continue
+        if bars:
+            return bars, name
+    print("[ensure] 补线：三源（东财/腾讯/新浪）均无数据 → 跳过补线（不阻断）", flush=True)
+    return {}, ""
+
 
 def catch_up(csv, lines, nl, last_date, target, check):
     """把 index_000300.csv 补齐到**数据源最近可用交易日**（补 < 今日 的历史缺失行）。
@@ -94,22 +152,23 @@ def catch_up(csv, lines, nl, last_date, target, check):
     返回 (已补日期列表, 新末行日期)。--check 时只打印不写（闸门验证不受影响）。
     取数失败/没有缺口 → 原样返回，绝不因补线失败而中断主链（补线是修数据，不是闸门）。
     """
-    try:
-        bars = fetch_em_recent()
-    except Exception as e:                               # noqa: BLE001
-        print(f"[ensure] 补线取数异常（跳过补线，不阻断）：{type(e).__name__}: {str(e)[:90]}", flush=True)
+    bars, src = fetch_recent()
+    if not bars:
         return [], last_date
     todo = sorted(d for d in bars if last_date < d < target)
     if not todo:
         return [], last_date
     if check:
-        print(f"[ensure][check] 可补 {len(todo)} 行：{todo[0]} → {todo[-1]}（末行 {last_date}）", flush=True)
+        print(f"[ensure][check] 可补 {len(todo)} 行：{todo[0]} → {todo[-1]}（末行 {last_date}，源={src}）",
+              flush=True)
         return todo, todo[-1]
     lines.extend(make_row(bars[d]) for d in todo)
     csv.write_bytes(nl.join(ln.encode("utf-8") for ln in lines) + nl)
-    print(f"[ensure] 补线 {len(todo)} 行：{todo[0]} → {todo[-1]}（源=em；末行 {last_date} → {todo[-1]}）",
+    print(f"[ensure] 补线 {len(todo)} 行：{todo[0]} → {todo[-1]}（源={src}；末行 {last_date} → {todo[-1]}）",
           flush=True)
     return todo, todo[-1]
+
+
 def _fmt(v):
     s = f"{float(v):.2f}".rstrip("0").rstrip(".")
     return s or "0"
