@@ -22,12 +22,14 @@ name: 收盘刷新（云端）
 #   ②G2 按「北京今日」判新鲜 → 长假期间恒 no-new-data，10-01 已重建出 09-30 全套却被丢掉，
 #   只能干等下一个真实交易日直接从 09-29 跳到 10-08/10-09。修法：G2a 三锚点（含 HTML）+
 #   可显式断言数据日的 as_of 输入；G2b 用 mtime 判定「这版看板到底重建没重建」。
-# 2026-10-03 加固共享交易日历（R-index-cache-1003）：index_000300.csv 是全站交易日历（build_dual_system
-#   顶部「tradeDay = 该文件末行」），链内 ensure_index_row 补出的行原先**不入缓存、也不回写 main**
-#   → 下一轮又回落到 main 里那份旧末行（09-28 事故的复发路径；且东财被拒时补线会整体跳过）。
-#   两处加固：①本文件两处 actions/cache 的 path 加 index_000300.csv（云端自己补的行不再每轮丢）；
-#   ②同批把补出的 2026-09-29 / 2026-09-30 两行入库（零网络时也有正确锚点）。
-#   主修复仍是补线本身：多源回落 em → tx → sina（见 backtest/ensure_index_row.py 头注）。
+# 2026-10-03 共享交易日历加固（R-index-cache-1003）：index_000300.csv 是全站交易日历（build_dual_system
+#   顶部「tradeDay = 该文件末行」）。补线修好后仍有复发路径：链内补出的行不入缓存、也不回写 main
+#   （云端 --no-main-push），且三源全被拒时补线整体跳过。
+#   落地①（**保留**）：把补出的 2026-09-29 / 2026-09-30 两行入库 —— 零网络时也有正确锚点。
+#   落地②（**已回退**）：曾把 index_000300.csv 加进本文件两处 actions/cache 的 path。实测
+#     run 37125519172：`Cache not found for input keys: qws-data-37125519172, qws-data-` —— path
+#     列表属于**缓存版本哈希**，一改即让全部历史缓存失配 → 回落周日种子（数据只到 09-27）→
+#     update_daily 拒拉、universe_cal exit 2、链 rc=1。代价（丢掉增量数据缓存）远大于收益，故回退。
 # 2026-09-25 改名为 close_refresh_cloud.yml（R-cloudsync-0925）：cron 曾于 09-24 改为 07:05 UTC，
 #   但 GitHub 旧注册未刷新——09-24 12:40 / 09-25 12:42 UTC 两轮仍按旧 12:30 UTC 触发（延迟 10–12 分钟特征一致）。
 #   同路径改文件不生效 → 改名 = 新建 workflow 实体，强制重新注册 schedule。（旧名 close_refresh.yml 已废弃）
@@ -106,7 +108,6 @@ jobs:
             fund_nav_cache
             data_fundamental
             backtest/a5_experiment
-            index_000300.csv
           key: qws-data-${{ github.run_id }}
           restore-keys: |
             qws-data-
@@ -190,7 +191,6 @@ jobs:
             fund_nav_cache
             data_fundamental
             backtest/a5_experiment
-            index_000300.csv
           key: qws-data-${{ github.run_id }}
 
       # ---- 5b 当日数据 delta（供本机同步 K 线；链失败也产出，故用 always）----
