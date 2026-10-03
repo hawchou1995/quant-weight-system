@@ -1,11 +1,11 @@
 {
-  "run_id": "36722593102",
-  "sha": "6c379d2878270c3ca02f1763bba9427a2ef9aa91",
+  "run_id": "37104738938",
+  "sha": "95a55202ec6884e8d36bdbfa6404f6f17445efc2",
   "mode": "chain",
   "status": "published-candidate",
-  "ts_cn": "2026-09-30 23:41:40",
-  "today_cn": "2026-09-30",
-  "chain_rc": 1,
+  "ts_cn": "2026-10-03 15:39:33",
+  "today_cn": "2026-10-03",
+  "chain_rc": 0,
   "g2_fresh": true,
   "runtime_deps": [
     "enhanced_data.js",
@@ -16,13 +16,16 @@
     "echarts.min.js",
     "kxmm_data.js"
   ],
-  "skipped_newer": [],
+  "skipped_newer": [
+    "sentinel_pool.js",
+    "sentinel_track.js"
+  ],
   "files": [
     {
       "name": "dual_system.html",
-      "md5": "28b1dffff6ec",
-      "bytes": 2772639,
-      "as_of": "2026-09-29"
+      "md5": "4bfe7c19c2b9",
+      "bytes": 2796519,
+      "as_of": "2026-09-30"
     },
     {
       "name": "short_v3_fund_slip20_summary.json",
@@ -50,7 +53,7 @@
     },
     {
       "name": "review_log.html",
-      "md5": "3510306f7796",
+      "md5": "ce8ee2f78533",
       "bytes": 47169,
       "as_of": null
     },
@@ -68,19 +71,19 @@
     },
     {
       "name": "short_signals.js",
-      "md5": "c6ad353dcd46",
-      "bytes": 1787249,
+      "md5": "e043b7116dec",
+      "bytes": 1787253,
       "as_of": "2026-09-30"
     },
     {
       "name": "enhanced_data.js",
-      "md5": "99993443aac6",
-      "bytes": 435808,
+      "md5": "600cf0ed0156",
+      "bytes": 435960,
       "as_of": "2026-09-30"
     },
     {
       "name": "a5_pool.js",
-      "md5": "60747a60827d",
+      "md5": "6c0050fe81c4",
       "bytes": 30144,
       "as_of": "2026-09-30"
     },
@@ -97,28 +100,16 @@
       "as_of": null
     },
     {
-      "name": "sentinel_pool.js",
-      "md5": "840eb7978ee6",
-      "bytes": 31791,
-      "as_of": "2026-09-30"
-    },
-    {
-      "name": "sentinel_track.js",
-      "md5": "9b3416a57261",
-      "bytes": 2542,
-      "as_of": "2026-09-30"
-    },
-    {
       "name": "index.html",
-      "md5": "28b1dffff6ec",
-      "bytes": 2772639,
-      "as_of": null
+      "md5": "4bfe7c19c2b9",
+      "bytes": 2796519,
+      "as_of": "2026-09-30"
     }
   ],
   "hpdk_fresh": {
-    "backtest/hpdk_candidates.json": "ok",
-    "backtest/hpdk_paper.json": "ok",
-    "backtest/hpdk_oos_view.json": "ok"
+    "backtest/hpdk_candidates.json": "stale(2026-09-29!=2026-09-28)",
+    "backtest/hpdk_paper.json": "stale(2026-09-29!=2026-09-28)",
+    "backtest/hpdk_oos_view.json": "stale(2026-09-29!=2026-09-28)"
   },
-  "hpdk_expect": "2026-09-30"
+  "hpdk_expect": "2026-09-28"
 }
