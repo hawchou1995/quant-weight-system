@@ -1,10 +1,10 @@
 {
-  "run_id": "37125930801",
-  "sha": "764e09195924f4d0e35b218a949f83d11b9f2935",
+  "run_id": "37773921517",
+  "sha": "899348eb1ae19535706382a6603cc75b8051e103",
   "mode": "chain",
   "status": "published-candidate",
-  "ts_cn": "2026-10-03 22:06:25",
-  "today_cn": "2026-10-03",
+  "ts_cn": "2026-10-08 22:23:08",
+  "today_cn": "2026-10-08",
   "chain_rc": 0,
   "g2_fresh": true,
   "runtime_deps": [
@@ -20,9 +20,9 @@
   "files": [
     {
       "name": "dual_system.html",
-      "md5": "ef114cec0e33",
-      "bytes": 2715650,
-      "as_of": "2026-09-30"
+      "md5": "b48e8e4df3ec",
+      "bytes": 2845248,
+      "as_of": "2026-10-08"
     },
     {
       "name": "short_v3_fund_slip20_summary.json",
@@ -50,7 +50,7 @@
     },
     {
       "name": "review_log.html",
-      "md5": "099cfac5b8c0",
+      "md5": "97f8adbcff97",
       "bytes": 47169,
       "as_of": null
     },
@@ -68,21 +68,21 @@
     },
     {
       "name": "short_signals.js",
-      "md5": "c28522b37bf0",
-      "bytes": 1787219,
-      "as_of": "2026-09-30"
+      "md5": "a695fec52942",
+      "bytes": 1775011,
+      "as_of": "2026-10-08"
     },
     {
       "name": "enhanced_data.js",
-      "md5": "8248596ce670",
-      "bytes": 435808,
-      "as_of": "2026-09-30"
+      "md5": "d9e3a5f503a7",
+      "bytes": 436356,
+      "as_of": "2026-10-08"
     },
     {
       "name": "a5_pool.js",
-      "md5": "c2c9499cb135",
-      "bytes": 30144,
-      "as_of": "2026-09-30"
+      "md5": "fefc377e6cf9",
+      "bytes": 26645,
+      "as_of": "2026-10-08"
     },
     {
       "name": "market_breadth.js",
@@ -98,21 +98,21 @@
     },
     {
       "name": "sentinel_pool.js",
-      "md5": "3c113319eb63",
-      "bytes": 31791,
-      "as_of": "2026-09-30"
+      "md5": "e96b9f5b4018",
+      "bytes": 31799,
+      "as_of": "2026-10-08"
     },
     {
       "name": "sentinel_track.js",
-      "md5": "94af7fa2b823",
-      "bytes": 2542,
-      "as_of": "2026-09-30"
+      "md5": "55367f00a5b8",
+      "bytes": 2551,
+      "as_of": "2026-10-08"
     },
     {
       "name": "index.html",
-      "md5": "ef114cec0e33",
-      "bytes": 2715650,
-      "as_of": "2026-09-30"
+      "md5": "b48e8e4df3ec",
+      "bytes": 2845248,
+      "as_of": "2026-10-08"
     }
   ],
   "hpdk_fresh": {
@@ -120,5 +120,5 @@
     "backtest/hpdk_paper.json": "ok",
     "backtest/hpdk_oos_view.json": "ok"
   },
-  "hpdk_expect": "2026-09-30"
+  "hpdk_expect": "2026-10-08"
 }
