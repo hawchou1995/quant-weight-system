@@ -217,13 +217,13 @@ try:
     _kh_ver = _kh_meta.get("ver") or {}
     _kh_note = ""
     if _kh_meta.get("sig"):
-        _kh_str = (f'{_kh_meta.get("buy_n", 0)} 只主信号 · {_kh_meta.get("watch_n", 0)} 只观察 · '
+        _kh_str = (f'{_kh_meta.get("buy_n", 0)} 只候选信号 · {_kh_meta.get("watch_n", 0)} 只观察 · '
                    f'卖出 A{_kh_ver.get("sell_a", 55)} {len(_kh_meta.get("sell", []))}/C{_kh_ver.get("sell_c", 50)} {len(_kh_meta.get("sell_c", []))}')
     else:
         _kh_str = "信号层未启用"
     SHORT_KHUNTER_BADGE = (f'<span class="badge" style="background:rgba(37,99,235,.14);color:#60a5fa;" '
-                           f'title="15 个超卖形态策略命中 + 信号日 RSI&lt;分域阈值 + 收盘≥低价过滤(仅熊市) + 牛熊分域 = 主信号（事件独立，有信号即买）；'
-                           f'信号观察 = 已命中但未触发；卖出 = 标准版分域（熊 RSI&gt;{_kh_ver.get("sell_a", 55)} / 牛 RSI&gt;{_kh_ver.get("sell_a_bull", 75)} / 弱牛 RSI&gt;{_kh_ver.get("sell_a_weak", 80)}）主信号 / 激进版 RSI&gt;{_kh_ver.get("sell_c", 50)} 参考（2026-09-03 牛熊分域 HYBRIDv2 + 09-04 弱牛域 OSL32：total 68.5%→80.0% 回撤不变）">'
+                           f'title="15 个超卖形态策略命中 + 信号日 RSI&lt;分域阈值 + 收盘≥低价过滤(仅熊市) + 牛熊分域 = 候选信号（事件独立，有信号即买）；'
+                           f'信号观察 = 已命中但未触发；卖出 = 标准版分域（熊 RSI&gt;{_kh_ver.get("sell_a", 55)} / 牛 RSI&gt;{_kh_ver.get("sell_a_bull", 75)} / 弱牛 RSI&gt;{_kh_ver.get("sell_a_weak", 80)}）/ 激进版 RSI&gt;{_kh_ver.get("sell_c", 50)} 参考（2026-09-03 牛熊分域 HYBRIDv2 + 09-04 弱牛域 OSL32：total 68.5%→80.0% 回撤不变）">'
                            f'超卖伏击今日: {_kh_str}</span>')
     SHORT_POOL_ASOF = SHORT_POOL.get("as_of", "—")
     _mg = SHORT_POOL.get("market_gate") or {}
@@ -729,8 +729,8 @@ def rows_html_for(items, score_sub="趋势/动量/量能/超买/风控"):
         pick_tag = ""
         if d.get("pick") == "top4":
             pick_tag = ('<span class="badge" style="background:rgba(37,99,235,.16);color:#60a5fa;" '
-                        f'title="超卖伏击主信号：15 策略命中 + 信号日 RSI&lt;35 超卖（主板限定，事件独立，有信号即买）">'
-                        f'🎯 超卖伏击主信号</span>')
+                        f'title="候选信号（非唯一主信号 · 策略由用户自选）：15 策略命中 + 信号日 RSI&lt;35 超卖（主板限定，事件独立，有信号即买）">'
+                        f'🎯 候选信号（用户自选）</span>')
         rows += f'''<tr data-code="{d["code"]}" data-search="{d["name"]} {_bare(d["code"])} {d["industry"]} {board}" data-board="{d["perm"]}" data-market="{board}" data-industry="{d["industry"]}" data-tier="{d["tier"]}" data-pick="{d.get("pick") or ""}">
 <td style="text-align:center">{rank}</td>
 <td><b>{d["name"]}</b>{pick_tag}{below_tag}<br><span style="color:var(--faint);font-size:11px">{_bare(d["code"])}</span></td>
@@ -775,7 +775,7 @@ def cards_html_for(items):
         cards += f'''<div class="stock-card" id="card-{d["code"]}" data-code="{d["code"]}" data-search="{d["name"]} {d["code"]} {d["industry"]} {board}" data-market="{board}" data-industry="{d["industry"]}" data-tier="{d["tier"]}" data-pick="{d.get("pick") or ""}">
 <div class="radar-wrap">{radar}</div>
 <div class="body">
-<h3>{d["name"]} <span class="sub">{d["code"]}</span> <span class="board-tag">{board}</span> <span class="board-tag">{d["industry"]}</span>{"🎯 超卖伏击主信号" if d.get("pick")=="top4" else ("候选·仅观察" if d.get("pick")=="cand" else "")}</h3>
+<h3>{d["name"]} <span class="sub">{d["code"]}</span> <span class="board-tag">{board}</span> <span class="board-tag">{d["industry"]}</span>{"🎯 候选信号" if d.get("pick")=="top4" else ("候选·仅观察" if d.get("pick")=="cand" else "")}</h3>
 <p class="meta">现价 <b>{d["px"]:.2f}</b>（<span class="{"up" if (d["chg"] or 0)>0 else "down"}">{f"{d['chg']:+.2f}%" if d["chg"] is not None else "—"}</span>）｜ 近一年 <span class="{"up" if (d["ret_1y"] or 0)>0 else "down"}">{f"{d['ret_1y']:+.0f}%" if d["ret_1y"] is not None else "—"}</span> ｜ RSI {d["rsi"]:.0f}</p>
 <p class="meta">权重 <b>{d["score"]:.1f} 分</b> → {tier_pill(d["tier"])} ｜ 建议：{action_for(d)} ｜ {ma200_txt}</p>
 {f'<p class="meta" style="color:var(--faint)">⚠ 低于入池门槛 {d.get("entry_min") or 65} 分（软标记 · 不改变交易语义）</p>' if d.get("below_entry") else ""}
@@ -979,12 +979,14 @@ ss_stk["main_c"] = KH_BT_C if KH_BT_C else {}
 ss_stk_tag["main_c"] = "超卖伏击 激进版参考卖出 RSI>50 · 全窗口对比口径（生产=MA250 卡）" if KH_BT_C else ""
 
 
-def bt_card(cid, title, tag, s, curve_id, color="var(--warn)", sub="2016-01~2026-08", precise=False):
+def bt_card(cid, title, tag, s, curve_id, color="var(--warn)", sub="2016-01~2026-08", precise=False,
+            extra=""):
     """回测 KPI 卡（收益/年化/回撤·夏普 + 净值曲线容器）"""
     if not s:
         return f'<div class="bt-card" id="{cid}"><div class="bt-head"><b>{title}</b><span class="bt-tag">{tag}</span></div><div class="kpis"><div class="kpi"><div class="l">回测收益</div><div class="v">—</div><div class="s">回测中…</div></div></div><div class="bt-curve" id="{curve_id}"></div></div>'
     # 2026-09-24 统一到回测卡层级：主带（年化/最大回撤/胜率）→ 次级带（回测收益/夏普/交易数）→ 区间元数据行。
-    # 本函数的数据源无「单笔平均/中位」字段 → 主带只有 3 格，不补 0、不外推。
+    # 本函数的数据源无「单笔平均/中位」字段 → 主带只有 3 格，不补 0、不外推；
+    # 2026-10-12 用户批准：确有逐笔取证的卡由调用点以 extra= 显式传入两格（不编数字、不外推）。
     _c_up = "var(--up)" if s["annual_return_pct"] >= 0 else "var(--down)"
     # 2026-10-12 用户批准：bt-fund 传 precise=True ⇒ 与手工板面逐字节一致（只影响该卡）。
     if precise:
@@ -1007,6 +1009,7 @@ def bt_card(cid, title, tag, s, curve_id, color="var(--warn)", sub="2016-01~2026
 <div class="kpi bt-sm"><div class="l">回测收益</div><div class="v" style="color:{color}">{_ft(s["total_return_pct"])}%</div></div>
 <div class="kpi bt-sm"><div class="l">夏普</div><div class="v">{_fs(s["sharpe"])}</div></div>
 <div class="kpi bt-sm"><div class="l">交易数</div><div class="v">{s.get("total_trades",0)}</div></div>
+{extra}
 </div>
 <div class="bt-curve" id="{curve_id}"></div>
 </div>'''
@@ -1014,6 +1017,9 @@ def bt_card(cid, title, tag, s, curve_id, color="var(--warn)", sub="2016-01~2026
 
 # ---- 2026-10-10 看板瘦身：8 条保留策略各一张回测 KPI 卡 ----
 # 5 张新卡由「平衡 div 扫描」从已验收板面抽出后写回源 ⇒ 源与板面逐字节一致；读数出处见各卡 bt-note。
+# 2026-10-12 用户批准：各卡新增「单笔中位 / 单笔均值」两格；值全部来自逐笔产物取证（见卡下 bt-note 与报告）。
+PT_FUND = ('<div class="kpi bt-sm"><div class="l">单笔中位</div><div class="v">+1.72%</div></div><div class="kpi bt-sm"><div class="l">单笔均值</div><div class="v">+2.68%</div></div>')
+
 QLCH_CARD_LIT = '''<div class="bt-card" id="bt-st-qlch">
 <div class="bt-head"><b>超跌低开低吸 · 回测参考</b><span class="bt-tag">B4 分位带滤网 + K3 + 全池 + 熊市门 MA20 + E2 固定持 2 日 · 往返 20bp · 自有生产口径（不与其他子标签共用）</span></div>
 <div class="bt-meta">回测区间 · 2018-02-02 → 2026-09-29（2099 交易日 · 窗口内 NAV 1.0249 → 6.3262）</div>
@@ -1026,6 +1032,8 @@ QLCH_CARD_LIT = '''<div class="bt-card" id="bt-st-qlch">
 <div class="kpi bt-sm"><div class="l">夏普</div><div class="v">0.878</div></div>
 <div class="kpi bt-sm"><div class="l">交易数</div><div class="v">1157</div></div>
 <div class="kpi bt-sm"><div class="l">回测收益</div><div class="v" style="color:var(--up)">+517.2%</div></div>
+<div class="kpi bt-sm"><div class="l">单笔中位</div><div class="v">+0.47%</div></div>
+<div class="kpi bt-sm"><div class="l">单笔均值</div><div class="v">+0.58%</div></div>
 </div>
 <div class="bt-curve" id="curve-chart-qlch"></div>
 <div class="bt-note">口径<b>从生产源码读出</b>：<code>backtest/qlch_paper_20260921.py</code> L321 <code>TP_PCT, SL_PCT, MAXHOLD = 9.99, -0.99, 2</code>（止盈止损取有限极值＝禁用，固定持 2 日、T+2 收盘卖）· L75 <code>COST_RT = 0.002</code>（往返 20bp）· L51/L143 池 = 全池（含创业板/科创板）· L54 熊市门 <code>GATE_MA = 20</code>。持有中位 2 日 · 平均占用 38.1% · 年均下单 134.6 次。分窗 train（→2021-12-31）31.66%/夏普 1.207 · val（2022-01-04→）17.78%/夏普 0.680（<b>val 段衰减但未崩</b>）。仓库文档里流传的「止盈 +15%/止损 −20%/上限 20 日」是已被取代的 E4 旧生产。</div>
@@ -1041,6 +1049,21 @@ _SENT_NOTE_TAIL_NEW = ('（全事件池 9833 笔中的可执行子集）· '
     '<b>夏普为派生值</b>：槽位引擎本身不落盘逐日 NAV（<code>top1_personal_170k_0924.py:188</code> 的 equity 只在内存），'
     '本轮用副本落盘后按 √252 派生（2507 行逐日 NAV，源 <code>runs/sentinel2/sentinel_nav_daily.csv</code>）；'
     '<b>不可</b>与 <code>sentinel_daily.py:341</code> 的 √244 口径混用</div>')
+
+_SENT_PERTRADE = ('<div class="kpi bt-sm"><div class="l">单笔中位</div><div class="v">+2.06%</div></div><div class="kpi bt-sm"><div class="l">单笔均值</div><div class="v">+3.68%</div></div>')
+
+
+def _sent_add_pertrade(html):
+    """哨兵回测卡：注入「单笔中位/均值」两格（n=111，源 runs/sentinel2/sentinel_trades.csv 的 ret_pct）。
+    锚点与 _sent_add_sharpe 相同（交易数格），故本函数按该格**末尾**做后插，避免两次注入交叠。"""
+    anc = '<div class="kpi bt-sm"><div class="l">交易数</div>'
+    i = html.find(anc)
+    if i >= 0:
+        j = html.find("</div></div>", i)
+        if j >= 0:
+            html = html[:j + 12] + _SENT_PERTRADE + html[j + 12:]
+    return html
+
 
 def _sent_add_sharpe(html):
     """哨兵回测卡：注入夏普格 + 在注脚补「派生值」说明（锚点取自产物 note 的稳定尾串；缺锚则只做注入）。"""
@@ -1063,6 +1086,8 @@ ML_NEW_CARDS = [
 <div class="kpi bt-sm"><div class="l">夏普</div><div class="v">1.429</div></div>
 <div class="kpi bt-sm"><div class="l">交易数</div><div class="v">781</div></div>
 <div class="kpi bt-sm"><div class="l">回测收益</div><div class="v" style="color:var(--up)">+193.4%</div></div>
+<div class="kpi bt-sm"><div class="l">单笔中位</div><div class="v">+1.68%</div></div>
+<div class="kpi bt-sm"><div class="l">单笔均值</div><div class="v">+3.02%</div></div>
 </div>
 <div class="bt-band" style="margin-top:10px">
 <div class="kpi bt-sm"><div class="l">相位年化中位</div><div class="v">18.06%</div><div class="s">20 相位 · 区间 9.21 ~ 23.40</div></div>
@@ -1084,6 +1109,8 @@ ML_NEW_CARDS = [
 <div class="kpi bt-sm"><div class="l">夏普</div><div class="v">1.255</div></div>
 <div class="kpi bt-sm"><div class="l">交易数</div><div class="v">806</div></div>
 <div class="kpi bt-sm"><div class="l">50bp 压力档</div><div class="v">16.39%</div><div class="s">夏普 0.973 · 过闸</div></div>
+<div class="kpi bt-sm"><div class="l">单笔中位</div><div class="v">+1.63%</div></div>
+<div class="kpi bt-sm"><div class="l">单笔均值</div><div class="v">+2.79%</div></div>
 </div>
 <div class="bt-band" style="margin-top:10px">
 <div class="kpi bt-sm"><div class="l">相位年化中位</div><div class="v">17.70%</div><div class="s">5 相位 · 区间 12.91 ~ 22.07</div></div>
@@ -1105,6 +1132,8 @@ ML_NEW_CARDS = [
 <div class="kpi bt-sm"><div class="l">夏普</div><div class="v">1.304</div></div>
 <div class="kpi bt-sm"><div class="l">交易数</div><div class="v">1557</div></div>
 <div class="kpi bt-sm"><div class="l">回测收益</div><div class="v" style="color:var(--up)">+125.4%</div></div>
+<div class="kpi bt-sm"><div class="l">单笔中位</div><div class="v">不适用</div><div class="s">合成 NAV · 无单笔</div></div>
+<div class="kpi bt-sm"><div class="l">单笔均值</div><div class="v">不适用</div><div class="s">两腿合成 · 非逐笔口径</div></div>
 </div>
 <div class="bt-band" style="margin-top:10px">
 <div class="kpi bt-sm"><div class="l">两腿相关</div><div class="v">0.2006</div><div class="s">日频</div></div>
@@ -1114,32 +1143,17 @@ ML_NEW_CARDS = [
 <div class="bt-curve" id="curve-chart-triple"></div>
 <div class="bt-note">合成口径：两腿各归一到交集窗起点 = 1.0，再 <code>r_c = 0.6·r_主 + 0.4·r_卫</code>（卡内为固定配置；两腿日频相关仅 0.2006）。<b>笔数 = 上界口径</b>：基金腿 745 笔为<b>全窗口</b>（2016-01-04 → 2026-10-08，无逐笔文件可切窗）+ SUPER 腿 812 笔（即为交集窗）= 1557。冻结研究 off0（年化 22.87% / 回撤 −21.96% / 夏普 1.297 / 812 笔）用复合 z clip ±8；本表主仓腿取<b>生产口径</b> slip20（+754.95% / 年化 22.07% / 回撤 −26.66% / 夏普 1.324 / 745 笔）。<b>已知高估</b>：日频再平衡的额外换手成本未计入；<b>已知低估</b>：再平衡持续把赢家腿削回 60%。</div>
 </div>''',
-    '''<div class="bt-card" id="bt-v8-lite">
-<div class="bt-head"><b>v8-lite 个人版 · 回测参考</b><span class="bt-tag">固定池 20 只（2026-08-17 去 ETF / 08-18 用户调整）· 自选池内轮动 Top4 · 42 日轮动 · 动态等权 · 移动止损 10% + MA200 择时 · 佣金万2.5 + 印花税</span></div>
-<div class="bt-meta">口径档 · Lite_Top4（5 档 TopN 复跑，见注）· 源产物未落盘窗口元数据</div>
-<div class="bt-band">
-<div class="kpi bt-hero"><div class="l">年化</div><div class="v" style="color:var(--up)">20.84%</div></div>
-<div class="kpi bt-hero"><div class="l">最大回撤</div><div class="v">-25.32%</div></div>
-<div class="kpi bt-hero"><div class="l">胜率</div><div class="v">49.20%</div></div>
-</div>
-<div class="bt-band" style="margin-top:10px">
-<div class="kpi bt-sm"><div class="l">夏普</div><div class="v">1.168</div></div>
-<div class="kpi bt-sm"><div class="l">交易数</div><div class="v">124</div></div>
-<div class="kpi bt-sm"><div class="l">回测收益</div><div class="v" style="color:var(--up)">+666.5%</div></div>
-</div>
-<div class="bt-curve" id="curve-chart-v8-lite"></div>
-<div class="bt-note"><b>口径分歧已登记</b>：本卡读<b>现版脚本</b> <code>v8_lite.py</code> 本轮复跑（rc=0）的 Lite_Top4 档 —— 666.50% / 年化 20.84% / 夏普 1.168 / 124 笔；5 档 TopN 全部落在年化 19.48 ~ 20.84%。冻结产物 <code>v8_lite_summary.json</code>（2026-08-17）明写「个人版 v3：50 万 / 自选池 25 只内 Top4 / 月轮动 / 移动止损 10%」，窗口 2016-01-04 → 2026-08-14，读数 3923.68% / 年化 41.66% / 夏普 1.644 / 210 笔 ⇒ <b>现版脚本与产出冻结 summary 的版本不是同一口径</b>（池 20 只 vs 25 只、TopN 自适应 vs 固定 Top4、42 日 vs 月度轮动）。本卡采用与现版脚本一致的口径。</div>
-</div>''',
 ]
 def bt_all_html():
     """中长线回测参考 5 卡（股票分层 4 + 基金；2026-08-17 去 ETF）"""
     cards = "".join([
-        bt_card("bt-fund", "🥇 主仓 FB3-H20 基金线", FUND_TAG, s_fund, "curve-chart-fund", color="#3b82f6", precise=True),
+        bt_card("bt-fund", "🥇 主仓 FB3-H20 基金线", FUND_TAG, s_fund, "curve-chart-fund", color="#3b82f6", precise=True, extra=PT_FUND),
     ] + ML_NEW_CARDS)
     _ret = ('<div class="sub" style="color:var(--up)">⛔ <b>v9 股票分层战法（一体/主板/创业板/科创板四卡）已于 2026-09-13 退役</b>'
             '——十重证伪确认负期望（ADR-0006/0007），历史曲线与明细见更新日志 v5.9~v5.11.15 与 backtest/ 报告存档。</div>')
     return ('<div class="card" id="bt-all">\n'
             '<h2>📊 回测参考 <span class="badge badge-auto">中/长线 · 股票按权限分层</span></h2>\n'
+            '<div class="sub" style="color:var(--sub)">📐 <b>单笔中位/均值</b>＝已平仓逐笔净收益的中位数/算术均值（卡内新增两格）：主仓基金 ← <code>finalize_short_v3.py --asset fund</code> 逐笔 <code>pnl_pct</code>（n=745）；卫星 ← <code>runs/fillblanks/satellite_nav_trades.csv</code> 的 <code>ret</code>（n=781）；动量增强 ← <code>runs/mom_enhb/trades_l0.2_off0.csv</code> 的 <code>net_ret</code>（n=806）；三轨为<b>合成 NAV</b>（60/0/40 加权）按定义无单笔 ⇒ 记「不适用」。</div>\n'
             f'<div class="sub"><b>双轨 60/0/40（2026-09-16 起：卫星单轨化）</b>：主仓 = 基金 NAV 动量牛熊 regime（牛市 Top10/熊市 Top3）｜ 卫星 = 主板量价因子选股（全审计过闸）｜ 信号：<code>backtest/signal_satellite_0913.py</code> · <span style="color:var(--warn);font-weight:600">看板构建 {__import__("datetime").datetime.now():%Y-%m-%d %H:%M}</span></div>\n'
             '<div class="sub" style="color:var(--sub)">💧 <b>滑点敏感性</b>（每边，sweep_ml_slip.py 扫描）：中长线换手低、影响显著小于短线 —— 股票 20bps 收益 -23%（夏普 1.58→1.43）、30bps -31% ｜ 历史固定池（已去除）20bps -13%、30bps -18% —— 实盘 10-20bps 区间内中长线策略稳健</div>\n'
             '<div class="sub" style="color:var(--warn)">🐻 <b>9/1 牛熊独立权重验证（修正引擎 T+1 · regime=沪深300&gt;MA200 同口径）</b>：生产口径 A（牛开熊清 + 固定权重 0.35/0.25/0.20/0.20）收益 +28.3%/夏普 0.229/回撤 -27.15% 仍最优；牛攻熊守双权重 B/C/D/E 变体（熊市开仓）全面恶化（-25.9%~-65.0%）→ <b>中长期维持「牛开熊清」，熊市开仓不可行</b>（与短线基金相反：基金熊市防守开仓 +398pp 因选到避险型基金）</div>\n'
@@ -2839,18 +2853,19 @@ HP_HPDK_BT = _bt_ref_card("st-hpdk", "🎯 缩量超跌 · 回测参考",
                           "故不计入主读数，全窗读数并列披露）。")
 
 
-SENTINEL_CARD = _sent_add_sharpe(_bt_ref_card("sentinel", "📡 热榜哨兵",
+SENTINEL_CARD = _sent_add_pertrade(_sent_add_sharpe(_bt_ref_card("sentinel", "📡 热榜哨兵",
                              "jiandi top30 共振哨兵 · 影子 · 只可否决 · 复测：通过（严格版 200 路径，剔最好1年仍 >0）",
                              "backtest/sentinel_backtest.json",
-                             "池数据由 backtest/sentinel_daily.py 产出（sentinel_pool.js / sentinel_track.js / sentinel_state.json）"))
+                             "池数据由 backtest/sentinel_daily.py 产出（sentinel_pool.js / sentinel_track.js / sentinel_state.json）")))
 RETEST = "backtest/jiandi_sentinel_retest_0924.json"
 BT_SHORT_SUB_BLOCKS = ('<div class="card" id="bt-short">'
     '<h2>⚡ 短线回测参考 <span class="badge badge-auto">按当前子标签分流 · R-btshort-param-0924</span></h2>'
+    '<div class="sub" style="color:var(--sub)">📐 <b>单笔中位/均值</b>＝已平仓逐笔净收益的中位数/算术均值：超跌低开低吸 ← 补跑 <code>runs/qlch2/qlch_prod_fullwin_bt.py</code> 单种子逐笔 <code>net_ret</code>（n=1157，与自报 <code>ret_mean_pct=0.5805</code> 对拍一致）；热榜哨兵 ← <code>runs/sentinel2/sentinel_trades.csv</code> 的 <code>ret_pct</code>（n=111）。</div>'
     + _bt_sub("st-qlch", QLCH_CARD_LIT, on=True)
-    + _bt_sub("st-sentinel", _sent_add_sharpe(_bt_ref_card("st-sentinel", "📡 热榜哨兵 · 回测参考",
+    + _bt_sub("st-sentinel",  _sent_add_pertrade(_sent_add_sharpe(_bt_ref_card("st-sentinel", "📡 热榜哨兵 · 回测参考",
               "jiandi top30 共振哨兵 · 影子账本 · 只可否决 · 复测：通过（A2·2槽×6万·200 随机路径；剔最好1年 0/200 变负）",
               "backtest/sentinel_backtest.json",
-              "本子标签自有回测产物（不与其他子标签共用）；复测读数见 " + RETEST)))
+              "本子标签自有回测产物（不与其他子标签共用）；复测读数见 " + RETEST))))
     + '</div>')
 
 
@@ -2887,14 +2902,14 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
   _sentinel_block() + _sentinel_track_card() + _sentinel_paper_card() + SENTINEL_CARD + SENTINEL_FOOT)}
 {subview("st-stk", "股票池", "全量池短线 · 主板信号 · 有信号即买", system_block(
   "view-short-stk", "sys-short-stk",
-  "⚡ 短线 · 股票池", "auto", "主板 超卖伏击主信号 · A59 主卖出 / C50 参考 · 低价≥3元",
+  "⚡ 短线 · 股票池", "auto", "主板 · 无主信号 · 用户自选策略（超卖伏击候选信号 A59 主卖出 / C50 参考 · 低价≥3元）",
   v9_short_stock, "tbl-short-stk", "card-short-stk",
   "信号池 = 回测买入清单：15 个超卖形态策略信号 + 信号日 RSI&lt;35 超卖 + 收盘≥3元（主板限定·事件独立·有信号即买）· 卖出 = <b>逐股独立</b>：持仓股自身 RSI 确认日 &gt; 标准版阈值（熊 59/牛 75） → T+1 开盘卖（RSI&gt;50 为激进版参考线，标注但<i>不执行</i>，标准/激进判定归模拟盘双轨）· 档位 = 短线买入口径（强买入/买入）· 下方「👁 跟踪池 · 股票池」自动跟踪可买入标的（保留 30 天）· <b>开盘跳空高开 &gt;3% 的标的标注「⚠ 高开规避」：不追高，可等盘中回落至 3% 以内再考虑买入（9:30 盘中起生效）</b>",
   extra_card=watch_card("st-stk", "股票池", "short", note=WATCH_NOTE_STK), score_sub="动量/量价/通道/波动",
   head_tags=[SHORT_POOL_GATE, SHORT_KHUNTER_BEAR, SHORT_KHUNTER_BADGE,
              '<span class="badge badge-auto">股票 = 15 个超卖形态策略信号 + RSI&lt;35 超卖 + 熊市MA250（主板限定 · 弃用旧战法）</span>',
              '<span class="badge badge-auto">超卖伏击信号密集期每日可能有几只，稀疏期 0 只属正常（事件驱动）</span>'],
-  head_note=f"<b>🎯 超卖伏击主信号（蓝标）= 主板 15 策略信号命中 + 信号日 RSI&lt;35 超卖 + 收盘≥3元 + 熊市(沪深300&lt;MA250)</b>（2026-09-07 牛熊线 MA250 投产 + ob59 升级：MA60→MA250 回测 total 68.49→75.06%（该对取自 phase11 相邻两行，**n 296 vs 253 ⇒ 非单变量对照**，同池重跑后确已反转 56.32% vs 47.26%）—— 判据应取**受控对照** 0908 R1/R2（同 gate/ob/osl、**仅 ma_bear 一个变量**，n 363 vs 364）：同池重跑后 **MA250 仍占优 95.34% vs 57.44%**（旧 152.06 vs 105.39）、夏普 0.455 vs 0.333（旧 0.660 vs 0.503）⇒ **MA250 依据成立（优势收窄），生产不回退**、ob 55→58→59 组合 total 66.13→74.54%/夏普 0.393→0.422；<b>标准版</b> 卖出 RSI&gt;59 主执行 / <b>激进版</b> RSI&gt;50 参考展示；入场两版相同）· 回测：MA250_ob59_oslb32 n=298 资金池(N5)年化 7.27%/回撤 25.56%/夏普 0.480（三域口径 · 满窗 2017 起验证 101.61%/0.509 稳健）· 分年度 11 年 7 正 4 负（2017 -1.4/2018 -9.7/2023 -4.2/2024 -0.3）· <b>旧战法（反转分）已全量弃用</b>（主板 -35.65% / 全市场 -41.67% 均负期望，不再展示）· 市况门控仅提醒：沪深300 &gt; MA20 才开新仓；超卖伏击买入由 <b>MA250 熊市门控</b>裁决（非熊→不开新仓仅观察/卖出，弱牛域 OSL32 开仓）· 卖出逐股独立走「👁 跟踪池 · 股票池」· 回测参考见「监控总览」",
+  head_note=f"<b>🎯 候选信号（蓝标）· 无唯一主信号（用户自选策略）= 主板 15 策略信号命中 + 信号日 RSI&lt;35 超卖 + 收盘≥3元 + 熊市(沪深300&lt;MA250)</b>（2026-09-07 牛熊线 MA250 投产 + ob59 升级：MA60→MA250 回测 total 68.49→75.06%（该对取自 phase11 相邻两行，**n 296 vs 253 ⇒ 非单变量对照**，同池重跑后确已反转 56.32% vs 47.26%）—— 判据应取**受控对照** 0908 R1/R2（同 gate/ob/osl、**仅 ma_bear 一个变量**，n 363 vs 364）：同池重跑后 **MA250 仍占优 95.34% vs 57.44%**（旧 152.06 vs 105.39）、夏普 0.455 vs 0.333（旧 0.660 vs 0.503）⇒ **MA250 依据成立（优势收窄），生产不回退**、ob 55→58→59 组合 total 66.13→74.54%/夏普 0.393→0.422；<b>标准版</b> 卖出 RSI&gt;59 主执行 / <b>激进版</b> RSI&gt;50 参考展示；入场两版相同）· 回测：MA250_ob59_oslb32 n=298 资金池(N5)年化 7.27%/回撤 25.56%/夏普 0.480（三域口径 · 满窗 2017 起验证 101.61%/0.509 稳健）· 分年度 11 年 7 正 4 负（2017 -1.4/2018 -9.7/2023 -4.2/2024 -0.3）· <b>旧战法（反转分）已全量弃用</b>（主板 -35.65% / 全市场 -41.67% 均负期望，不再展示）· 市况门控仅提醒：沪深300 &gt; MA20 才开新仓；超卖伏击买入由 <b>MA250 熊市门控</b>裁决（非熊→不开新仓仅观察/卖出，弱牛域 OSL32 开仓）· 卖出逐股独立走「👁 跟踪池 · 股票池」· 回测参考见「监控总览」",
   as_of=SHORT_POOL_ASOF, intraday_note=SHORT_POOL_INTRADAY,
   as_of_min=SHORT_POOL.get("intraday_ts") or SHORT_POOL_ASOF_MIN,
   tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=(), inline=True))}
@@ -2908,7 +2923,7 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
   extra_card=watch_card("st-fund", "基金池", "short_fund", note=WATCH_NOTE_FUND), score_sub="动量/趋势",
   head_tags=['<span class="badge badge-auto">🔵 场外基金动量（分≥50）</span>',
              '<span class="badge badge-auto">现价 = T-1 净值 · 次日公布</span>'],
-  head_note="基金池与股票池（超卖伏击 主板信号）完全独立：基金=净值动量轮动，股票=超卖伏击 事件信号；档位口径同为短线买入口径（强买入/买入）",
+  head_note="基金池与股票池（超卖伏击 候选信号）完全独立：基金=净值动量轮动，股票=超卖伏击 事件信号；档位口径同为短线买入口径（强买入/买入）",
   as_of=SHORT_POOL.get("fund_as_of", SHORT_POOL_ASOF), intraday_note="",
   as_of_min="20:00",
   tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=(), inline=True))}
@@ -3309,7 +3324,7 @@ window.ENH.sub_curves = {{
 function renderOneCurve(elId, vals, color, label, totalPct, emptyNote){{
   var el=document.getElementById(elId);if(!el)return;
   if(!vals||!vals.length){{ /* 未回测/无修正口径：画占位文字 */
-    el.innerHTML='<svg viewBox="0 0 1400 240" style="width:100%;height:auto"><text x="700" y="120" font-size="15" fill="var(--faint)" text-anchor="middle">' + (emptyNote||'未回测 · 用户仅可买主板（超卖伏击主信号按主板回测，见卡片 KPI）') + '</text></svg>';
+    el.innerHTML='<svg viewBox="0 0 1400 240" style="width:100%;height:auto"><text x="700" y="120" font-size="15" fill="var(--faint)" text-anchor="middle">' + (emptyNote||'未回测 · 无自有回测产物（策略由用户自选，见卡片 KPI）') + '</text></svg>';
     return;
   }}
   var n=vals.length,W=1400,H=240,PAD_L=70,PAD_R=20,PAD_T=22,PAD_B=28;
@@ -3339,7 +3354,6 @@ function renderSubCurve(){{
   renderOneCurve('curve-chart-satellite', [], '#3b82f6', '卫星 SUPER（轨B 13 因子 Top20）', '无净值曲线', '未内嵌净值曲线 · 读数见卡片 KPI（源 runs/fillblanks/satellite_nav_summary.json）');
   renderOneCurve('curve-chart-mom-enh', [], '#0ea5e9', '动量增强 λ0.2', '无净值曲线', '未内嵌净值曲线 · 读数见卡片 KPI（源 runs/mom_enh/kb_ret20_blend_0917.json）');
   renderOneCurve('curve-chart-triple', [], '#8b5cf6', '三轨 60/0/40（合成）', '无净值曲线', '合成 NAV 已落盘未内嵌 · 见 runs/fillblanks/triple_synth_equity.csv');
-  renderOneCurve('curve-chart-v8-lite', [], '#94a3b8', 'v8-lite Top4', '无净值曲线', '未内嵌净值曲线 · 读数见卡片 KPI（源 runs/v8_lite/v8_lite_results.json）');
 }}
 /* 视图切换（hash 驱动：切换时更新 location.hash，加载/前进后退时按 hash 定位） */
 var VIEW_MAP={{'sys-auto':'view-auto','short':'view-short','review':'view-review','changelog':'view-changelog','comment':'view-comment','kxmm':'view-kxmm'}};
@@ -3529,7 +3543,7 @@ document.addEventListener('DOMContentLoaded',function(){{
       else if(rec.ma5_above===false){{act='⚠️ 次日卖出（破MA5）';actCls='down';tierDisp='破MA5·卖出';}}
       else if(rec.tier==='清仓'){{act='🔴 清仓';actCls='down';}}
       else if(rec.tier==='减至半仓'){{act='🔴 减至半仓';actCls='down';}}
-      // 2026-09-04 修复（grill Q1）：超卖伏击主信号买入档必须显示为买入信号（原落进「观望」兜底）
+      // 2026-09-04 修复（grill Q1）：超卖伏击买入档必须显示为买入信号（原落进「观望」兜底）
       else if(rec.tier==='强买入'){{act='🟢 强买入信号（超卖伏击）';actCls='up';}}
       else if(rec.tier==='买入'){{act='🟢 买入信号（超卖伏击）';actCls='up';}}
       else if(!topSet[code]){{act='🔄 下次轮动换出';actCls='warn';}}
@@ -3573,7 +3587,7 @@ document.addEventListener('DOMContentLoaded',function(){{
     var cnt=document.getElementById('watch-count-'+k);
     if(cnt)cnt.textContent='筛选 '+filtered.length+' / 共 '+rows.length+' 只';
     if(!filtered.length){{box.innerHTML='<div class="sub" style="color:var(--faint)">无匹配标的 —— 调整搜索/筛选条件后重试</div>';return;}}
-    var h='<div class="sub" style="margin-bottom:6px;color:var(--sub)">🧭 版本说明：<b>标准版</b>=生产主信号（熊市卖出 RSI&gt;59 / 牛市卖出 RSI&gt;75）；<b>激进版</b>=参考线（RSI&gt;50 卖出，更早止盈高周转）—— 双版本并行对决；卖出为独立信号，不含买入含义</div>'
+    var h='<div class="sub" style="margin-bottom:6px;color:var(--sub)">🧭 版本说明：<b>标准版</b>=生产口径卖出线（熊市 RSI&gt;59 / 牛市卖出 RSI&gt;75）；<b>激进版</b>=参考线（RSI&gt;50 卖出，更早止盈高周转）—— 双版本并行对决；卖出为独立信号，不含买入含义</div>'
           +'<table class="tbl"><thead><tr><th>标的</th><th>类型</th><th>行业</th><th style="text-align:center">入池日期</th><th style="text-align:center">出池日期</th><th style="text-align:center">已跟踪</th><th style="text-align:right">现价</th><th style="text-align:right">涨跌</th><th style="text-align:center">短线分</th><th style="text-align:center">档位(标准版)</th><th style="text-align:center">建议(标准版)</th><th style="text-align:center">档位(激进版)</th><th style="text-align:center">建议(激进版)</th><th style="text-align:center">MA5</th></tr></thead><tbody>';
     filtered.forEach(function(r){{
       var rec=r.rec;

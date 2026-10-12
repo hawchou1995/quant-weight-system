@@ -49,6 +49,8 @@ LOW_PRICE = 3.0       # 低价过滤（仅熊市）：确认日收盘 ≥ 3 元
 LOW_PRICE_BULL = None # 牛市无低价过滤
 LOW_PRICE_WEAK = None # 弱牛回调无低价过滤（2026-09-04 OSL32 定稿，与牛市同口径）
 N_SLOTS = 5           # 最多 5 仓
+OPEN_NEW = False      # 2026-10-12 用户批准：停止占仓 —— 不再下新买单；已有持仓仍按分域 RSI / 持有上限正常卖出
+                      # （卖出路径 pending_sells 与本开关无关，见下方「3) 扫描今日信号」段）；置 True 即完全恢复。
 POS_SIZE = 20000.0    # 每仓 ¥20,000
 INIT_CAP = 100000.0   # 初始资金 ¥100,000
 HOLD_MAX = 25         # 持有上限（2026-09-03 三设施回测 Phase 8/9 定稿）：距入场 ≥25 交易日收盘 → 次日开盘卖
@@ -301,8 +303,11 @@ def main():
     for c in held_sells:
         r = "持有上限" if c in st.get("hold_over_codes", []) else f"RSI>{RSI_SELL:.0f}"
         log(f"  📉 卖出候选 {c} ({r})")
-    st["pending_buys"] = [{"code": b["code"], "rsi": b["rsi"], "close": b["close"],
-                           "regime": b.get("regime", "bear")} for b in buys]
+    # 2026-10-12 停止占仓：OPEN_NEW=False ⇒ 不下新买单；卖出路径（held_sells，含持有上限）不受影响
+    if not OPEN_NEW:
+        log(f"  ⏸ 停止占仓（OPEN_NEW=False）：{len(buys)} 只买入候选不下单；卖出路径照常（{len(held_sells)} 只）")
+    st["pending_buys"] = ([{"code": b["code"], "rsi": b["rsi"], "close": b["close"],
+                            "regime": b.get("regime", "bear")} for b in buys] if OPEN_NEW else [])
     st["pending_sells"] = held_sells
 
     # ===== 4) 净值 =====
