@@ -1200,39 +1200,7 @@ def bt_short_html(only=None):
                     f'<div class="bt-note">n={s["n"]} · {_kpi2s}</div>'
                     f'</div>')
         return bt_card(cid, title, tag, s, curve_id, color=color)
-    _c_cards = (f'{_card("bt-short-stock-main-c", "📈 短线 纯主板 · 激进版(OB50 参考)", ss_stk_tag["main_c"], ss_stk["main_c"], "curve-short-stock-main-c", color="#64748b")}'
-                if KH_BT_C else "")
-    # 🌟 MA250 牛熊分域总卡（生产口径 · 组合化资金 · Phase 11 · 2026-09-07 投产 · ob59 最终版）
-    _hybrid_card = ("""<div class="bt-card" id="bt-short-stock-hybrid" style="border-color:rgba(37,99,235,.5)">
-<div class="bt-head"><b>🌟 生产口径：牛熊分域 MA250 总卡（ob59）</b><span class="bt-tag">组合化资金 · 三域口径（含 09-04 弱牛域）· 正在用的就是它</span></div>
-<div class="bt-meta">口径 · 组合化资金（非单票口径）· ob59 定稿 · 三域全开 · 满窗验证</div>
-<div class="bt-band">
-<div class="kpi bt-hero"><div class="l">最大回撤</div><div class="v">-25.56%</div></div>
-<div class="kpi bt-hero"><div class="l">胜率</div><div class="v">58.5%</div></div>
-<div class="kpi bt-hero"><div class="l">单笔平均</div><div class="v" style="color:var(--up)">+2.18%</div></div>
-</div>
-<div class="bt-band" style="margin-top:10px">
-<div class="kpi bt-sm"><div class="l">组合总收益</div><div class="v" style="color:var(--up)">+105.4%</div></div>
-<div class="kpi bt-sm"><div class="l">夏普</div><div class="v">0.480</div></div>
-<div class="kpi bt-sm"><div class="l">交易数</div><div class="v">364</div></div>
-</div>
-<div class="bt-band" style="margin-top:10px">
-<div class="kpi bt-sm"><div class="l">牛(MA250上) 单笔中位</div><div class="v" style="color:var(--up)">+1.57%</div><div class="s">n=141 · wr 56% · 口径=MA250 划分（= 强牛75笔 +3.24% ＋ 弱牛66笔 +0.58%）</div></div>
-<div class="kpi bt-sm"><div class="l">熊(MA250下) 单笔中位</div><div class="v" style="color:var(--up)">+2.57%</div><div class="s">n=223 · wr 60% · 独立过闸</div></div>
-<div class="kpi bt-sm"><div class="l">前后半双过</div><div class="v" style="color:var(--up)">+0.90 / +2.94</div><div class="s">h1 / h2 单笔中位</div></div>
-<div class="kpi bt-sm"><div class="l">弱牛回调 单笔中位</div><div class="v" style="color:var(--up)">+0.58%</div><div class="s">n=66 · wr 53.0% · 均值 +3.37% · 生产口径(ob80/osl32/无低价)</div></div>
-</div>
-<div class="bt-note">11 年 7 正 4 负 · 牛/熊各域**独立过闸**（不是合并读数）· 弱牛回调(MA20 下 / MA250 上) **单变量实测：同参只切 gate 时本域新增 66 笔（卡臂 298 → 线上 364）；入场 0 笔被挤掉，但出场对 5/75 牛格笔不独立（退出日被扰动）** ⇒ 该域单笔中位 +0.58% / 均值 +3.37% / 胜率 53.0%（厚右尾：2018+2025 两年占域贡献 103.8%）⇒ 追加后组合全面改善：年化 5.58%→7.27%、回撤 −31.85%→−25.56%、夏普 0.422→0.480、水下期 976→695 交易日**。**裁决 2026-10-12：保留，定位「分散化补丁 / 小仓信号源」**（2017 是真实下行样本：NAV −7.5pp、年内回撤 −19.8%）。注：`khunter_weakbull_attrib_28trades.csv` 的 32 笔为 **9/4 快照口径（MA60线 + ob55）**归因样本，**非本域读数**</div>
-</div>""")
     _cards = {
-        "stock": "".join([
-            _card("bt-short-stock-all", "📈 短线 股票 一体", ss_stk_tag["all"], ss_stk["all"], "curve-short-stock-all"),
-            _card("bt-short-stock-main", "📈 短线 纯主板 · 标准版(主卖出 RSI>59)", ss_stk_tag["main"], ss_stk["main"], "curve-short-stock-main", color="var(--warn)"),
-            _card("bt-short-stock-gem", "📈 短线 纯创业板", ss_stk_tag["gem"], ss_stk["gem"], "curve-short-stock-gem"),
-            _card("bt-short-stock-star", "📈 短线 纯科创板", ss_stk_tag["star"], ss_stk["star"], "curve-short-stock-star"),
-        ]),
-        # 超卖伏击子标签只拿「生产口径」两卡（MA250 牛熊分域总卡 + 激进版参考），不与「股票池」子标签共用
-        "kh": _c_cards + _hybrid_card,
         "fund": bt_card("bt-short-fund", "🔵 短线 基金", ss_fund_tag, ss_fund, "curve-short-fund", color="#3b82f6"),
     }
     cards = "".join(v for k, v in _cards.items() if (only is None or k == only))
@@ -2879,8 +2847,6 @@ RETEST = "backtest/jiandi_sentinel_retest_0924.json"
 BT_SHORT_SUB_BLOCKS = ('<div class="card" id="bt-short">'
     '<h2>⚡ 短线回测参考 <span class="badge badge-auto">按当前子标签分流 · R-btshort-param-0924</span></h2>'
     + _bt_sub("st-qlch", QLCH_CARD_LIT, on=True)
-    + _bt_sub("st-kh", bt_short_html("kh"))
-    + _bt_sub("st-stk", bt_short_html("stock"))
     + _bt_sub("st-sentinel", _sent_add_sharpe(_bt_ref_card("st-sentinel", "📡 热榜哨兵 · 回测参考",
               "jiandi top30 共振哨兵 · 影子账本 · 只可否决 · 复测：通过（A2·2槽×6万·200 随机路径；剔最好1年 0/200 变负）",
               "backtest/sentinel_backtest.json",
@@ -2913,7 +2879,7 @@ SENTINEL_FOOT = ("""<div class="sub" style="color:var(--faint)">"""
   + """口径更正见 ADR-0010 D23/D24/D25。</div>""").replace("@SCANNED@", str(SCANNED)).replace("@REMAIN@", str(REMAIN)).replace("@EVENTS@", str(EVENTS))
 
 SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
-{subnav("short", [("st-qlch", "超跌低开低吸"), ("st-kh", "超卖伏击"),
+{subnav("short", [("st-qlch", "超跌低开低吸"), 
                     ("st-stk", "股票池"),
                      ("st-fund", "基金池"), ("st-sentinel", "热榜哨兵")],
         default_key="st-qlch")}
@@ -2934,8 +2900,6 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
   tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=(), inline=True))}
 {subview("st-qlch", "超跌低开低吸", "短期反转 + 跳空低吸 + 熊市择时 · 次日出场",
          qlch_card() + watch_card("st-qlch", "超跌低开低吸", "qlch", note=WATCH_NOTE_QLCH))}
-{subview("st-kh", "超卖伏击", "RSI 超卖 + 15 策略形态 · 标准/激进双轨",
-         KH_HITS_CARD + KH_PAPER_CARD + watch_card("st-kh", "超卖伏击", "kh", note=WATCH_NOTE_KH))}
 {subview("st-fund", "基金池", "场外基金动量（分≥50 才入池）", system_block(
   "view-short-fund", "sys-short-fund",
   "🔵 短线 · 基金池", "auto", "场外基金动量（分≥50 才入池）",
@@ -3309,7 +3273,6 @@ html = f"""<!doctype html>
 <script src="https://unpkg.com/artalk@2/dist/Artalk.js"></script>
 <script>window.SHORT_POOL = {SHORT_POOL_SLIM};</script>
 <script>window.ETF_SNAP = {ETF_SNAP_JS};</script>
-<script>window.KH_SNAP = {KH_SNAP_JS};</script>
 <script>window.STOCK_META = {STOCK_META_JS};</script>
 <!-- 盘中买点判定数据（R-qlch-live-0923）：qlch 候选 + 策略参数 + 六臂账本净值，构建期一次性内嵌。
      只读快照：判定与盘中净值都在浏览器端算（ADR-0009），不落盘、不写账本、不改收盘链。 -->
@@ -3323,7 +3286,7 @@ html = f"""<!doctype html>
 window.ENH.nav = [
   ["kxmm","","市场晴雨",[["kxmm-fg","恐贪指数"],["kxmm-heat","热力图"],["crowd-card","大盘拥挤度"],["mkt-weather","市场晴雨表"]]],
   ["sys-auto","","中长线池",[["sat-card","卫星目标持仓"],["sat-paper-b-card","多因子主仓 模拟盘"],["ret20-paper-card","动量增强模拟盘"],["fb3-pool-card","FB3 基金池"],["fund-paper-card","基金主仓模拟盘"]]],
-  ["short","","短线选股",[["card-short-stk","股票池 汇总表"],["card-short-stk-detail","股票池 逐标的详情"],["qlch-card","🏷️ 超跌低开低吸"],["card-kh-hits","🏷️ 超卖伏击 · 命中策略"],["card-kh-paper","🏷️ 超卖伏击 · 模拟盘"],["card-short-fund","基金池 汇总表"],["card-short-fund-detail","基金池 逐标的详情"],["watch-card-st-qlch","👁 跟踪池 · 超跌低开低吸"],["watch-card-st-kh","👁 跟踪池 · 超卖伏击"],["watch-card-st-stk","👁 跟踪池 · 股票池"],["watch-card-st-fund","👁 跟踪池 · 基金池"]]],
+  ["short","","短线选股",[["card-short-stk","股票池 汇总表"],["card-short-stk-detail","股票池 逐标的详情"],["qlch-card","🏷️ 超跌低开低吸"],["card-short-fund","基金池 汇总表"],["card-short-fund-detail","基金池 逐标的详情"],["watch-card-st-qlch","👁 跟踪池 · 超跌低开低吸"],["watch-card-st-stk","👁 跟踪池 · 股票池"],["watch-card-st-fund","👁 跟踪池 · 基金池"]]],
   ["qingju","","社区讨论",[],"https://qingju.me/"]
 ];
 /* 视图切换模式：滚动不更新导航高亮（COMMON_JS renderSidenav 检测此标志） */
@@ -3377,7 +3340,6 @@ function renderSubCurve(){{
   renderOneCurve('curve-chart-mom-enh', [], '#0ea5e9', '动量增强 λ0.2', '无净值曲线', '未内嵌净值曲线 · 读数见卡片 KPI（源 runs/mom_enh/kb_ret20_blend_0917.json）');
   renderOneCurve('curve-chart-triple', [], '#8b5cf6', '三轨 60/0/40（合成）', '无净值曲线', '合成 NAV 已落盘未内嵌 · 见 runs/fillblanks/triple_synth_equity.csv');
   renderOneCurve('curve-chart-v8-lite', [], '#94a3b8', 'v8-lite Top4', '无净值曲线', '未内嵌净值曲线 · 读数见卡片 KPI（源 runs/v8_lite/v8_lite_results.json）');
-  renderOneCurve('curve-short-stock-all', C.short_stock, '#f59e0b', '短线 股票 一体', '{(ss_stk["all"].get("total_return_pct") or 0):+.0f}');
 }}
 /* 视图切换（hash 驱动：切换时更新 location.hash，加载/前进后退时按 hash 定位） */
 var VIEW_MAP={{'sys-auto':'view-auto','short':'view-short','review':'view-review','changelog':'view-changelog','comment':'view-comment','kxmm':'view-kxmm'}};
