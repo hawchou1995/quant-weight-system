@@ -3,7 +3,7 @@
  "strategy": "热榜哨兵",
  "strategy_key": "sentinel",
  "rule_version": "R-jiandi-top30-0924/v1",
- "generated_at": "2026-09-24 23:07:05",
+ "generated_at": "2026-10-10 10:06:02",
  "generated_by": "backtest/sentinel_daily.py --refresh-backtest",
  "scope": "「热榜哨兵」子标签独占的回测摘要（个人 17 万槽位口径 + 预注册组合级参照）",
  "period": "2016-06-01 → 2026-09-23",
@@ -240,17 +240,26 @@
   "mdd_pct": -20.1,
   "note": "组合级 K=5 等权 NAV 口径；与本卡 total_return/ann_return/max_drawdown（个人 17 万槽位引擎）不同口径，勿混用"
  },
- "derived_from_nav_series": {
-  "source": "backtest/jiandi_top_grid_0924_out/top1_nav_daily_0924.csv",
-  "nav_start": "2017-01-18",
-  "nav_end": "2026-08-12",
-  "nav_first": 0.9788,
-  "nav_last": 3.772,
-  "n_rows": 2496,
-  "mdd_pct": -25.6,
-  "mdd_date": "2026-07-30",
-  "sharpe_ann_daily_selfcomputed": 0.798,
-  "sharpe_convention": "mean/std(日净值收益) × sqrt(244) —— 本脚本现算，非既有产物字段"
+ "derived_from_nav_series": null,
+ "derived_from_nav_series_withdrawn": {
+  "withdrawn_at": "2026-10-10",
+  "withdrawn_by": "用户批准（本脚本修正）",
+  "reason": "原 derived_from_nav_series 算在**错误对象**上：source backtest/jiandi_top_grid_0924_out/top1_nav_daily_0924.csv 由 top1_and_qlch_compare_0924.py 的 Side A 产出（θ≥20 + 固定持5日 + 全事件等权 + 单边 0.575%），非哨兵槽位口径；与哨兵共同交易日 2322、归一化净值最大偏离 2.2672、逐年 10/10 年偏离 >1pp（2018 该序列 +125.02% vs 哨兵 +35.64%）；复算其 √244 夏普 = 0.7979 ≈ 旧值 0.798。",
+  "withdrawn_values": {
+   "mdd_pct": -25.6,
+   "sharpe_ann_daily_selfcomputed": 0.798,
+   "note": "**这两个数不得作哨兵读数引用**"
+  },
+  "correct_derived_sharpe": {
+   "value_sqrt252": 1.3092,
+   "value_sqrt244": 1.2883,
+   "convention": "mean/std(全交易日净值收益) × √252，rf=0，n=2506 —— 与本仓其它卡同口径",
+   "caliber": "哨兵槽位引擎（A2 固定55 · 2槽×6万·日限2）· cnt 规则路径",
+   "series": "backtest/_board_prod_bt_20261009/runs/sentinel2/sentinel_nav_daily.csv（2507 行）",
+   "how": "槽位引擎不落盘逐日 NAV ⇒ 由审计副本 runs/sentinel2/sentinel_equity_dump.py 落盘后派生",
+   "caveat": "仅持仓日 √252 = 3.8884，那是「条件于持仓」的比率，**不可当组合年化夏普引用**"
+  },
+  "not_written_here_because": "本脚本是**日更**脚本；槽位引擎逐日 NAV 不在日更链上落盘，故日更里无法复算该口径 —— 正确值由上述审计产物给出。"
  },
  "per_year": [
   {
@@ -390,7 +399,7 @@
  "caveats": [
   "逐年收益 = 200 种子中位数 [p5~p95]，非单一路径；2016 年 0 笔因窗口内无满足阈值事件",
   "逐年触发日/事件按信号日归年；收益按年末权益归年",
-  "MDD 三处口径不同：槽位引擎规则路径（本卡 max_drawdown）、NAV 日序（derived_from_nav_series）、预注册 K=5 组合级（reference_preregistered）"
+  "MDD 三处口径不同：槽位引擎规则路径（本卡 max_drawdown）、预注册 K=5 组合级（reference_preregistered）、以及**已撤回的 NAV 日序口径**（derived_from_nav_series_withdrawn —— 2026-10-10 确认算在错对象上，不再产出数字）"
  ],
- "content_sha256": "bbd7145d14dd4e299c98950da5823caf9d8455d97056d3aa03f9720f31e177f7"
+ "content_sha256": "b05b5cff7155729a7a31a29537e4eb51e65a276cb450e91e6f63ea04ee8c8c09"
 }

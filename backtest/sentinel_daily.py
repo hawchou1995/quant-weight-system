@@ -331,23 +331,34 @@ def build_backtest_summary(log) -> dict:
     _er_key = ARM if ARM in _er else (_er_fam if _er_fam in _er else None)
     ev_ref = _er.get(_er_key) if _er_key else None
 
-    nav_metrics = {}
-    if pnav.exists():
-        nav = pd.read_csv(pnav)
-        nav["date"] = pd.to_datetime(nav["date"])
-        nav = nav.sort_values("date")
-        dd = (nav["nav"] / nav["nav"].cummax() - 1) * 100
-        rets = nav["nav"].pct_change().dropna()
-        sharpe = (float(rets.mean() / rets.std() * np.sqrt(244))
-                  if len(rets) > 2 and float(rets.std()) > 0 else None)
-        nav_metrics = dict(
-            source="backtest/jiandi_top_grid_0924_out/top1_nav_daily_0924.csv",
-            nav_start=str(nav["date"].iloc[0].date()), nav_end=str(nav["date"].iloc[-1].date()),
-            nav_first=round(float(nav["nav"].iloc[0]), 4), nav_last=round(float(nav["nav"].iloc[-1]), 4),
-            n_rows=int(len(nav)), mdd_pct=round(float(dd.min()), 2),
-            mdd_date=str(nav.loc[dd.idxmin(), "date"].date()),
-            sharpe_ann_daily_selfcomputed=(round(sharpe, 3) if sharpe is not None else None),
-            sharpe_convention="mean/std(日净值收益) × sqrt(244) —— 本脚本现算，非既有产物字段")
+    # ------------------------------------------------------------------ 2026-10-10 撤回（用户批准）
+    # 原实现读 top1_nav_daily_0924.csv 算 MDD / 夏普，但该 CSV 是
+    # top1_and_qlch_compare_0924.py 的 Side A 产出（θ≥20 + 固定持5日 + 全事件等权 + 单边 0.575%），
+    # **不是哨兵槽位口径**：与哨兵共同交易日 2322 天、归一化净值最大偏离 2.2672、逐年 10/10 年偏离 >1pp
+    # （2018 该序列 +125.02% vs 哨兵 +35.64%）。实测复算其 √244 夏普 = 0.7979 ≈ 旧值 0.798 ⇒ 确系错对象。
+    # 槽位引擎（top1_personal_170k_0924.py）本身**不落盘逐日 NAV**（equity 只在内存里，
+    # 见其 :164 append / :188 return 只回聚合值）⇒ **日更链上无法复算该口径**。
+    # 故此处**不再产出任何数字**，只留撤回说明 + 正确值出处，避免 0.798 / -25.6% 被继续误读。
+    nav_withdrawn = dict(
+        withdrawn_at="2026-10-10",
+        withdrawn_by="用户批准（本脚本修正）",
+        reason=("原 derived_from_nav_series 算在**错误对象**上：source "
+                "backtest/jiandi_top_grid_0924_out/top1_nav_daily_0924.csv 由 "
+                "top1_and_qlch_compare_0924.py 的 Side A 产出"
+                "（θ≥20 + 固定持5日 + 全事件等权 + 单边 0.575%），非哨兵槽位口径；"
+                "与哨兵共同交易日 2322、归一化净值最大偏离 2.2672、逐年 10/10 年偏离 >1pp"
+                "（2018 该序列 +125.02% vs 哨兵 +35.64%）；复算其 √244 夏普 = 0.7979 ≈ 旧值 0.798。"),
+        withdrawn_values=dict(mdd_pct=-25.6, sharpe_ann_daily_selfcomputed=0.798,
+                              note="**这两个数不得作哨兵读数引用**"),
+        correct_derived_sharpe=dict(
+            value_sqrt252=1.3092, value_sqrt244=1.2883,
+            convention="mean/std(全交易日净值收益) × √252，rf=0，n=2506 —— 与本仓其它卡同口径",
+            caliber="哨兵槽位引擎（A2 固定55 · 2槽×6万·日限2）· cnt 规则路径",
+            series="backtest/_board_prod_bt_20261009/runs/sentinel2/sentinel_nav_daily.csv（2507 行）",
+            how="槽位引擎不落盘逐日 NAV ⇒ 由审计副本 runs/sentinel2/sentinel_equity_dump.py 落盘后派生",
+            caveat="仅持仓日 √252 = 3.8884，那是「条件于持仓」的比率，**不可当组合年化夏普引用**"),
+        not_written_here_because=("本脚本是**日更**脚本；槽位引擎逐日 NAV 不在日更链上落盘，"
+                                  "故日更里无法复算该口径 —— 正确值由上述审计产物给出。"))
 
     ev_yearly = (dyear or {}).get("ev_yearly", {})
     tot_n = sum(v["n"] for v in ev_yearly.values()) if ev_yearly else None
@@ -418,7 +429,8 @@ def build_backtest_summary(log) -> dict:
                                      cagr_pct=11.50, sharpe=0.921, mdd_pct=-20.1,
                                      note=("组合级 K=5 等权 NAV 口径；与本卡 total_return/ann_return/max_drawdown"
                                            "（个人 17 万槽位引擎）不同口径，勿混用")),
-        derived_from_nav_series=(nav_metrics or dict(note="拿不到：top1_nav_daily_0924.csv 缺失")),
+        derived_from_nav_series=None,   # 2026-10-10 撤回：原实现算在错对象上，见 withdrawn 块
+        derived_from_nav_series_withdrawn=nav_withdrawn,
         per_year=per_year,
         quality_gate=dict(
             data_bar_checked="data_full/*.csv 末行日期直读；池产物 as_of 与末行日期对照（见 sentinel_pool.js universe/data）",
@@ -431,8 +443,9 @@ def build_backtest_summary(log) -> dict:
                      prereg="backtest/PRE-REGISTRATION_20260924_jiandi_top30_sentinel.md"),
         caveats=["逐年收益 = 200 种子中位数 [p5~p95]，非单一路径；2016 年 0 笔因窗口内无满足阈值事件",
                  "逐年触发日/事件按信号日归年；收益按年末权益归年",
-                 "MDD 三处口径不同：槽位引擎规则路径（本卡 max_drawdown）、NAV 日序（derived_from_nav_series）、"
-                 "预注册 K=5 组合级（reference_preregistered）"])
+                 "MDD 三处口径不同：槽位引擎规则路径（本卡 max_drawdown）、预注册 K=5 组合级"
+                 "（reference_preregistered）、以及**已撤回的 NAV 日序口径**"
+                 "（derived_from_nav_series_withdrawn —— 2026-10-10 确认算在错对象上，不再产出数字）"])
     out["content_sha256"] = content_hash(out)
     log("回测摘要：period=%s n_trigger_days=%s n_picks=%s total_return=%s ann=%s mdd=%s sharpe=%s"
         % (out["period"], out["n_trigger_days"], out["n_picks"], out["total_return"],

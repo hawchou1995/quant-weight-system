@@ -159,10 +159,23 @@ def candidate_ports(no_launch):
     sys.exit(1)
 
 
+def _is_quant_url(url):
+    """是否是量化站(i.gushi.in)页 —— 必须按 **host** 判，不能按子串。
+    2026-10-09 修：linux.do 的授权 URL 形如
+      https://connect.linux.do/oauth2/authorize?...redirect_uri=https%3A%2F%2Fi.gushi.in%2F...
+    查询串里就含 'i.gushi.in'，子串判据会把「授权页」当成「量化站页」返回，
+    导致采集器对着授权页跑 fetch → 全通道空手且原因难查。"""
+    try:
+        from urllib.parse import urlparse
+        return (urlparse(str(url)).hostname or "").lower() == "i.gushi.in"
+    except Exception:
+        return False
+
+
 def page_ws(port):
     with urllib.request.urlopen(f"http://127.0.0.1:{port}/json/list", timeout=8) as r:
         ts = json.load(r)
-    pages = [t for t in ts if t.get("type") == "page" and "i.gushi.in" in (t.get("url") or "")]
+    pages = [t for t in ts if t.get("type") == "page" and _is_quant_url(t.get("url"))]
     if pages:
         try:
             urllib.request.urlopen(f"http://127.0.0.1:{port}/json/activate/{pages[0]['id']}", timeout=5).read()

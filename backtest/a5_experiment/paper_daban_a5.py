@@ -18,7 +18,9 @@ A5_tp8t2 实验系统 v1.3 — 每日扫描 + 模拟盘跟踪（2026-08-27 投�
 
 两阶段：
   阶段1（观察清单）：D 日首板 → 加入 watchlist（sb_date=D），D+1 若低开 2-5% 则入场
-  阶段2（入场确认）：D 日检查 watchlist 中 sb_date=D-1 的标的，低开确认 → 记录入场
+  阶段2（入场确认）：D 日检查 watchlist 中 sb_date=D-1 的标的 —— **盲挂协议**（2026-10-08 起，ADR-0004）：
+        前一晚/09:15 前挂 昨收×(1+GAP_HI) 限价单（order_time=09:18）→ 09:15–09:20 可撤单窗撤掉
+        gap<GAP_LO 的单 → 09:25 撮合：带内（[−5%,−2%]）以**今开**成交，成交价=今开；带外不成交。
 
 回避清单（v1.1 新增，A2_tp3 口径与回测逐位一致）：
   信号：首板次日低开 2-6%（gap ∈ [-6%, -2%]）+ 首板日 rel_pos ≤ 0.7 + 成交额 ≥ 5000万
@@ -67,6 +69,75 @@ AVOID_REL_POS_MAX = 0.7
 AVOID_AMT_MIN = 5e7
 
 # ---------------- 池与名称 ----------------
+# ============ 盲挂协议（ADR-0004 · 引擎 session 真值源；2026-10-08 修正不可执行口径）============
+# 病根（修改前）：入场段 `gap = o/pc - 1` 在带内才建仓、`entry_px = float(o)` —— 用**入场日那根 bar 的开盘**
+#   判定、又按同价成交（同 bar 因果；P1–P4 全是日粒度语义 → 全部逃逸，实盘不可执行）。
+# 修法（与 HPDK v1.6 同一套协议）：前一晚 / 09:15 前**盲挂**限价 = 昨收 ×(1 + GAP_HI)（= −2% 价）；
+#   09:15–09:20 可撤单窗内撤掉 `gap < GAP_LO`（−5%）的单；09:25 集合竞价撮合 → 带内（[−5%, −2%]）
+#   **以今开成交**、带外不成交（限价没穿 or 已撤单）。判定口径不变，**判定时点前移到挂单时点**。
+_ENGINE_SESSION = None
+for _eng in (r"E:\PI\投资\fleur_absorb", os.path.join(os.path.dirname(os.path.dirname(BASE)), "fleur_absorb")):
+    if not os.path.isdir(_eng):
+        continue
+    try:
+        if _eng not in sys.path:
+            sys.path.insert(0, _eng)
+        from engine import session as _S
+
+        _ENGINE_SESSION = _S
+        break
+    except Exception:
+        _ENGINE_SESSION = None
+SESSION_SOURCE = "engine" if _ENGINE_SESSION is not None else "inline"
+if _ENGINE_SESSION is None:
+    print("  !! [ADR-0004 · R4] 引擎 session 不可用（E:\\PI\\投资\\fleur_absorb）→ 盲挂价/带内判定"
+          "改走**内联实现**。两份实现必须永远同式；本次产物会带 session_source=inline，"
+          "由门禁 G5 对拍。若引擎其实在位，说明 import 失败 —— 请修 import，不要继续跑。")
+
+
+def _blind_order_price_inline(prev_close, gap_hi):
+    """内联实现（引擎缺失时的等价回退；与 engine.session.blind_order_price 同式）。"""
+    return round(float(prev_close) * (1.0 + float(gap_hi)) - 1e-9, 2)
+
+
+def _selfcheck_session():
+    """引擎可用时抽样验证「内联 vs 引擎」逐位一致；不一致即失败闭锁（禁口径静默分叉）。"""
+    if _ENGINE_SESSION is None:
+        return SESSION_SOURCE
+    bad = []
+    for _pc, _gh in ((3.33, -0.01), (10.0, -0.01), (5.0, -0.02), (12.34, -0.01)):
+        _a = _blind_order_price_inline(_pc, _gh)
+        _b = float(_ENGINE_SESSION.blind_order_price(_pc, _gh))
+        if abs(_a - _b) > 1e-9:
+            bad.append((_pc, _gh, _a, _b))
+    if bad:
+        raise SystemExit("!! [ADR-0004 · R4] 内联 blind_order_price 与引擎不一致 → 口径分叉：%s" % bad)
+    return SESSION_SOURCE
+
+ORDER_TIME = "09:18"          # 盲挂下单时点（09:15–09:20 可撤单窗内）
+
+
+def blind_order_price(prev_close, gap_hi=GAP_HI):
+    """盲挂限价 = 前收 × (1 + 上沿)，向下取到 0.01（engine.session.blind_order_price 同式）。"""
+    if _ENGINE_SESSION is not None:
+        return float(_ENGINE_SESSION.blind_order_price(prev_close, gap_hi))
+    return _blind_order_price_inline(prev_close, gap_hi)
+
+
+def blind_auction_fill(prev_close, open_px, lo=GAP_LO, hi=GAP_HI):
+    """集合竞价盲挂成交：返回 (成交价 | None, 原因)。带内以**今开**成交；带外不成交。"""
+    if not (prev_close and prev_close > 0) or not (open_px and open_px > 0):
+        return None, "无昨收/今开（停牌或未上市）"
+    lim = blind_order_price(prev_close, hi)
+    gap = float(open_px) / float(prev_close) - 1.0
+    if gap > hi + 1e-12:
+        return None, ("限价未穿：今开 %+.2f%% 高于上沿 %+.2f%%（挂价 %.3f）" % (gap * 100, hi * 100, lim))
+    if gap < lo - 1e-12:
+        return None, ("开盘 %+.2f%% 跌破下沿 %+.2f%% → 09:15–09:20 可撤单窗撤单（不计成交）"
+                      % (gap * 100, lo * 100))
+    return min(lim, float(open_px)), "带内 → 09:25 集合竞价以今开成交"
+
+
 def limit_thr(code):
     c = code[2:]
     return 0.195 if c.startswith(('300', '301')) else 0.095
@@ -386,6 +457,7 @@ def main():
     names = load_names()
     ind_map = load_industry()
     state = load_state()
+    print("  [session] 盲挂价真值源 = %s" % _selfcheck_session())
     files = sorted(glob.glob(os.path.join(DATA_DIR, '*.csv')))
 
     # 一遍扫描：缓存特征 + 收集日期
@@ -469,26 +541,38 @@ def main():
         if o <= 0 or pc <= 0 or v <= 0:
             print(f'  [无效数据] {code} {w["name"]} {D} 开盘/量异常，丢弃')
             continue
+        # 盲挂协议（ADR-0004）：限价单**在 09:25 之前就存在** —— 判定用的是「挂单时点可知」的信息，
+        # 带内条件改由**限价本身**把关（今开 ≤ 挂价 = 昨收×(1+GAP_HI) ⇔ gap ≤ GAP_HI），
+        # 下沿（gap < GAP_LO）靠 09:15–09:20 可撤单窗撤单 ⇒ 见 blind_auction_fill。
         gap = o / pc - 1
-        if not (GAP_LO <= gap <= GAP_HI):
-            print(f'  [未低开] {code} {w["name"]} {D} gap={gap*100:+.2f}% 不在 [{GAP_LO*100:.0f}%,{GAP_HI*100:.0f}%]，不入场')
-            continue
+        lim = blind_order_price(pc, GAP_HI)
+        fill_px, fill_why = blind_auction_fill(pc, o, GAP_LO, GAP_HI)
         if feat['is_yz'][i]:
-            print(f'  [一字板] {code} {w["name"]} {D} 一字板，不入场')
+            print(f'  [一字板] {code} {w["name"]} {D} 一字板 → 挂单也买不进，不入场')
             continue
         if rev_screen.hit(code, D):
-            print(f'  [反向筛剔除] {code} {w["name"]} {D} 命中 9 强臂回避集，不入场')
+            print(f'  [反向筛剔除] {code} {w["name"]} {D} 命中 9 强臂回避集，不入场（决策在挂单前完成）')
+            continue
+        if fill_px is None:
+            print(f'  [未成交] {code} {w["name"]} {D} 盲挂 {lim:.2f}（昨收×{1 + GAP_HI:.2f}）'
+                  f' @{ORDER_TIME} · gap={gap*100:+.2f}% · {fill_why}')
             continue
         pos = {'code': code, 'name': w['name'], 'ind': w['ind'],
                'sb_date': w['sb_date'], 'entry_date': D,
-               'entry_px': float(o), 'gap': float(gap),
+               'entry_px': float(fill_px), 'gap': float(gap),
+               'order_time': ORDER_TIME,          # 盲挂下单时点（≤09:20 可撤单窗内）
+               'limit_px': float(lim),            # 盲挂限价 = 昨收 ×(1+上沿)
+               'band_hit': 1,                     # 带内成交（带外在上一步已 continue）
+               'entry_reason': fill_why,          # 成交原因（集合竞价以今开成交）
+               'real_fill_px': float(o),          # 实测回填字段：券商回报/行情实测的成交价（= 今开）
+               'session_source': SESSION_SOURCE,   # engine|inline（门禁 G5 对拍用）
                'pools': w.get('pools', []),   # v1.3 入场来源池（归因用）
                'exit_stage': 1, 'status': 'open',
                'exit_date': None, 'exit_px': None, 'exit_reason': None,
                'raw_ret': None, 'net_ret': None}
         new_positions.append(pos)
-        print(f'  [入场] {code} {w["name"]} {D} 开盘 {o:.2f} gap={gap*100:+.2f}%'
-              f' 池={"/".join(pos["pools"]) or "—"}'
+        print(f'  [入场] {code} {w["name"]} {D} 盲挂 {lim:.2f} @{ORDER_TIME} → 09:25 以今开 {o:.2f} 成交'
+              f' gap={gap*100:+.2f}% 池={"/".join(pos["pools"]) or "—"}'
               f' ⚠ 命中 A2_tp3 回避清单（负期望警示，严格执行 T+2 兜底）')
     state['watchlist'] = kept_wl
     state['positions'].extend(new_positions)

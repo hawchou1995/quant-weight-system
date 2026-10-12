@@ -1,57 +1,70 @@
-{
- "note": "P1=pos120<=0.20 入场滤网；口径 ob59/osl35/hold25/low3/hybrid；50bp=+30bp/边",
- "rows": [
-  {
-   "tag": "BASE 20bp",
-   "n": 266,
-   "wr": 62.4,
-   "med": 2.93,
-   "mean": null,
-   "total": 119.4,
-   "maxdd": -20.9,
-   "ann": 8.0,
-   "sharpe": 0.65,
-   "pass4": true,
-   "pass_half": true
-  },
-  {
-   "tag": "P1   20bp",
-   "n": 107,
-   "wr": 69.2,
-   "med": 3.01,
-   "mean": null,
-   "total": 40.2,
-   "maxdd": -11.2,
-   "ann": 3.4,
-   "sharpe": 0.59,
-   "pass4": true,
-   "pass_half": true
-  },
-  {
-   "tag": "BASE 50bp",
-   "n": 265,
-   "wr": 60.4,
-   "med": 2.31,
-   "mean": null,
-   "total": 85.4,
-   "maxdd": -21.9,
-   "ann": 6.2,
-   "sharpe": 0.52,
-   "pass4": true,
-   "pass_half": true
-  },
-  {
-   "tag": "P1   50bp",
-   "n": 107,
-   "wr": 65.4,
-   "med": 2.4,
-   "mean": null,
-   "total": 31.5,
-   "maxdd": -11.8,
-   "ann": 2.7,
-   "sharpe": 0.48,
-   "pass4": true,
-   "pass_half": true
-  }
- ]
-}
+[
+ {
+  "tag": "BASE 20bp",
+  "n": 298,
+  "wr": 59.7,
+  "med": 2.72,
+  "mean": 2.02,
+  "total": 74.5,
+  "maxdd": -31.8,
+  "ann": 5.6,
+  "sharpe": 0.422,
+  "pass4": 1.0,
+  "pass_half": 1.0,
+  "h1_med": 1.12,
+  "h2_med": 2.94,
+  "bull_med": 3.86,
+  "bear_med": 2.57
+ },
+ {
+  "tag": "P1   20bp",
+  "n": 124,
+  "wr": 61.3,
+  "med": 2.37,
+  "mean": 1.17,
+  "total": 13.5,
+  "maxdd": -21.6,
+  "ann": 1.2,
+  "sharpe": 0.19,
+  "pass4": 1.0,
+  "pass_half": 1.0,
+  "h1_med": 1.08,
+  "h2_med": 2.85,
+  "bull_med": 3.89,
+  "bear_med": 2.24
+ },
+ {
+  "tag": "BASE 50bp",
+  "n": 297,
+  "wr": 57.9,
+  "med": 2.06,
+  "mean": 1.38,
+  "total": 44.6,
+  "maxdd": -34.5,
+  "ann": 3.7,
+  "sharpe": 0.307,
+  "pass4": 1.0,
+  "pass_half": 1.0,
+  "h1_med": 0.52,
+  "h2_med": 2.31,
+  "bull_med": 3.23,
+  "bear_med": 1.88
+ },
+ {
+  "tag": "P1   50bp",
+  "n": 124,
+  "wr": 58.1,
+  "med": 1.76,
+  "mean": 0.57,
+  "total": 5.4,
+  "maxdd": -23.9,
+  "ann": 0.5,
+  "sharpe": 0.105,
+  "pass4": 1.0,
+  "pass_half": 1.0,
+  "h1_med": 0.48,
+  "h2_med": 2.24,
+  "bull_med": 3.27,
+  "bear_med": 1.63
+ }
+]

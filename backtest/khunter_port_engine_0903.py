@@ -69,11 +69,62 @@ def load_market_state():
                 'mom20': float(row['mom20'].iloc[0]) if not pd.isna(row['mom20'].iloc[0]) else 0.0}
     return idx, state_prev
 
+# ---- V3 修正（2026-10-10）：股票池层的「逐日可见名」（PIT）----------------------
+# 缺陷：旧口径用「当前名称（data_full_names.json）+ 全样本末收盘」整票剔除全历史
+#       ⇒ 按「今天叫什么」抹掉 10 年历史，池层前视（实测 396 只被剔，其中 157 只在 2016-06 时还叫别的名字）。
+# 修正：逐日简称（东财 RPT_VALUEANALYSIS_DET · SECURITY_NAME_ABBR，2021-01-04 起，见 data_fundamental/name_hist.csv）
+#       判「确认日当时叫什么」；不可判定时段不假装判定 —— 逐日名缺失（含 2016-06~2021-01）一律放行。
+#       全样本末收盘 ≤1.5 的判据删除；1.5 元门槛 PIT 化 = 确认日收盘 >1.5。
+NAME_HIST_CSV = r"D:\Documents\Workbuddy\股票基金\quant-weight-system\data_fundamental\name_hist.csv"
+_NAME_HIST_MAP = None           # {code6: (dates[datetime64[D]], bad[bool])}，懒加载 + 进程内复用
+
+def _is_bad_name(nm):
+    """名称是否属 ST/退市/S 前缀（判据与生产 build_short_pool.py:520 一致）"""
+    if not isinstance(nm, str) or not nm:
+        return False
+    return ("ST" in nm) or nm.startswith("S") or ("退" in nm)
+
+def pit_name_map():
+    """逐日简称表；加载失败 → {}（= 全放行，绝不因缺数据伪造筛选）"""
+    global _NAME_HIST_MAP
+    if _NAME_HIST_MAP is None:
+        m = {}
+        try:
+            _nh = pd.read_csv(NAME_HIST_CSV, dtype=str,
+                              usecols=['code', 'TRADE_DATE', 'SECURITY_NAME_ABBR'])
+            _nh['d'] = pd.to_datetime(_nh['TRADE_DATE']).dt.normalize()
+            _nh['code6'] = _nh['code'].astype(str).str.zfill(6)
+            _bad = {}
+            for c6, g in _nh.groupby('code6'):
+                g = g.sort_values('d')
+                m[c6] = (g['d'].values.astype('datetime64[D]'),
+                         np.array([_bad[x] if x in _bad else _bad.setdefault(x, _is_bad_name(x))
+                                   for x in g['SECURITY_NAME_ABBR'].values], dtype=bool))
+            log(f"逐日简称(PIT): {len(m)} 只 / {_nh['d'].min().date()} → {_nh['d'].max().date()}"
+                f"（此前时段无逐日名 ⇒ 放行）")
+        except Exception as _e:
+            log(f"逐日简称加载失败（池筛选放行全部）: {_e}")
+        _NAME_HIST_MAP = m
+    return _NAME_HIST_MAP
+
+def pit_name_ok(code, dates):
+    """逐日 bool：当日「可见名」不含 ST/退/S。该票无逐日名 → 全 True（放行）"""
+    e = pit_name_map().get(str(code)[2:])
+    if e is None:
+        return np.ones(len(dates), dtype=bool)
+    idx = np.searchsorted(e[0], np.asarray(dates).astype('datetime64[D]'), side='right') - 1
+    ok = np.ones(len(dates), dtype=bool)
+    m = idx >= 0
+    ok[m] = ~e[1][idx[m]]
+    return ok
+
 def build_sig_cache(cache, board_only=None, cache_file=None, st_skip=True):
     """预计算每只股票的 sig_any（15 信号任一命中）+ rsi1（RSI 前一日）—— 主信号候选
     返回 {code: (dates[np.ndarray], sig_any[np.ndarray bool], rsi1[np.ndarray], opens, closes)}
     cache_file: 持久化路径（避免多次 130s 重建）
-    st_skip: 剔除 ST/退市股（与生产 build_short_pool.py 第520行一致：名称含 ST/退/首字母S 或 close≤1.5）"""
+    st_skip: 池层筛选（V3 修正 2026-10-10）——**逐日可见名 PIT**：确认日(i-1)当日可见名不含 ST/退/首字母S
+            且确认日收盘 >1.5 元；逐日名不可得的时段（2016-06~2021-01）一律放行。
+             旧口径（名称含 ST/退/S 或 **全样本末收盘**≤1.5 → 整票剔除全历史）= 池层前视，已删除。"""
     if cache_file and os.path.exists(cache_file):
         log(f"加载信号缓存 {cache_file} ...")
         with open(cache_file, 'rb') as f:
@@ -91,13 +142,10 @@ def build_sig_cache(cache, board_only=None, cache_file=None, st_skip=True):
             continue
         if board_only and board_of(code) != board_only:
             continue
-        if st_skip:
-            _nm = _names.get(code, code)
-            if "ST" in _nm or _nm.startswith("S") or "退" in _nm:
-                continue
-            _px = df['close'].iloc[-1] if len(df) else 0
-            if _px is not None and _px <= 1.5:
-                continue
+        # ---- V3 修正（2026-10-10）：池层前视 → 逐日可见名 PIT ----
+        # 旧口径（已删除）：`当前名称含 ST/退/S` ∨ `全样本末收盘 ≤1.5` → 整票剔除**全历史**。
+        #   该判据用了回测期末才有的信息（今天的名字 / 末收盘）⇒ 池层前视（157/396 只被误剔）。
+        # 新口径：不在此处整票剔除；改在下方 cand 建好后按**确认日**逐日掩码（见 `cand &= _keep_pit`）。
         d = df[['open', 'high', 'low', 'close', 'volume']].copy()
         d.index.name = None
         d['date'] = d.index
@@ -118,6 +166,12 @@ def build_sig_cache(cache, board_only=None, cache_file=None, st_skip=True):
         cand = np.zeros(len(d), dtype=bool)
         cand[1:] = sig_any[:-1]
         cand &= d['date'].values >= BACKTEST_START
+        if st_skip:
+            # 逐日可见名 PIT：候选点 i（执行日）取**确认日 i-1**——当时可见名不含 ST/退/S 且当时收盘 >1.5 元
+            _ok_nm = pit_name_ok(code, d['date'].values)
+            _keep_pit = np.ones(len(d), dtype=bool)
+            _keep_pit[1:] = _ok_nm[:-1] & (d['close'].values[:-1] > 1.5)
+            cand &= _keep_pit
         rsi1 = r['rsi'].shift(1).fillna(99).values
         out[code] = {'dates': d['date'].values, 'open': d['open'].values,
                      'close': d['close'].values, 'cand': cand, 'rsi1': rsi1}

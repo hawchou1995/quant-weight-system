@@ -997,6 +997,10 @@ A5_JUDGE_JS = r"""
      'open'    09:25–15:05 有真实今开 → 判命中（页面置顶）
      'pre'     行情日 ≤ 候选 as_of（盘前 / 信号日当日）或时刻不可定 → 待开盘判定，不判
      'closed'  收盘后 → 不判
+   **可执行时点（ADR-0004 · 判定 ≠ 下单）**：09:25 起的命中是**判定**（用真实今开算价格条件），
+     不是下单时点 —— 交易所 09:25–09:30 为**静默期**（不接受申报/撤单、无成交）⇒ 动作只能 **≥09:30**；
+     若要按今开价成交（集合竞价单一价格撮合），动作必须 **≤09:20**（前一晚/09:15–09:20 盲挂
+     昨收×(1+上沿)，下沿太低的单在可撤单窗撤掉）。见 docs/ADR-0004。
    返回 {k, v, why}：k ∈ 'hit' | 'no' | 'pre'
    缺静态条件（rel_pos / amt / room_pct 任一为 NaN）→ **不判命中**（保守，宁可漏判不可误置顶）。 */
 function a5Judge(row, d, thr, phase){
@@ -1043,6 +1047,8 @@ A5_JS = r"""
                             **不置顶、不计命中**（契约 C 明确）；
      09:25 起       → 用**真实今开**跑 a5Judge，命中者加绿标 + 插入分组行并重排 DOM 到表顶；
      其它时段       → 「待开盘判定（as_of …）」，不判、不贴标。
+   **可执行时点（ADR-0004）**：绿标只说明「价格条件满足」（判定），不是「现在下单」；
+     09:25–09:30 静默期不受理申报 ⇒ 动作 ≥09:30；按今开成交须 ≤09:20 盲挂（下单窗口）。
    闸门与 QLCH 同一把：判定只在「行情日 > 候选 as_of」时生效，行情日取**交易所时间戳**（腾讯 [30]），
    不用本地日期 → 节假日 / 补班不误判。
    置顶 = **视图态**：只改 DOM 顺序，不改信号池、不动模拟盘账本、不写盘（ADR-0009）。
@@ -1052,7 +1058,7 @@ A5_JS = r"""
   if (!A) return;                                   /* 无数据 → 完全不动页面 */
   var CFG = { TBL: 'a5-wl', CARD: 'a5-watchlist', EPS: 1e-9,
               TIP: '竞价/开盘判定是盘中瞬时视图态：不写盘、不改账本；记账以收盘链写入为准' };
-  var THR = A.thr || {}, ASOF = String(A.as_of || '');
+  if(!document.getElementById(CFG.TBL)&&!document.getElementById(CFG.CARD)){return;} var THR = A.thr || {}, ASOF = String(A.as_of || '');
   var META = {}, ORDER = null;
   var S = {phase: '', hit: 0, n: 0, rows: 0, ts: '', src: '', mktDate: '', err: ''};
 
@@ -1115,15 +1121,17 @@ A5_JS = r"""
     var bd = h2.querySelector('.a5-auction-badge');
     if (!bd) { bd = document.createElement('span'); bd.className = 'badge a5-auction-badge'; h2.appendChild(bd); }
     if (!live || S.phase === 'pre')       bd.textContent = '待开盘判定（as_of ' + (ASOF || '—') + '）';
-    else if (S.phase === 'auction')       bd.textContent = '竞价预判中 · 09:25 后判命中';
-    else if (S.phase === 'open')          bd.textContent = '已命中 ' + S.hit + '/' + S.n;
+    else if (S.phase === 'auction')       bd.textContent = '竞价预判中 · 09:25 判定（判定≠下单，动作 ≤09:20 盲挂）';
+    else if (S.phase === 'open')          bd.textContent = '已命中 ' + S.hit + '/' + S.n;   /* 夹具严格相等 ⇒ 正文不动 */
     else                                  bd.textContent = '今日判定结束（' + (S.mktDate || '—') + '）';
     bd.title = CFG.TIP
       + ' · 判定口径：今开/昨收−1 ∈ [' + ((N(THR.gap_lo) || -0.05) * 100).toFixed(2) + '%, '
       + ((N(THR.gap_hi) || -0.02) * 100).toFixed(2) + '%]（闭区间）'
       + ' + 相对位置 ≤ ' + (N(THR.rel_pos_max) || 0.5)
       + ' + 成交额 ≥ ' + ((N(THR.amt_min) || 5e7) / 1e4).toFixed(0) + ' 万'
-      + ' + F3 空间 ≥ ' + (N(THR.room_min) || 20) + '%';
+      + ' + F3 空间 ≥ ' + (N(THR.room_min) || 20) + '%'
+      + ' · 可执行时点：09:25 只做判定 → 动作 ≥09:30（09:25–09:30 静默期不可下单）；'
+      + '按今开成交须 ≤09:20 盲挂（09:15–09:20 可撤单窗）';
   }
   function render(q, ts, src, mktTs){
     var tb = document.getElementById(CFG.TBL);
@@ -1167,7 +1175,8 @@ A5_JS = r"""
       var hr = document.createElement('tr');
       hr.className = 'a5-hit-hdr';
       hr.innerHTML = '<td colspan="' + ncol + '">\u26a1 已命中买点（' + hits.length
-        + '）· 置顶 = 价格条件满足的视图态，不改信号池与模拟盘账本</td>';
+        + '）· 置顶 = 价格条件满足的视图态，不改信号池与模拟盘账本'
+        + ' · <b>命中=09:25 判定，可执行时点 ≥09:30</b>（按今开成交须 ≤09:20 盲挂）</td>';
       body.insertBefore(hr, body.firstChild);
       var anchor = hr;
       for (i = 0; i < hits.length; i++) {
@@ -1183,7 +1192,8 @@ A5_JS = r"""
       if (!td) continue;
       var g = res[i].v.v, gs = isNaN(g) ? '—' : ((g * 100).toFixed(2) + '%');
       var isHit = res[i].v.k === 'hit', isPre = res[i].v.k === 'pre';
-      var txt = isHit ? ('命中 ' + gs) : (isPre ? (S.phase === 'auction' ? ('竞价预判 ' + gs) : '待今开') : '');
+      var txt = isHit ? ('命中 ' + gs + ' · 可执行 ≥09:30')
+                      : (isPre ? (S.phase === 'auction' ? ('竞价预判 ' + gs + ' · ≤09:20 盲挂') : '待今开') : '');
       if (!txt) continue;
       var sp = document.createElement('span');
       sp.className = 'a5-tag ' + (isHit ? 'hit' : 'pre');
@@ -1569,15 +1579,17 @@ HPDK_JS = r"""
     }
     var txt;
     if (!live)                       txt = '待行情（打开页面自动拉取）';
-    else if (S.phase === 'open')     txt = '已剔除 ' + S.removed + ' 只 · 命中 ' + S.hit + ' 只';
-    else if (S.phase === 'auction')  txt = '竞价预判中 · 09:25 后判定剔除';
-    else if (S.phase === 'pre')      txt = '待今开判定（09:25 起）';
+    else if (S.phase === 'open')     txt = '已剔除 ' + S.removed + ' 只 · 命中 ' + S.hit + ' 只';   /* 夹具严格相等 ⇒ 正文不动 */
+    else if (S.phase === 'auction')  txt = '竞价预判中 · 09:25 判定（判定≠下单，动作 ≤09:20 盲挂）';
+    else if (S.phase === 'pre')      txt = '待今开判定（09:25 判定 · 判定≠下单）';
     else if (S.phase === 'past')     txt = '买日已过（' + (H.buy_date || '—') + '）';
     else                             txt = '待买日判定（买日 ' + (H.buy_date || '—') + '）';
     bd.textContent = txt;
     bd.title = CFG.TIP + ' · 口径：今开/昨收−1 ∈ [' + fmtPct(numOr(H.gap_lo, -0.03)) + ', ' + fmtPct(numOr(H.gap_hi, -0.01))
              + ']（闭区间）＋ 可交易（现价/昨收/今开 > 0 且非停牌一字）＋ 20 日均额 ≥ ' + fmtWan(numOr(H.minamt, 0))
-             + ' ＋ 收盘 ≥ ' + numOr(H.minpx, 0).toFixed(2) + ' 元；取复合分 F 前 ' + numOr(H.k, 10) + ' 只（F 在**存活子集**内标准化）。';
+             + ' ＋ 收盘 ≥ ' + numOr(H.minpx, 0).toFixed(2) + ' 元；取复合分 F 前 ' + numOr(H.k, 10) + ' 只（F 在**存活子集**内标准化）'
+             + ' · 可执行时点：09:25 只做判定（今开）→ 动作 ≥09:30（09:25–09:30 静默期不可下单）；'
+             + '要按今开成交须 ≤09:20 盲挂 昨收×0.99。';
     if (h2) {
       var srcEl = h2.querySelector('.hpdk-live-src');
       if (!srcEl) { srcEl = document.createElement('span'); srcEl.className = 'hpdk-live-src'; h2.appendChild(srcEl); }
@@ -1852,10 +1864,12 @@ HPDK_JS = r"""
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     };
     /* R-hpdk-persist-top-0930（用户 2026-09-30 要求清单常驻）：表头**单一真值源** ——
-       常驻骨架（无清单时）与真实清单共用同一份，避免两处 thead 漂移。共 17 列。 */
+       常驻骨架（无清单时）与真实清单共用同一份，避免两处 thead 漂移。共 18 列
+       （2026-10-08 按 ADR-0004 增「可执行时点」列：判定时点 09:25 ≠ 可下单时点）。 */
     var TOPTHEAD = '<thead><tr>'
         + '<th style="text-align:center">#</th><th>标的</th>'
-        + '<th style="text-align:center">状态</th><th>板块</th><th>行业</th>'
+        + '<th style="text-align:center">状态</th>'
+        + '<th style="text-align:center">可执行时点</th><th>板块</th><th>行业</th>'
         + '<th data-key="px" style="text-align:right">现价 <span class="live-tag">实时</span></th>'
         + '<th data-key="chg" style="text-align:right">涨跌幅 <span class="live-tag">实时</span></th>'
         + '<th data-key="amt" style="text-align:right">成交额20</th>'
@@ -1933,7 +1947,7 @@ HPDK_JS = r"""
           /* R-hpdk-persist-top-0930：无命中时也给出**完整表头**（0 行是正常结果，不是故障）。 */
           _h3 += '<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-buylist" style="width:100%;font-size:12px">'
               +  TOPTHEAD
-              +  '<tbody><tr><td colspan="17" style="color:var(--faint);padding:8px 0">'
+              +  '<tbody><tr><td colspan="18" style="color:var(--faint);padding:8px 0">'
               +  '（本次判定范围内无命中 \u2014 名单为空是正常结果）</td></tr></tbody></table></div>';
         } else {
           _h3 += '<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-buylist" style="width:100%;font-size:12px">'
@@ -1963,6 +1977,8 @@ HPDK_JS = r"""
                 +  '<td><b>' + escH(_x3.name || _c3) + '</b><br><span style="color:var(--sub);font-size:var(--fs-xs)">'
                 +  escH(_c3) + '</span></td>'
                 +  '<td style="text-align:center"><span class="badge badge-auto">\u2705 买入候选</span></td>'
+                +  '<td style="text-align:center;color:var(--warn);font-size:var(--fs-xs)">'
+                +  '≤09:20 盲挂<br>／≥09:30 连续竞价</td>'
                 +  '<td style="color:var(--sub)">' + escH(_m3.board || '—') + '</td>'
                 +  '<td style="color:var(--sub)">' + escH(_m3.ind || '—') + '</td>'
                 +  '<td data-key="px" class="live-cell" style="text-align:right;font-variant-numeric:tabular-nums">'
@@ -2002,9 +2018,10 @@ HPDK_JS = r"""
                +  '开盘高于它的本就不成交）· <b>成交价 = 今开</b>（09:25 撮合价，必定 ≤ 挂单价）· '
                +  '<b>止盈 = 成交价 ×1.02</b>（冻结规则：基准 = <b>实际成交价</b>，不是挂单价）· '
                +  '单票可买 = min(本金/KSLOT=' + fmtWan(_slot) + ', 20日均额×1%)'
-               +  '<br><span style="color:var(--warn)">⚠ 下单：挂单价按分位<b>向上取整</b>（宁可高一分，'
-               +  '否则会漏掉刚好在带内的票；实测上沿略放宽反而略优）· '
-               +  '<b>09:25 撮合后立刻撤掉未成交挂单</b>（否则盘中跌到挂单价会意外成交）</span></div></div>';
+               +  '<br><span style="color:var(--warn)">⚠ 下单：挂单价按分位<b>向下取整</b>（宁可低一分 —— '
+               +  '向下取整保证<b>绝不成交在带外</b>；向上取整会让 gap 略超上沿的票也成交，破坏带的定义）· '
+               +  '<b>撤单只有两个窗口</b>：① 09:15–09:20 <b>可撤单窗</b>内撤掉带外单；'
+               +  '② <b>09:30 起</b>撤掉未成交余单（<b>静默期 09:25–09:30 不接受申报/撤单</b>）</span></div></div>';
         }
         topEl.innerHTML = _h3;
         TOPCACHE.buy = String(H.buy_date || ''); TOPCACHE.html = _h3;
@@ -2021,12 +2038,16 @@ HPDK_JS = r"""
         if (!buy) _st = '本卡未带买日（产物为占位 / 未生成）';
         else if (!live) _st = '等待行情 —— 页面打开后自动拉取；行情源无响应时保持本状态（不是故障）';
         else if (_isBuy && _nm2 < (9 * 60 + 15))
-          _st = '买日 ' + buy + ' · 尚未到集合竞价（09:15 开启预备清单；09:25 出权威清单）';
-        else if (_isBuy && _nm2 >= (9 * 60 + 15) && _nm2 < CFG.OPEN_MIN)
-          _st = '买日 ' + buy + ' · 竞价时段 09:15\u201309:25 —— 预备清单按参考价实时判定';
+          _st = '买日 ' + buy + ' · 尚未到集合竞价（09:15–09:20 可申报可撤单 = **盲挂下单窗口**，动作须 ≤09:20；09:25 出权威清单）';
+        else if (_isBuy && _nm2 >= (9 * 60 + 15) && _nm2 < (9 * 60 + 20))
+          _st = '买日 ' + buy + ' · 09:15–09:20 可撤单窗（此刻仍可下/撤盲挂单）· 预备清单按参考价实时判定';
+        else if (_isBuy && _nm2 >= (9 * 60 + 20) && _nm2 < CFG.OPEN_MIN)
+          _st = '买日 ' + buy + ' · 09:20–09:25 可申报**不可撤单**（盲挂下单窗口已关闭）· 预备清单按参考价实时判定';
+        else if (_isBuy && _nm2 >= CFG.OPEN_MIN && _nm2 < (9 * 60 + 30))
+          _st = '买日 ' + buy + ' · 09:25 判定已出（清单冻结）—— **09:25–09:30 静默期不可下单**，可执行时点 ≥09:30';
         else if (_isBuy)
-          _st = '买日 ' + buy + ' · 等待 09:25 撮合出真实今开（该时段不剔除、不判定）';
-        else _st = '非买日（买日 ' + buy + '）—— 本清单只在买日 09:25 后出结果';
+          _st = '买日 ' + buy + ' · 判定与撮合已完成 · 可执行时点 ≥09:30（连续竞价）；按今开成交须 ≤09:20 盲挂';
+        else _st = '非买日（买日 ' + buy + '）—— 本清单只在买日 09:25 判定后出结果（判定≠下单，动作 ≥09:30）';
         topEl.innerHTML = '<div class="sub" style="border-left:3px solid var(--faint);padding-left:8px;margin:0 0 8px">'
             + '<b>今日买入清单（全池判定 · 本卡唯一买入口径）</b> · 买日 <b>' + (buy || '\u2014') + '</b>'
             + '（信号日 ' + (H.as_of || '\u2014') + '）· 状态：<b>' + _st + '</b>'
@@ -2034,7 +2055,7 @@ HPDK_JS = r"""
             + '</div>'
             + '<div class="tbl-wrap"><table class="tbl" id="tbl-hpdk-buylist" style="width:100%;font-size:12px">'
             + TOPTHEAD
-            + '<tbody><tr><td colspan="17" style="color:var(--faint);padding:8px 0">'
+            + '<tbody><tr><td colspan="18" style="color:var(--faint);padding:8px 0">'
             + '（暂无清单 \u2014 ' + _st + '）</td></tr></tbody></table></div>';
       }
     }

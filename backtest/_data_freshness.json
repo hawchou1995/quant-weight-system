@@ -1,14 +1,14 @@
 {
- "ts": "2026-09-27 11:18",
- "trade_day": "2026-09-24",
+ "ts": "2026-09-29 21:18",
+ "trade_day": "2026-09-29",
  "total": 7540,
- "fresh": 6860,
- "stale": 679,
+ "fresh": 6859,
+ "stale": 680,
  "nodate": 1,
  "stale_pct": 9.0,
- "stale_tradable": 337,
+ "stale_tradable": 338,
  "stale_stock": 330,
- "stale_etf": 2,
+ "stale_etf": 3,
  "stock_total": 5533,
  "stock_fresh": 5203,
  "stock_fresh_pct": 94.0,
@@ -27,8 +27,8 @@
   },
   "ETF/基金-沪": {
    "total": 902,
-   "fresh": 900,
-   "stale": 2,
+   "fresh": 899,
+   "stale": 3,
    "delisted": 0
   },
   "A股-沪市": {
