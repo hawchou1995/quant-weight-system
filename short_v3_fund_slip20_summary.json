@@ -3,11 +3,11 @@
   "params": "FB3-H20 牛熊 · 牛动量重Top10/S30 · 熊低波重Top3/S45（C类份额；月度级轮动）",
   "slippage_bps": 5,
   "summary": {
-    "total_return_pct": 733.38,
-    "annual_return_pct": 21.95,
-    "max_drawdown_pct": -27.03,
-    "sharpe": 1.316,
-    "win_rate_pct": 68.0,
-    "total_trades": 741
+    "total_return_pct": 754.95,
+    "annual_return_pct": 22.07,
+    "max_drawdown_pct": -26.66,
+    "sharpe": 1.324,
+    "win_rate_pct": 67.7,
+    "total_trades": 745
   }
 }
