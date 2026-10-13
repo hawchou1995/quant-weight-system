@@ -36,6 +36,19 @@ class FundRotationLedgerTests(unittest.TestCase):
         self.assertEqual(state["pending_orders"], {})
         self.assertEqual(state["fills"], [])
 
+    def test_stale_seed_retries_when_same_day_pool_refreshes(self):
+        stale = self.make_pool("2026-01-02", "2026-01-01")
+        navs = {"000001": [("2026-01-05", 1.0)]}
+        state = fund.step(None, stale, navs, "2026-01-05", started_at="fixture")
+        self.assertEqual(state["status"], "SIGNAL_SOURCE_STALE")
+        fresh = self.make_pool("2026-01-05", "2026-01-05")
+        state = fund.step(state, fresh, navs, "2026-01-05")
+        self.assertEqual(state["status"], "WAITING_FOR_NEXT_NAV")
+        self.assertEqual(state["pending_orders"]["000001"]["side"], "buy")
+        self.assertEqual(state["fills"], [])
+        replay = fund.step(state, fresh, navs, "2026-01-05")
+        self.assertIs(replay, state)
+
     def test_signal_day_waits_then_buy_mark_sell_and_charge_both_sides(self):
         navs = {"000001": [("2026-01-05", 1.0), ("2026-01-06", 1.1),
                            ("2026-01-07", 1.2), ("2026-01-08", 1.3)]}

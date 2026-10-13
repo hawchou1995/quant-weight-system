@@ -17,14 +17,66 @@
   "seed_date": "2026-10-12",
   "cash": 100000.0,
   "positions": {},
-  "pending_orders": {},
-  "target_codes": null,
-  "names": {},
+  "pending_orders": {
+    "000244": {
+      "code": "000244",
+      "name": "天弘稳利定期开放A",
+      "side": "buy",
+      "target_units": 24459.4462381372,
+      "signal_fund_asof": "2026-10-12",
+      "signal_pool_asof": "2026-10-12",
+      "signal_nav": 1.3628,
+      "eligible_after": "2026-10-12",
+      "status": "WAITING_FOR_NEXT_NAV"
+    },
+    "000844": {
+      "code": "000844",
+      "name": "南方绝对收益",
+      "side": "buy",
+      "target_units": 25342.760840366,
+      "signal_fund_asof": "2026-10-12",
+      "signal_pool_asof": "2026-10-12",
+      "signal_nav": 1.3153,
+      "eligible_after": "2026-10-12",
+      "status": "WAITING_FOR_NEXT_NAV"
+    },
+    "003718": {
+      "code": "003718",
+      "name": "易方达标普500指数美元汇A",
+      "side": "buy",
+      "target_units": 70487.0656234581,
+      "signal_fund_asof": "2026-10-12",
+      "signal_pool_asof": "2026-10-12",
+      "signal_nav": 0.4729,
+      "eligible_after": "2026-10-12",
+      "status": "WAITING_FOR_NEXT_NAV"
+    }
+  },
+  "target_codes": [
+    "000844",
+    "000244",
+    "003718"
+  ],
+  "names": {
+    "000844": "南方绝对收益",
+    "000244": "天弘稳利定期开放A",
+    "003718": "易方达标普500指数美元汇A"
+  },
   "unpriced_codes": [],
   "last_market_asof": "2026-10-12",
-  "last_signal": null,
-  "status": "SIGNAL_SOURCE_STALE",
-  "status_note": "基金候选日期滞后；仅标记既有仓位/执行既有待成交单，不生成新交易。",
+  "last_signal": {
+    "pool_asof": "2026-10-12",
+    "fund_asof": "2026-10-12",
+    "market_regime": "bear",
+    "target_count": 3,
+    "target_codes": [
+      "000844",
+      "000244",
+      "003718"
+    ]
+  },
+  "status": "WAITING_FOR_NEXT_NAV",
+  "status_note": "候选目标已记录；等 fund_as_of 之后首个可得净值成交，不用信号日净值补成交。",
   "nav": 100000.0,
   "market_value": 0.0,
   "cum_return_pct": 0.0,
@@ -34,6 +86,10 @@
     {
       "date": "2026-10-12",
       "event": "short_pool.as_of=2026-09-29 与指数最新交易日=2026-10-12 不一致；忽略过期候选，不补做历史交易。"
+    },
+    {
+      "date": "2026-10-12",
+      "event": "目标集合变化：3 只，按差额等权轮动；0 只缺信号日净值"
     }
   ],
   "nav_history": [
@@ -48,7 +104,7 @@
     }
   ],
   "last_stale_asof": "2026-09-29",
-  "updated_at": "2026-10-13 09:32:22",
+  "updated_at": "2026-10-13 11:27:21",
   "n_fills": 0,
   "n_positions": 0,
   "n_completed_trades": 0,

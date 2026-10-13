@@ -345,11 +345,12 @@ def step(state: dict | None, pool: dict, navs: dict[str, list[tuple[str, float]]
         state = new_state(market_asof, started_at)
     if state.get("schema") != SCHEMA:
         raise ValueError("unexpected fund rotation state schema; refuse overwrite")
-    if _date(state.get("last_market_asof")) == market_asof:
-        return state  # 同日重跑绝不重复记账
-
     pool_asof = _date(pool.get("as_of"))
     fresh = bool(pool_asof and pool_asof == market_asof)
+    # Allow one same-day retry only when a previously stale source is now fresh.
+    if (_date(state.get("last_market_asof")) == market_asof
+            and not (state.get("status") == "SIGNAL_SOURCE_STALE" and fresh)):
+        return state  # 同日重跑绝不重复记账
     codes = selected_codes(pool) if fresh else []
     same_target = state.get("target_codes") is not None and sorted(codes) == sorted(state.get("target_codes") or [])
     unpriced_ready = bool(state.get("unpriced_codes")) and any(
