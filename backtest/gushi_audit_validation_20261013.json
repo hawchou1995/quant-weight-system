@@ -1,0 +1,34 @@
+{
+  "schema_version": "gushi-audit-validation/v1",
+  "captured_at": "2026-10-13",
+  "source": {
+    "url": "https://www.gushi.in/topic/465",
+    "title": "回测中的未来函数排查清单：十分钟自检",
+    "published_date": "2026-09-27"
+  },
+  "lookahead_audit": {
+    "command": "python backtest/audit_lookahead_gushi465_20260928.py --out <scratch>/evidence_lookahead_gushi465_20261013.json",
+    "exit_code": 0,
+    "duration_seconds": 92.9,
+    "scope": ["hpdk frozen specification", "qlch production B4_K3+MA20; E2 hold 2 days"],
+    "hpdk_baseline_2018_plus": {"trades": 24512, "annualized_pct": 62.5, "max_drawdown_pct": -26.8, "sharpe": 2.5},
+    "hpdk_rank_oracle_positive_control": {"annualized_pct": 64.26, "delta_percentage_points": 1.76, "sharpe": 2.56, "delta_sharpe": 0.06, "interpretation": "weak response; K=10 while KSLOT=20, so ranking within the selected top-10 rarely binds portfolio capacity"},
+    "hpdk_entry_day_low_price_positive_control": {"trades": 24512, "prices_substituted": 24512, "annualized_pct": 800.72, "delta_percentage_points": 738.22, "sharpe": 14.2, "delta_sharpe": 11.7, "interpretation": "strong detector response to an impossible hindsight fill; this is a control, not a strategy result"},
+    "qlch_realized_return_rank_positive_control": {"train_trades": 2700, "baseline_train_cagr_pct": 25.3868, "oracle_train_cagr_pct": 125.8077, "delta_percentage_points": 100.4209, "baseline_train_sharpe": 1.693, "oracle_train_sharpe": 4.3304, "interpretation": "strong detector response to ranking on realized future returns; control only"},
+    "frozen_script_sha256_before": "2351eb9d42acc62e35049d47785e755ff9ce5a0a60d178e90c7baa83f47800a2",
+    "frozen_script_sha256_after": "2351eb9d42acc62e35049d47785e755ff9ce5a0a60d178e90c7baa83f47800a2",
+    "frozen_script_unchanged": true
+  },
+  "trading_clock_gate": {
+    "command": "python tools/gate_trading_clock.py --selftest",
+    "exit_code": 0,
+    "invalid_control_cases_detected": 4,
+    "valid_control_false_positives": 0,
+    "result": "PASS"
+  },
+  "limitations": [
+    "A successful positive control proves sensitivity to the injected violation class only; it does not prove that every strategy or every small-magnitude timing error is clean.",
+    "This run did not replay forum performance claims from topics 911 or 918 and does not validate their return figures.",
+    "The audit reads local panels and was run to a scratch output path; the source strategy file hash is unchanged."
+  ]
+}
