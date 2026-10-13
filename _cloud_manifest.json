@@ -1,9 +1,9 @@
 {
-  "run_id": "38424338368",
-  "sha": "3522a26e2716a23f164dd383b7e011136825923d",
+  "run_id": "38439342194",
+  "sha": "d1d411b1c38786871adc5cffe8bf8be7157f34aa",
   "mode": "chain",
   "status": "published-candidate",
-  "ts_cn": "2026-10-14 01:23:26",
+  "ts_cn": "2026-10-14 03:07:39",
   "today_cn": "2026-10-14",
   "chain_rc": 0,
   "g2_fresh": true,
@@ -20,8 +20,8 @@
   "files": [
     {
       "name": "dual_system.html",
-      "md5": "331728ec5c25",
-      "bytes": 3318454,
+      "md5": "abe27ca81aad",
+      "bytes": 3321803,
       "as_of": "2026-10-13"
     },
     {
@@ -74,44 +74,44 @@
     },
     {
       "name": "enhanced_data.js",
-      "md5": "e02d29cbd5bf",
+      "md5": "214c8aa03f03",
       "bytes": 410046,
       "as_of": "2026-10-13"
     },
     {
       "name": "a5_pool.js",
-      "md5": "baf1b951104c",
+      "md5": "22fd0e8b4ab9",
       "bytes": 37730,
       "as_of": "2026-10-13"
     },
     {
       "name": "market_breadth.js",
-      "md5": "70e04beadcda",
+      "md5": "e4ba5b0b3955",
       "bytes": 1311,
       "as_of": "2026-10-13"
     },
     {
       "name": "market_weather.js",
-      "md5": "7ca959d8d49b",
-      "bytes": 17918,
+      "md5": "99fc2d2b9c63",
+      "bytes": 18150,
       "as_of": null
     },
     {
       "name": "sentinel_pool.js",
-      "md5": "9cdcbcc120ce",
+      "md5": "7feaab877557",
       "bytes": 31802,
       "as_of": "2026-10-13"
     },
     {
       "name": "sentinel_track.js",
-      "md5": "f89286d81f90",
+      "md5": "d6d3ecbb6362",
       "bytes": 2679,
       "as_of": "2026-10-13"
     },
     {
       "name": "index.html",
-      "md5": "331728ec5c25",
-      "bytes": 3318454,
+      "md5": "abe27ca81aad",
+      "bytes": 3321803,
       "as_of": "2026-10-13"
     }
   ],
