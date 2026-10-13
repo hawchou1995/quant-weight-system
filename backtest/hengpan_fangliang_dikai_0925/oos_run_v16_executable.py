@@ -338,28 +338,59 @@ def ret_side(entry, x, c):
     return -100.0 if x == 0 else (x * (1 - c) / (entry * (1 + c)) - 1) * 100
 
 
-def exit_of(tb, j, entry, cal, O, H, C, T, tp):
-    """出场（同源 oos_run.py:202-217 / entry_timing.exit_of）：止盈 +TP% / 未达标 T+2 尾盘 / 不止损。"""
+def _prev_finite_close(C, i, j):
+    """i 之前最近的有效收盘（停牌/NaN 也要能取到前收）。"""
+    k = i - 1
+    while k >= 0:
+        c = C[k, j]
+        if np.isfinite(c) and c > 0:
+            return float(c)
+        k -= 1
+    return None
+
+
+def sell_blocked(i, j, C, H, sym):
+    """当日**跌停封死**（全天内最高价已触及跌停价）→ 卖不出，须顺延到下一可卖日。
+
+    来源：gushi topic/1010 第②条「次日跌停卖不掉的应该归到 T+2…再算收益率」。
+    真值源用引擎：`S.limit_prices`（前收 × 板块档位）+ `S.reaches_limit_down`（含 tick 容差带）。
+    实测锚点：sz000042 2020-02-03 一字跌停（o=h=l=c=8.73，前收 9.70）→ 本函数判 True。
+    """
+    if i <= 0:
+        return False
+    pc = _prev_finite_close(C, i, j)
+    hi = H[i, j]
+    if pc is None or not np.isfinite(hi) or hi <= 0:
+        return False
+    board = S.board_of(str(sym)) if sym else "main"
+    _up, dn = S.limit_prices(pc, board)
+    return bool(S.reaches_limit_down(float(hi), float(dn)))
+
+
+def exit_of(tb, j, entry, cal, O, H, C, T, tp, sym=None):
+    """出场（同源 oos_run.py:202-217 / entry_timing.exit_of）：止盈 +TP% / 未达标 T+2 尾盘 / 不止损。
+
+    ⚠ 2026-10-13 修（G5c 取证）：原实现完全不查**卖出可行性** —— 当日跌停封死时照样按收盘价
+    出场（实测 sz000042 2020-02-03 一字跌停按 8.73 出场）。现改为：封死日跳过、顺延到下一
+    可卖日（与「收盘缺失顺延」同一条 ≤6 日上限）；6 日内无可卖日仍是末段最坏全损（flag=2）。
+    """
     ex_t = tb + 1
     if ex_t >= T:
         return None
-    exC, usedC, flagC = C[ex_t, j], ex_t, 0
-    if not (np.isfinite(exC) and exC > 0):
-        for k in range(ex_t + 1, min(ex_t + 6, T)):
-            cc = C[k, j]
-            if np.isfinite(cc) and cc > 0:
-                exC, usedC, flagC = cc, k, 1
-                break
-        else:
-            exC, usedC, flagC = np.float32(0.0), ex_t, 2      # 最坏全损
     tp_lv = entry * (1.0 + tp)
-    o2, h2 = O[ex_t, j], H[ex_t, j]
-    if np.isfinite(h2) and h2 > 0 and np.isfinite(o2):
-        if o2 >= tp_lv:
-            return dict(exit_idx=ex_t, exit_date=cal[ex_t], exit_px=float(o2), exit_flag=0, tp_hit=1)
-        if h2 >= tp_lv:
-            return dict(exit_idx=ex_t, exit_date=cal[ex_t], exit_px=float(tp_lv), exit_flag=0, tp_hit=1)
-    return dict(exit_idx=usedC, exit_date=cal[usedC], exit_px=float(exC), exit_flag=int(flagC), tp_hit=0)
+    for i in range(ex_t, min(ex_t + 6, T)):
+        if sell_blocked(i, j, C, H, sym):
+            continue                                  # 跌停封死 → 卖不出，顺延
+        o2, h2, c2 = O[i, j], H[i, j], C[i, j]
+        if np.isfinite(h2) and h2 > 0 and np.isfinite(o2):
+            if o2 >= tp_lv:
+                return dict(exit_idx=i, exit_date=cal[i], exit_px=float(o2), exit_flag=0, tp_hit=1)
+            if h2 >= tp_lv:
+                return dict(exit_idx=i, exit_date=cal[i], exit_px=float(tp_lv), exit_flag=0, tp_hit=1)
+        if np.isfinite(c2) and c2 > 0:
+            return dict(exit_idx=i, exit_date=cal[i], exit_px=float(c2),
+                        exit_flag=int(0 if i == ex_t else 1), tp_hit=0)
+    return dict(exit_idx=ex_t, exit_date=cal[ex_t], exit_px=np.float32(0.0), exit_flag=2, tp_hit=0)
 
 
 def build_v16_trades(FD, FL, cal, syms, P, signal_start):
@@ -387,7 +418,7 @@ def build_v16_trades(FD, FL, cal, syms, P, signal_start):
                 rec.update(filled=0, entry_px=None, exit_date=None, exit_px=None, exit_flag=None,
                            tp_hit=0, ret_pct=None, ret_pct_itemized=None)
             else:
-                ex = exit_of(t + 1, j, d["fill_px"], cal, O, H, C, T, P["TP"])
+                ex = exit_of(t + 1, j, d["fill_px"], cal, O, H, C, T, P["TP"], sym=syms[j])
                 if ex is None:
                     rec.update(filled=0, entry_px=round(float(d["fill_px"]), 4), exit_date=None,
                                exit_px=None, exit_flag=None, tp_hit=0, ret_pct=None)

@@ -1,0 +1,649 @@
+{
+ "generated_at": "2026-10-13 14:44:14",
+ "rule_version": "822e5eba607096c9e8c0539281d5d08a10d7b6e907240f7a48c7d765a1a1724f",
+ "frozen_script": {
+  "path": "backtest/hengpan_fangliang_dikai_0925/oos_run.py",
+  "sha256": "2351eb9d42acc62e35049d47785e755ff9ce5a0a60d178e90c7baa83f47800a2",
+  "bytes_untouched": true
+ },
+ "v16_script": {
+  "path": "backtest/hengpan_fangliang_dikai_0925/oos_run_v16_executable.py",
+  "sha256": "01c485efdbe0221870ee4daaf3355fa52d974277a6d368c73ff528ab35a0a3d0"
+ },
+ "panel": {
+  "source": "rebuilt(no-cache)",
+  "T": 2854,
+  "N": 5442,
+  "names_loaded": 5442
+ },
+ "window": {
+  "signal_start": "2016-01-01",
+  "portfolio_start": "2018-01-01",
+  "data_end": "2026-09-29"
+ },
+ "band": {
+  "lo": -0.03,
+  "hi": -0.01,
+  "order_time": "09:18",
+  "fill_price": "今开（09:25 撮合）"
+ },
+ "cost": {
+  "v16": {
+   "mode": "itemized",
+   "commission_rate": 0.0003,
+   "min_commission": 5.0,
+   "stamp_tax_sell": 0.001,
+   "transfer_fee_sh": 1e-05,
+   "flow_fee": 0.1
+  },
+  "v15": {
+   "mode": "round_trip",
+   "side": 0.000346,
+   "note": "v1.5 冻结单边成本"
+  }
+ },
+ "params": {
+  "P_v15": {
+   "P1": 0.01,
+   "P2": 0.03,
+   "K": 10,
+   "KSLOT": 20,
+   "MINAMT": 20000000.0,
+   "MINPX": 3.0,
+   "LISTED": 250,
+   "TP": 0.02,
+   "COST_SIDE": 0.000346,
+   "SHADOW_START": "2016-01-01",
+   "WORST_CASE_WIPEOUT": true,
+   "STP_CNT": 3,
+   "STNOW_LIVE_ONLY": true,
+   "STNOW_OFF": false,
+   "MAINBOARD": true
+  },
+  "K": 10,
+  "KSLOT": 20,
+  "NOTIONAL_UNIT": 1000000.0
+ },
+ "parity": {
+  "replication_vs_frozen": {
+   "replication_n": 24522,
+   "frozen_n": 24512,
+   "matched": 24512,
+   "missing_in_replication": [],
+   "n_missing": 0,
+   "extra_in_replication": [
+    [
+     "2026-09-28",
+     "sh600969",
+     -1.244
+    ],
+    [
+     "2026-09-28",
+     "sh603029",
+     -1.686
+    ],
+    [
+     "2026-09-28",
+     "sh603101",
+     -1.233
+    ],
+    [
+     "2026-09-28",
+     "sh603737",
+     -1.833
+    ],
+    [
+     "2026-09-28",
+     "sz000716",
+     -1.008
+    ]
+   ],
+   "n_extra": 10,
+   "ok": true
+  },
+  "anchor_2018": {
+   "anchor_source": "backtest/hengpan_fangliang_dikai_0925/evidence_sensitivity.json (subwindow_2018 · base 臂)",
+   "note": "锚点窗口至 2026-09-24；本机数据至 2026-09-29 ⇒ 允许小差",
+   "checked": {
+    "ann": {
+     "got": 62.5,
+     "expect": 62.7,
+     "pass_": true
+    },
+    "mdd": {
+     "got": -26.8,
+     "expect": -26.8,
+     "pass_": true
+    },
+    "sharpe": {
+     "got": 2.5,
+     "expect": 2.51,
+     "pass_": true
+    },
+    "win_rate": {
+     "got": 60.62,
+     "expect": 60.64,
+     "pass_": true
+    },
+    "mean_per_trade": {
+     "got": 0.4224,
+     "expect": 0.4234,
+     "pass_": true
+    },
+    "n_trades": {
+     "got": 21167,
+     "expect": 21157,
+     "pass_": true
+    },
+    "n_entries": {
+     "got": 20505,
+     "expect": 20495,
+     "pass_": true
+    },
+    "deploy_pct": {
+     "got": 48.45,
+     "expect": 48.45,
+     "pass_": true
+    }
+   },
+   "ok": true
+  }
+ },
+ "arms": {
+  "v15_research_upper_bound": {
+   "ann": 62.5,
+   "mdd": -26.8,
+   "sharpe": 2.5,
+   "win_rate": 60.62,
+   "mean_per_trade": 0.4224,
+   "med_per_trade": 1.9294,
+   "n_signals": 21167,
+   "n_entries": 20505,
+   "deploy_pct": 48.45,
+   "exec_n": 20505,
+   "exec_mean": 0.43,
+   "exec_med": 1.9294,
+   "exec_win": 60.65,
+   "n_years": 9,
+   "neg_years": 0,
+   "window": [
+    "2018-01-02",
+    "2026-09-29"
+   ],
+   "yearly": {
+    "2018": 26.84,
+    "2019": 149.96,
+    "2020": 54.7,
+    "2021": 65.02,
+    "2022": 63.53,
+    "2023": 67.07,
+    "2024": 53.64,
+    "2025": 51.0,
+    "2026": 32.65
+   }
+  },
+  "v16_executable": {
+   "ann": 0.84,
+   "mdd": -7.17,
+   "sharpe": 0.25,
+   "win_rate": 63.9,
+   "mean_per_trade": 0.2579,
+   "med_per_trade": 1.9294,
+   "n_signals": 953,
+   "n_entries": 928,
+   "deploy_pct": 2.18,
+   "exec_n": 928,
+   "exec_mean": 0.1681,
+   "exec_med": 1.8344,
+   "exec_win": 63.79,
+   "n_years": 9,
+   "neg_years": 3,
+   "window": [
+    "2018-01-02",
+    "2026-09-29"
+   ],
+   "yearly": {
+    "2018": -0.68,
+    "2019": 5.17,
+    "2020": 2.45,
+    "2021": 1.68,
+    "2022": 1.18,
+    "2023": 0.19,
+    "2024": -4.43,
+    "2025": -1.85,
+    "2026": 3.91
+   }
+  },
+  "v16_executable_same_cost": {
+   "ann": 1.34,
+   "mdd": -6.98,
+   "sharpe": 0.38,
+   "win_rate": 63.9,
+   "mean_per_trade": 0.2579,
+   "med_per_trade": 1.9294,
+   "n_signals": 953,
+   "n_entries": 928,
+   "deploy_pct": 2.2,
+   "exec_n": 928,
+   "exec_mean": 0.2607,
+   "exec_med": 1.9294,
+   "exec_win": 64.22,
+   "n_years": 9,
+   "neg_years": 2,
+   "window": [
+    "2018-01-02",
+    "2026-09-29"
+   ],
+   "yearly": {
+    "2018": 0.19,
+    "2019": 5.69,
+    "2020": 3.07,
+    "2021": 2.06,
+    "2022": 1.77,
+    "2023": 0.44,
+    "2024": -4.04,
+    "2025": -1.65,
+    "2026": 4.44
+   }
+  }
+ },
+ "trade_level_v16": {
+  "n": 1182,
+  "mean_pct": 0.1375,
+  "med_pct": 1.8346,
+  "win_pct": 63.54,
+  "tp_hit_pct": 55.5,
+  "notional": 100000.0,
+  "lot": 100,
+  "gross_mean_pct": 0.2993,
+  "cost_drag_pp": 0.1617
+ },
+ "attribution": {
+  "n_v15_picks": 21167,
+  "n_v16_picks": 21220,
+  "v15_pick_fate": {
+   "not_in_v16_topK": 20218,
+   "filled_in_v16": 924,
+   "v16_in_band_but_no_slot": 25
+  },
+  "v16_pick_fate": {
+   "gap_below_lo": 1012,
+   "gap_above_hi": 19075,
+   "in_band_filled": 953,
+   "suspended": 26,
+   "limit_up_open": 154
+  },
+  "required_categories": {
+   "带外": 20087,
+   "涨停": 154,
+   "停牌": 26,
+   "带内成交": 953
+  },
+  "same_category_examples": {
+   "not_in_v16_topK": [
+    [
+     "2017-12-29",
+     "sz002746"
+    ],
+    [
+     "2017-12-29",
+     "sz002827"
+    ],
+    [
+     "2017-12-29",
+     "sz002346"
+    ],
+    [
+     "2017-12-29",
+     "sz002810"
+    ],
+    [
+     "2017-12-29",
+     "sh603798"
+    ],
+    [
+     "2017-12-29",
+     "sh603818"
+    ],
+    [
+     "2017-12-29",
+     "sh600854"
+    ],
+    [
+     "2017-12-29",
+     "sh603727"
+    ]
+   ],
+   "filled_in_v16": [
+    [
+     "2018-01-05",
+     "sh603688"
+    ],
+    [
+     "2018-01-08",
+     "sz002799"
+    ],
+    [
+     "2018-01-08",
+     "sz002119"
+    ],
+    [
+     "2018-01-10",
+     "sz000889"
+    ],
+    [
+     "2018-01-10",
+     "sz002119"
+    ],
+    [
+     "2018-01-16",
+     "sh603168"
+    ],
+    [
+     "2018-01-17",
+     "sh603010"
+    ],
+    [
+     "2018-01-18",
+     "sz002799"
+    ]
+   ],
+   "v16_in_band_but_no_slot": [
+    [
+     "2018-02-05",
+     "sz002796"
+    ],
+    [
+     "2018-03-19",
+     "sz002729"
+    ],
+    [
+     "2018-05-29",
+     "sz000893"
+    ],
+    [
+     "2018-06-08",
+     "sz002767"
+    ],
+    [
+     "2018-06-19",
+     "sz002209"
+    ],
+    [
+     "2018-06-27",
+     "sz002220"
+    ],
+    [
+     "2018-08-21",
+     "sz002857"
+    ],
+    [
+     "2018-10-18",
+     "sz002664"
+    ]
+   ]
+  },
+  "days_where_v15_had_picks_and_v16_zero_fill": {
+   "2017-12-29": [
+    [
+     "sz002746",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002827",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002346",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002810",
+     "not_in_v16_topK"
+    ],
+    [
+     "sh603798",
+     "not_in_v16_topK"
+    ],
+    [
+     "sh603818",
+     "not_in_v16_topK"
+    ],
+    [
+     "sh600854",
+     "not_in_v16_topK"
+    ],
+    [
+     "sh603727",
+     "not_in_v16_topK"
+    ],
+    [
+     "sh603036",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz000548",
+     "not_in_v16_topK"
+    ]
+   ],
+   "2018-01-02": [
+    [
+     "sz002777",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002798",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002680",
+     "not_in_v16_topK"
+    ],
+    [
+     "sh603025",
+     "not_in_v16_topK"
+    ],
+    [
+     "sh600533",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002825",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002642",
+     "not_in_v16_topK"
+    ],
+    [
+     "sh603108",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002408",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz000571",
+     "not_in_v16_topK"
+    ]
+   ],
+   "2018-01-03": [
+    [
+     "sz002813",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002247",
+     "not_in_v16_topK"
+    ],
+    [
+     "sh601113",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002480",
+     "not_in_v16_topK"
+    ],
+    [
+     "sh600545",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002192",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002716",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002194",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002449",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002787",
+     "not_in_v16_topK"
+    ]
+   ],
+   "2018-01-04": [
+    [
+     "sh603067",
+     "not_in_v16_topK"
+    ],
+    [
+     "sh603160",
+     "not_in_v16_topK"
+    ],
+    [
+     "sh600679",
+     "not_in_v16_topK"
+    ],
+    [
+     "sh603131",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002068",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002209",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002517",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002445",
+     "not_in_v16_topK"
+    ],
+    [
+     "sh600663",
+     "not_in_v16_topK"
+    ],
+    [
+     "sh600626",
+     "not_in_v16_topK"
+    ]
+   ],
+   "2018-01-09": [
+    [
+     "sh603016",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002783",
+     "not_in_v16_topK"
+    ],
+    [
+     "sh603883",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002745",
+     "not_in_v16_topK"
+    ],
+    [
+     "sh600622",
+     "not_in_v16_topK"
+    ],
+    [
+     "sh600885",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002590",
+     "not_in_v16_topK"
+    ],
+    [
+     "sz002638",
+     "not_in_v16_topK"
+    ],
+    [
+     "sh603239",
+     "not_in_v16_topK"
+    ],
+    [
+     "sh603886",
+     "not_in_v16_topK"
+    ]
+   ]
+  }
+ },
+ "probe_p6_auction_order_admissibility": {
+  "v16": {
+   "probe": "auction_order_admissibility",
+   "n": 1182,
+   "n_fill_at_open": 1182,
+   "n_bad": 0,
+   "bad": [],
+   "ok": true
+  },
+  "v15": {
+   "probe": "auction_order_admissibility",
+   "n": 21167,
+   "n_fill_at_open": 21167,
+   "n_bad": 21167,
+   "bad": [
+    {
+     "i": 0,
+     "j": "sz002746",
+     "reason": "missing_order_time",
+     "detail": "成交价=今开，却无 ≤09:20 的下单动作记录（不可执行）"
+    },
+    {
+     "i": 1,
+     "j": "sz002827",
+     "reason": "missing_order_time",
+     "detail": "成交价=今开，却无 ≤09:20 的下单动作记录（不可执行）"
+    },
+    {
+     "i": 2,
+     "j": "sz002346",
+     "reason": "missing_order_time",
+     "detail": "成交价=今开，却无 ≤09:20 的下单动作记录（不可执行）"
+    },
+    {
+     "i": 3,
+     "j": "sz002810",
+     "reason": "missing_order_time",
+     "detail": "成交价=今开，却无 ≤09:20 的下单动作记录（不可执行）"
+    },
+    {
+     "i": 4,
+     "j": "sh603798",
+     "reason": "missing_order_time",
+     "detail": "成交价=今开，却无 ≤09:20 的下单动作记录（不可执行）"
+    }
+   ],
+   "ok": false
+  }
+ },
+ "runtime_sec": 56.8
+}
