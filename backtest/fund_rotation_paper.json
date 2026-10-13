@@ -1,0 +1,56 @@
+{
+  "schema": "fund_rotation_paper/v1",
+  "strategy": "基金轮动",
+  "rule_version": "short-fund-production-pool/v1",
+  "selection_rule": {
+    "universe": "2000 基金池",
+    "bull": "短线分数 >= 30，Top10",
+    "bear": "短线分数 >= 45，Top3",
+    "share_dedup": "同基份额去重，优先 C 类；由 build_short_pool.py 生产",
+    "candidate_source": "short_pool.json:tiers.基金（不在本账本重排）"
+  },
+  "target_weighting": "当前候选集合目标等权；目标变化时仅按单位差额轮动",
+  "fill_rule": "信号净值日之后首个可得基金净值日成交；缺值保留待成交，不用信号日净值成交",
+  "fee_per_side": 0.0005,
+  "initial_cash": 100000.0,
+  "started_at": "2026-10-13 09:32:22",
+  "seed_date": "2026-10-12",
+  "cash": 100000.0,
+  "positions": {},
+  "pending_orders": {},
+  "target_codes": null,
+  "names": {},
+  "unpriced_codes": [],
+  "last_market_asof": "2026-10-12",
+  "last_signal": null,
+  "status": "SIGNAL_SOURCE_STALE",
+  "status_note": "基金候选日期滞后；仅标记既有仓位/执行既有待成交单，不生成新交易。",
+  "nav": 100000.0,
+  "market_value": 0.0,
+  "cum_return_pct": 0.0,
+  "max_drawdown_pct": 0.0,
+  "fills": [],
+  "events": [
+    {
+      "date": "2026-10-12",
+      "event": "short_pool.as_of=2026-09-29 与指数最新交易日=2026-10-12 不一致；忽略过期候选，不补做历史交易。"
+    }
+  ],
+  "nav_history": [
+    {
+      "date": "2026-10-12",
+      "nav": 100000.0,
+      "cash": 100000.0,
+      "market_value": 0.0,
+      "cum_return_pct": 0.0,
+      "positions": 0,
+      "latest_fund_nav_date": null
+    }
+  ],
+  "last_stale_asof": "2026-09-29",
+  "updated_at": "2026-10-13 09:32:22",
+  "n_fills": 0,
+  "n_positions": 0,
+  "n_completed_trades": 0,
+  "latest_nav_date": "2026-10-12"
+}

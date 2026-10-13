@@ -1,0 +1,71 @@
+{
+  "schema": "sentinel_return_paper/v1",
+  "strategy": "热榜哨兵收益模拟",
+  "rule_version": "R-jiandi-top30-0924/v1",
+  "seed_date": "2026-10-12",
+  "started_at": "2026-10-13 09:32:22",
+  "initial_nav": 100000.0,
+  "universe": "沪深主板（sh60/sz00/sz002）· len(df)>=400 · 排除 sh5/sz1/bj",
+  "entry_rule": "K>=2 且当日全市场共振家数 θ>=30；T 收盘确认，T+1 开盘成交",
+  "selection_rule": "最多 K=5 槽等权；按冻结 seed=20260921 的日种子随机取样",
+  "exit_rule": "RSI(14) 域 55/65/65（熊/强牛/弱牛），信号次日开盘卖；最多持有 5 日",
+  "cost_rule": "预注册两档往返成本：0.20% 与 1.15%，在平仓时按入场名义金额扣除",
+  "trading_enabled": false,
+  "veto_state_source": "backtest/sentinel_state.json（只读职责；本账本不读写）",
+  "portfolios": {
+    "0.20%": {
+      "cost_label": "0.20%",
+      "round_trip_cost_rate": 0.002,
+      "cash": 100000.0,
+      "positions": {},
+      "nav": 100000.0,
+      "cum_net_return_pct": 0.0,
+      "max_drawdown_pct": 0.0,
+      "n_fills": 0,
+      "n_completed_trades": 0,
+      "fills": [],
+      "closed_trades": [],
+      "nav_history": [
+        {
+          "date": "2026-10-12",
+          "nav": 100000.0,
+          "cash": 100000.0,
+          "market_value": 0,
+          "cum_net_return_pct": 0.0,
+          "n_positions": 0
+        }
+      ],
+      "current_positions": []
+    },
+    "1.15%": {
+      "cost_label": "1.15%",
+      "round_trip_cost_rate": 0.0115,
+      "cash": 100000.0,
+      "positions": {},
+      "nav": 100000.0,
+      "cum_net_return_pct": 0.0,
+      "max_drawdown_pct": 0.0,
+      "n_fills": 0,
+      "n_completed_trades": 0,
+      "fills": [],
+      "closed_trades": [],
+      "nav_history": [
+        {
+          "date": "2026-10-12",
+          "nav": 100000.0,
+          "cash": 100000.0,
+          "market_value": 0,
+          "cum_net_return_pct": 0.0,
+          "n_positions": 0
+        }
+      ],
+      "current_positions": []
+    }
+  },
+  "pending_entries": null,
+  "signals": [],
+  "last_processed_date": "2026-10-12",
+  "as_of": "2026-10-12",
+  "status": "FLAT_NO_TRIGGER",
+  "status_note": "未触发/空仓；种子 NAV 100000.00，累计净收益 0.00%。"
+}

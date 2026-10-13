@@ -72,6 +72,9 @@ STEPS = [
     # 占 60% 仓位的 FB3 基金主仓长期用 3 周前净值选基（且新旧净值混算）。[软]=失败不阻断主链。
     ("基金净值刷新 fund_nav_update[软]", ["fund_nav_update.py"], "--skip-fundnav" in sys.argv),
     ("短池+门控+FB3基金池 build_short_pool", ["build_short_pool.py"], False),
+
+    # 短线基金独立收益账本：紧随当前生产候选生成；绝不访问 FB3-H20 fund_paper.json。
+    ("短线基金轮动纸面账本 fund_rotation_paper[软]", ["backtest/fund_rotation_paper.py"], "--skip-fundrotation" in sys.argv),
     # 全量池因子缓存重建（R-v8cache-0921 · 2026-09-21 用户批准接进日链）：
     # 根因=v9_auto.py:14 `pool_all = V.load_pool()` 在 **import 时**就读 v8_factor_cache.pkl，
     # 而该缓存此前**从不被日链刷新**（源是 data_full，属派生缓存）→ 缓存一冻，
@@ -135,38 +138,10 @@ STEPS = [
     #   ③ 年化 11.78%（含国债ETF现金叠加）< 12% 毕业门
     #   → 本账户为**影子/模拟性质**，毕业门前不申领实盘资金；QLCH_CASH=1 可开空仓期国债ETF叠加。
     # [软]=失败不阻断主链；--skip-qlch 跳过。
-    ("超跌低开低吸-旧基线 qlch_paper[软]", ["backtest/qlch_paper_20260921.py"], "--skip-qlch" in sys.argv),
-    # 潜龙 B4 对照轨（R-qlch-filter-0921k · 2026-09-21 用户批准）：与 C1 基线并行跑同一段前向数据，
-    # 在封存集上做头对头，而不是现在挑一个。
-    # 差异：市值/换手 绝对区间 → 当日横截面分位带（市值[.20,.70] / 换手[.40,.80]）。
-    # 依据：分层分解定位膨胀源=市值(1.73)/换手(2.02)；分位化后完整信号两段比 2.46→1.49（首次过 1.5 门），
-    #       训练窗夏普 0.894→1.838、年化 16.18%→41.85%。
-    # ⚠ 风险已在报告明示：稳定性恰在门线(1.49 vs 1.5)、仍属训练窗选型、改动了策略骨架（共有滤网）。
-    # [软]=失败不阻断主链；--skip-qlchb4 跳过。
-    ("超跌低开低吸-B4无上限 qlch_paper_b4[软]", ["backtest/qlch_paper_20260921.py", "--variant", "B4"], "--skip-qlchb4" in sys.argv),
-    # 潜龙 B4+K=3 轨（R-qlch-poscap-0921l · 2026-09-21 用户批准）：单票权重上限 1/3，未用资金持国债ETF。
-    # 目的：消掉「单票满仓」（B4 现口径下 248 天单只股票满仓、贡献 43.3% 总收益）。
-    # 实测（20bp+现金）：年化 33.35%→24.97%（−8.4pp），但夏普 1.341→1.474、回撤 −22.90%→−15.47%、
-    #   逐年双口径一致性 7/9→9/9、2026 单笔 −0.620%→+0.378%。50bp：夏普 0.646→0.804、回撤 −38.6%→−17.2%。
-    # ⚠ 预注册年化门（≥0.8×基线）未过 → 按 §五.1 持仓上限**判作废**；本轨仅为封存集三方头对头而设，非采纳。
-    # [软]=失败不阻断主链；--skip-qlchk3 跳过。
-    # ★ 2026-09-21 用户拍板投产（命名「超跌低开低吸」）：B4 分位滤网 + 单票上限 1/3。
-    #   ⚠ 保留 [软] 执行是工程判断（新模块首个稳定周后再硬化）——不影响投产状态：
-    #   本轨每日运行、写入 state、出现在看板「🏷 超跌低开低吸」组，并输出今日收盘候选。
-    #   硬化的代价：失败会阻断其后的看板重建；故先软一周。
-    ("超跌低开低吸-B4K3 qlch_paper_b4k3[软]", ["backtest/qlch_paper_20260921.py", "--variant", "B4", "--maxpos", "3"], "--skip-qlchk3" in sys.argv),
-    # 超跌低吸-B4K3主板轨（R-qlch-mainboard-0921m · 2026-09-21 用户批准预注册）：
-    # 与第 29 步（B4K3 全池）**唯一差异 = 池**，构成单变量头对头。
-    # 真主板 = sh600/601/603/605 + sz000/001/002/003（剔科创板 688，20% 涨跌幅）。
-    # 依据：科创板剔除影响逐臂不同（B4 年化 −10.56pp / C1 现生产 +3.84pp），不能一刀切，须按臂判定。
-    # 预注册 §三 声明：主板切片已被读过，不追溯为预注册；主板问题一律交封存集判定（§五 七门）。
-    # [软]=失败不阻断主链；--skip-qlchmb 跳过。
-    ("超跌低开低吸-B4K3主板 qlch_paper_b4k3mb[软]", ["backtest/qlch_paper_20260921.py", "--variant", "B4", "--maxpos", "3", "--mainboard"], "--skip-qlchmb" in sys.argv),
-    # 候选臂挂前向采集轨（R-qlch-sealed-0922 · 2026-09-22 用户批准）：
-    #   封存集 = 2026-09-22 起前向数据，毕业门见 PRE-REGISTRATION_20260921_qlch_paper.md §七（10 道 · 需 ≥60 交易日）
-    #   ⚠ 只采集不申领资金；[软]=失败不阻断主链；--skip-qlchg60 / --skip-qlchcb 跳过
-    ("超跌低开低吸-候选MA60门 qlch_paper_g60[软]", ["backtest/qlch_paper_20260921.py", "--variant", "B4", "--maxpos", "3", "--gate", "60"], "--skip-qlchg60" in sys.argv),
-    ("超跌低开低吸-候选综合分 qlch_paper_cb[软]", ["backtest/qlch_paper_20260921.py", "--variant", "B4", "--maxpos", "3", "--select", "combo"], "--skip-qlchcb" in sys.argv),
+    # 当前生产模拟盘仅更新 B4 分位滤网 + K3 槽位上限 + 全池；其余历史账本只读保留。
+    ("超跌低开低吸-B4K3全池 qlch_paper_b4k3[软]",
+     ["backtest/qlch_paper_20260921.py", "--variant", "B4", "--maxpos", "3"],
+     "--skip-qlchk3" in sys.argv),
     ("A5 打板实验盘扫描 paper_daban_a5[软]", [str(_A5_EXT / "paper_daban_a5.py") if _A5_EXT.is_dir() else str(BASE / "backtest" / "a5_experiment" / "paper_daban_a5.py")], "--skip-a5" in sys.argv),
     ("A5 看板数据 build_a5_pool[软]", ["build_a5_pool.py"], "--skip-a5" in sys.argv),
     ("A5 复盘日志 build_a5_review[软]", ["build_a5_review.py"], "--skip-a5" in sys.argv),
@@ -178,15 +153,9 @@ STEPS = [
     # ② finite-check 于日链状态 JSON 的数字叶子（拦 inf/NaN 静默污染，陷阱 ★178）
     # 仅 FAIL 时非零（FAIL 会打印到日志，但 [软] 语义下不阻断主链）；--skip-gate 跳过。
     ("因子检查闸 factor_gate_daily[软]", ["backtest/factor_gate_daily.py"], "--skip-gate" in sys.argv),
-    # 短线板块新策略接入：2026-09-24 两次决策后**暂无新增策略步**（此处保留位置说明）。
-    #   ⚠「左侧捡漏」(bt520 纯左侧簿)：复测门未过 → 整体下架（ADR-0010 D14）
-    #   ⚠「热榜哨兵」(jiandi top30 共振)：不满足**投产要求**（项目毕业门 = 封存集 ≥60 交易日 且
-    #     ≥40 笔；该哨兵 1 个扫描日 / 0 笔，且预注册自述「只可否决 · 不构成通过性证据」）
-    #     → 整体下架（ADR-0010 D16）
-    #   两者的 STEPS / git 白名单 / 校验清单条目均已移除，不留悬空引用。
-    # ⚠ 2026-09-25 三度决策（用户「执行复测再否定」）：热榜哨兵**已跑稳健性复测且 B1–B8 全过**
-    #   （backtest/jiandi_sentinel_retest_0924.json）→ 装回看板。左侧捡漏仍下架（复测门确为不通过）。
+    # 哨兵保持只读否决；纸面收益由独立账本记录，不回写 sentinel_state.json 或预注册状态。
     ("热榜哨兵-单日信号 sentinel_daily[软]", ["backtest/sentinel_daily.py"], "--skip-sentinel" in sys.argv),
+    ("热榜哨兵-收益账本 sentinel_return_paper[软]", ["backtest/sentinel_return_paper.py"], "--skip-sentinel" in sys.argv),
     # 缩量超跌（原名「横盘低开·两日」）当日候选（看板「缩量超跌」子标签的数据源）——**必须在 build_dual_system 之前跑**；
     # [软]=失败不阻断主链（看板退回上一份候选，卡片显示「产物未生成」，不会静默显示假数据）。
     # 幂等：只读行情/面板、只写自己的两个产物；与冻结脚本 oos_run.py 的 A11 逐位对拍失败会 exit 2。
@@ -323,9 +292,9 @@ if not fails:
         _expect = None
     _expect = _expect or str(date.today())
     for _rel, _var, _keys in [
-        # 2026-09-24：新增策略已全部下架（ADR-0010 D14 左侧捡漏 / D16 热榜哨兵）
-        # → 本清单暂无条目；结构保留，供下一次策略接入时直接填
-        #（判据仍是「文件在盘 + 可解析 + 日期字段 == 当日」）。
+        # 哨兵扫描/否决与独立收益账本分开核验；两份纸面账本日期都必须对齐最新交易日。
+        ("backtest/fund_rotation_paper.json", None, ("last_market_asof",)),
+        ("backtest/sentinel_return_paper.json", None, ("as_of",)),
         ("sentinel_pool.js", "window.SENTINEL_POOL", ("as_of",)),
         ("sentinel_track.js", "window.SENTINEL_TRACK", ("as_of",)),
         # sentinel_state.json 的日期字段按影子账本设计叫 last_scan（不是 as_of）——接受两者
@@ -408,6 +377,10 @@ if not fails and not NO_MAIN_PUSH:   # ⑤ 云端 Phase 1：只写 gh-pages，�
                           "backtest/sentinel_daily.py",
                           "backtest/sentinel_state.json",
                           "sentinel_pool.js", "sentinel_track.js",
+                          "backtest/fund_rotation_paper.py", "backtest/fund_rotation_paper.json",
+                          "backtest/sentinel_return_paper.py", "backtest/sentinel_return_paper.json",
+                          "backtest/paper_ledger_cards.py",
+                          "backtest/qlch_paper_state_b4_k3.json",
                           "backtest/jiandi_sentinel_retest_0924.py",
                           "backtest/jiandi_sentinel_retest_0924.json",
                           "backtest/PRE-REGISTRATION_20260924b_jiandi_sentinel_retest.md",
