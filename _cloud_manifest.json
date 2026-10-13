@@ -1,11 +1,11 @@
 {
-  "run_id": "38238914718",
-  "sha": "5acf71974c92281bfeb7d135f82f69e9876668e8",
-  "mode": "chain",
+  "run_id": "38337474055",
+  "sha": "2a712fae36f7ec7f74b69c6b03b5e8dc6d2a3308",
+  "mode": "probe",
   "status": "published-candidate",
-  "ts_cn": "2026-10-12 21:01:04",
-  "today_cn": "2026-10-12",
-  "chain_rc": 0,
+  "ts_cn": "2026-10-13 10:34:40",
+  "today_cn": "2026-10-13",
+  "chain_rc": null,
   "g2_fresh": true,
   "runtime_deps": [
     "enhanced_data.js",
@@ -20,8 +20,8 @@
   "files": [
     {
       "name": "dual_system.html",
-      "md5": "74a3859f6fce",
-      "bytes": 1411091,
+      "md5": "00f0c0796d2a",
+      "bytes": 1400052,
       "as_of": "2026-10-12"
     },
     {
@@ -110,15 +110,15 @@
     },
     {
       "name": "index.html",
-      "md5": "74a3859f6fce",
-      "bytes": 1411091,
+      "md5": "00f0c0796d2a",
+      "bytes": 1400052,
       "as_of": "2026-10-12"
     }
   ],
   "hpdk_fresh": {
-    "backtest/hpdk_candidates.json": "ok",
-    "backtest/hpdk_paper.json": "ok",
-    "backtest/hpdk_oos_view.json": "ok"
+    "backtest/hpdk_candidates.json": "stale(2026-09-29!=2026-09-30)",
+    "backtest/hpdk_paper.json": "stale(2026-09-28!=2026-09-30)",
+    "backtest/hpdk_oos_view.json": "stale(2026-09-28!=2026-09-30)"
   },
-  "hpdk_expect": "2026-10-12"
+  "hpdk_expect": "2026-09-30"
 }
