@@ -7,7 +7,7 @@ ADR-0004 审查取证：体系里没有任何地方表示「一根日线 bar 内
 于是「09:25 才撮合出清单、却要求 09:25 前下单」「09:25 判定 → 09:25 就动手」
 这类**实盘不可执行**的指令被反复写进卡片、清单与报告，而没有任何机械拦截。
 
-本脚本把四类违规做成会失败的检查：
+本脚本把五类违规做成会失败的检查：
 
   G1 静默期动作     行内出现 09:25–09:29 时刻 **且** 含买卖/撤单动作词，
                     又没有任何「可执行时点」标注 → 违规（交易所该时段不接受申报/撤单）
@@ -20,9 +20,14 @@ ADR-0004 审查取证：体系里没有任何地方表示「一根日线 bar 内
   G5 成交口径三查  来源：gushi topic/1010 主帖（2026-10-11，管理员要求按此口径回测）。
                     G5a 开盘涨停买不进  买入腿落在「开盘已触及涨停 / 一字板 / 停牌」的 bar 上
                     G5b 成交未确立      按开盘价挂买，但当日除开盘价外没有任何报价 ≤ 挂价；
-                                       `--strict-fill` 时「最低价恰等于开盘价」也计入
+                                       `--strict-fill` 时「最低价恰等于开盘价」也计入。
+                                       ⚠ 只对**09:20 之后才挂**的单子生效：委托时刻 ≤ 09:20
+                                       属盲挂（单子在开盘撮合前就挂了），开盘价成交正当，
+                                       不适用本条 —— 否则会把盲挂策略整批误判成违规。
                     G5c 跌停封死却记成交  卖出腿落在当日 high 已触及跌停价（全天封死）的 bar 上，
                                        须顺延到下一可卖日再计价
+                    只审**声称成交**的腿（`entry_px == entry_open` 或 `filled=1`）；
+                    盲挂放行 / 未声称成交 / 无 bar 三类分别计数，不静默略过。
                     三条全部复用 `engine.session` 的真值源（`board_of` / `limit_prices` /
                     `reaches_limit_up|down` / `limit_order_crossed` / `tradable_at_fill`），
                     不另写一份时钟或涨跌停常量。
@@ -35,7 +40,6 @@ ADR-0004 审查取证：体系里没有任何地方表示「一根日线 bar 内
     python tools/gate_trading_clock.py --strict-fill # G5b 采用严格成交口径
 
 退出码：0 = 无违规（例外已登记并计数）；1 = 有违规 **或** 门禁自身不可用（失败即闭锁）。
-
 例外登记
 --------
 `tools/gate_trading_clock_exempt.txt`：每行 `<必须出现的子串> || <原因>`。
@@ -46,6 +50,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import datetime as _dt
 import os
 import re
 import sys
@@ -232,8 +237,18 @@ def scan_trade_records(root: Path, S) -> tuple[list[dict], int]:
             out.append(dict(check="G4a 竞价下单时点", **b))
     except Exception as e:  # noqa: BLE001
         out.append(dict(check="G4a 竞价下单时点", reason="probe_error", detail=str(e)[:160]))
-    # ② 成交日可成交性：需要 bars —— 记录里带 bar 快照时才判（否则只统计不可判）
-    bare = [r for r in recs if isinstance(r.get("bar"), dict)]
+    # ② 成交日可成交性：需要 bars —— 记录里带 bar 快照**且声称成交**时才判。
+    #    没成交（filled=0 / entry_px 为空或 0）的记录去判「能不能成交」是空审，
+    #    实测会整批产出假阳性（停牌/涨停开盘买不进，共 5 条）。
+    def _claims_fill(r: dict) -> bool:
+        if r.get("filled") in (True, 1, "1", "true", "True"):
+            return True
+        try:
+            return float(r.get("entry_px")) > 0
+        except (TypeError, ValueError):
+            return False
+
+    bare = [r for r in recs if isinstance(r.get("bar"), dict) and _claims_fill(r)]
     if bare:
         bars = {}
         for r in bare:
@@ -242,7 +257,12 @@ def scan_trade_records(root: Path, S) -> tuple[list[dict], int]:
             b2 = audit.probe_fill_tradability(
                 [dict(sym=r.get("sym"), date=r.get("date") or r.get("entry_date"),
                       price=r.get("entry_px") or r.get("price"), side=r.get("side", "buy"),
-                      prev_close=r.get("prev_close")) for r in bare], bars)
+                      # ⚠ 前收必须与本条 bar **同尺度**：bar 自带 prev_close 时一律用它。
+                      # 否则会把「记录里的原始前收」与「回填的前复权 bar」混算，
+                      # 整批产出假阳性「涨停开盘买不进」（实测 5 条）。
+                      prev_close=(r["bar"].get("prev_close")
+                                  if isinstance(r.get("bar"), dict) else None) or r.get("prev_close"))
+                 for r in bare], bars)
             for b in b2.get("bad", []):
                 out.append(dict(check="G4b 成交日可成交性", **b))
         except Exception as e:  # noqa: BLE001
@@ -267,35 +287,47 @@ def _close_px(a, b, atol: float = 1e-9) -> bool:
     return abs(fa - fb) <= atol + 1e-9 * max(abs(fa), 1.0)
 
 
+def _pick(rec: dict, *keys):
+    """按顺序取第一个**非 None** 的字段（不用 `or`，避免把 0 当缺失）。"""
+    for k in keys:
+        if rec.get(k) is not None:
+            return rec[k]
+    return None
+
+
 def _legs(rec: dict) -> list[tuple[str, object, object, dict | None]]:
     """把一条逐笔记录拆成 (side, date, price, bar) 的腿。
 
-    支持两种形态：
-      A 单腿：{sym, date|entry_date, price|entry_px, side, bar, prev_close?}
-      B 往返：{sym, entry_date, entry_px, exit_date, exit_px, bar, exit_bar?, prev_close?}
+    支持两种形态（字段名兼容本仓历史产物）：
+      A 单腿：{sym, date|entry_date, price|entry_px|entry_open, side, bar, prev_close?}
+      B 往返：{sym, entry_date, entry_px|entry_open, exit_date, exit_px, bar, exit_bar?, prev_close?}
+    历史 `*trades*.jsonl` 用的是 `entry_open` / `exit_px`，故一并接受。
     """
     buy_bar = rec.get("bar") if isinstance(rec.get("bar"), dict) else None
     exit_bar = rec.get("exit_bar") if isinstance(rec.get("exit_bar"), dict) else None
     side = rec.get("side")
     if side in ("buy", "sell") and (rec.get("date") or rec.get("entry_date")):
         d = rec.get("date") or rec.get("entry_date")
-        px = rec.get("price") if rec.get("price") is not None else rec.get("entry_px")
-        return [(side, d, px, buy_bar)]
+        return [(side, d, _pick(rec, "price", "entry_px", "entry_open"), buy_bar)]
     legs = []
     d = rec.get("entry_date") or rec.get("date")
     if d:
-        legs.append(("buy", d, rec.get("entry_px") if rec.get("entry_px") is not None
-                     else rec.get("price"), buy_bar))
+        legs.append(("buy", d, _pick(rec, "entry_px", "entry_open", "price"), buy_bar))
     if rec.get("exit_date"):
-        legs.append(("sell", rec.get("exit_date"), rec.get("exit_px"), exit_bar))
+        legs.append(("sell", rec.get("exit_date"), _pick(rec, "exit_px", "price"), exit_bar))
     return legs
 
 
-def scan_fill_rules(root: Path, S, strict_fill: bool = False) -> tuple[list[dict], int, int]:
+def scan_fill_rules(root: Path, S, strict_fill: bool = False) -> tuple[list[dict], dict]:
     """G5：按 topic/1010 的三条执行口径检查逐笔记录。
 
-    返回 (violations, n_judged, n_unjudgeable)。只在记录带当日 bar 快照时才判；
-    不可判的腿**显式计数**，不静默略过。涨跌停真值源一律取 `engine.session`。
+    只审**声称成交**的腿，并按委托时刻分流（这条最容易误判）：
+      · 委托时刻 ≤ 撤单窗结束（09:20，`S.AUCTION_CANCEL_END`）→ 盲挂口径，
+        开盘价成交**正当**（单子在开盘撮合前就挂了），topic/1010 第③条不适用；
+      · 委托晚于该时刻、或记录未给委托时刻 → 适用第③条：按开盘价挂买必须有更低报价穿到，
+        `--strict-fill` 时「最低价恰等于开盘价」也算成交未确立。
+    返回 `(violations, stats)`；stats 逐类计数（judged / blind_legit / no_fill_claim /
+    unjudgeable），**不静默略过**。涨跌停与时钟真值源一律取 `engine.session`。
     """
     files = []
     for pat in TRADE_GLOBS:
@@ -313,18 +345,53 @@ def scan_fill_rules(root: Path, S, strict_fill: bool = False) -> tuple[list[dict
                 recs.append(json.loads(ln))
             except Exception:  # noqa: BLE001
                 continue
+
+    def _truthy(v) -> bool:
+        return v in (True, 1, "1", "true", "True")
+
+    def _claims_buy_fill(rec: dict) -> bool:
+        """记录是否**声称在开盘价成交**（entry_px 与 entry_open 同尺度比较，不做跨口径比较）。
+
+        非正的 entry_px（0 / None）是「未成交」哨兵，不算声称成交。
+        """
+        epx, eop = _num(rec.get("entry_px")), _num(rec.get("entry_open"))
+        if epx is not None and epx > 0 and eop is not None and _close_px(epx, eop):
+            return True
+        return _truthy(rec.get("filled"))
+
+    def _blind_order(rec: dict) -> bool:
+        """委托时刻 ≤ 09:20 → 盲挂：开盘价成交正当，不适用第③条。"""
+        t = rec.get("order_time")
+        if not t:
+            return False
+        try:
+            hh, mm = str(t).split(":")[:2]
+            return _dt.time(int(hh), int(mm)) <= S.AUCTION_CANCEL_END
+        except (TypeError, ValueError):
+            return False
+
     out: list[dict] = []
-    n_ok = n_skip = 0
+    stats = dict(judged=0, blind_legit=0, no_fill_claim=0, unjudgeable=0)
     for i, rec in enumerate(recs):
         sym = rec.get("sym")
+        blind = _blind_order(rec)
+        buy_claimed = _claims_buy_fill(rec)
         for side, d, px, bar in _legs(rec):
             if not isinstance(bar, dict):
-                n_skip += 1
+                stats["unjudgeable"] += 1
                 continue
-            n_ok += 1
-            pc = _num(rec.get("prev_close"))
+            if side == "buy" and not buy_claimed:
+                stats["no_fill_claim"] += 1
+                continue
+            if side == "sell" and (px is None or (_num(px) or 0) <= 0):
+                stats["no_fill_claim"] += 1
+                continue
+            stats["judged"] += 1
+            # 前收按「本条腿自己的 bar」优先：同一条记录的买入腿与卖出腿前收不同，
+            # 用记录级 prev_close 会把卖出日的跌停价算错。
+            pc = _num(bar.get("prev_close"))
             if pc is None:
-                pc = _num(bar.get("prev_close"))
+                pc = _num(rec.get("prev_close"))
             board = rec.get("board") or S.board_of(str(sym))
             is_st = bool(rec.get("is_st"))
             up, dn = bar.get("upper_limit"), bar.get("lower_limit")
@@ -334,22 +401,26 @@ def scan_fill_rules(root: Path, S, strict_fill: bool = False) -> tuple[list[dict
                 dn = dn2 if dn is None else dn
             tag = f"sym={sym} date={d} side={side} px={px}"
             if side == "buy":
-                if _close_px(px, bar.get("open")):
-                    tradable, why = S.tradable_at_fill(bar, pc, board, "buy", is_st)
-                    if not tradable:
-                        out.append(dict(check="G5a 开盘涨停买不进", i=i, detail=f"{tag} —— {why}"))
-                        continue
-                    low, op = _num(bar.get("low")), _num(bar.get("open"))
-                    if not S.limit_order_crossed(float(px), bar, "buy"):
-                        out.append(dict(check="G5b 成交未确立", i=i,
-                                        detail=f"{tag} —— 挂价未被当日最低价穿到，限价单不可能成交，"
-                                               f"该笔成交记录不成立"))
-                        continue
-                    if strict_fill and low is not None and op is not None and low >= op - 1e-9:
-                        out.append(dict(check="G5b 成交未确立（严格口径）", i=i,
-                                        detail=f"{tag} —— 当日最低价恰等于开盘价：除开盘价外没有任何更低报价，"
-                                               f"09:25 撮合后才按开盘价挂单的成交无法确立"))
-                        continue
+                tradable, why = S.tradable_at_fill(bar, pc, board, "buy", is_st)
+                if not tradable:
+                    out.append(dict(check="G5a 开盘涨停买不进", i=i, detail=f"{tag} —— {why}"))
+                    continue
+                if blind:
+                    stats["blind_legit"] += 1        # 盲挂：开盘价成交正当
+                    continue
+                op, low = _num(bar.get("open")), _num(bar.get("low"))
+                if op is None:
+                    continue
+                if not S.limit_order_crossed(float(op), bar, "buy"):
+                    out.append(dict(check="G5b 成交未确立", i=i,
+                                    detail=f"{tag} —— 挂价（今开 {op:.2f}）未被当日最低价穿到，"
+                                           f"限价单不可能成交，该笔成交记录不成立"))
+                    continue
+                if strict_fill and low is not None and low >= op - 1e-9:
+                    out.append(dict(check="G5b 成交未确立（严格口径）", i=i,
+                                    detail=f"{tag} —— 当日最低价 {low:.2f} 恰等于今开 {op:.2f}："
+                                           f"除开盘价外没有任何更低报价，09:25 之后才挂的这张单"
+                                           f"成交无法确立"))
                 continue
             if dn is not None:
                 highv = _num(bar.get("high"))
@@ -359,9 +430,9 @@ def scan_fill_rules(root: Path, S, strict_fill: bool = False) -> tuple[list[dict
                                            f"（全天封死、卖不掉），须顺延到下一可卖日再计价"))
                     continue
             tradable, why = S.tradable_at_fill(bar, pc, board, "sell", is_st)
-            if not tradable and _close_px(px, bar.get("open")):
+            if not tradable:
                 out.append(dict(check="G5c 跌停封死却记成交", i=i, detail=f"{tag} —— {why}"))
-    return out, n_ok, n_skip
+    return out, stats
 
 
 # ---------------------------------------------------------------- 自检（V6）
@@ -382,13 +453,14 @@ SELFTEST_GOOD = """# 正例：已标注可执行时点（不应被拦）
 
 
 SELFTEST_TRADES_BAD = """\
-{"sym":"sh600000","entry_date":"2026-03-02","entry_px":11.00,"prev_close":10.00,"bar":{"open":11.00,"high":11.00,"low":11.00,"close":11.00,"volume":1000}}
-{"sym":"sh600001","entry_date":"2026-03-02","entry_px":10.50,"prev_close":10.00,"bar":{"open":10.50,"high":10.90,"low":10.60,"close":10.80,"volume":1000}}
-{"sym":"sh600002","entry_date":"2026-03-02","entry_px":10.50,"exit_date":"2026-03-03","exit_px":9.00,"prev_close":10.00,"bar":{"open":10.50,"high":10.90,"low":10.20,"close":10.00,"volume":1000},"exit_bar":{"open":9.00,"high":9.00,"low":9.00,"close":9.00,"volume":1000}}
-{"sym":"sh600003","entry_date":"2026-03-02","entry_px":10.50,"prev_close":10.00,"bar":{"open":10.50,"high":10.90,"low":10.50,"close":10.80,"volume":1000}}
+{"sym":"sh600000","entry_date":"2026-03-02","entry_px":11.00,"entry_open":11.00,"filled":1,"prev_close":10.00,"bar":{"open":11.00,"high":11.00,"low":11.00,"close":11.00,"volume":1000}}
+{"sym":"sh600001","entry_date":"2026-03-02","entry_px":10.50,"entry_open":10.50,"filled":1,"prev_close":10.00,"bar":{"open":10.50,"high":10.90,"low":10.60,"close":10.80,"volume":1000}}
+{"sym":"sh600002","entry_date":"2026-03-02","entry_px":10.50,"entry_open":10.50,"filled":1,"exit_date":"2026-03-03","exit_px":9.00,"prev_close":10.00,"bar":{"open":10.50,"high":10.90,"low":10.20,"close":10.00,"volume":1000},"exit_bar":{"open":9.00,"high":9.00,"low":9.00,"close":9.00,"volume":1000}}
+{"sym":"sh600003","entry_date":"2026-03-02","entry_px":10.50,"entry_open":10.50,"filled":1,"prev_close":10.00,"bar":{"open":10.50,"high":10.90,"low":10.50,"close":10.80,"volume":1000}}
 """
 SELFTEST_TRADES_GOOD = """\
-{"sym":"sh600010","entry_date":"2026-03-02","entry_px":10.50,"exit_date":"2026-03-03","exit_px":10.40,"prev_close":10.00,"bar":{"open":10.50,"high":10.90,"low":10.20,"close":10.00,"volume":1000},"exit_bar":{"open":10.30,"high":10.60,"low":10.10,"close":10.40,"volume":1000}}
+{"sym":"sh600010","entry_date":"2026-03-02","entry_px":10.50,"entry_open":10.50,"filled":1,"exit_date":"2026-03-03","exit_px":10.40,"prev_close":10.00,"bar":{"open":10.50,"high":10.90,"low":10.20,"close":10.00,"volume":1000},"exit_bar":{"open":10.30,"high":10.60,"low":10.10,"close":10.40,"volume":1000}}
+{"sym":"sh600020","entry_date":"2026-03-02","entry_px":10.50,"entry_open":10.50,"filled":1,"order_time":"09:18","prev_close":10.00,"bar":{"open":10.50,"high":10.90,"low":10.50,"close":10.80,"volume":1000}}
 """
 
 
@@ -416,13 +488,14 @@ def _selftest(S) -> int:
         # ---- G5 成交口径三查：注入式正/负对照（夹具见 SELFTEST_TRADES_*）----
         bad_tr = root / "bt_trades_bad.jsonl"
         bad_tr.write_text(SELFTEST_TRADES_BAD, encoding="utf-8")
-        v_norm, nj, ns = scan_fill_rules(root, S, strict_fill=False)
+        v_norm, st_norm = scan_fill_rules(root, S, strict_fill=False)
         kinds = sorted({v["check"] for v in v_norm})
         print(f"[自检] G5 负例/常规口径：违规 {len(v_norm)} 条（期望 3：G5a+G5b+G5c），"
-              f"可判腿 {nj} 条，不可判 {ns} 条")
+              f"可判腿 {st_norm['judged']} 条，盲挂放行 {st_norm['blind_legit']} 条，"
+              f"未声称成交 {st_norm['no_fill_claim']} 条，不可判 {st_norm['unjudgeable']} 条")
         if len(v_norm) != 3 or len(kinds) != 3:
             print(f"  !! G5 常规口径未按预期拦下：{[v['check'] for v in v_norm]}"); ok = False
-        v_strict, _, _ = scan_fill_rules(root, S, strict_fill=True)
+        v_strict, _st2 = scan_fill_rules(root, S, strict_fill=True)
         print(f"[自检] G5 负例/严格口径：违规 {len(v_strict)} 条（期望 4：多一条「最低价=开盘价」）")
         if len(v_strict) != 4:
             print(f"  !! G5 严格口径计数异常：{[v['check'] for v in v_strict]}"); ok = False
@@ -430,9 +503,15 @@ def _selftest(S) -> int:
 
         good_tr = root / "bt_trades_good.jsonl"
         good_tr.write_text(SELFTEST_TRADES_GOOD, encoding="utf-8")
-        v_ok, nj2, _ = scan_fill_rules(root, S, strict_fill=False)
-        v_ok2, _, _ = scan_fill_rules(root, S, strict_fill=True)
-        print(f"[自检] G5 正例：常规 {len(v_ok)} 条 / 严格 {len(v_ok2)} 条（期望 0/0），可判腿 {nj2} 条")
+        v_ok, st_ok = scan_fill_rules(root, S, strict_fill=False)
+        v_ok2, st_ok2 = scan_fill_rules(root, S, strict_fill=True)
+        print(f"[自检] G5 正例：常规 {len(v_ok)} 条 / 严格 {len(v_ok2)} 条（期望 0/0）；"
+              f"盲挂（≤09:20 委托）放行 {st_ok2['blind_legit']} 条（期望 ≥1，不得按第③条判违规）")
+        for v in (v_ok + v_ok2):
+            print(f"  !! G5 误报 {v['check']} {v['detail'][:100]}")
+            ok = False
+        if st_ok2["blind_legit"] < 1:
+            print("  !! 盲挂（≤09:20 委托）未被识别 → 会与 topic/1010 第③条混判"); ok = False
         for v in (v_ok + v_ok2):
             print(f"  !! G5 误报 {v['check']} {v['detail'][:100]}")
             ok = False
@@ -487,10 +566,11 @@ def main() -> int:
     for v in tv[:20]:
         print(f"  ✗ {v}")
 
-    fv, n_judged, n_unjudged = scan_fill_rules(root, S, strict_fill=a.strict_fill)
+    fv, fstats = scan_fill_rules(root, S, strict_fill=a.strict_fill)
     print(f"\nG5 成交口径三查（topic/1010，口径={'严格' if a.strict_fill else '常规'}）："
-          f"可判腿 {n_judged} 条 / 不可判腿 {n_unjudged} 条 → 违规 {len(fv)} 条"
-          + ("（无可判记录：记录未带当日 bar 快照）" if n_judged == 0 else ""))
+          f"可判腿 {fstats['judged']} 条 → 违规 {len(fv)} 条；盲挂放行 {fstats['blind_legit']} 条、"
+          f"未声称成交 {fstats['no_fill_claim']} 条、无 bar 不可判 {fstats['unjudgeable']} 条"
+          + ("（无任何可判成交：记录未带当日 bar 快照）" if fstats['judged'] == 0 else ""))
     for v in fv[:20]:
         print(f"  ✗ {v['check']}  {v['detail']}")
 
@@ -499,7 +579,9 @@ def main() -> int:
                n_text_files=nf, n_violations_text=len(viol), n_exempted=len(exempted),
                n_trade_records=nrec, n_violations_trades=len(tv),
                fill_rule_mode="strict" if a.strict_fill else "normal",
-               n_fill_legs_judged=n_judged, n_fill_legs_unjudgeable=n_unjudged,
+               n_fill_legs_judged=fstats["judged"], n_fill_legs_unjudgeable=fstats["unjudgeable"],
+               n_fill_legs_blind_legit=fstats["blind_legit"],
+               n_fill_legs_no_fill_claim=fstats["no_fill_claim"],
                n_violations_fill_rules=len(fv),
                violations=viol[:200], exempted=exempted[:200], trade_violations=tv[:200],
                fill_rule_violations=fv[:200],
