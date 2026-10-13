@@ -6,11 +6,10 @@
   "requested_count": 388,
   "stopped_on_challenge": false,
   "body_status_counts": {
-    "full_body": 385,
-    "image_only": 1,
-    "login_gated": 2
+    "full_body": 387,
+    "image_only": 1
   },
-  "privacy_note": "Metadata only: no post text, cookies, account data, or private profile data.",
+  "privacy_note": "Metadata only: no post text, cookies, account data or private profile data are stored. Two TL1-gated topics were read with the owner's authenticated session under explicit authorization; for them only character counts and text digests are recorded.",
   "results": [
     {
       "topic_id": "1",
@@ -535,10 +534,14 @@
       "http_status": 200,
       "body_status": "image_only",
       "reason": "",
-      "thread_posts_read": 26,
+      "thread_posts_read": 13,
       "main_body_chars": 0,
       "response_bytes": 72917,
-      "response_sha256": "e3d69452c276b77c6add92ff27a88a2a65d85bc6016746c986ab9690371bef9a"
+      "response_sha256": "e3d69452c276b77c6add92ff27a88a2a65d85bc6016746c986ab9690371bef9a",
+      "ocr_images": 9,
+      "ocr_image_lines": 469,
+      "ocr_layout_rows": 104,
+      "ocr_engine": "PaddleOCR cloud API (module invocation)"
     },
     {
       "topic_id": "300",
@@ -6036,13 +6039,16 @@
       "forum": "最好的地方",
       "listing_activity_text": "昨天",
       "published_date_display": null,
-      "http_status": 403,
-      "body_status": "login_gated",
-      "reason": "消息 - 牛来股市社区 牛来股市社区 最好的地方 经验分享 指标公式 纯净水 社区共建 Ai 问财 避雷 暗盘 复盘 量化选股 搜索 菜单 × 消息 该主题需要 TL1 才可查看内容。 P 访客 请登录后发帖 登录 注册 站务公告 🌟访问卡顿的解决方案，不妨试试 · 积分兑换处 · 量化模型收益曲线 版块列表 最好的地方 261 经验分享 229 指标公式 257 纯净水 220 社区共建 44 给你发了一个积分红包 開 查看钱包 恭喜获得 0 积分已到账 可在钱包查看收支明",
-      "thread_posts_read": 0,
-      "main_body_chars": 0,
+      "http_status": 200,
+      "body_status": "full_body",
+      "reason": "",
+      "thread_posts_read": 2,
+      "main_body_chars": 137,
       "response_bytes": 23955,
-      "response_sha256": "d495551787b0fb86aa23cd93eb6a0d69a9912958b2650e0457da99c593688e04"
+      "anonymous_http_status": 403,
+      "anonymous_response_sha256": "d495551787b0fb86aa23cd93eb6a0d69a9912958b2650e0457da99c593688e04",
+      "body_text_sha256": "3c3d828d0e105c5604ba574b726e4cc19fa8f8862091a7ceed1409fab000bc35",
+      "body_access_mode": "owner authenticated TL1 session (browser-skill), 2026-10-13"
     },
     {
       "topic_id": "1010",
@@ -6052,13 +6058,16 @@
       "forum": "最好的地方",
       "listing_activity_text": "昨天",
       "published_date_display": null,
-      "http_status": 403,
-      "body_status": "login_gated",
-      "reason": "消息 - 牛来股市社区 牛来股市社区 最好的地方 经验分享 指标公式 纯净水 社区共建 Ai 问财 避雷 暗盘 复盘 量化选股 搜索 菜单 × 消息 该主题需要 TL1 才可查看内容。 P 访客 请登录后发帖 登录 注册 站务公告 🌟访问卡顿的解决方案，不妨试试 · 积分兑换处 · 量化模型收益曲线 版块列表 最好的地方 261 经验分享 229 指标公式 257 纯净水 220 社区共建 44 给你发了一个积分红包 開 查看钱包 恭喜获得 0 积分已到账 可在钱包查看收支明",
-      "thread_posts_read": 0,
-      "main_body_chars": 0,
+      "http_status": 200,
+      "body_status": "full_body",
+      "reason": "",
+      "thread_posts_read": 2,
+      "main_body_chars": 301,
       "response_bytes": 23955,
-      "response_sha256": "44e81d01567b830f462cff7336be3b8952c5401489948e7ea963581bfe53b349"
+      "anonymous_http_status": 403,
+      "anonymous_response_sha256": "44e81d01567b830f462cff7336be3b8952c5401489948e7ea963581bfe53b349",
+      "body_text_sha256": "ac623e47dcb5e999660d2d3f35271bc2fd0906fd2cff7945c957a7304f3ad92c",
+      "body_access_mode": "owner authenticated TL1 session (browser-skill), 2026-10-13"
     },
     {
       "topic_id": "1013",
@@ -6221,5 +6230,6 @@
       "response_sha256": "398c6d56253e3ccc3ae5e44675a2a33ebf162f5a08532cb282242aad0f00d329"
     }
   ],
-  "main_body_chars_definition": "character count of the topic opening post's extracted text, whitespace-normalized; 0 when no body text was extracted"
+  "main_body_chars_definition": "character count of the topic opening post's extracted text, whitespace-normalized; 0 when no body text was extracted",
+  "body_access_note": "topics 1009/1010 were read with the owner's authenticated TL1 browser session, under his explicit authorization on 2026-10-13; anonymous GET on both returns HTTP 403. No credentials, cookies, tokens or account data were extracted or stored."
 }

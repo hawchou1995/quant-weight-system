@@ -1,0 +1,172 @@
+{
+  "schema": "gushi-1010-tradability-controls/v1",
+  "captured_at": "2026-10-13",
+  "sample": [
+    {
+      "code": "301362",
+      "day": "2026-03-02"
+    },
+    {
+      "code": "301226",
+      "day": "2026-03-02"
+    },
+    {
+      "code": "603318",
+      "day": "2026-03-02"
+    },
+    {
+      "code": "002583",
+      "day": "2026-03-02"
+    },
+    {
+      "code": "300229",
+      "day": "2026-03-02"
+    }
+  ],
+  "observed_on_real_data": {
+    "picks": 3375,
+    "traded": 3312,
+    "excluded_limitup_open": 59,
+    "rolled_limitdown": 0,
+    "no_fill_low_eq_open": 0
+  },
+  "R2_negative_control": {
+    "expected": "all five normal picks pass through untraded-filtered",
+    "statuses": [
+      "traded",
+      "traded",
+      "traded",
+      "traded",
+      "traded"
+    ],
+    "passed": true,
+    "roll_days": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "R2_positive_control": {
+    "expected": "all five injected picks excluded as unbuyable",
+    "injections": [
+      {
+        "code": "301362",
+        "day": "2026-03-02",
+        "prev_close": 68.43,
+        "injected_open": 82.12,
+        "real_open": 70.78
+      },
+      {
+        "code": "301226",
+        "day": "2026-03-02",
+        "prev_close": 41.75,
+        "injected_open": 50.1,
+        "real_open": 43.11
+      },
+      {
+        "code": "603318",
+        "day": "2026-03-02",
+        "prev_close": 8.02,
+        "injected_open": 8.82,
+        "real_open": 8.4
+      },
+      {
+        "code": "002583",
+        "day": "2026-03-02",
+        "prev_close": 11.09,
+        "injected_open": 12.2,
+        "real_open": 11.33
+      },
+      {
+        "code": "300229",
+        "day": "2026-03-02",
+        "prev_close": 23.15,
+        "injected_open": 27.78,
+        "real_open": 24.0
+      }
+    ],
+    "statuses": [
+      "excluded_limitup_open",
+      "excluded_limitup_open",
+      "excluded_limitup_open",
+      "excluded_limitup_open",
+      "excluded_limitup_open"
+    ],
+    "caught": 5,
+    "all_caught": true
+  },
+  "R4_negative_control": {
+    "expected": "no roll without injection",
+    "roll_days": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "no_false_roll": true
+  },
+  "R4_positive_control": {
+    "expected": "all five forced limit-down exits roll to the next tradable close",
+    "injections": [
+      {
+        "code": "301362",
+        "pick_day": "2026-03-02",
+        "forced_seal_day": "2026-03-03",
+        "limit_down": 63.32,
+        "next_day": "2026-03-04"
+      },
+      {
+        "code": "301226",
+        "pick_day": "2026-03-02",
+        "forced_seal_day": "2026-03-03",
+        "limit_down": 38.46,
+        "next_day": "2026-03-04"
+      },
+      {
+        "code": "603318",
+        "pick_day": "2026-03-02",
+        "forced_seal_day": "2026-03-03",
+        "limit_down": 7.94,
+        "next_day": "2026-03-04"
+      },
+      {
+        "code": "002583",
+        "pick_day": "2026-03-02",
+        "forced_seal_day": "2026-03-03",
+        "limit_down": 10.31,
+        "next_day": "2026-03-04"
+      },
+      {
+        "code": "300229",
+        "pick_day": "2026-03-02",
+        "forced_seal_day": "2026-03-03",
+        "limit_down": 18.71,
+        "next_day": "2026-03-04"
+      }
+    ],
+    "statuses": [
+      "traded",
+      "traded",
+      "traded",
+      "traded",
+      "traded"
+    ],
+    "roll_days": [
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "all_rolled": true,
+    "rolled_count": 5
+  },
+  "verdict": {
+    "R2_probe_sensitive": true,
+    "R4_probe_sensitive": true,
+    "note": "在真实样本里 R4（跌停封板顺延）从未触发（rolled=0），其机制由注入对照证明；R2 在真实样本中命中 59 个开盘封板样本（全部四份导出合计 3375 笔），并被注入对照确认不会漏判。"
+  }
+}

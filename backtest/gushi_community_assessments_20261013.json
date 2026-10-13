@@ -43,16 +43,16 @@
       "applicability_conditions": "Any individual signal would need a separate frozen, point-in-time replication."
     },
     {
-      "assessment_id": "296-image",
+      "assessment_id": "296-image-decoded",
       "topic_id": "296",
       "title": "如图，请教下这个策略具体是啥，回测数据如何？",
       "source_url": "https://www.gushi.in/topic/296",
       "source_date_display": "2026-09-18",
       "body_status": "image_only",
-      "claim_type": "strategy_question",
+      "claim_type": "performance_claim",
       "decision": "无法验证",
-      "reason": "The main post is an image with no extractable text in the public HTML; the pictured strategy and metrics were not decoded or independently inspected.",
-      "applicability_conditions": "Requires the image content and underlying rule/data before assessment."
+      "reason": "主帖与回帖共 9 张内容图已全部 OCR 解码（PaddleOCR），得到 T+1闪电 选股截图、4 只标的分时图、2 张同一批交易的持仓表、1 张 15 个因子池交集表与 1 张共振分层表。逐项核验：两张持仓表内部算术完全自洽，但同一买入价下仅换卖出规则，近岸蛋白从 -5.00%(卖 76.58) 变为 +4.21%(卖 84.00)，单笔摆动 9.21pp、组合均值 7.30%→9.60%；因子池表最大 t=1.79，低于 18 个被比较格子在纯噪声下的最大值期望 1.82（族错误率 0.49）；15 个池有 5 个在剔除涨停续持后反号，均值最高的竞价阿尔法由 +4.26% 变为 -2.17%；共振分层 n 仅 12-24、窗口约 10 个交易日且为嵌套子集，单调性由包含关系机械保证。",
+      "applicability_conditions": "截图未给出可执行规则、样本定义与原始逐笔数据；分层样本量过小，不能作为可复现策略或收益证据。核验算式见 backtest/gushi_296_image_claim_verify_20261013.py。"
     },
     {
       "assessment_id": "300-intraday",
@@ -443,28 +443,56 @@
       "production_rule_change": false
     },
     {
-      "assessment_id": "1009-gated",
+      "assessment_id": "1009-dataset",
       "topic_id": "1009",
       "title": "竞价多头策略 历史数据",
       "source_url": "https://www.gushi.in/topic/1009",
-      "source_date_display": "昨天（页面列表显示；抓取日 2026-10-13）",
-      "body_status": "login_gated",
-      "claim_type": "performance_claim",
-      "decision": "无法验证",
-      "reason": "Direct public GET returned HTTP 403 and visible notice '该主题需要 TL1 才可查看内容'; no upgrade, points, payment or access bypass was attempted.",
-      "applicability_conditions": "Cannot assess the content until the user supplies an accessible copy or authorized access is provided."
+      "source_date_display": "2026-10-10（正文显示编辑于 2026-10-10 20:30）",
+      "body_status": "full_body",
+      "claim_type": "dataset_resource",
+      "decision": "不适用",
+      "source_method": "管理员发布的竞价多头策略 2026-03-01→2026-10-09 实际落盘选股导出（TL1 附件 zip；包内 __MACOSX 元数据显示导出地址为 i.gushi.in/strategy_export.php，属平台导出而非社区自述内容）。",
+      "reason": "正文不含方法或结论，只有数据附件与一句“可以发给 Ai 做做回测”。已就该数据做 T+1 可成交性对照（894 笔、149 个交易日）：按帖内成交规则日均 +0.575%（t=1.63）；严格要求除开盘价外出现更低报价后 -0.002%（t=-0.006）；剔除涨停续持后 -0.017%（t=-0.049）。",
+      "applicability_conditions": "仅作为真实落盘选股样本用于可成交性对照，不作为收益证据或生产规则来源；导出为不复权价，本机日线为前复权，比值已核对（除权因子 1.400/1.405）。"
     },
     {
-      "assessment_id": "1010-gated",
+      "assessment_id": "1010-execution-rules",
       "topic_id": "1010",
       "title": "T+1 闪电策略、盘前强势策略、陈星量化 历史数据，优选用途",
       "source_url": "https://www.gushi.in/topic/1010",
-      "source_date_display": "昨天（页面列表显示；抓取日 2026-10-13）",
-      "body_status": "login_gated",
+      "source_date_display": "2026-10-11（正文显示编辑于 2026-10-11 00:17）",
+      "body_status": "full_body",
+      "claim_type": "process_method",
+      "decision": "采纳",
+      "source_method": "三条可执行口径：① 排除开盘价已封涨停的样本（买不进）；② 卖出遇次日跌停封板顺延到 T+2/T+3…直到可卖那天收盘计价；③ 只有出票日除开盘价外出现过 ≤ 开盘价的报价，才算开盘价买入成功。",
+      "reason": "三条都可落成机械判据，且与既有 ADR-0004 交易时钟/可成交性门禁一致，不新增生产参数；第③条是本轮新增的检查口径（原门禁只查涨跌停可成交性，未查“价格是否回到开盘价”）。原文“不要使用任何历时数据！”保留原样：按上下文理解为禁止前视/事后信息，但用词为“历时”，未作改写。",
+      "applicability_conditions": "适用于日线级 T+1 开盘买入口径；要求下单时刻晚于 09:25 开盘集合竞价成交价公布（本批数据时间戳为 09:27:02–09:29:13，均为开盘后），故“按开盘价买入”属于限价重挂、必须用第③条判定能否成交。",
+      "local_verification": {
+        "result": "PASS",
+        "positive_control": "PASS",
+        "negative_control": "PASS",
+        "evidence_files": [
+          "backtest/gushi_1010_tradability_probe_20261013.py",
+          "backtest/gushi_1010_tradability_controls_20261013.json",
+          "backtest/gushi_strategy_export_t1_verify_20261013.py",
+          "backtest/gushi_strategy_export_verify_20261013.json",
+          "backtest/gushi_panqian_t1_verify_20261013.py"
+        ],
+        "controls": "注入式对照：把 5 个正常样本的 T 日开盘价改写成按板块档位算出的涨停价 → 5/5 被剔除（阳性）；同批样本不改写 → 5/5 放行（阴性）。把 5 个样本的卖出日 high 改写成该日跌停价 → 5/5 顺延（阳性）；不改写 → 0 误顺延（阴性）。真实样本上第①条命中 59/3375 笔，第②条 0 次触发（由注入对照证明机制有效）。"
+      },
+      "production_rule_change": false
+    },
+    {
+      "assessment_id": "1010-datasets-t1",
+      "topic_id": "1010",
+      "title": "T+1 闪电策略、盘前强势策略、陈星量化 历史数据，优选用途",
+      "source_url": "https://www.gushi.in/topic/1010",
+      "source_date_display": "2026-10-11（正文显示编辑于 2026-10-11 00:17）",
+      "body_status": "full_body",
       "claim_type": "performance_claim",
       "decision": "无法验证",
-      "reason": "Direct public GET returned HTTP 403 and the same TL1 restriction; no paid access or points were used.",
-      "applicability_conditions": "No conclusion about its hidden data or results."
+      "reason": "附件含 T+1闪电(478笔)/盘前强势(875笔)/竞价多头(894笔)/晨星量化(1128笔) 四份 2026-03-01→2026-10-09 落盘选股，合计 3,376 笔、147–149 个交易日。按其成交规则（排除开盘涨停买不进）复算：日均 +0.68%/+0.50%/+0.58%/+0.59%，t 分别 1.70/1.35/1.63/1.71，四者合计 t=1.65，均未过 5% 显著线；换成“除开盘价外出现更低报价才算成交”的严格臂后，四个策略全部落到 -0.20%/-0.07%/-0.002%/-0.04%（合计 -0.07%，t=-0.22）；再剔除涨停续持后合计 -0.09%（t=-0.28）。即正均值几乎全部来自“开盘价即当日最低价”的模糊成交样本与涨停续持。原帖未给出优选条件，故不存在“按原帖口径复现其最佳方案”的对象，仅核验其数据与可成交性。",
+      "applicability_conditions": "结论只覆盖这四份导出与其时间窗；不推断策略无效，只说明当前证据不足以支持正收益，且成交判定口径决定结论符号。"
     },
     {
       "assessment_id": "1013-night-review",
@@ -707,9 +735,8 @@
     "candidate_count": 388,
     "requested_count": 388,
     "body_status_counts": {
-      "full_body": 385,
-      "image_only": 1,
-      "login_gated": 2
+      "full_body": 387,
+      "image_only": 1
     },
     "stored_payload": "metadata-only; no post text"
   },
@@ -717,5 +744,12 @@
     "candidates_outside_initial_title_review": 13,
     "exact_terms": "回测|未来函数|前视|样本外|样本内|样本泄漏|过拟合|多重检验|参数搜索/优化|滑点|交易成本|收益曲线|最大回撤|夏普|收益率|年化",
     "interpretation": "lexical retrieval aid only; candidate methods still require applicability and evidence review"
+  },
+  "tl1_access_note": "topics 1009/1010 were read with the owner's authenticated TL1 browser session, under his explicit authorization on 2026-10-13; anonymous GET on both returns HTTP 403. No credentials, cookies, tokens or account data were extracted or stored.",
+  "verification_addendum": {
+    "captured_at": "2026-10-13",
+    "strategy_export_verification": "backtest/gushi_strategy_export_verify_20261013.json",
+    "tradability_controls": "backtest/gushi_1010_tradability_controls_20261013.json",
+    "image_claim_verification": "backtest/gushi_296_claim_verify_20261013.json"
   }
 }
