@@ -256,5 +256,121 @@ class BreadthDateTests(unittest.TestCase):
                 self.assertEqual(p.read_text(encoding="utf-8"), "old")
 
 
+class HPDKProjectionTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.paper = load("closing_hpdk_paper", "backtest/hengpan_fangliang_dikai_0925/hpdk_paper.py")
+
+    def setUp(self):
+        import numpy as np
+        self.np = np
+        self.cal = ["2026-10-%02d" % i for i in range(1, 9)]
+        self.F = {k: np.full((8, 1), 100.0, dtype=np.float32) for k in ("O", "H", "L", "C", "V", "A")}
+        self.P = {"TP": 0.02, "COST_SIDE": 0.000346, "WORST_CASE_WIPEOUT": True}
+
+    def assert_frozen_equivalent(self, cal=None, F=None):
+        import textwrap
+        cal, F = cal or self.cal, F or self.F
+        source = (ROOT / "backtest/hengpan_fangliang_dikai_0925/oos_run.py").read_text(encoding="utf-8")
+        start = source.index("            ex_t = t+2")
+        stop = source.index("            have.add", start)
+        block = textwrap.dedent(source[start:stop])
+        ns = {"np": self.np, "P": self.P, "cal": cal, "T": len(cal), "t": 0, "j": 0,
+              "entry": F["O"][1, 0], "O": F["O"], "H": F["H"], "C": F["C"],
+              "g": 0.0, "sym": "sz000001", "settled": [], "n_pending": 0, "_ret_of": lambda entry, px: 0.0}
+        exec(compile("for _once in [0]:\n" + textwrap.indent(block, "    "), "<frozen-oos-exit>", "exec"), ns)
+        if ns["settled"]:
+            rec = ns["settled"][0]
+            expected = (rec["exit_date"], rec["exit_px"], rec["exit_flag"], rec["tp_hit"])
+        else:
+            expected = (None, None, 0, 0)
+        actual = self.paper.frozen_exit(cal, F, 0, 0, self.P)
+        self.assertEqual(actual, expected)
+        return actual
+
+    def test_open_above_tp_uses_real_open(self):
+        self.F["O"][2, 0], self.F["H"][2, 0] = 104, 105
+        self.assertEqual(self.assert_frozen_equivalent()[1:], (104.0, 0, 1))
+
+    def test_intraday_tp_uses_frozen_target(self):
+        self.F["H"][2, 0] = 104
+        self.assertEqual(self.assert_frozen_equivalent()[1:], (102.0, 0, 1))
+
+    def test_no_tp_uses_t_plus_two_close(self):
+        self.F["C"][2, 0] = 99
+        self.assertEqual(self.assert_frozen_equivalent()[1:], (99.0, 0, 0))
+
+    def test_suspended_exit_uses_frozen_five_day_window(self):
+        self.F["C"][2:4, 0] = 0
+        self.F["C"][4, 0] = 98
+        self.assertEqual(self.assert_frozen_equivalent(), (self.cal[4], 98.0, 1, 0))
+
+    def test_wipeout_is_not_omitted_by_truthiness(self):
+        self.F["C"][2:, 0] = 0
+        self.assertEqual(self.assert_frozen_equivalent()[1:], (0.0, 2, 0))
+        src = (ROOT / "backtest/hengpan_fangliang_dikai_0925/hpdk_paper.py").read_text(encoding="utf-8")
+        self.assertIn('p.get("exit_px") is not None', src)
+
+    def test_unclosed_future_bars_remain_unpriced(self):
+        self.assertEqual(self.assert_frozen_equivalent(self.cal[:2], {k: v[:2] for k, v in self.F.items()}), (None, None, 0, 0))
+
+    def test_buy_day_high_cannot_trigger_t_plus_one_sale(self):
+        self.F["H"][1, 0] = 150
+        self.F["C"][2, 0] = 99
+        self.assertEqual(self.assert_frozen_equivalent()[1:], (99.0, 0, 0))
+
+    def run_small_projection(self, tamper=None):
+        import json
+        from types import SimpleNamespace
+        cal = ["2026-09-%02d" % i for i in range(1, 31)]
+        sym, t = "sz000001", 25
+        F = {k: self.np.full((30, 1), 100.0, dtype=self.np.float32) for k in ("O", "H", "L", "C", "V", "A")}
+        F["A"][:] = 3e7
+        F["O"][26, 0], F["O"][27, 0], F["H"][27, 0] = 98, 99, 104
+        P = dict(self.P, SHADOW_START=cal[t], P1=0.01, P2=0.03, K=10)
+        ex_date, px, flag, hit = self.paper.frozen_exit(cal, F, t, 0, P)
+        led = {"signal_date": cal[t], "sym": sym, "entry_date": cal[t + 1], "entry_open": 98.0,
+               "exit_date": ex_date, "exit_px": px, "exit_flag": flag, "tp_hit": hit}
+        if tamper == "price":
+            led["exit_px"] += 1
+        elif tamper == "date":
+            led["exit_date"] = cal[t + 3]
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            out = root / "ledger"
+            out.mkdir()
+            (root / "data_full_names.json").write_text(json.dumps({sym: "fixture"}), encoding="utf-8")
+            uni = root / "universe.json"
+            uni.write_text(json.dumps({"universe": [{"sym": sym}]}), encoding="utf-8")
+            (out / "oos_trades.jsonl").write_text(json.dumps(led) + "\n", encoding="utf-8")
+            mod = SimpleNamespace(P=P, FROZEN_SHA="unchanged-frozen-source", load_universe=lambda: (cal, [sym], []))
+            with mock.patch.object(self.paper, "R", root), mock.patch.object(self.paper, "OUT", out), \
+                 mock.patch.object(self.paper, "UNI", uni), mock.patch.object(self.paper, "load_mod", return_value=mod), \
+                 mock.patch.object(self.paper, "get_panel", return_value=(cal, [sym], F)), \
+                 mock.patch.object(self.paper, "allpicks", return_value={cal[t]: [sym]}), \
+                 mock.patch.object(sys, "argv", ["paper", "--cache", td, "--outdir", td]), \
+                 contextlib.redirect_stdout(io.StringIO()):
+                rc = self.paper.main()
+            payload = json.loads((root / "hpdk_paper.json").read_text(encoding="utf-8"))
+        return rc, payload
+
+    def test_matching_projection_passes_and_keeps_future_pending(self):
+        rc, payload = self.run_small_projection()
+        self.assertEqual(rc, 0)
+        self.assertEqual(payload["reconcile"]["mismatches"], [])
+        self.assertEqual(payload["account"]["n_settled"], 1)
+        self.assertTrue(any(x["state"] == "待判定" for x in payload["track"]))
+
+    def test_price_mismatch_still_fails_closed(self):
+        rc, payload = self.run_small_projection("price")
+        self.assertEqual(rc, 3)
+        self.assertTrue(payload["reconcile"]["mismatches"])
+
+    def test_exit_date_mismatch_still_fails_closed(self):
+        rc, payload = self.run_small_projection("date")
+        self.assertEqual(rc, 3)
+        self.assertTrue(payload["reconcile"]["mismatches"])
+
+
 if __name__ == "__main__":
     unittest.main()

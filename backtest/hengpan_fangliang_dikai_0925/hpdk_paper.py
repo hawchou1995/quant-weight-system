@@ -101,6 +101,33 @@ def zs(x):
     return (x - mu) / sd if np.isfinite(sd) and sd > 0 else np.zeros_like(x)
 
 
+def frozen_exit(cal, F, t, j, P):
+    """只读投影 oos_run.py 的既有出场规则；未知未来行不参与成交。"""
+    ex_t = t + 2
+    T = len(cal)
+    if ex_t >= T:
+        return None, None, 0, 0
+    entry = F["O"][t + 1, j]
+    exC, usedC, flagC = F["C"][ex_t, j], ex_t, 0
+    if not (np.isfinite(exC) and exC > 0):
+        for k in range(ex_t + 1, min(ex_t + 6, T)):
+            if np.isfinite(F["C"][k, j]) and F["C"][k, j] > 0:
+                exC, usedC, flagC = F["C"][k, j], k, 1
+                break
+        else:
+            if P["WORST_CASE_WIPEOUT"]:
+                exC, usedC, flagC = 0.0, ex_t, 2
+    tp_lv = entry * (1.0 + P["TP"])
+    o2, h2 = F["O"][ex_t, j], F["H"][ex_t, j]
+    exT, usedT, flagT, tp_hit = exC, usedC, flagC, 0
+    if np.isfinite(h2) and h2 > 0 and np.isfinite(o2):
+        if o2 >= tp_lv:
+            exT, usedT, flagT, tp_hit = o2, ex_t, 0, 1
+        elif h2 >= tp_lv:
+            exT, usedT, flagT, tp_hit = tp_lv, ex_t, 0, 1
+    return cal[usedT], round(float(exT), 4), flagT, tp_hit
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--cache", default=os.environ.get("PI_SCRATCH_DIR")
@@ -167,12 +194,12 @@ def main():
         order = [pick[q] for q in np.argsort(-comp)[:int(P["K"])]]
         for s in order:
             j = jof[s]
+            ex_date, ex_px, ex_flag, tp_hit = frozen_exit(cal, F, t, j, P)
             trades.append(dict(signal_date=cal[t], undetermined=False, sym=s,
                                gap=round(float(g[j]) * 100, 3),
                                entry_date=cal[t + 1] if t + 1 < T else None,
-                               entry_open=None if t + 1 >= T else round(float(F2["O"][t + 1, j]), 4),
-                               exit_date=cal[t + 2] if t + 2 < T else None,
-                               exit_px=None if t + 2 >= T else round(float(F2["C"][t + 2, j]), 4)))
+                               entry_open=None if t + 1 >= T else round(float(F["O"][t + 1, j]), 4),
+                               exit_date=ex_date, exit_px=ex_px, exit_flag=ex_flag, tp_hit=tp_hit))
     n_und = sum(1 for x in trades if x.get("undetermined"))
     n_real = len(trades) - n_und
     log("信号日条目：定榜 %d 笔（含未到期）· 待判定信号日 %d 个" % (n_real, n_und))
@@ -192,8 +219,8 @@ def main():
         m = next((x for x in trades if x["signal_date"] == k[0] and x.get("sym") == k[1]), None)
         if m is None:
             bad.append(("台账有、重放无", k)); continue
-        if m["entry_open"] != v["entry_open"] or m["exit_px"] != v["exit_px"]:
-            bad.append(("价格不一致", k, m["entry_open"], v["entry_open"], m["exit_px"], v["exit_px"]))
+        if (m["entry_open"], m["exit_date"], m["exit_px"]) != (v["entry_open"], v["exit_date"], v["exit_px"]):
+            bad.append(("价格/日期不一致", k, m["entry_open"], v["entry_open"], m["exit_px"], v["exit_px"], m["exit_date"], v["exit_date"]))
     log("[对拍] 台账 %d 笔 / 重放可了结 %d 笔 / 不一致 %d 项" % (len(led), len(mine_set), len(bad)))
     for b in bad[:5]:
         log("   !! %s" % (b,))
@@ -238,7 +265,7 @@ def main():
                                 alloc=round(alloc, 2), outlay=round(outlay, 2), shares=sh,
                                 cap_limited=bool(capv < navprev / a.kslot - 1e-9)))
         for p in list(pos):                            # B) 出场（exit_date == 当日，T+2 尾盘）
-            if p["exit_date"] == d and p.get("exit_px"):
+            if p["exit_date"] == d and p.get("exit_px") is not None and np.isfinite(p["exit_px"]) and p["exit_px"] >= 0:
                 cash += p["shares"] * p["exit_px"] * (1.0 - cost)
                 p["ret_pct"] = round(100.0 * (p["exit_px"] * (1 - cost) /
                                               (p["entry_open"] * (1 + cost)) - 1.0), 4)
