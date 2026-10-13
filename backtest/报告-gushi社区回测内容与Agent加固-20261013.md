@@ -102,7 +102,7 @@ topic/1010《T+1 闪电策略、盘前强势策略、陈星量化 历史数据�
 三条结论：
 
 1. **按其自己的规则，四个策略都没有统计显著性**：日均 +0.5%~+0.7%，t 均在 1.35–1.71，合计 t=1.65，未过 5% 线（|t|>1.96）。
-2. **结论符号由“成交判定口径”决定**：把“最低价 ≤ 开盘价”（在日线上恒真、等于不设限）换成“除开盘价外确实出现过更低报价”（C 臂，剔除 328/3375 笔），四个策略全部落到 ≈0 或负。所有正收益都集中在“开盘价就是当日最低价”的样本里——而这类样本恰恰是 09:29 才按开盘价挂单**最可能买不到**的。
+2. **结论符号由“成交判定口径”决定**：把“最低价 ≤ 开盘价”（在日线上恒真、等于不设限）换成“除开盘价外确实出现过更低报价”（C 臂，剔除 328/3375 笔），四个策略全部落到 ≈0 或负。所有正收益都集中在“开盘价就是当日最低价”的样本里——而这批样本恰恰是『09:29 之后按开盘价挂单』最不可能成交（**不可成交**）的那批。
 3. **正收益基本是涨停续持**：D 臂剔除卖出日收盘涨停的样本（15+28、16+38、9+50、19+66 笔）后全部 ≈0 或负。这与原帖自报的“盘前强势 … 剔除涨停续持后 +0.05%”量级一致，等于用他们自己的数据独立复现了他们自己的那一列。
 
 **复权口径核对**（避免把口径差当成数据错误）：导出价是不复权，本机日线是前复权。170 只有多日记录的股票中，140 只在全部日期上比值恒定（同一复权因子），30 只跨除权事件出现比值漂移；抽查 301165/300394/300857 的漂移比值恰为 **1.400 / 1.405 / 1.4016**（10 送 4），且除权之后的日期比值精确等于 1.000。故导出文件的“开盘价”就是官方开盘价，差异全部来自复权。
@@ -126,7 +126,7 @@ topic/1010《T+1 闪电策略、盘前强势策略、陈星量化 历史数据�
 
 ### 3.4 交易时钟门禁（沿用）
 
-`python tools/gate_trading_clock.py --selftest`（交易时钟门禁属另一条工作线，本仓未跟踪该文件）：坏例检出 4，正例误报 0，退出码 0。topic/795 的二级帖子不替代 ADR-0004/引擎时钟。
+`python tools/gate_trading_clock.py --selftest`：文本坏例检出 4、正例误报 0；本轮新增的 **G5 成交口径三查**（topic/1010）坏例检出 3（严格口径 4）、正例 0/0，退出码 0。全仓扫（`--json`）：文本违规 0 条、逐笔 76,588 条 G4 违规 0 条、G5 可判腿 0 条／**不可判腿 103,464 条**（仓内逐笔记录不带当日 bar 快照，故 G5 在真实记录上不可判——门禁显式计数，不静默放行）。topic/795 的二级帖子不替代 ADR-0004/引擎时钟。
 
 ### 3.5 闸门与回归自检
 
@@ -136,6 +136,7 @@ topic/1010《T+1 闪电策略、盘前强势策略、陈星量化 历史数据�
 | 离线单测 | `python -m unittest discover -s backtest -p 'test_gushi_backtest_evidence_gate.py' -v` | 通过 17/17，退出码 0 |
 | 真实产物校验 | `python tools/gushi_backtest_evidence_gate.py --check --inventory … --review … --body-scan …` | PASS：53/53 页、1,011 帖、388 候选、**52 项判定/48 topic**，采纳 2 / 待实验 17 / 不适用 16 / 无法验证 17，退出码 0 |
 | 既有账本回归 | `python backtest/test_independent_paper_ledgers.py` | 通过 9/9，退出码 0 |
+| 交易时钟门禁 | `python tools/gate_trading_clock.py --selftest`（含本轮新增的 G5 成交口径三查） | 文本坏例 4 / 正例 0；G5 坏例 3（严格口径 4）/ 正例 0/0，退出码 0 |
 
 闸门会直接校验已发布的真实产物（目录、正文状态索引、评估台账），因此“标了全文却没有实测长度”“评估里的正文状态与索引不一致”这类问题不会沉默通过。
 
@@ -150,6 +151,11 @@ topic/1010《T+1 闪电策略、盘前强势策略、陈星量化 历史数据�
    - `backtest/gushi_1010_tradability_probe_20261013.py` + `backtest/gushi_1010_tradability_controls_20261013.json`（执行规则正负对照）
    - `backtest/gushi_296_image_claim_verify_20261013.py` + `backtest/gushi_296_claim_verify_20261013.json`（图片帖数字核验）
 5. `backtest/gushi_community_inventory_20261013.json`、`backtest/gushi_candidate_body_status_20261013.json`、`backtest/gushi_community_assessments_20261013.json`、`backtest/gushi_audit_validation_20261013.json`：1,011 条标题目录、388 条正文状态（387 全文 + 1 图片，含首帖字符数与文本摘要）、48 个 topic/52 项主张评估、topic/465 本地阳性对照回执。
+6. `tools/gate_trading_clock.py`（quant-weight-system；本轮由“未跟踪”转为入库）：新增 **G5 成交口径三查**，来源 topic/1010 的三条执行口径，逐条落到引擎真值源而非新写常量：
+   - **G5a 开盘涨停买不进**：买入腿落在 `tradable_at_fill` 判为不可成交（开盘触及涨停 / 一字板 / 停牌）的当日 bar 上 → 违规。
+   - **G5b 成交未确立**：按开盘价挂买、但当日最低价没穿到挂价（`limit_order_crossed` 为假）→ 违规；`--strict-fill` 时“最低价恰等于开盘价”也计入（除开盘价外没有任何更低报价，09:25 撮合后才挂的这张单成交无法确立）。
+   - **G5c 跌停封死却记成交**：卖出腿落在当日 high 已触及跌停价的 bar 上（全天封死卖不掉）→ 违规，须顺延到下一可卖日再计价。
+   注入式自检夹具证明其非空转（负例常规 3 / 严格 4，正例 0/0）；仓库当前逐笔记录不带 bar 快照 → 可判 0 腿 / 不可判 103,464 腿，门禁**显式计数**，不静默放行。
 
 **零生产变更**：未改选股公式、交易信号、费率、持仓/模拟盘状态或看板；不把任何帖子中的回测收益数字导入生产。
 
@@ -164,7 +170,8 @@ python backtest/gushi_strategy_export_t1_verify_20261013.py <解压后的四份C
 python backtest/gushi_1010_tradability_probe_20261013.py <解压后的四份CSV目录> <输出JSON>
 python backtest/gushi_296_image_claim_verify_20261013.py <输出JSON>
 python backtest/audit_lookahead_gushi465_20260928.py --out <scratch>/evidence_lookahead_gushi465_20261013.json
-python tools/gate_trading_clock.py --selftest   # 本地工具，本仓未跟踪
+python tools/gate_trading_clock.py --selftest
+python tools/gate_trading_clock.py --strict-fill --json <scratch>/clock_gate_strict.json   # G5 严格成交口径
 ```
 
 `--check` 的三个输入缺一即参数错误；`--body-scan` 是 388 条候选的元数据索引，不含正文。

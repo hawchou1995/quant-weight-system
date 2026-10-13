@@ -476,9 +476,10 @@
           "backtest/gushi_1010_tradability_controls_20261013.json",
           "backtest/gushi_strategy_export_t1_verify_20261013.py",
           "backtest/gushi_strategy_export_verify_20261013.json",
-          "backtest/gushi_panqian_t1_verify_20261013.py"
+          "backtest/gushi_panqian_t1_verify_20261013.py",
+          "tools/gate_trading_clock.py"
         ],
-        "controls": "注入式对照：把 5 个正常样本的 T 日开盘价改写成按板块档位算出的涨停价 → 5/5 被剔除（阳性）；同批样本不改写 → 5/5 放行（阴性）。把 5 个样本的卖出日 high 改写成该日跌停价 → 5/5 顺延（阳性）；不改写 → 0 误顺延（阴性）。真实样本上第①条命中 59/3375 笔，第②条 0 次触发（由注入对照证明机制有效）。"
+        "controls": "注入式对照：把 5 个正常样本的 T 日开盘价改写成按板块档位算出的涨停价 → 5/5 被剔除（阳性）；同批样本不改写 → 5/5 放行（阴性）。把 5 个样本的卖出日 high 改写成该日跌停价 → 5/5 顺延（阳性）；不改写 → 0 误顺延（阴性）。真实样本上第①条命中 59/3375 笔，第②条 0 次触发（由注入对照证明机制有效）。同一口径已机械化为 tools/gate_trading_clock.py 的 G5 三查（G5a 开盘涨停买不进 / G5b 成交未确立 / G5c 跌停封死却记成交），附注入式自检夹具：负例常规 3、严格 4、正例 0/0。"
       },
       "production_rule_change": false
     },
