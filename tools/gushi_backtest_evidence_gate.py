@@ -27,6 +27,7 @@ except ImportError:  # Keep --check and --selftest actionable on lean installati
 SITE = "https://www.gushi.in"
 INVENTORY_SCHEMA = "gushi-public-forum-inventory/v1"
 REVIEW_SCHEMA = "gushi-backtest-evidence-review/v1"
+BODY_SCAN_SCHEMA = "gushi-title-candidate-body-scan/v1"
 ALLOWED_HOSTS = {"gushi.in", "www.gushi.in"}
 DECISIONS = {"采纳", "待实验", "不适用", "无法验证"}
 BODY_STATES = {"full_body", "partial_body", "image_only", "login_gated", "listing_only", "request_error"}
@@ -239,6 +240,55 @@ def _check_inventory(inventory: dict) -> list[str]:
     return errors
 
 
+def validate_body_scan(body_scan: dict, inventory: dict) -> list[str]:
+    """Validate the low-rate body-status index without retaining article text."""
+    errors = []
+    if body_scan.get("schema_version") != BODY_SCAN_SCHEMA:
+        errors.append("unsupported body scan schema_version")
+    if body_scan.get("stopped_on_challenge") is True:
+        errors.append("body scan stopped on a challenge; candidate coverage is incomplete")
+    candidates = {str(row["topic_id"]): row for row in inventory.get("sources", []) if row.get("title_screen_terms")}
+    results = body_scan.get("results")
+    if not isinstance(results, list):
+        return errors + ["body scan results must be a list"]
+    result_ids = [str(row.get("topic_id", "")) for row in results]
+    if not all(result_ids) or len(result_ids) != len(set(result_ids)):
+        errors.append("body scan topic_id values must be nonempty and unique")
+    if body_scan.get("candidate_count") != len(candidates) or body_scan.get("requested_count") != len(results):
+        errors.append("body scan counters do not match inventory/result rows")
+    if set(result_ids) != set(candidates):
+        errors.append("body scan must include every title candidate exactly once")
+    allowed = {"full_body", "image_only", "login_gated", "blocked_403", "http_error", "request_error", "body_missing", "access_notice"}
+    for row in results:
+        tid = str(row.get("topic_id", "")); source = candidates.get(tid)
+        if source is None:
+            errors.append(f"body scan topic {tid}: not present in title-candidate inventory")
+            continue
+        if row.get("title") != source.get("title") or row.get("url") != source.get("url"):
+            errors.append(f"body scan topic {tid}: title or URL does not match inventory")
+        if not _site_url(row.get("url", "")):
+            errors.append(f"body scan topic {tid}: URL outside gushi.in")
+        status = row.get("body_status")
+        code = row.get("http_status")
+        chars = row.get("main_body_chars")
+        if status not in allowed:
+            errors.append(f"body scan topic {tid}: unknown body_status")
+        if status == "full_body" and (code != 200 or not isinstance(chars, int) or chars <= 0):
+            errors.append(f"body scan topic {tid}: full_body requires HTTP 200 and nonempty extracted text")
+        if status == "image_only" and (code != 200 or chars not in (0, None)):
+            errors.append(f"body scan topic {tid}: image_only requires HTTP 200 and no extracted text")
+        if status == "login_gated" and code != 403:
+            errors.append(f"body scan topic {tid}: login_gated requires observed HTTP 403")
+        if status in {"blocked_403", "http_error", "request_error", "body_missing", "access_notice"} and not row.get("reason"):
+            errors.append(f"body scan topic {tid}: unavailable body status requires reason")
+        if "text" in row or "posts" in row or "body" in row:
+            errors.append(f"body scan topic {tid}: raw post text must not be stored in the public status index")
+        digest = row.get("response_sha256")
+        if digest is not None and (not isinstance(digest, str) or len(digest) != 64):
+            errors.append(f"body scan topic {tid}: response_sha256 must be a 64-character digest")
+    return errors
+
+
 def _check_review(review: dict, inventory: dict, repo_root: Path) -> list[str]:
     errors = []
     if review.get("schema_version") != REVIEW_SCHEMA:
@@ -311,8 +361,18 @@ def _check_review(review: dict, inventory: dict, repo_root: Path) -> list[str]:
     return errors
 
 
-def validate_documents(inventory: dict, review: dict, repo_root: Path) -> list[str]:
-    return _check_inventory(inventory) + _check_review(review, inventory, repo_root)
+def validate_documents(inventory: dict, review: dict, repo_root: Path, body_scan: dict | None = None) -> list[str]:
+    errors = _check_inventory(inventory) + _check_review(review, inventory, repo_root)
+    if review.get("body_scan_required") and body_scan is None:
+        errors.append("review requires the full-candidate body-status scan")
+    if body_scan is not None:
+        errors.extend(validate_body_scan(body_scan, inventory))
+        status_by_id = {str(row.get("topic_id")): row.get("body_status") for row in body_scan.get("results", [])}
+        for item in review.get("assessments", []):
+            observed = status_by_id.get(str(item.get("topic_id")))
+            if observed and item.get("body_status") != observed:
+                errors.append(f"assessment {item.get('assessment_id')}: body_status differs from body scan")
+    return errors
 
 
 def _fixture_documents(root: Path) -> tuple[dict, dict]:
@@ -378,6 +438,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", type=Path, help="inventory JSON output for --scan")
     parser.add_argument("--inventory", type=Path, help="inventory JSON input for --check")
     parser.add_argument("--review", type=Path, help="review JSON input for --check")
+    parser.add_argument("--body-scan", type=Path, help="sanitized candidate body-status index for --check")
     parser.add_argument("--repo-root", type=Path, default=Path(__file__).resolve().parents[1])
     args = parser.parse_args(argv)
     if args.selftest:
@@ -395,15 +456,16 @@ def main(argv: list[str] | None = None) -> int:
         print(f"captured pages={result['page_count_read']}/{result['page_count_requested']} topics={result['unique_topic_count']} title_candidates={result['title_candidate_count']} failures={len(result['page_failures'])}")
         print(f"wrote {out}")
         return 0 if not result["page_failures"] else 1
-    if args.inventory is None or args.review is None:
-        parser.error("--check requires --inventory PATH --review PATH")
+    if args.inventory is None or args.review is None or args.body_scan is None:
+        parser.error("--check requires --inventory PATH --review PATH --body-scan PATH")
     try:
         inventory = json.loads(args.inventory.read_text(encoding="utf-8"))
         review = json.loads(args.review.read_text(encoding="utf-8"))
+        body_scan = json.loads(args.body_scan.read_text(encoding="utf-8"))
     except Exception as exc:
         print(f"cannot read JSON input: {type(exc).__name__}: {exc}", file=sys.stderr)
         return 2
-    errors = validate_documents(inventory, review, args.repo_root.resolve())
+    errors = validate_documents(inventory, review, args.repo_root.resolve(), body_scan)
     if errors:
         for error in errors:
             print(f"FAIL: {error}")
@@ -412,7 +474,7 @@ def main(argv: list[str] | None = None) -> int:
     for item in review["assessments"]:
         decisions[item["decision"]] = decisions.get(item["decision"], 0) + 1
     print("PASS: inventory coverage and claim/evidence gate")
-    print(f"forum_pages={inventory['page_count_read']}/{inventory['page_count_requested']} topics={inventory['unique_topic_count']} title_candidates={inventory['title_candidate_count']} reviewed={len(review['assessments'])}")
+    print(f"forum_pages={inventory['page_count_read']}/{inventory['page_count_requested']} topics={inventory['unique_topic_count']} title_candidates={inventory['title_candidate_count']} body_scanned={body_scan['requested_count']} reviewed={len(review['assessments'])}")
     print("decisions=" + json.dumps(decisions, ensure_ascii=False, sort_keys=True))
     return 0
 

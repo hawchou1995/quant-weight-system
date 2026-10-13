@@ -4,6 +4,7 @@
 - 目标：`www.gushi.in` 牛来股市社区；不混入相邻 `i.gushi.in` 量化选股平台数据。
 - 机器可读来源目录：`backtest/gushi_community_inventory_20261013.json`
 - 逐帖主张/判定台账：`backtest/gushi_community_assessments_20261013.json`
+- 388 个标题候选的正文状态索引：`backtest/gushi_candidate_body_status_20261013.json`（只存元数据：状态、响应哈希、响应字节数、首帖字符数与日期，不存正文）
 - 判定状态：**采纳 / 待实验 / 不适用 / 无法验证**。帖子中的收益数字都保留为“作者主张”，未经复现不作事实或生产依据。
 
 ## 1. 检索覆盖与边界
@@ -23,7 +24,9 @@
 
 53/53 页 HTTP 200；按帖子 ID 去重后 1,011 条。标题高召回筛选词包括“回测、未来函数、样本外、收益曲线、量化、策略、公式、滑点、成本、交易、验证、复盘、指标、开盘、成交、仓位、参数、选股、择时、复权、因子、胜率、夏普、最大回撤”等，命中 388 条。标题筛选只用于召回，不代表正文相关或方法有效。
 
-从这 388 条中按“可能改变回测 Agent 研究/验收流程”二次挑出 35 个 topic 阅读正文/回复：32 个正文可读；topic/1009 与 topic/1010 返回 HTTP 403，页面明示“该主题需要 TL1 才可查看内容”；topic/296 主帖仅有未抽取的图片，正文文本为空。权限限制未绕过，未消费积分。其余 broad-title 命中项保留在目录，标成标题级“无法验证”，不推断正文结论。
+对 388 条标题命中逐篇作无登录 GET：385 篇正文可读、1 篇正文仅图片、2 篇（topic/1009、/1010）HTTP 403 且页面明示需要 TL1；没有升级权限或消费积分。对 385 篇可读正文做第二轮回测/未来函数/样本/成本/收益关键词筛查，发现 13 个额外方法或信号候选。最终对 48 个 topic 形成 51 项逐条判定；其余可读正文保留响应哈希、长度、日期与读取状态，仅作标题/正文关键词筛查，未作语义结论或本地策略复现。topic/296 主帖是图片，未做 OCR。
+
+每条“全文”状态都附可核查的抽取长度 `main_body_chars`：首帖抽取文本的字符数（空白归一化，索引内已写明口径）。385 条全文的最小值 3、中位数 997、最大值 9,074；短正文是真实存在的灌水/提问帖，不是抽取失败。闸门据此要求“全文”必须同时观测到 HTTP 200 与正数长度，缺长度即拒绝——这一条正是本轮修掉的自证漏洞。
 
 - 社区站内 `/search` 请求返回“请登录后操作”，因此没有声称取得登录态站内搜索结果。
 - 外部索引的宽泛 `site:gushi.in` 查询命中经验分享分类页；对分类/“回测、未来函数”等窄查询有空结果。空索引结果不作为“站内不存在”的证据。
@@ -51,6 +54,15 @@
 | [topic/1013](https://www.gushi.in/topic/1013)、[topic/1014](https://www.gushi.in/topic/1014)、[topic/360](https://www.gushi.in/topic/360) | 提问/征求复盘数据、数据源观点或请求别人回测。 | **不适用为方法/规则证据**。 | 讨论问题本身没有提供可验证规则或实验结果。 |
 | [topic/435](https://www.gushi.in/topic/435)、[topic/447](https://www.gushi.in/topic/447)、[topic/11](https://www.gushi.in/topic/11)、[topic/1019](https://www.gushi.in/topic/1019) | 自动交易 API、信号浏览器插件、工具预告或平台登录事件。 | **不适用**。 | 属执行工具/平台运维，不是回测有效性方法；工具可用不等于策略有效。 |
 
+### 正文第二轮发现（13 个额外候选）
+
+- [topic/86](https://www.gushi.in/topic/86)：回复建议同一信号下分别核算 T+1 开盘卖/收盘卖，并统计涨跌停开盘无法买入项；**待实验**，锁定 exit 前先预注册，不能事后选最好结果。
+- [topic/109](https://www.gushi.in/topic/109)：提出跨时间稳定、分组收益单调、成本/过拟合披露；**待实验**为诊断项，组别与时间窗须预先固定，不能把一段好看的曲线当证明。
+- [topic/805](https://www.gushi.in/topic/805)：分时公式以当日动态高低价构造阈值；**待实验**，必须逐时点重放，不能用完整日线 high/low 解释盘中信号。
+- [topic/488](https://www.gushi.in/topic/488)、[/504](https://www.gushi.in/topic/504)、[/517](https://www.gushi.in/topic/517)、[/557](https://www.gushi.in/topic/557)：参数化公式/调参提示，**待实验**，全都只是候选，不等于已验证策略。
+- [topic/578](https://www.gushi.in/topic/578)、[/604](https://www.gushi.in/topic/604)、[/933](https://www.gushi.in/topic/933)：公式/准确率/未来函数讨论，**无法验证**其效果或“无未来”结论；topic/933 的评论区争论不等于运行探针。
+- [topic/484](https://www.gushi.in/topic/484)、[/605](https://www.gushi.in/topic/605)、[/1031](https://www.gushi.in/topic/1031)：公式入门或泛化交易建议，**不适用**为可复现实验方法。
+
 ## 3. 本地核验及限制
 
 ### topic/465 方法灵敏度复跑
@@ -61,14 +73,25 @@
 
 ### 交易时钟门禁
 
-`python tools/gate_trading_clock.py --selftest`：坏例检出 4，正例误报 0，退出码 0。topic/795 的二级帖子不替代 ADR-0004/引擎时钟。
+`python tools/gate_trading_clock.py --selftest`（交易时钟门禁属另一条工作线，本仓未跟踪该文件）：坏例检出 4，正例误报 0，退出码 0。topic/795 的二级帖子不替代 ADR-0004/引擎时钟。
+
+### 证据闸与回归自检
+
+| 检查 | 命令 | 结果 |
+|---|---|---|
+| 闸门自检 | `python tools/gushi_backtest_evidence_gate.py --selftest` | 通过 7/7，退出码 0 |
+| 离线单测 | `python -m unittest discover -s backtest -p 'test_gushi_backtest_evidence_gate.py' -v` | 通过 17/17，退出码 0 |
+| 真实产物校验 | `python tools/gushi_backtest_evidence_gate.py --check --inventory ... --review ... --body-scan ...` | PASS：53/53 页、1,011 帖、388 候选、51 项判定，退出码 0 |
+| 既有账本回归 | `python backtest/test_independent_paper_ledgers.py` | 通过 9/9，退出码 0 |
+
+闸门会直接校验已发布的真实产物（目录、正文状态索引、评估台账），因此“索引里 `main_body_chars` 全为 0”这类生产者漏记字段的问题不会再沉默通过：`full_body` 行必须带 HTTP 200 与正数字符数，缺一即报 `full_body requires HTTP 200 and nonempty extracted text`。
 
 ## 4. 实施变更
 
-1. `subagents/strategy-backtest-expert.md`（专家团仓库）：增加外部社区来源分账、状态枚举、五维时点审计、同-bar 判据、阳性/阴性控制、全期搜索/样本泄漏审查，以及受限正文的处理规则。
-2. `tools/gushi_backtest_evidence_gate.py`（quant-weight-system）：只读扫描 5 个公开分类；生成 topic-ID/标题/URL/最新活动时间清单；列表标题高召回筛选并标明“标题级无法验证”，正文 review 另行评估；对 `采纳` 强制 full body、本地 PASS、positive/negative control 与 evidence files；`待实验` 强制实验计划和零生产变更；拒绝 `i.gushi.in` 混源。
-3. `backtest/test_gushi_backtest_evidence_gate.py`：离线回归覆盖来源域、正文受限、正负控、缺失理由、实验计划、重复 ID、URL 对齐及目录解析。
-4. `backtest/gushi_community_inventory_20261013.json`、`backtest/gushi_community_assessments_20261013.json`、`backtest/gushi_audit_validation_20261013.json`：公开目录、35 个重点帖子/38 项主张评估、topic/465 本地阳性对照回执。
+1. `subagents/strategy-backtest-expert.md`（专家团仓库）：增加外部社区来源分账、状态枚举、五维时点审计、同-bar 判据、阳性/阴性控制、全期搜索/样本泄漏审查、受限正文处理规则，以及“标全文必须带可核查抽取长度”的取证要求与含 `--body-scan` 的闸门命令。
+2. `tools/gushi_backtest_evidence_gate.py`（quant-weight-system）：只读扫描 5 个公开分类；生成 topic-ID/标题/URL/最新活动时间清单；列表标题高召回筛选并标明“标题级无法验证”，正文 review 另行评估；`--check` 强制 `--inventory`/`--review`/`--body-scan` 三件套；正文状态校验要求 `full_body` 具备 HTTP 200 与正数 `main_body_chars`、`image_only` 不带文本长度、`login_gated` 有实测 403；对 `采纳` 强制 full body、本地 PASS、positive/negative control 与 evidence files；`待实验` 强制实验计划和零生产变更；拒绝 `i.gushi.in` 混源。
+3. `backtest/test_gushi_backtest_evidence_gate.py`：离线回归覆盖来源域、正文受限、正负控、缺失理由、实验计划、重复 ID、URL 对齐、目录解析，以及正文状态索引的全文长度/403/图片三类断言，并新增对已发布真实产物直接跑闸门的回归（17 项）。
+4. `backtest/gushi_community_inventory_20261013.json`、`backtest/gushi_candidate_body_status_20261013.json`、`backtest/gushi_community_assessments_20261013.json`、`backtest/gushi_audit_validation_20261013.json`：1,011 条标题目录、388 条正文状态（含首帖字符数，仅元数据）、48 个 topic/51 项主张评估、topic/465 本地阳性对照回执。
 5. 本报告记录检索范围、逐帖判断与无法验证的内容。
 
 **零生产变更**：未改选股公式、交易信号、费率、持仓/模拟盘状态或看板；不把任何帖子中的回测收益数字导入生产。
@@ -78,15 +101,18 @@
 ```powershell
 python tools/gushi_backtest_evidence_gate.py --selftest
 python tools/gushi_backtest_evidence_gate.py --scan --out backtest/gushi_community_inventory_20261013.json
-python tools/gushi_backtest_evidence_gate.py --check --inventory backtest/gushi_community_inventory_20261013.json --review backtest/gushi_community_assessments_20261013.json
+python tools/gushi_backtest_evidence_gate.py --check --inventory backtest/gushi_community_inventory_20261013.json --review backtest/gushi_community_assessments_20261013.json --body-scan backtest/gushi_candidate_body_status_20261013.json
 python -m unittest discover -s backtest -p 'test_gushi_backtest_evidence_gate.py' -v
+python backtest/test_independent_paper_ledgers.py
 python backtest/audit_lookahead_gushi465_20260928.py --out <scratch>/evidence_lookahead_gushi465_20261013.json
-python tools/gate_trading_clock.py --selftest
+python tools/gate_trading_clock.py --selftest   # 本地工具，本仓未跟踪
 ```
+
+`--check` 的三个输入缺一即参数错误；`--body-scan` 是 388 条候选的元数据索引，不含正文。以上除标“本地工具”的一条外，命令与文件均在 `quant-weight-system` 仓库内。
 
 ## 6. 仍未验证
 
-- 1,011 条目录已全量标题化；388 条为高召回标题命中，35 个重点 topic 做了正文/线程读取与评估。其余 broad-title 命中正文没有逐篇审读，清单保留其“标题级无法验证”，不宣称站内内容穷尽。
+- 1,011 条公开目录标题全部采集；388 条高召回标题候选的正文读取状态逐条登记（385 可读、1 图片正文、2 TL1 限制），可读正文做了第二轮关键词筛查。48 个 topic/51 项主张有逐条评估；其余可读公式/策略正文未作逐条语义复现，故不宣称所有 388 条都已人工判定或策略验证。
 - 登录态内部搜索不可用（`/search` 提示登录）；精确索引搜索为空不是不存在的证据。
 - TL1 受限 topic/1009、1010 未读；图片 topic/296 的图表未作 OCR。
 - 911/918 以及公式贴没有原始历史成分、逐笔委托/成交或外部可校验数据；未复制回测收益，尚未开展新策略复现。

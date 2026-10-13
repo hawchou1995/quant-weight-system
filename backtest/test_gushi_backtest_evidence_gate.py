@@ -1,4 +1,4 @@
-import importlib.util
+import json
 import sys
 import tempfile
 import unittest
@@ -71,8 +71,22 @@ class GushiEvidenceGateTests(unittest.TestCase):
             ],
         }
 
-    def errors(self, inventory=None, review=None):
-        return gate.validate_documents(inventory or self.inventory, review or self.review, self.root)
+    def make_body_scan(self):
+        return {"schema_version": gate.BODY_SCAN_SCHEMA, "candidate_count": 2,
+                "requested_count": 2, "stopped_on_challenge": False,
+                "results": [
+                    {"topic_id": "465", "title": self.inventory["sources"][0]["title"],
+                     "url": self.inventory["sources"][0]["url"], "http_status": 200,
+                     "body_status": "full_body", "main_body_chars": 1200,
+                     "reason": "", "response_sha256": "a" * 64},
+                    {"topic_id": "1009", "title": self.inventory["sources"][1]["title"],
+                     "url": self.inventory["sources"][1]["url"], "http_status": 403,
+                     "body_status": "login_gated", "main_body_chars": 0,
+                     "reason": "该主题需要 TL1", "response_sha256": "b" * 64},
+                ]}
+
+    def errors(self, inventory=None, review=None, body_scan=None):
+        return gate.validate_documents(inventory or self.inventory, review or self.review, self.root, body_scan)
 
     def test_valid_adopted_method_and_gated_unverified_claim_pass(self):
         self.assertEqual(self.errors(), [])
@@ -131,6 +145,58 @@ class GushiEvidenceGateTests(unittest.TestCase):
         self.assertEqual(page["topics"][0]["listing_activity_text"], "2026-09-27")
         self.assertEqual(page["topics"][0]["title_screen_decision"], "无法验证")
 
+    def test_body_scan_covers_every_title_candidate(self):
+        scan = self.make_body_scan()
+        self.assertEqual(gate.validate_body_scan(scan, self.inventory), [])
+        scan["results"].pop()
+        self.assertTrue(any("every title candidate" in e for e in gate.validate_body_scan(scan, self.inventory)))
+
+    def test_body_scan_rejects_copied_post_text(self):
+        scan = self.make_body_scan()
+        scan["results"][0]["text"] = "private raw body"
+        self.assertTrue(any("raw post text must not be stored" in e for e in gate.validate_body_scan(scan, self.inventory)))
+
+    def test_review_can_require_body_scan_and_match_access_state(self):
+        review = json.loads(json.dumps(self.review))
+        review["body_scan_required"] = True
+        self.assertTrue(any("requires the full-candidate" in e for e in self.errors(review=review)))
+        scan = self.make_body_scan()
+        self.assertEqual(self.errors(review=review, body_scan=scan), [])
+        review["assessments"][1]["body_status"] = "full_body"
+        self.assertTrue(any("body_status differs" in e for e in self.errors(review=review, body_scan=scan)))
+
+    def test_full_body_without_extracted_text_is_rejected(self):
+        """Regression: a body-status row claiming full_body with a zero/absent
+        character count means the producer never recorded the extracted length."""
+        scan = self.make_body_scan()
+        scan["results"][0]["main_body_chars"] = 0
+        self.assertTrue(any("nonempty extracted text" in e for e in gate.validate_body_scan(scan, self.inventory)))
+        scan["results"][0].pop("main_body_chars")
+        self.assertTrue(any("nonempty extracted text" in e for e in gate.validate_body_scan(scan, self.inventory)))
+
+    def test_login_gated_requires_observed_403(self):
+        scan = self.make_body_scan()
+        scan["results"][1]["http_status"] = 200
+        self.assertTrue(any("login_gated requires observed HTTP 403" in e
+                            for e in gate.validate_body_scan(scan, self.inventory)))
+
+    def test_image_only_must_not_carry_extracted_text(self):
+        scan = self.make_body_scan()
+        scan["results"][1].update({"body_status": "image_only", "http_status": 200, "main_body_chars": 42})
+        self.assertTrue(any("image_only requires HTTP 200 and no extracted text" in e
+                            for e in gate.validate_body_scan(scan, self.inventory)))
+
+    def test_shipped_artifacts_pass_the_gate(self):
+        """Regression on the real captured artifacts: the published inventory,
+        body-status index and assessments ledger must validate as shipped."""
+        base = REPO / "backtest"
+        inventory = json.loads((base / "gushi_community_inventory_20261013.json").read_text(encoding="utf-8"))
+        review = json.loads((base / "gushi_community_assessments_20261013.json").read_text(encoding="utf-8"))
+        body_scan = json.loads((base / "gushi_candidate_body_status_20261013.json").read_text(encoding="utf-8"))
+        self.assertEqual(gate.validate_documents(inventory, review, REPO, body_scan), [])
+        self.assertTrue(review.get("body_scan_required"))
+        self.assertEqual(body_scan["requested_count"], len(body_scan["results"]))
+        self.assertEqual(body_scan["requested_count"], inventory["title_candidate_count"])
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
