@@ -187,6 +187,51 @@ class CloudContractTests(unittest.TestCase):
             self.assertEqual(before, p.stat().st_size)
 
 
+class ProductionViewTests(unittest.TestCase):
+    def test_a5_projection_uses_real_date_prices_and_escapes_names(self):
+        import ast
+        src = (ROOT / "build_dual_system.py").read_text(encoding="utf-8")
+        tree = ast.parse(src)
+        names = {"asof_badge", "_a5_tbl_full", "a5_current_card"}
+        nodes = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name in names]
+        scope = {"A5": {"as_of": DAY, "watchlist": [], "positions": [
+            {"code": "sz000001", "name": "<unsafe>", "entry_date": DAY, "entry_px": 11.57}],
+            "closed": [], "stats": {"nav": 0.76}}}
+        exec(compile(ast.Module(body=nodes, type_ignores=[]), "projection", "exec"), scope)
+        html = scope["a5_current_card"]()
+        self.assertIn("数据截至 " + DAY, html)
+        self.assertIn("11.57", html)
+        self.assertIn("&lt;unsafe&gt;", html)
+        self.assertNotIn("<unsafe>", html)
+        self.assertIn('id="card-a5-current"', html)
+        self.assertEqual(html.count("<div"), html.count("</div>"))
+
+    def test_a5_tab_and_dropdown_are_wired(self):
+        src = (ROOT / "build_dual_system.py").read_text(encoding="utf-8")
+        view = src[src.index("SHORT_VIEW_HTML ="):src.index("def qlch_live_payload")]
+        self.assertIn('("st-a5", "A5 实验盘")', view)
+        self.assertIn('subview("st-a5"', view)
+        self.assertIn('["card-a5-current","A5 实验盘"]', src)
+
+    def test_closed_breadth_view_does_not_mix_stale_live_pools(self):
+        program = r'''
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const source=fs.readFileSync(process.argv[1],'utf8');
+const part=source.slice(source.indexOf('function sentimentLevel('),source.indexOf('function renderIndices('));
+const node={innerHTML:''};
+const context={MB:{latest:{red:2790,green:2267,flat:167,limit_up:70,limit_down:10,broken_limit:22}},
+ state:{breadth:{red:1,green:2,flat:3},pools:{limit_up:67,limit_down:8,broken_limit:19}},
+ $:()=>node,isTrading:()=>false,fmtYi:String,fmtNum:String};
+vm.runInNewContext(part+';renderSummary();',context);
+assert(node.innerHTML.includes('2790'));assert(node.innerHTML.includes('2267'));
+assert(node.innerHTML.includes('>70<'));assert(node.innerHTML.includes('>10<'));
+console.log('CLOSED_BREADTH_RENDER_PASS');
+'''
+        result = subprocess.run(["node", "-e", program, str(ROOT / "market_weather.js")], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("CLOSED_BREADTH_RENDER_PASS", result.stdout)
+
+
 class BreadthDateTests(unittest.TestCase):
     def test_quote_day_not_wall_clock_day_is_published(self):
         with tempfile.TemporaryDirectory() as td:

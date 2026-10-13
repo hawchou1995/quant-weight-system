@@ -1270,6 +1270,40 @@ def _a5_tbl_full(tbl_id, head_keys, rows, empty="（无）"):
     return toolbar + f'<table class="tbl" id="{tbl_id}"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table>'
 
 
+def a5_current_card():
+    """Read-only projection of already published A5 data; never runs the strategy."""
+    from html import escape
+    safe = lambda v: escape(str(v if v is not None else "—"), quote=True)
+    watch = A5.get("watchlist") or []
+    positions = A5.get("positions") or []
+    closed = A5.get("closed") or []
+    stats = A5.get("stats") or {}
+    out = ['<div class="card" id="card-a5-current"><h2>A5 实验盘 '
+           + asof_badge(A5.get("as_of")) + '</h2>',
+           '<div class="sub">只读 A5 自有观察池、持仓与账本；不改变入场、出场或资金规则。</div>',
+           '<div class="kpis"><div class="kpi"><div class="l">观察池</div><div class="v">'
+           + str(len(watch)) + '</div></div><div class="kpi"><div class="l">持仓</div><div class="v">'
+           + str(len(positions)) + '</div></div><div class="kpi"><div class="l">账本净值</div><div class="v">'
+           + safe(stats.get("nav")) + '</div></div></div>']
+    sections = [
+        ("watch", "观察池", watch, "sb_date", "首板日", "board", "板块"),
+        ("positions", "持仓", positions, "entry_date", "入场日", "entry_px", "入场价"),
+        ("closed", "历史已平仓（最近 8 笔）", closed[-8:], "exit_date", "出场日", "exit_px", "出场价"),
+    ]
+    for key, label, data, date_key, date_label, val_key, val_label in sections:
+        rows = []
+        for row in data:
+            attrs = {"data-search": safe(str(row.get("code", "")) + " " + str(row.get("name", ""))),
+                     "data-market": safe(row.get("board", "")), "data-industry": safe(row.get("ind", ""))}
+            cells = ['<td>' + safe(row.get(k)) + '</td>' for k in ("code", "name", date_key, val_key)]
+            rows.append((attrs, cells))
+        out.append('<h3>' + label + '</h3>' + _a5_tbl_full(
+            "a5-current-" + key, [("code", "代码"), ("name", "名称"), ("date", date_label), ("value", val_label)],
+            rows, empty="当前无" + label + "记录（按真实账本展示）"))
+    out.append('</div>')
+    return ''.join(out)
+
+
 def system_block(vid, sid, title, badge, sub, items, tbl_id, card_id, note, extra_stat=None, extra_card="", score_sub="趋势/动量/量能/超买/风控", as_of=None, intraday_note=None, as_of_min=None, tier_opts=None, tier_add=None, tier_watch=None, tier_cut=None, head_tags=None, head_note="", inline=False):
     """每个系统的完整区块：系统头（标题+说明）+ 操作统计条 + 汇总表 + 详情卡片
     回测参考统一放总览视图，这里只保留监控主体。extra_card=视图末尾追加卡片（如持仓跟踪）
@@ -2846,6 +2880,7 @@ SENTINEL_FOOT = ("""<div class="sub" style="color:var(--faint)">"""
 SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
 {subnav("short", [("st-qlch", "超跌低开低吸"),
                     ("st-hpdk", "缩量超跌"),
+                    ("st-a5", "A5 实验盘"),
                     ("st-fund", "基金轮动"), ("st-sentinel", "热榜哨兵")],
         default_key="st-qlch")}
 {subview("st-sentinel", "热榜哨兵", "jiandi top30 共振哨兵 · 只可否决 + 独立纸面收益",
@@ -2854,6 +2889,7 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
          qlch_card() + watch_card("st-qlch", "超跌低开低吸", "qlch", note=WATCH_NOTE_QLCH))}
 {subview("st-hpdk", "缩量超跌", "只读自有候选、前向 OOS 与模拟盘；不改变策略口径",
          hpdk_card() + hpdk_oos_card() + hpdk_paper_card() + hpdk_track_card() + HP_HPDK_BT)}
+{subview("st-a5", "A5 实验盘", "自有状态与观察池的只读投影", a5_current_card())}
 {subview("st-fund", "基金轮动", "2000 基金池 · 牛市分≥30 Top10 / 熊市分≥45 Top3", system_block(
   "view-short-fund", "sys-short-fund",
   "🔵 短线 · 基金轮动", "auto", "2000 基金池 · 牛市 S30 Top10 / 熊市 S45 Top3",
@@ -3239,7 +3275,7 @@ html = f"""<!doctype html>
 window.ENH.nav = [
   ["kxmm","","市场晴雨",[["kxmm-fg","恐贪指数"],["kxmm-heat","热力图"],["crowd-card","大盘拥挤度"],["mkt-weather","市场晴雨表"]]],
   ["sys-auto","","中长线池",[["sat-card","卫星目标持仓"],["sat-paper-b-card","多因子主仓 模拟盘"],["ret20-paper-card","动量增强模拟盘"],["fb3-pool-card","FB3 基金池"],["fund-paper-card","基金主仓模拟盘"]]],
-  ["short","","短线选股",[["qlch-card","🏷️ 超跌低开低吸"],["watch-card-st-qlch","👁 跟踪池 · 超跌低开低吸"],["card-short-fund","基金轮动 汇总表"],["card-short-fund-detail","基金轮动逐标的详情"],["fund-rotation-paper-card","基金轮动模拟收益"],["watch-card-st-fund","👁 跟踪池 · 基金轮动"],["card-sentinel-pool","热榜哨兵选股池"],["card-sentinel-track","👁 跟踪池 · 热榜哨兵"],["card-sentinel-paper","热榜哨兵纸面收益"]]],
+  ["short","","短线选股",[["qlch-card","🏷️ 超跌低开低吸"],["watch-card-st-qlch","👁 跟踪池 · 超跌低开低吸"],["hpdk-card","缩量超跌"],["card-a5-current","A5 实验盘"],["card-short-fund","基金轮动 汇总表"],["card-short-fund-detail","基金轮动逐标的详情"],["fund-rotation-paper-card","基金轮动模拟收益"],["watch-card-st-fund","👁 跟踪池 · 基金轮动"],["card-sentinel-pool","热榜哨兵选股池"],["card-sentinel-track","👁 跟踪池 · 热榜哨兵"],["card-sentinel-paper","热榜哨兵纸面收益"]]],
   ["qingju","","社区讨论",[],"https://qingju.me/"]
 ];
 /* 视图切换模式：滚动不更新导航高亮（COMMON_JS renderSidenav 检测此标志） */
@@ -3741,6 +3777,9 @@ document.addEventListener('DOMContentLoaded',function(){{
   initTable('tbl-v9', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});
   initTable('tbl-short-stk', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});
   initTable('tbl-short-fund', {{columns: {{rank:0, name:1, board:2, industry:3, px:4, chg:5, ret1y:6, score:7, rsi:8, vp:9, conf:10, tier:11, tierchg:12, action:13}}}});
+  ['a5-current-watch','a5-current-positions','a5-current-closed'].forEach(function(id){{
+    initTable(id, {{columns: {{code:0, name:1, date:2, value:3}}}});
+  }});
   /* A5 打板实验五表：与 v9/短线池同标准——表头排序 + 搜索 + 板块/行业筛选（2026-08-28；2026-09-06 名称+代码同格后列索引前移） */
   // 2026-09-22 R-qlch-buyhint-0922：原映射过期（pools 未映射、hit/tier/advice 整体错位 1）→ 列头排序会排错，一并修正
   initTable('a5-zt', {{columns: {{name:0, board:1, ind:2, pct:3, status:4, amt:5, relpos:6, dist:7, pools:8, hit:9, tier:10, advice:11, buy:12}}}});

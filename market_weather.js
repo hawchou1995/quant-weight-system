@@ -152,7 +152,7 @@
   }
   function renderBadge() {
     var b = $('mw-badge'), t = isTrading() ? '30s 实时' : '静态';
-    if (b) b.textContent = t + (MB && MB.meta ? ' · 精算 ' + (MB.meta.ts || '') : '');
+    if (b) b.textContent = t + (MB && MB.meta ? ' · 数据截至 ' + (MB.meta.as_of || '—') + ' · 精算 ' + (MB.meta.ts || '') : '');
   }
   function sentimentLevel(red, green, zt) {
     if (red >= green * 1.5 && zt >= 30) return { lv: '进攻', color: '#dc2626' };
@@ -164,8 +164,10 @@
   function renderSummary() {
     var b = $('mw-summary');
     if (!b) return;
-    var src = state.breadth || (MB && MB.latest) || null;
-    var pools = state.pools || {};
+    // 非交易时段整块使用同一份有日期的收盘快照，不能混入旧涨跌停池计数。
+    var closed = !isTrading() && MB && MB.latest;
+    var src = closed || state.breadth || (MB && MB.latest) || null;
+    var pools = closed ? {} : (state.pools || {});
     var stat = MB && MB.latest ? MB.latest : null;
     if (!src && !stat) { b.innerHTML = '<span style="color:var(--faint)">等待数据…</span>'; return; }
     var red = src.red || 0, green = src.green || 0, flat = src.flat || 0;
