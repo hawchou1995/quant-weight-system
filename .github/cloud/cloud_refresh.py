@@ -37,11 +37,12 @@ import json
 import os
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import time
 import urllib.request
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
@@ -79,8 +80,8 @@ HTML = "dual_system.html"
 
 # 新鲜度锚点：文件内 "as_of": "YYYY-MM-DD"
 AS_OF_RE = re.compile(r'"as_of"\s*:\s*"(\d{4}-\d{2}-\d{2})"')
-# G2 硬门只看这两个（看板标题「数据截至 X」与命中一览都读它们）
-G2_FILES = ("enhanced_data.js", "short_signals.js")
+# 所有生产视图必须新鲜，不能静默发布旧 A5 / 市场宽度。
+G2_FILES = ("enhanced_data.js", "short_signals.js", "a5_pool.js", "market_breadth.js")
 # 看板 HTML 内嵌的数据日（标题与卡片徽章文本 = 「数据截至 YYYY-MM-DD …」）——G2a 第三锚点。
 # 2026-10-03 加：此前 HTML 从不进任何门禁，是「JS 新 / HTML 旧」错配能上线的原因。
 HTML_ASOF_RE = re.compile(r'数据截至\s*(\d{4}-\d{2}-\d{2})')
@@ -165,12 +166,53 @@ def ensure_win_path_shim() -> None:
         log(f"  ⚠ 兼容软链创建失败（不阻断；写死 D:/ 路径的步骤可能仍失败）：{type(e).__name__}: {e}")
 
 
-def run_chain(timeout: int, force: bool = False) -> int:
+def latest_closed_weekday(now=None):
+    now = now or datetime.now(timezone(timedelta(hours=8)))
+    day = now.date() - (timedelta(days=1) if now.hour < 15 else timedelta())
+    while day.weekday() >= 5:
+        day -= timedelta(days=1)
+    return day.isoformat()
+
+
+def run_process_tree(cmd, *, cwd, env, timeout):
+    """Wait for a private process tree; no descendants may write after return."""
+    options = {"start_new_session": True} if os.name != "nt" else {
+        "creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}
+    proc = subprocess.Popen(cmd, cwd=cwd, env=env, **options)
+    try:
+        return proc.wait(timeout=timeout)
+    finally:
+        if os.name == "nt":
+            if proc.poll() is None:
+                subprocess.run(["taskkill", "/PID", str(proc.pid), "/T", "/F"],
+                               check=True, capture_output=True, timeout=15)
+                proc.wait(timeout=10)
+        else:
+            # A timeout on daily_refresh alone leaves update_daily writing while
+            # Actions archives data_full. Own and terminate the whole group.
+            try:
+                os.killpg(proc.pid, signal.SIGTERM)
+            except ProcessLookupError:
+                pass
+            try:
+                proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                pass
+            try:
+                os.killpg(proc.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            proc.wait(timeout=10)
+
+
+def run_chain(timeout: int, force: bool = False, target: str = "") -> int:
     ensure_win_path_shim()
     # force=True → 给 daily_refresh.py 追加 --force：越过「周末/非交易日」守卫。
     # 只为**验证与补跑**（例：周日验证云端链能否跑通新策略步骤）；定时任务永不带它。
     cmd = [sys.executable, "daily_refresh.py"] + CHAIN_FLAGS + (["--force"] if force else [])
     env = os.environ.copy()
+    if target:
+        env["QWS_TARGET_DATE"] = target
     # 云端专属 env（2026-09-24 加；本机链不经此处 → 本机行为一律不变）：
     #  A. REBASE_BUDGET_S：update_daily.py L401 的「复权基准漂移检测」相位预算（默认 2400s）。
     #     实测 run 35943548423：单步 40.4min 全烧在此（云端 17.3s/只 → 只处理 156/400；本机 4.5s/只
@@ -189,8 +231,7 @@ def run_chain(timeout: int, force: bool = False) -> int:
     log(f"[chain] {' '.join(cmd)}  (timeout {timeout}s · REBASE_BUDGET_S={env['REBASE_BUDGET_S']}"
         f" · FUND_NAV_WORKERS={env['FUND_NAV_WORKERS']} · FUND_NAV_BUDGET_S={env['FUND_NAV_BUDGET_S']})")
     try:
-        r = subprocess.run(cmd, cwd=str(REPO), timeout=timeout, env=env)
-        return r.returncode
+        return run_process_tree(cmd, cwd=str(REPO), timeout=timeout, env=env)
     except subprocess.TimeoutExpired:
         log(f"[chain] ⏱ 超时（{timeout}s）—— 视为失败")
         return 1
@@ -232,6 +273,9 @@ def main() -> int:
                     help="链超时秒数（默认 9000=150min；job 上限 180min，留余量给门禁/组装）")
     ap.add_argument("--no-live-check", action="store_true", help="本地干跑时跳过线上比对")
     a = ap.parse_args()
+    expect = a.expect_as_of or latest_closed_weekday()
+    if datetime.strptime(expect, "%Y-%m-%d").strftime("%Y-%m-%d") != expect or expect > latest_closed_weekday():
+        ap.error("期望日必须是已收盘日期，不能指向未来或尚未收盘的交易日")
 
     t0 = time.time()
     line("=")
@@ -251,7 +295,7 @@ def main() -> int:
             log("[chain] ⛔ data_full 为空（缓存与种子均未就位）→ 拒绝跑链（rc 3）")
             emit(publish="false", status="no-data-cache", live_url=LIVE_BASE)
             return 3
-        chain_rc = run_chain(a.chain_timeout, a.force_chain)
+        chain_rc = run_chain(a.chain_timeout, a.force_chain, expect)
         global CHAIN_RC
         CHAIN_RC = chain_rc
         log(f"[chain] rc={chain_rc}")
@@ -290,7 +334,7 @@ def main() -> int:
     #   重建出 09-30 全套（链 rc=0），却被「vs 今日 2026-10-01」判 no-new-data 丢掉，
     #   于是 09-29 的旧看板再也无法被纠正，只能等下一个真实交易日直接跳到 10-08/10-09。
     today = today_cn()
-    expect = a.expect_as_of or today
+    # expect 在链启动前冻结；跨午夜不能把同批真实行情错误判为过期。
     as_ofs = {}
     for n in G2_FILES:
         as_ofs[n] = as_of_of((REPO / n).read_text(encoding="utf-8", errors="replace"))

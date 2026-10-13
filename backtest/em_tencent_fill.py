@@ -40,6 +40,7 @@ import re
 import subprocess
 import sys
 import urllib.parse
+from datetime import date, datetime
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(BASE, "data_full")
@@ -55,7 +56,12 @@ HOST = "https://qt.gtimg.cn/q="
 ETF_PRE = ("51", "56", "58", "15", "16")
 
 
-def trade_day():
+def trade_day(explicit=None):
+    if explicit:
+        parsed = date.fromisoformat(explicit)
+        if parsed.isoformat() != explicit or parsed > date.today():
+            raise ValueError("目标日必须为已到来的 YYYY-MM-DD；价格仍须通过收盘时间戳校验")
+        return explicit
     with open(CAL, encoding="utf-8") as f:
         rows = [l.split(",")[0] for l in f.read().strip().splitlines()[1:] if l[:4].isdigit()]
     return rows[-1]
@@ -128,7 +134,8 @@ def main():
         print(f"[filter] --syms-file 限定 {len(allow)} 只")
 
 
-    day = trade_day()
+    explicit = args[args.index("--date") + 1] if "--date" in args else None
+    day = trade_day(explicit)
     files = sorted(glob.glob(os.path.join(DATA, "*.csv")))
     tgt, stock_n, etf_n = [], 0, 0
     for p in files:
@@ -173,7 +180,12 @@ def main():
         if not q:
             continue
         ts = q[0]
-        if not (ts[:8] == ymd and ts[8:12] >= "1500"):
+        if not (re.fullmatch(r"\d{14}", ts) and ts[:8] == ymd and ts[8:12] >= "1500"):
+            warm += 1
+            continue
+        try:
+            datetime.strptime(ts, "%Y%m%d%H%M%S")
+        except ValueError:
             warm += 1
             continue
         o, hi, lo, c, vol, amt = q[1:]

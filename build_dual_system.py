@@ -2845,12 +2845,15 @@ SENTINEL_FOOT = ("""<div class="sub" style="color:var(--faint)">"""
 
 SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
 {subnav("short", [("st-qlch", "超跌低开低吸"),
+                    ("st-hpdk", "缩量超跌"),
                     ("st-fund", "基金轮动"), ("st-sentinel", "热榜哨兵")],
         default_key="st-qlch")}
 {subview("st-sentinel", "热榜哨兵", "jiandi top30 共振哨兵 · 只可否决 + 独立纸面收益",
   _sentinel_block() + _sentinel_track_card() + _sentinel_paper_card() + SENTINEL_CARD + SENTINEL_FOOT)}
 {subview("st-qlch", "超跌低开低吸", "当前投产组合：B4 分位滤网 + K3 槽位上限 + 全池",
          qlch_card() + watch_card("st-qlch", "超跌低开低吸", "qlch", note=WATCH_NOTE_QLCH))}
+{subview("st-hpdk", "缩量超跌", "只读自有候选、前向 OOS 与模拟盘；不改变策略口径",
+         hpdk_card() + hpdk_oos_card() + hpdk_paper_card() + hpdk_track_card() + HP_HPDK_BT)}
 {subview("st-fund", "基金轮动", "2000 基金池 · 牛市分≥30 Top10 / 熊市分≥45 Top3", system_block(
   "view-short-fund", "sys-short-fund",
   "🔵 短线 · 基金轮动", "auto", "2000 基金池 · 牛市 S30 Top10 / 熊市 S45 Top3",
@@ -2865,7 +2868,7 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
   tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=(), inline=True)
   + _PAPER_CARDS.fund_rotation_card(BASE))}
 {ASSET_HINT}
-<!-- 短线保留三个独立子视图：超跌低开低吸、基金轮动、热榜哨兵。KHunter 股票池仅下架展示；共享日更保留。 -->
+<!-- 短线独立子视图：超跌低开低吸、缩量超跌、基金轮动、热榜哨兵。KHunter 股票池仅下架展示；共享日更保留。 -->
 <div class="pool-sec"><b>回测数据</b><span>短线池 · 按当前子标签分流（R-btshort-param-0924）</span></div>
 {BT_SHORT_SUB_BLOCKS}
 </div>'''

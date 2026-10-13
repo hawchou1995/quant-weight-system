@@ -138,7 +138,12 @@ STEPS = [
     #   ③ 年化 11.78%（含国债ETF现金叠加）< 12% 毕业门
     #   → 本账户为**影子/模拟性质**，毕业门前不申领实盘资金；QLCH_CASH=1 可开空仓期国债ETF叠加。
     # [软]=失败不阻断主链；--skip-qlch 跳过。
-    # 当前生产模拟盘仅更新 B4 分位滤网 + K3 槽位上限 + 全池；其余历史账本只读保留。
+    # 六条既有账本独立推进，参数原样；页面仍只展示 B4+K3 全池。
+    ("超跌低开低吸-旧基线 qlch_paper[软]", ["backtest/qlch_paper_20260921.py"], "--skip-qlch" in sys.argv),
+    ("超跌低开低吸-B4无上限 qlch_paper_b4[软]", ["backtest/qlch_paper_20260921.py", "--variant", "B4"], "--skip-qlchb4" in sys.argv),
+    ("超跌低开低吸-B4K3主板 qlch_paper_b4k3mb[软]", ["backtest/qlch_paper_20260921.py", "--variant", "B4", "--maxpos", "3", "--mainboard"], "--skip-qlchmb" in sys.argv),
+    ("超跌低开低吸-候选MA60门 qlch_paper_g60[软]", ["backtest/qlch_paper_20260921.py", "--variant", "B4", "--maxpos", "3", "--gate", "60"], "--skip-qlchg60" in sys.argv),
+    ("超跌低开低吸-候选综合分 qlch_paper_cb[软]", ["backtest/qlch_paper_20260921.py", "--variant", "B4", "--maxpos", "3", "--select", "combo"], "--skip-qlchcb" in sys.argv),
     ("超跌低开低吸-B4K3全池 qlch_paper_b4k3[软]",
      ["backtest/qlch_paper_20260921.py", "--variant", "B4", "--maxpos", "3"],
      "--skip-qlchk3" in sys.argv),
@@ -198,6 +203,7 @@ STEPS = [
     # 「数据截至 — · 待数据」（不静默显示假数据）。--skip-etf 跳过。
     ("ETF 模拟盘日更 etf_paper[软]", ["etf_paper_0906.py"], "--skip-etf" in sys.argv),
     ("ETF 看板快照 etf_snapshot[软]", ["etf_dashboard_snapshot.py"], "--skip-etf" in sys.argv),
+    ("市场宽度收盘快照 build_market_breadth", ["build_market_breadth.py", "--close"], False),
     ("看板重建 build_dual_system", ["build_dual_system.py"], False),
     ("部署 gh-pages", ["_deploy_fundline_0911.py"], "--skip-deploy" in sys.argv),
 ]

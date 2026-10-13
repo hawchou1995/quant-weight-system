@@ -234,7 +234,9 @@ def save_candidates(D, rows):
         "n": len(rows),
         "codes": rows,
     }
-    cur["updated"] = time.strftime("%Y-%m-%d %H:%M:%S")
+    # updated 表示这份候选的数据日；跨午夜的真实执行时间单列。
+    cur["updated"] = D
+    cur["generated_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
     sys.path.insert(0, str(BASE))                     # 北交所硬闸（R-no-bj-0923）：写盘前断言
     from no_bj import assert_clean as _assert_clean
     _assert_clean(cur, "qlch_candidates.json")
@@ -438,7 +440,8 @@ def main():
     st["equity"].append({"date": D, "nav": nav, "n": len(st["positions"]),
                          "port_ret": port, "cash_ret": cashret if cash_w > 1e-9 else 0.0,
                          "n_exit": len(exits_today), "n_new": len(newpos)})
-    st["last_run"] = time.strftime("%Y-%m-%d %H:%M:%S")
+    st["last_run"] = D
+    st["generated_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
     if not DRY:
         save_state(st)
 

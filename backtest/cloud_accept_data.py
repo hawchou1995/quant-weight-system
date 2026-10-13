@@ -131,7 +131,11 @@ def main():
     ap.add_argument("--sample", type=int, default=12, help="多源验证抽样只数")
     ap.add_argument("--no-sina", action="store_true", help="跳过新浪（akshare，慢）")
     ap.add_argument("--out", default=None, help="下载目录（默认 <repo>/_cloud_local）")
+    ap.add_argument("--as-of", default="", help="显式期望数据日 YYYY-MM-DD（跨午夜收盘验收）")
     a = ap.parse_args()
+    if a.as_of and (datetime.strptime(a.as_of, "%Y-%m-%d").strftime("%Y-%m-%d") != a.as_of
+                    or a.as_of > datetime.now().strftime("%Y-%m-%d")):
+        ap.error("数据日格式错误或晚于当前日期")
 
     out = Path(a.out) if a.out else (REPO / "_cloud_local")
     out.mkdir(parents=True, exist_ok=True)
@@ -194,7 +198,9 @@ def main():
             fails.append(nm)
         print("%-38s %10d %-14s %s" % (nm, len(b), h, note))
         (out / nm).write_bytes(b)
-        got[nm] = {"bytes": len(b), "md5": h, "as_of": f.get("as_of"), "ok": ok}
+        actual = re.search(rb'"as_of"\s*:\s*"(\d{4}-\d{2}-\d{2})"', b)
+        got[nm] = {"bytes": len(b), "md5": h,
+                   "as_of": actual.group(1).decode("ascii") if actual else None, "ok": ok}
 
     print("\n=== 2. 结构一致性（index.html 与 dual_system.html 必须同份）===")
     if got.get("index.html", {}).get("md5") == got.get("dual_system.html", {}).get("md5"):
@@ -202,8 +208,8 @@ def main():
     else:
         print("FAIL md5 不同：index=%s dual=%s" % (got.get("index.html", {}).get("md5"), got.get("dual_system.html", {}).get("md5"))); fails.append("index-vs-dual")
 
-    today = datetime.now().strftime("%Y-%m-%d")
-    print("\n=== 3. 新鲜度（as_of 是否 == 今日 %s）===" % today)
+    today = a.as_of or datetime.now().strftime("%Y-%m-%d")
+    print("\n=== 3. 新鲜度（as_of 是否 == 期望数据日 %s）===" % today)
     deps = man.get("runtime_deps") or []
     stale = []
     for nm in deps:
@@ -211,6 +217,8 @@ def main():
         flag = "fresh" if ao == today else "STALE(%s)" % ao
         if ao != today:
             stale.append(nm)
+            if nm in ("enhanced_data.js", "short_signals.js", "a5_pool.js", "market_breadth.js"):
+                fails.append("stale:" + nm)
         print("  %-24s as_of=%s  %s" % (nm, ao, flag))
     if stale:
         warns.append("as_of 未推进：" + ",".join(stale))

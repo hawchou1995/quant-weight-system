@@ -607,7 +607,7 @@ def main():
                 _sf = BASE / "_bulk_syms.txt"
                 _sf.write_text("\n".join(str(x[0]) for x in lag) + "\n", encoding="utf-8")
                 _r = _sp.run([sys.executable, str(BASE / "backtest" / "em_tencent_fill.py"),
-                              "--syms-file", str(_sf)],
+                              "--syms-file", str(_sf), "--date", str(target_date)],
                              cwd=str(BASE), capture_output=True, text=True,
                              encoding="utf-8", errors="replace")
                 for _ln in ((_r.stdout or "") + (_r.stderr or "")).strip().splitlines()[-4:]:

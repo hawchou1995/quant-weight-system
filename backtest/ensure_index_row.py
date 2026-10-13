@@ -146,6 +146,11 @@ def fetch_recent():
     return {}, ""
 
 
+def fetch_tx_bar(day):
+    """Exact-date Tencent index bar, not a relabelled latest bar."""
+    return fetch_tx_recent().get(day)
+
+
 def catch_up(csv, lines, nl, last_date, target, check):
     """把 index_000300.csv 补齐到**数据源最近可用交易日**（补 < 今日 的历史缺失行）。
 
@@ -197,13 +202,18 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true", help="只查不写")
     ap.add_argument("--file", default=str(DEFAULT_CSV), help="目标 csv（测试用）")
+    import os
+    ap.add_argument("--date", default=os.environ.get("QWS_TARGET_DATE", ""),
+                    help="已验证的收盘数据日；补跑跨午夜不改成尚未收盘的日期")
     args = ap.parse_args()
 
     csv = Path(args.file)
     if not csv.exists():
         print(f"[ensure] 缺文件 {csv}", flush=True)
         sys.exit(1)
-    target = date.today().isoformat()
+    target = args.date or date.today().isoformat()
+    if date.fromisoformat(target).isoformat() != target or target > date.today().isoformat():
+        raise ValueError("Invalid or future target data date")
 
     raw = csv.read_bytes()
     # ⚠ 必须从**字节**判行尾：read_text 的 universal-newlines 会把 CRLF 统一成 LF，
@@ -216,7 +226,7 @@ def main():
     # ---- 补线：先补齐到数据源最近可用交易日（只补 < 今日 的历史缺失行）----
     _added, last_date = catch_up(csv, lines, nl, last_date, target, args.check)
     bar, src = None, ""
-    for name, fn in (("em", fetch_em_bar), ("sina", fetch_sina_bar)):
+    for name, fn in (("em", fetch_em_bar), ("tx", fetch_tx_bar), ("sina", fetch_sina_bar)):
         try:
             bar = fn(target)
         except Exception as e:                           # noqa: BLE001

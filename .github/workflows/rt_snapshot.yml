@@ -46,7 +46,7 @@ jobs:
       - name: 组装部署目录（仅盘中数据文件；HTML 由收盘本地管道部署）
         run: |
           mkdir -p staging
-          cp enhanced_data.js short_pool.js a5_pool.js staging/
+          python .github/cloud/guard_rt_publish.py --out staging
 
       - name: 部署 gh-pages（keep_files 保留 HTML，只更新数据文件）
         uses: peaceiris/actions-gh-pages@v4

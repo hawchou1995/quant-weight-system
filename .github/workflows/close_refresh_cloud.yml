@@ -108,12 +108,24 @@ jobs:
             fund_nav_cache
             data_fundamental
             backtest/a5_experiment
-            backtest/fund_rotation_paper.json
-            backtest/sentinel_return_paper.json
-            backtest/qlch_paper_state_b4_k3.json
+          # 这五条 path 保持与既有缓存版本一致；新增账本独立缓存。
           key: qws-data-${{ github.run_id }}
           restore-keys: |
             qws-data-
+
+      - name: 恢复策略状态缓存
+        id: state_cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            backtest/fund_rotation_paper.json
+            backtest/sentinel_return_paper.json
+            backtest/qlch_paper_state*.json
+            backtest/qlch_candidates.json
+            index_000300.csv
+          key: qws-states-${{ github.run_id }}
+          restore-keys: |
+            qws-states-
 
       - name: 回落种子包（无任何缓存命中时）
         # F6 修复（2026-09-24）：cache-hit 在 restore-keys 部分命中时为 false，
@@ -138,6 +150,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r .github/cloud/requirements.txt
+
+      - name: 收盘刷新回归测试（含进程树清理）
+        if: steps.mode.outputs.mode == 'chain'
+        run: python -X utf8 -m unittest discover -s backtest -p test_cloud_close_refresh.py -v
 
       # ---- 2 组装 + 门禁（必要时先跑链）----
       - name: 云端刷新（组装/门禁/可选跑链）
@@ -194,10 +210,20 @@ jobs:
             fund_nav_cache
             data_fundamental
             backtest/a5_experiment
+          # 与 restore 的五条 path 逐位一致，避免 path 哈希让旧缓存失配。
+          key: qws-data-${{ github.run_id }}
+
+      - name: 保存策略状态缓存
+        if: always() && steps.mode.outputs.mode == 'chain'
+        uses: actions/cache/save@v4
+        with:
+          path: |
             backtest/fund_rotation_paper.json
             backtest/sentinel_return_paper.json
-            backtest/qlch_paper_state_b4_k3.json
-          key: qws-data-${{ github.run_id }}
+            backtest/qlch_paper_state*.json
+            backtest/qlch_candidates.json
+            index_000300.csv
+          key: qws-states-${{ github.run_id }}
 
       # ---- 5b 当日数据 delta（供本机同步 K 线；链失败也产出，故用 always）----
       - name: 当日数据 delta

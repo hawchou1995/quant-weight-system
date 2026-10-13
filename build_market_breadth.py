@@ -344,7 +344,8 @@ def compute_lianban(today: str, top: int = 5) -> dict:
 def fetch_breadth_snapshot(min_rows: int = DEFAULT_MIN_ROWS,
                            deadline_seconds: int = DEFAULT_DEADLINE_SECONDS,
                            workers: int = DEFAULT_WORKERS,
-                           chunk_size: int = DEFAULT_CHUNK_SIZE) -> dict:
+                           chunk_size: int = DEFAULT_CHUNK_SIZE,
+                           expect_as_of: str = "", close_only: bool = False) -> dict:
     """Fetch full-market snapshot and return breadth summary."""
     all_symbols = symbols()
     chunks = [all_symbols[i:i + chunk_size] for i in range(0, len(all_symbols), chunk_size)]
@@ -357,15 +358,19 @@ def fetch_breadth_snapshot(min_rows: int = DEFAULT_MIN_ROWS,
             attempts += 1
             try:
                 body = fut.result()
-                rows.extend(parse_quote_body(body))
+                batch = parse_quote_body(body)
+                if expect_as_of or close_only:
+                    batch = [r for r in batch if r.get("quote_ts") and
+                             (not expect_as_of or dt.datetime.fromtimestamp(r["quote_ts"], CN_TZ).strftime("%Y-%m-%d") == expect_as_of) and
+                             (not close_only or dt.datetime.fromtimestamp(r["quote_ts"], CN_TZ).hour >= 15)]
+                rows.extend(batch)
             except Exception:
                 pass  # 单块失败跳过，保留其余块
-            if len(rows) >= min_rows:
-                # 数据够了就取消剩余任务
-                for f in futures:
-                    f.cancel()
-                break
+            # Closing statistics use every available chunk, not an early 4000-stock subset.
+            # Individual requests remain bounded by the deadline.
     summary = summarize_market_breadth(rows)
+    if len(rows) < min_rows:
+        raise ValueError(f"有效行情仅 {len(rows)} / 最低 {min_rows}，保留旧件，不伪造更新日")
     summary["attempted_chunks"] = attempts
     return summary
 
@@ -415,9 +420,16 @@ def write_js(path: Path, payload: dict) -> None:
                     encoding="utf-8")
 
 
-def run_once(output: Path, append: bool, ts_label: str | None = None, quiet: bool = False) -> dict:
+def run_once(output: Path, append: bool, ts_label: str | None = None, quiet: bool = False,
+             expect_as_of: str = "", close_only: bool = False) -> dict:
     now = dt.datetime.now(CN_TZ)
-    summary = fetch_breadth_snapshot()
+    summary = fetch_breadth_snapshot(expect_as_of=expect_as_of, close_only=close_only)
+    data_ts = dt.datetime.strptime(summary.get("generated_at", ""), "%Y-%m-%d %H:%M:%S").replace(tzinfo=CN_TZ)
+    data_day = data_ts.strftime("%Y-%m-%d")
+    if summary.get("quote_count", 0) < DEFAULT_MIN_ROWS or (expect_as_of and data_day != expect_as_of):
+        raise ValueError(f"宽度行情日期/覆盖未通过：{data_day} != {expect_as_of or data_day}")
+    if close_only and data_ts.hour < 15:
+        raise ValueError("不能将盘中宽度快照当成收盘数据")
     # 收盘/非交易时段：填充连板高度（盘中不计算，保持 0）
     if not is_trading_session(now):
         today = (summary.get("generated_at") or "")[:10] or now.strftime("%Y-%m-%d")
@@ -429,20 +441,22 @@ def run_once(output: Path, append: bool, ts_label: str | None = None, quiet: boo
             sent["lianban_top"] = lb["lianban_top"]
         except Exception:
             pass
-    entry = timeline_entry(summary, now)
+    entry = timeline_entry(summary, data_ts)
     if ts_label:
         entry["t"] = ts_label
     payload = load_existing(output) if append else {}
+    if payload.get("date") != data_day:
+        payload = {}
     payload.update({
-        "date": now.strftime("%Y-%m-%d"),
+        "date": data_day,
         "meta": {
-            "as_of": now.strftime("%Y-%m-%d"),
-            "ts": ts_label or now.strftime("%H:%M"),
+            "as_of": data_day,
+            "ts": ts_label or data_ts.strftime("%H:%M"),
             "generated_at": now.strftime("%Y-%m-%d %H:%M:%S"),
             "source": SOURCE_NAME,
             "source_url": SOURCE_URL,
             "universe": UNIVERSE_LABEL,
-            "mode": "intraday" if is_trading_session(now) else "close",
+            "mode": "close" if close_only else ("intraday" if is_trading_session(now) else "close"),
         },
         "latest": {
             "red": summary.get("red", 0),
@@ -499,15 +513,19 @@ def main() -> None:
     append = "--append" in args
     daemon = "--daemon" in args
     ts_label = None
+    expect_as_of = os.environ.get("QWS_TARGET_DATE", "")
+    close_only = "--close" in args
     for i, arg in enumerate(args):
         if arg == "--output" and i + 1 < len(args):
             output = Path(args[i + 1])
         if arg == "--ts" and i + 1 < len(args):
             ts_label = args[i + 1]
+        if arg == "--expect-as-of" and i + 1 < len(args):
+            expect_as_of = args[i + 1]
     if daemon:
         run_daemon(output)
     else:
-        run_once(output, append=append, ts_label=ts_label)
+        run_once(output, append=append, ts_label=ts_label, expect_as_of=expect_as_of, close_only=close_only)
 
 
 if __name__ == "__main__":
