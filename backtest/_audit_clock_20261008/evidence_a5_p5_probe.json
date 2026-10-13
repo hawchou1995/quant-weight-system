@@ -1,0 +1,56 @@
+{
+ "_what": "A5 打板族决定层的同 bar 因果探针（C5）＋阳性对照（证明探针非空转）",
+ "scope": "协议级：用与 A5 同形的**决策函数**在两行 ctx 上判定；**未**跑完整 A5 流程（需行情数据、且会改写 paper_state.json —— 属他人运行时状态，不动）",
+ "band": [
+  -0.05,
+  -0.02
+ ],
+ "decide_day": "T-1",
+ "fill_day": "T",
+ "t": 2,
+ "fill_idx": 3,
+ "arm_fixed_after_repair": {
+  "desc": "只读 T−1 及以前（修复后的决定层）",
+  "probe": "same_bar_causality",
+  "t": 2,
+  "fill_idx": 3,
+  "ok": true,
+  "tripped": "none",
+  "clean": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "up": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "down": [
+   0,
+   1,
+   2,
+   3
+  ]
+ },
+ "arm_prefix_bug": {
+  "desc": "读成交那根 bar 的开盘（修复前口径，阳性对照）",
+  "probe": "same_bar_causality",
+  "t": 2,
+  "fill_idx": 3,
+  "ok": false,
+  "tripped": "both",
+  "clean": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "up": [],
+  "down": []
+ },
+ "verdict": "修复后的决定层 P5 **通过**（决策不随成交 bar 的毒化而变：ok=True）；修复前口径 **被捕获**（ok=False, tripped=both）⇒ 探针对该口径有效、非空转。",
+ "residual": "**残留**：下沿（gap ≥ −5%）仍靠「09:15–09:20 可撤单窗撤单」实现，而撤单决策当时能看到的是**虚拟开盘参考价**、回测用**最终今开**代替 ⇒ 撤单层仍有同 bar 依赖。已量化机制存在性与噪声量级，见 `evidence_band_cancel_bias_20261008.json`（ADR-0004 B-3/R3）。"
+}

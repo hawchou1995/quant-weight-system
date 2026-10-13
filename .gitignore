@@ -605,3 +605,6 @@ backtest/etf_rotation_out/*
 !backtest/etf_rotation_out/etf_momentum_volscale_0906.csv
 # 回测变体缓存目录（x2_sens/x5_gates 运行产生；444MB，不入库）
 .x3cache/
+
+# 大体量派生数据（合计 3GB+）：回测 runs/backups 与缓存不入库（2026-10-13 登记）
+backtest/_board_prod_bt_20261009/

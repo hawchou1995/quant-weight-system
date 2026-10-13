@@ -1,0 +1,251 @@
+{
+ "_what": "量化「盲挂撤单乐观偏差」（ADR-0004 · B-3/R3）：回测用最终今开代替09:15–09:20 可撤单窗可见的虚拟开盘参考价来决定撤单 ⇒ 残留同 bar 依赖",
+ "method": "逐票比较 gap(09:18 参考价) vs gap(最终今开)，统计两侧撤单决策不一致率与幅度",
+ "sources": [
+  "evidence_auction_field_probe_20260930.json",
+  "sample_intraday_20260929.json"
+ ],
+ "decide_at": "09:18",
+ "bands": {
+  "hpdk": [
+   -0.03,
+   -0.01
+  ],
+  "a5": [
+   -0.05,
+   -0.02
+  ]
+ },
+ "n_stocks": 8,
+ "noise": {
+  "abs_delta_pct": {
+   "mean": 1.3357,
+   "median": 0.4785,
+   "max": 5.7279,
+   "n": 8
+  },
+  "note": "|gap(09:18 参考价) − gap(最终今开)| 的分布 —— 撤单决策可见信息与成交价的差"
+ },
+ "disagreement": {
+  "hpdk": {
+   "n": 0,
+   "cancel_bt_only": 0,
+   "cancel_rt_only": 0,
+   "outside_fill": 0,
+   "missed_fill": 0,
+   "rate": 0.0
+  },
+  "a5": {
+   "n": 0,
+   "cancel_bt_only": 0,
+   "cancel_rt_only": 0,
+   "outside_fill": 0,
+   "missed_fill": 0,
+   "rate": 0.0
+  }
+ },
+ "rows": [
+  {
+   "sym": "sh603639",
+   "name": "海利尔",
+   "src": "field_probe_0930",
+   "pcl": 10.36,
+   "ref_px": 10.36,
+   "open_px": 10.36,
+   "gap_ref": 0.0,
+   "gap_open": 0.0,
+   "abs_delta": 0.0,
+   "hpdk_band": [
+    -0.03,
+    -0.01
+   ],
+   "hpdk_cancel_bt": false,
+   "hpdk_cancel_rt": false,
+   "hpdk_disagree": false,
+   "a5_band": [
+    -0.05,
+    -0.02
+   ],
+   "a5_cancel_bt": false,
+   "a5_cancel_rt": false,
+   "a5_disagree": false
+  },
+  {
+   "sym": "sh603167",
+   "name": "渤海轮渡",
+   "src": "field_probe_0930",
+   "pcl": 7.98,
+   "ref_px": 7.99,
+   "open_px": 8.0,
+   "gap_ref": 0.001253,
+   "gap_open": 0.002506,
+   "abs_delta": 0.001253,
+   "hpdk_band": [
+    -0.03,
+    -0.01
+   ],
+   "hpdk_cancel_bt": false,
+   "hpdk_cancel_rt": false,
+   "hpdk_disagree": false,
+   "a5_band": [
+    -0.05,
+    -0.02
+   ],
+   "a5_cancel_bt": false,
+   "a5_cancel_rt": false,
+   "a5_disagree": false
+  },
+  {
+   "sym": "sh603208",
+   "name": "江山欧派",
+   "src": "field_probe_0930",
+   "pcl": 11.43,
+   "ref_px": 11.54,
+   "open_px": 11.49,
+   "gap_ref": 0.009624,
+   "gap_open": 0.005249,
+   "abs_delta": 0.004374,
+   "hpdk_band": [
+    -0.03,
+    -0.01
+   ],
+   "hpdk_cancel_bt": false,
+   "hpdk_cancel_rt": false,
+   "hpdk_disagree": false,
+   "a5_band": [
+    -0.05,
+    -0.02
+   ],
+   "a5_cancel_bt": false,
+   "a5_cancel_rt": false,
+   "a5_disagree": false
+  },
+  {
+   "sym": "sh600327",
+   "name": "大东方",
+   "src": "field_probe_0930",
+   "pcl": 3.85,
+   "ref_px": 3.85,
+   "open_px": 3.87,
+   "gap_ref": 0.0,
+   "gap_open": 0.005195,
+   "abs_delta": 0.005195,
+   "hpdk_band": [
+    -0.03,
+    -0.01
+   ],
+   "hpdk_cancel_bt": false,
+   "hpdk_cancel_rt": false,
+   "hpdk_disagree": false,
+   "a5_band": [
+    -0.05,
+    -0.02
+   ],
+   "a5_cancel_bt": false,
+   "a5_cancel_rt": false,
+   "a5_disagree": false
+  },
+  {
+   "sym": "sz002275",
+   "name": "桂林三金",
+   "src": "field_probe_0930",
+   "pcl": 12.07,
+   "ref_px": 12.13,
+   "open_px": 12.12,
+   "gap_ref": 0.004971,
+   "gap_open": 0.004143,
+   "abs_delta": 0.000829,
+   "hpdk_band": [
+    -0.03,
+    -0.01
+   ],
+   "hpdk_cancel_bt": false,
+   "hpdk_cancel_rt": false,
+   "hpdk_disagree": false,
+   "a5_band": [
+    -0.05,
+    -0.02
+   ],
+   "a5_cancel_bt": false,
+   "a5_cancel_rt": false,
+   "a5_disagree": false
+  },
+  {
+   "sym": "sz002889",
+   "name": "东方嘉盛",
+   "src": "field_probe_0930",
+   "pcl": 12.08,
+   "ref_px": 12.28,
+   "open_px": 12.1,
+   "gap_ref": 0.016556,
+   "gap_open": 0.001656,
+   "abs_delta": 0.014901,
+   "hpdk_band": [
+    -0.03,
+    -0.01
+   ],
+   "hpdk_cancel_bt": false,
+   "hpdk_cancel_rt": false,
+   "hpdk_disagree": false,
+   "a5_band": [
+    -0.05,
+    -0.02
+   ],
+   "a5_cancel_bt": false,
+   "a5_cancel_rt": false,
+   "a5_disagree": false
+  },
+  {
+   "sym": "sh603029",
+   "name": "天鹅股份",
+   "src": "field_probe_0930",
+   "pcl": 16.76,
+   "ref_px": 17.72,
+   "open_px": 16.76,
+   "gap_ref": 0.057279,
+   "gap_open": 0.0,
+   "abs_delta": 0.057279,
+   "hpdk_band": [
+    -0.03,
+    -0.01
+   ],
+   "hpdk_cancel_bt": false,
+   "hpdk_cancel_rt": false,
+   "hpdk_disagree": false,
+   "a5_band": [
+    -0.05,
+    -0.02
+   ],
+   "a5_cancel_bt": false,
+   "a5_cancel_rt": false,
+   "a5_disagree": false
+  },
+  {
+   "sym": "sz001299",
+   "name": "美能能源",
+   "src": "field_probe_0930",
+   "pcl": 9.99,
+   "ref_px": 9.9,
+   "open_px": 10.13,
+   "gap_ref": -0.009009,
+   "gap_open": 0.014014,
+   "abs_delta": 0.023023,
+   "hpdk_band": [
+    -0.03,
+    -0.01
+   ],
+   "hpdk_cancel_bt": false,
+   "hpdk_cancel_rt": false,
+   "hpdk_disagree": false,
+   "a5_band": [
+    -0.05,
+    -0.02
+   ],
+   "a5_cancel_bt": false,
+   "a5_cancel_rt": false,
+   "a5_disagree": false
+  }
+ ],
+ "caveat": "样本极小（n=8）且 8 只票的 gap 都靠近 0（|gap| 多在 1% 内），**未落在 HPDK[−3%,−1%] / A5[−5%,−2%] 的下沿附近** ⇒ 本样本对「下沿撤单不一致」的估计**不具统计效力**，只能作为**机制存在性证明**与噪声量级的粗估。要给出可用偏差率，需要「候选池内、开盘 gap 落在下沿 ±1% 邻域」的样本 —— 本机现有证据不含该子集。",
+ "verdict": "机制**确实存在**（参考价与今开在可撤单窗内会变动，09:18 与最终开盘不一致）；但偏差**幅度不可用现有证据定量**，须先采集「下沿邻域」样本。在拿到该样本前：v1.6 / A5 的读数必须标注「下沿撤单假设完美 ⇒ 乐观」。"
+}

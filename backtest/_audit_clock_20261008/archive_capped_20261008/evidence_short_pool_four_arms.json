@@ -1,0 +1,227 @@
+{
+ "_what": "短线池·超卖伏击 四臂对照",
+ "generated_at": "2026-10-08 16:44:31",
+ "nav_unit": 1000000.0,
+ "cost_side": 0.00575,
+ "start": "2016-06-01",
+ "arms": {
+  "A_x3": {
+   "frozen": {
+    "n": 402,
+    "wr": 65.67,
+    "med": 2.536,
+    "mean": 2.456
+   },
+   "L1_legacy_cache": {
+    "label": "L1 生产脚本 @cache",
+    "n": 404,
+    "wr_pct": 65.1,
+    "med_pct": 2.448,
+    "mean_pct": 2.304,
+    "ann_trade_pct": 59.86,
+    "hold_med": 10.0,
+    "set_compare_vs_engine": {
+     "n_legacy": 404,
+     "n_engine": 315,
+     "n_common": 315,
+     "n_only_legacy": 89,
+     "n_only_engine": 0,
+     "mean_only_legacy_pct": 4.472
+    }
+   },
+   "L1_trades_itemized20w": {
+    "n": 404,
+    "notional": 200000.0,
+    "mean_pct": 2.73,
+    "med_pct": 2.875,
+    "wr_pct": 67.08,
+    "fee_pp": 0.1648
+   },
+   "L2_engine_cache": {
+    "label": "L2 引擎 @cache",
+    "n": 315,
+    "wr_pct": 64.13,
+    "med_pct": 2.338,
+    "mean_pct": 1.691,
+    "ann_trade_pct": 38.06,
+    "hold_med": 10.0
+   },
+   "L3_engine_datafull": {
+    "label": "L3 引擎 @data_full",
+    "n": 359,
+    "wr_pct": 61.84,
+    "med_pct": 2.004,
+    "mean_pct": 1.691,
+    "ann_trade_pct": 38.22,
+    "hold_med": 10.0
+   },
+   "L4_engine_itemized_enf": {
+    "label": "L4 引擎 @data_full·分项·可成交性（K=5 组合级）",
+    "n": 206,
+    "wr_pct": 60.19,
+    "med_pct": 2.009,
+    "mean_pct": 1.566,
+    "ann_trade_pct": 31.63,
+    "hold_med": 10.0,
+    "engine_diag": {
+     "n_rej_limit_up": 0,
+     "n_rej_limit_down": 0,
+     "n_rej_suspended": 0,
+     "enforce": true
+    },
+    "portfolio": {
+     "ann_pct": 5.37,
+     "mdd_pct": -25.18,
+     "sharpe": 0.441,
+     "final_nav": 1.7161
+    }
+   }
+  },
+  "C_x3": {
+   "frozen": {
+    "n": 402,
+    "wr": 63.68,
+    "med": 2.08,
+    "mean": 2.193
+   },
+   "L1_legacy_cache": {
+    "label": "L1 生产脚本 @cache",
+    "n": 404,
+    "wr_pct": 63.12,
+    "med_pct": 2.045,
+    "mean_pct": 2.048,
+    "ann_trade_pct": 76.22,
+    "hold_med": 8.0,
+    "set_compare_vs_engine": {
+     "n_legacy": 404,
+     "n_engine": 316,
+     "n_common": 316,
+     "n_only_legacy": 88,
+     "n_only_engine": 0,
+     "mean_only_legacy_pct": 3.936
+    }
+   },
+   "L1_trades_itemized20w": {
+    "n": 404,
+    "notional": 200000.0,
+    "mean_pct": 2.473,
+    "med_pct": 2.47,
+    "wr_pct": 66.34,
+    "fee_pp": 0.1644
+   },
+   "L2_engine_cache": {
+    "label": "L2 引擎 @cache",
+    "n": 316,
+    "wr_pct": 59.81,
+    "med_pct": 1.624,
+    "mean_pct": 1.522,
+    "ann_trade_pct": 48.7,
+    "hold_med": 8.0
+   },
+   "L3_engine_datafull": {
+    "label": "L3 引擎 @data_full",
+    "n": 360,
+    "wr_pct": 57.5,
+    "med_pct": 1.387,
+    "mean_pct": 1.468,
+    "ann_trade_pct": 46.68,
+    "hold_med": 8.0
+   },
+   "L4_engine_itemized_enf": {
+    "label": "L4 引擎 @data_full·分项·可成交性（K=5 组合级）",
+    "n": 227,
+    "wr_pct": 58.15,
+    "med_pct": 1.817,
+    "mean_pct": 1.792,
+    "ann_trade_pct": 54.71,
+    "hold_med": 9.0,
+    "engine_diag": {
+     "n_rej_limit_up": 0,
+     "n_rej_limit_down": 0,
+     "n_rej_suspended": 0,
+     "enforce": true
+    },
+    "portfolio": {
+     "ann_pct": 7.55,
+     "mdd_pct": -22.29,
+     "sharpe": 0.621,
+     "final_nav": 2.1204
+    }
+   }
+  },
+  "B_x3": {
+   "frozen": {
+    "n": 402,
+    "wr": 65.42,
+    "med": 2.496,
+    "mean": 2.19
+   },
+   "L1_legacy_cache": {
+    "label": "L1 生产脚本 @cache",
+    "n": 404,
+    "wr_pct": 64.85,
+    "med_pct": 2.387,
+    "mean_pct": 1.993,
+    "ann_trade_pct": 52.6,
+    "hold_med": 10.0,
+    "set_compare_vs_engine": {
+     "n_legacy": 404,
+     "n_engine": 315,
+     "n_common": 315,
+     "n_only_legacy": 89,
+     "n_only_engine": 0,
+     "mean_only_legacy_pct": 4.297
+    }
+   },
+   "L1_trades_itemized20w": {
+    "n": 404,
+    "notional": 200000.0,
+    "mean_pct": 2.418,
+    "med_pct": 2.812,
+    "wr_pct": 66.83,
+    "fee_pp": 0.1644
+   },
+   "L2_engine_cache": {
+    "label": "L2 引擎 @cache",
+    "n": 315,
+    "wr_pct": 63.81,
+    "med_pct": 2.31,
+    "mean_pct": 1.183,
+    "ann_trade_pct": 27.09,
+    "hold_med": 10.0
+   },
+   "L3_engine_datafull": {
+    "label": "L3 引擎 @data_full",
+    "n": 359,
+    "wr_pct": 61.56,
+    "med_pct": 1.943,
+    "mean_pct": 1.061,
+    "ann_trade_pct": 24.1,
+    "hold_med": 10.0
+   },
+   "L4_engine_itemized_enf": {
+    "label": "L4 引擎 @data_full·分项·可成交性（K=5 组合级）",
+    "n": 219,
+    "wr_pct": 61.64,
+    "med_pct": 2.19,
+    "mean_pct": 1.021,
+    "ann_trade_pct": 22.08,
+    "hold_med": 10.0,
+    "engine_diag": {
+     "n_rej_limit_up": 0,
+     "n_rej_limit_down": 1,
+     "n_rej_suspended": 0,
+     "enforce": true
+    },
+    "portfolio": {
+     "ann_pct": 3.21,
+     "mdd_pct": -21.75,
+     "sharpe": 0.303,
+     "final_nav": 1.3861
+    }
+   }
+  }
+ },
+ "n_cache": 3408,
+ "n_datafull": 5354
+}

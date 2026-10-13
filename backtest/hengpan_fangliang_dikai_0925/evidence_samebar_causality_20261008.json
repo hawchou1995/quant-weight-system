@@ -1,0 +1,926 @@
+{
+ "generated_at": "2026-10-08 10:32:03",
+ "probe": "fleur_absorb/engine/audit.py:probe_same_bar_causality（P5 · 双向投毒 ±1e9）",
+ "criterion": "决策是否读取**成交那一根** bar：把该行整行双向毒化，决策必须一字不变",
+ "reference_arm": {
+  "id": "hpdk_v16",
+  "same_bar_causality": false,
+  "script": "backtest/hengpan_fangliang_dikai_0925/oos_run_v16_executable.py"
+ },
+ "records": [
+  {
+   "id": "hpdk_v15",
+   "name": "HPDK v1.5（缩量超跌 · oos_run.py）",
+   "method": "probe",
+   "decision": "signal(t) = elig(t) ∩ 带内 g ∩ 复合分前 K；g = O[t+1]/C[t] − 1",
+   "fill_ref": "今开（= O[t+1]）",
+   "fill_idx": "t+1",
+   "same_bar_causality": true,
+   "probe": {
+    "v15": {
+     "days": [
+      "2026-09-28",
+      "2026-09-24",
+      "2026-09-23"
+     ],
+     "n_probes": 3,
+     "n_tripped": 3,
+     "ok_all": false,
+     "n_clean_decision": 8,
+     "detail": {
+      "probe": "same_bar_causality",
+      "t": 2852,
+      "fill_idx": 2853,
+      "ok": false,
+      "tripped": "both",
+      "clean": [
+       711,
+       989,
+       1051,
+       1439,
+       2527,
+       2766,
+       3088,
+       3154
+      ],
+      "up": [],
+      "down": []
+     }
+    },
+    "v16": {
+     "days": [
+      "2026-09-28",
+      "2026-09-24",
+      "2026-09-23"
+     ],
+     "n_probes": 3,
+     "n_tripped": 0,
+     "ok_all": true,
+     "n_clean_decision": 8,
+     "detail": {
+      "probe": "same_bar_causality",
+      "t": 2852,
+      "fill_idx": 2853,
+      "ok": true,
+      "tripped": "none",
+      "clean": [
+       1037,
+       1186,
+       1257,
+       1316,
+       1380,
+       1520,
+       3214,
+       3521
+      ],
+      "up": [
+       1037,
+       1186,
+       1257,
+       1316,
+       1380,
+       1520,
+       3214,
+       3521
+      ],
+      "down": [
+       1037,
+       1186,
+       1257,
+       1316,
+       1380,
+       1520,
+       3214,
+       3521
+      ]
+     }
+    },
+    "control": {
+     "days": [
+      "2026-09-28",
+      "2026-09-24",
+      "2026-09-23"
+     ],
+     "n_probes": 3,
+     "n_tripped": 0,
+     "ok_all": true,
+     "n_clean_decision": 5,
+     "detail": {
+      "probe": "same_bar_causality",
+      "t": 2852,
+      "fill_idx": 2853,
+      "ok": true,
+      "tripped": "none",
+      "clean": [
+       0,
+       1,
+       2,
+       3,
+       4
+      ],
+      "up": [
+       0,
+       1,
+       2,
+       3,
+       4
+      ],
+      "down": [
+       0,
+       1,
+       2,
+       3,
+       4
+      ]
+     }
+    }
+   },
+   "static": [
+    {
+     "file": "backtest/hengpan_fangliang_dikai_0925/oos_run.py",
+     "lines": [
+      {
+       "n": 166,
+       "code": "def signal(t):"
+      },
+      {
+       "n": 167,
+       "code": "b = elig(t); g = GAP[t]"
+      },
+      {
+       "n": 168,
+       "code": "m = b & np.isfinite(g) & (g <= -P[\"P1\"]) & (g >= -P[\"P2\"]) & np.isfinite(RET20[t]) & np.isfinite(VOLBR[t])"
+      },
+      {
+       "n": 169,
+       "code": "ix = np.nonzero(m)[0]"
+      },
+      {
+       "n": 170,
+       "code": "if ix.size == 0: return []"
+      },
+      {
+       "n": 171,
+       "code": "comp = zs(-np.log(AMT20[t][ix])) + zs(-np.log(VOLBR[t][ix])) + zs(-RET20[t][ix])"
+      },
+      {
+       "n": 172,
+       "code": "k = min(P[\"K\"], ix.size)"
+      },
+      {
+       "n": 173,
+       "code": "return [[int(ix[q]), float(comp[q])] for q in np.argsort(-comp)[:k]]"
+      }
+     ]
+    },
+    {
+     "file": "backtest/hengpan_fangliang_dikai_0925/oos_run.py",
+     "lines": [
+      {
+       "n": 195,
+       "code": "sym = syms[j]"
+      },
+      {
+       "n": 196,
+       "code": "if (cal[t], sym) in have: continue"
+      },
+      {
+       "n": 197,
+       "code": "g = GAP[t][j]; entry = O[t+1][j] if t+1 < T else np.nan"
+      },
+      {
+       "n": 198,
+       "code": "if not (np.isfinite(entry) and entry > 0): continue"
+      },
+      {
+       "n": 199,
+       "code": "ex_t = t+2"
+      }
+     ]
+    }
+   ],
+   "verdict": "同 bar 因果成立：筛选读 `GAP[t]`（= O[t+1]/C[t]−1）而成交又按 `O[t+1][j]` ⇒ 用成交那根 bar 的开盘筛选。实盘不可执行（09:25 才知道清单，挂单须早于 09:25）⇒ 读数只能当研究上界。",
+   "executable_gap": "清单需 09:25 撮合才有 ⇒ 无 ≤09:20 下单动作（P6 违规 n=%s）",
+   "extra": {
+    "probe_v16_for_reference": {
+     "name": "HPDK v1.6（盲挂协议 · 本目录 oos_run_v16_executable.py）",
+     "method": "probe",
+     "same_bar_causality": false,
+     "probe": {
+      "days": [
+       "2026-09-28",
+       "2026-09-24",
+       "2026-09-23"
+      ],
+      "n_probes": 3,
+      "n_tripped": 0,
+      "ok_all": true,
+      "n_clean_decision": 8,
+      "detail": {
+       "probe": "same_bar_causality",
+       "t": 2852,
+       "fill_idx": 2853,
+       "ok": true,
+       "tripped": "none",
+       "clean": [
+        1037,
+        1186,
+        1257,
+        1316,
+        1380,
+        1520,
+        3214,
+        3521
+       ],
+       "up": [
+        1037,
+        1186,
+        1257,
+        1316,
+        1380,
+        1520,
+        3214,
+        3521
+       ],
+       "down": [
+        1037,
+        1186,
+        1257,
+        1316,
+        1380,
+        1520,
+        3214,
+        3521
+       ]
+      }
+     },
+     "positive_control": {
+      "days": [
+       "2026-09-28",
+       "2026-09-24",
+       "2026-09-23"
+      ],
+      "n_probes": 3,
+      "n_tripped": 0,
+      "ok_all": true,
+      "n_clean_decision": 5,
+      "detail": {
+       "probe": "same_bar_causality",
+       "t": 2852,
+       "fill_idx": 2853,
+       "ok": true,
+       "tripped": "none",
+       "clean": [
+        0,
+        1,
+        2,
+        3,
+        4
+       ],
+       "up": [
+        0,
+        1,
+        2,
+        3,
+        4
+       ],
+       "down": [
+        0,
+        1,
+        2,
+        3,
+        4
+       ]
+      }
+     },
+     "verdict": "不读成交那根 bar：选股只用 T 日及以前信息，带内条件移到成交判定（盲挂限价 前收×0.99）。"
+    }
+   },
+   "status": "ok"
+  },
+  {
+   "id": "a5",
+   "name": "A5 打板族（paper_daban_a5.py）",
+   "method": "probe(真实入场记录回放)+static",
+   "decision": "watchlist(sb_date=T−1) → 入场日 D 读 feat['open'][i]/prev_close[i] 算 gap，带内才建仓",
+   "fill_ref": "今开（entry_px = float(o)）",
+   "fill_idx": "入场日 D 那一根",
+   "same_bar_causality": true,
+   "probe": {
+    "n_rows": 12,
+    "n_tripped": 12,
+    "ok_all": false,
+    "rows_source": "backtest/a5_experiment/paper_state.json 的 positions+closed（entry_px/gap 实测值）",
+    "detail": {
+     "probe": "same_bar_causality",
+     "t": 0,
+     "fill_idx": 0,
+     "ok": false,
+     "tripped": "both",
+     "clean": 1,
+     "up": 0,
+     "down": 0
+    }
+   },
+   "static": [
+    {
+     "file": "HEAD:backtest/a5_experiment/paper_daban_a5.py",
+     "lines": [
+      {
+       "n": 463,
+       "code": "feat = feats.get(code)"
+      },
+      {
+       "n": 464,
+       "code": "if feat is None or feat['dates'][-1] != D:"
+      },
+      {
+       "n": 465,
+       "code": "print(f'  [停牌/无数据] {code} {w[\"name\"]} 观察日 {w[\"sb_date\"]} 无 {D} 数据，丢弃')"
+      },
+      {
+       "n": 466,
+       "code": "continue"
+      },
+      {
+       "n": 467,
+       "code": "i = feat['dates'].index(D)"
+      },
+      {
+       "n": 468,
+       "code": "o, pc, v = feat['open'][i], feat['prev_close'][i], feat['vol'][i]"
+      },
+      {
+       "n": 469,
+       "code": "if o <= 0 or pc <= 0 or v <= 0:"
+      },
+      {
+       "n": 470,
+       "code": "print(f'  [无效数据] {code} {w[\"name\"]} {D} 开盘/量异常，丢弃')"
+      },
+      {
+       "n": 471,
+       "code": "continue"
+      },
+      {
+       "n": 472,
+       "code": "gap = o / pc - 1"
+      },
+      {
+       "n": 473,
+       "code": "if not (GAP_LO <= gap <= GAP_HI):"
+      },
+      {
+       "n": 474,
+       "code": "print(f'  [未低开] {code} {w[\"name\"]} {D} gap={gap*100:+.2f}% 不在 [{GAP_LO*100:.0f}%,{GAP_HI*100:.0f}%]，不入场')"
+      },
+      {
+       "n": 475,
+       "code": "continue"
+      },
+      {
+       "n": 476,
+       "code": "if feat['is_yz'][i]:"
+      },
+      {
+       "n": 477,
+       "code": "print(f'  [一字板] {code} {w[\"name\"]} {D} 一字板，不入场')"
+      },
+      {
+       "n": 478,
+       "code": "continue"
+      },
+      {
+       "n": 479,
+       "code": "if rev_screen.hit(code, D):"
+      },
+      {
+       "n": 480,
+       "code": "print(f'  [反向筛剔除] {code} {w[\"name\"]} {D} 命中 9 强臂回避集，不入场')"
+      },
+      {
+       "n": 481,
+       "code": "continue"
+      },
+      {
+       "n": 482,
+       "code": "pos = {'code': code, 'name': w['name'], 'ind': w['ind'],"
+      },
+      {
+       "n": 483,
+       "code": "'sb_date': w['sb_date'], 'entry_date': D,"
+      },
+      {
+       "n": 484,
+       "code": "'entry_px': float(o), 'gap': float(gap),"
+      }
+     ]
+    }
+   ],
+   "static_after_fix": [
+    {
+     "file": "backtest/a5_experiment/paper_daban_a5.py",
+     "lines": [
+      {
+       "n": 520,
+       "code": "# 盲挂协议（ADR-0004）：限价单**在 09:25 之前就存在** —— 判定用的是「挂单时点可知」的信息，"
+      },
+      {
+       "n": 521,
+       "code": "# 带内条件改由**限价本身**把关（今开 ≤ 挂价 = 昨收×(1+GAP_HI) ⇔ gap ≤ GAP_HI），"
+      },
+      {
+       "n": 522,
+       "code": "# 下沿（gap < GAP_LO）靠 09:15–09:20 可撤单窗撤单 ⇒ 见 blind_auction_fill。"
+      },
+      {
+       "n": 523,
+       "code": "gap = o / pc - 1"
+      },
+      {
+       "n": 524,
+       "code": "lim = blind_order_price(pc, GAP_HI)"
+      },
+      {
+       "n": 525,
+       "code": "fill_px, fill_why = blind_auction_fill(pc, o, GAP_LO, GAP_HI)"
+      }
+     ]
+    },
+    {
+     "file": "backtest/a5_experiment/paper_daban_a5.py",
+     "lines": [
+      {
+       "n": 532,
+       "code": "if fill_px is None:"
+      },
+      {
+       "n": 533,
+       "code": "print(f'  [未成交] {code} {w[\"name\"]} {D} 盲挂 {lim:.2f}（昨收×{1 + GAP_HI:.2f}）'"
+      },
+      {
+       "n": 534,
+       "code": "f' @{ORDER_TIME} · gap={gap*100:+.2f}% · {fill_why}')"
+      },
+      {
+       "n": 535,
+       "code": "continue"
+      },
+      {
+       "n": 536,
+       "code": "pos = {'code': code, 'name': w['name'], 'ind': w['ind'],"
+      },
+      {
+       "n": 537,
+       "code": "'sb_date': w['sb_date'], 'entry_date': D,"
+      },
+      {
+       "n": 538,
+       "code": "'entry_px': float(fill_px), 'gap': float(gap),"
+      },
+      {
+       "n": 539,
+       "code": "'order_time': ORDER_TIME,          # 盲挂下单时点（≤09:20 可撤单窗内）"
+      },
+      {
+       "n": 540,
+       "code": "'limit_px': float(lim),            # 盲挂限价 = 昨收 ×(1+上沿)"
+      },
+      {
+       "n": 541,
+       "code": "'band_hit': 1,                     # 带内成交（带外在上一步已 continue）"
+      },
+      {
+       "n": 542,
+       "code": "'entry_reason': fill_why,          # 成交原因（集合竞价以今开成交）"
+      },
+      {
+       "n": 543,
+       "code": "'real_fill_px': float(o),          # 实测回填字段：券商回报/行情实测的成交价（= 今开）"
+      }
+     ]
+    }
+   ],
+   "post_fix_note": "B2（本会话）已把 A5 判定**前移**为盲挂协议：入场段改为 `lim = blind_order_price(pc, GAP_HI)` + `fill_px, fill_why = blind_auction_fill(...)`，记录里新增 order_time='09:18' / limit_px / band_hit / entry_reason / real_fill_px；建仓集合与成交价与改前**逐笔等价**（12/12 真实入场记录验证通过）。协议级 P5 证据：同一套盲挂协议在 HPDK v1.6 上跑双向投毒 = 0/3 次被抓（见本文件参照臂）。**局限**：A5 本口径尚未跑修复后的正式 P5 探针（决策行 ≠ 成交行的 ctx 需按「信号日 / 成交日」两行构造，本会话未做）⇒ 标为待办。",
+   "verdict": "同 bar 因果成立：`gap = o/pc − 1` 的 o 是**入场日那根 bar 的开盘**，而 `entry_px = float(o)` 又按同价成交 ⇒ 实盘只能「09:25 撮合出今开后立刻按今开买入」，与「≤09:20 盲挂」（集合竞价唯一可撤单窗口）冲突。",
+   "executable_gap": "无 ≤09:20 下单动作（无 order_time/limit_px 字段）⇒ P6 不可执行",
+   "state_change": "**本会话已修**（B2）：改为盲挂协议后，判定输入 = T 日收盘 × (1+上沿)（挂单时点信息），带内条件由限价把关、下沿由 09:15–09:20 可撤单窗撤单 ⇒ 不再读成交那根 bar；order_time='09:18' + limit_px 使 P6 可核。",
+   "status": "ok"
+  },
+  {
+   "id": "qlch",
+   "name": "qlch 超跌低开低吸（qlch_paper_20260921.py）",
+   "method": "probe",
+   "decision": "cand[T−1]（超跌+熊市门）∩ gap[T] ∈ [−5%,−2%] → 建仓价 = O[T]",
+   "fill_ref": "今开（entry_px = float(O[t, _j])）",
+   "fill_idx": "T（成交那一根）",
+   "same_bar_causality": true,
+   "probe": {
+    "n_inband_in_clean": 103,
+    "ctx_rows": 2610,
+    "probe_gap_gate": {
+     "probe": "same_bar_causality",
+     "t": 2608,
+     "fill_idx": 2608,
+     "ok": false,
+     "tripped": "both",
+     "clean": [
+      28,
+      80,
+      111,
+      141,
+      165,
+      309,
+      318,
+      354
+     ],
+     "up": [],
+     "down": []
+    },
+    "positive_control": {
+     "probe": "same_bar_causality",
+     "t": 2608,
+     "fill_idx": 2608,
+     "ok": true,
+     "tripped": "none",
+     "clean": [
+      0,
+      1,
+      2,
+      3,
+      4
+     ],
+     "up": [
+      0,
+      1,
+      2,
+      3,
+      4
+     ],
+     "down": [
+      0,
+      1,
+      2,
+      3,
+      4
+     ]
+    },
+    "ctx_note": "探针 ctx 只含 open/close 两键（mask/valid 是成交日的**可交易性**读，属 P6 类；且 bool 数组不支持 ±1e9 投毒）—— 故本探针精确测 :357-358 的 gap 门"
+   },
+   "static": [
+    {
+     "file": "backtest/qlch_paper_20260921.py",
+     "lines": [
+      {
+       "n": 356,
+       "code": "# ---- 2) 再处理今日入场（D-1 收盘判定 ∩ D 日 gap 过滤）----"
+      },
+      {
+       "n": 357,
+       "code": "candset = np.where(cand[t - 1] & np.isfinite(gap[t])"
+      },
+      {
+       "n": 358,
+       "code": "& (gap[t] >= GAP_LO) & (gap[t] <= GAP_HI) & valid[t])[0]"
+      },
+      {
+       "n": 359,
+       "code": "log(\"D=%s  候选(D-1超跌+熊市门) ∩ gap[%+.0f%%,%+.0f%%] = %d 只\""
+      }
+     ]
+    },
+    {
+     "file": "backtest/qlch_paper_20260921.py",
+     "lines": [
+      {
+       "n": 384,
+       "code": "continue"
+      },
+      {
+       "n": 385,
+       "code": "newpos.append({\"code\": codes[_j], \"name\": names.get(codes[_j], \"\"),"
+      },
+      {
+       "n": 386,
+       "code": "\"entry_date\": D, \"entry_px\": float(O[t, _j]),"
+      },
+      {
+       "n": 387,
+       "code": "\"gap\": float(gap[t, _j]), \"w\": _w, \"shares\": 0})"
+      },
+      {
+       "n": 388,
+       "code": "st[\"positions\"] = st[\"positions\"] + newpos"
+      }
+     ]
+    },
+    {
+     "file": "backtest/qlch_paper_20260921.py",
+     "lines": [
+      {
+       "n": 181,
+       "code": "# gap：O(D)/C(D-1)-1"
+      },
+      {
+       "n": 182,
+       "code": "gap = np.full((T, N), np.nan)"
+      },
+      {
+       "n": 183,
+       "code": "gap[1:] = O[1:] / C[:-1] - 1.0"
+      },
+      {
+       "n": 184,
+       "code": "gap[1:] = np.where(np.isfinite(O[1:]) & (O[1:] > 0) & np.isfinite(C[:-1]) & (C[:-1] > 0),"
+      },
+      {
+       "n": 185,
+       "code": "gap[1:], np.nan)"
+      },
+      {
+       "n": 186,
+       "code": "# T 日候选（T 日判定），T+1 = D 日开盘成交"
+      },
+      {
+       "n": 187,
+       "code": "cand = OVERSOLD & bear[:, None]"
+      }
+     ]
+    }
+   ],
+   "verdict": "同 bar 因果成立：`gap[t]` 用**成交日开盘** O[t]，同一行又按 O[t] 成交（:386 entry_px = float(O[t, _j])）。另 :358 还读 `valid[t]`（成交日有效性）—— 属可交易性判定，不是决策输入，但仍需 ≤09:20 的挂单动作。",
+   "executable_gap": "无 ≤09:20 下单动作；成交价 = 今开 ⇒ P6 不可执行",
+   "status": "ok"
+  },
+  {
+   "id": "forum8",
+   "name": "forum8 对称毛口径（m4_portfolio_20260928.py）",
+   "method": "static（本机 scratch 缺 m2/v3 公式引擎资产 ⇒ 探针不可跑：{\"registry\": false, \"topics_dir\": false, \"panel_x1cache\": false}）",
+   "decision": "sig[T]（3 条公式的最后一布尔输出，由 m2_sweep/v3 公式引擎在 T 日数据上求值）→ entry = O[T+1]",
+   "fill_ref": "今开（entry = O[e, j_idx]，e = t_idx + 1）",
+   "fill_idx": "t+1",
+   "same_bar_causality": false,
+   "probe": {
+    "skipped": true,
+    "reason": "缺 SCRATCH/gushi_raw/registry.json 与 SCRATCH/x1cache/panel_oos.npz（本会话 scratch 无该两份资产）",
+    "assets": {
+     "registry": false,
+     "topics_dir": false,
+     "panel_x1cache": false
+    }
+   },
+   "static": [
+    {
+     "file": "backtest/forum8_formulas_0928/m4_portfolio_20260928.py",
+     "lines": [
+      {
+       "n": 127,
+       "code": "t_idx, j_idx = np.where(sig)"
+      },
+      {
+       "n": 128,
+       "code": "n_sig = int(t_idx.size)"
+      },
+      {
+       "n": 129,
+       "code": "blank = dict(n_signal=n_sig, n_rej_limit_up=0, n_drop_no_exit=0, n_drop_truncation=0,"
+      },
+      {
+       "n": 130,
+       "code": "n_tradeable=0, n_wiped=0, recs=[])"
+      },
+      {
+       "n": 131,
+       "code": "if n_sig == 0:"
+      },
+      {
+       "n": 132,
+       "code": "return blank"
+      },
+      {
+       "n": 133,
+       "code": "e = t_idx + 1"
+      },
+      {
+       "n": 134,
+       "code": "inw = e < Tn"
+      },
+      {
+       "n": 135,
+       "code": "e_c = np.clip(e, 0, Tn - 1)"
+      },
+      {
+       "n": 136,
+       "code": "zt_hit = inw & np.isfinite(O[e_c, j_idx]) & (O[e_c, j_idx] >= ZT[e_c, j_idx] - 1e-4)"
+      },
+      {
+       "n": 137,
+       "code": "n_rej = int(zt_hit.sum())"
+      },
+      {
+       "n": 138,
+       "code": "c_bad = ~(np.isfinite(C[t_idx, j_idx]) & (C[t_idx, j_idx] > 0))"
+      },
+      {
+       "n": 139,
+       "code": "o_bad = ~(np.isfinite(O[e_c, j_idx]) & (O[e_c, j_idx] > 0))"
+      },
+      {
+       "n": 140,
+       "code": "n_not_inw = int((~inw).sum())"
+      },
+      {
+       "n": 141,
+       "code": "n_c_bad = int((c_bad & inw).sum())"
+      },
+      {
+       "n": 142,
+       "code": "n_o_bad = int((o_bad & inw).sum())"
+      },
+      {
+       "n": 143,
+       "code": "ok = inw & (~c_bad) & (~o_bad) & (~zt_hit)"
+      },
+      {
+       "n": 144,
+       "code": "t_idx, j_idx, e = t_idx[ok], j_idx[ok], e[ok]"
+      }
+     ]
+    },
+    {
+     "file": "backtest/forum8_formulas_0928/m4_portfolio_20260928.py",
+     "lines": [
+      {
+       "n": 165,
+       "code": "entry = O[e, j_idx].astype(np.float64)"
+      },
+      {
+       "n": 166,
+       "code": "x_ex = np.clip(x, 0, Tn - 1)"
+      },
+      {
+       "n": 167,
+       "code": "# 顺延窗口内取不到收盘 → 记最坏 −100%：仍在**原定 T+2 收盘日**结算，成交价 = 0"
+      },
+      {
+       "n": 168,
+       "code": "# （不在面板末日结算——那会把 2 日的损失变成「占着一个仓位好几年再全损」，人为摧毁容量）"
+      },
+      {
+       "n": 169,
+       "code": "exitp = np.where(ext, C[x_ex, j_idx].astype(np.float64), 0.0)"
+      },
+      {
+       "n": 170,
+       "code": "good = np.isfinite(entry) & (entry > 0)"
+      },
+      {
+       "n": 171,
+       "code": "t_idx, j_idx, e, x, entry, exitp, ext = (t_idx[good], j_idx[good], e[good], x[good],"
+      },
+      {
+       "n": 172,
+       "code": "entry[good], exitp[good], ext[good])"
+      },
+      {
+       "n": 173,
+       "code": "ret = (exitp * (1.0 - cost_side) / (entry * (1.0 + cost_side)) - 1.0) * 100.0"
+      }
+     ]
+    },
+    {
+     "file": "backtest/forum8_formulas_0928/m4_portfolio_20260928.py",
+     "lines": [
+      {
+       "n": 216,
+       "code": "def sim_portfolio(recs, cal, syms, F, K, KSLOT, cost_side, start=None, order=\"entry_first\"):"
+      },
+      {
+       "n": 217,
+       "code": "T = len(cal)"
+      },
+      {
+       "n": 218,
+       "code": "jof = {s: j for j, s in enumerate(syms)}"
+      },
+      {
+       "n": 219,
+       "code": "C = F[\"C\"]"
+      },
+      {
+       "n": 220,
+       "code": "by_entry = {}"
+      },
+      {
+       "n": 221,
+       "code": "for r in recs:"
+      },
+      {
+       "n": 222,
+       "code": "by_entry.setdefault(r[\"entry_date\"], []).append(r)"
+      },
+      {
+       "n": 223,
+       "code": "nav = np.full(T, np.nan)"
+      },
+      {
+       "n": 224,
+       "code": "depl = np.full(T, np.nan)"
+      },
+      {
+       "n": 225,
+       "code": "cash, pos, n_in = 1.0, [], 0"
+      },
+      {
+       "n": 226,
+       "code": "executed = []"
+      },
+      {
+       "n": 227,
+       "code": ""
+      },
+      {
+       "n": 228,
+       "code": "def do_entry(t, d):                              # 入场（09:25，只能用开盘前已有现金）"
+      },
+      {
+       "n": 229,
+       "code": "nonlocal cash, n_in"
+      },
+      {
+       "n": 230,
+       "code": "if not (start is None or d >= start):"
+      },
+      {
+       "n": 231,
+       "code": "return"
+      },
+      {
+       "n": 232,
+       "code": "for r in by_entry.get(d, [])[:K]:"
+      },
+      {
+       "n": 233,
+       "code": "if len(pos) >= KSLOT:"
+      },
+      {
+       "n": 234,
+       "code": "break"
+      },
+      {
+       "n": 235,
+       "code": "if any(q[\"sym\"] == r[\"sym\"] for q in pos):"
+      },
+      {
+       "n": 236,
+       "code": "continue"
+      },
+      {
+       "n": 237,
+       "code": "navprev = nav[t - 1] if (t > 0 and np.isfinite(nav[t - 1])) else 1.0"
+      },
+      {
+       "n": 238,
+       "code": "alloc = min(navprev / KSLOT, cash)"
+      },
+      {
+       "n": 239,
+       "code": "if alloc <= 1e-12:"
+      },
+      {
+       "n": 240,
+       "code": "break"
+      },
+      {
+       "n": 241,
+       "code": "px = r[\"entry_open\"]"
+      },
+      {
+       "n": 242,
+       "code": "if not (np.isfinite(px) and px > 0):"
+      },
+      {
+       "n": 243,
+       "code": "continue"
+      },
+      {
+       "n": 244,
+       "code": "cash -= alloc"
+      },
+      {
+       "n": 245,
+       "code": "pos.append(dict(sym=r[\"sym\"], shares=alloc / (px * (1.0 + cost_side)),"
+      },
+      {
+       "n": 246,
+       "code": "entry_px=px, exit_date=r[\"exit_date\"], exit_px=r[\"exit_px\"]))"
+      }
+     ]
+    }
+   ],
+   "verdict": "同 bar 因果**不成立**：选股矩阵 sig[T] 只由 T 日及以前数据求值，成交价取 T+1 开盘（:165），**没有**任何「用今开筛选」的门 —— 与 HPDK v1.5 / A5 / qlch 的关键差别就在此。但 :136/:143 的涨停剔除读 `O[e]`（成交日开盘）：那是**可交易性剔除**（开盘一字涨停确实买不到），属可执行的市场事实，不算决策输入。",
+   "executable_gap": "仍带 P6 缺口：成交价 = 今开却无 ≤09:20 的挂单动作记录（清单/信号 T 日收盘即可得，因此**可**用盲挂修复：挂 昨收×(1+上沿) 或直接 T 日收盘后下单）",
+   "status": "ok"
+  }
+ ]
+}

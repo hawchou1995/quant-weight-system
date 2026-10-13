@@ -1,0 +1,97 @@
+{
+ "_what": "独立抽查：逐笔产物的成交日可成交性（join data_full）",
+ "data_dir": "D:\\Documents\\Quant data\\data_full",
+ "items": [
+  {
+   "file": "v8_final_trades.csv",
+   "status": "ok",
+   "n_trades": 470,
+   "entry": {
+    "bar_missing": 0,
+    "not_buyable": 0,
+    "one_word": 0,
+    "suspended": 0,
+    "pct": 0.0
+   },
+   "exit": {
+    "n": 470,
+    "bar_missing": 0,
+    "not_sellable": 4,
+    "one_word": 3,
+    "suspended": 0,
+    "pct": 0.85
+   },
+   "examples": []
+  },
+  {
+   "file": "v8_top25_timing_trades.csv",
+   "status": "ok",
+   "n_trades": 1163,
+   "entry": {
+    "bar_missing": 0,
+    "not_buyable": 1,
+    "one_word": 1,
+    "suspended": 0,
+    "pct": 0.09
+   },
+   "exit": {
+    "n": 1163,
+    "bar_missing": 0,
+    "not_sellable": 1,
+    "one_word": 0,
+    "suspended": 0,
+    "pct": 0.09
+   },
+   "examples": [
+    {
+     "sym": "sz002633",
+     "date": "2025-07-10",
+     "side": "entry",
+     "why": "一字涨停（open 16.21 触及涨停 16.21（含浮点容差带））买不进"
+    }
+   ]
+  },
+  {
+   "file": "v8_lite_trades.csv",
+   "status": "ok",
+   "n_trades": 210,
+   "entry": {
+    "bar_missing": 0,
+    "not_buyable": 0,
+    "one_word": 0,
+    "suspended": 0,
+    "pct": 0.0
+   },
+   "exit": {
+    "n": 210,
+    "bar_missing": 0,
+    "not_sellable": 3,
+    "one_word": 3,
+    "suspended": 0,
+    "pct": 1.43
+   },
+   "examples": []
+  },
+  {
+   "file": "v9_auto_trades.csv",
+   "status": "ok",
+   "n_trades": 183,
+   "entry": {
+    "bar_missing": 0,
+    "not_buyable": 0,
+    "one_word": 0,
+    "suspended": 0,
+    "pct": 0.0
+   },
+   "exit": {
+    "n": 183,
+    "bar_missing": 0,
+    "not_sellable": 0,
+    "one_word": 0,
+    "suspended": 0,
+    "pct": 0.0
+   },
+   "examples": []
+  }
+ ]
+}

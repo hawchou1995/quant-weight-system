@@ -1,0 +1,829 @@
+{
+ "_what": "短线池 · 超卖伏击 用 fleur_absorb（最新 agent）重跑",
+ "generated_at": "2026-10-08 18:14:20",
+ "source_protocol": "backtest/khunter_three_ver_opt_20260903.py",
+ "data_dir": "D:\\Documents\\Quant data\\data_full",
+ "n_frames": 5354,
+ "results": {
+  "主板（板面口径）": {
+   "A59 | orig_cost": {
+    "board": "主卖出（ob55 + 低价≥3元）",
+    "mode_label": "原口径复现（往返 1.15% · 不判可成交性）",
+    "portfolio": {
+     "n_trades": 191,
+     "ann_pct": 1.06,
+     "mdd_pct": -30.86,
+     "sharpe": 0.148,
+     "wr_pct": 60.21,
+     "mean_ret_pct": 0.541,
+     "final_nav": 1.1155
+    },
+    "trade_level": {
+     "n": 404,
+     "wr_pct": 65.35,
+     "mean_pct": 2.352,
+     "med_pct": 2.536,
+     "hold_med": 10.0,
+     "ann_trade_pct": 60.71
+    },
+    "trade_level_itemized20w": {
+     "n": 404,
+     "notional": 200000.0,
+     "mean_pct": 3.369,
+     "med_pct": 3.556,
+     "wr_pct": 70.54,
+     "fee_pp": 0.1656
+    },
+    "fill_tradability": {
+     "n": 404,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 0,
+     "examples": []
+    },
+    "n_entry_signals": 454,
+    "diag": {
+     "n_rej_limit_up": 0,
+     "n_rej_limit_down": 0,
+     "n_rej_suspended": 0,
+     "enforce": false,
+     "cost_model": "round_trip"
+    }
+   },
+   "A59 | itemized": {
+    "board": "主卖出（ob55 + 低价≥3元）",
+    "mode_label": "新 agent · 分项成本",
+    "portfolio": {
+     "n_trades": 191,
+     "ann_pct": 4.84,
+     "mdd_pct": -28.4,
+     "sharpe": 0.421,
+     "wr_pct": 63.87,
+     "mean_ret_pct": 1.54,
+     "final_nav": 1.6298
+    },
+    "trade_level": {
+     "n": 404,
+     "wr_pct": 65.35,
+     "mean_pct": 2.352,
+     "med_pct": 2.536,
+     "hold_med": 10.0,
+     "ann_trade_pct": 60.71
+    },
+    "trade_level_itemized20w": {
+     "n": 404,
+     "notional": 200000.0,
+     "mean_pct": 3.369,
+     "med_pct": 3.556,
+     "wr_pct": 70.54,
+     "fee_pp": 0.1656
+    },
+    "fill_tradability": {
+     "n": 404,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 0,
+     "examples": []
+    },
+    "n_entry_signals": 454,
+    "diag": {
+     "n_rej_limit_up": 0,
+     "n_rej_limit_down": 0,
+     "n_rej_suspended": 0,
+     "enforce": false,
+     "cost_model": "itemized"
+    }
+   },
+   "A59 | itemized_enf": {
+    "board": "主卖出（ob55 + 低价≥3元）",
+    "mode_label": "新 agent · 分项成本 + 强制成交日可成交性",
+    "portfolio": {
+     "n_trades": 191,
+     "ann_pct": 4.84,
+     "mdd_pct": -28.4,
+     "sharpe": 0.421,
+     "wr_pct": 63.87,
+     "mean_ret_pct": 1.54,
+     "final_nav": 1.6298
+    },
+    "trade_level": {
+     "n": 404,
+     "wr_pct": 65.35,
+     "mean_pct": 2.352,
+     "med_pct": 2.536,
+     "hold_med": 10.0,
+     "ann_trade_pct": 60.71
+    },
+    "trade_level_itemized20w": {
+     "n": 404,
+     "notional": 200000.0,
+     "mean_pct": 3.369,
+     "med_pct": 3.556,
+     "wr_pct": 70.54,
+     "fee_pp": 0.1656
+    },
+    "fill_tradability": {
+     "n": 404,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 0,
+     "examples": []
+    },
+    "n_entry_signals": 454,
+    "diag": {
+     "n_rej_limit_up": 0,
+     "n_rej_limit_down": 0,
+     "n_rej_suspended": 0,
+     "enforce": true,
+     "cost_model": "itemized"
+    }
+   },
+   "C50 | orig_cost": {
+    "board": "参考（ob50 + 低价≥3元）",
+    "mode_label": "原口径复现（往返 1.15% · 不判可成交性）",
+    "portfolio": {
+     "n_trades": 210,
+     "ann_pct": 2.35,
+     "mdd_pct": -24.47,
+     "sharpe": 0.253,
+     "wr_pct": 56.19,
+     "mean_ret_pct": 0.668,
+     "final_nav": 1.2707
+    },
+    "trade_level": {
+     "n": 405,
+     "wr_pct": 63.21,
+     "mean_pct": 2.051,
+     "med_pct": 2.046,
+     "hold_med": 8.0,
+     "ann_trade_pct": 75.14
+    },
+    "trade_level_itemized20w": {
+     "n": 405,
+     "notional": 200000.0,
+     "mean_pct": 3.065,
+     "med_pct": 3.061,
+     "wr_pct": 69.14,
+     "fee_pp": 0.1652
+    },
+    "fill_tradability": {
+     "n": 405,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 0,
+     "examples": []
+    },
+    "n_entry_signals": 454,
+    "diag": {
+     "n_rej_limit_up": 0,
+     "n_rej_limit_down": 0,
+     "n_rej_suspended": 0,
+     "enforce": false,
+     "cost_model": "round_trip"
+    }
+   },
+   "C50 | itemized": {
+    "board": "参考（ob50 + 低价≥3元）",
+    "mode_label": "新 agent · 分项成本",
+    "portfolio": {
+     "n_trades": 210,
+     "ann_pct": 6.55,
+     "mdd_pct": -22.36,
+     "sharpe": 0.582,
+     "wr_pct": 60.95,
+     "mean_ret_pct": 1.669,
+     "final_nav": 1.9254
+    },
+    "trade_level": {
+     "n": 405,
+     "wr_pct": 63.21,
+     "mean_pct": 2.051,
+     "med_pct": 2.046,
+     "hold_med": 8.0,
+     "ann_trade_pct": 75.14
+    },
+    "trade_level_itemized20w": {
+     "n": 405,
+     "notional": 200000.0,
+     "mean_pct": 3.065,
+     "med_pct": 3.061,
+     "wr_pct": 69.14,
+     "fee_pp": 0.1652
+    },
+    "fill_tradability": {
+     "n": 405,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 0,
+     "examples": []
+    },
+    "n_entry_signals": 454,
+    "diag": {
+     "n_rej_limit_up": 0,
+     "n_rej_limit_down": 0,
+     "n_rej_suspended": 0,
+     "enforce": false,
+     "cost_model": "itemized"
+    }
+   },
+   "C50 | itemized_enf": {
+    "board": "参考（ob50 + 低价≥3元）",
+    "mode_label": "新 agent · 分项成本 + 强制成交日可成交性",
+    "portfolio": {
+     "n_trades": 210,
+     "ann_pct": 6.55,
+     "mdd_pct": -22.36,
+     "sharpe": 0.582,
+     "wr_pct": 60.95,
+     "mean_ret_pct": 1.669,
+     "final_nav": 1.9254
+    },
+    "trade_level": {
+     "n": 405,
+     "wr_pct": 63.21,
+     "mean_pct": 2.051,
+     "med_pct": 2.046,
+     "hold_med": 8.0,
+     "ann_trade_pct": 75.14
+    },
+    "trade_level_itemized20w": {
+     "n": 405,
+     "notional": 200000.0,
+     "mean_pct": 3.065,
+     "med_pct": 3.061,
+     "wr_pct": 69.14,
+     "fee_pp": 0.1652
+    },
+    "fill_tradability": {
+     "n": 405,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 0,
+     "examples": []
+    },
+    "n_entry_signals": 454,
+    "diag": {
+     "n_rej_limit_up": 0,
+     "n_rej_limit_down": 0,
+     "n_rej_suspended": 0,
+     "enforce": true,
+     "cost_model": "itemized"
+    }
+   },
+   "B59s30 | orig_cost": {
+    "board": "已否决（ob55 + 30%止损）",
+    "mode_label": "原口径复现（往返 1.15% · 不判可成交性）",
+    "portfolio": {
+     "n_trades": 200,
+     "ann_pct": -0.77,
+     "mdd_pct": -33.27,
+     "sharpe": 0.005,
+     "wr_pct": 59.5,
+     "mean_ret_pct": 0.07,
+     "final_nav": 0.9234
+    },
+    "trade_level": {
+     "n": 404,
+     "wr_pct": 65.1,
+     "mean_pct": 1.875,
+     "med_pct": 2.448,
+     "hold_med": 9.5,
+     "ann_trade_pct": 49.19
+    },
+    "trade_level_itemized20w": {
+     "n": 404,
+     "notional": 200000.0,
+     "mean_pct": 2.887,
+     "med_pct": 3.466,
+     "wr_pct": 70.3,
+     "fee_pp": 0.165
+    },
+    "fill_tradability": {
+     "n": 404,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 1,
+     "examples": [
+      {
+       "sym": "sz002356",
+       "side": "sell",
+       "idx": 503,
+       "why": "一字跌停（open 7.29 触及跌停 7.29（含浮点容差带））卖不出"
+      }
+     ]
+    },
+    "n_entry_signals": 454,
+    "diag": {
+     "n_rej_limit_up": 0,
+     "n_rej_limit_down": 0,
+     "n_rej_suspended": 0,
+     "enforce": false,
+     "cost_model": "round_trip"
+    }
+   },
+   "B59s30 | itemized": {
+    "board": "已否决（ob55 + 30%止损）",
+    "mode_label": "新 agent · 分项成本",
+    "portfolio": {
+     "n_trades": 200,
+     "ann_pct": 3.12,
+     "mdd_pct": -25.09,
+     "sharpe": 0.308,
+     "wr_pct": 64.0,
+     "mean_ret_pct": 1.065,
+     "final_nav": 1.3734
+    },
+    "trade_level": {
+     "n": 404,
+     "wr_pct": 65.1,
+     "mean_pct": 1.875,
+     "med_pct": 2.448,
+     "hold_med": 9.5,
+     "ann_trade_pct": 49.19
+    },
+    "trade_level_itemized20w": {
+     "n": 404,
+     "notional": 200000.0,
+     "mean_pct": 2.887,
+     "med_pct": 3.466,
+     "wr_pct": 70.3,
+     "fee_pp": 0.165
+    },
+    "fill_tradability": {
+     "n": 404,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 1,
+     "examples": [
+      {
+       "sym": "sz002356",
+       "side": "sell",
+       "idx": 503,
+       "why": "一字跌停（open 7.29 触及跌停 7.29（含浮点容差带））卖不出"
+      }
+     ]
+    },
+    "n_entry_signals": 454,
+    "diag": {
+     "n_rej_limit_up": 0,
+     "n_rej_limit_down": 0,
+     "n_rej_suspended": 0,
+     "enforce": false,
+     "cost_model": "itemized"
+    }
+   },
+   "B59s30 | itemized_enf": {
+    "board": "已否决（ob55 + 30%止损）",
+    "mode_label": "新 agent · 分项成本 + 强制成交日可成交性",
+    "portfolio": {
+     "n_trades": 200,
+     "ann_pct": 3.22,
+     "mdd_pct": -25.09,
+     "sharpe": 0.315,
+     "wr_pct": 64.5,
+     "mean_ret_pct": 1.098,
+     "final_nav": 1.3872
+    },
+    "trade_level": {
+     "n": 404,
+     "wr_pct": 65.1,
+     "mean_pct": 1.875,
+     "med_pct": 2.448,
+     "hold_med": 9.5,
+     "ann_trade_pct": 49.19
+    },
+    "trade_level_itemized20w": {
+     "n": 404,
+     "notional": 200000.0,
+     "mean_pct": 2.887,
+     "med_pct": 3.466,
+     "wr_pct": 70.3,
+     "fee_pp": 0.165
+    },
+    "fill_tradability": {
+     "n": 404,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 1,
+     "examples": [
+      {
+       "sym": "sz002356",
+       "side": "sell",
+       "idx": 503,
+       "why": "一字跌停（open 7.29 触及跌停 7.29（含浮点容差带））卖不出"
+      }
+     ]
+    },
+    "n_entry_signals": 454,
+    "diag": {
+     "n_rej_limit_up": 0,
+     "n_rej_limit_down": 1,
+     "n_rej_suspended": 0,
+     "enforce": true,
+     "cost_model": "itemized"
+    }
+   }
+  },
+  "原口径（非科创/创业）": {
+   "A59 | orig_cost": {
+    "board": "主卖出（ob55 + 低价≥3元）",
+    "mode_label": "原口径复现（往返 1.15% · 不判可成交性）",
+    "portfolio": {
+     "n_trades": 206,
+     "ann_pct": 1.29,
+     "mdd_pct": -28.56,
+     "sharpe": 0.164,
+     "wr_pct": 56.8,
+     "mean_ret_pct": 0.567,
+     "final_nav": 1.1414
+    },
+    "trade_level": {
+     "n": 503,
+     "wr_pct": 63.42,
+     "mean_pct": 2.537,
+     "med_pct": 2.387,
+     "hold_med": 10.0,
+     "ann_trade_pct": 67.89
+    },
+    "trade_level_itemized20w": {
+     "n": 503,
+     "notional": 200000.0,
+     "mean_pct": 3.557,
+     "med_pct": 3.404,
+     "wr_pct": 68.39,
+     "fee_pp": 0.1657
+    },
+    "fill_tradability": {
+     "n": 503,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 0,
+     "examples": []
+    },
+    "n_entry_signals": 571,
+    "diag": {
+     "n_rej_limit_up": 0,
+     "n_rej_limit_down": 0,
+     "n_rej_suspended": 0,
+     "enforce": false,
+     "cost_model": "round_trip"
+    }
+   },
+   "A59 | itemized": {
+    "board": "主卖出（ob55 + 低价≥3元）",
+    "mode_label": "新 agent · 分项成本",
+    "portfolio": {
+     "n_trades": 206,
+     "ann_pct": 5.37,
+     "mdd_pct": -25.18,
+     "sharpe": 0.441,
+     "wr_pct": 60.19,
+     "mean_ret_pct": 1.566,
+     "final_nav": 1.7161
+    },
+    "trade_level": {
+     "n": 503,
+     "wr_pct": 63.42,
+     "mean_pct": 2.537,
+     "med_pct": 2.387,
+     "hold_med": 10.0,
+     "ann_trade_pct": 67.89
+    },
+    "trade_level_itemized20w": {
+     "n": 503,
+     "notional": 200000.0,
+     "mean_pct": 3.557,
+     "med_pct": 3.404,
+     "wr_pct": 68.39,
+     "fee_pp": 0.1657
+    },
+    "fill_tradability": {
+     "n": 503,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 0,
+     "examples": []
+    },
+    "n_entry_signals": 571,
+    "diag": {
+     "n_rej_limit_up": 0,
+     "n_rej_limit_down": 0,
+     "n_rej_suspended": 0,
+     "enforce": false,
+     "cost_model": "itemized"
+    }
+   },
+   "A59 | itemized_enf": {
+    "board": "主卖出（ob55 + 低价≥3元）",
+    "mode_label": "新 agent · 分项成本 + 强制成交日可成交性",
+    "portfolio": {
+     "n_trades": 206,
+     "ann_pct": 5.37,
+     "mdd_pct": -25.18,
+     "sharpe": 0.441,
+     "wr_pct": 60.19,
+     "mean_ret_pct": 1.566,
+     "final_nav": 1.7161
+    },
+    "trade_level": {
+     "n": 503,
+     "wr_pct": 63.42,
+     "mean_pct": 2.537,
+     "med_pct": 2.387,
+     "hold_med": 10.0,
+     "ann_trade_pct": 67.89
+    },
+    "trade_level_itemized20w": {
+     "n": 503,
+     "notional": 200000.0,
+     "mean_pct": 3.557,
+     "med_pct": 3.404,
+     "wr_pct": 68.39,
+     "fee_pp": 0.1657
+    },
+    "fill_tradability": {
+     "n": 503,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 0,
+     "examples": []
+    },
+    "n_entry_signals": 571,
+    "diag": {
+     "n_rej_limit_up": 0,
+     "n_rej_limit_down": 0,
+     "n_rej_suspended": 0,
+     "enforce": true,
+     "cost_model": "itemized"
+    }
+   },
+   "C50 | orig_cost": {
+    "board": "参考（ob50 + 低价≥3元）",
+    "mode_label": "原口径复现（往返 1.15% · 不判可成交性）",
+    "portfolio": {
+     "n_trades": 227,
+     "ann_pct": 2.98,
+     "mdd_pct": -24.41,
+     "sharpe": 0.292,
+     "wr_pct": 54.19,
+     "mean_ret_pct": 0.791,
+     "final_nav": 1.355
+    },
+    "trade_level": {
+     "n": 504,
+     "wr_pct": 61.71,
+     "mean_pct": 2.253,
+     "med_pct": 1.909,
+     "hold_med": 8.0,
+     "ann_trade_pct": 85.85
+    },
+    "trade_level_itemized20w": {
+     "n": 504,
+     "notional": 200000.0,
+     "mean_pct": 3.269,
+     "med_pct": 2.922,
+     "wr_pct": 67.46,
+     "fee_pp": 0.1653
+    },
+    "fill_tradability": {
+     "n": 504,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 0,
+     "examples": []
+    },
+    "n_entry_signals": 571,
+    "diag": {
+     "n_rej_limit_up": 0,
+     "n_rej_limit_down": 0,
+     "n_rej_suspended": 0,
+     "enforce": false,
+     "cost_model": "round_trip"
+    }
+   },
+   "C50 | itemized": {
+    "board": "参考（ob50 + 低价≥3元）",
+    "mode_label": "新 agent · 分项成本",
+    "portfolio": {
+     "n_trades": 227,
+     "ann_pct": 7.55,
+     "mdd_pct": -22.29,
+     "sharpe": 0.621,
+     "wr_pct": 58.15,
+     "mean_ret_pct": 1.792,
+     "final_nav": 2.1204
+    },
+    "trade_level": {
+     "n": 504,
+     "wr_pct": 61.71,
+     "mean_pct": 2.253,
+     "med_pct": 1.909,
+     "hold_med": 8.0,
+     "ann_trade_pct": 85.85
+    },
+    "trade_level_itemized20w": {
+     "n": 504,
+     "notional": 200000.0,
+     "mean_pct": 3.269,
+     "med_pct": 2.922,
+     "wr_pct": 67.46,
+     "fee_pp": 0.1653
+    },
+    "fill_tradability": {
+     "n": 504,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 0,
+     "examples": []
+    },
+    "n_entry_signals": 571,
+    "diag": {
+     "n_rej_limit_up": 0,
+     "n_rej_limit_down": 0,
+     "n_rej_suspended": 0,
+     "enforce": false,
+     "cost_model": "itemized"
+    }
+   },
+   "C50 | itemized_enf": {
+    "board": "参考（ob50 + 低价≥3元）",
+    "mode_label": "新 agent · 分项成本 + 强制成交日可成交性",
+    "portfolio": {
+     "n_trades": 227,
+     "ann_pct": 7.55,
+     "mdd_pct": -22.29,
+     "sharpe": 0.621,
+     "wr_pct": 58.15,
+     "mean_ret_pct": 1.792,
+     "final_nav": 2.1204
+    },
+    "trade_level": {
+     "n": 504,
+     "wr_pct": 61.71,
+     "mean_pct": 2.253,
+     "med_pct": 1.909,
+     "hold_med": 8.0,
+     "ann_trade_pct": 85.85
+    },
+    "trade_level_itemized20w": {
+     "n": 504,
+     "notional": 200000.0,
+     "mean_pct": 3.269,
+     "med_pct": 2.922,
+     "wr_pct": 67.46,
+     "fee_pp": 0.1653
+    },
+    "fill_tradability": {
+     "n": 504,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 0,
+     "examples": []
+    },
+    "n_entry_signals": 571,
+    "diag": {
+     "n_rej_limit_up": 0,
+     "n_rej_limit_down": 0,
+     "n_rej_suspended": 0,
+     "enforce": true,
+     "cost_model": "itemized"
+    }
+   },
+   "B59s30 | orig_cost": {
+    "board": "已否决（ob55 + 30%止损）",
+    "mode_label": "原口径复现（往返 1.15% · 不判可成交性）",
+    "portfolio": {
+     "n_trades": 219,
+     "ann_pct": -1.13,
+     "mdd_pct": -31.1,
+     "sharpe": -0.013,
+     "wr_pct": 57.08,
+     "mean_ret_pct": -0.003,
+     "final_nav": 0.8895
+    },
+    "trade_level": {
+     "n": 504,
+     "wr_pct": 63.29,
+     "mean_pct": 2.036,
+     "med_pct": 2.387,
+     "hold_med": 10.0,
+     "ann_trade_pct": 54.93
+    },
+    "trade_level_itemized20w": {
+     "n": 504,
+     "notional": 200000.0,
+     "mean_pct": 3.05,
+     "med_pct": 3.404,
+     "wr_pct": 68.25,
+     "fee_pp": 0.165
+    },
+    "fill_tradability": {
+     "n": 504,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 1,
+     "examples": [
+      {
+       "sym": "sz002356",
+       "side": "sell",
+       "idx": 503,
+       "why": "一字跌停（open 7.29 触及跌停 7.29（含浮点容差带））卖不出"
+      }
+     ]
+    },
+    "n_entry_signals": 571,
+    "diag": {
+     "n_rej_limit_up": 0,
+     "n_rej_limit_down": 0,
+     "n_rej_suspended": 0,
+     "enforce": false,
+     "cost_model": "round_trip"
+    }
+   },
+   "B59s30 | itemized": {
+    "board": "已否决（ob55 + 30%止损）",
+    "mode_label": "新 agent · 分项成本",
+    "portfolio": {
+     "n_trades": 219,
+     "ann_pct": 3.11,
+     "mdd_pct": -22.35,
+     "sharpe": 0.296,
+     "wr_pct": 61.19,
+     "mean_ret_pct": 0.991,
+     "final_nav": 1.3723
+    },
+    "trade_level": {
+     "n": 504,
+     "wr_pct": 63.29,
+     "mean_pct": 2.036,
+     "med_pct": 2.387,
+     "hold_med": 10.0,
+     "ann_trade_pct": 54.93
+    },
+    "trade_level_itemized20w": {
+     "n": 504,
+     "notional": 200000.0,
+     "mean_pct": 3.05,
+     "med_pct": 3.404,
+     "wr_pct": 68.25,
+     "fee_pp": 0.165
+    },
+    "fill_tradability": {
+     "n": 504,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 1,
+     "examples": [
+      {
+       "sym": "sz002356",
+       "side": "sell",
+       "idx": 503,
+       "why": "一字跌停（open 7.29 触及跌停 7.29（含浮点容差带））卖不出"
+      }
+     ]
+    },
+    "n_entry_signals": 571,
+    "diag": {
+     "n_rej_limit_up": 0,
+     "n_rej_limit_down": 0,
+     "n_rej_suspended": 0,
+     "enforce": false,
+     "cost_model": "itemized"
+    }
+   },
+   "B59s30 | itemized_enf": {
+    "board": "已否决（ob55 + 30%止损）",
+    "mode_label": "新 agent · 分项成本 + 强制成交日可成交性",
+    "portfolio": {
+     "n_trades": 219,
+     "ann_pct": 3.21,
+     "mdd_pct": -21.75,
+     "sharpe": 0.303,
+     "wr_pct": 61.64,
+     "mean_ret_pct": 1.021,
+     "final_nav": 1.3861
+    },
+    "trade_level": {
+     "n": 504,
+     "wr_pct": 63.29,
+     "mean_pct": 2.036,
+     "med_pct": 2.387,
+     "hold_med": 10.0,
+     "ann_trade_pct": 54.93
+    },
+    "trade_level_itemized20w": {
+     "n": 504,
+     "notional": 200000.0,
+     "mean_pct": 3.05,
+     "med_pct": 3.404,
+     "wr_pct": 68.25,
+     "fee_pp": 0.165
+    },
+    "fill_tradability": {
+     "n": 504,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 1,
+     "examples": [
+      {
+       "sym": "sz002356",
+       "side": "sell",
+       "idx": 503,
+       "why": "一字跌停（open 7.29 触及跌停 7.29（含浮点容差带））卖不出"
+      }
+     ]
+    },
+    "n_entry_signals": 571,
+    "diag": {
+     "n_rej_limit_up": 0,
+     "n_rej_limit_down": 1,
+     "n_rej_suspended": 0,
+     "enforce": true,
+     "cost_model": "itemized"
+    }
+   }
+  }
+ }
+}

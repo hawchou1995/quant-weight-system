@@ -1,0 +1,38 @@
+{
+ "_what": "C2：面板归档 + 指纹清单 + 303 差异根因取证（ADR-0004 §3.2）",
+ "generated_at": "2026-10-08 11:00:28",
+ "current_panel": {
+  "path": "D:\\Documents\\.pi-desktop\\data\\scratch\\a0987be1-2a3b-4f77-8ce0-239510c7156d\\panel\\panel.npz",
+  "exists": true,
+  "bytes": 171686411,
+  "sha256": "3a3a7a0c411dc00e6546a3272971e0a228da249f4a0e4c7ba144e0bde1cfe38e"
+ },
+ "anchor_panel": {
+  "sha256": "eac7327c98b9278b6f8cf91ff114c267e61211ddeba855dbce6d6e0a8fec90f7",
+  "note": "冻结基线（2026-09-22 构建，2606×3465）—— **未被持久化**，本机任何位置都不存在该文件；位级对拍永久不可复现"
+ },
+ "archived": {
+  "path": "D:\\Documents\\Quant data\\panel\\panel_20261008.npz",
+  "bytes": 171686411,
+  "sha256": "3a3a7a0c411dc00e6546a3272971e0a228da249f4a0e4c7ba144e0bde1cfe38e",
+  "match_current": true,
+  "in_git": false,
+  "note": "163.7 MB 不进 git；放在 D:\\Documents\\Quant data\\panel\\"
+ },
+ "rootcause": {
+  "status": "ok",
+  "n_common_dates": 2606,
+  "n_common_syms": 3379,
+  "n_valid_cells": 7503482,
+  "n_cells_differ": 104217,
+  "differ_rate": 0.013889,
+  "max_rel": 1.3646867275238037,
+  "mean_rel": 0.00021309294970706105,
+  "n_syms_with_diff": 143,
+  "cv_median_all": 0.0,
+  "cv_median_of_differing": 0.0017295454163104296,
+  "ratio_median_of_differing": 0.9994472861289978,
+  "kind": "cell-revision",
+  "interpretation": "两份面板在**共同 symbol × 共同日期**上逐格比对：差格 1.3889%（max rel 1.3647）。逐格内容修订：有差格的标的 A/B 比值**非**常数（CV 中位 0.00173）。⇒ 303 格 parity 差异的**地板来自面板内容本身已变**（非本次引擎改动）；具体类型见 kind 字段。"
+ }
+}

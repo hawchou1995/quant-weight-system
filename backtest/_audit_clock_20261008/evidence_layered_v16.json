@@ -1,0 +1,404 @@
+{
+ "_what": "① 短线分层在 fleur_absorb 上重算（**修正版**：入场同 bar 对齐）",
+ "generated_at": "2026-10-08 18:21:49",
+ "abolished": "旧 shortsplit_* 含未来函数，build_dual_system.py:899-901 判定作废",
+ "protocol": "15信号任一 ∧ RSI[i-1]<35 ∧ 熊市[i] → i 日开盘买；RSI[i-1]>ob → i 日开盘卖；低价≥3元",
+ "data_note": "data_full 前复权；**含存活偏差**（退市股已剔除）；本轮已修正移植 off-by-one（引擎成交日曾晚 1 个交易日）",
+ "excluded": "ETF/LOF/北交所/指数",
+ "universes": {
+  "纯主板": {
+   "n_symbols": 3461,
+   "rule": "见 docstring 四宇宙定义"
+  },
+  "纯创业板": {
+   "n_symbols": 1439,
+   "rule": "见 docstring 四宇宙定义"
+  },
+  "纯科创板": {
+   "n_symbols": 612,
+   "rule": "见 docstring 四宇宙定义"
+  },
+  "股票一体": {
+   "n_symbols": 5512,
+   "rule": "见 docstring 四宇宙定义"
+  }
+ },
+ "results": {
+  "纯主板": {
+   "A59": {
+    "board": "主卖出（ob55+低价≥3）",
+    "trade_level": {
+     "n": 404,
+     "wr_pct": 65.35,
+     "mean_pct": 2.352,
+     "med_pct": 2.536,
+     "hold_med": 10.0,
+     "ann_trade_pct": 60.71
+    },
+    "trade_level_itemized20w": {
+     "n": 404,
+     "notional": 200000.0,
+     "mean_pct": 3.369,
+     "med_pct": 3.556,
+     "wr_pct": 70.54,
+     "fee_pp": 0.1656
+    },
+    "fill_tradability": {
+     "n": 404,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 0,
+     "examples": []
+    },
+    "portfolio": {
+     "orig_cost": {
+      "n_trades": 191,
+      "ann_pct": 1.06,
+      "mdd_pct": -30.86,
+      "sharpe": 0.148,
+      "wr_pct": 60.21,
+      "mean_ret_pct": 0.541,
+      "final_nav": 1.1155
+     },
+     "itemized_enf": {
+      "n_trades": 191,
+      "ann_pct": 4.84,
+      "mdd_pct": -28.4,
+      "sharpe": 0.421,
+      "wr_pct": 63.87,
+      "mean_ret_pct": 1.54,
+      "final_nav": 1.6298
+     }
+    },
+    "n_entry_signals": 454
+   },
+   "C50": {
+    "board": "参考（ob50+低价≥3）",
+    "trade_level": {
+     "n": 405,
+     "wr_pct": 63.21,
+     "mean_pct": 2.051,
+     "med_pct": 2.046,
+     "hold_med": 8.0,
+     "ann_trade_pct": 75.14
+    },
+    "trade_level_itemized20w": {
+     "n": 405,
+     "notional": 200000.0,
+     "mean_pct": 3.065,
+     "med_pct": 3.061,
+     "wr_pct": 69.14,
+     "fee_pp": 0.1652
+    },
+    "fill_tradability": {
+     "n": 405,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 0,
+     "examples": []
+    },
+    "portfolio": {
+     "orig_cost": {
+      "n_trades": 210,
+      "ann_pct": 2.35,
+      "mdd_pct": -24.47,
+      "sharpe": 0.253,
+      "wr_pct": 56.19,
+      "mean_ret_pct": 0.668,
+      "final_nav": 1.2707
+     },
+     "itemized_enf": {
+      "n_trades": 210,
+      "ann_pct": 6.55,
+      "mdd_pct": -22.36,
+      "sharpe": 0.582,
+      "wr_pct": 60.95,
+      "mean_ret_pct": 1.669,
+      "final_nav": 1.9254
+     }
+    },
+    "n_entry_signals": 454
+   }
+  },
+  "纯创业板": {
+   "A59": {
+    "board": "主卖出（ob55+低价≥3）",
+    "trade_level": {
+     "n": 258,
+     "wr_pct": 60.85,
+     "mean_pct": 1.238,
+     "med_pct": 1.465,
+     "hold_med": 10.0,
+     "ann_trade_pct": 27.09
+    },
+    "trade_level_itemized20w": {
+     "n": 258,
+     "notional": 200000.0,
+     "mean_pct": 2.245,
+     "med_pct": 2.475,
+     "wr_pct": 66.67,
+     "fee_pp": 0.1632
+    },
+    "fill_tradability": {
+     "n": 258,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 0,
+     "examples": []
+    },
+    "portfolio": {
+     "orig_cost": {
+      "n_trades": 150,
+      "ann_pct": -1.85,
+      "mdd_pct": -53.76,
+      "sharpe": -0.044,
+      "wr_pct": 52.0,
+      "mean_ret_pct": -0.447,
+      "final_nav": 0.8248
+     },
+     "itemized_enf": {
+      "n_trades": 150,
+      "ann_pct": 1.0,
+      "mdd_pct": -50.83,
+      "sharpe": 0.145,
+      "wr_pct": 60.0,
+      "mean_ret_pct": 0.544,
+      "final_nav": 1.1087
+     }
+    },
+    "n_entry_signals": 279
+   },
+   "C50": {
+    "board": "参考（ob50+低价≥3）",
+    "trade_level": {
+     "n": 258,
+     "wr_pct": 54.26,
+     "mean_pct": 0.261,
+     "med_pct": 0.559,
+     "hold_med": 8.0,
+     "ann_trade_pct": 6.38
+    },
+    "trade_level_itemized20w": {
+     "n": 258,
+     "notional": 200000.0,
+     "mean_pct": 1.258,
+     "med_pct": 1.559,
+     "wr_pct": 60.85,
+     "fee_pp": 0.1619
+    },
+    "fill_tradability": {
+     "n": 258,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 0,
+     "examples": []
+    },
+    "portfolio": {
+     "orig_cost": {
+      "n_trades": 162,
+      "ann_pct": -2.66,
+      "mdd_pct": -53.55,
+      "sharpe": -0.114,
+      "wr_pct": 51.23,
+      "mean_ret_pct": -0.666,
+      "final_nav": 0.7569
+     },
+     "itemized_enf": {
+      "n_trades": 162,
+      "ann_pct": 0.39,
+      "mdd_pct": -50.32,
+      "sharpe": 0.102,
+      "wr_pct": 58.02,
+      "mean_ret_pct": 0.322,
+      "final_nav": 1.0412
+     }
+    },
+    "n_entry_signals": 279
+   }
+  },
+  "纯科创板": {
+   "A59": {
+    "board": "主卖出（ob55+低价≥3）",
+    "trade_level": {
+     "n": 96,
+     "wr_pct": 56.25,
+     "mean_pct": 0.118,
+     "med_pct": 1.712,
+     "hold_med": 10.0,
+     "ann_trade_pct": 1.93
+    },
+    "trade_level_itemized20w": {
+     "n": 96,
+     "notional": 200000.0,
+     "mean_pct": 1.112,
+     "med_pct": 2.721,
+     "wr_pct": 60.42,
+     "fee_pp": 0.1638
+    },
+    "fill_tradability": {
+     "n": 96,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 0,
+     "examples": []
+    },
+    "portfolio": {
+     "orig_cost": {
+      "n_trades": 75,
+      "ann_pct": -0.85,
+      "mdd_pct": -35.1,
+      "sharpe": -0.042,
+      "wr_pct": 54.67,
+      "mean_ret_pct": -0.354,
+      "final_nav": 0.9154
+     },
+     "itemized_enf": {
+      "n_trades": 75,
+      "ann_pct": 0.58,
+      "mdd_pct": -30.08,
+      "sharpe": 0.11,
+      "wr_pct": 58.67,
+      "mean_ret_pct": 0.636,
+      "final_nav": 1.0616
+     }
+    },
+    "n_entry_signals": 100
+   },
+   "C50": {
+    "board": "参考（ob50+低价≥3）",
+    "trade_level": {
+     "n": 96,
+     "wr_pct": 58.33,
+     "mean_pct": 0.574,
+     "med_pct": 1.506,
+     "hold_med": 8.0,
+     "ann_trade_pct": 14.07
+    },
+    "trade_level_itemized20w": {
+     "n": 96,
+     "notional": 200000.0,
+     "mean_pct": 1.572,
+     "med_pct": 2.514,
+     "wr_pct": 61.46,
+     "fee_pp": 0.1644
+    },
+    "fill_tradability": {
+     "n": 96,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 0,
+     "examples": []
+    },
+    "portfolio": {
+     "orig_cost": {
+      "n_trades": 82,
+      "ann_pct": 0.18,
+      "mdd_pct": -27.87,
+      "sharpe": 0.064,
+      "wr_pct": 57.32,
+      "mean_ret_pct": 0.249,
+      "final_nav": 1.0185
+     },
+     "itemized_enf": {
+      "n_trades": 82,
+      "ann_pct": 1.76,
+      "mdd_pct": -20.85,
+      "sharpe": 0.253,
+      "wr_pct": 59.76,
+      "mean_ret_pct": 1.244,
+      "final_nav": 1.1973
+     }
+    },
+    "n_entry_signals": 100
+   }
+  },
+  "股票一体": {
+   "A59": {
+    "board": "主卖出（ob55+低价≥3）",
+    "trade_level": {
+     "n": 758,
+     "wr_pct": 62.66,
+     "mean_pct": 1.69,
+     "med_pct": 2.05,
+     "hold_med": 10.0,
+     "ann_trade_pct": 38.54
+    },
+    "trade_level_itemized20w": {
+     "n": 758,
+     "notional": 200000.0,
+     "mean_pct": 2.701,
+     "med_pct": 3.064,
+     "wr_pct": 67.94,
+     "fee_pp": 0.1646
+    },
+    "fill_tradability": {
+     "n": 758,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 0,
+     "examples": []
+    },
+    "portfolio": {
+     "orig_cost": {
+      "n_trades": 250,
+      "ann_pct": -1.79,
+      "mdd_pct": -46.09,
+      "sharpe": -0.014,
+      "wr_pct": 54.4,
+      "mean_ret_pct": -0.1,
+      "final_nav": 0.8297
+     },
+     "itemized_enf": {
+      "n_trades": 250,
+      "ann_pct": 3.02,
+      "mdd_pct": -39.2,
+      "sharpe": 0.262,
+      "wr_pct": 59.6,
+      "mean_ret_pct": 0.893,
+      "final_nav": 1.3601
+     }
+    },
+    "n_entry_signals": 833
+   },
+   "C50": {
+    "board": "参考（ob50+低价≥3）",
+    "trade_level": {
+     "n": 759,
+     "wr_pct": 59.55,
+     "mean_pct": 1.255,
+     "med_pct": 1.586,
+     "hold_med": 8.0,
+     "ann_trade_pct": 37.54
+    },
+    "trade_level_itemized20w": {
+     "n": 759,
+     "notional": 200000.0,
+     "mean_pct": 2.262,
+     "med_pct": 2.596,
+     "wr_pct": 65.35,
+     "fee_pp": 0.164
+    },
+    "fill_tradability": {
+     "n": 759,
+     "n_buy_rejected": 0,
+     "n_sell_rejected": 0,
+     "examples": []
+    },
+    "portfolio": {
+     "orig_cost": {
+      "n_trades": 290,
+      "ann_pct": -5.2,
+      "mdd_pct": -63.42,
+      "sharpe": -0.22,
+      "wr_pct": 49.66,
+      "mean_ret_pct": -0.739,
+      "final_nav": 0.5758
+     },
+     "itemized_enf": {
+      "n_trades": 290,
+      "ann_pct": 0.19,
+      "mdd_pct": -57.79,
+      "sharpe": 0.1,
+      "wr_pct": 54.48,
+      "mean_ret_pct": 0.247,
+      "final_nav": 1.0197
+     }
+    },
+    "n_entry_signals": 833
+   }
+  }
+ }
+}
