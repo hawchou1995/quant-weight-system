@@ -1,9 +1,9 @@
 {
-  "run_id": "38713766465",
-  "sha": "e64efce2341cb086b34b24cd952e701ec937209d",
+  "run_id": "38735814381",
+  "sha": "ef2c763a5df6d0ac14fb06acf1089c2b471d898b",
   "mode": "chain",
   "status": "published-candidate",
-  "ts_cn": "2026-10-15 19:17:55",
+  "ts_cn": "2026-10-15 22:31:48",
   "today_cn": "2026-10-15",
   "chain_rc": 0,
   "g2_fresh": true,
@@ -20,8 +20,8 @@
   "files": [
     {
       "name": "dual_system.html",
-      "md5": "476e59ae0852",
-      "bytes": 3669236,
+      "md5": "218a5f7ed1b4",
+      "bytes": 3670507,
       "as_of": "2026-10-15"
     },
     {
@@ -50,7 +50,7 @@
     },
     {
       "name": "review_log.html",
-      "md5": "a2fd9c0f4e0b",
+      "md5": "a12957ccbdc0",
       "bytes": 46468,
       "as_of": null
     },
@@ -68,25 +68,25 @@
     },
     {
       "name": "short_signals.js",
-      "md5": "2ca6cd373ea8",
-      "bytes": 1799209,
+      "md5": "39c02bfe04d5",
+      "bytes": 1799231,
       "as_of": "2026-10-15"
     },
     {
       "name": "enhanced_data.js",
-      "md5": "51451b1a3d0c",
-      "bytes": 382725,
+      "md5": "d04f2b80860b",
+      "bytes": 382707,
       "as_of": "2026-10-15"
     },
     {
       "name": "a5_pool.js",
-      "md5": "384b01c40c78",
+      "md5": "1c490f26377e",
       "bytes": 22809,
       "as_of": "2026-10-15"
     },
     {
       "name": "market_breadth.js",
-      "md5": "58ddee2b5c06",
+      "md5": "dbc60085de94",
       "bytes": 1302,
       "as_of": "2026-10-15"
     },
@@ -98,20 +98,20 @@
     },
     {
       "name": "sentinel_pool.js",
-      "md5": "1b26739f2022",
+      "md5": "197f72570683",
       "bytes": 31800,
       "as_of": "2026-10-15"
     },
     {
       "name": "sentinel_track.js",
-      "md5": "330a77c2523b",
+      "md5": "7e9cbcbf7108",
       "bytes": 2676,
       "as_of": "2026-10-15"
     },
     {
       "name": "index.html",
-      "md5": "476e59ae0852",
-      "bytes": 3669236,
+      "md5": "218a5f7ed1b4",
+      "bytes": 3670507,
       "as_of": "2026-10-15"
     }
   ],
