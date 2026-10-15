@@ -1,10 +1,10 @@
 {
-  "run_id": "38543188388",
-  "sha": "6cb8142726aa05d80d66e6793ff3ae188c12bbff",
+  "run_id": "38713766465",
+  "sha": "e64efce2341cb086b34b24cd952e701ec937209d",
   "mode": "chain",
   "status": "published-candidate",
-  "ts_cn": "2026-10-14 19:00:08",
-  "today_cn": "2026-10-14",
+  "ts_cn": "2026-10-15 19:17:55",
+  "today_cn": "2026-10-15",
   "chain_rc": 0,
   "g2_fresh": true,
   "runtime_deps": [
@@ -20,9 +20,9 @@
   "files": [
     {
       "name": "dual_system.html",
-      "md5": "492d79af164f",
-      "bytes": 2669993,
-      "as_of": "2026-10-14"
+      "md5": "476e59ae0852",
+      "bytes": 3669236,
+      "as_of": "2026-10-15"
     },
     {
       "name": "short_v3_fund_slip20_summary.json",
@@ -50,7 +50,7 @@
     },
     {
       "name": "review_log.html",
-      "md5": "770dbd2c4a3d",
+      "md5": "a2fd9c0f4e0b",
       "bytes": 46468,
       "as_of": null
     },
@@ -68,27 +68,27 @@
     },
     {
       "name": "short_signals.js",
-      "md5": "ef118f450f93",
-      "bytes": 1789894,
-      "as_of": "2026-10-14"
+      "md5": "2ca6cd373ea8",
+      "bytes": 1799209,
+      "as_of": "2026-10-15"
     },
     {
       "name": "enhanced_data.js",
-      "md5": "39f0418b5bd1",
-      "bytes": 401727,
-      "as_of": "2026-10-14"
+      "md5": "51451b1a3d0c",
+      "bytes": 382725,
+      "as_of": "2026-10-15"
     },
     {
       "name": "a5_pool.js",
-      "md5": "0a713ca9d4b5",
-      "bytes": 22961,
-      "as_of": "2026-10-14"
+      "md5": "384b01c40c78",
+      "bytes": 22809,
+      "as_of": "2026-10-15"
     },
     {
       "name": "market_breadth.js",
-      "md5": "788c98a62507",
-      "bytes": 1307,
-      "as_of": "2026-10-14"
+      "md5": "58ddee2b5c06",
+      "bytes": 1302,
+      "as_of": "2026-10-15"
     },
     {
       "name": "market_weather.js",
@@ -98,21 +98,21 @@
     },
     {
       "name": "sentinel_pool.js",
-      "md5": "ea5b8008bcc9",
+      "md5": "1b26739f2022",
       "bytes": 31800,
-      "as_of": "2026-10-14"
+      "as_of": "2026-10-15"
     },
     {
       "name": "sentinel_track.js",
-      "md5": "1b5985d09922",
+      "md5": "330a77c2523b",
       "bytes": 2676,
-      "as_of": "2026-10-14"
+      "as_of": "2026-10-15"
     },
     {
       "name": "index.html",
-      "md5": "492d79af164f",
-      "bytes": 2669993,
-      "as_of": "2026-10-14"
+      "md5": "476e59ae0852",
+      "bytes": 3669236,
+      "as_of": "2026-10-15"
     }
   ],
   "hpdk_fresh": {
@@ -120,5 +120,5 @@
     "backtest/hpdk_paper.json": "ok",
     "backtest/hpdk_oos_view.json": "ok"
   },
-  "hpdk_expect": "2026-10-14"
+  "hpdk_expect": "2026-10-15"
 }
