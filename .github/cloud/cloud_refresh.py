@@ -87,6 +87,14 @@ G2_FILES = ("enhanced_data.js", "short_signals.js", "a5_pool.js", "market_breadt
 HTML_ASOF_RE = re.compile(r'数据截至\s*(\d{4}-\d{2}-\d{2})')
 # G2b 容差：checkout/写盘抖动是毫秒级；真实「未重建」是小时级（09-30 实测差 12.8h）。
 G2_MTIME_TOL_S = 300
+RETIRED_SHORT_KEYS = ("st-hpdk", "st-a5")
+
+
+def check_retired_short_views(html: str) -> None:
+    attrs = set(re.findall(r"\b(?:data-sub|id)\s*=\s*[\"']([^\"']+)[\"']", html, re.IGNORECASE))
+    found = [key for key in RETIRED_SHORT_KEYS if key in attrs or f"sv-{key}" in attrs]
+    if found:
+        raise ValueError("retired short-board UI returned: " + ", ".join(found))
 
 CHAIN_FLAGS = ["--skip-deploy", "--skip-fullguard",
                "--no-main-push", "--skip-gushi"]
@@ -312,6 +320,15 @@ def main() -> int:
         emit(publish="false", status="structure-fail", live_url=LIVE_BASE)
         return 2
     log(f"✅ G1 结构门禁：{len(deps)} 个运行期 <script src> 全在清单内（{'、'.join(deps)}）")
+
+    # ---------- 2b 退役短线入口防回归（硬门） ----------
+    try:
+        check_retired_short_views((REPO / HTML).read_text(encoding="utf-8", errors="replace"))
+    except ValueError as e:
+        log(f"❌ 短线看板入口门禁不过 —— {e}；拒绝发布（rc 2）")
+        emit(publish="false", status="retired-short-ui-present", live_url=LIVE_BASE)
+        return 2
+    log("✅ 短线看板入口门禁：st-hpdk / st-a5 均未注册")
 
     # ---------- 3 G3 防回归（线上更新的同名文件不覆盖） ----------
     skipped_newer = []

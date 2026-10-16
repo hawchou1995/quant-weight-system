@@ -2879,17 +2879,12 @@ SENTINEL_FOOT = ("""<div class="sub" style="color:var(--faint)">"""
 
 SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
 {subnav("short", [("st-qlch", "超跌低开低吸"),
-                    ("st-hpdk", "缩量超跌"),
-                    ("st-a5", "A5 实验盘"),
                     ("st-fund", "基金轮动"), ("st-sentinel", "热榜哨兵")],
         default_key="st-qlch")}
 {subview("st-sentinel", "热榜哨兵", "jiandi top30 共振哨兵 · 只可否决 + 独立纸面收益",
   _sentinel_block() + _sentinel_track_card() + _sentinel_paper_card() + SENTINEL_CARD + SENTINEL_FOOT)}
 {subview("st-qlch", "超跌低开低吸", "当前投产组合：B4 分位滤网 + K3 槽位上限 + 全池",
          qlch_card() + watch_card("st-qlch", "超跌低开低吸", "qlch", note=WATCH_NOTE_QLCH))}
-{subview("st-hpdk", "缩量超跌", "只读自有候选、前向 OOS 与模拟盘；不改变策略口径",
-         hpdk_card() + hpdk_oos_card() + hpdk_paper_card() + hpdk_track_card() + HP_HPDK_BT)}
-{subview("st-a5", "A5 实验盘", "自有状态与观察池的只读投影", a5_current_card())}
 {subview("st-fund", "基金轮动", "2000 基金池 · 牛市分≥30 Top10 / 熊市分≥45 Top3", system_block(
   "view-short-fund", "sys-short-fund",
   "🔵 短线 · 基金轮动", "auto", "2000 基金池 · 牛市 S30 Top10 / 熊市 S45 Top3",
@@ -2904,7 +2899,7 @@ SHORT_VIEW_HTML = f'''<div class="view" id="view-short">
   tier_opts=["强买入", "买入", "不买"], tier_add=("强买入", "买入"), tier_watch=("不买",), tier_cut=(), inline=True)
   + _PAPER_CARDS.fund_rotation_card(BASE))}
 {ASSET_HINT}
-<!-- 短线独立子视图：超跌低开低吸、缩量超跌、基金轮动、热榜哨兵。KHunter 股票池仅下架展示；共享日更保留。 -->
+<!-- 短线独立子视图：超跌低开低吸、基金轮动、热榜哨兵。KHunter 股票池仅下架展示；共享日更保留。 -->
 <div class="pool-sec"><b>回测数据</b><span>短线池 · 按当前子标签分流（R-btshort-param-0924）</span></div>
 {BT_SHORT_SUB_BLOCKS}
 </div>'''
@@ -3275,7 +3270,7 @@ html = f"""<!doctype html>
 window.ENH.nav = [
   ["kxmm","","市场晴雨",[["kxmm-fg","恐贪指数"],["kxmm-heat","热力图"],["crowd-card","大盘拥挤度"],["mkt-weather","市场晴雨表"]]],
   ["sys-auto","","中长线池",[["sat-card","卫星目标持仓"],["sat-paper-b-card","多因子主仓 模拟盘"],["ret20-paper-card","动量增强模拟盘"],["fb3-pool-card","FB3 基金池"],["fund-paper-card","基金主仓模拟盘"]]],
-  ["short","","短线选股",[["qlch-card","🏷️ 超跌低开低吸"],["watch-card-st-qlch","👁 跟踪池 · 超跌低开低吸"],["hpdk-card","缩量超跌"],["card-a5-current","A5 实验盘"],["card-short-fund","基金轮动 汇总表"],["card-short-fund-detail","基金轮动逐标的详情"],["fund-rotation-paper-card","基金轮动模拟收益"],["watch-card-st-fund","👁 跟踪池 · 基金轮动"],["card-sentinel-pool","热榜哨兵选股池"],["card-sentinel-track","👁 跟踪池 · 热榜哨兵"],["card-sentinel-paper","热榜哨兵纸面收益"]]],
+  ["short","","短线选股",[["qlch-card","🏷️ 超跌低开低吸"],["watch-card-st-qlch","👁 跟踪池 · 超跌低开低吸"],["card-short-fund","基金轮动 汇总表"],["card-short-fund-detail","基金轮动逐标的详情"],["fund-rotation-paper-card","基金轮动模拟收益"],["watch-card-st-fund","👁 跟踪池 · 基金轮动"],["card-sentinel-pool","热榜哨兵选股池"],["card-sentinel-track","👁 跟踪池 · 热榜哨兵"],["card-sentinel-paper","热榜哨兵纸面收益"]]],
   ["qingju","","社区讨论",[],"https://qingju.me/"]
 ];
 /* 视图切换模式：滚动不更新导航高亮（COMMON_JS renderSidenav 检测此标志） */

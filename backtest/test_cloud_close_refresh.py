@@ -123,14 +123,20 @@ class CloudContractTests(unittest.TestCase):
         self.assertIn("a5_pool.js", CLOUD.G2_FILES)
         self.assertIn("market_breadth.js", CLOUD.G2_FILES)
 
-    def test_breadth_generation_precedes_html_and_hpdk_is_visible(self):
+    def test_breadth_generation_precedes_html_and_retired_views_are_absent(self):
         chain = (ROOT / "daily_refresh.py").read_text(encoding="utf-8")
-        self.assertLess(chain.index('["build_market_breadth.py"'), chain.index('["build_dual_system.py"'))
+        self.assertLess(chain.index('["build_market_breadth.py"'), chain.index('["build_dual_system.py"]'))
         src = (ROOT / "build_dual_system.py").read_text(encoding="utf-8")
         view = src[src.index("SHORT_VIEW_HTML ="):src.index("def qlch_live_payload")]
-        self.assertIn('("st-hpdk", "缩量超跌")', view)
-        self.assertIn('subview("st-hpdk"', view)
-        self.assertIn("hpdk_card() + hpdk_oos_card()", view)
+        for key, label in (("st-hpdk", "缩量超跌"), ("st-a5", "A5 实验盘")):
+            self.assertNotIn(f'("{key}", "{label}")', view)
+            self.assertNotIn(f'subview("{key}"', view)
+        nav_start = src.index("window.ENH.nav = [")
+        nav_end = src.index("];", nav_start)
+        nav = src[nav_start:nav_end]
+        self.assertNotIn('["hpdk-card","缩量超跌"]', nav)
+        self.assertNotIn('["card-a5-current","A5 实验盘"]', nav)
+        self.assertIn("def hpdk_card()", src)
 
     def test_timeout_stops_descendant_writes(self):
         with tempfile.TemporaryDirectory() as td:
@@ -206,12 +212,29 @@ class ProductionViewTests(unittest.TestCase):
         self.assertIn('id="card-a5-current"', html)
         self.assertEqual(html.count("<div"), html.count("</div>"))
 
-    def test_a5_tab_and_dropdown_are_wired(self):
+    def test_retired_short_strategy_views_are_not_registered(self):
         src = (ROOT / "build_dual_system.py").read_text(encoding="utf-8")
         view = src[src.index("SHORT_VIEW_HTML ="):src.index("def qlch_live_payload")]
-        self.assertIn('("st-a5", "A5 实验盘")', view)
-        self.assertIn('subview("st-a5"', view)
-        self.assertIn('["card-a5-current","A5 实验盘"]', src)
+        for key, label in (("st-hpdk", "缩量超跌"), ("st-a5", "A5 实验盘")):
+            self.assertNotIn(f'("{key}", "{label}")', view)
+            self.assertNotIn(f'subview("{key}"', view)
+        nav_start = src.index("window.ENH.nav = [")
+        nav_end = src.index("];", nav_start)
+        nav = src[nav_start:nav_end]
+        self.assertNotIn('"hpdk-card","缩量超跌"', nav)
+        self.assertNotIn('"card-a5-current","A5 实验盘"', nav)
+
+    def test_cloud_retired_view_guard_fails_closed(self):
+        cloud_source = (ROOT / ".github/cloud/cloud_refresh.py").read_text(encoding="utf-8")
+        guard_at = cloud_source.index("check_retired_short_views((REPO / HTML)")
+        stage_at = cloud_source.index("# ---------- 5 组装 staging")
+        self.assertLess(guard_at, stage_at)
+        self.assertIn('emit(publish="false", status="retired-short-ui-present"', cloud_source)
+        clean = '<button data-sub="st-qlch"></button><div id="sv-st-qlch"></div>'
+        CLOUD.check_retired_short_views(clean)
+        stale = '<button data-sub="st-hpdk"></button><section id="sv-st-a5"></section>'
+        with self.assertRaisesRegex(ValueError, "st-hpdk, st-a5"):
+            CLOUD.check_retired_short_views(stale)
 
     def test_closed_breadth_view_does_not_mix_stale_live_pools(self):
         program = r'''
