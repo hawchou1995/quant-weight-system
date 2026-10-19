@@ -72,9 +72,8 @@ SYNC = [
     # 2026-09-25：热榜哨兵经稳健性复测（B1–B8 通过）装回看板
     "sentinel_pool.js", "sentinel_track.js",
 ]
-# [软] 发布项：由 daily_refresh.py 的 [软] 步产出 → 一并发布，但**不进 G1 硬存在门**。
-# 理由同 _deploy_fundline_0911.py：新策略偶发失败不得阻断整条云端发布。
-SYNC_SOFT = ["sentinel_pool.js", "sentinel_track.js"]   # [软]：热榜哨兵（复测通过后装回）
+# 热榜哨兵池现承载生产筛选口径，必须进入 G1；独立跟踪账本仍为可选软产物。
+SYNC_SOFT = ["sentinel_track.js"]
 # 看板 HTML：dual_system.html 为准，index.html 由本脚本复制（与本地部署同口径）
 HTML = "dual_system.html"
 
@@ -88,6 +87,14 @@ HTML_ASOF_RE = re.compile(r'数据截至\s*(\d{4}-\d{2}-\d{2})')
 # G2b 容差：checkout/写盘抖动是毫秒级；真实「未重建」是小时级（09-30 实测差 12.8h）。
 G2_MTIME_TOL_S = 300
 RETIRED_SHORT_KEYS = ("st-hpdk", "st-a5")
+SENTINEL_FILTER_VERSION = "name-snapshot-st-star-delist-union/v1"
+SENTINEL_FILTER_SOURCE = "data_full_names.json"
+SENTINEL_FILTER_SNAPSHOT_AS_OF = "2026-08-17"
+SENTINEL_FILTER_RULES = {
+    "plain_ST": "normalised name startswith 'ST' and not startswith '*ST'",
+    "star_ST": "normalised name startswith '*ST'",
+    "delist_proxy": "normalised name contains '退'",
+}
 
 
 def check_retired_short_views(html: str) -> None:
@@ -95,6 +102,61 @@ def check_retired_short_views(html: str) -> None:
     found = [key for key in RETIRED_SHORT_KEYS if key in attrs or f"sv-{key}" in attrs]
     if found:
         raise ValueError("retired short-board UI returned: " + ", ".join(found))
+
+def check_sentinel_filter_contract(pool_text: str, html: str) -> dict:
+    """Reject cloud staging unless the published pool and visible UI attest the filter."""
+    match = re.match(r"\s*window\.SENTINEL_POOL\s*=\s*(\{.*\})\s*;\s*$", pool_text, re.DOTALL)
+    if not match:
+        raise ValueError("sentinel_pool.js has no parseable SENTINEL_POOL assignment")
+    try:
+        pool = json.loads(match.group(1))
+    except Exception as exc:
+        raise ValueError("sentinel_pool.js JSON is invalid: %s" % type(exc).__name__) from exc
+
+    meta = pool.get("classification_filter") if isinstance(pool, dict) else None
+    if not isinstance(meta, dict):
+        raise ValueError("sentinel_pool.js lacks classification_filter metadata")
+    expected = {
+        "version": SENTINEL_FILTER_VERSION,
+        "source": SENTINEL_FILTER_SOURCE,
+        "source_snapshot_as_of": SENTINEL_FILTER_SNAPSHOT_AS_OF,
+        "point_in_time": False,
+        "applied_before_signal_count": True,
+        "unclassified_name_count": 0,
+    }
+    mismatched = [key for key, value in expected.items() if meta.get(key) != value]
+    if mismatched:
+        raise ValueError("sentinel classification metadata mismatch: " + ", ".join(mismatched))
+    if meta.get("rules") != SENTINEL_FILTER_RULES:
+        raise ValueError("sentinel classification rules differ from the approved three-class union")
+    if not re.fullmatch(r"[0-9a-f]{64}", str(meta.get("source_sha256", ""))):
+        raise ValueError("sentinel name snapshot SHA-256 is missing or invalid")
+
+    note = str(meta.get("display_note", ""))
+    required_note = ("普通 ST、*ST、当前名称含‘退’", "共振计数前过滤",
+                     "data_full_names.json", "2026-08-17", "非历史点时状态")
+    missing_note = [part for part in required_note if part not in note or part not in html]
+    if missing_note:
+        raise ValueError("sentinel filter disclosure missing from pool/UI: " + ", ".join(missing_note))
+    if "sentinel-name-filter-note" not in html or \
+            ('data-name-filter-version="%s"' % SENTINEL_FILTER_VERSION) not in html:
+        raise ValueError("sentinel filter disclosure is not rendered in the pool card")
+
+    rows = list(pool.get("pool") or [])
+    rows.extend((pool.get("last_trigger_pool") or {}).get("entries") or [])
+    rows.extend((pool.get("details") or {}).values())
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        name = "".join(str(row.get("name") or "").split()).replace("＊", "*")
+        is_star = name.startswith("*ST")
+        is_plain = name.startswith("ST") and not is_star
+        is_delist = "退" in name
+        if is_star or is_plain or is_delist:
+            raise ValueError("sentinel pool contains filtered name: %s %s" %
+                             (row.get("code", ""), row.get("name", "")))
+    return pool
+
 
 CHAIN_FLAGS = ["--skip-deploy", "--skip-fullguard",
                "--no-main-push", "--skip-gushi"]
@@ -329,6 +391,18 @@ def main() -> int:
         emit(publish="false", status="retired-short-ui-present", live_url=LIVE_BASE)
         return 2
     log("✅ 短线看板入口门禁：st-hpdk / st-a5 均未注册")
+
+    # ---------- 2c 热榜哨兵三类名称过滤契约（硬门） ----------
+    try:
+        check_sentinel_filter_contract(
+            (REPO / "sentinel_pool.js").read_text(encoding="utf-8", errors="replace"),
+            (REPO / HTML).read_text(encoding="utf-8", errors="replace"),
+        )
+    except (OSError, ValueError) as e:
+        log(f"❌ 热榜哨兵过滤门禁不过 —— {e}；拒绝发布（rc 2）")
+        emit(publish="false", status="sentinel-filter-contract-fail", live_url=LIVE_BASE)
+        return 2
+    log("✅ 热榜哨兵过滤门禁：池/页面均披露 ST、*ST、名称含‘退’快照过滤及非点时限制")
 
     # ---------- 3 G3 防回归（线上更新的同名文件不覆盖） ----------
     skipped_newer = []

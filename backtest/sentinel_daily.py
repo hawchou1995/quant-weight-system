@@ -61,7 +61,21 @@ THR_A3 = {0: 55, 1: 65, 2: 65}
 SUBS = [("rushi", "入市"), ("jihui", "机会"), ("jiandi", "见底"),
         ("kuaixian", "穿20"), ("laiLin", "穿25"), ("deng", "穿30")]
 SKIP_PREFIX = ("sh5", "sz1", "bj")
-UNIVERSE_LABEL = "沪深主板（sh60/sz00/sz002）· len(df)>=400 · 排除 sh5/sz1/bj"
+NAME_FILTER_VERSION = "name-snapshot-st-star-delist-union/v1"
+NAME_SNAPSHOT_AS_OF = "2026-08-17"
+NAME_FILTER_SOURCE = "data_full_names.json"
+NAME_FILTER_NOTE = (
+    "普通 ST、*ST、当前名称含‘退’已在共振计数前过滤；标签源 data_full_names.json "
+    "（名称快照截至 2026-08-17），非历史点时状态。"
+)
+NAME_FILTER_RULES = {
+    "plain_ST": "normalised name startswith 'ST' and not startswith '*ST'",
+    "star_ST": "normalised name startswith '*ST'",
+    "delist_proxy": "normalised name contains '退'",
+}
+
+UNIVERSE_LABEL = ("沪深主板（sh60/sz00/sz002）· len(df)>=400 · 排除 sh5/sz1/bj · "
+                  "名称快照排除普通 ST/*ST/含‘退’代理（非点时）")
 ENTRY_LABEL = "K>=2 共振 且当日共振家数 θ>=30；T 收盘确认 → T+1 开盘买（本脚本不下单）"
 EXIT_LABEL = "RSI(14) 域 55/65/65（熊 55 / 非熊 65），兜底满 5 日；次日开盘卖"
 
@@ -112,6 +126,43 @@ def load_names() -> dict:
         except Exception:
             return {}
     return {}
+
+
+def normalize_stock_name(name: str) -> str:
+    """名称快照归一化：移除全部空白，并将全角星号映射为半角星号。"""
+    return "".join(str(name or "").split()).replace("＊", "*")
+
+
+def stock_name_exclusion_rules(name: str) -> frozenset[str]:
+    """按批准的当前名称快照定义返回命中的 ST / *ST / 退市名称代理规则。"""
+    normalized = normalize_stock_name(name)
+    rules = set()
+    if normalized.startswith("*ST"):
+        rules.add("star_ST")
+    if normalized.startswith("ST") and not normalized.startswith("*ST"):
+        rules.add("plain_ST")
+    if "退" in normalized:
+        rules.add("delist_proxy")
+    return frozenset(rules)
+
+
+def name_filter_payload(scan: dict) -> dict:
+    """可见地披露筛选依据，并防止把名称快照误读成历史点时状态。"""
+    stats = scan["name_filter_stats"]
+    return dict(
+        version=NAME_FILTER_VERSION,
+        source=NAME_FILTER_SOURCE,
+        source_snapshot_as_of=NAME_SNAPSHOT_AS_OF,
+        source_sha256=scan["name_snapshot_sha256"],
+        point_in_time=False,
+        applied_before_signal_count=True,
+        normalization="remove all whitespace; map full-width ＊ to *",
+        rules=dict(NAME_FILTER_RULES),
+        excluded_by_rule=dict(stats["excluded_by_rule"]),
+        excluded_union=int(stats["excluded_union"]),
+        unclassified_name_count=int(stats["unclassified_name_count"]),
+        display_note=NAME_FILTER_NOTE,
+    )
 
 
 def build_regime(idx: pd.DataFrame) -> dict:
@@ -165,8 +216,17 @@ def assert_no_bj(obj, where: str):
 
 
 # ---------------- 扫描（真值） ----------------
-def do_scan(data_dir: Path, as_of_ts: pd.Timestamp, log) -> dict:
-    """data_full 直读全市场，算「见底共振」日频家数与候选（主板口径）。"""
+def do_scan(data_dir: Path, as_of_ts: pd.Timestamp, log, names=None) -> dict:
+    """名称快照过滤先于信号、共振计数、Theta 触发日和候选池生成。"""
+    names = names if names is not None else load_names()
+    if not isinstance(names, dict) or not names:
+        raise SystemExit("[sentinel] ERR: data_full_names.json 缺失、为空或无法解析；为避免未过滤发布而中止")
+    try:
+        snapshot_raw = NAMES_JSON.read_bytes()
+    except OSError:
+        snapshot_raw = json.dumps(names, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    name_snapshot_sha256 = hashlib.sha256(snapshot_raw).hexdigest()
+
     idx = pd.read_csv(IDX_CSV, dtype={"date": str})
     idx["date"] = pd.to_datetime(idx["date"])
     idx = idx.sort_values("date").reset_index(drop=True)
@@ -182,13 +242,25 @@ def do_scan(data_dir: Path, as_of_ts: pd.Timestamp, log) -> dict:
     cal_pos = {d: i for i, d in enumerate(cal)}
 
     cache, skipped_short, skipped_pref = {}, 0, 0
+    excluded_codes = set()
+    excluded_by_rule = {key: 0 for key in NAME_FILTER_RULES}
+    unclassified_name_count = 0
     for p in sorted(data_dir.glob("*.csv")):
-        c = p.stem
-        if c.startswith(SKIP_PREFIX):
+        code = p.stem
+        if code.startswith(SKIP_PREFIX):
             skipped_pref += 1
             continue
-        if JG.board_of(c) != "main":
+        if JG.board_of(code) != "main":
             continue
+
+        name = str(names.get(code) or "")
+        matched_rules = stock_name_exclusion_rules(name)
+        if matched_rules:
+            excluded_codes.add(code)
+            for rule in matched_rules:
+                excluded_by_rule[rule] += 1
+            continue
+
         try:
             df = pd.read_csv(p, dtype={"date": str})
         except Exception:
@@ -196,11 +268,23 @@ def do_scan(data_dir: Path, as_of_ts: pd.Timestamp, log) -> dict:
         if len(df) < MIN_ROWS:
             skipped_short += 1
             continue
+        if not normalize_stock_name(name):
+            unclassified_name_count += 1
         df["date"] = pd.to_datetime(df["date"])
         df = df.set_index("date").sort_index()
-        cache[c] = df
-    log("宇宙 %d 只（主板 · len>=%d；跳过 len<%d: %d；前缀剔除: %d）"
+        cache[code] = df
+
+    name_filter_stats = dict(excluded_by_rule=excluded_by_rule,
+                             excluded_union=len(excluded_codes),
+                             unclassified_name_count=unclassified_name_count)
+    log("名称快照过滤先于信号计算：排除并集 %d 只（普通 ST=%d / *ST=%d / 含‘退’=%d；未分类名称=%d）"
+        % (len(excluded_codes), excluded_by_rule["plain_ST"], excluded_by_rule["star_ST"],
+           excluded_by_rule["delist_proxy"], unclassified_name_count))
+    log("过滤后宇宙 %d 只（主板 · len>=%d；跳过 len<%d: %d；前缀剔除: %d）"
         % (len(cache), MIN_ROWS, MIN_ROWS, skipped_short, skipped_pref))
+    if unclassified_name_count:
+        raise SystemExit("[sentinel] ERR: %d 个可入池主板代码缺名称快照标签；未能完成三类过滤，拒绝计算信号/Theta/候选池"
+                         % unclassified_name_count)
     n_with_bar = sum(1 for df in cache.values() if last_cal in df.index)
 
     res_daily = defaultdict(int)
@@ -239,7 +323,14 @@ def do_scan(data_dir: Path, as_of_ts: pd.Timestamp, log) -> dict:
     return dict(idx=idx, reg_map=reg_map, cal=cal, last_cal=last_cal, cache=cache,
                 res_daily=res_daily, cands=cands, n_bad=n_bad,
                 n_universe=len(cache), n_with_bar=n_with_bar,
-                skipped_short=skipped_short, skipped_pref=skipped_pref)
+                skipped_short=skipped_short, skipped_pref=skipped_pref,
+                name_snapshot_sha256=name_snapshot_sha256,
+                name_filter_stats=name_filter_stats)
+
+
+def trigger_dates(res_daily, threshold: int = THETA):
+    """过滤后的共振家数才可进入 Theta 触发日判定。"""
+    return sorted(day for day, count in res_daily.items() if count >= threshold)
 
 
 def replay_one(scan: dict, cand: dict):
@@ -482,19 +573,23 @@ def main(argv=None) -> int:
     as_of_ts = pd.Timestamp(req)
     log("data_dir=%s | --date=%s | index 末行=%s" % (data_dir, req, idx_last))
 
-    scan = do_scan(data_dir, as_of_ts, log)
+    names = load_names()
+    if not names:
+        print("[sentinel] ERR: %s 缺失、为空或无法解析；为避免未过滤发布而中止" % NAMES_JSON)
+        return 2
+    scan = do_scan(data_dir, as_of_ts, log, names=names)
     cal, res_daily, last_cal = scan["cal"], scan["res_daily"], scan["last_cal"]
+    filter_meta = name_filter_payload(scan)
     if as_of_ts != last_cal:
         log("WARN: --date=%s 不是可交易日（或超出数据）→ 回落到最近交易日 %s" % (req, last_cal.date()))
     as_of = str(last_cal.date())
 
-    trig = sorted([d for d, v in res_daily.items() if v >= THETA])
+    trig = trigger_dates(res_daily)
     is_trigger = last_cal in set(trig)
     res_asof = int(res_daily.get(last_cal, 0))
     reason = ("trigger_day" if is_trigger else
               ("no_resonance_day" if res_asof == 0 else "resonance_below_threshold"))
 
-    names = load_names()
     pool = pool_entries(scan, last_cal, names) if is_trigger else []
     last_tgt = trig[-1] if trig else None
     last_tgt_res = int(res_daily.get(last_tgt, 0)) if last_tgt else 0
@@ -521,14 +616,16 @@ def main(argv=None) -> int:
 
     # ================= 1) sentinel_pool.js =================
     reason_text = (
-        "%s 全市场（主板 %d 只 · 当日有行情 %d 只）见底共振 ≥2 分项家数 = %d < θ%d → 非触发日，当日选股池为空"
+        "%s 名称快照过滤后全市场（主板 %d 只 · 当日有行情 %d 只）见底共振 ≥2 分项家数 = %d < θ%d → 非触发日，当日选股池为空"
         % (as_of, scan["n_universe"], scan["n_with_bar"], res_asof, THETA)) if not is_trigger else (
-        "%s 触发日：共振 %d 家 ≥ θ%d → 当日选股池共 %d 只" % (as_of, res_asof, THETA, len(pool)))
+        "%s 名称快照过滤后触发日：共振 %d 家 ≥ θ%d → 当日选股池共 %d 只"
+        % (as_of, res_asof, THETA, len(pool)))
 
     pool_obj = dict(
         schema="sentinel_pool/v1", strategy=STRATEGY, strategy_key=STRATEGY_KEY,
         rule_version=RULE_VERSION, as_of=as_of, built_at=now_stamp(),
         generated_by="backtest/sentinel_daily.py",
+        classification_filter=filter_meta,
         triggered=bool(is_trigger), is_trigger=bool(is_trigger),
         reason=reason, reason_text=reason_text,
         as_of_resonance=res_asof, threshold=THETA, is_resonance_day=bool(res_asof > 0),
@@ -567,7 +664,8 @@ def main(argv=None) -> int:
                         shadow_start=SHADOW_START),
         caveats=["本池为规则清单，不含下单执行（入场 T+1 开盘）；价格仅用于显示与历史重放",
                  "共享缓存不重建；缓存末行 ≠ data_full 末行时一律以 data_full 为准",
-                 "空池 ≠ 失败：共振 0 家属正常交易日（θ=30 属低频触发，回测期 88 个触发日 / 约 10 年）"])
+                 "空池 ≠ 失败：共振 0 家属正常交易日（θ=30 属低频触发，回测期 88 个触发日 / 约 10 年）",
+                 NAME_FILTER_NOTE])
     assert_no_bj(pool_obj, "sentinel_pool.js")
     pool_obj["content_sha256"] = content_hash(pool_obj)
     n_pool_bytes, pool_sha = write_js(POOL_JS, "SENTINEL_POOL", pool_obj, args.dry_run)

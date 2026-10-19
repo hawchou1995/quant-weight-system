@@ -2677,6 +2677,10 @@ def _sentinel_block(pool_js="sentinel_pool.js", track_js="sentinel_track.js",
                '<span class="badge badge-auto">主板 sh60/sz00 · T 收盘确认 → T+1 开盘买</span> '
                '<span class="badge badge-auto">影子只读 · 只可否决 · 不构成通过性证据</span></div>' % _e(thr))
     out.append('<div class="sub" style="color:var(--faint)">%s</div>' % _e((pool or {}).get("reason_text") or ""))
+    filter_meta = (pool or {}).get("classification_filter") or {}
+    filter_note = filter_meta.get("display_note") or "名称筛选状态未验证。"
+    out.append('<div class="sub sentinel-name-filter-note" data-name-filter-version="%s"><b>名称过滤：</b>%s</div>'
+               % (_e(filter_meta.get("version") or "missing"), _e(filter_note)))
     if ent:
         cnt_opts = sorted({str(e.get("cnt")) for e in ent if e.get("cnt") is not None}, reverse=True)
         out.append('<div class="toolbar">'

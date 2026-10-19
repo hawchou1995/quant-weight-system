@@ -138,6 +138,58 @@ class CloudContractTests(unittest.TestCase):
         self.assertNotIn('["card-a5-current","A5 实验盘"]', nav)
         self.assertIn("def hpdk_card()", src)
 
+    def test_cloud_probe_assembles_filtered_pool_and_both_dashboard_mirrors(self):
+        import json
+
+        with tempfile.TemporaryDirectory() as td:
+            repo = Path(td) / "repo"
+            repo.mkdir()
+            stage = repo / "_cloud_dist"
+            note = ("普通 ST、*ST、当前名称含‘退’已在共振计数前过滤；标签源 "
+                    "data_full_names.json（名称快照截至 2026-08-17），非历史点时状态。")
+            payload = {
+                "as_of": DAY, "pool": [], "last_trigger_pool": {"entries": []}, "details": {},
+                "classification_filter": {
+                    "version": CLOUD.SENTINEL_FILTER_VERSION,
+                    "source": CLOUD.SENTINEL_FILTER_SOURCE,
+                    "source_snapshot_as_of": CLOUD.SENTINEL_FILTER_SNAPSHOT_AS_OF,
+                    "source_sha256": "b" * 64, "point_in_time": False,
+                    "applied_before_signal_count": True,
+                    "unclassified_name_count": 0,
+                    "rules": dict(CLOUD.SENTINEL_FILTER_RULES), "display_note": note,
+                },
+            }
+            for name in CLOUD.SYNC:
+                path = repo / name
+                if name == "sentinel_pool.js":
+                    content = "window.SENTINEL_POOL = " + json.dumps(payload, ensure_ascii=False) + ";"
+                else:
+                    content = json.dumps({"as_of": DAY})
+                path.write_text(content, encoding="utf-8")
+            html = ('<title>标的监控看板（数据截至 %s）</title>'
+                    '<script src="enhanced_data.js"></script>'
+                    '<div class="sub sentinel-name-filter-note" data-name-filter-version="%s">%s</div>'
+                    % (DAY, CLOUD.SENTINEL_FILTER_VERSION, note))
+            (repo / CLOUD.HTML).write_text(html, encoding="utf-8")
+            (repo / "index_000300.csv").write_text("date,close\n%s,100\n" % DAY, encoding="utf-8")
+            argv = ["cloud_refresh.py", "--mode", "probe", "--expect-as-of", DAY, "--no-live-check"]
+            with (mock.patch.object(CLOUD, "REPO", repo),
+                  mock.patch.object(CLOUD, "STAGING", stage),
+                  mock.patch.object(CLOUD, "today_cn", return_value=DAY),
+                  mock.patch.object(CLOUD, "latest_closed_weekday", return_value=DAY),
+                  mock.patch.object(CLOUD, "CHAIN_RC", None),
+                  mock.patch.object(sys, "argv", argv),
+                  contextlib.redirect_stdout(io.StringIO())):
+                self.assertEqual(CLOUD.main(), 0)
+            self.assertTrue((stage / "sentinel_pool.js").is_file())
+            self.assertTrue((stage / "dual_system.html").is_file())
+            self.assertTrue((stage / "index.html").is_file())
+            self.assertEqual((stage / "dual_system.html").read_bytes(), (stage / "index.html").read_bytes())
+            manifest = json.loads((stage / "_cloud_manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["status"], "published-candidate")
+            self.assertTrue({"sentinel_pool.js", "dual_system.html", "index.html"}.issubset(
+                {item["name"] for item in manifest["files"]}))
+
     def test_timeout_stops_descendant_writes(self):
         with tempfile.TemporaryDirectory() as td:
             heartbeat = Path(td) / "heartbeat.txt"
@@ -235,6 +287,72 @@ class ProductionViewTests(unittest.TestCase):
         stale = '<button data-sub="st-hpdk"></button><section id="sv-st-a5"></section>'
         with self.assertRaisesRegex(ValueError, "st-hpdk, st-a5"):
             CLOUD.check_retired_short_views(stale)
+
+    def test_sentinel_pool_is_hard_synced_and_filter_gate_precedes_staging(self):
+        cloud_source = (ROOT / ".github/cloud/cloud_refresh.py").read_text(encoding="utf-8")
+        self.assertIn("sentinel_pool.js", CLOUD.SYNC)
+        self.assertNotIn("sentinel_pool.js", CLOUD.SYNC_SOFT)
+        self.assertIn("sentinel_track.js", CLOUD.SYNC_SOFT)
+        guard_at = cloud_source.index("check_sentinel_filter_contract(\n            (REPO / \"sentinel_pool.js\")")
+        stage_at = cloud_source.index("# ---------- 5 组装 staging")
+        self.assertLess(guard_at, stage_at)
+
+    def test_sentinel_filter_gate_accepts_clean_pool_and_rejects_stale_or_leaking_pool(self):
+        import copy
+        import json
+
+        note = ("普通 ST、*ST、当前名称含‘退’已在共振计数前过滤；标签源 "
+                "data_full_names.json（名称快照截至 2026-08-17），非历史点时状态。")
+        payload = {
+            "as_of": DAY,
+            "classification_filter": {
+                "version": CLOUD.SENTINEL_FILTER_VERSION,
+                "source": CLOUD.SENTINEL_FILTER_SOURCE,
+                "source_snapshot_as_of": CLOUD.SENTINEL_FILTER_SNAPSHOT_AS_OF,
+                "source_sha256": "a" * 64,
+                "point_in_time": False,
+                "applied_before_signal_count": True,
+                "unclassified_name_count": 0,
+                "rules": dict(CLOUD.SENTINEL_FILTER_RULES),
+                "display_note": note,
+            },
+            "pool": [{"code": "sz000001", "name": "平安银行"}],
+            "last_trigger_pool": {"entries": []},
+            "details": {"sz000001": {"code": "sz000001", "name": "平安银行"}},
+        }
+        html = ('<div class="sub sentinel-name-filter-note" '
+                'data-name-filter-version="%s">%s</div>'
+                % (CLOUD.SENTINEL_FILTER_VERSION, note))
+        text = "window.SENTINEL_POOL = " + json.dumps(payload, ensure_ascii=False) + ";"
+        self.assertEqual(CLOUD.check_sentinel_filter_contract(text, html)["as_of"], DAY)
+
+        stale = copy.deepcopy(payload)
+        stale["classification_filter"]["point_in_time"] = True
+        with self.assertRaisesRegex(ValueError, "point_in_time"):
+            CLOUD.check_sentinel_filter_contract(
+                "window.SENTINEL_POOL = " + json.dumps(stale, ensure_ascii=False) + ";", html)
+
+        unknown = copy.deepcopy(payload)
+        unknown["classification_filter"]["unclassified_name_count"] = 1
+        with self.assertRaisesRegex(ValueError, "unclassified_name_count"):
+            CLOUD.check_sentinel_filter_contract(
+                "window.SENTINEL_POOL = " + json.dumps(unknown, ensure_ascii=False) + ";", html)
+
+        leaking = copy.deepcopy(payload)
+        leaking["pool"].append({"code": "sh603021", "name": "＊ ST华鹏"})
+        with self.assertRaisesRegex(ValueError, "contains filtered name"):
+            CLOUD.check_sentinel_filter_contract(
+                "window.SENTINEL_POOL = " + json.dumps(leaking, ensure_ascii=False) + ";", html)
+
+    def test_checked_in_sentinel_pool_and_dashboard_match_filter_contract(self):
+        pool_text = (ROOT / "sentinel_pool.js").read_text(encoding="utf-8")
+        dual = (ROOT / "dual_system.html").read_text(encoding="utf-8")
+        index_bytes = (ROOT / "index.html").read_bytes()
+        self.assertEqual((ROOT / "dual_system.html").read_bytes(), index_bytes)
+        payload = CLOUD.check_sentinel_filter_contract(pool_text, dual)
+        self.assertGreater(payload["classification_filter"]["excluded_union"], 0)
+        self.assertIn("sentinel-name-filter-note", dual)
+        self.assertIn(payload["classification_filter"]["display_note"], dual)
 
     def test_closed_breadth_view_does_not_mix_stale_live_pools(self):
         program = r'''
